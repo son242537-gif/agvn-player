@@ -847,7 +847,7 @@ public class FileManagerFragment extends Fragment {
             File iconDest = new File(iconDir64, displayName + ".png");
             boolean iconExtracted = ExeIconExtractor.extractIcon(file, iconDest);
 
-            File iconsDir = new File(Environment.getExternalStorageDirectory(), "Winlator/icons");
+            File iconsDir = new File(SettingsFragment.DEFAULT_WINLATOR_PATH, "icons");
             if (!iconsDir.exists()) iconsDir.mkdirs();
             if (iconExtracted) {
                 File userIcon = new File(iconsDir, displayName + ".png");
@@ -858,7 +858,7 @@ public class FileManagerFragment extends Fragment {
                 }
             }
 
-            File coversDir = new File(Environment.getExternalStorageDirectory(), "Winlator/covers");
+            File coversDir = new File(SettingsFragment.DEFAULT_WINLATOR_PATH, "covers");
             if (!coversDir.exists()) coversDir.mkdirs();
             File autoCover = new File(coversDir, displayName + ".png");
             if (autoCover.exists()) autoCover.delete();

@@ -446,7 +446,7 @@ public class ShortcutsFragment extends Fragment {
     }
 
     private File getImagesDir(boolean isCover) {
-        File targetDir = new File(Environment.getExternalStorageDirectory(), isCover ? "Winlator/covers" : "Winlator/icons");
+        File targetDir = new File(SettingsFragment.DEFAULT_WINLATOR_PATH, isCover ? "covers" : "icons");
         if (!targetDir.exists()) targetDir.mkdirs();
         
         File nomedia = new File(targetDir, ".nomedia");
@@ -457,7 +457,7 @@ public class ShortcutsFragment extends Fragment {
     }
 
     private File getBannerDir() {
-        File targetDir = new File(Environment.getExternalStorageDirectory(), "Winlator/banners");
+        File targetDir = new File(SettingsFragment.DEFAULT_WINLATOR_PATH, "banners");
         if (!targetDir.exists()) targetDir.mkdirs();
         File nomedia = new File(targetDir, ".nomedia");
         if (!nomedia.exists()) {
@@ -858,7 +858,7 @@ public class ShortcutsFragment extends Fragment {
 
     private ArrayList<DynamicShortcutEntry> snapshotDynamicShortcuts() {
         ArrayList<DynamicShortcutEntry> snapshot = new ArrayList<>();
-        File winlatorDir = new File(Environment.getExternalStorageDirectory(), "Winlator");
+        File winlatorDir = new File(SettingsFragment.DEFAULT_WINLATOR_PATH);
         File iconDir = new File(winlatorDir, "icons");
         File coverDir = new File(winlatorDir, "covers");
         File bannerDir = new File(winlatorDir, "banners");

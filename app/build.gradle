@@ -20,25 +20,65 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose'
 }
 
+// AGVN pinned downloads: every large asset is checked against scripts/agvn/pins.txt.
+// -PagvnAssetCache=<dir> reuses verified copies from <dir> (offline rebuilds) and refreshes the cache after a download.
+def agvnPins = new Properties()
+rootProject.file("scripts/agvn/pins.txt").withInputStream { agvnPins.load(it) }
+def agvnAssetCache = project.findProperty("agvnAssetCache")
+
+def fileSHA256 = { File file ->
+    MessageDigest digest = MessageDigest.getInstance("SHA-256")
+    file.withInputStream { input ->
+        byte[] buffer = new byte[64 * 1024]
+        int read
+        while ((read = input.read(buffer)) != -1) digest.update(buffer, 0, read)
+    }
+    digest.digest().collect { String.format("%02x", ((int) it) & 0xff) }.join()
+}
+
+def pinnedAsset = { File target, String pinKey, Closure download ->
+    String expected = agvnPins.getProperty(pinKey)
+    if (!expected) throw new GradleException("Missing pin '" + pinKey + "' in scripts/agvn/pins.txt")
+    def isValid = { File f -> f.isFile() && fileSHA256(f).equalsIgnoreCase(expected) }
+    File cached = agvnAssetCache ? new File(agvnAssetCache.toString(), target.name) : null
+    if (isValid(target)) {
+        if (cached != null && !cached.isFile()) {
+            cached.parentFile.mkdirs()
+            cached.bytes = target.bytes
+        }
+        return
+    }
+    target.delete()
+    if (cached != null && isValid(cached)) {
+        println("Using cached ${target.name} from ${cached.parent}")
+        target.bytes = cached.bytes
+        return
+    }
+    println("${target.name} was not present or failed validation, downloading...\n")
+    download(target)
+    if (!isValid(target)) {
+        target.delete()
+        throw new GradleException("Downloaded ${target.name} failed SHA-256 validation (pin '${pinKey}')")
+    }
+    if (cached != null) {
+        cached.parentFile.mkdirs()
+        cached.bytes = target.bytes
+    }
+}
+
 tasks.register("downloadImageFS") {
     def assetDir = new File(project.rootDir, ["app","src","main","assets"].join(File.separator))
     File imageFS = new File(assetDir, "imagefs.tar.zst")
     int parts = 2
 
     doLast {
-        if (!imageFS.exists()) {
-            println("ImageFS was not present, downloading...\n")
-            FileOutputStream outputStream = new FileOutputStream(imageFS)
-            for (int i = 0; i < parts; i++) {
-                File partFile = new File(assetDir, String.format("imagefs.tar.zst.%02d", i))
-                String partURL = String.format("https://raw.githubusercontent.com/Other-backup/winlator-imagefs-v2/main/imagefs.tar.zst.%02d", i)
-                new URL(partURL).withInputStream { p ->
-                    partFile.withOutputStream { it << p }
-                    outputStream << partFile.bytes
+        pinnedAsset(imageFS, "imagefs_sha256") { File target ->
+            target.withOutputStream { outputStream ->
+                for (int i = 0; i < parts; i++) {
+                    String partURL = String.format("https://raw.githubusercontent.com/Other-backup/winlator-imagefs-v2/main/imagefs.tar.zst.%02d", i)
+                    new URL(partURL).withInputStream { p -> outputStream << p }
                 }
-                partFile.delete()
             }
-            outputStream.close()
         }
     }
 }
@@ -48,37 +88,12 @@ tasks.register("downloadProton") {
     File protonARM64EC = new File(assetDir, "proton-9.0-arm64ec.tar.zst")
     File staleProtonARM64EC = new File(assetDir, "proton-10.0-5-arm64ec.tar.zst")
     String protonURL = "https://github.com/Other-backup/winlator-imagefs-v2/releases/download/c/proton-9.0-arm64ec.tar.zst"
-    String protonSHA256 = "5f9375640479a5b2c4c3998fda689bb5085febc8fcdb7b6998c79d925392991a"
-    long protonSize = 73570637L
-
-    def fileSHA256 = { File file ->
-        MessageDigest digest = MessageDigest.getInstance("SHA-256")
-        file.withInputStream { input ->
-            byte[] buffer = new byte[64 * 1024]
-            int read
-            while ((read = input.read(buffer)) != -1) digest.update(buffer, 0, read)
-        }
-        digest.digest().collect { String.format("%02x", ((int) it) & 0xff) }.join()
-    }
 
     doLast {
         if (staleProtonARM64EC.exists()) staleProtonARM64EC.delete()
-
-        boolean valid = protonARM64EC.isFile()
-                && protonARM64EC.length() == protonSize
-                && fileSHA256(protonARM64EC).equalsIgnoreCase(protonSHA256)
-        if (!valid) {
-            if (protonARM64EC.exists()) protonARM64EC.delete()
-            println("Proton 9 ARM64EC was not present or failed validation, downloading...\n")
+        pinnedAsset(protonARM64EC, "proton_arm64ec_sha256") { File target ->
             new URL(protonURL).withInputStream { input ->
-                protonARM64EC.withOutputStream { output -> output << input }
-            }
-            valid = protonARM64EC.isFile()
-                    && protonARM64EC.length() == protonSize
-                    && fileSHA256(protonARM64EC).equalsIgnoreCase(protonSHA256)
-            if (!valid) {
-                protonARM64EC.delete()
-                throw new GradleException("Downloaded Proton 9 ARM64EC archive failed size/SHA-256 validation")
+                target.withOutputStream { output -> output << input }
             }
         }
     }
@@ -87,6 +102,19 @@ tasks.register("downloadProton") {
 tasks.register("prepareKotlinBuildScriptModel"){}
 downloadProton.dependsOn(downloadImageFS)
 preBuild.dependsOn(downloadProton)
+
+File agvnKeystorePropsFile = System.getenv("AGVN_KEYSTORE_PROPS") ?
+        new File(System.getenv("AGVN_KEYSTORE_PROPS")) : rootProject.file("keystore.properties")
+boolean agvnRequireReleaseSigning = project.findProperty("agvnRequireReleaseSigning")?.toString() == "true"
+
+gradle.taskGraph.whenReady { graph ->
+    boolean release = graph.allTasks.any { it.project == project && it.name.toLowerCase().contains("release") }
+    if (!release || agvnKeystorePropsFile.isFile()) return
+    String msg = "Không tìm thấy keystore.properties (" + agvnKeystorePropsFile + "). " +
+            "Bản release sẽ ký bằng khóa debug, KHÔNG dùng để phát hành cho khách."
+    if (agvnRequireReleaseSigning) throw new GradleException(msg + " Đặt AGVN_KEYSTORE_PROPS hoặc tạo keystore.properties rồi build lại.")
+    logger.warn("AGVN: " + msg)
+}
 
 android {
     namespace 'com.winlator.cmod'
@@ -99,13 +127,15 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.winlator.cmod"
+        // AGVN identity block: package name and version (AGVN_VERSION_CODE / AGVN_VERSION_NAME in
+        // gradle.properties; environment variables of the same name win, for CI).
+        applicationId "com.agvn.player"
         minSdkVersion 28
         // We’re preserving Winlator’s request to keep targetSdkVersion at 28
         targetSdkVersion 28
 
-        versionCode 20
-        versionName "4.1"
+        versionCode((System.getenv("AGVN_VERSION_CODE") ?: project.property("AGVN_VERSION_CODE")).toString().toInteger())
+        versionName((System.getenv("AGVN_VERSION_NAME") ?: project.property("AGVN_VERSION_NAME")).toString())
 
         // External native build from Winlator
         externalNativeBuild {
@@ -132,6 +162,23 @@ android {
         freeCompilerArgs += ['-opt-in=androidx.compose.material3.ExperimentalMaterial3Api']
     }
 
+    // AGVN release signing: the maintainer keeps keystore.properties (storeFile, storePassword, keyAlias,
+    // keyPassword) outside git; AGVN_KEYSTORE_PROPS may point to it. Without it the release APK is
+    // debug-signed (cloud/test builds); -PagvnRequireReleaseSigning=true turns that into a hard error.
+    signingConfigs {
+        release {
+            File propsFile = agvnKeystorePropsFile
+            if (propsFile.isFile()) {
+                def props = new Properties()
+                propsFile.withInputStream { props.load(it) }
+                storeFile file(props.getProperty("storeFile"))
+                storePassword props.getProperty("storePassword")
+                keyAlias props.getProperty("keyAlias")
+                keyPassword props.getProperty("keyPassword")
+            }
+        }
+    }
+
     // Keep Winlator’s buildTypes
     buildTypes {
         debug {
@@ -139,7 +186,7 @@ android {
         }
         release {
             minifyEnabled false
-            signingConfig signingConfigs.debug
+            signingConfig agvnKeystorePropsFile.isFile() ? signingConfigs.release : signingConfigs.debug
             crunchPngs false
         }
     }
