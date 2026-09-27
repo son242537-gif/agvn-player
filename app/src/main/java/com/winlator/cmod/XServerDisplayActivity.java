@@ -893,6 +893,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
     private void exit() {
         if (!exiting.compareAndSet(false, true)) return;
+        if (agvnSessionGuard != null) agvnSessionGuard.destroy();
         NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID);
         boolean removeLoadingBar = PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("remove_loading_bar_when_booting_games", false);
@@ -957,6 +958,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             winlatorLogcatLogger = null;
         }
         if (taskManagerSidebar != null) taskManagerSidebar.stop();
+        if (agvnSessionGuard != null) agvnSessionGuard.destroy();
         super.onDestroy();
     }
 
@@ -2438,7 +2440,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private void extractGraphicsDriverFiles() {
         String requestedDriverId = graphicsDriverConfig.get("version");
         String adrenoToolsDriverId = com.winlator.cmod.agvn.DriverSafety.resolveUsable(this, requestedDriverId);
-        if (!adrenoToolsDriverId.equals(requestedDriverId)) {
+        if (!adrenoToolsDriverId.equalsIgnoreCase(requestedDriverId)) {
             Log.w("AGVN", "fallback " + requestedDriverId + " -> " + adrenoToolsDriverId);
             graphicsDriverConfig.put("version", adrenoToolsDriverId);
             String from = requestedDriverId, to = adrenoToolsDriverId;

@@ -122,6 +122,7 @@ public class ContainerSectionFragment extends Fragment {
         rendererDriverLabels.add("System");
         rendererDriverIds.add("system");
         for (String id : adrenotoolsManager.enumarateInstalledDrivers()) {
+            if (!com.winlator.cmod.agvn.DriverSafety.isPickable(requireContext(), id)) continue;
             String label = adrenotoolsManager.getDriverName(id) + " " + adrenotoolsManager.getDriverVersion(id);
             rendererDriverLabels.add(label.trim());
             rendererDriverIds.add(id);

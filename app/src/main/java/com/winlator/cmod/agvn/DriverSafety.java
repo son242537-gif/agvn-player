@@ -82,12 +82,14 @@ public final class DriverSafety {
         SharedPreferences prefs = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         String key = driverName + "@" + appVersionCode(ctx);
         String state = prefs.getString(key, null);
-        String myMarker = "probing:" + android.os.Process.myPid();
         if ("ok".equals(state)) return true;
         if ("bad".equals(state)) return false;
+        int failures = previousFailures(state);
+        String myMarker = "probing:" + android.os.Process.myPid() + ":" + failures;
         if (state != null && state.startsWith("probing:") && !state.equals(myMarker)) {
-            Log.w(TAG, "driver probe for " + driverName + " crashed last time, marking unusable");
-            prefs.edit().putString(key, "bad").commit();
+            // the process died inside the probe last time (native crash, or killed while probing)
+            Log.w(TAG, "driver probe for " + driverName + " did not finish last time");
+            prefs.edit().putString(key, failedState(failures)).commit();
             return false;
         }
         prefs.edit().putString(key, myMarker).commit();
@@ -98,17 +100,39 @@ public final class DriverSafety {
             Log.w(TAG, "driver probe for " + driverName + " failed", e);
             ok = false;
         }
-        prefs.edit().putString(key, ok ? "ok" : "bad").commit();
+        prefs.edit().putString(key, ok ? "ok" : failedState(failures)).commit();
         return ok;
     }
 
-    /** Returns {@code id} when usable, else Turnip (bundled wrapper), else System. */
+    /** Failures recorded so far: "bad1" = 1, "probing:<pid>:<n>" = n, anything else = 0. */
+    static int previousFailures(String state) {
+        if ("bad1".equals(state)) return 1;
+        if (state != null && state.startsWith("probing:")) {
+            int colon = state.lastIndexOf(':');
+            try {
+                return colon > 8 ? Integer.parseInt(state.substring(colon + 1)) : 0;
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        }
+        return 0;
+    }
+
+    /** A driver is written off only after its second failed probe; one failure is retried next time. */
+    static String failedState(int previousFailures) {
+        return previousFailures + 1 >= 2 ? "bad" : "bad1";
+    }
+
+    /**
+     * Returns {@code id} when usable, else Turnip (bundled wrapper), else System. When nothing probes as usable,
+     * System is the last resort unless it is denylisted for this GPU (no 3D on Adreno 8xx); then Turnip.
+     */
     public static String resolveUsable(Context ctx, String id) {
         if (isUsable(ctx, id)) return SYSTEM.equalsIgnoreCase(id) ? SYSTEM : id;
         for (String candidate : Arrays.asList(DefaultVersion.WRAPPER_ADRENO, SYSTEM)) {
             if (!candidate.equalsIgnoreCase(id) && isUsable(ctx, candidate)) return candidate;
         }
-        return SYSTEM;
+        return isDenylisted(ctx, SYSTEM) ? DefaultVersion.WRAPPER_ADRENO : SYSTEM;
     }
 
     public static void forgetProbes(Context ctx) {

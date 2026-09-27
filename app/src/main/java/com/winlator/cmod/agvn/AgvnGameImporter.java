@@ -114,7 +114,8 @@ public final class AgvnGameImporter {
         shortcut.putExtra("simTouchScreen", p.isSimulatedTouchscreen() ? "1" : "0");
         shortcut.putExtra(EXTRA_PROFILE_PATH, profileCopy.getAbsolutePath());
         shortcut.putExtra(EXTRA_GAME_DIR, c.gameDir.getAbsolutePath());
-        shortcut.putExtra(EXTRA_TEXTURE_POOL, String.valueOf(eff.texturePool));
+        boolean unreal = c.engine == GameExeResolver.Engine.UNREAL;
+        shortcut.putExtra(EXTRA_TEXTURE_POOL, String.valueOf(unreal ? eff.texturePool : 0));
         shortcut.putExtra(EXTRA_ENGINE, c.engine.name());
     }
 
