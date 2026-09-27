@@ -228,7 +228,7 @@ internal suspend fun loadSettingsCatalog(
     val driverOptions = linkedMapOf<String, DriverOption>()
 
     context.resources.getStringArray(R.array.wrapper_graphics_driver_version_entries).forEach { version ->
-        if (version.equals("System", ignoreCase = true) || GPUInformation.isDriverSupported(version, context)) {
+        if (com.winlator.cmod.agvn.DriverSafety.isPickable(context, version)) {
             driverOptions[version.lowercase()] = DriverOption(version, version, true)
         }
     }

@@ -1,0 +1,7 @@
+[
+  {
+    "gpu": "Adreno \\(TM\\) 8\\d\\d",
+    "hide": ["System", "v863"],
+    "why": "Adreno 830 field test: System renders no 3D, bundled Qualcomm v863.1 crashes at launch; Turnip works"
+  }
+]

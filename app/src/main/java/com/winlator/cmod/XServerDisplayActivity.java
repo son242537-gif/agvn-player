@@ -2432,7 +2432,14 @@ public class XServerDisplayActivity extends AppCompatActivity {
     }
 
     private void extractGraphicsDriverFiles() {
-        String adrenoToolsDriverId = graphicsDriverConfig.get("version");
+        String requestedDriverId = graphicsDriverConfig.get("version");
+        String adrenoToolsDriverId = com.winlator.cmod.agvn.DriverSafety.resolveUsable(this, requestedDriverId);
+        if (!adrenoToolsDriverId.equals(requestedDriverId)) {
+            Log.w("AGVN", "fallback " + requestedDriverId + " -> " + adrenoToolsDriverId);
+            graphicsDriverConfig.put("version", adrenoToolsDriverId);
+            String from = requestedDriverId, to = adrenoToolsDriverId;
+            runOnUiThread(() -> Toast.makeText(this, getString(R.string.agvn_driver_fallback, from, to), Toast.LENGTH_LONG).show());
+        }
 
         Log.d("GraphicsDriverExtraction", "Adrenotools DriverID: " + adrenoToolsDriverId);
 
@@ -2477,7 +2484,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         }
 
         String vulkanVersion = graphicsDriverConfig.get("vulkanVersion");
-        String vulkanVersionPatch = GPUInformation.getVulkanVersion(adrenoToolsDriverId, this).split("\\.")[2];
+        int vulkanVersionPatch = com.winlator.cmod.agvn.DriverSafety.parseVulkanPatch(GPUInformation.getVulkanVersion(adrenoToolsDriverId, this));
         vulkanVersion = vulkanVersion + "." + vulkanVersionPatch;
         envVars.put("WRAPPER_VK_VERSION", vulkanVersion);
 
