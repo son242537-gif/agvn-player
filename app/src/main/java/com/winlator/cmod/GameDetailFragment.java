@@ -141,7 +141,7 @@ public class GameDetailFragment extends Fragment {
             intent.putExtra("shortcut_name", shortcut.name);
             intent.putExtra("disableXinput", shortcut.getExtra("disableXinput", "0"));
             intent.putExtra("native_rendering", shortcut.getRendererNative());
-            activity.startActivity(intent);
+            com.winlator.cmod.agvn.PreLaunchCheck.run(activity, shortcut, () -> activity.startActivity(intent));
         } else {
             XrActivity.openIntent(activity, shortcut.container.id, shortcut.file.getPath());
         }

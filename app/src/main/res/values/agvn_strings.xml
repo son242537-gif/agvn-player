@@ -40,4 +40,8 @@
     <string name="agvn_guard_low_ram_title">Sắp hết RAM</string>
     <string name="agvn_guard_low_ram">RAM trống còn rất ít, game có thể bị Android tắt. Hãy lưu game ngay và đóng bớt ứng dụng khác.</string>
     <string name="agvn_guard_countdown">Tự đóng thông báo sau %1$d giây</string>
+    <string name="agvn_prelaunch_title">RAM trống chưa đủ</string>
+    <string name="agvn_prelaunch_message">Game cần khoảng %1$d MB RAM trống, máy đang có %2$d MB.\n\nHãy mở danh sách ứng dụng gần đây và đóng bớt ứng dụng khác, rồi bấm \"Kiểm tra lại\". Nếu vẫn chơi, game có thể nạp chậm (khoảng 30–60 giây) hoặc bị tắt giữa chừng.</string>
+    <string name="agvn_prelaunch_recheck">Kiểm tra lại</string>
+    <string name="agvn_prelaunch_play_anyway">Vẫn chơi</string>
 </resources>

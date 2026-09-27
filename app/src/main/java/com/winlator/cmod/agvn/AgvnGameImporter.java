@@ -101,6 +101,7 @@ public final class AgvnGameImporter {
         shortcut.putExtra(EXTRA_TIER, tier.name());
         shortcut.saveData();
         shortcut.genUUID();
+        PreLaunchCheck.applyUeConfig(shortcut);
         extractIcon(container, exeFile, name);
         return desktopFile;
     }
