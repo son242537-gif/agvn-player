@@ -671,7 +671,7 @@ private fun ShortcutGameSavesCard(s: ShortcutEditorStateV2, context: Context) {
             ) {
                 Text("Backup folder", style = MaterialTheme.typography.labelLarge)
                 Text(
-                    "Winlator/Saves/${GameSaveManager.getGameDir(s.shortcut).name}/",
+                    "AGVN-Player/Saves/${GameSaveManager.getGameDir(s.shortcut).name}/",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

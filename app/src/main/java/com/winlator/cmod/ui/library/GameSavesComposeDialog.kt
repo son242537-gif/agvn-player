@@ -147,7 +147,7 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                         Text("Backup folder", style = MaterialTheme.typography.labelLarge)
                         Text(
-                            "Winlator/Saves/${GameSaveManager.getGameDir(shortcut).name}/",
+                            "AGVN-Player/Saves/${GameSaveManager.getGameDir(shortcut).name}/",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

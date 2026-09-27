@@ -36,7 +36,7 @@ import java.util.zip.ZipOutputStream;
  * Per-game save discovery, backup and restore.
  *
  * Backups live beside the public artwork directories:
- *   /storage/emulated/0/Winlator/Saves/<Game Name>/
+ *   /storage/emulated/0/AGVN-Player/Saves/<Game Name>/
  *
  * Save locations are discovered under the Wine user's common save roots, then persisted in
  * save.json so discovery only has to succeed once. Automatic backups are intentionally scoped:
@@ -106,7 +106,7 @@ public final class GameSaveManager {
     }
 
     public static File getGameDir(Shortcut shortcut) {
-        File root = new File(Environment.getExternalStorageDirectory(), "Winlator/Saves");
+        File root = new File(com.winlator.cmod.SettingsFragment.DEFAULT_WINLATOR_PATH, "Saves");
         return new File(root, sanitize(shortcut.name));
     }
 
