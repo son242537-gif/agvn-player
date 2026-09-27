@@ -19,3 +19,5 @@ app/src/main/assets/imagefs.tar.zst
 app/src/main/assets/proton-*.tar.zst
 __pycache__/
 *.pyc
+# AGVN release output (APK + checksum), built locally by the maintainer
+/release/

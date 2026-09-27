@@ -39,6 +39,11 @@ Build the final release candidate, run a comprehensive test matrix on the mainta
 - Every artifact reproducible from tagged commit (e.g., `git tag v0.1.0`)
 - versionCode and versionName updated in `gradle.properties` before tagging
 
+## Tooling (added during implementation)
+
+- `scripts/agvn/make-release.ps1` (Windows, maintainer) / `make-release.sh`: secret gate, tests, signed build, badging + certificate pin check, `release/v<ver>/` with APK, `.sha256`, install guide and release notes; the PowerShell script also runs Windows Defender.
+- Fill in `docs/agvn/rc-test-report.md`; install guide and notes live in `docs/agvn/release/`.
+
 ## Implementation Steps
 
 1. **Prepare release build:**
@@ -59,7 +64,7 @@ Build the final release candidate, run a comprehensive test matrix on the mainta
    - Unit tests: `gradlew testReleaseUnitTest` → record results
    - Install RC over previous build: verify data preservation
    - Import 3 test games (UE5, Unity, other): verify launch, input, exit
-   - Trigger each phase feature: crash dialog, thermal warning, RAM cleanup, driver fallback, tier override
+   - Trigger each phase feature: crash dialog, thermal warning, pre-launch RAM dialog, driver fallback, tier override
    - Measure baseline: FPS, RAM, temps (compare to P1 numbers)
    - 10-screen Vietnamese review
 
@@ -106,7 +111,7 @@ Build the final release candidate, run a comprehensive test matrix on the mainta
 - [ ] Temps: within ±5°C of P1 (CPU 50°C, GPU 46°C)
 - [ ] Driver fallback: v863 → Turnip works
 - [ ] Thermal warning: >45°C triggers dialog
-- [ ] RAM cleanup: [Sạch RAM] frees memory
+- [ ] Pre-launch RAM dialog: [Kiểm tra lại] re-measures after closing apps (no in-app RAM cleaner, see ROADMAP notes)
 - [ ] Crash export: 10 screens Vietnamese (no English)
 - [ ] Settings: tier override to Yếu → FPS 24, res 854×480 applied
 - [ ] Antivirus scan: clean

@@ -1,0 +1,61 @@
+HƯỚNG DẪN CÀI VÀ DÙNG AGVN PLAYER
+agvn.io.vn
+==================================================
+
+AGVN Player giúp chơi game PC (Windows) trên điện thoại Android.
+Cần: Android 9 trở lên, chip Snapdragon (Adreno) là tốt nhất, RAM từ 6 GB,
+bộ nhớ trống ít nhất 4 GB cộng dung lượng game.
+
+1. CÀI ỨNG DỤNG
+--------------------------------------------------
+- Tải file AGVN-Player-v0.1.0.apk về điện thoại.
+- Mở file. Nếu điện thoại hỏi "Cho phép cài ứng dụng từ nguồn này?",
+  bấm Cài đặt → bật "Cho phép từ nguồn này" → quay lại → Cài đặt.
+- Nếu Play Protect cảnh báo, chọn "Chi tiết" → "Vẫn cài đặt".
+  (Ứng dụng không có quảng cáo, không thu thập dữ liệu.)
+- AGVN Player cài riêng, không ảnh hưởng Winlator hay ứng dụng khác bạn đang có.
+
+2. MỞ LẦN ĐẦU
+--------------------------------------------------
+- Mở AGVN Player. Màn hình logo hiện khoảng 1 giây.
+- Cho phép quyền truy cập bộ nhớ (chọn "Cho phép quản lý tất cả tệp")
+  và quyền thông báo khi được hỏi.
+- Bấm "Bắt đầu". Lần đầu ứng dụng giải nén dữ liệu, mất khoảng 1–2 phút.
+  Đừng tắt ứng dụng trong lúc này.
+
+3. CHÉP GAME VÀO ĐIỆN THOẠI
+--------------------------------------------------
+- Mỗi game AGVN là một thư mục có file agvn-profile.json.
+- Chép cả thư mục game vào: Bộ nhớ trong / AGVN /
+  Ví dụ: Bộ nhớ trong/AGVN/AVDirector/agvn-profile.json
+- Có thể chép bằng cáp USB từ máy tính, hoặc giải nén file game ngay trên điện thoại.
+
+4. THÊM GAME VÀO THƯ VIỆN
+--------------------------------------------------
+- Trong AGVN Player, mở Thư viện → bấm nút "+" (hoặc "Thêm game").
+- Chọn tên thư mục game → xem thông tin → bấm "Nhập".
+- Ứng dụng tự chọn cấu hình theo sức máy (Mạnh / Trung bình / Yếu).
+  Muốn đổi: bấm "Đổi mức" trước khi Nhập, hoặc Cài đặt → AGVN → Chế độ thiết bị.
+- Game hiện trong Thư viện. Bấm "Chơi".
+- Lần chạy đầu một game có thể mất 30–60 giây trước khi hiện hình.
+
+5. KHI ĐANG CHƠI
+--------------------------------------------------
+- Chạm màn hình = bấm chuột tại chỗ chạm.
+- Chạm bằng 4 ngón để mở menu (bàn phím, thoát game...).
+- Nếu hiện "Máy đang nóng" hoặc "Sắp hết RAM": hãy lưu game, nghỉ một lúc
+  hoặc đóng bớt ứng dụng khác. Thông báo tự tắt sau 30 giây.
+- Nếu khi bấm Chơi hiện "RAM trống chưa đủ": đóng bớt ứng dụng trong danh sách
+  ứng dụng gần đây rồi bấm "Kiểm tra lại".
+
+6. KHI GẶP LỖI
+--------------------------------------------------
+- Vào Cài đặt → AGVN → "Xuất nhật ký lỗi".
+- File AGVN-nhat-ky-<ngày-giờ>.zip sẽ nằm trong thư mục Download.
+- Gửi file này kèm một dòng mô tả lỗi cho AGVN qua agvn.io.vn.
+  File chỉ chứa thông tin máy và nhật ký, không chứa mật khẩu hay dữ liệu cá nhân.
+
+7. CẬP NHẬT
+--------------------------------------------------
+- Cài bản mới đè lên bản cũ; game và bản lưu được giữ nguyên.
+- Chỉ tải bản cập nhật từ agvn.io.vn.

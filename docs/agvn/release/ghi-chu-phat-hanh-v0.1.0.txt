@@ -1,0 +1,13 @@
+AGVN Player v0.1.0 (bản thử nghiệm đầu tiên) - agvn.io.vn
+
+Mới:
+- Thêm game AGVN một chạm từ thư mục /sdcard/AGVN (tự chọn đúng file chạy cho game Unreal).
+- Tự nhận sức máy (Mạnh / Trung bình / Yếu) và chỉnh FPS, độ phân giải, bộ nhớ ảnh cho phù hợp.
+- Cảnh báo máy nóng, sắp hết RAM; kiểm tra RAM trước khi chơi.
+- Tự tránh driver đồ họa gây văng game; xuất nhật ký lỗi một chạm để gửi AGVN.
+- Giao diện tiếng Việt.
+Hạn chế đã biết:
+- Máy chip Mali/Exynos chỉ dùng được driver hệ thống, game 3D có thể chậm hoặc lỗi hình.
+- Giới hạn FPS áp dụng cho game DirectX 9–11.
+- Phần cài đặt nâng cao (container, driver, Box64/FEX) vẫn bằng tiếng Anh.
+Góp ý và báo lỗi: gửi file "Xuất nhật ký lỗi" qua agvn.io.vn.
