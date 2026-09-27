@@ -214,6 +214,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private boolean isRelativeMouseMovement = false;
     private boolean isMouseDisabled = false;
     private boolean simulateTouchScreen = false;
+    private com.winlator.cmod.agvn.GameSessionGuard agvnSessionGuard;
 
     private SensorManager sensorManager;
 
@@ -807,6 +808,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
         }
         startTime = System.currentTimeMillis();
         handler.postDelayed(savePlaytimeRunnable, SAVE_INTERVAL_MS);
+        if (agvnSessionGuard == null) agvnSessionGuard = new com.winlator.cmod.agvn.GameSessionGuard(this);
+        agvnSessionGuard.start();
         if (!isInPictureInPictureMode())
             ProcessHelper.resumeAllWineProcesses();
     }
@@ -814,6 +817,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         if (taskManagerSidebar != null) taskManagerSidebar.stop();
+        if (agvnSessionGuard != null) agvnSessionGuard.stop();
         super.onPause();
 
         if (!isInPictureInPictureMode()) {
