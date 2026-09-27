@@ -1,0 +1,2 @@
+linkernsbypass_commit=b10d48548d608dfca38ffc449d0350335b2f3737
+adrenotools_commit=8483dfdaa2abf97ee89ad0e5f337e7b508550c6b
