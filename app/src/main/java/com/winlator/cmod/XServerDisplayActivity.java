@@ -236,8 +236,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private EnvVars overrideEnvVars;
 
     private void createNotifcationChannel() {
-        String name = "Winlator";
-        String description = "Winlator XServer Messages";
+        String name = getString(R.string.app_name);
+        String description = getString(R.string.agvn_notification_running);
         int importance = NotificationManager.IMPORTANCE_HIGH;
         NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
         channel.setDescription(description);
@@ -662,8 +662,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_stat_ab_gear_0011)
-                .setContentTitle("Winlator")
-                .setContentText("Winlator is running, do not kill or swipe this notification")
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.agvn_notification_running))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(false);

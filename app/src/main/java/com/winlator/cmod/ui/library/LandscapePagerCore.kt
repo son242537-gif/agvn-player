@@ -174,14 +174,14 @@ internal fun LandscapePagerCore(
                             color = Color.White.copy(.20f),
                             contentColor = Color.White,
                             border = BorderStroke(1.dp, Color.White.copy(.22f))
-                        ) { Text("View details", Modifier.padding(horizontal = 21.dp, vertical = 11.dp)) }
+                        ) { Text("Xem chi tiết", Modifier.padding(horizontal = 21.dp, vertical = 11.dp)) }
                         Surface(
                             onClick = { callbacks.onRun(item.shortcutPath) },
                             modifier = Modifier.size(44.dp),
                             shape = CircleShape,
                             color = Color.Black.copy(.62f),
                             contentColor = Color.White
-                        ) { Box(contentAlignment = Alignment.Center) { Icon(Icons.Outlined.PlayArrow, "Play") } }
+                        ) { Box(contentAlignment = Alignment.Center) { Icon(Icons.Outlined.PlayArrow, "Chơi") } }
                         footerActions(item)
                     }
                 }

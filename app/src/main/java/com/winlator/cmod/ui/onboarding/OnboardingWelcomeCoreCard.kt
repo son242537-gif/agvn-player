@@ -46,7 +46,7 @@ internal fun ClassicCoreStatusCard(readyState: State<Boolean>, progressState: St
             }
             Spacer(Modifier.size(14.dp))
             Text(
-                if (ready) "Winlator core is ready" else "Preparing Winlator core in the background",
+                if (ready) "Lõi AGVN Player đã sẵn sàng" else "Đang chuẩn bị lõi AGVN Player ở chế độ nền",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

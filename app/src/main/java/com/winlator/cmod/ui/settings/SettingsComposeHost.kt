@@ -177,7 +177,7 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
     }
 
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-        if (landscape) LandscapeMainNavigation(activity, R.id.main_menu_settings, "Settings")
+        if (landscape) LandscapeMainNavigation(activity, R.id.main_menu_settings, "Cài đặt")
         LazyColumn(
             modifier = Modifier.fillMaxWidth().weight(1f),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 30.dp),
@@ -204,20 +204,20 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
                 }
             }
 
-            item("appearance-title") { SectionTitle("APPEARANCE") }
+            item("appearance-title") { SectionTitle("GIAO DIỆN") }
             item("theme") { WinlatorThemePreferenceCard() }
 
-            item("environment-title") { SectionTitle("ENVIRONMENTS") }
+            item("environment-title") { SectionTitle("MÔI TRƯỜNG") }
             item("containers") {
-                NavigationRow(Icons.Outlined.Dns, "Containers", "Create and manage Windows environments") {
+                NavigationRow(Icons.Outlined.Dns, "Môi trường chạy", "Tạo và quản lý môi trường Windows") {
                     context.startActivity(Intent(context, ContainersSettingsActivity::class.java))
                 }
             }
             item("components") {
-                NavigationRow(Icons.Outlined.Apps, "Components", "Wine, Proton, DXVK, VKD3D and runtimes", callbacks::onOpenComponents)
+                NavigationRow(Icons.Outlined.Apps, "Thành phần", "Wine, Proton, DXVK, VKD3D and runtimes", callbacks::onOpenComponents)
             }
 
-            item("presets-title") { SectionTitle("PRESETS") }
+            item("presets-title") { SectionTitle("PRESET") }
             item("presets") {
                 GroupCard {
                     PresetChoiceRow(
@@ -247,25 +247,25 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
                 SoundFontCard(model.soundFonts, callbacks::onInstallSoundFont, callbacks::onRemoveSoundFont)
             }
 
-            item("paths-title") { SectionTitle("PATH SETTINGS") }
-            item("winlator-path") { NavigationRow(Icons.Outlined.Storage, "Winlator Path", model.winlatorPath, callbacks::onChooseWinlatorPath) }
-            item("shortcut-path") { NavigationRow(Icons.Outlined.FolderOpen, "Shortcut Export Path", model.shortcutPath, callbacks::onChooseShortcutPath) }
+            item("paths-title") { SectionTitle("THƯ MỤC") }
+            item("winlator-path") { NavigationRow(Icons.Outlined.Storage, "Thư mục dữ liệu", model.winlatorPath, callbacks::onChooseWinlatorPath) }
+            item("shortcut-path") { NavigationRow(Icons.Outlined.FolderOpen, "Thư mục xuất game", model.shortcutPath, callbacks::onChooseShortcutPath) }
 
-            item("game-saves-title") { SectionTitle("GAME SAVES") }
+            item("game-saves-title") { SectionTitle("BẢN LƯU GAME") }
             item("game-saves") {
                 GroupCard {
                     ToggleRow(
-                        "Game Saves for all shortcuts",
+                        "Sao lưu bản lưu cho mọi game",
                         model.gameSavesAllShortcuts,
-                        "Automatically detect and back up saves when any shortcut exits"
+                        "Tự tìm và sao lưu bản lưu mỗi khi thoát game"
                     ) { callbacks.onBooleanChanged("game_saves_all_shortcuts", it) }
                 }
             }
 
-            item("big-picture-title") { SectionTitle("BIG PICTURE MODE") }
+            item("big-picture-title") { SectionTitle("CHẾ ĐỘ BIG PICTURE") }
             item("big-picture") {
                 GroupCard {
-                    ToggleRow("Enable Big Picture Mode on App Launch", model.bigPicture) { callbacks.onBooleanChanged("enable_big_picture_mode", it) }
+                    ToggleRow("Mở chế độ Big Picture khi khởi động", model.bigPicture) { callbacks.onBooleanChanged("enable_big_picture_mode", it) }
                     GroupDivider()
                     ToggleRow("Set SteamGrid API Key? (Cover Art)", model.customApiKeyEnabled) { callbacks.onBooleanChanged("enable_custom_api_key", it) }
                 }
@@ -285,7 +285,7 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
                         ToggleRow(stringResource(R.string.use_xr), model.useXr) { callbacks.onBooleanChanged("use_xr", it) }
                     }
                     GroupDivider()
-                    ToggleRow("Capture External Pointer", model.cursorLock) { callbacks.onBooleanChanged("cursor_lock", it) }
+                    ToggleRow("Bắt chuột ngoài", model.cursorLock) { callbacks.onBooleanChanged("cursor_lock", it) }
                     GroupDivider()
                     ToggleRow("Disable Xinput (Used for Exclusive M/KB support)", model.xInput) { callbacks.onBooleanChanged("xinput_toggle", it) }
                 }
@@ -331,9 +331,9 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
             item("imagefs-title") { SectionTitle(stringResource(R.string.imagefs)) }
             item("imagefs") { NavigationRow(Icons.Outlined.Refresh, stringResource(R.string.reinstall_imagefs), null, callbacks::onReinstallImageFs) }
 
-            item("about-title") { SectionTitle("ABOUT") }
+            item("about-title") { SectionTitle("GIỚI THIỆU") }
             item("about") {
-                NavigationRow(Icons.Outlined.Info, "About", null) { activity?.showAboutDialog() }
+                NavigationRow(Icons.Outlined.Info, "Giới thiệu", null) { activity?.showAboutDialog() }
             }
         }
     }
@@ -423,7 +423,7 @@ private fun CursorSpeedRow(value: Int, onChanged: (Int) -> Unit) {
     var draft by remember(value) { mutableFloatStateOf(value.coerceIn(10, 200).toFloat()) }
     Column(Modifier.fillMaxWidth().padding(horizontal = 15.dp, vertical = 10.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Cursor speed", modifier = Modifier.weight(1f))
+            Text("Tốc độ con trỏ", modifier = Modifier.weight(1f))
             Text("${draft.roundToInt()}%", color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Slider(
@@ -475,7 +475,7 @@ private fun PresetChoiceRow(
                 }
                 DropdownMenu(expanded = actionsOpen, onDismissRequest = { actionsOpen = false }) {
                     DropdownMenuItem(
-                        text = { Text("Create new") },
+                        text = { Text("Tạo mới") },
                         leadingIcon = { Icon(Icons.Outlined.Add, null) },
                         onClick = {
                             actionsOpen = false
@@ -484,7 +484,7 @@ private fun PresetChoiceRow(
                     )
                     if (selectedId.isNotBlank()) {
                         DropdownMenuItem(
-                            text = { Text("Clone") },
+                            text = { Text("Nhân bản") },
                             leadingIcon = { Icon(Icons.Outlined.ContentCopy, null) },
                             onClick = {
                                 actionsOpen = false
@@ -492,7 +492,7 @@ private fun PresetChoiceRow(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Edit") },
+                            text = { Text("Sửa") },
                             leadingIcon = { Icon(Icons.Outlined.Edit, null) },
                             onClick = {
                                 actionsOpen = false
@@ -500,7 +500,7 @@ private fun PresetChoiceRow(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Delete") },
+                            text = { Text("Xóa") },
                             leadingIcon = { Icon(Icons.Outlined.DeleteOutline, null) },
                             onClick = {
                                 actionsOpen = false
@@ -648,10 +648,10 @@ private fun WineDebugChannelsDialog(
         },
         confirmButton = {
             TextButton(onClick = { onApply(allOptions.filter { it in selected }.joinToString(",")) }) {
-                Text("Apply")
+                Text("Áp dụng")
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Hủy") } }
     )
 }
 
@@ -670,7 +670,7 @@ private fun SoundFontCard(choices: List<SettingChoice>, onInstall: () -> Unit, o
         Button(onClick = onInstall, modifier = Modifier.fillMaxWidth().padding(12.dp)) {
             Icon(Icons.Outlined.Add, null)
             Spacer(Modifier.width(7.dp))
-            Text("Install SoundFont")
+            Text("Cài SoundFont")
         }
     }
 }
@@ -685,6 +685,6 @@ private fun EditableInlineValue(label: String, initial: String, onSave: (String)
     var value by remember(initial) { mutableStateOf(initial) }
     Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         OutlinedTextField(value = value, onValueChange = { value = it }, label = { Text(label) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-        Button(onClick = { onSave(value) }, modifier = Modifier.align(Alignment.End)) { Text("Save") }
+        Button(onClick = { onSave(value) }, modifier = Modifier.align(Alignment.End)) { Text("Lưu") }
     }
 }

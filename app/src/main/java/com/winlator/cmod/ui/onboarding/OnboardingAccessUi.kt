@@ -32,7 +32,7 @@ internal fun OnboardingAccessScreen(back: () -> Unit, next: () -> Unit) {
             Icon(Icons.Outlined.Security, null, modifier = Modifier.size(52.dp))
             Spacer(Modifier.height(14.dp))
             Text(title, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-            Text("Winlator needs storage and notification access to manage games and keep sessions running.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("AGVN Player cần quyền bộ nhớ và thông báo để quản lý game và giữ game chạy ổn định.", color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(20.dp))
             Button(onClick = next, modifier = Modifier.fillMaxWidth().height(50.dp)) {
                 Icon(Icons.Outlined.NotificationsNone, null)
@@ -40,7 +40,7 @@ internal fun OnboardingAccessScreen(back: () -> Unit, next: () -> Unit) {
                 Text(action)
             }
             Spacer(Modifier.height(8.dp))
-            OutlinedButton(onClick = back, modifier = Modifier.fillMaxWidth().height(48.dp)) { Text("Back") }
+            OutlinedButton(onClick = back, modifier = Modifier.fillMaxWidth().height(48.dp)) { Text("Quay lại") }
         }
     }
 }

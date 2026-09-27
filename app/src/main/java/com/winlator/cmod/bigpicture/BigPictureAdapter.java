@@ -52,7 +52,7 @@ public class BigPictureAdapter extends RecyclerView.Adapter<BigPictureAdapter.Vi
         if (shortcut.icon != null) {
             holder.iconView.setImageBitmap(shortcut.icon);
         } else {
-            holder.iconView.setImageResource(R.mipmap.ic_launcher_foreground); // Placeholder for missing icon
+            holder.iconView.setImageResource(R.mipmap.agvn_launcher_foreground); // Placeholder for missing icon
         }
 
         // Make sure the item can receive focus

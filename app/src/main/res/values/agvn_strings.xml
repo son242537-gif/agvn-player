@@ -44,4 +44,7 @@
     <string name="agvn_prelaunch_message">Game cần khoảng %1$d MB RAM trống, máy đang có %2$d MB.\n\nHãy mở danh sách ứng dụng gần đây và đóng bớt ứng dụng khác, rồi bấm \"Kiểm tra lại\". Nếu vẫn chơi, game có thể nạp chậm (khoảng 30–60 giây) hoặc bị tắt giữa chừng.</string>
     <string name="agvn_prelaunch_recheck">Kiểm tra lại</string>
     <string name="agvn_prelaunch_play_anyway">Vẫn chơi</string>
+    <string name="agvn_about_message">Phiên bản %1$s\n\nChơi game PC trên điện thoại, bản tiếng Việt.\nagvn.io.vn\n\nMã nguồn mở (MIT), dựa trên Winlator.</string>
+    <string name="agvn_licenses">Giấy phép mã nguồn mở</string>
+    <string name="agvn_notification_running">Game đang chạy, đừng tắt thông báo này</string>
 </resources>

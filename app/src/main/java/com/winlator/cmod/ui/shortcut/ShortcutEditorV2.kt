@@ -646,7 +646,7 @@ private fun ShortcutGameSavesCard(s: ShortcutEditorStateV2, context: Context) {
         if (globalEnabled) {
             SettingsDivider()
             Text(
-                "Enabled globally in Winlator Settings. All shortcuts are backed up on exit.",
+                "Đang bật chung trong Cài đặt. Mọi game được sao lưu khi thoát.",
                 modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -912,7 +912,7 @@ private fun ShortcutCategoryV2(
             }
             SettingsCard {
                 val hudEntries = listOf("Off", "Classic", "Modern")
-                SettingChoice("Winlator HUD", hudEntries.getOrElse(s.winlatorHudMode) { "Off" }, hudEntries) {
+                SettingChoice("HUD", hudEntries.getOrElse(s.winlatorHudMode) { "Off" }, hudEntries) {
                     s.winlatorHudMode = hudEntries.indexOf(it).coerceAtLeast(0)
                     s.extra("hudMode", s.winlatorHudMode.toString())
                 }

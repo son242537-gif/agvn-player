@@ -45,13 +45,13 @@ internal fun ClassicWinlatorWelcome(
         ) {
             Spacer(Modifier.weight(.62f))
             Image(
-                painterResource(R.drawable.winlator_mark_exact),
-                "Winlator",
+                painterResource(R.drawable.agvn_logo),
+                "AGVN Player",
                 Modifier.size(146.dp)
             )
             Spacer(Modifier.height(22.dp))
             Text(
-                "Welcome to Winlator",
+                "Chào mừng bạn",
                 style = MaterialTheme.typography.displaySmall.copy(fontSize = 28.sp),
                 color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 1,
@@ -59,22 +59,22 @@ internal fun ClassicWinlatorWelcome(
             )
             Spacer(Modifier.height(7.dp))
             Text(
-                "Your lightweight PC emulator for Android.",
+                "Chơi game PC trên điện thoại, bản tiếng Việt.",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(26.dp))
             ClassicWelcomeCard(
                 Icons.Outlined.Apps,
-                "Get started",
-                "Choose components",
+                "Bắt đầu",
+                "Chọn thành phần",
                 start
             )
             Spacer(Modifier.height(12.dp))
             ClassicWelcomeCard(
                 Icons.Outlined.SkipNext,
-                "Skip",
-                "Use the components bundled with Winlator and configure everything later.",
+                "Bỏ qua",
+                "Dùng các thành phần có sẵn và cấu hình sau.",
                 skip
             )
             Spacer(Modifier.height(12.dp))
