@@ -58,6 +58,19 @@ export PATH=\$ANDROID_HOME/cmdline-tools/latest/bin:\$ANDROID_HOME/platform-tool
 EOF
 fi
 
+# repo.maven.apache.org answers HTTP 429 to shared cloud IPs mid-build; resolve Maven Central through Google's
+# mirror first (the original repositories stay as fallbacks). User-level init script, not part of the repo build.
+mkdir -p ~/.gradle/init.d
+cat > ~/.gradle/init.d/agvn-central-mirror.gradle <<'GRADLE'
+def MIRROR = 'https://maven-central.storage-download.googleapis.com/maven2/'
+settingsEvaluated { settings ->
+    [settings.pluginManagement.repositories, settings.dependencyResolutionManagement.repositories].each { repos ->
+        def m = repos.maven { url MIRROR; name 'CentralMirror' }
+        repos.remove(m); repos.add(0, m)
+    }
+}
+GRADLE
+
 log "Versions:"
 java -version 2>&1 | head -1
 "$SDK" --sdk_root="$ANDROID_HOME" --version
