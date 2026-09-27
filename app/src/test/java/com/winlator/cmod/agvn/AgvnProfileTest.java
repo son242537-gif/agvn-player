@@ -90,6 +90,17 @@ public class AgvnProfileTest {
         assertRejected(AgvnProfile.parse("{\"schemaVersion\":1,\"name\":\"a/b\"}"), dir);
     }
 
+    /** Same example file is validated by tools/agvn/tests/test_toolkit.py (Python toolkit). */
+    @Test
+    public void sharedExampleProfileIsValid() throws Exception {
+        String json = new String(java.nio.file.Files.readAllBytes(
+                java.nio.file.Paths.get("../docs/agvn/agvn-profile.example.json")), java.nio.charset.StandardCharsets.UTF_8);
+        AgvnProfile p = AgvnProfile.parse(json);
+        File dir = tmp.newFolder("AVDirector");
+        touch(new File(dir, p.exe));
+        assertEquals(p.exe, AgvnProfileValidator.validate(p, dir));
+    }
+
     @Test(expected = AgvnProfileException.class)
     public void rejectsBrokenJson() throws Exception {
         AgvnProfile.parse("{not json");
