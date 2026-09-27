@@ -27,6 +27,7 @@ public final class AgvnGameImporter {
     public static final String EXTRA_GAME_DIR = "agvnGameDir";
     public static final String EXTRA_TEXTURE_POOL = "agvnTexturePool";
     public static final String EXTRA_ENGINE = "agvnEngine";
+    public static final String EXTRA_TIER = "agvnTier";
 
     /** A validated profile ready to import. */
     public static final class Candidate {
@@ -74,7 +75,7 @@ public final class AgvnGameImporter {
     }
 
     /** Creates (or replaces) the shortcut in {@code container}; returns the .desktop file. */
-    public static File importGame(Context ctx, Container container, Candidate c) throws IOException {
+    public static File importGame(Context ctx, Container container, Candidate c, DeviceTier tier) throws IOException {
         String name = c.profile.name.trim();
         File profileDir = new File(getProfilesRoot(), c.gameDir.getName());
         profileDir.mkdirs();
@@ -95,22 +96,24 @@ public final class AgvnGameImporter {
         }
 
         Shortcut shortcut = new Shortcut(container, desktopFile);
-        applyProfile(shortcut, c, profileCopy);
+        LaunchPresetResolver.Effective eff = LaunchPresetResolver.resolve(c.profile, tier, DeviceTierManager.getRules(ctx).preset(tier));
+        applyProfile(shortcut, c, profileCopy, eff);
+        shortcut.putExtra(EXTRA_TIER, tier.name());
         shortcut.saveData();
         shortcut.genUUID();
         extractIcon(container, exeFile, name);
         return desktopFile;
     }
 
-    static void applyProfile(Shortcut shortcut, Candidate c, File profileCopy) {
+    static void applyProfile(Shortcut shortcut, Candidate c, File profileCopy, LaunchPresetResolver.Effective eff) {
         AgvnProfile p = c.profile;
         shortcut.putExtra("execArgs", String.join(" ", p.args));
-        shortcut.putExtra("envVars", buildEnvVars(p.env, p.getFpsLimit()));
-        if (p.resolution != null) shortcut.putExtra("screenSize", p.resolution);
+        shortcut.putExtra("envVars", buildEnvVars(p.env, eff.fps));
+        if (eff.resolution != null) shortcut.putExtra("screenSize", eff.resolution);
         shortcut.putExtra("simTouchScreen", p.isSimulatedTouchscreen() ? "1" : "0");
         shortcut.putExtra(EXTRA_PROFILE_PATH, profileCopy.getAbsolutePath());
         shortcut.putExtra(EXTRA_GAME_DIR, c.gameDir.getAbsolutePath());
-        shortcut.putExtra(EXTRA_TEXTURE_POOL, String.valueOf(p.getTexturePool()));
+        shortcut.putExtra(EXTRA_TEXTURE_POOL, String.valueOf(eff.texturePool));
         shortcut.putExtra(EXTRA_ENGINE, c.engine.name());
     }
 

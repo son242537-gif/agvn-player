@@ -1,0 +1,24 @@
+{
+  "comment": "Ordered rules, first match wins. GPU renderer is checked first, then SoC model (Build.SOC_MODEL / ro.soc.model), then RAM caps the result. RAM thresholds use the kernel-reported total (an advertised 8 GB phone reports about 7.3 GB).",
+  "gpus": [
+    {"pattern": "Adreno.*\\b8\\d\\d\\b", "tier": "FLAGSHIP"},
+    {"pattern": "Adreno.*\\b7\\d\\d\\b", "tier": "TRUNG_BINH"},
+    {"pattern": "Adreno.*\\b[1-6]\\d\\d\\b", "tier": "YEU"},
+    {"pattern": "Immortalis|Mali-G7[12]\\d|Mali-G9\\d\\d", "tier": "TRUNG_BINH"},
+    {"pattern": "Xclipse", "tier": "TRUNG_BINH"},
+    {"pattern": "Mali|PowerVR|IMG", "tier": "YEU"}
+  ],
+  "socs": [
+    {"pattern": "^SM8\\d{3}", "tier": "FLAGSHIP"},
+    {"pattern": "^SM7\\d{3}", "tier": "TRUNG_BINH"},
+    {"pattern": "^SM[46]\\d{3}", "tier": "YEU"},
+    {"pattern": "^MT69[89]\\d", "tier": "TRUNG_BINH"},
+    {"pattern": "^MT6\\d{3}", "tier": "YEU"}
+  ],
+  "ram": {"flagshipMinMb": 7000, "trungBinhMinMb": 5000},
+  "presets": {
+    "FLAGSHIP":   {"fps": 30, "resolution": "1280x720", "texturePool": 1024},
+    "TRUNG_BINH": {"fps": 27, "resolution": "960x544",  "texturePool": 768},
+    "YEU":        {"fps": 24, "resolution": "854x480",  "texturePool": 512}
+  }
+}

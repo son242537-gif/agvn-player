@@ -184,6 +184,14 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
             verticalArrangement = Arrangement.spacedBy(7.dp)
         ) {
             item("agvn-title") { SectionTitle(stringResource(R.string.agvn_settings_section)) }
+            item("agvn-tier") {
+                var tierSummary by remember { mutableStateOf(com.winlator.cmod.agvn.AgvnTierDialog.summary(context)) }
+                NavigationRow(Icons.Outlined.Speed, stringResource(R.string.agvn_tier_title), tierSummary) {
+                    com.winlator.cmod.agvn.AgvnTierDialog.showDeviceSetting(context) {
+                        tierSummary = com.winlator.cmod.agvn.AgvnTierDialog.summary(context)
+                    }
+                }
+            }
             item("agvn-import") {
                 NavigationRow(Icons.Outlined.Add, stringResource(R.string.agvn_import_title), stringResource(R.string.agvn_import_summary)) {
                     activity?.let { com.winlator.cmod.agvn.AgvnImportDialog.show(it) }

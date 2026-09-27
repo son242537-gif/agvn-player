@@ -27,14 +27,14 @@ public final class AgvnImportDialog {
         } else {
             String[] names = new String[dirs.size()];
             for (int i = 0; i < names.length; i++) names[i] = dirs.get(i).getName();
-            builder.setItems(names, (d, which) -> preview(activity, dirs.get(which)));
+            builder.setItems(names, (d, which) -> preview(activity, dirs.get(which), DeviceTierManager.current(activity)));
         }
         builder.setNeutralButton(R.string.agvn_import_manual, (d, w) -> activity.navigateToMainDestination(R.id.main_menu_file_manager))
                 .setNegativeButton(R.string.agvn_close, null)
                 .show();
     }
 
-    private static void preview(MainActivity activity, File gameDir) {
+    private static void preview(MainActivity activity, File gameDir, DeviceTier tier) {
         AgvnGameImporter.Candidate candidate;
         try {
             candidate = AgvnGameImporter.load(gameDir);
@@ -43,31 +43,36 @@ public final class AgvnImportDialog {
             return;
         }
         AgvnProfile p = candidate.profile;
+        LaunchPresetResolver.Effective eff = LaunchPresetResolver.resolve(p, tier, DeviceTierManager.getRules(activity).preset(tier));
         StringBuilder msg = new StringBuilder();
+        msg.append(activity.getString(R.string.agvn_import_preview_tier, tier.label)).append('\n');
         msg.append(activity.getString(R.string.agvn_import_preview_exe, candidate.exe)).append('\n');
-        msg.append(activity.getString(R.string.agvn_import_preview_fps, p.getFpsLimit() > 0 ? String.valueOf(p.getFpsLimit()) : activity.getString(R.string.agvn_unlimited))).append('\n');
-        msg.append(activity.getString(R.string.agvn_import_preview_resolution, p.resolution != null ? p.resolution : activity.getString(R.string.agvn_default_value))).append('\n');
-        if (p.getTexturePool() > 0) {
-            msg.append(activity.getString(R.string.agvn_import_preview_pool, p.getTexturePool())).append('\n');
-            if (p.getTexturePool() > availableRamMb(activity))
+        msg.append(activity.getString(R.string.agvn_import_preview_fps, eff.fps > 0 ? String.valueOf(eff.fps) : activity.getString(R.string.agvn_unlimited))).append('\n');
+        msg.append(activity.getString(R.string.agvn_import_preview_resolution, eff.resolution != null ? eff.resolution : activity.getString(R.string.agvn_default_value))).append('\n');
+        if (eff.texturePool > 0 && candidate.engine == GameExeResolver.Engine.UNREAL) {
+            msg.append(activity.getString(R.string.agvn_import_preview_pool, eff.texturePool)).append('\n');
+            if (eff.texturePool > availableRamMb(activity))
                 msg.append('\n').append(activity.getString(R.string.agvn_import_pool_warning)).append('\n');
         }
         new AlertDialog.Builder(activity)
                 .setTitle(p.name)
                 .setMessage(msg.toString().trim())
-                .setPositiveButton(R.string.agvn_import_confirm, (d, w) -> doImport(activity, candidate))
+                .setPositiveButton(R.string.agvn_import_confirm, (d, w) -> doImport(activity, candidate, tier))
+                .setNeutralButton(activity.getString(R.string.agvn_import_change_tier, tier.label), (d, w) ->
+                        AgvnTierDialog.choose(activity, activity.getString(R.string.agvn_tier_for_game), tier.ordinal() + 1,
+                                chosen -> preview(activity, gameDir, chosen != null ? chosen : DeviceTierManager.detect(activity))))
                 .setNegativeButton(R.string.agvn_cancel, null)
                 .show();
     }
 
-    private static void doImport(MainActivity activity, AgvnGameImporter.Candidate candidate) {
+    private static void doImport(MainActivity activity, AgvnGameImporter.Candidate candidate, DeviceTier tier) {
         List<Container> containers = new ContainerManager(activity).getContainers();
         if (containers.isEmpty()) {
             showError(activity, activity.getString(R.string.agvn_import_no_container));
             return;
         }
         try {
-            AgvnGameImporter.importGame(activity, containers.get(0), candidate);
+            AgvnGameImporter.importGame(activity, containers.get(0), candidate, tier);
         } catch (Exception e) {
             showError(activity, activity.getString(R.string.agvn_import_failed, String.valueOf(e.getMessage())));
             return;
