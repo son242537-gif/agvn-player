@@ -50,7 +50,10 @@ public final class AgvnProfileValidator {
                     throw new AgvnProfileException("Khóa Engine.ini không hợp lệ: " + kv.getKey());
             }
         }
-        return resolveExe(p, gameDir);
+        String exe = resolveExe(p, gameDir);
+        if (gameDir.getName().contains("wine ") || exe.contains("wine "))
+            throw new AgvnProfileException("Tên thư mục hoặc đường dẫn exe không được chứa chữ \"wine \" (viết thường, có dấu cách). Hãy đổi tên thư mục.");
+        return exe;
     }
 
     private static String resolveExe(AgvnProfile p, File gameDir) throws AgvnProfileException {

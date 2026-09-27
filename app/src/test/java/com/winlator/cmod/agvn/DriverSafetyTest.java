@@ -20,6 +20,17 @@ public class DriverSafetyTest {
     }
 
     @Test
+    public void driverIsWrittenOffOnlyAfterTwoFailures() {
+        assertEquals(0, DriverSafety.previousFailures(null));
+        assertEquals("bad1", DriverSafety.failedState(DriverSafety.previousFailures(null)));
+        assertEquals(1, DriverSafety.previousFailures("bad1"));
+        assertEquals("bad", DriverSafety.failedState(DriverSafety.previousFailures("bad1")));
+        assertEquals(1, DriverSafety.previousFailures("probing:1234:1"));
+        assertEquals(0, DriverSafety.previousFailures("probing:1234"));
+        assertEquals(0, DriverSafety.previousFailures("probing:1234:x"));
+    }
+
+    @Test
     public void denylistHidesSystemAndV863OnAdreno8xx() {
         DriverDenylist list = DriverDenylist.parse(DENYLIST);
         assertTrue(list.isDenylisted("Adreno (TM) 830", "System"));

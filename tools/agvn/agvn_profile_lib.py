@@ -136,12 +136,17 @@ def validate(profile, game_dir):
             if not INI_KEY.match(k) or not isinstance(v, str) or not SAFE_VALUE.match(v):
                 raise ProfileError("Khóa Engine.ini không hợp lệ: %s" % k)
 
+    if "wine " in os.path.basename(os.path.normpath(game_dir)) or "wine " in (profile.get("exe") or ""):
+        raise ProfileError('Tên thư mục hoặc đường dẫn exe không được chứa chữ "wine " (viết thường, có dấu cách). '
+                           'Hãy đổi tên thư mục.')
     engine = detect_engine(game_dir)
     suggested = resolve_exe(game_dir, engine)
     exe = (profile.get("exe") or "").strip().replace("\\", "/")
     if not exe:
         if not suggested:
             raise ProfileError('Không tìm thấy file .exe để chạy. Hãy ghi rõ "exe" trong profile.')
+        if "wine " in suggested:
+            raise ProfileError('Đường dẫn exe không được chứa chữ "wine " (viết thường, có dấu cách): %s' % suggested)
         return suggested
     if exe.startswith("/") or re.match(r"^[A-Za-z]:", exe) or ".." in exe:
         raise ProfileError("Đường dẫn exe phải nằm trong thư mục game: %s" % exe)
@@ -153,5 +158,7 @@ def validate(profile, game_dir):
     if not os.path.isfile(full):
         raise ProfileError("Không tìm thấy file chạy: %s" % exe)
     if engine == "UNREAL" and not exe.lower().endswith("-shipping.exe") and suggested:
-        return suggested
+        exe = suggested
+    if "wine " in exe:
+        raise ProfileError('Đường dẫn exe không được chứa chữ "wine " (viết thường, có dấu cách): %s' % exe)
     return exe

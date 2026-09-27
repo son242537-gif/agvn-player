@@ -101,6 +101,13 @@ public class AgvnProfileTest {
         assertEquals(p.exe, AgvnProfileValidator.validate(p, dir));
     }
 
+    @Test
+    public void rejectsWineInFolderName() throws Exception {
+        File dir = tmp.newFolder("Red wine 2");
+        touch(new File(dir, "game.exe"));
+        assertRejected(profile(""), dir);
+    }
+
     @Test(expected = AgvnProfileException.class)
     public void rejectsBrokenJson() throws Exception {
         AgvnProfile.parse("{not json");

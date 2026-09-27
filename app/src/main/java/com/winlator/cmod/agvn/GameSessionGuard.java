@@ -58,6 +58,20 @@ public final class GameSessionGuard {
         handler.removeCallbacks(poll);
     }
 
+    /** Stops polling, cancels the countdown and closes an open warning (activity going away). */
+    public void destroy() {
+        stop();
+        handler.removeCallbacksAndMessages(null);
+        if (dialog != null && dialog.isShowing() && !activity.isDestroyed()) {
+            try {
+                dialog.dismiss();
+            } catch (IllegalArgumentException ignored) {
+                // window already gone
+            }
+        }
+        dialog = null;
+    }
+
     private void warn(SessionGuard.Decision decision) {
         if (activity.isFinishing()) return;
         Log.w(TAG, "session guard: " + decision);
@@ -73,7 +87,7 @@ public final class GameSessionGuard {
     }
 
     private void countdown(AlertDialog shown, String message, int secondsLeft) {
-        if (shown != dialog || !shown.isShowing()) return;
+        if (shown != dialog || !shown.isShowing() || activity.isFinishing() || activity.isDestroyed()) return;
         if (secondsLeft <= 0) {
             shown.dismiss();
             return;

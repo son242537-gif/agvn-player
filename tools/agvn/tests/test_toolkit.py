@@ -91,6 +91,12 @@ class ProfileRulesTest(unittest.TestCase):
             with self.assertRaises(ProfileError, msg=str(extra)):
                 validate(p, self.ue)
 
+    def test_rejects_wine_in_path(self):
+        g = os.path.join(self.tmp.name, "Red wine 2")
+        touch(g, "game.exe")
+        with self.assertRaises(ProfileError):
+            validate({"schemaVersion": 1, "name": "g"}, g)
+
     def test_shared_example_profile_is_valid(self):
         with open(os.path.join(REPO, "docs", "agvn", "agvn-profile.example.json"), encoding="utf-8") as f:
             example = json.load(f)

@@ -608,7 +608,10 @@ public class SettingsFragment extends Fragment {
                 ContentDialog.confirm(
                         requireContext(),
                         R.string.do_you_want_to_reinstall_imagefs,
-                        () -> ImageFsInstaller.installFromAssets((MainActivity) requireActivity(), null)
+                        () -> {
+                            com.winlator.cmod.agvn.DriverSafety.forgetProbes(requireContext());
+                            ImageFsInstaller.installFromAssets((MainActivity) requireActivity(), null);
+                        }
                 );
             }
 
