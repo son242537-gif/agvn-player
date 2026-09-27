@@ -23,7 +23,9 @@ if [ -d "$ANDROID_HOME/ndk/$NDK_VERSION" ]; then
     log "NDK $NDK_VERSION already installed; nothing to do."
 else
     log "Installing native build tools (glslang, ninja, zstd)..."
-    apt-get update -qq
+    # The cloud image ships extra PPAs (launchpad) that the Custom network blocks with 403; apt-get update then
+    # exits 100 even though the Ubuntu archive indexes refreshed fine. Tolerate that and let the install decide.
+    apt-get update -qq || log "apt-get update reported errors (blocked PPAs are expected); continuing"
     apt-get install -y -qq curl unzip git glslang-tools ninja-build zstd
 
     log "Downloading Android command-line tools..."
