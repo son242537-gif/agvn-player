@@ -805,6 +805,10 @@ public class FileManagerFragment extends Fragment {
                 writer.println("Exec=env WINEPREFIX=\"" + winePrefix + "\" wine \"" + file.getAbsolutePath() + "\"");
                 writer.println("Type=Application");
                 writer.println("container_id:" + container.id);
+                // AGVN: touch = mouse click at the touched spot by default (see docs/agvn/device-findings.md)
+                writer.println();
+                writer.println("[Extra Data]");
+                writer.println("simTouchScreen=1");
             }
 
             Intent intent = new Intent();
@@ -839,6 +843,10 @@ public class FileManagerFragment extends Fragment {
                 writer.println("Type=Application");
                 writer.println("Icon=" + displayName);
                 writer.println("container_id:" + container.id);
+                // AGVN: touch = mouse click at the touched spot by default (see docs/agvn/device-findings.md)
+                writer.println();
+                writer.println("[Extra Data]");
+                writer.println("simTouchScreen=1");
             }
             Toast.makeText(getContext(), "Game added to Library!", Toast.LENGTH_SHORT).show();
 
