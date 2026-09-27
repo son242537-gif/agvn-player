@@ -12,4 +12,22 @@
     <string name="agvn_export_done">Xuất xong: %1$s (thư mục Download)</string>
     <string name="agvn_export_failed">Không xuất được nhật ký: %1$s</string>
     <string name="agvn_settings_section">AGVN</string>
+    <string name="agvn_import_title">Thêm game AGVN</string>
+    <string name="agvn_import_empty">Chưa thấy game nào trong %1$s.\n\nHãy chép thư mục game (có file agvn-profile.json) vào đó rồi mở lại mục này.</string>
+    <string name="agvn_import_manual">Tự chọn file .exe</string>
+    <string name="agvn_close">Đóng</string>
+    <string name="agvn_cancel">Hủy</string>
+    <string name="agvn_import_confirm">Nhập</string>
+    <string name="agvn_import_preview_exe">File chạy: %1$s</string>
+    <string name="agvn_import_preview_fps">Giới hạn FPS: %1$s</string>
+    <string name="agvn_import_preview_resolution">Độ phân giải: %1$s</string>
+    <string name="agvn_import_preview_pool">Texture pool: %1$d MB</string>
+    <string name="agvn_import_pool_warning">Lưu ý: RAM trống hiện tại ít hơn texture pool của game, game có thể bị tắt giữa chừng.</string>
+    <string name="agvn_unlimited">không giới hạn</string>
+    <string name="agvn_default_value">mặc định</string>
+    <string name="agvn_import_no_container">Chưa có môi trường chạy (container). Hãy hoàn tất phần cài đặt ban đầu rồi thử lại.</string>
+    <string name="agvn_import_failed">Không nhập được game: %1$s</string>
+    <string name="agvn_import_done">Đã thêm \"%1$s\" vào thư viện</string>
+    <string name="agvn_import_error_title">Profile game không hợp lệ</string>
+    <string name="agvn_import_summary">Nhập game từ thư mục /sdcard/AGVN</string>
 </resources>

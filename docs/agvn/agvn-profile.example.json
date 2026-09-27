@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "AV Director LIFE",
+  "exe": "AVDirector/Binaries/Win64/AVDirector-Win64-Shipping.exe",
+  "args": [],
+  "env": {},
+  "resolution": "1280x720",
+  "fpsLimit": 30,
+  "texturePool": 1024,
+  "simulatedTouchscreen": true,
+  "weakDevice": { "resolution": "854x480", "fpsLimit": 24, "texturePool": 512 },
+  "ueEngineIni": {}
+}
