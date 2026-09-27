@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN Player: Vietnamese customer-facing strings (default locale on purpose). -->
+<resources>
+    <string name="agvn_driver_fallback">Driver đồ họa %1$s không chạy được trên máy này, đã tự chuyển sang %2$s.</string>
+    <string name="agvn_crash_title">Ứng dụng vừa gặp lỗi</string>
+    <string name="agvn_crash_message">Ứng dụng vừa gặp lỗi. Xuất nhật ký để gửi AGVN?</string>
+    <string name="agvn_export">Xuất</string>
+    <string name="agvn_skip">Bỏ qua</string>
+    <string name="agvn_export_logs">Xuất nhật ký lỗi</string>
+    <string name="agvn_export_logs_summary">Tạo file ZIP trong thư mục Download để gửi cho AGVN</string>
+    <string name="agvn_export_running">Đang xuất nhật ký…</string>
+    <string name="agvn_export_done">Xuất xong: %1$s (thư mục Download)</string>
+    <string name="agvn_export_failed">Không xuất được nhật ký: %1$s</string>
+    <string name="agvn_settings_section">AGVN</string>
+</resources>

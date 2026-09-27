@@ -114,6 +114,7 @@ public class ContainerSectionFragment extends Fragment {
         LinkedHashSet<String> graphicsVersions = new LinkedHashSet<>(Arrays.asList(
                 getResources().getStringArray(R.array.wrapper_graphics_driver_version_entries)
         ));
+        graphicsVersions.removeIf(v -> !com.winlator.cmod.agvn.DriverSafety.isPickable(requireContext(), v));
         LinkedHashSet<String> installedGraphicsVersions = new LinkedHashSet<>(graphicsVersions);
         AdrenotoolsManager adrenotoolsManager = new AdrenotoolsManager(requireContext());
         ArrayList<String> rendererDriverLabels = new ArrayList<>();

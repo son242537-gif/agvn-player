@@ -179,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             winlatorDir.mkdirs();
 
         containerManager = new ContainerManager(this);
+        com.winlator.cmod.agvn.CrashPrompt.showIfPending(this);
 
         Intent intent = getIntent();
         editInputControls = intent.getBooleanExtra("edit_input_controls", false);

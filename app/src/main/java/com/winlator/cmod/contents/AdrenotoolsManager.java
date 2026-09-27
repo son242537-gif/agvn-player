@@ -138,11 +138,12 @@ public class AdrenotoolsManager {
                 com.winlator.cmod.R.array.wrapper_graphics_driver_version_entries);
 
         for (String id : bundledDrivers) {
-            if (!id.equalsIgnoreCase("System") && isFromResources(id) && !driversList.contains(id))
+            if (!id.equalsIgnoreCase("System") && isFromResources(id) && !driversList.contains(id)
+                    && com.winlator.cmod.agvn.DriverSafety.isPickable(mContext, id))
                 driversList.add(id);
         }
         for (String id : enumarateInstalledDrivers()) {
-            if (!driversList.contains(id)) driversList.add(id);
+            if (!driversList.contains(id) && com.winlator.cmod.agvn.DriverSafety.isPickable(mContext, id)) driversList.add(id);
         }
         return driversList;
     }

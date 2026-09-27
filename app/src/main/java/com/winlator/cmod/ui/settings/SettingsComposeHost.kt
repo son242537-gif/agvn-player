@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Apps
+import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.DeleteOutline
@@ -182,6 +183,14 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 30.dp),
             verticalArrangement = Arrangement.spacedBy(7.dp)
         ) {
+            item("agvn-title") { SectionTitle(stringResource(R.string.agvn_settings_section)) }
+            item("agvn-export-logs") {
+                NavigationRow(Icons.Outlined.BugReport, stringResource(R.string.agvn_export_logs), stringResource(R.string.agvn_export_logs_summary)) {
+                    android.widget.Toast.makeText(context, R.string.agvn_export_running, android.widget.Toast.LENGTH_SHORT).show()
+                    com.winlator.cmod.agvn.DiagnosticsExporter.export(context)
+                }
+            }
+
             item("appearance-title") { SectionTitle("APPEARANCE") }
             item("theme") { WinlatorThemePreferenceCard() }
 

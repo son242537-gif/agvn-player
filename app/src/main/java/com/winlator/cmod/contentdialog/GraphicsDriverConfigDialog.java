@@ -348,7 +348,7 @@ public class GraphicsDriverConfigDialog extends ContentDialog {
         String[] wrapperDefaultVersions = context.getResources().getStringArray(R.array.wrapper_graphics_driver_version_entries);
 
         for (String version : wrapperDefaultVersions) {
-            if (GPUInformation.isDriverSupported(version, context))
+            if (com.winlator.cmod.agvn.DriverSafety.isPickable(context, version))
                 wrapperVersions.add(version);
         }
         
