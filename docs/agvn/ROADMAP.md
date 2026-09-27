@@ -14,8 +14,8 @@
 | 6 | In-game thermal & RAM guards | P5 | 4h | ✅ Merged (#5), device test pending |
 | 7 | Pre-launch RAM check & UE texture pool | P6 | 5h | ✅ Merged (#6), device test pending |
 | 8 | Vietnamese UI & AGVN branding | P2, P7 | 10h | ✅ Merged (#7), device test pending |
-| 9 | PC weak-build toolkit | P4 | 6h | 📋 Pending (parallel-safe) |
-| 10 | Release candidate & field test | All | 4h | 📋 Pending |
+| 9 | PC weak-build toolkit | P4 | 6h | ✅ Merged (#9), needs real game files to calibrate |
+| 10 | Release candidate & field test | All | 4h | 🔶 Tooling/docs merged; signing, device, AV and field tests pending (maintainer) |
 
 **Total estimated effort:** 55 hours  
 **Sequential path:** P1→P2→P3→P4→P5→P6→P7 (shared code files)  
