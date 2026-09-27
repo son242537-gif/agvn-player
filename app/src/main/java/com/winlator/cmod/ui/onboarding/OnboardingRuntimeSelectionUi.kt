@@ -85,7 +85,7 @@ internal fun OnboardingRuntimeSelectionScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             item {
-                Text("Choose environment", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+                Text("Chọn môi trường", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
                 if (preparing) {
                     Spacer(Modifier.height(18.dp))
                     Surface(
@@ -95,7 +95,7 @@ internal fun OnboardingRuntimeSelectionScreen(
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
                     ) {
                         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            Text("Preparing environment", fontWeight = FontWeight.SemiBold)
+                            Text("Đang chuẩn bị môi trường", fontWeight = FontWeight.SemiBold)
                             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                         }
                     }
@@ -126,7 +126,7 @@ internal fun OnboardingRuntimeSelectionScreen(
                 item {
                     Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp), color = MaterialTheme.colorScheme.surface) {
                         Text(
-                            "Install at least one Wine or Proton version to continue.",
+                            "Hãy cài ít nhất một phiên bản Wine hoặc Proton để tiếp tục.",
                             Modifier.padding(16.dp),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -142,14 +142,14 @@ internal fun OnboardingRuntimeSelectionScreen(
                     modifier = Modifier.weight(1f).height(48.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Back")
+                    Text("Quay lại")
                 }
                 Button(
                     onClick = { if (selected.isNotBlank() && !preparing) onContinue(selected) },
                     enabled = selected.isNotBlank() && !preparing,
                     modifier = Modifier.weight(1f).height(48.dp),
                     shape = RoundedCornerShape(12.dp)
-                ) { Text(if (preparing) "Preparing…" else "Continue") }
+                ) { Text(if (preparing) "Preparing…" else "Tiếp tục") }
             }
         }
     }

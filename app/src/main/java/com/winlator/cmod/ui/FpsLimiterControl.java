@@ -73,7 +73,7 @@ public class FpsLimiterControl extends LinearLayout {
         sliderGroup.addView(valueRow, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
         TextView title = new TextView(context);
-        title.setText("FPS Limit");
+        title.setText("Giới hạn FPS");
         title.setTextColor(onSurface);
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
@@ -294,8 +294,8 @@ public class FpsLimiterControl extends LinearLayout {
         boolean customMode = position >= CUSTOM_POSITION;
         customValue.setVisibility(customMode ? VISIBLE : GONE);
 
-        if (position <= 0) valueLabel.setText("Off");
-        else if (customMode) valueLabel.setText("Custom");
+        if (position <= 0) valueLabel.setText("Tắt");
+        else if (customMode) valueLabel.setText("Tùy chỉnh");
         else valueLabel.setText((position * STEP_FPS) + " FPS");
     }
 

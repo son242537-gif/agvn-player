@@ -97,7 +97,7 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
         scope.launch {
             roots = withContext(Dispatchers.IO) { GameSaveManager.rediscoverSaveRoots(shortcut) }
             message = if (roots.isEmpty()) {
-                "No per-game folder detected. Manual backup will fall back to the whole Wine profile."
+                "Chưa tìm thấy thư mục lưu riêng của game. Sao lưu thủ công sẽ lưu toàn bộ hồ sơ Wine."
             } else {
                 "Detected ${roots.size} save location${if (roots.size == 1) "" else "s"}."
             }
@@ -133,10 +133,10 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(Modifier.weight(1f)) {
-                        Text("Game saves", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                        Text("Bản lưu game", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                         Text(shortcut.name, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                    TextButton(onClick = onClose, enabled = !busy) { Text("Close") }
+                    TextButton(onClick = onClose, enabled = !busy) { Text("Đóng") }
                 }
 
                 Surface(
@@ -145,16 +145,16 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .55f)
                 ) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                        Text("Backup folder", style = MaterialTheme.typography.labelLarge)
+                        Text("Thư mục sao lưu", style = MaterialTheme.typography.labelLarge)
                         Text(
                             "AGVN-Player/Saves/${GameSaveManager.getGameDir(shortcut).name}/",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.height(3.dp))
-                        Text("Latest backup", style = MaterialTheme.typography.labelLarge)
+                        Text("Bản sao lưu mới nhất", style = MaterialTheme.typography.labelLarge)
                         Text(
-                            latest?.let(::backupLabel) ?: "No backup yet",
+                            latest?.let(::backupLabel) ?: "Chưa có bản sao lưu",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -165,10 +165,10 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(Modifier.weight(1f)) {
-                        Text("Automatic backup", fontWeight = FontWeight.SemiBold)
+                        Text("Tự sao lưu", fontWeight = FontWeight.SemiBold)
                         Text(
-                            if (globalAutoBackup) "Enabled globally in Winlator Settings"
-                            else "Replace auto-latest.zip when the game exits",
+                            if (globalAutoBackup) "Đang bật chung trong Cài đặt"
+                            else "Ghi đè auto-latest.zip khi thoát game",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -183,7 +183,7 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                     )
                 }
 
-                Text("Save locations", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                Text("Vị trí lưu", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                 if (loading) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(modifier = Modifier.height(22.dp))
@@ -191,7 +191,7 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                     }
                 } else if (roots.isEmpty()) {
                     Text(
-                        "No specific folder detected yet.",
+                        "Chưa tìm thấy thư mục cụ thể.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -206,7 +206,7 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !busy && !loading
                 ) {
-                    Text("Rescan save locations")
+                    Text("Quét lại vị trí lưu")
                 }
 
                 Row(
@@ -236,7 +236,7 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                         modifier = Modifier.weight(1f),
                         enabled = !busy && !loading
                     ) {
-                        Text("Back up now")
+                        Text("Sao lưu ngay")
                     }
 
                     OutlinedButton(
@@ -260,7 +260,7 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                         modifier = Modifier.weight(1f),
                         enabled = !busy && latest != null
                     ) {
-                        Text("Restore")
+                        Text("Khôi phục")
                     }
                 }
 

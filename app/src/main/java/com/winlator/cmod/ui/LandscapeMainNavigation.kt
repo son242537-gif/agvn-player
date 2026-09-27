@@ -121,7 +121,7 @@ fun LandscapeMainNavigation(
     title: String,
     modifier: Modifier = Modifier,
     actionIcon: ImageVector? = null,
-    actionDescription: String = "Action",
+    actionDescription: String = "Thao tác",
     onAction: (() -> Unit)? = null
 ) {
     KeepLandscapeChromeHidden(activity)
@@ -142,13 +142,13 @@ fun LandscapeMainNavigation(
         if (actionIcon != null && onAction != null) {
             Destination(actionIcon, actionDescription, false, onAction)
         }
-        Destination(Icons.Outlined.Home, "Library", selected == R.id.main_menu_shortcuts) {
+        Destination(Icons.Outlined.Home, "Thư viện", selected == R.id.main_menu_shortcuts) {
             activity?.navigateToMainDestination(R.id.main_menu_shortcuts)
         }
-        Destination(Icons.Outlined.SportsEsports, "Input Controls", selected == R.id.main_menu_input_controls) {
+        Destination(Icons.Outlined.SportsEsports, "Điều khiển", selected == R.id.main_menu_input_controls) {
             activity?.navigateToMainDestination(R.id.main_menu_input_controls)
         }
-        Destination(Icons.Outlined.Settings, "Settings", selected == R.id.main_menu_settings) {
+        Destination(Icons.Outlined.Settings, "Cài đặt", selected == R.id.main_menu_settings) {
             activity?.navigateToMainDestination(R.id.main_menu_settings)
         }
     }

@@ -46,12 +46,12 @@ internal fun OnboardingThemeScreen(
         ) {
             Column(Modifier.weight(0.8f)) {
                 Text(
-                    "Choose your theme",
+                    "Chọn giao diện",
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    "Pick the look you prefer. You can change it later in Settings.",
+                    "Chọn giao diện bạn thích. Có thể đổi lại trong Cài đặt.",
                     modifier = Modifier.padding(top = 8.dp),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -81,12 +81,12 @@ internal fun OnboardingThemeScreen(
         Spacer(Modifier.height(8.dp))
         Column(Modifier.widthIn(max = 620.dp)) {
             Text(
-                "Choose your theme",
+                "Chọn giao diện",
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                "Pick the look you prefer. You can change it later in Settings.",
+                "Chọn giao diện bạn thích. Có thể đổi lại trong Cài đặt.",
                 modifier = Modifier.padding(top = 7.dp, bottom = 22.dp),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -111,11 +111,11 @@ private fun ThemeNavigationButtons(
     ) {
         if (onBack != null) {
             OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) {
-                Text("Back")
+                Text("Quay lại")
             }
         }
         Button(onClick = onContinue, modifier = Modifier.weight(1f)) {
-            Text("Continue")
+            Text("Tiếp tục")
         }
     }
 }

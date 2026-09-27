@@ -54,9 +54,9 @@ internal fun LibraryRootWithoutEmptyDescription(
             Modifier.padding(vertical = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            EmptyFilterChip("All", true)
-            EmptyFilterChip("Favorites", false)
-            EmptyFilterChip("Recent", false)
+            EmptyFilterChip("Tất cả", true)
+            EmptyFilterChip("Yêu thích", false)
+            EmptyFilterChip("Gần đây", false)
         }
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Surface(
@@ -81,7 +81,7 @@ internal fun LibraryRootWithoutEmptyDescription(
                     }
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        "Add games",
+                        "Thêm game",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
