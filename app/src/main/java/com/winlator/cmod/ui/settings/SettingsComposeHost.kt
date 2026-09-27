@@ -184,6 +184,11 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
             verticalArrangement = Arrangement.spacedBy(7.dp)
         ) {
             item("agvn-title") { SectionTitle(stringResource(R.string.agvn_settings_section)) }
+            item("agvn-import") {
+                NavigationRow(Icons.Outlined.Add, stringResource(R.string.agvn_import_title), stringResource(R.string.agvn_import_summary)) {
+                    activity?.let { com.winlator.cmod.agvn.AgvnImportDialog.show(it) }
+                }
+            }
             item("agvn-export-logs") {
                 NavigationRow(Icons.Outlined.BugReport, stringResource(R.string.agvn_export_logs), stringResource(R.string.agvn_export_logs_summary)) {
                     android.widget.Toast.makeText(context, R.string.agvn_export_running, android.widget.Toast.LENGTH_SHORT).show()
