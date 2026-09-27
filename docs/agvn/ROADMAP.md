@@ -7,13 +7,13 @@
 | Phase | Name | Dependencies | Effort | Status |
 |-------|------|--------------|--------|--------|
 | 1 | Baseline build (unmodified Ludashi) | — | 4h | ⏸ Local-only setup |
-| 2 | App identity & signing | P1 | 4h | 📋 Pending |
-| 3 | Crash safety & diagnostics | P2 | 4h | 📋 Pending |
-| 4 | AGVN game import profile | P3 | 8h | 📋 Pending |
-| 5 | Device tiering & auto presets | P4 | 6h | 📋 Pending |
-| 6 | In-game thermal & RAM guards | P5 | 4h | 📋 Pending |
-| 7 | Pre-launch RAM check & UE texture pool | P6 | 5h | 📋 Pending |
-| 8 | Vietnamese UI & AGVN branding | P2, P7 | 10h | 📋 Pending |
+| 2 | App identity & signing | P1 | 4h | ✅ Merged (#1), device test pending |
+| 3 | Crash safety & diagnostics | P2 | 4h | ✅ Merged (#2), device test pending |
+| 4 | AGVN game import profile | P3 | 8h | ✅ Merged (#3), device test pending |
+| 5 | Device tiering & auto presets | P4 | 6h | ✅ Merged (#4), device test pending |
+| 6 | In-game thermal & RAM guards | P5 | 4h | ✅ Merged (#5), device test pending |
+| 7 | Pre-launch RAM check & UE texture pool | P6 | 5h | ✅ Merged (#6), device test pending |
+| 8 | Vietnamese UI & AGVN branding | P2, P7 | 10h | ✅ Merged (#7), device test pending |
 | 9 | PC weak-build toolkit | P4 | 6h | 📋 Pending (parallel-safe) |
 | 10 | Release candidate & field test | All | 4h | 📋 Pending |
 
@@ -22,6 +22,13 @@
 **Parallel opportunity:** P8 after P2; P9 after P4 (touches no app code)
 
 ---
+
+## Implementation notes (deviations decided during the build)
+
+- P2: a missing `keystore.properties` does not fail the default release build (cloud/test builds are debug-signed with a warning); `-PagvnRequireReleaseSigning=true` makes it fatal for real releases.
+- P6: temperature comes from battery temperature + `PowerManager` thermal status/headroom (no `dumpsys`, which needs the DUMP permission); raw CPU/GPU 45 °C is the normal steady state on the Adreno 830 and is not used as a trigger.
+- P7: no "Sạch RAM" button (Android 14+ lets an app kill only its own processes; AGVN never kills other apps); Unreal overrides go to the per-user `Saved/Config/Windows*/Engine.ini` in the Wine prefix with `r.Streaming.PoolSize`.
+- Simulated Touchscreen is on by default for imported games and for games added from the file manager.
 
 ## Quick Phase Summaries
 
