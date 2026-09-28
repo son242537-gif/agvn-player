@@ -533,6 +533,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
         this.graphicsDriverConfig = GraphicsDriverConfigDialog.parseGraphicsDriverConfig(graphicsDriverConfig);
         this.dxwrapperConfig = DXVKConfigDialog.parseConfig(dxwrapperConfig);
+        // AGVN: DXVK 1.11.1-sarek is not bundled (Windows Defender flags its DLLs); use the other legacy DXVK instead
+        if ("1.11.1-sarek".equals(this.dxwrapperConfig.get("version"))) {
+            Log.w("AGVN", "DXVK 1.11.1-sarek is not bundled, using 1.10.3");
+            this.dxwrapperConfig.put("version", "1.10.3");
+        }
 
         if (!wineInfo.isWin64()) {
             onExtractFileListener = (file, size) -> {
