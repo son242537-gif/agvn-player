@@ -122,6 +122,9 @@ def validate(profile, game_dir):
     for k, v in (profile.get("env") or {}).items():
         if not ENV_KEY.match(k) or not isinstance(v, str) or not SAFE_VALUE.match(v):
             raise ProfileError("Biến môi trường (env) không an toàn: %s" % k)
+    for k, v in (profile.get("dllOverrides") or {}).items():
+        if not re.match(r"^[A-Za-z0-9_.-]+$", k) or v not in ("n", "b", "n,b", "b,n", ""):
+            raise ProfileError("dllOverrides không hợp lệ: %s (chỉ dùng n, b, n,b hoặc b,n)" % k)
     _check_resolution(profile.get("resolution"))
     _check_fps(profile.get("fpsLimit"))
     _check_pool(profile.get("texturePool"))

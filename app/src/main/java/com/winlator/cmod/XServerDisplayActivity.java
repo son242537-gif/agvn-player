@@ -440,6 +440,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (shortcutPath != null && !shortcutPath.isEmpty()) {
             shortcut = new Shortcut(container, new File(shortcutPath));
         }
+        com.winlator.cmod.agvn.AgvnControls.applyDefault(this, shortcut);
 
         taskAffinityMask = (short) ProcessHelper.getAffinityMask(container.getCPUList(true));
         taskAffinityMaskWoW64 = (short) ProcessHelper.getAffinityMask(container.getCPUListWoW64(true));
@@ -677,6 +678,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
         Runnable runnable = () -> {
             setupUI();
+            com.winlator.cmod.agvn.AgvnKeyboardButton.attach(this);
             setupSidebarInputControls();
             if (controlsProfile.isEmpty()) {
 
@@ -1125,8 +1127,10 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
             envVars.putAll(container.getEnvVars());
 
-            if (shortcut != null)
+            if (shortcut != null) {
                 envVars.putAll(shortcut.getExtra("envVars"));
+                com.winlator.cmod.agvn.GameDllOverrides.applyAtLaunch(envVars, shortcut.path);
+            }
 
             applyOpenGLDriverEnvVars();
 
