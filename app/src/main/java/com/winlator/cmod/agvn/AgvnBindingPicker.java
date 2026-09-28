@@ -18,7 +18,6 @@ import com.winlator.cmod.core.AppUtils;
 import com.winlator.cmod.inputcontrols.Binding;
 import com.winlator.cmod.inputcontrols.ControlElement;
 
-import java.util.List;
 
 /**
  * In-game key picker for the selected control: a Vietnamese list of keys for a button (plus renaming its label), or
@@ -38,39 +37,17 @@ final class AgvnBindingPicker {
     static void pick(Activity activity, ControlElement element, Result result) {
         switch (element.getType()) {
             case BUTTON:
-                pickKey(activity, element, result);
+                AgvnKeyboardPicker.pick(activity, element, result);
                 break;
             case D_PAD:
             case STICK:
+            case TRACKPAD:
                 pickDirections(activity, element, result);
                 break;
             default:
                 AppUtils.showToast(activity, R.string.agvn_edit_no_keys_for_type);
                 result.done(false);
         }
-    }
-
-    private static void pickKey(Activity activity, ControlElement element, Result result) {
-        List<Binding> bindings = AgvnBindingLabels.buttonBindings();
-        String[] labels = new String[bindings.size()];
-        for (int i = 0; i < labels.length; i++) labels[i] = AgvnBindingLabels.label(activity, bindings.get(i));
-        boolean[] handled = {false};
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-                .setTitle(R.string.agvn_edit_pick_key)
-                .setItems(labels, (d, which) -> {
-                    handled[0] = true;
-                    setKey(activity, element, bindings.get(which));
-                    result.done(true);
-                })
-                .setNegativeButton(R.string.agvn_cancel, null)
-                .setOnDismissListener(d -> {
-                    if (!handled[0]) result.done(false);
-                });
-        if (element.getBindingAt(0) != Binding.NONE) builder.setNeutralButton(R.string.agvn_edit_rename, (d, w) -> {
-            handled[0] = true;
-            rename(activity, element, result);
-        });
-        show(activity, builder.create());
     }
 
     /** One key on slot 0, the other slots cleared, and the face text set to the key's short name. */
@@ -81,7 +58,7 @@ final class AgvnBindingPicker {
         element.setText(AgvnBindingLabels.faceText(activity, binding));
     }
 
-    private static void rename(Activity activity, ControlElement element, Result result) {
+    static void rename(Activity activity, ControlElement element, Result result) {
         EditText input = new EditText(activity);
         input.setSingleLine(true);
         input.setText(element.getText()); // before the filter, which would cut a longer label

@@ -115,4 +115,7 @@
     <string name="agvn_dir_arrows">Mũi tên ↑ → ↓ ←</string>
     <string name="agvn_dir_wasd">W A S D</string>
     <string name="agvn_dir_mouse">Di chuyển chuột</string>
+    <string name="agvn_kb_hold">Giữ (bấm 1 lần để giữ, bấm lần nữa để thả) — dùng để giữ chuột kéo thả</string>
+    <string name="agvn_edit_add_trackpad">+ Vùng xoay</string>
+    <string name="agvn_edit_add_trackpad_desc">Thêm vùng vuốt để xoay camera / di chuột như touchpad</string>
 </resources>
