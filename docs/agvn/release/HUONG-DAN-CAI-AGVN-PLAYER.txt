@@ -25,18 +25,20 @@ bộ nhớ trống ít nhất 4 GB cộng dung lượng game.
 
 3. CHÉP GAME VÀO ĐIỆN THOẠI
 --------------------------------------------------
-- Mỗi game AGVN là một thư mục có file agvn-profile.json.
-- Chép cả thư mục game vào: Bộ nhớ trong / AGVN /
-  Ví dụ: Bộ nhớ trong/AGVN/AVDirector/agvn-profile.json
+- Chép nguyên thư mục game vào Bộ nhớ trong / AGVN (nên dùng), hoặc thư mục Download,
+  hoặc thẻ nhớ / AGVN. Để trong thư mục con cũng được (ví dụ AGVN/Games/Tên game).
 - Có thể chép bằng cáp USB từ máy tính, hoặc giải nén file game ngay trên điện thoại.
 
 4. THÊM GAME VÀO THƯ VIỆN
 --------------------------------------------------
 - Trong AGVN Player, mở Thư viện → bấm nút "+" (hoặc "Thêm game").
-- Chọn tên thư mục game → xem thông tin → bấm "Nhập".
+- Ứng dụng tự tìm game trong máy và hiện danh sách. Game có dấu ✦ là game chưa có file
+  cấu hình, ứng dụng sẽ tự cấu hình.
+- Nếu ứng dụng báo chưa được phép đọc bộ nhớ: bấm "Cấp quyền" → bật "Cho phép quản lý tất
+  cả tệp" → quay lại.
+- Chọn game → xem thông tin → bấm "Nhập". Game hiện trong Thư viện. Bấm "Chơi".
 - Ứng dụng tự chọn cấu hình theo sức máy (Mạnh / Trung bình / Yếu).
   Muốn đổi: bấm "Đổi mức" trước khi Nhập, hoặc Cài đặt → AGVN → Chế độ thiết bị.
-- Game hiện trong Thư viện. Bấm "Chơi".
 - Lần chạy đầu một game có thể mất 30–60 giây trước khi hiện hình.
 
 5. KHI ĐANG CHƠI

@@ -54,22 +54,54 @@ public final class AgvnGameImporter {
         return new File(SettingsFragment.DEFAULT_WINLATOR_PATH, "profiles");
     }
 
-    /** Game folders directly under /sdcard/AGVN that contain agvn-profile.json. */
+    /**
+     * Game folders found anywhere a player is likely to copy them: internal storage/AGVN (3 levels), Download,
+     * Games, the storage root itself, and the same places on SD cards / USB drives.
+     */
     public static List<File> listGameDirs() {
-        List<File> dirs = new ArrayList<>();
-        File[] children = getGamesRoot().listFiles();
-        if (children == null) return dirs;
-        java.util.Arrays.sort(children);
-        for (File dir : children) {
-            if (dir.isDirectory() && new File(dir, AgvnProfile.FILE_NAME).isFile()) dirs.add(dir);
+        List<AgvnGameScanner.Root> roots = new ArrayList<>();
+        for (File volume : storageVolumes()) {
+            roots.add(new AgvnGameScanner.Root(new File(volume, "AGVN"), 3));
+            roots.add(new AgvnGameScanner.Root(new File(volume, "Download"), 2));
+            roots.add(new AgvnGameScanner.Root(new File(volume, "Games"), 2));
+            roots.add(new AgvnGameScanner.Root(volume, 1));
         }
-        return dirs;
+        return AgvnGameScanner.scan(roots);
+    }
+
+    /** Internal storage first, then removable volumes mounted under /storage. */
+    static List<File> storageVolumes() {
+        List<File> volumes = new ArrayList<>();
+        volumes.add(Environment.getExternalStorageDirectory());
+        File[] mounted = new File("/storage").listFiles();
+        if (mounted != null) {
+            for (File f : mounted) {
+                String n = f.getName();
+                if (!n.equals("emulated") && !n.equals("self") && f.isDirectory() && f.canRead()) volumes.add(f);
+            }
+        }
+        return volumes;
+    }
+
+    /** True when the app cannot list shared storage (missing "all files" / storage permission). */
+    public static boolean storageBlocked() {
+        File root = Environment.getExternalStorageDirectory();
+        if (android.os.Build.VERSION.SDK_INT >= 30 && !Environment.isExternalStorageManager()) {
+            return root.listFiles() == null;
+        }
+        return !root.canRead() || root.listFiles() == null;
     }
 
     public static Candidate load(File gameDir) throws AgvnProfileException {
-        String json = FileUtils.readString(new File(gameDir, AgvnProfile.FILE_NAME));
-        if (json == null) throw new AgvnProfileException("Không đọc được file agvn-profile.json.");
-        AgvnProfile profile = AgvnProfile.parse(json);
+        File profileFile = new File(gameDir, AgvnProfile.FILE_NAME);
+        AgvnProfile profile;
+        if (profileFile.isFile()) {
+            String json = FileUtils.readString(profileFile);
+            if (json == null || json.isEmpty()) throw new AgvnProfileException("Không đọc được file agvn-profile.json.");
+            profile = AgvnProfile.parse(json);
+        } else {
+            profile = AgvnProfile.defaultFor(gameDir.getName());
+        }
         String exe = AgvnProfileValidator.validate(profile, gameDir);
         return new Candidate(gameDir, profile, exe, GameExeResolver.detectEngine(gameDir));
     }
@@ -80,8 +112,8 @@ public final class AgvnGameImporter {
         File profileDir = new File(getProfilesRoot(), c.gameDir.getName());
         profileDir.mkdirs();
         File profileCopy = new File(profileDir, AgvnProfile.FILE_NAME);
-        if (!FileUtils.copy(new File(c.gameDir, AgvnProfile.FILE_NAME), profileCopy))
-            throw new IOException("cannot copy profile to " + profileCopy);
+        if (!FileUtils.writeString(profileCopy, c.profile.toJson()))
+            throw new IOException("cannot write profile to " + profileCopy);
 
         File exeFile = new File(c.gameDir, c.exe);
         File desktopDir = container.getDesktopDir();

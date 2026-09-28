@@ -404,6 +404,11 @@ public class FileManagerFragment extends Fragment {
         File dRoot = Environment.getExternalStorageDirectory();
         File downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         File dTarget = downloads.exists() ? downloads : dRoot;
+        // AGVN: the storage root (where players copy the AGVN folder) was only reachable by going up from Downloads
+        File agvnDir = new File(dRoot, "AGVN");
+        driveOptionsPanel.addView(createDriveOptionRow(
+                "Bộ nhớ trong", agvnDir.isDirectory() ? "Có thư mục AGVN" : dRoot.getAbsolutePath(),
+                samePath(currentDir, dRoot), () -> openDrive(dRoot, dRoot)));
         driveOptionsPanel.addView(createDriveOptionRow(
                 "Drive D:", "Downloads", samePath(currentDriveRoot, dRoot), () -> openDrive(dTarget, dRoot)));
 

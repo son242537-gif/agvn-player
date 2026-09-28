@@ -3,6 +3,11 @@ package com.winlator.cmod.agvn;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -14,19 +19,50 @@ import com.winlator.cmod.container.ContainerManager;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.Executors;
 
-/** "Thêm game AGVN": pick a folder under /sdcard/AGVN, preview its profile, import it into the library. */
+/**
+ * "Thêm game AGVN": scans storage for game folders (with or without agvn-profile.json; ✦ = configured automatically),
+ * previews the resulting settings and imports the chosen one into the library.
+ */
 public final class AgvnImportDialog {
     private AgvnImportDialog() {}
 
     public static void show(MainActivity activity) {
-        List<File> dirs = AgvnGameImporter.listGameDirs();
+        if (AgvnGameImporter.storageBlocked()) {
+            new AlertDialog.Builder(activity)
+                    .setTitle(R.string.agvn_import_title)
+                    .setMessage(R.string.agvn_import_no_permission)
+                    .setPositiveButton(R.string.agvn_import_grant, (d, w) -> openStoragePermission(activity))
+                    .setNegativeButton(R.string.agvn_close, null)
+                    .show();
+            return;
+        }
+        AlertDialog progress = new AlertDialog.Builder(activity)
+                .setMessage(R.string.agvn_import_scanning).setCancelable(false).show();
+        Handler main = new Handler(Looper.getMainLooper());
+        Executors.newSingleThreadExecutor().execute(() -> {
+            List<File> dirs = AgvnGameImporter.listGameDirs();
+            main.post(() -> {
+                progress.dismiss();
+                if (!activity.isFinishing()) showList(activity, dirs);
+            });
+        });
+    }
+
+    private static void showList(MainActivity activity, List<File> dirs) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity).setTitle(R.string.agvn_import_title);
         if (dirs.isEmpty()) {
-            builder.setMessage(activity.getString(R.string.agvn_import_empty, AgvnGameImporter.getGamesRoot().getPath()));
+            builder.setMessage(R.string.agvn_import_empty);
         } else {
+            String root = android.os.Environment.getExternalStorageDirectory().getPath();
             String[] names = new String[dirs.size()];
-            for (int i = 0; i < names.length; i++) names[i] = dirs.get(i).getName();
+            for (int i = 0; i < names.length; i++) {
+                File dir = dirs.get(i);
+                String where = dir.getParent() != null ? dir.getParent().replace(root, activity.getString(R.string.agvn_internal_storage)) : "";
+                boolean auto = !new File(dir, AgvnProfile.FILE_NAME).isFile();
+                names[i] = dir.getName() + (auto ? " ✦" : "") + "\n   " + where;
+            }
             builder.setItems(names, (d, which) -> preview(activity, dirs.get(which), DeviceTierManager.current(activity)));
         }
         builder.setNeutralButton(R.string.agvn_import_manual, (d, w) -> activity.navigateToMainDestination(R.id.main_menu_file_manager))
@@ -79,6 +115,17 @@ public final class AgvnImportDialog {
         }
         Toast.makeText(activity, activity.getString(R.string.agvn_import_done, candidate.profile.name), Toast.LENGTH_LONG).show();
         activity.navigateToMainDestination(R.id.main_menu_shortcuts);
+    }
+
+    private static void openStoragePermission(MainActivity activity) {
+        try {
+            Intent intent = android.os.Build.VERSION.SDK_INT >= 30
+                    ? new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + activity.getPackageName()))
+                    : new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + activity.getPackageName()));
+            activity.startActivity(intent);
+        } catch (Exception e) {
+            activity.startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + activity.getPackageName())));
+        }
     }
 
     private static void showError(Context ctx, String message) {
