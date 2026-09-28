@@ -538,6 +538,14 @@ public class ShortcutsFragment extends Fragment {
     }
 
     private void requestCover(Shortcut shortcut, File cover, File autoIcon) {
+        // AGVN: offline cover (image in the game folder, else drawn from the exe icon + name); no online lookup
+        if (!cover.exists()) {
+            com.winlator.cmod.agvn.AgvnCovers.requestAsync(shortcut.name, shortcut.getExtra("agvnGameDir"),
+                    resolveExeFile(shortcut), cover, () -> {
+                        if (getActivity() != null) getActivity().runOnUiThread(() -> refreshArtworkAndLauncherShortcuts(shortcut));
+                    });
+            return;
+        }
         final String coverKey = "cover:" + shortcut.file.getPath();
         if (!cover.exists() && artworkRequests.add(coverKey)) {
             fetchCoverFromSteamGrid(shortcut, cover, () -> {
@@ -701,6 +709,9 @@ public class ShortcutsFragment extends Fragment {
         }
         else if (LibraryComposeHost.ACTION_SETTINGS.equals(action)) {
             ShortcutSettingsComposeDialog.show(this, shortcut);
+        }
+        else if (LibraryComposeHost.ACTION_QUALITY.equals(action)) {
+            com.winlator.cmod.agvn.AgvnQualityDialog.show(requireActivity(), shortcut, this::loadShortcutsList);
         }
         else if (LibraryComposeHost.ACTION_ICON.equals(action)) {
             shortcutForIconUpdate = shortcut;
