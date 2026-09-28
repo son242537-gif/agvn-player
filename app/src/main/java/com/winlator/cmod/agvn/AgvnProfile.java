@@ -65,6 +65,17 @@ public final class AgvnProfile {
         return profile;
     }
 
+    /** Profile for a game folder without agvn-profile.json: exe auto-detected, tier presets decide the rest. */
+    public static AgvnProfile defaultFor(String folderName) {
+        AgvnProfile p = new AgvnProfile();
+        p.schemaVersion = SCHEMA_VERSION;
+        String name = folderName.replaceAll("[\\\\/:*?\"<>|]", " ").trim();
+        if (name.isEmpty()) name = "Game";
+        p.name = name.length() > 80 ? name.substring(0, 80).trim() : name;
+        p.simulatedTouchscreen = true;
+        return p;
+    }
+
     public boolean isSimulatedTouchscreen() {
         return simulatedTouchscreen == null || simulatedTouchscreen;
     }
