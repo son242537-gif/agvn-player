@@ -34,6 +34,9 @@ Tùy chọn cài thêm (anh tự tải từ trang chính thức, script không t
      máy yếu (`weakDevice`) 512. Đổi bằng `--pool` / `--weak-pool`.
    - FPS 30 / máy yếu 24, độ phân giải 1280x720 / máy yếu 854x480. Đổi bằng `--fps --weak-fps --screen --weak-screen`.
    - Simulated Touchscreen bật sẵn (tắt bằng `--no-touch`).
+   - Bộ phím ảo app tự chọn theo engine: Ren'Py/KiriKiri/Tyrano/Siglus/NScripter → `vn`, RPG Maker/Wolf RPG → `rpg`,
+     GameMaker/Godot → `2d`, còn lại → `pc`. Game 3D hoặc game chỉ dùng chuột: thêm `--controls action` / `--controls mouse`
+     (ghi vào `"controls"` trong profile).
 6. **Chép lên điện thoại:** `/sdcard/AGVN/<Game>/` (cả thư mục game lẫn `agvn-profile.json`).
 7. Trong app: Thư viện → **+** → chọn game → **Nhập**. Chơi thử 5–15 phút và chạy `do-tai.sh`.
 

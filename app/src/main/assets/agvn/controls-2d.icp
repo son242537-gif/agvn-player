@@ -1,0 +1,16 @@
+{
+ "id": 9003,
+ "name": "AGVN · 2D",
+ "cursorSpeed": 1,
+ "agvnLayoutVersion": 1,
+ "elements": [
+  {"type": "D_PAD", "shape": "CIRCLE", "bindings": ["KEY_UP", "KEY_RIGHT", "KEY_DOWN", "KEY_LEFT"], "scale": 0.9, "x": 0.13, "y": 0.74, "toggleSwitch": false, "text": "", "iconId": 0, "opacity": 0.6},
+  {"type": "BUTTON", "shape": "CIRCLE", "bindings": ["KEY_Z", "NONE", "NONE", "NONE"], "scale": 0.9, "x": 0.865, "y": 0.86, "toggleSwitch": false, "text": "Z", "iconId": 0, "opacity": 0.6},
+  {"type": "BUTTON", "shape": "CIRCLE", "bindings": ["KEY_X", "NONE", "NONE", "NONE"], "scale": 0.9, "x": 0.925, "y": 0.73, "toggleSwitch": false, "text": "X", "iconId": 0, "opacity": 0.6},
+  {"type": "BUTTON", "shape": "CIRCLE", "bindings": ["KEY_C", "NONE", "NONE", "NONE"], "scale": 0.9, "x": 0.805, "y": 0.73, "toggleSwitch": false, "text": "C", "iconId": 0, "opacity": 0.6},
+  {"type": "BUTTON", "shape": "CIRCLE", "bindings": ["KEY_SHIFT_L", "NONE", "NONE", "NONE"], "scale": 0.9, "x": 0.865, "y": 0.6, "toggleSwitch": false, "text": "Shift", "iconId": 0, "opacity": 0.6},
+  {"type": "BUTTON", "shape": "ROUND_RECT", "bindings": ["KEY_ESC", "NONE", "NONE", "NONE"], "scale": 0.7, "x": 0.95, "y": 0.18, "toggleSwitch": false, "text": "Esc", "iconId": 0, "opacity": 0.6},
+  {"type": "BUTTON", "shape": "ROUND_RECT", "bindings": ["KEY_ENTER", "NONE", "NONE", "NONE"], "scale": 0.7, "x": 0.95, "y": 0.3, "toggleSwitch": false, "text": "Enter", "iconId": 0, "opacity": 0.6},
+  {"type": "BUTTON", "shape": "ROUND_RECT", "bindings": ["KEY_SPACE", "NONE", "NONE", "NONE"], "scale": 0.7, "x": 0.95, "y": 0.42, "toggleSwitch": false, "text": "Space", "iconId": 0, "opacity": 0.6}
+ ]
+}

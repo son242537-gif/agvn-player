@@ -1,6 +1,8 @@
 /* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
+import com.winlator.cmod.core.EnvVars;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -64,13 +66,22 @@ public final class GameDllOverrides {
 
     /**
      * Adds detected proxy DLLs of the launched exe to WINEDLLOVERRIDES (entries already set keep their mode).
-     * Covers games added before this feature and games added from the file manager. Unix exe paths only.
+     * Covers games added before this feature and games added from the file manager. {@code exePath} is the path
+     * actually launched (after {@link AgvnExeRedirect}); DOS paths are mapped through the container drives.
      */
-    public static void applyAtLaunch(com.winlator.cmod.core.EnvVars env, String exePath) {
-        if (exePath == null) return;
-        String path = exePath.replace("\"", "").trim();
-        if (!path.startsWith("/")) return;
-        Map<String, String> detected = detect(new File(path).getParentFile());
+    public static void applyAtLaunch(EnvVars env, String exePath, com.winlator.cmod.container.Container container) {
+        applyToExe(env, AgvnExeRedirect.toUnixPath(exePath, container));
+    }
+
+    /** Same with a drive letter -> unix folder map instead of a container. */
+    static void applyAtLaunch(EnvVars env, String exePath, Map<String, String> drives) {
+        applyToExe(env, AgvnExeRedirect.toUnixPath(exePath, drives));
+    }
+
+    /** {@code exeFile}: the exe's mapped path (unquoted, no args); .lnk files and null are ignored. */
+    static void applyToExe(EnvVars env, String exeFile) {
+        if (exeFile == null || exeFile.toLowerCase(Locale.ROOT).endsWith(".lnk")) return;
+        Map<String, String> detected = detect(new File(exeFile).getParentFile());
         if (detected.isEmpty()) return;
         String existing = env.has("WINEDLLOVERRIDES") ? env.get("WINEDLLOVERRIDES") : "";
         String merged = merge(existing, detected);

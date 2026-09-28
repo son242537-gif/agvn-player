@@ -46,6 +46,8 @@ public final class AgvnProfileValidator {
             checkFps(p.weakDevice.fpsLimit);
             checkPool(p.weakDevice.texturePool);
         }
+        if (p.controls != null && !AgvnLayouts.isKind(p.controls))
+            throw new AgvnProfileException("Bộ phím (controls) phải là một trong: " + String.join(", ", AgvnLayouts.KINDS) + ": " + p.controls);
         for (Map.Entry<String, Map<String, String>> section : p.ueEngineIni.entrySet()) {
             if (!INI_SECTION.matcher(section.getKey()).matches() || section.getValue() == null)
                 throw new AgvnProfileException("Mục Engine.ini không được phép: " + section.getKey());

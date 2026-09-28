@@ -324,6 +324,7 @@ public class ShortcutSettingsDialog extends ContentDialog implements DXVKConfigD
 
         final Spinner sControlsProfile = findViewById(R.id.SControlsProfile);
         loadControlsProfileSpinner(sControlsProfile, shortcut.getExtra("controlsProfile", "0"));
+        final int agvnControlsShown = sControlsProfile.getSelectedItemPosition(); // AGVN: untouched picker keeps the auto layout
 
         final CheckBox cbDisabledXInput = findViewById(R.id.CBDisabledXInput);
         boolean isXInputDisabled = shortcut.getExtra("disableXinput", "0").equals("1");
@@ -505,7 +506,10 @@ public class ShortcutSettingsDialog extends ContentDialog implements DXVKConfigD
 
             ArrayList<ControlsProfile> profiles = inputControlsManager.getProfiles(true);
             int controlsProfile = sControlsProfile.getSelectedItemPosition() > 0 ? profiles.get(sControlsProfile.getSelectedItemPosition() - 1).id : 0;
-            shortcut.putExtra("controlsProfile", controlsProfile > 0 ? String.valueOf(controlsProfile) : null);
+            if (sControlsProfile.getSelectedItemPosition() != agvnControlsShown) { // AGVN: player's choice; "0" = controls off
+                shortcut.putExtra("controlsProfile", String.valueOf(controlsProfile));
+                shortcut.putExtra(com.winlator.cmod.agvn.AgvnLayouts.EXTRA_AUTO, null);
+            }
 
             String cpuList = cpuListView.getCheckedCPUListAsString();
             shortcut.putExtra("cpuList", cpuList);

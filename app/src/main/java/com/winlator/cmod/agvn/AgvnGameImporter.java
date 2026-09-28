@@ -127,7 +127,7 @@ public final class AgvnGameImporter {
             writer.println("Icon=" + name);
         }
 
-        AgvnControls.ensureProfile(ctx);
+        AgvnControls.ensureProfiles(ctx);
         Shortcut shortcut = new Shortcut(container, desktopFile);
         LaunchPresetResolver.Effective eff = LaunchPresetResolver.resolve(c.profile, tier, DeviceTierManager.getRules(ctx).preset(tier));
         applyProfile(shortcut, c, profileCopy, eff);
@@ -145,7 +145,7 @@ public final class AgvnGameImporter {
         File exeDir = new File(c.gameDir, c.exe).getParentFile();
         String dlls = GameDllOverrides.build(GameDllOverrides.detect(exeDir), p.dllOverrides);
         shortcut.putExtra("envVars", buildEnvVars(p.env, eff.fps, dlls));
-        shortcut.putExtra("controlsProfile", String.valueOf(AgvnControls.PROFILE_ID));
+        AgvnLayouts.applyImport(shortcut, AgvnLayouts.kindFor(p, c.engine));
         if (eff.resolution != null) shortcut.putExtra("screenSize", eff.resolution);
         shortcut.putExtra("simTouchScreen", p.isSimulatedTouchscreen() ? "1" : "0");
         shortcut.putExtra(EXTRA_PROFILE_PATH, profileCopy.getAbsolutePath());

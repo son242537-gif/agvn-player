@@ -4,8 +4,10 @@ package com.winlator.cmod.agvn;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Guesses the engine of a Windows game folder and the exe that should be launched.
@@ -13,7 +15,8 @@ import java.util.Locale;
  * needs VC++/.NET redists under Wine). Other engines: the single sensible exe in the folder root.
  */
 public final class GameExeResolver {
-    public enum Engine { UNREAL, UNITY, GODOT, GAMEMAKER, RENPY, UNKNOWN }
+    /** Stored by name in the shortcut extra "agvnEngine": never rename or remove a value. */
+    public enum Engine { UNREAL, UNITY, GODOT, GAMEMAKER, RENPY, KIRIKIRI, TYRANO, SIGLUS, NSCRIPTER, RPGMAKER, RPGMAKER_MV, WOLFRPG, UNKNOWN }
 
     private static final List<String> IGNORED = Arrays.asList(
             "unitycrashhandler64.exe", "unitycrashhandler32.exe", "crashreportclient.exe", "dxsetup.exe",
@@ -22,6 +25,10 @@ public final class GameExeResolver {
 
     private GameExeResolver() {}
 
+    /**
+     * Cheap fingerprint of the folder top level (plus a few fixed sub-paths). Order matters: Siglus ships Scene.pck, so it
+     * must win over the generic *.pck (Godot) rule. Mirrored by tools/agvn/agvn_profile_lib.py detect_engine.
+     */
     public static Engine detectEngine(File gameDir) {
         if (findShipping(gameDir) != null || new File(gameDir, "Engine/Binaries").isDirectory()) return Engine.UNREAL;
         File[] children = listOrEmpty(gameDir);
@@ -30,13 +37,32 @@ public final class GameExeResolver {
             if (f.isDirectory() && n.endsWith("_data") && new File(f, "globalgamemanagers").exists()) return Engine.UNITY;
             if (f.isFile() && n.equals("unityplayer.dll")) return Engine.UNITY;
         }
-        for (File f : children) {
-            String n = f.getName().toLowerCase(Locale.ROOT);
-            if (f.isFile() && n.endsWith(".pck")) return Engine.GODOT;
-            if (f.isFile() && n.equals("data.win")) return Engine.GAMEMAKER;
-            if (f.isDirectory() && n.equals("renpy")) return Engine.RENPY;
-        }
+        Map<String, File> top = new HashMap<>();
+        for (File f : children) top.put(f.getName().toLowerCase(Locale.ROOT), f);
+        if (isFile(top.get("scene.pck")) || isFile(top.get("gameexe.dat"))) return Engine.SIGLUS;
+        if (isFile(path(top, "www", "js", "rpg_core.js")) || isFile(path(top, "www", "js", "rmmz_core.js"))
+                || isFile(path(top, "js", "rpg_core.js")) || isFile(path(top, "js", "rmmz_core.js"))) return Engine.RPGMAKER_MV;
+        if (isRpgMaker(top)) return Engine.RPGMAKER;
+        if (anyFile(children, "", ".wolf") || anyFile(listOrEmpty(path(top, "data")), "", ".wolf")
+                || isFile(top.get("gurugurusmf4.dll"))) return Engine.WOLFRPG;
+        if (anyFile(children, "", ".xp3")) return Engine.KIRIKIRI;
+        if (anyFile(children, "", ".nsa") || isFile(top.get("nscript.dat"))) return Engine.NSCRIPTER;
+        if (isDir(top.get("tyrano")) || isFile(path(top, "data", "system", "config.tjs"))) return Engine.TYRANO;
+        File[] renpyGame = listOrEmpty(path(top, "game"));
+        if (isDir(top.get("renpy")) || anyFile(renpyGame, "", ".rpa", ".rpyc")) return Engine.RENPY;
+        if (anyFile(children, "", ".pck")) return Engine.GODOT;
+        if (isFile(top.get("data.win"))) return Engine.GAMEMAKER;
         return Engine.UNKNOWN;
+    }
+
+    /** RPG Maker 2000/2003 (RPG_RT.*) or XP/VX/VX Ace (Game.ini with an RGSS dll, encrypted archive or Data/ files). */
+    private static boolean isRpgMaker(Map<String, File> top) {
+        if (isFile(top.get("rpg_rt.ini")) || isFile(top.get("rpg_rt.ldb"))) return true;
+        if (!isFile(top.get("game.ini"))) return false;
+        File[] children = top.values().toArray(new File[0]);
+        File[] data = listOrEmpty(path(top, "data"));
+        return anyFile(children, "rgss", ".dll") || anyFile(listOrEmpty(path(top, "system")), "rgss", ".dll")
+                || anyFile(children, "", ".rgssad", ".rgss2a", ".rgss3a") || anyFile(data, "", ".rxdata", ".rvdata", ".rvdata2");
     }
 
     /** Exe path relative to {@code gameDir} with '/' separators, or null when nothing fits. */
@@ -77,6 +103,35 @@ public final class GameExeResolver {
             }
         }
         return null;
+    }
+
+    /** Follows lower-case path segments case-insensitively (game folders come from Windows); null when missing. */
+    private static File path(Map<String, File> top, String... segments) {
+        File f = top.get(segments[0]);
+        for (int i = 1; f != null && i < segments.length; i++) {
+            File next = null;
+            for (File c : listOrEmpty(f)) if (c.getName().toLowerCase(Locale.ROOT).equals(segments[i])) next = c;
+            f = next;
+        }
+        return f;
+    }
+
+    /** True when one of {@code files} is a file whose lower-case name starts with {@code prefix} and has one of the suffixes. */
+    private static boolean anyFile(File[] files, String prefix, String... suffixes) {
+        for (File f : files) {
+            String n = f.getName().toLowerCase(Locale.ROOT);
+            if (!n.startsWith(prefix)) continue;
+            for (String suffix : suffixes) if (n.endsWith(suffix) && f.isFile()) return true;
+        }
+        return false;
+    }
+
+    private static boolean isFile(File f) {
+        return f != null && f.isFile();
+    }
+
+    private static boolean isDir(File f) {
+        return f != null && f.isDirectory();
     }
 
     private static File[] listOrEmpty(File dir) {

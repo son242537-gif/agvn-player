@@ -225,7 +225,7 @@ private class ShortcutEditorStateV2(val shortcut: Shortcut) {
     var fexPreset by mutableStateOf(shortcut.getExtra("fexcorePreset", container.getFEXCorePreset()))
     var boxPreset by mutableStateOf(shortcut.getExtra("box64Preset", container.getBox64Preset()))
 
-    var controlsProfile by mutableStateOf(shortcut.getExtra("controlsProfile", "0"))
+    var controlsProfile by mutableStateOf(shortcut.getExtra("controlsProfile", "")) // AGVN: missing = automatic layout, "0" = off
     var fullscreen by mutableStateOf(shortcut.getExtra("fullscreenStretched", "0") == "1")
     private var inputType by mutableIntStateOf(shortcut.getExtra("inputType", container.getInputType().toString()).toIntOrNull() ?: container.getInputType())
     var exclusive by mutableStateOf(shortcut.getExtra("exclusiveXInput").let { if (it.isBlank()) container.isExclusiveXInput() else it == "1" })
@@ -443,7 +443,7 @@ internal fun ShortcutEditorV2(fragment: Fragment, shortcut: Shortcut, close: () 
     val fexPresets = remember { FEXCorePresetManager.getPresets(context).associate { it.id to it.name } }
     val boxPresets = remember { Box64PresetManager.getPresets("box64", context).associate { it.id to it.name } }
     val profiles = remember {
-        linkedMapOf("0" to "None").apply {
+        linkedMapOf("" to context.getString(R.string.agvn_controls_auto), "0" to "None").apply { // AGVN: "" = AGVN picks the layout
             InputControlsManager(context).getProfiles(true).forEach { put(it.id.toString(), it.name) }
         }
     }
@@ -1157,7 +1157,7 @@ private fun ShortcutCategoryV2(
 
         "Input" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
-                SettingMappedChoice("Controls Profile", s.controlsProfile, profiles) { s.controlsProfile = it; s.extra("controlsProfile", it.takeUnless { id -> id == "0" }) }
+                SettingMappedChoice("Controls Profile", s.controlsProfile, profiles) { s.controlsProfile = it; s.shortcut.putExtra(com.winlator.cmod.agvn.AgvnLayouts.EXTRA_AUTO, null); s.extra("controlsProfile", it.ifEmpty { null }) } // AGVN: player's choice; "0" = controls off, "" = automatic
                 SettingsDivider()
                 SettingToggle("Exclusive Input", s.exclusive) {
                     s.exclusive = it

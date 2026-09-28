@@ -164,6 +164,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private FrameRating classicHud = null;
     private WinlatorHUD modernHud = null;
     private Runnable editInputControlsCallback;
+    private Runnable agvnReloadProfileSpinner; // AGVN: lets the in-game controls editor list a new per-game profile
     private Shortcut shortcut;
     private String graphicsDriver = Container.DEFAULT_GRAPHICS_DRIVER;
     private HashMap<String, String> graphicsDriverConfig;
@@ -215,6 +216,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private boolean isMouseDisabled = false;
     private boolean simulateTouchScreen = false;
     private com.winlator.cmod.agvn.GameSessionGuard agvnSessionGuard;
+    private String agvnEffectiveExePath; // AGVN: exe actually launched (Unreal bootstrap -> Shipping redirect)
 
     private SensorManager sensorManager;
 
@@ -678,13 +680,14 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
         Runnable runnable = () -> {
             setupUI();
-            com.winlator.cmod.agvn.AgvnKeyboardButton.attach(this);
             setupSidebarInputControls();
+            com.winlator.cmod.agvn.AgvnControlsBar.attach(this); // AGVN: ⌨ ✎ 👁 bar, after the sidebar (its first apply re-shows the controls)
             if (controlsProfile.isEmpty()) {
 
                 simulateConfirmInputControlsDialog();
             }
             Executors.newSingleThreadExecutor().execute(() -> {
+                if (shortcut != null) agvnEffectiveExePath = com.winlator.cmod.agvn.AgvnExeRedirect.effectivePath(shortcut.path, container); // AGVN
                 setupWineSystemFiles();
                 extractGraphicsDriverFiles();
                 changeWineAudioDriver();
@@ -1079,6 +1082,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         }
 
         WineUtils.setJoystickRegistryKeys(container, dinputEnabled, exclusiveXInput);
+        com.winlator.cmod.agvn.VcRuntimeMarker.apply(new File(container.getRootDir(), ".wine/system.reg")); // AGVN: Visual C++ 2015-2022 markers
 
         if (shortcut != null)
             startupSelection = shortcut.getExtra("startupSelection", String.valueOf(container.getStartupSelection()));
@@ -1129,7 +1133,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
             if (shortcut != null) {
                 envVars.putAll(shortcut.getExtra("envVars"));
-                com.winlator.cmod.agvn.GameDllOverrides.applyAtLaunch(envVars, shortcut.path);
+                com.winlator.cmod.agvn.GameDllOverrides.applyAtLaunch(envVars, agvnExePath(), container); // AGVN
             }
 
             applyOpenGLDriverEnvVars();
@@ -2088,6 +2092,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             spInputControlsProfile.setAdapter(adapter);
             spInputControlsProfile.setSelection(selectedPosition, false);
         };
+        agvnReloadProfileSpinner = loadProfileSpinner; // AGVN
         loadProfileSpinner.run();
 
         if (swShowTouchscreenControls != null)
@@ -2626,6 +2631,31 @@ public class XServerDisplayActivity extends AppCompatActivity {
         return inputControlsView;
     }
 
+    // AGVN: hooks for the in-game controls editor (agvn/AgvnControlsBar, AgvnControlsEditor); UI thread only
+    public Shortcut agvnShortcut() {
+        return shortcut;
+    }
+
+    public InputControlsManager agvnControlsManager() {
+        return inputControlsManager;
+    }
+
+    public void agvnShowControls(ControlsProfile profile) {
+        showInputControls(profile);
+    }
+
+    public void agvnHideControls() {
+        hideInputControls();
+    }
+
+    // AGVN: rebuilds the sidebar profile list around the shown profile (its listener then re-applies that same profile)
+    public void agvnRefreshControlsSidebar() {
+        if (agvnReloadProfileSpinner == null || inputControlsView == null) return;
+        agvnReloadProfileSpinner.run();
+        Switch swShow = findViewById(R.id.SWShowTouchscreenControls);
+        if (swShow != null) swShow.setChecked(inputControlsView.isShowTouchscreenControls());
+    }
+
     private static final String TAG = "DXWrapperExtraction";
 
     private void extractDXWrapperFiles(String dxwrapper) {
@@ -2822,7 +2852,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             if (shortcut.path.endsWith(".lnk")) {
                 args += "\"" + shortcut.path + "\"" + execArgs;
             } else {
-                String fullPath = shortcut.path.replace("\"", "");
+                String fullPath = agvnExePath().replace("\"", ""); // AGVN: may be the redirected Shipping exe
                 String exeDir;
                 String filename;
 
@@ -2863,6 +2893,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
         String command = "winhandler.exe " + args;
 
         return command;
+    }
+
+    // AGVN: the launch path after AgvnExeRedirect, or the shortcut's own path before it is computed
+    private String agvnExePath() {
+        return agvnEffectiveExePath != null ? agvnEffectiveExePath : shortcut.path;
     }
 
     private String getExecutable() {

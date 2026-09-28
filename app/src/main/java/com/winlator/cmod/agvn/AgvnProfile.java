@@ -16,7 +16,7 @@ import java.util.Map;
  * {"schemaVersion": 1, "name": "My Game", "exe": "MyGame/Binaries/Win64/MyGame-Win64-Shipping.exe",
  *  "args": ["-dx11"], "env": {"DXVK_HUD": "0"}, "resolution": "1280x720", "fpsLimit": 30,
  *  "texturePool": 1024, "simulatedTouchscreen": true,
- *  "weakDevice": {"resolution": "854x480", "fpsLimit": 24, "texturePool": 512},
+ *  "weakDevice": {"resolution": "854x480", "fpsLimit": 24, "texturePool": 512}, "controls": "action",
  *  "ueEngineIni": {"/Script/Engine.RendererSettings": {"r.TextureStreamingPoolSize": "512"}}}
  * </pre>
  * Fields are public for Gson; treat instances as read-only after {@link #parse}.
@@ -49,6 +49,8 @@ public final class AgvnProfile {
     public Map<String, String> dllOverrides = new LinkedHashMap<>();
     /** UE Engine.ini overrides: section -> key -> value. */
     public Map<String, Map<String, String>> ueEngineIni = new LinkedHashMap<>();
+    /** On-screen controls layout: pc, vn, rpg, 2d, action or mouse (see {@link AgvnLayouts}); missing = chosen by engine. */
+    public String controls;
 
     public static AgvnProfile parse(String json) throws AgvnProfileException {
         AgvnProfile profile;

@@ -15,7 +15,7 @@ TOOLS = os.path.dirname(HERE)
 REPO = os.path.dirname(os.path.dirname(TOOLS))
 sys.path.insert(0, TOOLS)
 
-from agvn_profile_lib import ProfileError, detect_engine, resolve_exe, validate  # noqa: E402
+from agvn_profile_lib import CONTROLS, ProfileError, controls_for, detect_engine, resolve_exe, validate  # noqa: E402
 from texture_headers import read_texture  # noqa: E402
 
 
@@ -105,6 +105,78 @@ class ProfileRulesTest(unittest.TestCase):
         self.assertEqual(example["exe"], validate(example, game))
 
 
+class EngineDetectionTest(unittest.TestCase):
+    """Same fixtures as GameExeResolverTest.java: both sides must agree on every engine."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def game(self, name, *paths):
+        root = os.path.join(self.tmp.name, name)
+        os.makedirs(root)
+        for rel in paths:
+            if rel.endswith("/"):
+                os.makedirs(os.path.join(root, *rel.strip("/").split("/")))
+            else:
+                touch(root, rel)
+        return root
+
+    def check(self, expected, name, *paths):
+        root = self.game(name, *paths)
+        self.assertEqual(expected, detect_engine(root), name)
+        return root
+
+    def test_siglus_is_not_godot(self):
+        siglus = self.check("SIGLUS", "siglus", "SiglusEngine.exe", "Scene.pck", "Gameexe.dat", "g00/")
+        self.check("SIGLUS", "siglus2", "Game.exe", "Gameexe.dat")
+        self.check("GODOT", "godot", "Game.exe", "Game.pck")
+        self.assertEqual("SiglusEngine.exe", resolve_exe(siglus, "SIGLUS"))
+
+    def test_rpgmaker_families(self):
+        mv = self.check("RPGMAKER_MV", "mv", "Game.exe", "notification_helper.exe", "nw.dll", "www/js/rpg_core.js")
+        self.assertEqual("Game.exe", resolve_exe(mv, "RPGMAKER_MV"))
+        self.check("RPGMAKER_MV", "mz", "Game.exe", "js/rmmz_core.js")
+        self.check("RPGMAKER", "vxace", "Game.exe", "Game.ini", "Game.rgss3a", "System/RGSS301.dll")
+        self.check("RPGMAKER", "xp", "Game.exe", "Game.ini", "RGSS104E.dll")
+        self.check("RPGMAKER", "vx", "Game.exe", "Game.ini", "Data/Map001.rvdata")
+        self.check("RPGMAKER", "rm2k3", "RPG_RT.exe", "RPG_RT.ldb", "RPG_RT.ini")
+        self.check("UNKNOWN", "iniOnly", "Game.exe", "Game.ini")
+
+    def test_wolf_skips_config_exe(self):
+        wolf = self.check("WOLFRPG", "wolf", "Config.exe", "Game.exe", "Data.wolf", "GuruguruSMF4.dll")
+        self.assertEqual("Game.exe", resolve_exe(wolf, "WOLFRPG"))
+        self.check("WOLFRPG", "wolf2", "Game.exe", "Data/BasicData.wolf")
+        self.check("WOLFRPG", "wolf3", "Game.exe", "GuruguruSMF4.dll", "Data/BasicData/")
+
+    def test_visual_novel_engines(self):
+        self.check("KIRIKIRI", "krkr", "game.exe", "data.xp3", "plugin/wuvorbis.dll")
+        self.check("NSCRIPTER", "ons", "nscr.exe", "arc.nsa", "0.txt")
+        self.check("NSCRIPTER", "ons2", "nscr.exe", "nscript.dat")
+        self.check("TYRANO", "tyrano", "Game.exe", "index.html", "tyrano/libs.js")
+        self.check("TYRANO", "tyrano2", "Game.exe", "Data/System/Config.tjs")
+        self.check("RENPY", "renpy", "Game.exe", "renpy/", "lib/")
+        self.check("RENPY", "renpy2", "Game.exe", "game/archive.rpa")
+        self.check("RENPY", "renpy3", "Game.exe", "game/script.rpyc")
+        self.check("UNKNOWN", "plain", "Game.exe", "game/readme.txt")
+
+    def test_controls_kind(self):
+        self.assertEqual(("pc", "vn", "rpg", "2d", "action", "mouse"), CONTROLS)
+        for engine, kind in (("RENPY", "vn"), ("KIRIKIRI", "vn"), ("TYRANO", "vn"), ("SIGLUS", "vn"), ("NSCRIPTER", "vn"),
+                             ("RPGMAKER", "rpg"), ("RPGMAKER_MV", "rpg"), ("WOLFRPG", "rpg"), ("GAMEMAKER", "2d"),
+                             ("GODOT", "2d"), ("UNREAL", "pc"), ("UNITY", "pc"), ("UNKNOWN", "pc")):
+            self.assertEqual(kind, controls_for(engine), engine)
+        self.assertEqual("action", controls_for("RENPY", {"controls": "action"}))
+        game = self.game("g", "game.exe", "data.xp3")
+        for kind in CONTROLS:
+            validate({"schemaVersion": 1, "name": "g", "controls": kind}, game)
+        for bad in ("VN", "gamepad", "", 1):
+            with self.assertRaises(ProfileError, msg=repr(bad)):
+                validate({"schemaVersion": 1, "name": "g", "controls": bad}, game)
+
+
 class ProfileScriptTest(unittest.TestCase):
     def test_generate_and_check(self):
         mod = load_script("tao-agvn-profile.py")
@@ -123,6 +195,23 @@ class ProfileScriptTest(unittest.TestCase):
                 self.assertEqual(3, mod.main([game]))           # no overwrite without --force
                 self.assertEqual(0, mod.main([game, "--check"]))
                 self.assertEqual(1, mod.main([game, "--force", "--fps", "500"]))
+
+    def test_controls_option(self):
+        mod = load_script("tao-agvn-profile.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            game = os.path.join(tmp, "Game")
+            touch(game, "Game.exe")
+            touch(game, "data.xp3")
+            out = io.StringIO()
+            with redirect_stdout(out):
+                self.assertEqual(0, mod.main([game]))
+            self.assertIn("Bộ phím: vn", out.getvalue())
+            with open(os.path.join(game, "agvn-profile.json"), encoding="utf-8") as f:
+                self.assertNotIn("controls", json.load(f))
+            with redirect_stdout(io.StringIO()):
+                self.assertEqual(0, mod.main([game, "--force", "--controls", "mouse"]))
+            with open(os.path.join(game, "agvn-profile.json"), encoding="utf-8") as f:
+                self.assertEqual("mouse", json.load(f)["controls"])
 
     def test_no_exe(self):
         mod = load_script("tao-agvn-profile.py")
