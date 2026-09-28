@@ -17,11 +17,14 @@ public class GameDllOverridesTest {
     @Test
     public void detectsProxyDllsNextToExe() throws Exception {
         File dir = tmp.newFolder("bin");
-        for (String n : new String[]{"game.exe", "DINPUT8.dll", "winhttp.dll", "d3d11.dll", "steam_api64.dll"})
+        for (String n : new String[]{"game.exe", "DINPUT8.dll", "winmm.dll", "agvncheat.dll", "d3d11.dll", "dxgi.dll",
+                "kernel32.dll", "api-ms-win-crt-runtime-l1-1-0.dll", "readme.txt"})
             assertTrue(new File(dir, n).createNewFile());
+        assertTrue(new File(dir, "D3D12").mkdir());
+        assertTrue(new File(dir, "D3D12/D3D12Core.dll").createNewFile());
         Map<String, String> found = GameDllOverrides.detect(dir);
-        assertEquals("dinput8=n,b;winhttp=n,b", GameDllOverrides.build(found, null));
-        assertEquals("dinput8=n,b;winhttp=b", GameDllOverrides.build(found, Collections.singletonMap("winhttp.dll", "b")));
+        assertEquals("agvncheat=n,b;dinput8=n,b;winmm=n,b", GameDllOverrides.build(found, null));
+        assertEquals("agvncheat=n,b;dinput8=n,b;winmm=b", GameDllOverrides.build(found, Collections.singletonMap("winmm.dll", "b")));
         assertTrue(GameDllOverrides.detect(tmp.newFolder("empty")).isEmpty());
     }
 

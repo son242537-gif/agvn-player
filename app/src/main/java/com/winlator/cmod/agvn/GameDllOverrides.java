@@ -2,35 +2,45 @@
 package com.winlator.cmod.agvn;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 /**
- * Cheat menus, translations and mod loaders ship "proxy" DLLs next to the game exe (Ultimate ASI Loader dinput8/
- * version/winmm, BepInEx/Doorstop winhttp, UE4SS dwmapi/xinput1_3 ...). Wine prefers its own builtin copy of those
- * names, so the mod silently never loads. This builds WINEDLLOVERRIDES entries (native first) for the ones present.
- * Graphics DLLs (d3d*, dxgi) are already native through DXVK and are left alone.
+ * AGVN game packages ship their own DLLs next to the exe: cheat/mod loaders (winmm/dinput8/version proxies, BepInEx
+ * winhttp, UE4SS dwmapi/xinput) and DLLs tuned by AGVN to make the game lighter. Wine prefers its builtin copy of any
+ * name it knows, so those files are silently ignored. Every DLL in the exe folder is therefore loaded native-first,
+ * except core Windows/Wine system DLLs (replacing them breaks Wine) and graphics DLLs (already native via DXVK/VKD3D).
  */
 public final class GameDllOverrides {
-    static final String[] PROXY_DLLS = {
-            "dinput8", "version", "winmm", "winhttp", "dsound", "dwmapi",
-            "xinput1_3", "xinput1_4", "xinput9_1_0", "xinput1_1", "xinput1_2"};
+    /** Never forced native: Wine core, C runtime base and graphics stacks. */
+    static final Set<String> KEEP_BUILTIN = new HashSet<>(Arrays.asList(
+            "ntdll", "kernel32", "kernelbase", "user32", "gdi32", "win32u", "advapi32", "sechost", "rpcrt4",
+            "ole32", "oleaut32", "combase", "shell32", "shlwapi", "msvcrt", "ucrtbase", "ws2_32", "imm32",
+            "d3d8", "d3d9", "d3d10", "d3d10_1", "d3d10core", "d3d11", "d3d12", "d3d12core", "dxgi", "ddraw",
+            "wined3d", "opengl32", "vulkan-1", "winevulkan", "dxcore"));
     static final Pattern NAME = Pattern.compile("^[A-Za-z0-9_.-]+$");
     static final Pattern MODE = Pattern.compile("^(n|b|n,b|b,n|)$");
 
     private GameDllOverrides() {}
 
-    /** Proxy DLLs found in the exe folder, mapped to "n,b". */
+    /** DLLs found in the exe folder (not subfolders), mapped to "n,b", minus {@link #KEEP_BUILTIN} and api-ms-*. */
     public static Map<String, String> detect(File exeDir) {
-        Map<String, String> found = new LinkedHashMap<>();
+        Map<String, String> found = new TreeMap<>();
         File[] files = exeDir != null ? exeDir.listFiles() : null;
         if (files == null) return found;
-        for (String dll : PROXY_DLLS) {
-            for (File f : files) {
-                if (f.isFile() && f.getName().toLowerCase(Locale.ROOT).equals(dll + ".dll")) found.put(dll, "n,b");
-            }
+        for (File f : files) {
+            String lower = f.getName().toLowerCase(Locale.ROOT);
+            if (!f.isFile() || !lower.endsWith(".dll")) continue;
+            String name = lower.substring(0, lower.length() - 4);
+            if (KEEP_BUILTIN.contains(name) || name.startsWith("api-ms-") || name.startsWith("ext-ms-")) continue;
+            if (!NAME.matcher(name).matches()) continue;
+            found.put(name, "n,b");
         }
         return found;
     }
