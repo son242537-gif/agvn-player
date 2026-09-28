@@ -108,6 +108,14 @@ public class AgvnProfileTest {
         assertRejected(profile(""), dir);
     }
 
+    @Test
+    public void validatesDllOverrides() throws Exception {
+        File dir = ueGame();
+        AgvnProfileValidator.validate(profile(",\"dllOverrides\":{\"dinput8\":\"n,b\"}"), dir);
+        assertRejected(profile(",\"dllOverrides\":{\"dinput8\":\"n;rm\"}"), dir);
+        assertRejected(profile(",\"dllOverrides\":{\"a b\":\"n\"}"), dir);
+    }
+
     @Test(expected = AgvnProfileException.class)
     public void rejectsBrokenJson() throws Exception {
         AgvnProfile.parse("{not json");
@@ -116,7 +124,11 @@ public class AgvnProfileTest {
     @Test
     public void envVarsIncludeFpsCap() {
         assertEquals("DXVK_HUD=0 DXVK_FRAME_RATE=24",
-                AgvnGameImporter.buildEnvVars(Collections.singletonMap("DXVK_HUD", "0"), 24));
-        assertEquals("", AgvnGameImporter.buildEnvVars(Collections.emptyMap(), 0));
+                AgvnGameImporter.buildEnvVars(Collections.singletonMap("DXVK_HUD", "0"), 24, ""));
+        assertEquals("", AgvnGameImporter.buildEnvVars(Collections.emptyMap(), 0, null));
+        assertEquals("WINEDLLOVERRIDES=dinput8=n,b DXVK_FRAME_RATE=30",
+                AgvnGameImporter.buildEnvVars(Collections.emptyMap(), 30, "dinput8=n,b"));
+        assertEquals("WINEDLLOVERRIDES=mscoree=b;winhttp=n,b",
+                AgvnGameImporter.buildEnvVars(Collections.singletonMap("WINEDLLOVERRIDES", "mscoree=b"), 0, "winhttp=n,b"));
     }
 }

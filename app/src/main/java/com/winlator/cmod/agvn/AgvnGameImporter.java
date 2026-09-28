@@ -95,6 +95,7 @@ public final class AgvnGameImporter {
             writer.println("Icon=" + name);
         }
 
+        AgvnControls.ensureProfile(ctx);
         Shortcut shortcut = new Shortcut(container, desktopFile);
         LaunchPresetResolver.Effective eff = LaunchPresetResolver.resolve(c.profile, tier, DeviceTierManager.getRules(ctx).preset(tier));
         applyProfile(shortcut, c, profileCopy, eff);
@@ -109,7 +110,10 @@ public final class AgvnGameImporter {
     static void applyProfile(Shortcut shortcut, Candidate c, File profileCopy, LaunchPresetResolver.Effective eff) {
         AgvnProfile p = c.profile;
         shortcut.putExtra("execArgs", String.join(" ", p.args));
-        shortcut.putExtra("envVars", buildEnvVars(p.env, eff.fps));
+        File exeDir = new File(c.gameDir, c.exe).getParentFile();
+        String dlls = GameDllOverrides.build(GameDllOverrides.detect(exeDir), p.dllOverrides);
+        shortcut.putExtra("envVars", buildEnvVars(p.env, eff.fps, dlls));
+        shortcut.putExtra("controlsProfile", String.valueOf(AgvnControls.PROFILE_ID));
         if (eff.resolution != null) shortcut.putExtra("screenSize", eff.resolution);
         shortcut.putExtra("simTouchScreen", p.isSimulatedTouchscreen() ? "1" : "0");
         shortcut.putExtra(EXTRA_PROFILE_PATH, profileCopy.getAbsolutePath());
@@ -119,11 +123,15 @@ public final class AgvnGameImporter {
         shortcut.putExtra(EXTRA_ENGINE, c.engine.name());
     }
 
-    /** "KEY=VALUE KEY2=VALUE2"; the FPS cap uses DXVK's DXVK_FRAME_RATE. */
-    static String buildEnvVars(Map<String, String> env, int fpsLimit) {
+    /** "KEY=VALUE KEY2=VALUE2"; the FPS cap uses DXVK's DXVK_FRAME_RATE, mod DLLs go to WINEDLLOVERRIDES. */
+    static String buildEnvVars(Map<String, String> env, int fpsLimit, String dllOverrides) {
         StringBuilder sb = new StringBuilder();
+        String overrides = dllOverrides != null ? dllOverrides : "";
+        String fromEnv = env.get("WINEDLLOVERRIDES");
+        if (fromEnv != null && !fromEnv.isEmpty()) overrides = overrides.isEmpty() ? fromEnv : fromEnv + ";" + overrides;
+        if (!overrides.isEmpty()) sb.append("WINEDLLOVERRIDES=").append(overrides);
         for (Map.Entry<String, String> e : env.entrySet()) {
-            if (e.getKey().equals("DXVK_FRAME_RATE")) continue;
+            if (e.getKey().equals("DXVK_FRAME_RATE") || e.getKey().equals("WINEDLLOVERRIDES")) continue;
             if (sb.length() > 0) sb.append(' ');
             sb.append(e.getKey()).append('=').append(e.getValue());
         }

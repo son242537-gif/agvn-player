@@ -34,6 +34,10 @@ public final class AgvnProfileValidator {
             if (!ENV_KEY.matcher(e.getKey()).matches() || e.getValue() == null || !SAFE_VALUE.matcher(e.getValue()).matches())
                 throw new AgvnProfileException("Biến môi trường (env) không an toàn: " + e.getKey());
         }
+        for (Map.Entry<String, String> e : p.dllOverrides.entrySet()) {
+            if (!GameDllOverrides.isValid(e.getKey(), e.getValue()))
+                throw new AgvnProfileException("dllOverrides không hợp lệ: " + e.getKey() + " (chỉ dùng n, b, n,b hoặc b,n)");
+        }
         checkResolution(p.resolution);
         checkFps(p.fpsLimit);
         checkPool(p.texturePool);
