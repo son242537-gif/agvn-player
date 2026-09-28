@@ -68,7 +68,7 @@ public class UeIniWriterTest {
         List<File> files = UeIniWriter.apply(user, "MyGame", o);
         assertEquals(2, files.size());
         for (File f : files) {
-            assertTrue(f.getPath().contains("AppData/Local/MyGame/Saved/Config/"));
+            assertTrue(f.getPath().replace(File.separatorChar, '/').contains("AppData/Local/MyGame/Saved/Config/"));
             assertTrue(new String(Files.readAllBytes(f.toPath()), StandardCharsets.UTF_8).contains("r.Streaming.PoolSize=512"));
         }
         assertTrue(UeIniWriter.apply(user, "MyGame", new LinkedHashMap<>()).isEmpty());
