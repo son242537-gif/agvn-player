@@ -58,7 +58,7 @@ $defender = Join-Path $env:ProgramFiles "Windows Defender\MpCmdRun.exe"
 if (Test-Path $defender) {
     Log "Quet Windows Defender..."
     & $defender -Scan -ScanType 3 -File (Resolve-Path (Join-Path $out $apkName)) -DisableRemediation
-    if ($LASTEXITCODE -eq 0) { Log "Defender: sach" } else { Log "Defender bao nghi ngo (ma $LASTEXITCODE) - KHONG phat hanh, xem lai file bi bao" }
+    if ($LASTEXITCODE -eq 0) { Log "Defender: sach" } else { Log "Defender bao nghi ngo (ma $LASTEXITCODE). Neu chi co assets/proton-9.0-arm64ec.tar.zst thi da biet, xem docs\agvn\release\defender-bao-nham.md; file khac bi bao thi dung lai kiem tra" }
 } else { Log "Khong thay MpCmdRun.exe - hay quet APK bang phan mem diet virus khac" }
 
 Log "Xong: $out"; Get-ChildItem $out

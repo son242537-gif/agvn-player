@@ -7,7 +7,7 @@ Quét `AGVN-Player-v0.1.0.apk` bằng `MpCmdRun -Scan -ScanType 3` (Windows 10, 
 | `assets/proton-9.0-arm64ec.tar.zst` | Proton 9.0 arm64ec của Ludashi, SHA-256 khớp `proton_arm64ec_sha256` trong `scripts/agvn/pins.txt` | Bắt buộc cho mọi game; gửi mẫu báo nhầm cho Microsoft |
 | `assets/dxwrapper/dxvk-1.11.1-sarek.tzst` (d3d8/d3d9/d3d10core/d3d11/dxgi.dll) | DXVK bản cho GPU cũ, không phải mặc định | Đã bỏ khỏi app; cấu hình cũ tự chuyển sang DXVK 1.10.3 |
 
-Tên mối đe dọa: "Unknown" (Defender không nêu tên họ mã độc).
+Tên mối đe dọa: "Unknown" lần quét đầu; sau khi bỏ DXVK sarek chỉ còn Proton, báo `Trojan:Win32/Suschil!rfn` (nhận dạng heuristic).
 
 ## Gửi báo nhầm cho Microsoft (maintainer)
 1. Mở https://www.microsoft.com/en-us/wdsi/filesubmission → chọn "Home customer", đăng nhập tài khoản Microsoft.
@@ -16,4 +16,7 @@ Tên mối đe dọa: "Unknown" (Defender không nêu tên họ mã độc).
    (Winlator-Ludashi fork). Contains Windows system DLL replacements. Source: github.com/ValveSoftware/Proton".
 4. Chờ kết quả (thường 1–3 ngày), cập nhật định nghĩa Defender (`MpCmdRun -SignatureUpdate`), quét lại APK.
 
-Chưa phát hành APK cho khách khi Defender còn báo.
+## Quyết định của maintainer (28/09/2026)
+Khách AGVN tải APK thẳng trên điện thoại Android, nơi Windows Defender không quét, nên v0.1.0 được phát hành dù Defender
+trên Windows vẫn báo file Proton. Không gửi báo nhầm lúc này. Nếu sau này phát hành qua máy tính (Google Drive tải về PC,
+link Windows...) thì gửi báo nhầm theo các bước trên trước.
