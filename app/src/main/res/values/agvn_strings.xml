@@ -118,4 +118,12 @@
     <string name="agvn_kb_hold">Giữ (bấm 1 lần để giữ, bấm lần nữa để thả) — dùng để giữ chuột kéo thả</string>
     <string name="agvn_edit_add_trackpad">+ Vùng xoay</string>
     <string name="agvn_edit_add_trackpad_desc">Thêm vùng vuốt để xoay camera / di chuột như touchpad</string>
+    <string name="agvn_quality_action">Đồ họa</string>
+    <string name="agvn_quality_title">Đồ họa: %1$s</string>
+    <string name="agvn_quality_auto">Tự động theo máy (%1$s)</string>
+    <string name="agvn_quality_low">Thấp: nhẹ nhất, mát máy</string>
+    <string name="agvn_quality_medium">Trung bình</string>
+    <string name="agvn_quality_high">Cao: đẹp nhất</string>
+    <string name="agvn_quality_detail">Độ phân giải %1$s · %2$s</string>
+    <string name="agvn_quality_applied">Đã đặt đồ họa: %1$s</string>
 </resources>

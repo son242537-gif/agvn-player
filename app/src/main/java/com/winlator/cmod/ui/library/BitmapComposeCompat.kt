@@ -40,6 +40,7 @@ import androidx.compose.material.icons.outlined.Photo
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SportsEsports
+import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -474,6 +475,15 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
                 LibraryActionTileCompat(Icons.Outlined.Photo, "Ảnh bìa", Modifier.weight(1f), horizontal = landscape) {
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_ICON)
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                LibraryActionTileCompat(Icons.Outlined.Speed, "Đồ họa: Thấp / Trung bình / Cao", Modifier.weight(1f), horizontal = true) {
+                    close()
+                    cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_QUALITY)
                 }
             }
             Row(
