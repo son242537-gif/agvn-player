@@ -103,7 +103,7 @@ public class InputControlsManager {
             for (File file : files) {
                 ControlsProfile profile = loadProfile(context, file);
                 if (!(ignoreTemplates && profile.isTemplate())) profiles.add(profile);
-                maxProfileId = Math.max(maxProfileId, profile.id);
+                if (!com.winlator.cmod.agvn.AgvnControlsFork.inLayoutRange(profile.id)) maxProfileId = Math.max(maxProfileId, profile.id); // AGVN: new profiles stay out of the reserved ids 9000-9099
             }
         }
 

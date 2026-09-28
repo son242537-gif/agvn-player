@@ -30,7 +30,8 @@ final class AgvnBindingPicker {
         void done(boolean changed);
     }
 
-    private static final int MAX_LABEL = 8;
+    /** Longest label the player can type; longer existing labels are shown whole (the filter only limits typing). */
+    private static final int MAX_LABEL = 12;
 
     private AgvnBindingPicker() {}
 
@@ -83,8 +84,8 @@ final class AgvnBindingPicker {
     private static void rename(Activity activity, ControlElement element, Result result) {
         EditText input = new EditText(activity);
         input.setSingleLine(true);
+        input.setText(element.getText()); // before the filter, which would cut a longer label
         input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(MAX_LABEL)});
-        input.setText(element.getText());
         input.setSelection(input.getText().length());
         boolean[] handled = {false};
         show(activity, new AlertDialog.Builder(activity)

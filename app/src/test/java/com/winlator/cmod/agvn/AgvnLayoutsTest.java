@@ -112,10 +112,35 @@ public class AgvnLayoutsTest {
         touch(new File(root, "AVDirectorLife.exe"));
         File shipping = touch(new File(root, "AVDirectorLife/Binaries/Win64/AVDirectorLife-Win64-Shipping.exe"));
         assertEquals(GameExeResolver.Engine.UNREAL, AgvnLayouts.detectAround(shipping.getParentFile()));
-        File deep = tmp.newFolder("rm", "a", "b", "c", "d");
+        // Ren'Py keeps its python builds in lib/<platform>
+        File renpyLib = tmp.newFolder("rp", "lib", "py3-windows-x86_64");
+        assertTrue(new File(tmp.getRoot(), "rp/renpy").mkdir());
+        assertEquals(GameExeResolver.Engine.RENPY, AgvnLayouts.detectAround(renpyLib));
+        File deep = tmp.newFolder("rm", "bin", "x64", "win64", "lib");
         touch(new File(tmp.getRoot(), "rm/Game.ini"));
         touch(new File(tmp.getRoot(), "rm/Game.rgss3a"));
         assertEquals(GameExeResolver.Engine.UNKNOWN, AgvnLayouts.detectAround(deep));             // 4 levels: too far
         assertEquals(GameExeResolver.Engine.RPGMAKER, AgvnLayouts.detectAround(deep.getParentFile()));
+    }
+
+    @Test
+    public void sharedFoldersAboveTheGameFolderAreNotSearched() throws Exception {
+        File download = tmp.newFolder("Download");
+        touch(new File(download, "patch.xp3")); // a translation patch downloaded next to the games
+        touch(new File(download, "mod.pck"));
+        File game = tmp.newFolder("Download", "MyGame");
+        File exe = touch(new File(game, "Game.exe"));
+        assertEquals(GameExeResolver.Engine.UNKNOWN, AgvnLayouts.detectAround(game));
+        assertEquals("pc", AgvnLayouts.launchKind(null, null, null, exe.getPath()));
+        assertEquals("pc", AgvnLayouts.launchKind(null, null, game.getPath(), exe.getPath()));
+        // bin -> Tool is climbed, Tool (a plain folder) is not
+        assertEquals(GameExeResolver.Engine.UNKNOWN, AgvnLayouts.detectAround(tmp.newFolder("Download", "Tool", "bin")));
+        // Unreal Project/Binaries/Win64 reaches the root only when the root has Engine/
+        File win64 = tmp.newFolder("Download", "UE", "Proj", "Binaries", "Win64");
+        touch(new File(win64, "Proj.exe"));
+        assertEquals(GameExeResolver.Engine.UNKNOWN, AgvnLayouts.detectAround(win64));
+        assertTrue(new File(tmp.getRoot(), "Download/UE/Engine/Binaries").mkdirs());
+        assertEquals(GameExeResolver.Engine.UNREAL, AgvnLayouts.detectAround(win64));
+        assertEquals(GameExeResolver.Engine.UNKNOWN, AgvnLayouts.detectAround(new File(tmp.getRoot(), "Download/UE/Proj")));
     }
 }

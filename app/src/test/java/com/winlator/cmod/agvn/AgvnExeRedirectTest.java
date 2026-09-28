@@ -13,6 +13,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +57,29 @@ public class AgvnExeRedirectTest {
         assertEquals(launcher, AgvnExeRedirect.redirectUnrealBootstrap(launcher));
         assertTrue(new File(root, "Engine").mkdir());
         assertEquals(shipping, AgvnExeRedirect.redirectUnrealBootstrap(launcher));
+        // tools next to the game keep launching themselves
+        for (String tool : new String[]{"Config.exe", "Launcher.exe", "GameSettings.exe", "unins000.exe", "Setup.exe"}) {
+            File exe = touch(new File(root, tool));
+            assertEquals(tool, exe, AgvnExeRedirect.redirectUnrealBootstrap(exe));
+        }
+        File big = touch(new File(root, "Other.exe"));
+        grow(big, AgvnExeRedirect.BOOTSTRAP_MAX_BYTES + 1);
+        assertEquals(big, AgvnExeRedirect.redirectUnrealBootstrap(big));
+    }
+
+    @Test
+    public void exactProjectNameRedirectsWhateverTheSize() throws Exception {
+        File root = unrealGame();
+        File bootstrap = new File(root, "AVDirectorLife.exe");
+        grow(bootstrap, 2 * AgvnExeRedirect.BOOTSTRAP_MAX_BYTES);
+        assertEquals(new File(root, "AVDirectorLife/Binaries/Win64/AVDirectorLife-Win64-Shipping.exe"),
+                AgvnExeRedirect.redirectUnrealBootstrap(bootstrap));
+    }
+
+    private static void grow(File f, long length) throws IOException {
+        try (RandomAccessFile raf = new RandomAccessFile(f, "rw")) {
+            raf.setLength(length);
+        }
     }
 
     @Test

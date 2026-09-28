@@ -20,6 +20,10 @@ import java.util.Map;
  */
 public final class AgvnExeRedirect {
     private static final String TAG = "AGVN";
+    /** Root exes that are tools, not the bootstrap (same idea as GameExeResolver.resolveExe): never sent to the game. */
+    private static final String[] TOOL_WORDS = {"launcher", "setup", "config", "setting", "unins", "crash", "redist", "prereq"};
+    /** An Unreal bootstrap is ~150-500 KB; a bigger root exe next to Engine/ is something else. */
+    static final long BOOTSTRAP_MAX_BYTES = 1024 * 1024;
 
     private AgvnExeRedirect() {}
 
@@ -76,8 +80,9 @@ public final class AgvnExeRedirect {
     /**
      * The -Shipping.exe to run instead of an Unreal bootstrap or dev exe, or {@code exe} unchanged. Handled layouts:
      * {@code <Root>/<Name>.exe} with {@code <Root>/<Name>/Binaries/Win64/<Name>-Win64-Shipping.exe};
-     * any {@code <Root>/*.exe} next to {@code <Root>/Engine} and {@code <Root>/<X>/Binaries/Win64/*-Shipping.exe};
-     * {@code .../Binaries/Win64/<Name>[-...].exe} next to {@code <Name>-Win64-Shipping.exe}.
+     * a bootstrap-like {@code <Root>/*.exe} (small, not a launcher/setup/config tool) next to {@code <Root>/Engine} and
+     * {@code <Root>/<X>/Binaries/Win64/*-Shipping.exe}; {@code .../Binaries/Win64/<Name>[-...].exe} next to
+     * {@code <Name>-Win64-Shipping.exe}.
      */
     public static File redirectUnrealBootstrap(File exe) {
         if (exe == null || !exe.isFile()) return exe;
@@ -92,9 +97,15 @@ public final class AgvnExeRedirect {
             File sibling = shippingFor(dir, base.toLowerCase(Locale.ROOT));
             return sibling != null ? sibling : exe;
         }
-        if (!new File(dir, "Engine").isDirectory()) return exe;
+        if (!new File(dir, "Engine").isDirectory() || !looksLikeBootstrap(exe, lower)) return exe;
         File shipping = GameExeResolver.findShipping(dir);
         return shipping != null ? shipping : exe;
+    }
+
+    /** A root exe that may be a renamed Unreal bootstrap: small and not named like a tool (Config.exe, Launcher.exe ...). */
+    static boolean looksLikeBootstrap(File exe, String lowerName) {
+        for (String word : TOOL_WORDS) if (lowerName.contains(word)) return false;
+        return exe.length() <= BOOTSTRAP_MAX_BYTES;
     }
 
     /** First *-Shipping.exe in {@code win64} whose project name (text before the first '-') matches {@code base}. */

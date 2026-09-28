@@ -16,6 +16,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
@@ -385,9 +386,30 @@ public class InputControlsView extends View {
 
     // AGVN: lets go of held and latched controls, so no key stays pressed when the editor takes the touches or the controls hide
     public synchronized void releaseAll() {
-        if (profile == null) return;
-        for (ControlElement element : profile.getElements()) element.releaseTouch();
+        cancelTouchpadGesture();
+        releaseElements();
         invalidate();
+    }
+
+    // AGVN: a finger on the game forwarded to the touchpad never gets its UP there once the editor or [hide] takes the
+    // touches; cancel it (resets its finger count) and let go of the left/right press a simulated-touch tap may hold
+    private void cancelTouchpadGesture() {
+        if (touchpadView != null) {
+            long now = SystemClock.uptimeMillis();
+            MotionEvent cancel = MotionEvent.obtain(now, now, MotionEvent.ACTION_CANCEL, 0, 0, 0);
+            touchpadView.onTouchEvent(cancel);
+            cancel.recycle();
+        }
+        if (xServer != null) {
+            if (xServer.pointer.isButtonPressed(Pointer.Button.BUTTON_LEFT)) xServer.injectPointerButtonRelease(Pointer.Button.BUTTON_LEFT);
+            if (xServer.pointer.isButtonPressed(Pointer.Button.BUTTON_RIGHT)) xServer.injectPointerButtonRelease(Pointer.Button.BUTTON_RIGHT);
+        }
+    }
+
+    // AGVN: releases the current profile's held keys and latched toggles (not in edit mode: there "selected" means picked)
+    private synchronized void releaseElements() {
+        if (profile == null || editMode) return;
+        for (ControlElement element : profile.getElements()) element.releaseTouch();
     }
 
     private synchronized void deselectAllElements() {
@@ -411,6 +433,7 @@ public class InputControlsView extends View {
     }
 
     public synchronized void setProfile(ControlsProfile profile) {
+        releaseElements(); // AGVN: a latched toggle ("Tua" = Ctrl) or held key must not stay pressed when the profile changes or hides
         if (profile != null) {
             this.profile = profile;
             deselectAllElements();

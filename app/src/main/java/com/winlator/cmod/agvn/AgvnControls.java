@@ -41,7 +41,7 @@ public final class AgvnControls {
                 Install action = installAction(target.isFile() ? FileUtils.readString(target) : null, asset);
                 if (action == Install.WRITE && !FileUtils.writeString(target, asset)) continue;
                 if (action != Install.FOREIGN) available.add(kind);
-                else Log.w(TAG, "controls profile " + target.getName() + " belongs to the player; layout " + kind + " not used");
+                else Log.w(TAG, target.getName() + " is not a controls profile; layout " + kind + " not used");
             } catch (Exception e) {
                 Log.w(TAG, "cannot install AGVN controls layout " + kind, e);
             }
@@ -50,9 +50,10 @@ public final class AgvnControls {
     }
 
     /**
-     * Missing or unreadable file, or an older bundled version: WRITE. Same or newer bundled version, or our layout
-     * edited by the player (no version key, same name): KEEP. No version key and another name: someone else's
-     * profile took the id (FOREIGN), leave it alone.
+     * Missing or unreadable file, or an older bundled version: WRITE. Same or newer bundled version: KEEP. A controls
+     * profile without the version key is our layout saved by the player (the editors drop the key, a rename changes the
+     * name): KEEP, games keep using it. New profiles never get ids 9000-9099 (InputControlsManager, AgvnControlsFork),
+     * so nothing else is expected there; a JSON file that is not a controls profile is left alone and not used (FOREIGN).
      */
     static Install installAction(String installed, String asset) {
         if (installed == null || installed.trim().isEmpty()) return Install.WRITE;
@@ -64,8 +65,7 @@ public final class AgvnControls {
         }
         JsonObject ours = JsonParser.parseString(asset).getAsJsonObject();
         if (current.has(VERSION_KEY)) return intOf(current.get(VERSION_KEY)) < intOf(ours.get(VERSION_KEY)) ? Install.WRITE : Install.KEEP;
-        String name = stringOf(current.get("name"));
-        return name != null && name.equals(stringOf(ours.get("name"))) ? Install.KEEP : Install.FOREIGN;
+        return current.has("elements") && current.get("elements").isJsonArray() ? Install.KEEP : Install.FOREIGN;
     }
 
     /**
@@ -100,9 +100,5 @@ public final class AgvnControls {
         } catch (RuntimeException ex) {
             return 0;
         }
-    }
-
-    private static String stringOf(JsonElement e) {
-        return e != null && e.isJsonPrimitive() ? e.getAsString() : null;
     }
 }

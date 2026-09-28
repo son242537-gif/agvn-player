@@ -103,16 +103,28 @@ public final class AgvnBindingLabels {
         }
     }
 
-    /** Short text printed on the button face; arrows become ↑ ↓ ← →. */
+    /** Short text printed on the button face; arrows become ↑ ↓ ← →, mouse keys a 6-letter name (face text is small). */
     static String faceText(Context ctx, Binding b) {
         switch (b) {
             case KEY_UP: return "↑";
             case KEY_DOWN: return "↓";
             case KEY_LEFT: return "←";
             case KEY_RIGHT: return "→";
-            case KEY_BKSP: return ctx.getString(R.string.agvn_key_backspace_short);
             default:
-                return b.isMouse() && nameRes(b) != 0 ? ctx.getString(nameRes(b)) : keyName(b);
+                return shortRes(b) != 0 ? ctx.getString(shortRes(b)) : keyName(b);
+        }
+    }
+
+    /** Button-face name resource (at most 6 letters) for keys whose Vietnamese name is too long, else 0. */
+    static int shortRes(Binding b) {
+        switch (b) {
+            case MOUSE_LEFT_BUTTON: return R.string.agvn_key_mouse_left_short;
+            case MOUSE_RIGHT_BUTTON: return R.string.agvn_key_mouse_right_short;
+            case MOUSE_MIDDLE_BUTTON: return R.string.agvn_key_mouse_middle_short;
+            case MOUSE_SCROLL_UP: return R.string.agvn_key_scroll_up_short;
+            case MOUSE_SCROLL_DOWN: return R.string.agvn_key_scroll_down_short;
+            case KEY_BKSP: return R.string.agvn_key_backspace_short;
+            default: return 0;
         }
     }
 

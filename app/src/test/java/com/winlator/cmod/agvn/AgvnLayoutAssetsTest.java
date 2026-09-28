@@ -75,7 +75,8 @@ public class AgvnLayoutAssetsTest {
         assertTrue(where, scale >= 0.5 && scale <= 2.5);
         // read with getBoolean/getString/getInt by ControlsProfile.loadElements: must be present
         e.get("toggleSwitch").getAsBoolean();
-        e.get("text").getAsString();
+        // the face text is shrunk to fit the button: longer labels need a bigger button to stay readable
+        assertTrue(where, e.get("text").getAsString().length() <= (scale >= 0.9 ? 7 : 6));
         assertEquals(where, 0, e.get("iconId").getAsInt());
         assertEquals(where, 0.6, e.get("opacity").getAsDouble(), 1e-9);
     }
@@ -95,9 +96,12 @@ public class AgvnLayoutAssetsTest {
         // saved by the controls editor (version key dropped): the player's edits of our layout are kept
         assertEquals(AgvnControls.Install.KEEP,
                 AgvnControls.installAction("{\"id\":9001,\"name\":\"AGVN · Visual novel\",\"elements\":[]}", asset));
-        // another profile took the id: never overwritten, and the kind is not used
-        assertEquals(AgvnControls.Install.FOREIGN,
+        // renamed by the player in the profile manager: still our layout, kept and used
+        assertEquals(AgvnControls.Install.KEEP,
                 AgvnControls.installAction("{\"id\":9001,\"name\":\"My keys\",\"elements\":[]}", asset));
+        // not a controls profile: never overwritten, and the kind is not used
+        assertEquals(AgvnControls.Install.FOREIGN,
+                AgvnControls.installAction("{\"id\":9001,\"name\":\"My keys\"}", asset));
     }
 
     @Test

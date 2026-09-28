@@ -2,6 +2,7 @@
 package com.winlator.cmod.agvn;
 
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -19,10 +20,10 @@ import com.winlator.cmod.inputcontrols.ControlsProfile;
 import com.winlator.cmod.widget.InputControlsView;
 
 /**
- * Small bar at the top centre of the game screen: [⌨] opens the Android keyboard, [✎] edits the on-screen controls
- * right on the game ({@link AgvnControlsEditor}), [👁] hides or shows them for this game (remembered in the shortcut,
- * extra agvnControlsHidden). Hidden controls are really gone (View.GONE), so touches reach the game. Long-press a
- * button for its name. The bar hides while the sidebar drawer is open.
+ * Small bar at the top centre of the game screen: [⌨] opens the Android keyboard, [✎ Sửa] edits the on-screen controls
+ * right on the game ({@link AgvnControlsEditor}), [👁 Ẩn / 👁 Hiện] hides or shows them for this game (remembered in the
+ * shortcut, extra agvnControlsHidden). Hidden controls are really gone (View.GONE), so touches reach the game.
+ * Long-press a button for its full name. The bar hides while the sidebar drawer is open.
  */
 public final class AgvnControlsBar {
     private static final int BG_NORMAL = 0x99000000, BG_HIDDEN = 0x99b71c1c;
@@ -39,9 +40,9 @@ public final class AgvnControlsBar {
         float dp = activity.getResources().getDisplayMetrics().density;
         bar = new LinearLayout(activity);
         bar.setOrientation(LinearLayout.HORIZONTAL);
-        bar.addView(glyph("⌨", R.string.agvn_bar_keyboard, v -> AppUtils.showKeyboard(activity)));
-        bar.addView(glyph("✎", R.string.agvn_bar_edit, v -> edit()));
-        eye = glyph("👁", R.string.agvn_bar_toggle, v -> toggle());
+        bar.addView(barButton("⌨", 18, R.string.agvn_bar_keyboard, v -> AppUtils.showKeyboard(activity)));
+        bar.addView(barButton(activity.getString(R.string.agvn_bar_edit_label), 14, R.string.agvn_bar_edit, v -> edit()));
+        eye = barButton(activity.getString(R.string.agvn_bar_hide_label), 14, R.string.agvn_bar_toggle, v -> toggle());
         bar.addView(eye);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
@@ -108,7 +109,9 @@ public final class AgvnControlsBar {
         InputControlsView view = activity.getInputControlsView();
         if (view == null || editor.isActive()) return;
         ControlsProfile base = view.getProfile() != null ? view.getProfile() : profileToShow();
-        if (!editor.start(base)) return;
+        int[] at = new int[2];
+        bar.getLocationOnScreen(at); // the editor keeps controls out of the bar, which it hides meanwhile
+        if (!editor.start(base, new Rect(at[0], at[1], at[0] + bar.getWidth(), at[1] + bar.getHeight()))) return;
         hiddenProfileId = -1;
         AgvnControlsFork.setHidden(activity.agvnShortcut(), false);
         bar.setVisibility(View.GONE);
@@ -125,6 +128,7 @@ public final class AgvnControlsBar {
     private void updateEye() {
         boolean shown = isShown();
         ((GradientDrawable) eye.getBackground()).setColor(shown ? BG_NORMAL : BG_HIDDEN);
+        eye.setText(shown ? R.string.agvn_bar_hide_label : R.string.agvn_bar_show_label);
         eye.setContentDescription(activity.getString(shown ? R.string.agvn_bar_hide : R.string.agvn_bar_show));
     }
 
@@ -142,16 +146,24 @@ public final class AgvnControlsBar {
             @Override
             public void onDrawerClosed(View drawerView) {
                 bar.setVisibility(View.VISIBLE);
+                if (isShown()) { // the sidebar showed the controls again: do not hide them at the next launch
+                    hiddenProfileId = -1;
+                    AgvnControlsFork.setHidden(activity.agvnShortcut(), false);
+                }
                 updateEye(); // the sidebar may have changed the controls
             }
         });
     }
 
-    private TextView glyph(String glyph, int nameRes, View.OnClickListener onClick) {
+    /** A bar button showing {@code text} (a glyph, or a glyph and a short name); its full name is read out / long-pressed. */
+    private TextView barButton(String text, int sp, int nameRes, View.OnClickListener onClick) {
         float dp = activity.getResources().getDisplayMetrics().density;
         TextView button = new TextView(activity);
-        button.setText(glyph);
-        button.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        button.setText(text);
+        button.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
+        button.setSingleLine(true);
+        button.setMinWidth((int) (48 * dp));
+        button.setPadding((int) (10 * dp), 0, (int) (10 * dp), 0);
         button.setTextColor(Color.WHITE);
         button.setGravity(Gravity.CENTER);
         button.setAlpha(0.6f);
@@ -165,7 +177,7 @@ public final class AgvnControlsBar {
             AppUtils.showToast(activity, v.getContentDescription().toString());
             return true;
         });
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams((int) (48 * dp), (int) (36 * dp));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, (int) (36 * dp));
         lp.setMargins((int) (3 * dp), 0, (int) (3 * dp), 0);
         button.setLayoutParams(lp);
         return button;

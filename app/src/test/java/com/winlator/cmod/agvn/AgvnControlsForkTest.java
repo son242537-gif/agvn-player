@@ -31,6 +31,21 @@ public class AgvnControlsForkTest {
         assertFalse(AgvnControlsFork.isReservedId(901));
         assertFalse(AgvnControlsFork.isReservedId(9100));
         assertFalse(AgvnControlsFork.isReservedId(1));
+        // only 9000-9099 is kept away from the profile manager's new ids (the legacy 900 is on disk, below them)
+        assertTrue(AgvnControlsFork.inLayoutRange(9000));
+        assertTrue(AgvnControlsFork.inLayoutRange(9099));
+        assertFalse(AgvnControlsFork.inLayoutRange(900));
+        assertFalse(AgvnControlsFork.inLayoutRange(8999));
+        assertFalse(AgvnControlsFork.inLayoutRange(9100));
+    }
+
+    @Test
+    public void copiesGetANameNoOtherProfileHas() {
+        assertEquals("GameX", AgvnControlsFork.uniqueName("GameX", Collections.<String>emptySet()));
+        assertEquals("GameX", AgvnControlsFork.uniqueName("GameX", new HashSet<>(Arrays.asList("GameY", "GameX (1)"))));
+        assertEquals("GameX (1)", AgvnControlsFork.uniqueName("GameX", new HashSet<>(Arrays.asList("GameX"))));
+        assertEquals("GameX (3)", AgvnControlsFork.uniqueName("GameX",
+                new HashSet<>(Arrays.asList("GameX", "GameX (1)", "GameX (2)"))));
     }
 
     @Test

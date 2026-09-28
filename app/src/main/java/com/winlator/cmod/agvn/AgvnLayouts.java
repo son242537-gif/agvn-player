@@ -8,6 +8,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Automatic on-screen controls per game type. Six bundled layouts (assets/agvn/controls-&lt;kind&gt;.icp) own the
@@ -29,6 +30,8 @@ public final class AgvnLayouts {
     public static final String EXTRA_AUTO = "agvnControlsAuto";
     /** Parent folders of the exe folder searched for an engine at launch (Unreal: Win64 -> Binaries -> Project -> root). */
     static final int PARENT_LEVELS = 3;
+    /** Engine sub-folders holding the exe, which the launch-time search climbs out of (plus Ren'Py lib/py3-..., windows-...). */
+    private static final List<String> BINARY_FOLDERS = Arrays.asList("win64", "win32", "binaries", "bin", "x64", "x86", "lib");
 
     private AgvnLayouts() {}
 
@@ -113,8 +116,8 @@ public final class AgvnLayouts {
 
     /**
      * Kind for this launch: the kind stored at import; else the engine of the game folder saved at import, of the exe
-     * folder or of up to {@link #PARENT_LEVELS} parents (first known engine wins); else the engine stored at import
-     * (older builds could store a wrong one, e.g. GODOT for Siglus, so files win over it).
+     * folder or of up to {@link #PARENT_LEVELS} parents it sits in ({@link #detectAround}); else the engine stored at
+     * import (older builds could store a wrong one, e.g. GODOT for Siglus, so files win over it).
      */
     static String launchKind(String storedKind, String storedEngine, String gameDir, String exeUnixPath) {
         if (isKind(storedKind)) return storedKind;
@@ -125,13 +128,30 @@ public final class AgvnLayouts {
         return kindFor(engine);
     }
 
-    /** Engine of {@code dir} or of its first parents; UNKNOWN when none is recognised. */
+    /**
+     * Engine of {@code dir}, else of the game folder above it while {@code dir} is an engine's exe sub-folder (Unreal
+     * Project/Binaries/Win64 up to a root with Engine/, Ren'Py lib/py3-windows-x86_64, bin, x64 ...), at most
+     * {@link #PARENT_LEVELS} up; UNKNOWN when none is recognised. A plain game folder is never climbed out of: its parent
+     * is often a shared folder (Download, the storage root) where a stray patch.xp3 or *.pck says nothing about this game.
+     */
     static GameExeResolver.Engine detectAround(File dir) {
-        for (int level = 0; dir != null && level <= PARENT_LEVELS; level++, dir = dir.getParentFile()) {
+        String child = null;
+        for (int level = 0; dir != null && level <= PARENT_LEVELS; level++) {
             GameExeResolver.Engine engine = GameExeResolver.detectEngine(dir);
             if (engine != GameExeResolver.Engine.UNKNOWN) return engine;
+            String name = dir.getName().toLowerCase(Locale.ROOT);
+            File parent = dir.getParentFile();
+            boolean unrealProject = "binaries".equals(child) && parent != null && new File(parent, "Engine").isDirectory();
+            if (!isBinaryFolder(name) && !unrealProject) break;
+            child = name;
+            dir = parent;
         }
         return GameExeResolver.Engine.UNKNOWN;
+    }
+
+    static boolean isBinaryFolder(String lowerName) {
+        return BINARY_FOLDERS.contains(lowerName) || lowerName.startsWith("py2-") || lowerName.startsWith("py3-")
+                || lowerName.startsWith("windows-");
     }
 
     private static GameExeResolver.Engine parseEngine(String name) {

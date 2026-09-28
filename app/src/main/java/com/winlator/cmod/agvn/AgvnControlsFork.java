@@ -34,13 +34,18 @@ public final class AgvnControlsFork {
     private AgvnControlsFork() {}
 
     static boolean isReservedId(int id) {
-        return id == AgvnLayouts.LEGACY_ID || (id >= RESERVED_FIRST && id <= RESERVED_LAST);
+        return id == AgvnLayouts.LEGACY_ID || inLayoutRange(id);
+    }
+
+    /** Ids 9000-9099, kept for AGVN layouts: new profiles (InputControlsManager, the editor's copies) never get one. */
+    public static boolean inLayoutRange(int id) {
+        return id >= RESERVED_FIRST && id <= RESERVED_LAST;
     }
 
     /** One above the highest profile id outside 9000-9099, skipping reserved and existing ids. */
     static int nextForkId(Collection<Integer> existing) {
         int max = 0;
-        for (int id : existing) if (id < RESERVED_FIRST || id > RESERVED_LAST) max = Math.max(max, id);
+        for (int id : existing) if (!inLayoutRange(id)) max = Math.max(max, id);
         int id = max + 1;
         while (isReservedId(id) || existing.contains(id)) id++;
         return id;
@@ -94,32 +99,46 @@ public final class AgvnControlsFork {
         }
     }
 
-    /** The profile the editor may change for this game: {@code base} itself if it is the game's own copy, else a copy. */
+    /**
+     * The profile the editor may change for this game: {@code base} itself if it is the game's own copy, else a copy
+     * (written over the game's earlier copy, one per game). Either way the game uses it from now on.
+     */
     static ControlsProfile editable(XServerDisplayActivity activity, ControlsProfile base) {
         Shortcut shortcut = activity.agvnShortcut();
         InputControlsManager manager = activity.agvnControlsManager();
         if (base == null || manager == null) return null;
-        if (!needsFork(base.id, shortcut != null ? shortcut.getExtra(EXTRA_OWN, null) : null, shortcut != null)) return base;
+        String own = shortcut != null ? shortcut.getExtra(EXTRA_OWN, null) : null;
+        if (!needsFork(base.id, own, shortcut != null)) {
+            if (shortcut != null) useFor(shortcut, base.id);
+            return base;
+        }
         String name = shortcut != null && !shortcut.name.trim().isEmpty() ? shortcut.name.trim()
                 : activity.getString(R.string.agvn_edit_own_profile);
-        ControlsProfile fork = fork(activity, manager, base.id, name);
+        ControlsProfile fork = fork(activity, manager, base.id, parseId(own), name);
         if (fork != null && shortcut != null) {
-            String id = String.valueOf(fork.id);
-            shortcut.putExtra(AgvnLayouts.EXTRA_PROFILE, id);
-            shortcut.putExtra(AgvnLayouts.EXTRA_AUTO, null);
-            shortcut.putExtra(EXTRA_OWN, id);
-            shortcut.saveData();
+            shortcut.putExtra(EXTRA_OWN, String.valueOf(fork.id));
+            useFor(shortcut, fork.id);
         }
         return fork;
     }
 
-    private static ControlsProfile fork(Context ctx, InputControlsManager manager, int sourceId, String name) {
+    /** Makes {@code id} the game's controls profile as the player's choice (AGVN no longer re-picks it at launch). */
+    private static void useFor(Shortcut shortcut, int id) {
+        shortcut.putExtra(AgvnLayouts.EXTRA_PROFILE, String.valueOf(id));
+        shortcut.putExtra(AgvnLayouts.EXTRA_AUTO, null);
+        shortcut.saveData();
+    }
+
+    private static ControlsProfile fork(Context ctx, InputControlsManager manager, int sourceId, int ownId, String name) {
         try {
             File source = ControlsProfile.getProfileFile(ctx, sourceId);
             String json = source.isFile() ? FileUtils.readString(source) : "";
             if (json.trim().isEmpty()) return null;
-            int id = nextForkId(idsOf(InputControlsManager.getProfilesDir(ctx).list()));
-            if (!FileUtils.writeString(ControlsProfile.getProfileFile(ctx, id), forkJson(json, id, name))) return null;
+            Set<Integer> ids = idsOf(InputControlsManager.getProfilesDir(ctx).list());
+            int id = ownId > 0 && !isReservedId(ownId) && ids.contains(ownId) ? ownId : nextForkId(ids);
+            Set<String> taken = new HashSet<>();
+            for (ControlsProfile p : manager.getProfiles()) if (p.id != id) taken.add(p.getName());
+            if (!FileUtils.writeString(ControlsProfile.getProfileFile(ctx, id), forkJson(json, id, uniqueName(name, taken)))) return null;
             manager.loadProfiles(false); // same list the game loaded at start (templates included)
             Log.i(TAG, "controls profile " + sourceId + " copied to " + id + " for " + name);
             return manager.getProfile(id);
@@ -127,6 +146,13 @@ public final class AgvnControlsFork {
             Log.w(TAG, "cannot copy controls profile " + sourceId, e);
             return null;
         }
+    }
+
+    /** {@code name}, else "name (n)" with the first free n, like the profile manager's duplicate (pickers list by name). */
+    static String uniqueName(String name, Collection<String> taken) {
+        String candidate = name;
+        for (int i = 1; taken.contains(candidate); i++) candidate = name + " (" + i + ")";
+        return candidate;
     }
 
     /**

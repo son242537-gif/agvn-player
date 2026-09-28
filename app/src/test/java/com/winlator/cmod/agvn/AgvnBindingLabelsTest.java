@@ -10,8 +10,13 @@ import com.winlator.cmod.inputcontrols.Binding;
 
 import org.junit.Test;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** Key list of the in-game binding picker and the editor's resize steps. */
 public class AgvnBindingLabelsTest {
@@ -63,6 +68,20 @@ public class AgvnBindingLabelsTest {
         for (Binding b : AgvnBindingLabels.buttonBindings()) {
             if (AgvnBindingLabels.nameRes(b) == 0) assertTrue(b.name(), AgvnBindingLabels.keyName(b).length() <= 8);
         }
+    }
+
+    @Test
+    public void mouseKeysGetShortFaceTexts() throws Exception {
+        String strings = new String(Files.readAllBytes(new File("src/main/res/values/agvn_strings.xml").toPath()),
+                StandardCharsets.UTF_8);
+        for (Binding b : AgvnBindingLabels.buttonBindings()) {
+            if (b.isMouse() && AgvnBindingLabels.nameRes(b) != 0)
+                assertNotEquals(b.name(), 0, AgvnBindingLabels.shortRes(b));
+        }
+        Matcher m = Pattern.compile("<string name=\"agvn_key_[a-z_]+_short\">([^<]*)</string>").matcher(strings);
+        int found = 0;
+        for (; m.find(); found++) assertTrue(m.group(1), m.group(1).length() <= 6);
+        assertEquals(6, found);
     }
 
     @Test
