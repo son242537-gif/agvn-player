@@ -147,13 +147,13 @@ public class ControlsEditorActivity extends AppCompatActivity implements View.On
         popupContent.setPadding(pad, pad, pad, pad);
 
         TextView title = new TextView(this);
-        title.setText("Scheme Color");
+        title.setText("Màu chủ đạo");
         title.setTextColor(0xffffffff);
         title.setTextSize(14);
         popupContent.addView(title);
 
         TextView subtitle = new TextView(this);
-        subtitle.setText("Applies to every control that doesn't have its own custom color");
+        subtitle.setText("Áp dụng cho mọi nút chưa có màu riêng");
         subtitle.setTextColor(0xffaaaaaa);
         subtitle.setTextSize(11);
         LinearLayout.LayoutParams subtitleParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);

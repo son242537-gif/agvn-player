@@ -55,7 +55,7 @@ private val shortcutDriveLettersV2 = ('D'..'Z').map { it.toString() }
 internal fun ShortcutDriveLettersEditorV2(container: Container) {
     DriveLettersEditorV2(
         initialDrives = container.drives.orEmpty(),
-        subtitle = "Changes apply to this container"
+        subtitle = "Thay đổi áp dụng cho môi trường chạy này"
     ) { serialized ->
         if (serialized != container.drives.orEmpty()) {
             container.setDrives(serialized)
@@ -67,7 +67,7 @@ internal fun ShortcutDriveLettersEditorV2(container: Container) {
 @Composable
 internal fun DriveLettersEditorV2(
     initialDrives: String,
-    subtitle: String = "Changes apply to this container",
+    subtitle: String = "Thay đổi áp dụng cho môi trường chạy này",
     onChanged: (String) -> Unit
 ) {
     val context = LocalContext.current
@@ -109,7 +109,7 @@ internal fun DriveLettersEditorV2(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(Modifier.weight(1f)) {
-                Text("Drive letters", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text("Ký tự ổ đĩa", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Text(
                     subtitle,
                     style = MaterialTheme.typography.bodySmall,
@@ -121,13 +121,13 @@ internal fun DriveLettersEditorV2(
                 onClick = { if (nextLetter != null) entries.add(ShortcutDriveEntryV2(nextLetter, "")) },
                 enabled = nextLetter != null
             ) {
-                Icon(Icons.Outlined.Add, "Add drive")
+                Icon(Icons.Outlined.Add, "Thêm ổ")
             }
         }
 
         if (entries.isEmpty()) {
             Text(
-                "No custom drives",
+                "Chưa có ổ tùy chỉnh",
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -202,11 +202,11 @@ private fun ShortcutDriveLetterRowV2(
             onValueChange = onPath,
             modifier = Modifier.weight(1f),
             singleLine = true,
-            label = { Text("Path") },
+            label = { Text("Đường dẫn") },
             placeholder = { Text("/storage/emulated/0/...", maxLines = 1, overflow = TextOverflow.Ellipsis) },
             shape = RoundedCornerShape(10.dp)
         )
-        IconButton(onClick = onBrowse) { Icon(Icons.Outlined.FolderOpen, "Choose folder") }
-        IconButton(onClick = onRemove) { Icon(Icons.Outlined.DeleteOutline, "Remove drive") }
+        IconButton(onClick = onBrowse) { Icon(Icons.Outlined.FolderOpen, "Chọn thư mục") }
+        IconButton(onClick = onRemove) { Icon(Icons.Outlined.DeleteOutline, "Xóa ổ") }
     }
 }

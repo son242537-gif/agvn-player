@@ -481,7 +481,7 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                LibraryActionTileCompat(Icons.Outlined.Speed, "Đồ họa: Thấp / Trung bình / Cao", Modifier.weight(1f), horizontal = true) {
+                LibraryActionTileCompat(Icons.Outlined.Speed, "Chỉnh đồ họa: mát máy ↔ đẹp", Modifier.weight(1f), horizontal = true) {
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_QUALITY)
                 }

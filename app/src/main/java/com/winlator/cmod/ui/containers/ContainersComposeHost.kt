@@ -118,9 +118,9 @@ private fun ContainersScreen(
             LandscapeMainNavigation(
                 activity = activity,
                 selected = R.id.main_menu_containers,
-                title = "Containers",
+                title = "Môi trường chạy",
                 actionIcon = Icons.Outlined.Add,
-                actionDescription = "Add container",
+                actionDescription = "Thêm môi trường chạy",
                 onAction = callbacks::onAdd
             )
         }
@@ -144,10 +144,10 @@ private fun ContainersScreen(
                         }
                     }
                     Spacer(Modifier.height(14.dp))
-                    Text("No containers yet", style = MaterialTheme.typography.titleLarge)
+                    Text("Chưa có môi trường chạy", style = MaterialTheme.typography.titleLarge)
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Create a container to prepare your first Windows environment.",
+                        "Tạo môi trường chạy để chuẩn bị môi trường Windows đầu tiên.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -247,7 +247,7 @@ private fun ContainerCard(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Outlined.PlayArrow, "Run", modifier = Modifier.size(27.dp))
+                        Icon(Icons.Outlined.PlayArrow, "Chạy", modifier = Modifier.size(27.dp))
                     }
                 }
             }
@@ -262,16 +262,16 @@ private fun ContainerCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (compact) {
-                    IconButton(onClick = { callbacks.onEdit(container.id) }) { Icon(Icons.Outlined.Edit, "Edit") }
-                    IconButton(onClick = { callbacks.onDuplicate(container.id) }) { Icon(Icons.Outlined.ContentCopy, "Duplicate") }
-                    IconButton(onClick = { callbacks.onRemove(container.id) }) { Icon(Icons.Outlined.DeleteOutline, "Remove") }
+                    IconButton(onClick = { callbacks.onEdit(container.id) }) { Icon(Icons.Outlined.Edit, "Sửa") }
+                    IconButton(onClick = { callbacks.onDuplicate(container.id) }) { Icon(Icons.Outlined.ContentCopy, "Nhân bản") }
+                    IconButton(onClick = { callbacks.onRemove(container.id) }) { Icon(Icons.Outlined.DeleteOutline, "Xóa") }
                 } else {
                     ContainerAction(Icons.Outlined.Edit, "Edit") { callbacks.onEdit(container.id) }
                     ContainerAction(Icons.Outlined.ContentCopy, "Duplicate") { callbacks.onDuplicate(container.id) }
                     ContainerAction(Icons.Outlined.DeleteOutline, "Remove") { callbacks.onRemove(container.id) }
                 }
                 IconButton(onClick = { callbacks.onInfo(container.id) }) {
-                    Icon(Icons.Outlined.Info, "Container info")
+                    Icon(Icons.Outlined.Info, "Thông tin môi trường chạy")
                 }
             }
         }

@@ -102,7 +102,7 @@ public class FileManagerFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (getActivity() != null && ((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("File Manager");
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Quản lý file");
         }
     }
 
@@ -393,7 +393,7 @@ public class FileManagerFragment extends Fragment {
         View arrow = getView() != null ? getView().findViewById(R.id.IVDriveArrow) : null;
         if (arrow != null) arrow.setRotation(180f);
         if (discoveredExternalStorageRoots.isEmpty()) {
-            Toast.makeText(getContext(), "No external storage found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Không tìm thấy bộ nhớ ngoài", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -410,36 +410,36 @@ public class FileManagerFragment extends Fragment {
                 "Bộ nhớ trong", agvnDir.isDirectory() ? "Có thư mục AGVN" : dRoot.getAbsolutePath(),
                 samePath(currentDir, dRoot), () -> openDrive(dRoot, dRoot)));
         driveOptionsPanel.addView(createDriveOptionRow(
-                "Drive D:", "Downloads", samePath(currentDriveRoot, dRoot), () -> openDrive(dTarget, dRoot)));
+                "Ổ D:", "Thư mục tải về", samePath(currentDriveRoot, dRoot), () -> openDrive(dTarget, dRoot)));
 
         boolean inDriveC = currentDir != null && normalizeFilePath(currentDir.getAbsolutePath()).contains("/.wine/drive_c");
         driveOptionsPanel.addView(createDriveOptionRow(
-                "Drive C:", "Wine System", inDriveC, this::handleDriveCSelection));
+                "Ổ C:", "Hệ thống Wine", inDriveC, this::handleDriveCSelection));
 
         File rootFs = new File(requireContext().getFilesDir(), "imagefs");
         driveOptionsPanel.addView(createDriveOptionRow(
-                "Drive Z:", "RootFS", samePath(currentDriveRoot, rootFs), () -> {
+                "Ổ Z:", "RootFS", samePath(currentDriveRoot, rootFs), () -> {
                     if (rootFs.exists()) openDrive(rootFs, rootFs);
-                    else Toast.makeText(getContext(), "RootFS not found", Toast.LENGTH_SHORT).show();
+                    else Toast.makeText(getContext(), "Không tìm thấy RootFS", Toast.LENGTH_SHORT).show();
                 }));
 
         if (discoveredExternalStorageRoots != null) {
             for (File external : discoveredExternalStorageRoots) {
                 driveOptionsPanel.addView(createDriveOptionRow(
-                        "External Storage", external.getName(), samePath(currentDriveRoot, external), () -> openDrive(external, external)));
+                        "Bộ nhớ ngoài", external.getName(), samePath(currentDriveRoot, external), () -> openDrive(external, external)));
             }
         }
 
         driveOptionsPanel.addView(createDriveOptionRow(
-                "Add External Storage",
-                discoveredExternalStorageRoots == null ? "Find SD card or USB storage" : "Scan again",
+                "Thêm bộ nhớ ngoài",
+                discoveredExternalStorageRoots == null ? "Tìm thẻ SD hoặc USB" : "Quét lại",
                 false,
                 this::discoverExternalStorage));
     }
 
     private void openDrive(File directory, File driveRoot) {
         if (directory == null || !directory.exists() || !directory.isDirectory() || !directory.canRead()) {
-            Toast.makeText(getContext(), "Storage is not accessible", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Không truy cập được bộ nhớ", Toast.LENGTH_SHORT).show();
             return;
         }
         currentDriveRoot = driveRoot != null ? driveRoot : inferDriveRoot(directory);
@@ -501,8 +501,8 @@ public class FileManagerFragment extends Fragment {
         ArrayList<Container> containers = containerManager.getContainers();
         if (containers == null || containers.isEmpty()) {
             new AlertDialog.Builder(getContext())
-                    .setTitle("No Containers")
-                    .setMessage("You need to create a container first to access Drive C:.")
+                    .setTitle("Chưa có môi trường chạy")
+                    .setMessage("Bạn cần tạo môi trường chạy trước để mở ổ C:.")
                     .setPositiveButton("OK", null)
                     .show();
             return;
@@ -514,7 +514,7 @@ public class FileManagerFragment extends Fragment {
             String[] names = new String[containers.size()];
             for (int i = 0; i < containers.size(); i++) names[i] = containers.get(i).getName();
             new AlertDialog.Builder(getContext())
-                    .setTitle("Select Container Drive C:")
+                    .setTitle("Chọn ổ C: của môi trường chạy")
                     .setItems(names, (dialog, which) -> navigateToContainerDriveC(containers.get(which)))
                     .show();
         }
@@ -525,12 +525,12 @@ public class FileManagerFragment extends Fragment {
         File windowsDir = new File(driveC, "windows");
         if (driveC.exists() && driveC.isDirectory() && windowsDir.exists()) {
             openDrive(driveC, driveC);
-            Toast.makeText(getContext(), "Opened C: (" + container.getName() + ")", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Đã mở C: (" + container.getName() + ")", Toast.LENGTH_SHORT).show();
         } else {
             new AlertDialog.Builder(getContext())
-                    .setTitle("Drive C: Not Initialized")
-                    .setMessage("The Wine system files (Drive C:) for '" + container.getName() + "' are missing.\n\n" +
-                            "Please RUN this container once to generate the filesystem.")
+                    .setTitle("Ổ C: chưa được khởi tạo")
+                    .setMessage("Thiếu file hệ thống Wine (ổ C:) của '" + container.getName() + "'.\n\n" +
+                            "Hãy CHẠY môi trường chạy này một lần để tạo hệ thống file.")
                     .setPositiveButton("OK", null)
                     .show();
         }
@@ -539,7 +539,7 @@ public class FileManagerFragment extends Fragment {
     private void navigateUp() {
         if (currentDir == null) return;
         if (currentDriveRoot != null && samePath(currentDir, currentDriveRoot)) {
-            Toast.makeText(getContext(), "Drive root reached", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Đã ở thư mục gốc của ổ", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -547,13 +547,13 @@ public class FileManagerFragment extends Fragment {
         if (parent != null && parent.canRead() && isWithinRoot(parent, currentDriveRoot)) {
             loadDirectory(parent);
         } else {
-            Toast.makeText(getContext(), "Drive root reached", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Đã ở thư mục gốc của ổ", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void loadDirectory(File dir) {
         if (dir == null || !dir.exists() || !dir.isDirectory() || !dir.canRead()) {
-            Toast.makeText(getContext(), "Folder is not accessible", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Không truy cập được thư mục", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -590,16 +590,16 @@ public class FileManagerFragment extends Fragment {
         String path = normalizeFilePath(dir.getAbsolutePath());
         String primary = normalizeFilePath(Environment.getExternalStorageDirectory().getAbsolutePath());
         if (path.contains("/.wine/drive_c")) {
-            tvDriveName.setText("Drive C:");
+            tvDriveName.setText("Ổ C:");
             ivDriveIcon.setImageResource(R.drawable.icon_wine);
         } else if (path.equals(primary) || path.startsWith(primary + File.separator)) {
-            tvDriveName.setText("Drive D:");
+            tvDriveName.setText("Ổ D:");
             ivDriveIcon.setImageResource(R.drawable.ic_internal_storage);
         } else if (path.startsWith("/storage/") && !path.startsWith("/storage/emulated")) {
-            tvDriveName.setText("External Storage");
+            tvDriveName.setText("Bộ nhớ ngoài");
             ivDriveIcon.setImageResource(R.drawable.ic_internal_storage);
         } else {
-            tvDriveName.setText("Drive Z:");
+            tvDriveName.setText("Ổ Z:");
             ivDriveIcon.setImageResource(android.R.drawable.ic_menu_manage);
         }
     }
@@ -607,7 +607,7 @@ public class FileManagerFragment extends Fragment {
     private void performContainerAction(File file, ContainerAction action) {
         ArrayList<Container> containers = containerManager.getContainers();
         if (containers == null || containers.isEmpty()) {
-            Toast.makeText(getContext(), "Create a container first!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Hãy tạo môi trường chạy trước!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -617,7 +617,7 @@ public class FileManagerFragment extends Fragment {
             String[] names = new String[containers.size()];
             for (int i = 0; i < containers.size(); i++) names[i] = containers.get(i).getName();
             new AlertDialog.Builder(getContext())
-                    .setTitle("Select Container")
+                    .setTitle("Chọn môi trường chạy")
                     .setItems(names, (dialog, which) -> action.onContainerSelected(containers.get(which)))
                     .show();
         }
@@ -797,7 +797,7 @@ public class FileManagerFragment extends Fragment {
     private void runFileDirectly(File file, Container container) {
         try {
             if (!ensureExternalStorageMapped(container, file)) {
-                Toast.makeText(getContext(), "No free drive letter for external storage", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Hết ký tự ổ trống cho bộ nhớ ngoài", Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -822,7 +822,7 @@ public class FileManagerFragment extends Fragment {
             intent.putExtra("shortcut_path", tempShortcut.getAbsolutePath());
             startActivity(intent);
         } catch (Exception e) {
-            Toast.makeText(getContext(), "Error launching: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Lỗi khi chạy: " + e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
     }
@@ -830,7 +830,7 @@ public class FileManagerFragment extends Fragment {
     private void createShortcutDirectly(File file, Container container) {
         try {
             if (!ensureExternalStorageMapped(container, file)) {
-                Toast.makeText(getContext(), "No free drive letter for external storage", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Hết ký tự ổ trống cho bộ nhớ ngoài", Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -853,7 +853,7 @@ public class FileManagerFragment extends Fragment {
                 writer.println("[Extra Data]");
                 writer.println("simTouchScreen=1");
             }
-            Toast.makeText(getContext(), "Game added to Library!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Đã thêm game vào Thư viện!", Toast.LENGTH_SHORT).show();
 
             File iconDir64 = container.getIconsDir(64);
             if (!iconDir64.exists()) iconDir64.mkdirs();
@@ -884,12 +884,12 @@ public class FileManagerFragment extends Fragment {
         this.clipboardFile = file;
         this.isCutOperation = isCut;
         if (fabPaste != null) fabPaste.setVisibility(View.VISIBLE);
-        Toast.makeText(getContext(), (isCut ? "Cut: " : "Copied: ") + file.getName(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), (isCut ? "Đã cắt: " : "Đã chép: ") + file.getName(), Toast.LENGTH_SHORT).show();
     }
 
     private void startPasteOperation() {
         if (clipboardFile == null || !clipboardFile.exists()) {
-            Toast.makeText(getContext(), "Nothing to paste", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Không có gì để dán", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -897,15 +897,15 @@ public class FileManagerFragment extends Fragment {
         File dest = new File(currentDir, source.getName());
         if (dest.exists()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setTitle("File Conflict");
-            builder.setMessage("The destination \"" + dest.getName() + "\" already exists.");
-            builder.setPositiveButton("Replace", (dialog, which) -> {
+            builder.setTitle("Trùng file");
+            builder.setMessage("\"" + dest.getName() + "\" đã tồn tại ở nơi đến.");
+            builder.setPositiveButton("Thay thế", (dialog, which) -> {
                 deleteRecursive(dest);
                 executePaste(source, dest);
             });
-            builder.setNeutralButton("Rename", (dialog, which) ->
+            builder.setNeutralButton("Đổi tên", (dialog, which) ->
                     executePaste(source, getUniqueDestination(currentDir, source.getName())));
-            builder.setNegativeButton("Cancel", null);
+            builder.setNegativeButton("Hủy", null);
             builder.show();
         } else {
             executePaste(source, dest);
@@ -932,12 +932,12 @@ public class FileManagerFragment extends Fragment {
 
     private void executePaste(File source, File dest) {
         if (isCutOperation && source.renameTo(dest)) {
-            Toast.makeText(getContext(), "Moved instantly", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Đã chuyển xong", Toast.LENGTH_SHORT).show();
             finishPaste(true);
             return;
         }
 
-        showProgressDialog(isCutOperation ? "Moving..." : "Copying...");
+        showProgressDialog(isCutOperation ? "Đang chuyển..." : "Đang chép...");
         isOperationCancelled = false;
         new Thread(() -> {
             try {
@@ -953,10 +953,10 @@ public class FileManagerFragment extends Fragment {
                 new Handler(Looper.getMainLooper()).post(() -> {
                     dismissProgressDialog();
                     if (!isOperationCancelled) {
-                        Toast.makeText(getContext(), "Success!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Thành công!", Toast.LENGTH_SHORT).show();
                         finishPaste(isCutOperation);
                     } else {
-                        Toast.makeText(getContext(), "Cancelled", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Đã hủy", Toast.LENGTH_SHORT).show();
                         deleteRecursive(dest);
                         loadDirectory(currentDir);
                     }
@@ -965,7 +965,7 @@ public class FileManagerFragment extends Fragment {
                 final String errorMsg = e.getMessage();
                 new Handler(Looper.getMainLooper()).post(() -> {
                     dismissProgressDialog();
-                    Toast.makeText(getContext(), "Error: " + errorMsg + ". Source preserved.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Lỗi: " + errorMsg + ". File gốc vẫn được giữ.", Toast.LENGTH_LONG).show();
                     deleteRecursive(dest);
                     loadDirectory(currentDir);
                 });
@@ -1002,12 +1002,12 @@ public class FileManagerFragment extends Fragment {
         layout.addView(progressBar);
 
         progressText = new TextView(getContext());
-        progressText.setText("Calculating...");
+        progressText.setText("Đang tính...");
         progressText.setPadding(0, 20, 0, 0);
         layout.addView(progressText);
 
         builder.setView(layout);
-        builder.setNegativeButton("Cancel", (d, w) -> isOperationCancelled = true);
+        builder.setNegativeButton("Hủy", (d, w) -> isOperationCancelled = true);
         progressDialog = builder.create();
         progressDialog.show();
     }
@@ -1087,7 +1087,7 @@ public class FileManagerFragment extends Fragment {
 
     private void renameFile(File file) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Rename");
+        builder.setTitle("Đổi tên");
         final EditText input = new EditText(getContext());
         input.setText(file.getName());
         builder.setView(input);
@@ -1095,9 +1095,9 @@ public class FileManagerFragment extends Fragment {
             String newName = input.getText().toString();
             File newFile = new File(file.getParent(), newName);
             if (file.renameTo(newFile)) loadDirectory(currentDir);
-            else Toast.makeText(getContext(), "Rename failed", Toast.LENGTH_SHORT).show();
+            else Toast.makeText(getContext(), "Đổi tên thất bại", Toast.LENGTH_SHORT).show();
         });
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton("Hủy", null);
         builder.show();
     }
 
@@ -1109,36 +1109,36 @@ public class FileManagerFragment extends Fragment {
     private void showFileOptions(File file, View anchor) {
         PopupMenu popup = new PopupMenu(getContext(), anchor);
         if (isExecutable(file)) {
-            popup.getMenu().add("Run / Open").setOnMenuItemClickListener(item -> {
+            popup.getMenu().add("Chạy / Mở").setOnMenuItemClickListener(item -> {
                 performContainerAction(file, container -> runFileDirectly(file, container));
                 return true;
             });
-            popup.getMenu().add("Add this game").setOnMenuItemClickListener(item -> {
+            popup.getMenu().add("Thêm game này").setOnMenuItemClickListener(item -> {
                 performContainerAction(file, container -> createShortcutDirectly(file, container));
                 return true;
             });
         }
-        popup.getMenu().add("Copy").setOnMenuItemClickListener(item -> {
+        popup.getMenu().add("Sao chép").setOnMenuItemClickListener(item -> {
             copyToClipboard(file, false);
             return true;
         });
-        popup.getMenu().add("Cut (Move)").setOnMenuItemClickListener(item -> {
+        popup.getMenu().add("Cắt (di chuyển)").setOnMenuItemClickListener(item -> {
             copyToClipboard(file, true);
             return true;
         });
-        popup.getMenu().add("Rename").setOnMenuItemClickListener(item -> {
+        popup.getMenu().add("Đổi tên").setOnMenuItemClickListener(item -> {
             renameFile(file);
             return true;
         });
-        popup.getMenu().add("Delete").setOnMenuItemClickListener(item -> {
+        popup.getMenu().add("Xóa").setOnMenuItemClickListener(item -> {
             new AlertDialog.Builder(getContext())
-                    .setTitle("Delete")
-                    .setMessage("Are you sure you want to delete " + file.getName() + "?")
-                    .setPositiveButton("Yes", (d, w) -> {
+                    .setTitle("Xóa")
+                    .setMessage("Bạn có chắc muốn xóa " + file.getName() + "?")
+                    .setPositiveButton("Có", (d, w) -> {
                         deleteRecursive(file);
                         loadDirectory(currentDir);
                     })
-                    .setNegativeButton("No", null)
+                    .setNegativeButton("Không", null)
                     .show();
             return true;
         });
@@ -1245,7 +1245,7 @@ public class FileManagerFragment extends Fragment {
         File[] children = file.listFiles();
         int count = children == null ? 0 : children.length;
         String date = modifiedLabel(file);
-        return "Folder  •  " + count + (count == 1 ? " item" : " items") + (date.isEmpty() ? "" : "  •  " + date);
+        return "Thư mục  •  " + count + " mục" + (date.isEmpty() ? "" : "  •  " + date);
     }
 
     private String fileDetails(File file) {

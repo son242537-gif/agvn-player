@@ -218,7 +218,7 @@ public class OnboardingActivity extends AppCompatActivity {
                 syncComposeCatalog();
                 if (!success) {
                     Toast.makeText(OnboardingActivity.this,
-                            "WinZ core installation failed. Tap retry to try again.", Toast.LENGTH_LONG).show();
+                            "Cài thành phần lõi thất bại. Chạm Thử lại để cài lại.", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -236,7 +236,7 @@ public class OnboardingActivity extends AppCompatActivity {
         if (installBusy || !coreReady) return;
         installBusy = true;
         composeController.setInstallBusy(BUNDLED_RUNTIME_ID, true);
-        composeController.updateInstallProgress("Installing " + BUNDLED_RUNTIME_NAME, -1);
+        composeController.updateInstallProgress("Đang cài " + BUNDLED_RUNTIME_NAME, -1);
         io.execute(() -> {
             boolean success;
             try {
@@ -251,7 +251,7 @@ public class OnboardingActivity extends AppCompatActivity {
                 composeController.setInstallBusy(null, false);
                 refreshBundledRuntimeState();
                 syncComposeCatalog();
-                if (!installed) Toast.makeText(this, "Unable to install " + BUNDLED_RUNTIME_NAME + ".", Toast.LENGTH_LONG).show();
+                if (!installed) Toast.makeText(this, "Không cài được " + BUNDLED_RUNTIME_NAME + ".", Toast.LENGTH_LONG).show();
             });
         });
     }
@@ -260,17 +260,17 @@ public class OnboardingActivity extends AppCompatActivity {
         String using = WineRuntimeGuard.getContainerUsing(this, WineInfo.MAIN_WINE_VERSION.identifier());
         if (using != null) {
             new AlertDialog.Builder(this)
-                    .setTitle("Proton is in use")
-                    .setMessage(BUNDLED_RUNTIME_NAME + " cannot be deleted because it is used by " + using + ".")
+                    .setTitle("Proton đang được dùng")
+                    .setMessage(BUNDLED_RUNTIME_NAME + " không xóa được vì đang được dùng bởi " + using + ".")
                     .setPositiveButton(android.R.string.ok, null)
                     .show();
             return;
         }
         new AlertDialog.Builder(this)
-                .setTitle("Delete " + BUNDLED_RUNTIME_NAME + "?")
-                .setMessage("The bundled Proton files will be removed. You can install them again later.")
+                .setTitle("Xóa " + BUNDLED_RUNTIME_NAME + "?")
+                .setMessage("File Proton đi kèm sẽ bị xóa. Bạn có thể cài lại sau.")
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton("Delete", (dialog, which) -> removeBundledRuntime())
+                .setPositiveButton("Xóa", (dialog, which) -> removeBundledRuntime())
                 .show();
     }
 
@@ -284,7 +284,7 @@ public class OnboardingActivity extends AppCompatActivity {
                 installBusy = false;
                 composeController.setInstallBusy(null, false);
                 refreshBundledRuntimeState();
-                if (!removed) Toast.makeText(this, BUNDLED_RUNTIME_NAME + " could not be deleted.", Toast.LENGTH_LONG).show();
+                if (!removed) Toast.makeText(this, BUNDLED_RUNTIME_NAME + " không xóa được.", Toast.LENGTH_LONG).show();
             });
         });
     }
@@ -467,17 +467,17 @@ public class OnboardingActivity extends AppCompatActivity {
         installBusy = true;
         String id = componentId(item);
         composeController.setInstallBusy(id, true);
-        composeController.updateInstallProgress("Preparing " + item.name, 0);
+        composeController.updateInstallProgress("Đang chuẩn bị " + item.name, 0);
         io.execute(() -> {
             File archive = new File(getCacheDir(), "winz-component-" + System.nanoTime());
             try {
-                if (!download(item.url, archive, item.name)) throw new Exception("Download failed");
+                if (!download(item.url, archive, item.name)) throw new Exception("Tải về thất bại");
                 installContentArchive(Uri.fromFile(archive), item.name, 72, () -> {
                     rebuildCatalog();
                     runOnUiThread(() -> finishInstall(id, null));
                 }, error -> runOnUiThread(() -> finishInstall(id, error)));
             } catch (Exception error) {
-                runOnUiThread(() -> finishInstall(id, "Unable to install " + item.name + "."));
+                runOnUiThread(() -> finishInstall(id, "Không cài được " + item.name + "."));
             } finally {
                 archive.delete();
             }
@@ -490,7 +490,7 @@ public class OnboardingActivity extends AppCompatActivity {
         String id = componentId(item);
         ProtonPackageManager.PackageInfo packageInfo = item.packageInfo;
         composeController.setInstallBusy(id, true);
-        composeController.updateInstallProgress("Preparing " + item.name, 0);
+        composeController.updateInstallProgress("Đang chuẩn bị " + item.name, 0);
         io.execute(() -> {
             File archive = new File(getCacheDir(), packageInfo.identifier + "-" + System.nanoTime());
             boolean installed = false;
@@ -499,12 +499,12 @@ public class OnboardingActivity extends AppCompatActivity {
                         packageInfo,
                         archive,
                         progress -> postInstallProgress(
-                                "Downloading " + item.name,
+                                "Đang tải " + item.name,
                                 Math.min(70, progress * 70 / 100)
                         )
                 );
                 if (downloaded) {
-                    postInstallProgress("Installing " + item.name, 72);
+                    postInstallProgress("Đang cài " + item.name, 72);
                     installed = ProtonPackageManager.installPackage(this, packageInfo.identifier, archive);
                 }
             } finally {
@@ -514,7 +514,7 @@ public class OnboardingActivity extends AppCompatActivity {
             final boolean success = installed;
             runOnUiThread(() -> finishInstall(
                     id,
-                    success ? null : "Unable to install " + item.name + "."
+                    success ? null : "Không cài được " + item.name + "."
             ));
         });
     }
@@ -523,36 +523,36 @@ public class OnboardingActivity extends AppCompatActivity {
 
     private void installContentArchive(Uri uri, String displayName, int startProgress,
                                        Runnable success, FailureCallback failure) {
-        postInstallProgress("Installing " + displayName, startProgress);
+        postInstallProgress("Đang cài " + displayName, startProgress);
         contentsManager.extraContentFile(uri, archiveProgress -> {
             int progress = archiveProgress < 0
                     ? -1
                     : startProgress + ((92 - startProgress) * archiveProgress / 100);
-            postInstallProgress("Installing " + displayName, progress);
+            postInstallProgress("Đang cài " + displayName, progress);
         }, new ContentsManager.OnInstallFinishedCallback() {
             @Override
             public void onFailed(ContentsManager.InstallFailedReason reason, Exception error) {
-                failure.call("Package validation failed: " + reason);
+                failure.call("Gói không hợp lệ: " + reason);
             }
 
             @Override
             public void onSucceed(ContentProfile extracted) {
                 String installedName = extracted.verName != null && !extracted.verName.isEmpty()
                         ? extracted.verName : displayName;
-                postInstallProgress("Validating " + installedName, 92);
+                postInstallProgress("Đang kiểm tra " + installedName, 92);
                 contentsManager.finishInstallContent(extracted, new ContentsManager.OnInstallFinishedCallback() {
                     @Override
                     public void onFailed(ContentsManager.InstallFailedReason reason, Exception error) {
                         if (reason == ContentsManager.InstallFailedReason.ERROR_EXIST) {
-                            postInstallProgress("Installed " + installedName, 100);
+                            postInstallProgress("Đã cài " + installedName, 100);
                             success.run();
                         }
-                        else failure.call("Installation failed: " + reason);
+                        else failure.call("Cài đặt thất bại: " + reason);
                     }
 
                     @Override
                     public void onSucceed(ContentProfile installed) {
-                        postInstallProgress("Installed " + installedName, 100);
+                        postInstallProgress("Đã cài " + installedName, 100);
                         success.run();
                     }
                 });
@@ -566,7 +566,7 @@ public class OnboardingActivity extends AppCompatActivity {
             long total = response.body().contentLength();
             long copied = 0;
             int lastProgress = -1;
-            postInstallProgress("Downloading " + displayName, total > 0 ? 0 : -1);
+            postInstallProgress("Đang tải " + displayName, total > 0 ? 0 : -1);
             try (InputStream input = response.body().byteStream(); FileOutputStream output = new FileOutputStream(out)) {
                 byte[] buffer = new byte[64 * 1024];
                 int read;
@@ -577,7 +577,7 @@ public class OnboardingActivity extends AppCompatActivity {
                         int progress = Math.min(70, (int)((copied * 70L) / total));
                         if (progress != lastProgress) {
                             lastProgress = progress;
-                            postInstallProgress("Downloading " + displayName, progress);
+                            postInstallProgress("Đang tải " + displayName, progress);
                         }
                     }
                 }
@@ -607,7 +607,7 @@ public class OnboardingActivity extends AppCompatActivity {
         } catch (Exception ignored) {
         }
         if (name == null || name.trim().isEmpty()) name = uri.getLastPathSegment();
-        return name == null || name.trim().isEmpty() ? "local component" : name;
+        return name == null || name.trim().isEmpty() ? "thành phần trên máy" : name;
     }
 
     private void finishInstall(String id, String error) {
@@ -630,10 +630,10 @@ public class OnboardingActivity extends AppCompatActivity {
     private void requestRemoveComponent(String componentId) {
         if (componentId.startsWith("adrenotools:")) {
             new AlertDialog.Builder(this)
-                    .setTitle("Delete driver?")
-                    .setMessage("The installed driver files will be removed.")
+                    .setTitle("Xóa driver?")
+                    .setMessage("File driver đã cài sẽ bị xóa.")
                     .setNegativeButton(android.R.string.cancel, null)
-                    .setPositiveButton("Delete", (d, w) -> removeDriver(componentId.substring("adrenotools:".length())))
+                    .setPositiveButton("Xóa", (d, w) -> removeDriver(componentId.substring("adrenotools:".length())))
                     .show();
             return;
         }
@@ -647,17 +647,17 @@ public class OnboardingActivity extends AppCompatActivity {
         if (!WineRuntimeGuard.canRemove(this, profile)) {
             String using = WineRuntimeGuard.getContainerUsing(this, ContentsManager.getEntryName(profile));
             new AlertDialog.Builder(this)
-                    .setTitle("Runtime is in use")
-                    .setMessage(profile.verName + " cannot be deleted because it is used by " + using + ".")
+                    .setTitle("Thành phần đang được dùng")
+                    .setMessage(profile.verName + " không xóa được vì đang được dùng bởi " + using + ".")
                     .setPositiveButton(android.R.string.ok, null)
                     .show();
             return;
         }
         new AlertDialog.Builder(this)
-                .setTitle("Delete component?")
-                .setMessage("The installed files will be removed from WinZ.")
+                .setTitle("Xóa thành phần?")
+                .setMessage("File đã cài sẽ bị xóa khỏi AGVN Player.")
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton("Delete", (d, w) -> removeContent(profile, componentId))
+                .setPositiveButton("Xóa", (d, w) -> removeContent(profile, componentId))
                 .show();
     }
 
@@ -666,17 +666,17 @@ public class OnboardingActivity extends AppCompatActivity {
         String using = WineRuntimeGuard.getContainerUsing(this, identifier);
         if (using != null) {
             new AlertDialog.Builder(this)
-                    .setTitle("Runtime is in use")
-                    .setMessage(item.name + " cannot be deleted because it is used by " + using + ".")
+                    .setTitle("Thành phần đang được dùng")
+                    .setMessage(item.name + " không xóa được vì đang được dùng bởi " + using + ".")
                     .setPositiveButton(android.R.string.ok, null)
                     .show();
             return;
         }
         new AlertDialog.Builder(this)
-                .setTitle("Delete component?")
-                .setMessage("The installed files will be removed from WinZ.")
+                .setTitle("Xóa thành phần?")
+                .setMessage("File đã cài sẽ bị xóa khỏi AGVN Player.")
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton("Delete", (d, w) -> {
+                .setPositiveButton("Xóa", (d, w) -> {
                     if (installBusy) return;
                     installBusy = true;
                     composeController.setInstallBusy(componentId, true);
@@ -747,7 +747,7 @@ public class OnboardingActivity extends AppCompatActivity {
         final RemoteDriverCatalog.Entry driver = found;
         installBusy = true;
         composeController.setInstallBusy(componentId, true);
-        composeController.updateInstallProgress("Installing " + driver.name, -1);
+        composeController.updateInstallProgress("Đang cài " + driver.name, -1);
         io.execute(() -> {
             String installed = RemoteDriverCatalog.install(this, driver.url);
             runOnUiThread(() -> {
@@ -755,7 +755,7 @@ public class OnboardingActivity extends AppCompatActivity {
                 composeController.setInstallBusy(null, false);
                 syncComposeCatalog();
                 if (installed == null || installed.isEmpty()) {
-                    Toast.makeText(this, "Unable to install " + driver.name + ".", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Không cài được " + driver.name + ".", Toast.LENGTH_LONG).show();
                 }
             });
         });
@@ -797,7 +797,7 @@ public class OnboardingActivity extends AppCompatActivity {
             composeController.setInstallBusy("local", true);
             Uri uri = data.getData();
             String displayName = localDisplayName(uri);
-            composeController.updateInstallProgress("Preparing " + displayName, 0);
+            composeController.updateInstallProgress("Đang chuẩn bị " + displayName, 0);
             io.execute(() -> installContentArchive(uri, displayName, 5, () -> {
                 rebuildCatalog();
                 runOnUiThread(() -> finishInstall("local", null));
@@ -807,7 +807,7 @@ public class OnboardingActivity extends AppCompatActivity {
             installBusy = true;
             composeController.setInstallBusy("driver-local", true);
             Uri uri = data.getData();
-            composeController.updateInstallProgress("Installing " + localDisplayName(uri), -1);
+            composeController.updateInstallProgress("Đang cài " + localDisplayName(uri), -1);
             io.execute(() -> {
                 String installed = adrenotoolsManager.installDriver(uri);
                 runOnUiThread(() -> {
@@ -815,7 +815,7 @@ public class OnboardingActivity extends AppCompatActivity {
                     composeController.setInstallBusy(null, false);
                     syncComposeCatalog();
                     if (installed == null || installed.isEmpty()) {
-                        Toast.makeText(this, "Unable to install the driver.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "Không cài được driver.", Toast.LENGTH_LONG).show();
                     }
                 });
             });
@@ -856,7 +856,7 @@ public class OnboardingActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, results);
         if (requestCode == REQUEST_STORAGE) {
             if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) continuePermissionFlow();
-            else Toast.makeText(this, "Storage access is required to manage games.", Toast.LENGTH_LONG).show();
+            else Toast.makeText(this, "Cần quyền truy cập bộ nhớ để quản lý game.", Toast.LENGTH_LONG).show();
         } else if (requestCode == REQUEST_NOTIFICATIONS) {
             finishOnboarding();
         }
@@ -879,14 +879,14 @@ public class OnboardingActivity extends AppCompatActivity {
         String runtime = resolveSelectedRuntime();
         if (runtime == null) {
             finishing = false;
-            Toast.makeText(this, "Install and select a Wine or Proton layer first.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Hãy cài và chọn Wine hoặc Proton trước.", Toast.LENGTH_LONG).show();
             return;
         }
 
         WineInfo wineInfo = WineInfo.fromIdentifier(this, contentsManager, runtime);
         if (wineInfo.path == null || wineInfo.path.isEmpty()) {
             finishing = false;
-            Toast.makeText(this, "The selected Wine/Proton layer is no longer installed.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Wine/Proton đã chọn không còn được cài.", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -915,14 +915,14 @@ public class OnboardingActivity extends AppCompatActivity {
             manager.createContainerAsync(data, contentsManager, created -> {
                 if (created == null) {
                     finishing = false;
-                    Toast.makeText(this, "Unable to create the first container.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Không tạo được môi trường chạy đầu tiên.", Toast.LENGTH_LONG).show();
                 } else {
                     enterMainApp();
                 }
             });
         } catch (Exception error) {
             finishing = false;
-            Toast.makeText(this, "Unable to prepare the first container.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Không chuẩn bị được môi trường chạy đầu tiên.", Toast.LENGTH_LONG).show();
         }
     }
 

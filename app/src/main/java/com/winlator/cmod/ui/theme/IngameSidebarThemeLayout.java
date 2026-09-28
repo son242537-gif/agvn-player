@@ -123,17 +123,17 @@ public class IngameSidebarThemeLayout extends FrameLayout {
 
     private void applyCompactPremiumLayout() {
         FpsLimiterControl fps = findFirstFpsLimiter(this);
-        insertSectionLabelBefore(fps, "PERFORMANCE");
+        insertSectionLabelBefore(fps, "HIỆU NĂNG");
 
         View imageQuality = findViewById(R.id.LLStandardOptions);
-        insertSectionLabelBefore(imageQuality, "IMAGE QUALITY");
+        insertSectionLabelBefore(imageQuality, "CHẤT LƯỢNG HÌNH");
         flattenSection(imageQuality);
 
         View frameGen = findViewById(R.id.LLFrameGenOptions);
         flattenSection(frameGen);
 
         View savePreset = findViewById(R.id.BTSaveGraphicsPreset);
-        insertSectionLabelBefore(savePreset, "PRESETS");
+        insertSectionLabelBefore(savePreset, "PRESET");
         compactActionRow(savePreset);
 
         View hudStyle = findViewById(R.id.LLHudStyleRow);
@@ -141,15 +141,15 @@ public class IngameSidebarThemeLayout extends FrameLayout {
             LinearLayout hudParent = (LinearLayout) hudStyle.getParent();
             int styleIndex = hudParent.indexOfChild(hudStyle);
             View enableHud = previousContentChild(hudParent, styleIndex);
-            insertSectionLabelBefore(enableHud, "GENERAL");
-            insertSectionLabelBefore(hudStyle, "APPEARANCE");
+            insertSectionLabelBefore(enableHud, "CHUNG");
+            insertSectionLabelBefore(hudStyle, "GIAO DIỆN");
 
             flattenSection(enableHud);
             flattenSection(hudStyle);
 
-            TextView resetText = findTextView(this, "Reset HUD");
+            TextView resetText = findTextView(this, "Đặt lại HUD");
             View resetRow = directChildUnder(hudParent, resetText);
-            insertSectionLabelBefore(resetRow, "ACTIONS");
+            insertSectionLabelBefore(resetRow, "THAO TÁC");
             compactActionRow(resetRow);
         }
     }

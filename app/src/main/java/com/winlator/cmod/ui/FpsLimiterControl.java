@@ -104,7 +104,7 @@ public class FpsLimiterControl extends LinearLayout {
         customValue.setSingleLine(true);
         customValue.setInputType(InputType.TYPE_CLASS_NUMBER);
         customValue.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        customValue.setHint("Enter custom FPS");
+        customValue.setHint("Nhập FPS tùy chỉnh");
         customValue.setTextColor(onSurface);
         customValue.setHintTextColor(onSurfaceVariant);
         customValue.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);

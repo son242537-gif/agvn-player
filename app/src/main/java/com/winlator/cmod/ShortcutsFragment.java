@@ -139,6 +139,7 @@ public class ShortcutsFragment extends Fragment {
     private boolean isGridView = false;
     private final ArrayList<Shortcut> allShortcuts = new ArrayList<>();
     private final Set<String> artworkRequests = Collections.synchronizedSet(new HashSet<>());
+    private static final Set<String> artworkChecked = Collections.synchronizedSet(new HashSet<>()); // AGVN
 
     private Shortcut shortcutForIconUpdate;
     private ActivityResultLauncher<String> iconPickerLauncher;
@@ -246,16 +247,16 @@ public class ShortcutsFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        MenuItem viewItem = menu.add(0, MENU_VIEW_MODE, 0, isGridView ? "List View" : "Grid View");
+        MenuItem viewItem = menu.add(0, MENU_VIEW_MODE, 0, isGridView ? "Dạng danh sách" : "Dạng lưới");
         viewItem.setIcon(R.drawable.ui_ic_view);
         viewItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-        MenuItem searchItem = menu.add(0, MENU_SEARCH, 1, "Search");
+        MenuItem searchItem = menu.add(0, MENU_SEARCH, 1, "Tìm kiếm");
         searchItem.setIcon(R.drawable.ui_ic_search);
         searchItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS |
                 MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
         SearchView searchView = new SearchView(requireContext());
-        searchView.setQueryHint("Search games");
+        searchView.setQueryHint("Tìm game");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -271,23 +272,23 @@ public class ShortcutsFragment extends Fragment {
         });
         searchItem.setActionView(searchView);
 
-        MenuItem addItem = menu.add(0, MENU_FILE_MANAGER, 2, "Open File Manager");
+        MenuItem addItem = menu.add(0, MENU_FILE_MANAGER, 2, "Mở Quản lý file");
         addItem.setIcon(R.drawable.ui_ic_add);
         addItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
         MainActivity activity = (MainActivity) requireActivity();
-        SubMenu moreMenu = menu.addSubMenu(0, MENU_MORE, 3, "More");
+        SubMenu moreMenu = menu.addSubMenu(0, MENU_MORE, 3, "Thêm");
         MenuItem moreItem = moreMenu.getItem();
         moreItem.setIcon(R.drawable.ui_ic_more);
         moreItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-        moreMenu.add(MENU_GROUP_LOCK, MENU_LOCK_ORIENTATION, 0, "Lock screen orientation")
+        moreMenu.add(MENU_GROUP_LOCK, MENU_LOCK_ORIENTATION, 0, "Khóa hướng màn hình")
                 .setCheckable(true)
                 .setChecked(activity.isOrientationLocked());
-        moreMenu.add(MENU_GROUP_ORIENTATION_MODE, MENU_VERTICAL_MODE, 1, "Vertical mode")
+        moreMenu.add(MENU_GROUP_ORIENTATION_MODE, MENU_VERTICAL_MODE, 1, "Chế độ dọc")
                 .setCheckable(true)
                 .setChecked(activity.isVerticalModeEnabled());
-        moreMenu.add(MENU_GROUP_ORIENTATION_MODE, MENU_HORIZONTAL_MODE, 2, "Horizontal mode")
+        moreMenu.add(MENU_GROUP_ORIENTATION_MODE, MENU_HORIZONTAL_MODE, 2, "Chế độ ngang")
                 .setCheckable(true)
                 .setChecked(activity.isHorizontalModeEnabled());
         moreMenu.setGroupCheckable(MENU_GROUP_LOCK, true, false);
@@ -497,6 +498,10 @@ public class ShortcutsFragment extends Fragment {
             File autoIcon = new File(getImagesDir(false), baseName + ".png");
             File cover = new File(getImagesDir(true), baseName + ".png");
             File banner = new File(getBannerDir(), baseName + ".png");
+            if (artworkChecked.add(baseName)) { // AGVN: redraw artwork made by an older AGVN version
+                com.winlator.cmod.agvn.AgvnCovers.dropIfOutdated(cover);
+                com.winlator.cmod.agvn.AgvnCovers.dropIfOutdated(banner);
+            }
             String iconPath = userIcon.exists() ? userIcon.getPath() :
                     (autoIcon.exists() ? autoIcon.getPath() : null);
 
@@ -541,7 +546,7 @@ public class ShortcutsFragment extends Fragment {
         // AGVN: offline cover (image in the game folder, else drawn from the exe icon + name); no online lookup
         if (!cover.exists()) {
             com.winlator.cmod.agvn.AgvnCovers.requestAsync(shortcut.name, shortcut.getExtra("agvnGameDir"),
-                    resolveExeFile(shortcut), cover, () -> {
+                    resolveExeFile(shortcut), cover, false, () -> {
                         if (getActivity() != null) getActivity().runOnUiThread(() -> refreshArtworkAndLauncherShortcuts(shortcut));
                     });
             return;
@@ -568,6 +573,14 @@ public class ShortcutsFragment extends Fragment {
     }
 
     private void requestBanner(Shortcut shortcut, File banner) {
+        // AGVN: offline banner, same sources as the cover; no online lookup
+        if (!banner.exists()) {
+            com.winlator.cmod.agvn.AgvnCovers.requestAsync(shortcut.name, shortcut.getExtra("agvnGameDir"),
+                    resolveExeFile(shortcut), banner, true, () -> {
+                        if (getActivity() != null) getActivity().runOnUiThread(() -> refreshArtworkAndLauncherShortcuts(shortcut));
+                    });
+            return;
+        }
         final String bannerKey = "banner:" + shortcut.file.getPath();
         if (!banner.exists() && artworkRequests.add(bannerKey)) {
             fetchBannerFromSteamGrid(shortcut, banner, () -> {
@@ -610,11 +623,11 @@ public class ShortcutsFragment extends Fragment {
                 }
             }
 
-            Toast.makeText(getContext(), "Icon updated!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Đã cập nhật biểu tượng!", Toast.LENGTH_SHORT).show();
             loadShortcutsList();
 
         } catch (Exception e) {
-            Toast.makeText(getContext(), "Error saving icon", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Lỗi khi lưu biểu tượng", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -729,7 +742,7 @@ public class ShortcutsFragment extends Fragment {
                 if (fileDeleted) {
                     disableShortcutOnScreen(requireContext(), shortcut);
                     loadShortcutsList();
-                    Toast.makeText(context, "Shortcut removed.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Đã xóa lối tắt.", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -737,14 +750,14 @@ public class ShortcutsFragment extends Fragment {
             ContainerManager containerManager = new ContainerManager(context);
             ArrayList<Container> containers = containerManager.getContainers();
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Select a container");
+            builder.setTitle("Chọn môi trường chạy");
             String[] containerNames = new String[containers.size()];
             for (int i = 0; i < containers.size(); i++) {
                 containerNames[i] = containers.get(i).getName();
             }
             builder.setItems(containerNames, (dialog, which) -> {
                 if (shortcut.cloneToContainer(containers.get(which))) {
-                    Toast.makeText(context, "Cloned successfully.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Đã nhân bản xong.", Toast.LENGTH_SHORT).show();
                     loadShortcutsList();
                 }
             });

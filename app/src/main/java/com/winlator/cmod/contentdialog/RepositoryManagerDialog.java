@@ -45,7 +45,7 @@ public class RepositoryManagerDialog {
 
     public void show() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Driver Sources"); // English
+        builder.setTitle("Nguồn driver"); // English
 
         recyclerView = new RecyclerView(context);
         recyclerView.setBackgroundColor(Color.BLACK);
@@ -57,8 +57,8 @@ public class RepositoryManagerDialog {
 
         builder.setView(recyclerView);
         
-        builder.setPositiveButton("Add Source", (d, w) -> showRepoDialog(null, -1));
-        builder.setNegativeButton("Close", null);
+        builder.setPositiveButton("Thêm nguồn", (d, w) -> showRepoDialog(null, -1));
+        builder.setNegativeButton("Đóng", null);
 
         dialog = builder.create();
         dialog.show();
@@ -68,14 +68,14 @@ public class RepositoryManagerDialog {
     
     private void showRepoDialog(DriverRepo repoToEdit, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(repoToEdit == null ? "Add Repository" : "Edit Repository");
+        builder.setTitle(repoToEdit == null ? "Thêm kho driver" : "Sửa kho driver");
 
         final EditText inputName = new EditText(context);
-        inputName.setHint("Name (e.g. Turnip Drivers)");
+        inputName.setHint("Tên (VD: Turnip Drivers)");
         if (repoToEdit != null) inputName.setText(repoToEdit.name);
         
         final EditText inputUrl = new EditText(context);
-        inputUrl.setHint("GitHub API URL");
+        inputUrl.setHint("Link GitHub API");
         if (repoToEdit != null) inputUrl.setText(repoToEdit.apiUrl);
 
         android.widget.LinearLayout layout = new android.widget.LinearLayout(context);
@@ -85,7 +85,7 @@ public class RepositoryManagerDialog {
         layout.addView(inputUrl);
         builder.setView(layout);
 
-        builder.setPositiveButton("Save", (d, w) -> {
+        builder.setPositiveButton("Lưu", (d, w) -> {
             String name = inputName.getText().toString().trim();
             String url = inputUrl.getText().toString().trim();
             
@@ -107,7 +107,7 @@ public class RepositoryManagerDialog {
                 adapter.notifyDataSetChanged();
             }
         });
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton("Hủy", null);
         builder.show();
     }
 
@@ -189,13 +189,13 @@ public class RepositoryManagerDialog {
             
             holder.actionButton.setOnClickListener(v -> {
                 PopupMenu popup = new PopupMenu(context, holder.actionButton);
-                popup.getMenu().add("Edit");
-                popup.getMenu().add("Delete");
+                popup.getMenu().add("Sửa");
+                popup.getMenu().add("Xóa");
                 
                 popup.setOnMenuItemClickListener(item -> {
-                    if (item.getTitle().equals("Edit")) {
+                    if (item.getTitle().equals("Sửa")) {
                         showRepoDialog(repo, position);
-                    } else if (item.getTitle().equals("Delete")) {
+                    } else if (item.getTitle().equals("Xóa")) {
                         repos.remove(position);
                         saveRepos();
                         notifyDataSetChanged();

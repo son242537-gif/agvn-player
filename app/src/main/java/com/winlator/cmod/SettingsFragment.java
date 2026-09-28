@@ -681,7 +681,7 @@ public class SettingsFragment extends Fragment {
                                 ? id.startsWith(Box64Preset.CUSTOM)
                                 : id.startsWith(FEXCorePreset.CUSTOM);
                         if (!exportable) {
-                            AppUtils.showToast(context, "Cannot export this preset");
+                            AppUtils.showToast(context, "Không xuất được preset này");
                             return;
                         }
                         if (box64) Box64PresetManager.exportPreset("box64", context, id);
@@ -853,7 +853,7 @@ public class SettingsFragment extends Fragment {
         Callback<String> onExportPreset = (String prefix) -> {
             final String presetId = Box64PresetManager.getSpinnerSelectedId(spinners.get(prefix));
             if (!presetId.startsWith(Box64Preset.CUSTOM)) {
-                AppUtils.showToast(context, "Cannot export this preset");
+                AppUtils.showToast(context, "Không xuất được preset này");
                 return;
             }
             getActivity().runOnUiThread(() ->  {
@@ -915,7 +915,7 @@ public class SettingsFragment extends Fragment {
         Callback<String> onExportPreset = (String prefix) -> {
             final String presetId = FEXCorePresetManager.getSpinnerSelectedId(sFEXCorePreset);
             if (!presetId.startsWith(FEXCorePreset.CUSTOM)) {
-                AppUtils.showToast(context, "Cannot export this preset");
+                AppUtils.showToast(context, "Không xuất được preset này");
                 return;
             }
             getActivity().runOnUiThread(() ->  {
@@ -1031,7 +1031,7 @@ public class SettingsFragment extends Fragment {
                                     Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                             );
                         } catch (SecurityException e) {
-                            AppUtils.showToast(getContext(), "Unable to take persistable permissions: " + e.getMessage());
+                            AppUtils.showToast(getContext(), "Không lấy được quyền truy cập lâu dài: " + e.getMessage());
                         }
 
                         // Convert the URI to an absolute path and display it
@@ -1056,7 +1056,7 @@ public class SettingsFragment extends Fragment {
                                     Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                             );
                         } catch (SecurityException e) {
-                            AppUtils.showToast(getContext(), "Unable to take persistable permissions: " + e.getMessage());
+                            AppUtils.showToast(getContext(), "Không lấy được quyền truy cập lâu dài: " + e.getMessage());
                         }
 
                         // Convert the URI to an absolute path and display it

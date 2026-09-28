@@ -99,12 +99,12 @@ private data class SectionItem(val id: String, val title: String, val subtitle: 
 private fun ContainerOverviewScreen(model: ContainerOverviewModel, callbacks: ContainerOverviewCallbacks) {
     val sections = remember(model) {
         listOf(
-            SectionItem(ContainerOverviewComposeHost.SECTION_SYSTEM, "System", "Wine ${model.wineVersion}", Icons.Outlined.Settings),
-            SectionItem(ContainerOverviewComposeHost.SECTION_VIDEO, "Video", "${model.renderer}  •  ${model.screenSize}", Icons.Outlined.DesktopWindows),
-            SectionItem(ContainerOverviewComposeHost.SECTION_AUDIO, "Audio", model.audioDriver, Icons.Outlined.VolumeUp),
-            SectionItem(ContainerOverviewComposeHost.SECTION_COMPATIBILITY, "Compatibility", model.emulator, Icons.Outlined.Extension),
-            SectionItem(ContainerOverviewComposeHost.SECTION_STORAGE, "Storage", "Container files", Icons.Outlined.Folder),
-            SectionItem(ContainerOverviewComposeHost.SECTION_ADVANCED, "Advanced", "", Icons.Outlined.Tune)
+            SectionItem(ContainerOverviewComposeHost.SECTION_SYSTEM, "Hệ thống", "Wine ${model.wineVersion}", Icons.Outlined.Settings),
+            SectionItem(ContainerOverviewComposeHost.SECTION_VIDEO, "Hình ảnh", "${model.renderer}  •  ${model.screenSize}", Icons.Outlined.DesktopWindows),
+            SectionItem(ContainerOverviewComposeHost.SECTION_AUDIO, "Âm thanh", model.audioDriver, Icons.Outlined.VolumeUp),
+            SectionItem(ContainerOverviewComposeHost.SECTION_COMPATIBILITY, "Tương thích", model.emulator, Icons.Outlined.Extension),
+            SectionItem(ContainerOverviewComposeHost.SECTION_STORAGE, "Ổ đĩa", "File của môi trường chạy", Icons.Outlined.Folder),
+            SectionItem(ContainerOverviewComposeHost.SECTION_ADVANCED, "Nâng cao", "", Icons.Outlined.Tune)
         )
     }
     var expanded by remember { mutableStateOf<String?>(null) }
@@ -119,7 +119,7 @@ private fun ContainerOverviewScreen(model: ContainerOverviewModel, callbacks: Co
                         .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()).height(52.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary)
-                ) { Text("Launch Environment", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold) }
+                ) { Text("Mở môi trường chạy", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold) }
             }
         }
     ) { padding ->

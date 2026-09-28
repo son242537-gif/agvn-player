@@ -365,7 +365,7 @@ private fun ContainerSectionScreen(
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    Text("Save", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Lưu", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 }
             }
         }
@@ -394,15 +394,15 @@ private fun ContainerSectionScreen(
                         1 -> {
                             ChoiceSetting(
                                 Icons.Outlined.DesktopWindows,
-                                "Renderer",
+                                "Bộ dựng hình",
                                 renderer,
                                 rendererEntries
                             ) { renderer = it }
                             GroupDivider()
                             ActionSetting(
                                 Icons.Outlined.Tune,
-                                "Renderer options",
-                                "Present mode, driver, filter and color channels",
+                                "Tùy chọn dựng hình",
+                                "Chế độ trình chiếu, driver, bộ lọc và kênh màu",
                                 expanded = rendererOptionsExpanded
                             ) { rendererOptionsExpanded = !rendererOptionsExpanded }
                             if (rendererOptionsExpanded) {
@@ -421,7 +421,7 @@ private fun ContainerSectionScreen(
                                 )
                             }
                             GroupDivider()
-                            ChoiceSetting(Icons.Outlined.Memory, "Screen Size", screen, screenEntries) { screen = it }
+                            ChoiceSetting(Icons.Outlined.Memory, "Độ phân giải", screen, screenEntries) { screen = it }
                             if (screen.equals("Custom", true)) {
                                 CustomResolutionFields(
                                     width = customWidth,
@@ -433,15 +433,15 @@ private fun ContainerSectionScreen(
                             GroupDivider()
                             ChoiceSetting(
                                 Icons.Outlined.DesktopWindows,
-                                "Graphics Driver",
+                                "Driver đồ họa",
                                 graphics,
                                 graphicsEntries
                             ) { graphics = it }
                             GroupDivider()
                             ActionSetting(
                                 Icons.Outlined.Tune,
-                                "Graphics driver options",
-                                "Driver version, Vulkan, resource and BCN settings",
+                                "Tùy chọn driver đồ họa",
+                                "Phiên bản driver, Vulkan, tài nguyên và BCN",
                                 expanded = graphicsOptionsExpanded
                             ) { graphicsOptionsExpanded = !graphicsOptionsExpanded }
                             if (graphicsOptionsExpanded) {
@@ -471,9 +471,9 @@ private fun ContainerSectionScreen(
                             }
                         }
                         2 -> {
-                            ChoiceSetting(Icons.Outlined.VolumeUp, "Audio Driver", audio, audioEntries) { audio = it }
+                            ChoiceSetting(Icons.Outlined.VolumeUp, "Driver âm thanh", audio, audioEntries) { audio = it }
                             GroupDivider()
-                            InfoText("ALSA offers direct audio output. PulseAudio can improve compatibility in some applications.")
+                            InfoText("ALSA xuất âm thanh trực tiếp. PulseAudio có thể tương thích tốt hơn với một số ứng dụng.")
                         }
                         else -> {
                             ChoiceSetting(Icons.Outlined.VerifiedUser, "DX Wrapper", wrapper, wrapperEntries) {
@@ -482,8 +482,8 @@ private fun ContainerSectionScreen(
                             GroupDivider()
                             ActionSetting(
                                 Icons.Outlined.Tune,
-                                "Wrapper options",
-                                "DXVK / VKD3D versions and wrapper configuration",
+                                "Tùy chọn wrapper",
+                                "Phiên bản DXVK / VKD3D và cấu hình wrapper",
                                 expanded = wrapperOptionsExpanded
                             ) { wrapperOptionsExpanded = !wrapperOptionsExpanded }
                             if (wrapperOptionsExpanded) {
@@ -526,21 +526,21 @@ private fun ContainerSectionScreen(
                             GroupDivider()
                             ReadOnlySetting(
                                 icon = Icons.Outlined.Memory,
-                                label = "64-bit Emulator",
+                                label = "Giả lập 64-bit",
                                 value = if (arm64EcWine) "FEXCore" else "Box64"
                             )
                             GroupDivider()
                             if (arm64EcWine) {
                                 ChoiceSetting(
                                     Icons.Outlined.Memory,
-                                    "32-bit Emulator",
+                                    "Giả lập 32-bit",
                                     if (emulator.equals("FEXCore", true)) "FEXCore" else "WOWBox64",
                                     arrayOf("FEXCore", "WOWBox64")
                                 ) { emulator = if (it.equals("WOWBox64", true)) "Box64" else "FEXCore" }
                             } else {
                                 ReadOnlySetting(
                                     icon = Icons.Outlined.Memory,
-                                    label = "32-bit Emulator",
+                                    label = "Giả lập 32-bit",
                                     value = "Box64"
                                 )
                             }
@@ -548,7 +548,7 @@ private fun ContainerSectionScreen(
                                 GroupDivider()
                                 ChoiceSetting(
                                     Icons.Outlined.Memory,
-                                    "FEXCore Version",
+                                    "Phiên bản FEXCore",
                                     fexcoreVersion,
                                     fexcoreVersionEntries,
                                     installedEntries = installedFexcoreVersionEntries,
@@ -557,7 +557,7 @@ private fun ContainerSectionScreen(
                                 GroupDivider()
                                 IdChoiceSetting(
                                     icon = Icons.Outlined.Tune,
-                                    label = "FEXCore Preset",
+                                    label = "Preset FEXCore",
                                     selectedId = fexcorePreset,
                                     entries = fexcorePresetEntries,
                                     ids = fexcorePresetIds,
@@ -568,7 +568,7 @@ private fun ContainerSectionScreen(
                                 GroupDivider()
                                 ChoiceSetting(
                                     Icons.Outlined.Memory,
-                                    if (arm64EcWine) "WOWBox64 Version" else "Box64 Version",
+                                    if (arm64EcWine) "Phiên bản WOWBox64" else "Phiên bản Box64",
                                     box64Version,
                                     box64VersionEntries,
                                     installedEntries = installedBox64VersionEntries,
@@ -579,7 +579,7 @@ private fun ContainerSectionScreen(
                                 GroupDivider()
                                 IdChoiceSetting(
                                     icon = Icons.Outlined.Tune,
-                                    label = "Box64 Preset",
+                                    label = "Preset Box64",
                                     selectedId = box64Preset,
                                     entries = box64PresetEntries,
                                     ids = box64PresetIds,
@@ -708,7 +708,7 @@ private fun ChoiceSetting(
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
                 )
                 Text(
-                    "Choose an option",
+                    "Chọn một mục",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 8.dp).padding(bottom = 10.dp)
@@ -738,7 +738,7 @@ private fun ChoiceSetting(
                                     Icon(Icons.Outlined.Check, null)
                                 } else if (!installed) {
                                     Text(
-                                        "Download",
+                                        "Tải về",
                                         style = MaterialTheme.typography.labelMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -803,11 +803,11 @@ private fun RendererOptionsPanel(
     val presentEntries = arrayOf("Mailbox", "Fifo")
     val presentIds = arrayOf("mailbox", "fifo")
     val filterEntries = if (nativeRenderer) {
-        arrayOf("Bilinear", "Nearest neighbor")
+        arrayOf("Bilinear", "Điểm gần nhất")
     } else {
         arrayOf(
             "Bilinear",
-            "Nearest neighbor",
+            "Điểm gần nhất",
             "Snapdragon Super Resolution",
             "AMD FidelityFX Super Resolution"
         )
@@ -821,15 +821,15 @@ private fun RendererOptionsPanel(
         Column(Modifier.padding(vertical = 4.dp)) {
             if (!nativeRenderer) {
                 InlineChoice(
-                    label = "Present Mode",
+                    label = "Chế độ trình chiếu",
                     selected = presentEntries[presentIds.indexOf(presentMode).coerceAtLeast(0)],
                     entries = presentEntries
                 ) { value -> onPresentMode(presentIds[presentEntries.indexOf(value)]) }
                 ThinDivider()
                 val selectedDriver = driverIds.indexOf(driverId).takeIf { it >= 0 } ?: 0
                 InlineChoice(
-                    label = "Renderer Driver",
-                    selected = driverEntries.getOrElse(selectedDriver) { "System" },
+                    label = "Driver dựng hình",
+                    selected = driverEntries.getOrElse(selectedDriver) { "Hệ thống" },
                     entries = driverEntries
                 ) { value ->
                     val index = driverEntries.indexOf(value).coerceAtLeast(0)
@@ -838,7 +838,7 @@ private fun RendererOptionsPanel(
                 ThinDivider()
             }
             InlineChoice(
-                label = "Texture Filter",
+                label = "Lọc texture",
                 selected = filterEntries.getOrElse(filterMode) { filterEntries[0] },
                 entries = filterEntries
             ) { value -> onFilterMode(filterEntries.indexOf(value).coerceAtLeast(0)) }
@@ -847,7 +847,7 @@ private fun RendererOptionsPanel(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 7.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Swap red/blue channels", modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                Text("Đổi kênh màu đỏ/xanh dương", modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
                 Switch(checked = swapRB, onCheckedChange = onSwapRB)
             }
         }
@@ -887,7 +887,7 @@ private fun GraphicsDriverOptionsPanel(
         Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
             ChoiceSetting(
                 icon = Icons.Outlined.DesktopWindows,
-                label = "Driver Version",
+                label = "Phiên bản driver",
                 selected = version,
                 entries = versionEntries,
                 showIcon = false,
@@ -896,21 +896,21 @@ private fun GraphicsDriverOptionsPanel(
                 onSelected = onVersion
             )
             ThinDivider()
-            InlineChoice("Vulkan Version", vulkanVersion, arrayOf("1.1", "1.2", "1.3"), onVulkanVersion)
+            InlineChoice("Phiên bản Vulkan", vulkanVersion, arrayOf("1.1", "1.2", "1.3"), onVulkanVersion)
             ThinDivider()
-            InlineChoice("Present Mode", presentMode, arrayOf("mailbox", "fifo", "immediate", "relaxed"), onPresentMode)
+            InlineChoice("Chế độ trình chiếu", presentMode, arrayOf("mailbox", "fifo", "immediate", "relaxed"), onPresentMode)
             ThinDivider()
-            InlineChoice("Resource Type", resourceType, arrayOf("auto", "buffer", "image"), onResourceType)
+            InlineChoice("Loại tài nguyên", resourceType, arrayOf("auto", "buffer", "image"), onResourceType)
             ThinDivider()
-            InlineChoice("BCN Emulation", bcnEmulation, arrayOf("none", "partial", "full", "auto"), onBcnEmulation)
+            InlineChoice("Giả lập BCN", bcnEmulation, arrayOf("none", "partial", "full", "auto"), onBcnEmulation)
             ThinDivider()
-            InlineChoice("BCN Emulation Type", bcnEmulationType, arrayOf("software", "compute"), onBcnEmulationType)
+            InlineChoice("Kiểu giả lập BCN", bcnEmulationType, arrayOf("software", "compute"), onBcnEmulationType)
             ThinDivider()
-            ToggleSetting("BCN Emulation Cache", bcnEmulationCache, onBcnEmulationCache)
+            ToggleSetting("Bộ đệm giả lập BCN", bcnEmulationCache, onBcnEmulationCache)
             ThinDivider()
-            ToggleSetting("Sync Frame", syncFrame, onSyncFrame)
+            ToggleSetting("Đồng bộ khung hình", syncFrame, onSyncFrame)
             ThinDivider()
-            ToggleSetting("Disable Present Wait", disablePresentWait, onDisablePresentWait)
+            ToggleSetting("Tắt Present Wait", disablePresentWait, onDisablePresentWait)
         }
     }
 }
@@ -961,7 +961,7 @@ private fun WrapperOptionsPanel(
             if (dxvk) {
                 ChoiceSetting(
                     icon = Icons.Outlined.Memory,
-                    label = "DXVK Version",
+                    label = "Phiên bản DXVK",
                     selected = dxvkVersion.ifBlank { dxvkEntries.firstOrNull().orEmpty() },
                     entries = dxvkEntries,
                     showIcon = false,
@@ -971,7 +971,7 @@ private fun WrapperOptionsPanel(
                 )
                 ChoiceSetting(
                     icon = Icons.Outlined.Memory,
-                    label = "VKD3D Version",
+                    label = "Phiên bản VKD3D",
                     selected = vkd3dVersion.ifBlank { vkd3dEntries.firstOrNull().orEmpty() },
                     entries = vkd3dEntries,
                     showIcon = false,
@@ -980,20 +980,20 @@ private fun WrapperOptionsPanel(
                     onSelected = onVkd3dVersion
                 )
                 InlineChoice(
-                    label = "VKD3D Feature Level",
+                    label = "Mức tính năng VKD3D",
                     selected = vkd3dLevel,
                     entries = arrayOf("12_0", "12_1", "12_2", "11_1", "11_0", "10_1", "10_0", "9_3", "9_2", "9_1"),
                     onSelected = onVkd3dLevel
                 )
                 CompactTextField(
-                    label = "Frame Rate Limit",
+                    label = "Giới hạn FPS",
                     value = frameRate,
                     onValueChange = onFrameRate,
                     numeric = true
                 )
-                ToggleSetting("Max Frame Latency", maxFrameLatency, onMaxFrameLatency)
-                ToggleSetting("Async shaders", async, onAsync)
-                ToggleSetting("Async shader cache", asyncCache, onAsyncCache)
+                ToggleSetting("Độ trễ khung hình tối đa", maxFrameLatency, onMaxFrameLatency)
+                ToggleSetting("Shader Async", async, onAsync)
+                ToggleSetting("Bộ đệm shader Async", asyncCache, onAsyncCache)
                 InlineChoice(
                     label = "DDraw Wrapper",
                     selected = ddrawWrapper,
@@ -1002,21 +1002,21 @@ private fun WrapperOptionsPanel(
                 )
             } else {
                 ToggleSetting("CSMT", csmt, onCsmt)
-                ToggleSetting("Strict Shader Math", strictShaderMath, onStrictShaderMath)
+                ToggleSetting("Tính shader chính xác", strictShaderMath, onStrictShaderMath)
                 InlineChoice(
-                    label = "Offscreen Rendering",
+                    label = "Vẽ ngoài màn hình",
                     selected = offscreenMode,
                     entries = arrayOf("fbo", "backbuffer"),
                     onSelected = onOffscreenMode
                 )
                 InlineChoice(
-                    label = "WineD3D Renderer",
+                    label = "Bộ dựng hình WineD3D",
                     selected = wineRenderer,
                     entries = arrayOf("gl", "vulkan", "gdi"),
                     onSelected = onWineRenderer
                 )
                 CompactTextField(
-                    label = "Video Memory (MB)",
+                    label = "Bộ nhớ video (MB)",
                     value = videoMemory,
                     onValueChange = onVideoMemory,
                     numeric = true
@@ -1036,9 +1036,9 @@ private fun WrapperOptionsPanel(
                     Icon(Icons.Outlined.Memory, null, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(10.dp))
                     Column(Modifier.weight(1f)) {
-                        Text("Manage installed versions", style = MaterialTheme.typography.titleSmall)
+                        Text("Quản lý phiên bản đã cài", style = MaterialTheme.typography.titleSmall)
                         Text(
-                            "Install or remove DXVK, VKD3D and emulator components",
+                            "Cài hoặc xóa DXVK, VKD3D và các trình giả lập",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -1096,7 +1096,7 @@ private fun CustomResolutionFields(
             value = width,
             onValueChange = onWidth,
             modifier = Modifier.weight(1f),
-            label = { Text("Width") },
+            label = { Text("Rộng") },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             shape = RoundedCornerShape(10.dp)
@@ -1105,7 +1105,7 @@ private fun CustomResolutionFields(
             value = height,
             onValueChange = onHeight,
             modifier = Modifier.weight(1f),
-            label = { Text("Height") },
+            label = { Text("Cao") },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             shape = RoundedCornerShape(10.dp)

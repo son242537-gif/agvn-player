@@ -104,7 +104,7 @@ fun EnvironmentVariablesEditor(
                 color = MaterialTheme.colorScheme.surface
             ) {
                 Text(
-                    "No environment variables added.",
+                    "Chưa thêm biến môi trường nào.",
                     modifier = Modifier.padding(14.dp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -134,7 +134,7 @@ fun EnvironmentVariablesEditor(
         OutlinedButton(onClick = { addOpen = true }, modifier = Modifier.fillMaxWidth()) {
             Icon(Icons.Outlined.Add, null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.size(7.dp))
-            Text("Add variable")
+            Text("Thêm biến")
         }
     }
 
@@ -165,7 +165,7 @@ private fun EnvironmentVariableRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(row.name, modifier = Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
-            IconButton(onClick = onRemove) { Icon(Icons.Outlined.DeleteOutline, "Remove") }
+            IconButton(onClick = onRemove) { Icon(Icons.Outlined.DeleteOutline, "Xóa") }
         }
         when (spec.kind) {
             EnvValueKind.CHECKBOX -> {
@@ -178,13 +178,13 @@ private fun EnvironmentVariableRow(
                 )
             }
             EnvValueKind.SELECT -> SettingChoice(
-                label = "Value",
+                label = "Giá trị",
                 selected = row.value.ifBlank { spec.options.firstOrNull().orEmpty() },
                 entries = spec.options
             ) { onValue(it) }
             EnvValueKind.MULTI -> MultiEnvironmentChoice(spec.options, row.value, onValue)
-            EnvValueKind.NUMBER -> SettingText("Value", row.value) { onValue(it.filter(Char::isDigit)) }
-            EnvValueKind.TEXT -> SettingText("Value", row.value, onChanged = onValue)
+            EnvValueKind.NUMBER -> SettingText("Giá trị", row.value) { onValue(it.filter(Char::isDigit)) }
+            EnvValueKind.TEXT -> SettingText("Giá trị", row.value, onChanged = onValue)
         }
     }
 }
@@ -192,10 +192,10 @@ private fun EnvironmentVariableRow(
 @Composable
 private fun MultiEnvironmentChoice(options: List<String>, value: String, onChanged: (String) -> Unit) {
     var open by remember { mutableStateOf(false) }
-    val selectedText = value.ifBlank { "None" }
+    val selectedText = value.ifBlank { "Không có" }
     Surface(onClick = { open = true }, color = androidx.compose.ui.graphics.Color.Transparent, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 9.dp)) {
-            Text("Value", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("Giá trị", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(selectedText, style = MaterialTheme.typography.bodyLarge)
         }
     }
@@ -211,10 +211,10 @@ private fun MultiEnvironmentChoice(options: List<String>, value: String, onChang
                 TextButton(onClick = {
                     onChanged(selected.joinToString(","))
                     open = false
-                }) { Text("Done") }
+                }) { Text("Xong") }
             },
-            dismissButton = { TextButton(onClick = { open = false }) { Text("Cancel") } },
-            title = { Text("Select values") },
+            dismissButton = { TextButton(onClick = { open = false }) { Text("Hủy") } },
+            title = { Text("Chọn giá trị") },
             text = {
                 LazyColumn(Modifier.heightIn(max = 420.dp)) {
                     items(options) { option ->
@@ -247,14 +247,14 @@ private fun AddEnvironmentVariableDialog(
     val available = knownEnvironmentVariables.map { it.name }
     var name by remember { mutableStateOf(available.firstOrNull().orEmpty()) }
     var customName by remember { mutableStateOf("") }
-    val options = available + "Custom…"
-    val selected = if (name in available) name else "Custom…"
+    val options = available + "Tùy chỉnh…"
+    val selected = if (name in available) name else "Tùy chỉnh…"
 
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = {
-                val finalName = if (selected == "Custom…") customName.trim().replace(" ", "") else name
+                val finalName = if (selected == "Tùy chỉnh…") customName.trim().replace(" ", "") else name
                 if (finalName.isNotBlank() && finalName !in existing) {
                     val spec = knownEnvironmentVariables.firstOrNull { it.name == finalName }
                     val initial = when (spec?.kind) {
@@ -264,17 +264,17 @@ private fun AddEnvironmentVariableDialog(
                     }
                     onAdd(finalName, initial)
                 }
-            }) { Text("Add") }
+            }) { Text("Thêm") }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
-        title = { Text("Add environment variable") },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Hủy") } },
+        title = { Text("Thêm biến môi trường") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                SettingChoice("Variable", selected, options) { picked ->
-                    name = if (picked == "Custom…") "" else picked
+                SettingChoice("Biến", selected, options) { picked ->
+                    name = if (picked == "Tùy chỉnh…") "" else picked
                 }
-                if (selected == "Custom…") {
-                    SettingText("Name", customName) { customName = it }
+                if (selected == "Tùy chỉnh…") {
+                    SettingText("Tên", customName) { customName = it }
                 }
             }
         }

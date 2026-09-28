@@ -36,17 +36,17 @@
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="General" />
+                    android:text="Chung" />
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Environment" />
+                    android:text="Môi trường" />
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Drivers" />
+                    android:text="Driver" />
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
@@ -56,7 +56,7 @@
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Components" />
+                    android:text="Thành phần" />
 
             </com.google.android.material.tabs.TabLayout>
 
@@ -292,7 +292,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="8dp"
-                android:text="Renderer" />
+                android:text="Bộ dựng hình" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -347,7 +347,7 @@
                         android:id="@+id/TVEmulator64Label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="64bit Emulator" />
+                        android:text="Giả lập 64-bit" />
 
                     <Spinner
                         style="@style/ComboBox"
@@ -838,7 +838,7 @@
                                 android:id="@+id/CBExclusiveXInput"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Exclusive Input" />
+                                android:text="Nhập độc quyền" />
                             <ImageView
                                 android:id="@+id/BTExclusiveXInputHelp"
                                 style="@style/HelpButton"

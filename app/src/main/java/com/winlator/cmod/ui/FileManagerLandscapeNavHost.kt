@@ -14,7 +14,7 @@ object FileManagerLandscapeNavHost {
                 LandscapeMainNavigation(
                     activity = activity,
                     selected = 0,
-                    title = "File Manager"
+                    title = "Quản lý file"
                 )
             }
         }

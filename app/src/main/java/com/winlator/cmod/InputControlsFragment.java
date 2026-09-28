@@ -279,7 +279,7 @@ public class InputControlsFragment extends Fragment {
     }
 
     private void showImportOptions() {
-        String[] options = {"Open local profile", "Download profiles"};
+        String[] options = {"Mở cấu hình trên máy", "Tải cấu hình về"};
         new AlertDialog.Builder(requireContext())
                 .setTitle(R.string.import_profile)
                 .setItems(options, (dialog, which) -> {

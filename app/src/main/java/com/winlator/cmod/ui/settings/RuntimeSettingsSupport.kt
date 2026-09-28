@@ -224,7 +224,7 @@ internal suspend fun loadSettingsCatalog(
     }
 
     val adreno = AdrenotoolsManager(context)
-    val rendererDrivers = linkedMapOf("system" to "System")
+    val rendererDrivers = linkedMapOf("system" to "Hệ thống")
     val driverOptions = linkedMapOf<String, DriverOption>()
 
     context.resources.getStringArray(R.array.wrapper_graphics_driver_version_entries).forEach { version ->
@@ -387,15 +387,15 @@ private fun settingDisplayLabel(value: String): String =
     if (value == "Lanczos 2 (16-tap)") "Lanczos 2" else value
 
 private fun settingFieldLabel(label: String): String = when (label) {
-    "Graphics Driver" -> "OpenGL Driver"
-    "Driver Version" -> "Vulkan Driver"
+    "Driver đồ họa" -> "Driver OpenGL"
+    "Phiên bản driver" -> "Driver Vulkan"
     else -> label
 }
 
 private fun settingChoiceEntries(label: String, entries: List<String>): List<String> =
-    if (label == "Graphics Driver") listOf("Zink", "Freedreno") else entries
+    if (label == "Driver đồ họa") listOf("Zink", "Freedreno") else entries
 private fun settingChoiceSelected(label: String, selected: String): String =
-    if (label == "Graphics Driver" && selected.equals("wrapper", ignoreCase = true)) "Zink" else selected
+    if (label == "Driver đồ họa" && selected.equals("wrapper", ignoreCase = true)) "Zink" else selected
 
 @Composable
 internal fun SettingsCard(content: @Composable () -> Unit) {
@@ -435,14 +435,14 @@ private fun WallpaperPreview() {
         if (bitmap != null) {
             Image(
                 bitmap = bitmap.asImageBitmap(),
-                contentDescription = "Wallpaper preview",
+                contentDescription = "Xem trước hình nền",
                 modifier = Modifier.fillMaxWidth().height(132.dp).clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
         } else {
             Image(
                 painter = painterResource(R.drawable.wallpaper),
-                contentDescription = "Wallpaper preview",
+                contentDescription = "Xem trước hình nền",
                 modifier = Modifier.fillMaxWidth().height(132.dp).clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
@@ -502,7 +502,7 @@ internal fun SettingChoice(
                 }
             }
         }
-        if (label == "Desktop Background" && selected.equals("Image", ignoreCase = true)) {
+        if (label == "Hình nền desktop" && selected.equals("Hình ảnh", ignoreCase = true)) {
             WallpaperPreview()
         }
     }
@@ -541,7 +541,7 @@ internal fun SettingWineRuntimeChoice(
                 Column(Modifier.weight(1f)) {
                     Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(
-                        selectedOption?.label ?: selectedId.ifBlank { "Choose a version" },
+                        selectedOption?.label ?: selectedId.ifBlank { "Chọn phiên bản" },
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Medium,
                         maxLines = 1,
@@ -606,7 +606,7 @@ internal fun SettingInstallChoice(
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(selected.ifBlank { "Choose a version" }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+                    Text(selected.ifBlank { "Chọn phiên bản" }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
                 }
                 Icon(Icons.Outlined.KeyboardArrowDown, null)
             }
@@ -623,7 +623,7 @@ internal fun SettingInstallChoice(
                     text = {
                         Column {
                             Text(value, color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (available) 1f else .52f))
-                            if (!available) Text(if (busy) "Downloading…" else "Download", style = MaterialTheme.typography.labelSmall)
+                            if (!available) Text(if (busy) "Đang tải…" else "Tải về", style = MaterialTheme.typography.labelSmall)
                         }
                     },
                     trailingIcon = {
@@ -685,7 +685,7 @@ internal fun SettingDriverChoice(
                     text = {
                         Column {
                             Text(option.label, color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (option.installed) 1f else .52f))
-                            if (!option.installed) Text(if (busy) "Downloading…" else "Download", style = MaterialTheme.typography.labelSmall)
+                            if (!option.installed) Text(if (busy) "Đang tải…" else "Tải về", style = MaterialTheme.typography.labelSmall)
                         }
                     },
                     trailingIcon = {

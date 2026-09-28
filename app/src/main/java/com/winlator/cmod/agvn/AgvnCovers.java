@@ -3,47 +3,58 @@ package com.winlator.cmod.agvn;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.LinearGradient;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Shader;
-import android.graphics.Typeface;
 import android.util.Log;
 
 import com.winlator.cmod.core.ExeIconExtractor;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
- * Library cover art without internet: an image shipped in the game folder (cover/poster/folder/header/capsule/box/
- * banner .png/.jpg/.webp, or agvn-cover.*) is used first; otherwise a 600x900 AGVN cover is drawn from the exe
- * icon and the game name. Runs off the UI thread.
+ * Library artwork without internet: the game's own image (see {@link AgvnCoverSources}) or a full-bleed picture drawn
+ * from the exe icon and the game name, as a 600x900 cover or a 1280x720 banner. Runs off the UI thread. Each file AGVN
+ * writes gets a "<file>.agvn" note with the drawing version, so older AGVN artwork is redrawn after an update.
  */
 public final class AgvnCovers {
-    static final String[] NAMES = {"agvn-cover", "cover", "poster", "folder", "boxart", "box", "capsule", "header", "banner", "key_art", "keyart"};
-    static final String[] EXTS = {".png", ".jpg", ".jpeg", ".webp"};
-    private static final int W = 600, H = 900;
+    static final String VERSION = "2";
+    private static final int COVER_W = 600, COVER_H = 900, BANNER_W = 1280, BANNER_H = 720;
 
     private static final java.util.concurrent.ExecutorService EXECUTOR = java.util.concurrent.Executors.newSingleThreadExecutor();
     private static final java.util.Set<String> PENDING = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
 
     private AgvnCovers() {}
 
-    /** Background {@link #ensure}; {@code done} runs on the worker thread after a cover was written. */
-    public static void requestAsync(String gameName, String agvnGameDir, File exe, File target, Runnable done) {
+    /** Background {@link #ensure}; {@code done} runs on the worker thread after the artwork was written. */
+    public static void requestAsync(String gameName, String agvnGameDir, File exe, File target, boolean banner, Runnable done) {
         if (target.isFile() || !PENDING.add(target.getPath())) return;
         EXECUTOR.execute(() -> {
             try {
-                if (ensure(gameName, gameDirFor(agvnGameDir, exe), exe, target) && done != null) done.run();
+                if (ensure(gameName, gameDirFor(agvnGameDir, exe), exe, target, banner) && done != null) done.run();
             } finally {
                 PENDING.remove(target.getPath());
             }
         });
+    }
+
+    /** Deletes artwork drawn by an older AGVN version (so it is drawn again); true when it was removed. */
+    public static boolean dropIfOutdated(File target) {
+        File note = noteFor(target);
+        boolean outdated;
+        if (note.isFile()) {
+            outdated = !VERSION.equals(readNote(note));
+        } else {
+            // the first AGVN covers (no note) were exactly 600x900
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(target.getPath(), o);
+            outdated = o.outWidth == COVER_W && o.outHeight == COVER_H;
+        }
+        if (!outdated) return false;
+        note.delete();
+        return target.delete();
     }
 
     /** The imported game folder, else the Unreal project root above Binaries/Win64, else the exe folder. Pure Java. */
@@ -55,84 +66,46 @@ public final class AgvnCovers {
                 && dir.getParentFile().getName().equalsIgnoreCase("Binaries")) {
             File project = dir.getParentFile().getParentFile();
             File root = project != null ? project.getParentFile() : null;
-            if (root != null && findLocal(root) != null) return root;
+            if (root != null && AgvnCoverSources.findLocal(root) != null) return root;
             return project;
         }
         return dir;
     }
 
-    /** Writes {@code target} (PNG); true when a cover now exists. */
-    public static boolean ensure(String gameName, File gameDir, File exe, File target) {
+    /** Writes {@code target} (PNG); true when artwork now exists. */
+    public static boolean ensure(String gameName, File gameDir, File exe, File target, boolean banner) {
         if (target.isFile()) return true;
+        int w = banner ? BANNER_W : COVER_W, h = banner ? BANNER_H : COVER_H;
         try {
-            File local = findLocal(gameDir);
-            Bitmap cover = null;
-            if (local != null) cover = scaleCrop(BitmapFactory.decodeFile(local.getPath()));
-            if (cover == null) cover = draw(gameName, exe != null ? ExeIconExtractor.extractBitmap(exe) : null);
+            File source = AgvnCoverSources.find(gameDir);
+            Bitmap image = source != null ? BitmapFactory.decodeFile(source.getPath()) : null;
+            Bitmap out = image != null ? AgvnCoverPainter.fromImage(image, w, h)
+                    : AgvnCoverPainter.drawn(gameName, exe != null ? ExeIconExtractor.extractBitmap(exe) : null, w, h);
             File parent = target.getParentFile();
             if (parent != null) parent.mkdirs();
-            try (FileOutputStream out = new FileOutputStream(target)) {
-                return cover.compress(Bitmap.CompressFormat.PNG, 95, out);
+            try (FileOutputStream stream = new FileOutputStream(target)) {
+                if (!out.compress(Bitmap.CompressFormat.PNG, 95, stream)) return false;
             }
+            try (FileOutputStream note = new FileOutputStream(noteFor(target))) {
+                note.write(VERSION.getBytes(StandardCharsets.UTF_8));
+            }
+            return true;
         } catch (Throwable e) {
-            Log.w("AGVN", "cover for " + gameName + " failed", e);
+            Log.w("AGVN", "artwork for " + gameName + " failed", e);
             return false;
         }
     }
 
-    /** First matching image directly in {@code gameDir} (case-insensitive name), or null. Pure Java. */
-    static File findLocal(File gameDir) {
-        File[] files = gameDir != null ? gameDir.listFiles(File::isFile) : null;
-        if (files == null) return null;
-        for (String name : NAMES) {
-            for (File f : files) {
-                String n = f.getName().toLowerCase(Locale.ROOT);
-                for (String ext : EXTS) if (n.equals(name + ext)) return f;
-            }
-        }
-        return null;
+    static File noteFor(File target) {
+        return new File(target.getPath() + ".agvn");
     }
 
-    private static Bitmap scaleCrop(Bitmap src) {
-        if (src == null) return null;
-        Bitmap out = Bitmap.createBitmap(W, H, Bitmap.Config.ARGB_8888);
-        float scale = Math.max(W / (float) src.getWidth(), H / (float) src.getHeight());
-        int sw = Math.round(W / scale), sh = Math.round(H / scale);
-        int sx = (src.getWidth() - sw) / 2, sy = (src.getHeight() - sh) / 2;
-        new Canvas(out).drawBitmap(src, new Rect(sx, sy, sx + sw, sy + sh), new Rect(0, 0, W, H), new Paint(Paint.FILTER_BITMAP_FLAG));
-        return out;
-    }
-
-    private static Bitmap draw(String name, Bitmap icon) {
-        Bitmap out = Bitmap.createBitmap(W, H, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(out);
-        Paint bg = new Paint();
-        bg.setShader(new LinearGradient(0, 0, 0, H, 0xFF2A2F3A, 0xFF15171C, Shader.TileMode.CLAMP));
-        c.drawRect(0, 0, W, H, bg);
-        Paint accent = new Paint(Paint.ANTI_ALIAS_FLAG);
-        accent.setColor(0xFFFFD97A);
-        c.drawRect(0, H - 12, W, H, accent);
-        if (icon != null) {
-            int size = 300, left = (W - size) / 2, top = 190;
-            c.drawBitmap(icon, new Rect(0, 0, icon.getWidth(), icon.getHeight()), new Rect(left, top, left + size, top + size), new Paint(Paint.FILTER_BITMAP_FLAG));
+    private static String readNote(File note) {
+        try {
+            return new String(java.nio.file.Files.readAllBytes(note.toPath()), StandardCharsets.UTF_8).trim();
+        } catch (Exception e) {
+            return "";
         }
-        Paint text = new Paint(Paint.ANTI_ALIAS_FLAG);
-        text.setColor(0xFFFFFFFF);
-        text.setTypeface(Typeface.DEFAULT_BOLD);
-        text.setTextAlign(Paint.Align.CENTER);
-        text.setTextSize(54);
-        List<String> lines = wrap(name, 16, 3);
-        float y = icon != null ? 610 : 380;
-        for (String line : lines) {
-            c.drawText(line, W / 2f, y, text);
-            y += 66;
-        }
-        Paint brand = new Paint(Paint.ANTI_ALIAS_FLAG);
-        brand.setColor(0xFFFFD97A);
-        brand.setTextAlign(Paint.Align.CENTER);
-        brand.setTextSize(30);
-        c.drawText("AGVN", W / 2f, H - 50, brand);
-        return out;
     }
 
     /** Word wrap to at most {@code maxLines} lines of about {@code width} characters. Pure Java. */

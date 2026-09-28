@@ -32,9 +32,9 @@
         <item>PulseAudio-GN</item>
     </string-array>
     <string-array name="binding_type_entries">
-        <item>Keyboard</item>
-        <item>Mouse</item>
-        <item>Gamepad</item>
+        <item>Bàn phím</item>
+        <item>Chuột</item>
+        <item>Tay cầm</item>
     </string-array>
     <string-array name="dxwrapper_entries">
         <item>WineD3D</item>
@@ -53,14 +53,14 @@
         <item>2.3.1-arm64ec-gplasync</item>
     </string-array>
     <string-array name="dxvk_max_device_memory_entries">
-        <item>0 (Default)</item>
+        <item>0 (Mặc định)</item>
         <item>512 MB</item>
         <item>1024 MB</item>
         <item>2048 MB</item>
         <item>4096 MB</item>
     </string-array>
     <string-array name="device_memory_entries">
-    <item>0 (Default)</item>
+    <item>0 (Mặc định)</item>
     <item>512 MB</item>
     <item>1024 MB</item>
     <item>2048 MB</item>
@@ -111,7 +111,7 @@
         <item>4096 MB</item>
     </string-array>
     <string-array name="dxvk_framerate_entries">
-        <item>0 (Default)</item>
+        <item>0 (Mặc định)</item>
         <item>20</item>
         <item>30</item>
         <item>40</item>
@@ -125,8 +125,8 @@
         <item>120</item>
     </string-array>
     <string-array name="wincomponent_entries">
-        <item>Builtin (Wine)</item>
-        <item>Native (Windows)</item>
+        <item>Có sẵn (Wine)</item>
+        <item>Gốc (Windows)</item>
     </string-array>
     <string-array name="box64_version_entries">
         <item>0.4.2</item>
@@ -138,17 +138,17 @@
         <item>2601</item>
     </string-array>
     <string-array name="desktop_theme_entries">
-        <item>Light</item>
-        <item>Dark</item>
+        <item>Sáng</item>
+        <item>Tối</item>
     </string-array>
     <string-array name="desktop_background_type_entries">
-        <item>Image</item>
-        <item>Solid Color</item>
+        <item>Hình ảnh</item>
+        <item>Màu đơn</item>
     </string-array>
     <string-array name="startup_selection_entries">
-        <item>Normal (Load all services)</item>
-        <item>Essential (Load only essential services)</item>
-        <item>Aggressive (Stop services on startup)</item>
+        <item>Bình thường (tải mọi dịch vụ)</item>
+        <item>Thiết yếu (chỉ tải dịch vụ cần thiết)</item>
+        <item>Tối giản (dừng dịch vụ khi khởi động)</item>
     </string-array>
     <string-array name="vkd3d_version_entries">
         <item>None</item>
@@ -196,14 +196,14 @@
         <item>B</item>
         <item>X</item>
         <item>Y</item>
-        <item>R1 (Right Bumper)</item>
-        <item>R2 (Right Trigger)</item>
-        <item>L1 (Left Bumper)</item>
-        <item>L2 (Left Trigger)</item>
+        <item>R1 (Bumper phải)</item>
+        <item>R2 (Cò phải)</item>
+        <item>L1 (Bumper trái)</item>
+        <item>L2 (Cò trái)</item>
         <item>Start</item>
         <item>Select</item>
-        <item>R3 (Right Stick Button)</item>
-        <item>L3 (Left Stick Button)</item>
+        <item>R3 (Nhấn cần phải)</item>
+        <item>L3 (Nhấn cần trái)</item>
     </string-array>
     <integer-array name="button_keycodes">
         <item>@integer/keycode_button_a</item>
@@ -221,9 +221,9 @@
     </integer-array>
 
     <string-array name="touchscreenInputModesEntries">
-        <item>Trackpad</item>
-        <item>Simulated touchscreen</item>
-        <item>Direct touch</item>
+        <item>Touchpad</item>
+        <item>Giả lập cảm ứng</item>
+        <item>Chạm trực tiếp</item>
     </string-array>
     <string-array name="touchscreenInputModesValues">
         <item>1</item>
@@ -231,11 +231,11 @@
         <item>3</item>
     </string-array>
     <string-array name="transformCapturedPointerEntries">
-        <item>No</item>
-        <item>Clockwise</item>
-        <item>Counter clockwise</item>
-        <item>Upside down</item>
-        <item>Automatic (for touchpad)</item>
+        <item>Không</item>
+        <item>Xoay theo chiều kim đồng hồ</item>
+        <item>Xoay ngược chiều kim đồng hồ</item>
+        <item>Lộn ngược</item>
+        <item>Tự động (cho touchpad)</item>
     </string-array>
     <string-array name="transformCapturedPointerValues">
         <item>no</item>

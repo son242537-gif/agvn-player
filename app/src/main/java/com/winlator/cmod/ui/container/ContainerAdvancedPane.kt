@@ -34,8 +34,8 @@ private val advancedComponents = listOf(
 internal fun ContainerAdvancedPane(containerId: Int) {
     val context = LocalContext.current
     val container = remember(containerId) { ContainerManager(context).getContainerById(containerId) } ?: return
-    var page by remember { mutableStateOf("Environment") }
-    val pages = listOf("Environment", "Components", "Startup & Input", "CPU")
+    var page by remember { mutableStateOf("Biến môi trường") }
+    val pages = listOf("Biến môi trường", "Thành phần", "Khởi động & điều khiển", "CPU")
     var environment by remember(container.getEnvVars()) { mutableStateOf(container.getEnvVars()) }
     val components = remember(container.getWinComponents()) {
         mutableStateMapOf<String, Int>().apply { putAll(parseComponents(container.getWinComponents())) }
@@ -70,17 +70,17 @@ internal fun ContainerAdvancedPane(containerId: Int) {
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        SettingsCard { SettingChoice("Advanced", page, pages) { page = it } }
+        SettingsCard { SettingChoice("Nâng cao", page, pages) { page = it } }
         when (page) {
-            "Environment" -> EnvironmentVariablesEditor(environment, onChanged = {
+            "Biến môi trường" -> EnvironmentVariablesEditor(environment, onChanged = {
                 environment = it
                 container.setEnvVars(it)
                 container.saveData()
             })
 
-            "Components" -> SettingsCard {
+            "Thành phần" -> SettingsCard {
                 advancedComponents.forEachIndexed { index, (key, label) ->
-                    val entries = listOf("Builtin (Wine)", "Native (Windows)")
+                    val entries = listOf("Có sẵn (Wine)", "Gốc (Windows)")
                     val selected = entries[(components[key] ?: 0).coerceIn(0, 1)]
                     SettingChoice(label, selected, entries) { value ->
                         components[key] = entries.indexOf(value).coerceAtLeast(0)
@@ -95,19 +95,19 @@ internal fun ContainerAdvancedPane(containerId: Int) {
                 }
             }
 
-            "Startup & Input" -> SettingsCard {
+            "Khởi động & điều khiển" -> SettingsCard {
                 val startupEntries = listOf(
-                    "Normal (Load all services)",
-                    "Essential (Load only essential services)",
-                    "Aggressive (Stop services on startup)"
+                    "Bình thường (tải mọi dịch vụ)",
+                    "Thiết yếu (chỉ tải dịch vụ cần thiết)",
+                    "Tối giản (dừng dịch vụ khi khởi động)"
                 )
-                SettingChoice("Startup Selection", startupEntries[startup], startupEntries) { value ->
+                SettingChoice("Chế độ khởi động", startupEntries[startup], startupEntries) { value ->
                     startup = startupEntries.indexOf(value).coerceAtLeast(0)
                     container.setStartupSelection(startup.toByte())
                     container.saveData()
                 }
                 SettingsDivider()
-                SettingToggle("Exclusive Input", exclusive) { enabled ->
+                SettingToggle("Nhập độc quyền", exclusive) { enabled ->
                     exclusive = enabled
                     if (!enabled) {
                         xinput = true
@@ -118,13 +118,13 @@ internal fun ContainerAdvancedPane(containerId: Int) {
                     saveInput()
                 }
                 SettingsDivider()
-                SettingToggle("Enable XInput", xinput, exclusive) { enabled ->
+                SettingToggle("Bật XInput", xinput, exclusive) { enabled ->
                     xinput = enabled
                     if (exclusive && enabled && dinput) dinput = false
                     saveInput()
                 }
                 SettingsDivider()
-                SettingToggle("Enable DInput", dinput, exclusive) { enabled ->
+                SettingToggle("Bật DInput", dinput, exclusive) { enabled ->
                     dinput = enabled
                     if (exclusive && enabled && xinput) xinput = false
                     saveInput()
@@ -132,12 +132,12 @@ internal fun ContainerAdvancedPane(containerId: Int) {
             }
 
             else -> SettingsCard {
-                SettingToggle("Sync CPU Topology", syncCpu) {
+                SettingToggle("Đồng bộ cấu trúc CPU", syncCpu) {
                     syncCpu = it
                     saveCpu()
                 }
                 SettingsDivider()
-                CpuSelectorRow("Processor Affinity", cpu64) { index, checked ->
+                CpuSelectorRow("Chọn nhân CPU", cpu64) { index, checked ->
                     cpu64[index] = checked
                     saveCpu()
                 }

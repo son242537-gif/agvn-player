@@ -252,9 +252,9 @@ public abstract class Box64PresetManager {
             }
         }
         if (presetFile != null && presetFile.exists())
-            AppUtils.showToast(context, "Preset " + presetFile.getName() + " exported successfully at " + presetFile.getParentFile().getPath());
+            AppUtils.showToast(context, "Đã xuất preset " + presetFile.getName() + " vào " + presetFile.getParentFile().getPath());
         else
-            AppUtils.showToast(context, "Failed to export preset");
+            AppUtils.showToast(context, "Xuất preset thất bại");
     }
 
     public static void importPreset(String prefix, Context context, InputStream stream) {

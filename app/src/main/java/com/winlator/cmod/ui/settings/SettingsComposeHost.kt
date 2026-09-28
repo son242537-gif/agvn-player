@@ -267,11 +267,11 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
                 GroupCard {
                     ToggleRow("Mở chế độ Big Picture khi khởi động", model.bigPicture) { callbacks.onBooleanChanged("enable_big_picture_mode", it) }
                     GroupDivider()
-                    ToggleRow("Set SteamGrid API Key? (Cover Art)", model.customApiKeyEnabled) { callbacks.onBooleanChanged("enable_custom_api_key", it) }
+                    ToggleRow("Đặt khóa API SteamGrid? (Ảnh bìa)", model.customApiKeyEnabled) { callbacks.onBooleanChanged("enable_custom_api_key", it) }
                 }
             }
             if (model.customApiKeyEnabled) {
-                item("api-key") { EditableValueCard("SteamGridDB API Key", model.customApiKey, callbacks::onCustomApiKeyChanged) }
+                item("api-key") { EditableValueCard("Khóa API SteamGridDB", model.customApiKey, callbacks::onCustomApiKeyChanged) }
             }
 
             item("xserver-title") { SectionTitle(stringResource(R.string.xserver)) }
@@ -287,7 +287,7 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
                     GroupDivider()
                     ToggleRow("Bắt chuột ngoài", model.cursorLock) { callbacks.onBooleanChanged("cursor_lock", it) }
                     GroupDivider()
-                    ToggleRow("Disable Xinput (Used for Exclusive M/KB support)", model.xInput) { callbacks.onBooleanChanged("xinput_toggle", it) }
+                    ToggleRow("Tắt XInput (chỉ dùng chuột/bàn phím)", model.xInput) { callbacks.onBooleanChanged("xinput_toggle", it) }
                 }
             }
 
@@ -326,7 +326,7 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
                     ToggleRow(stringResource(R.string.remove_loading_bar_when_booting_games), model.removeLoadingBar) { callbacks.onBooleanChanged("remove_loading_bar_when_booting_games", it) }
                 }
             }
-            item("contents-url") { EditableValueCard("Downloadable Contents URL", model.contentsUrl, callbacks::onContentsUrlChanged) }
+            item("contents-url") { EditableValueCard("Link tải thành phần", model.contentsUrl, callbacks::onContentsUrlChanged) }
 
             item("imagefs-title") { SectionTitle(stringResource(R.string.imagefs)) }
             item("imagefs") { NavigationRow(Icons.Outlined.Refresh, stringResource(R.string.reinstall_imagefs), null, callbacks::onReinstallImageFs) }
@@ -471,7 +471,7 @@ private fun PresetChoiceRow(
             }
             Box {
                 IconButton(onClick = { actionsOpen = true }) {
-                    Icon(Icons.Outlined.MoreVert, "Preset actions")
+                    Icon(Icons.Outlined.MoreVert, "Thao tác preset")
                 }
                 DropdownMenu(expanded = actionsOpen, onDismissRequest = { actionsOpen = false }) {
                     DropdownMenuItem(
@@ -552,7 +552,7 @@ private fun WineDebugChannelsRow(
         selectedValue.split(',').map { it.trim() }.filter { it.isNotEmpty() }
     }
     val summary = when {
-        selectedChannels.isEmpty() -> "No channels selected"
+        selectedChannels.isEmpty() -> "Chưa chọn kênh nào"
         selectedChannels.size <= 3 -> selectedChannels.joinToString(", ")
         else -> selectedChannels.take(3).joinToString(", ") + " +${selectedChannels.size - 3}"
     }
@@ -565,7 +565,7 @@ private fun WineDebugChannelsRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(Modifier.weight(1f)) {
-            Text("Wine debug channels", style = MaterialTheme.typography.bodyLarge)
+            Text("Kênh debug Wine", style = MaterialTheme.typography.bodyLarge)
             Text(
                 summary,
                 style = MaterialTheme.typography.bodySmall,
@@ -609,13 +609,13 @@ private fun WineDebugChannelsDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Wine debug channels") },
+        title = { Text("Kênh debug Wine") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedTextField(
                     value = query,
                     onValueChange = { query = it },
-                    label = { Text("Search channels") },
+                    label = { Text("Tìm kênh") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )

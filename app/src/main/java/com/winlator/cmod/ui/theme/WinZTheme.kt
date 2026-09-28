@@ -43,12 +43,12 @@ enum class WinlatorThemeType(
     val displayName: String,
     val description: String
 ) {
-    WHITE("white", "White", "Bright surfaces with dark text"),
-    BLACK("black", "Black", "Balanced dark theme · Default"),
-    AMOLED("amoled", "AMOLED", "Pure black background for OLED displays"),
-    BLUE("blue", "Blue", "Dark interface with cool blue accents"),
-    RED("red", "Red", "Dark interface with warm red accents"),
-    PURPLE("purple", "Purple", "Dark interface with rich purple accents");
+    WHITE("white", "Trắng", "Nền sáng, chữ tối"),
+    BLACK("black", "Đen", "Giao diện tối cân bằng · Mặc định"),
+    AMOLED("amoled", "AMOLED", "Nền đen tuyền cho màn hình OLED"),
+    BLUE("blue", "Xanh dương", "Giao diện tối, điểm nhấn xanh dương"),
+    RED("red", "Đỏ", "Giao diện tối, điểm nhấn đỏ"),
+    PURPLE("purple", "Tím", "Giao diện tối, điểm nhấn tím");
 
     companion object {
         fun fromId(id: String?): WinlatorThemeType = values().firstOrNull { it.id == id } ?: BLACK

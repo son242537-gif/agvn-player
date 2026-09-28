@@ -25,7 +25,7 @@
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="6dp"
                 android:layout_marginBottom="8dp"
-                android:text="APP SETTINGS"
+                android:text="CÀI ĐẶT ỨNG DỤNG"
                 android:textColor="@color/ui_text_muted"
                 android:textSize="10sp"
                 android:textStyle="bold"
@@ -63,7 +63,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Runtime and interface"
+                        android:text="Môi trường chạy và giao diện"
                         android:textColor="@color/ui_text_primary"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -72,7 +72,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="Presets, paths, input and diagnostics"
+                        android:text="Preset, đường dẫn, điều khiển và chẩn đoán"
                         android:textColor="@color/ui_text_muted"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -298,12 +298,12 @@
                         android:id="@+id/CBDarkMode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Enable Dark Mode" />
+                        android:text="Bật chế độ tối" />
                 </LinearLayout>
                 <TextView
                     android:id="@+id/TVTheme"
                     style="@style/FieldSetLabel"
-                    android:text="Theme" />
+                    android:text="Giao diện" />
             </FrameLayout>
 
             <!-- Shortcuts -->
@@ -314,7 +314,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Winlator Path" />
+                        android:text="Đường dẫn Winlator" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -331,13 +331,13 @@
                             android:id="@+id/BTChooseWinlatorPath"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Choose Path" />
+                            android:text="Chọn đường dẫn" />
                     </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Shortcut Export Path" />
+                        android:text="Đường dẫn xuất lối tắt" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -354,13 +354,13 @@
                             android:id="@+id/BTChooseShortcutExportPath"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Choose Path" />
+                            android:text="Chọn đường dẫn" />
                     </LinearLayout>
                 </LinearLayout>
                 <TextView
                     android:id="@+id/TVShortcutSettings"
                     style="@style/FieldSetLabel"
-                    android:text="Path Settings" />
+                    android:text="Cài đặt đường dẫn" />
             </FrameLayout>
 
 
@@ -377,7 +377,7 @@
                         android:id="@+id/CBEnableBigPictureMode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Enable Big Picture Mode on App Launch" />
+                        android:text="Mở chế độ màn hình lớn khi khởi động" />
 
                     <FrameLayout
                         android:layout_width="match_parent"
@@ -395,7 +395,7 @@
                                     android:id="@+id/CBEnableCustomApiKey"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Set SteamGrid API Key? (Cover Art)" />
+                                    android:text="Đặt khóa API SteamGrid? (Ảnh bìa)" />
 
                                 <ImageView
                                     android:id="@+id/BTHelpApiKey"
@@ -409,14 +409,14 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:hint="Enter your API Key here"
+                                android:hint="Nhập khóa API tại đây"
                                 android:visibility="gone" />
                         </LinearLayout>
 
                         <TextView
                             android:id="@+id/TVCustomApiKey"
                             style="@style/FieldSetLabel"
-                            android:text="SteamGridDB API Key" />
+                            android:text="Khóa API SteamGridDB" />
                     </FrameLayout>
 
                 </LinearLayout>
@@ -424,7 +424,7 @@
                 <TextView
                     android:id="@+id/TVBigPictureMode"
                     style="@style/FieldSetLabel"
-                    android:text="Big Picture Mode" />
+                    android:text="Chế độ màn hình lớn" />
             </FrameLayout>
 
             <FrameLayout
@@ -476,7 +476,7 @@
                         android:id="@+id/CBCursorLock"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Capture External Pointer"
+                        android:text="Chiếm chuột ngoài"
                         android:layout_marginTop="8dp" />
 
                     <!-- New Xinput Toggle Checkbox -->
@@ -484,7 +484,7 @@
                         android:id="@+id/CBXinputToggle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Disable Xinput (Used for Exclusive M/KB support)"
+                        android:text="Tắt XInput (chỉ dùng chuột/bàn phím)"
                         android:layout_marginTop="8dp" />
 
                 </LinearLayout>
@@ -610,7 +610,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Downloadable Contents URL" />
+                            android:text="Link tải thành phần" />
 
                         <EditText
                             android:layout_width="match_parent"

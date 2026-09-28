@@ -402,7 +402,7 @@ public class BigPictureActivity extends AppCompatActivity {
 
             playDefaultMp3FromAssets();
 
-            Toast.makeText(this, "MP3 reset to default", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Đã đặt lại MP3 mặc định", Toast.LENGTH_SHORT).show();
         });
 
 
@@ -473,7 +473,7 @@ public class BigPictureActivity extends AppCompatActivity {
                     editor.putString("saved_youtube_url", userUrl);
                     editor.apply();
                 } else {
-                    youtubeUrlInput.setError("Invalid YouTube URL");
+                    youtubeUrlInput.setError("Link YouTube không hợp lệ");
                 }
             } else {
                 loadYouTubeVideo(defaultVideoId);
@@ -606,9 +606,9 @@ public class BigPictureActivity extends AppCompatActivity {
 
     private void updateBgMusicButtonText(Button button, boolean isEnabled) {
         if (isEnabled) {
-            button.setText("Disable BG Music");
+            button.setText("Tắt nhạc nền");
         } else {
-            button.setText("Enable BG Music");
+            button.setText("Bật nhạc nền");
         }
     }
 
@@ -729,8 +729,8 @@ public class BigPictureActivity extends AppCompatActivity {
 
     private void showCoverArtOptionsDialog() {
         new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Cover Art Options")
-                .setItems(new CharSequence[]{"Remove Custom Cover Art", "Upload New Cover Art"}, (dialog, which) -> {
+                .setTitle("Tùy chọn ảnh bìa")
+                .setItems(new CharSequence[]{"Xóa ảnh bìa tùy chỉnh", "Tải ảnh bìa mới"}, (dialog, which) -> {
                     switch (which) {
                         case 0: // Remove Custom Cover Art
                             removeCustomCoverArt();
@@ -740,7 +740,7 @@ public class BigPictureActivity extends AppCompatActivity {
                             break;
                     }
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton("Hủy", null)
                 .show();
     }
 
@@ -853,8 +853,8 @@ public class BigPictureActivity extends AppCompatActivity {
         SharedPreferences playtimePrefs = getSharedPreferences("playtime_stats", Context.MODE_PRIVATE);
         long totalPlaytime = playtimePrefs.getLong(shortcut.name + "_playtime", 0);
         int playCount = playtimePrefs.getInt(shortcut.name + "_play_count", 0);
-        playCountView.setText("Times Played: " + playCount);
-        playtimeView.setText("Playtime: " + formatPlaytime(totalPlaytime));
+        playCountView.setText("Số lần chơi: " + playCount);
+        playtimeView.setText("Thời gian chơi: " + formatPlaytime(totalPlaytime));
 
         Container container = manager.getContainerForShortcut(shortcut);
         String graphicsDriver = shortcut.getExtra("graphicsDriver");
@@ -909,7 +909,7 @@ public class BigPictureActivity extends AppCompatActivity {
         } else if (!containerValue.isEmpty()) {
             textView.setText(containerValue); // Fallback to the container's value
         } else {
-            textView.setText("Not Set"); // Fallback if neither are available
+            textView.setText("Chưa đặt"); // Fallback if neither are available
         }
     }
 
@@ -920,7 +920,7 @@ public class BigPictureActivity extends AppCompatActivity {
         } else if (!containerValue.isEmpty()) {
             textView.setText(label + containerValue); // Fallback to the container's value
         } else {
-            textView.setText(label + "Not Set"); // Fallback if neither are available
+            textView.setText(label + "Chưa đặt"); // Fallback if neither are available
         }
     }
 
@@ -974,7 +974,7 @@ public class BigPictureActivity extends AppCompatActivity {
             }
 
             uploadText = new TextView(this); // Initialize the uploadText variable
-            uploadText.setText("No suitable cover art found for " + shortcut.name + ". Click the image to upload custom cover art or rename the Shortcut to something SteamGrid can recognize.");
+            uploadText.setText("Không tìm thấy ảnh bìa phù hợp cho " + shortcut.name + ". Chạm vào ảnh để tải ảnh bìa tùy chỉnh hoặc đổi tên lối tắt để SteamGrid nhận ra.");
             uploadText.setTextColor(Color.WHITE);
             uploadText.setTextSize(18);
             uploadText.setPadding(20, 20, 20, 20);
@@ -1091,7 +1091,7 @@ public class BigPictureActivity extends AppCompatActivity {
 
                     String[] displayOptions = {"Center", "Stretch", "Tile"};
                     new AlertDialog.Builder(this)
-                            .setTitle("Select Display Mode")
+                            .setTitle("Chọn kiểu hiển thị")
                             .setItems(displayOptions, (dialog, which) -> {
                                 editor.putString(WALLPAPER_DISPLAY_PREF_KEY, displayOptions[which].toLowerCase());
                                 editor.apply();
@@ -1442,13 +1442,13 @@ public class BigPictureActivity extends AppCompatActivity {
     private void loadFramesFromFolder(Uri folderUri) {
         DocumentFile docFolder = DocumentFile.fromTreeUri(this, folderUri);
         if (docFolder == null || !docFolder.isDirectory()) {
-            Toast.makeText(this, "Invalid folder selected!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Thư mục đã chọn không hợp lệ!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         DocumentFile[] docFiles = docFolder.listFiles();
         if (docFiles == null || docFiles.length == 0) {
-            Toast.makeText(this, "No files in folder!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Thư mục không có file nào!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -1467,7 +1467,7 @@ public class BigPictureActivity extends AppCompatActivity {
         }
 
         if (bitmaps.isEmpty()) {
-            Toast.makeText(this, "No PNG files found in this folder!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Không có file PNG trong thư mục này!", Toast.LENGTH_SHORT).show();
             return;
         }
 

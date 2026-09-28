@@ -23,7 +23,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Present Mode"
+                    android:text="Chế độ trình chiếu"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:paddingBottom="8dp"/>
                 <Spinner
@@ -44,7 +44,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Renderer Driver"
+                    android:text="Driver dựng hình"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:paddingBottom="8dp"/>
                 <Spinner
@@ -65,7 +65,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Texture Filter"
+                    android:text="Lọc texture"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:paddingBottom="8dp"/>
                 <Spinner
@@ -82,7 +82,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Swap red/blue channels" />
+                android:text="Đổi kênh màu đỏ/xanh dương" />
 
         </LinearLayout>
     </ScrollView>

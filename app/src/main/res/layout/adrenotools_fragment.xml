@@ -15,7 +15,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Installed Driver"
+            android:text="Driver đã cài"
             android:textSize="18sp" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -35,7 +35,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Latest StevenMXZ Drivers"
+                android:text="Driver StevenMXZ mới nhất"
                 android:textSize="18sp" />
 
             <TextView
@@ -43,7 +43,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="Refresh"
+                android:text="Làm mới"
                 android:textColor="#0066ff" />
         </LinearLayout>
 
@@ -57,13 +57,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Driver Repositories"
+            android:text="Kho driver"
             android:textSize="18sp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Manage driver sources and updates."
+            android:text="Quản lý nguồn driver và cập nhật."
             android:textColor="#9e9e9e"
             android:textSize="14sp" />
 
@@ -79,7 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Install Driver from File" />
+            android:text="Cài driver từ file" />
 
     </LinearLayout>
 </ScrollView>
