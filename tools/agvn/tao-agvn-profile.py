@@ -5,6 +5,7 @@ Ví dụ:
   python tao-agvn-profile.py "D:/AGVN/AVDirector" --name "AV Director LIFE"
   python tao-agvn-profile.py D:/AGVN/Game --fps 30 --weak-fps 24 --screen 1280x720 --pool 1024 --weak-pool 512
   python tao-agvn-profile.py D:/AGVN/Game --check      # chỉ kiểm tra profile đang có
+  python tao-agvn-profile.py D:/AGVN/Game --controls action   # ép bộ phím ảo (mặc định: theo engine)
 
 Exe được tự tìm giống hệt app (Unreal: <Game>-Win64-Shipping.exe). Profile được kiểm tra bằng đúng luật của app
 trước khi ghi; sai luật thì báo lỗi tiếng Việt và không ghi file. Không truy cập mạng.
@@ -16,7 +17,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from agvn_profile_lib import ProfileError, detect_engine, resolve_exe, validate  # noqa: E402
+from agvn_profile_lib import CONTROLS, ProfileError, controls_for, detect_engine, resolve_exe, validate  # noqa: E402
 
 PROFILE = "agvn-profile.json"
 
@@ -47,6 +48,8 @@ def build_profile(game_dir, args):
         "weakDevice": {"resolution": args.weak_screen, "fpsLimit": args.weak_fps},
         "ueEngineIni": {},
     }
+    if args.controls:
+        profile["controls"] = args.controls
     if engine == "UNREAL":
         profile["texturePool"] = args.pool or pool_for_ram(args.ram_mb)
         profile["weakDevice"]["texturePool"] = args.weak_pool or 512
@@ -67,6 +70,8 @@ def main(argv=None):
     p.add_argument("--pool", type=int, help="texture pool (MB), chỉ cho Unreal")
     p.add_argument("--weak-pool", type=int, help="texture pool máy yếu (MB), chỉ cho Unreal")
     p.add_argument("--no-touch", action="store_true", help="tắt Simulated Touchscreen")
+    p.add_argument("--controls", choices=CONTROLS,
+                   help="bộ phím ảo: pc, vn, rpg, 2d, action, mouse (mặc định: app tự chọn theo engine)")
     p.add_argument("--force", action="store_true", help="ghi đè profile đang có")
     p.add_argument("--check", action="store_true", help="chỉ kiểm tra profile đang có")
     args = p.parse_args(argv)
@@ -94,7 +99,7 @@ def main(argv=None):
     with open(target, "w", encoding="utf-8") as f:
         json.dump(profile, f, ensure_ascii=False, indent=2)
         f.write("\n")
-    print("Engine: %s\nExe: %s\nĐã ghi: %s" % (engine, exe, target))
+    print("Engine: %s\nExe: %s\nBộ phím: %s\nĐã ghi: %s" % (engine, exe, controls_for(engine, profile), target))
     return 0
 
 

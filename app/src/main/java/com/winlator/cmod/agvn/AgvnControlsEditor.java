@@ -1,0 +1,200 @@
+/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+package com.winlator.cmod.agvn;
+
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.winlator.cmod.R;
+import com.winlator.cmod.XServerDisplayActivity;
+import com.winlator.cmod.core.AppUtils;
+import com.winlator.cmod.inputcontrols.Binding;
+import com.winlator.cmod.inputcontrols.ControlElement;
+import com.winlator.cmod.inputcontrols.ControlsProfile;
+import com.winlator.cmod.widget.InputControlsView;
+
+/**
+ * Edits the on-screen controls on the game screen, GameHub style: the game stays visible and running, the player drags
+ * controls to move them and uses a toolbar to add a button / arrow pad / WASD stick, change keys, resize or delete
+ * the selected control. Edits go to the game's own copy of the profile ({@link AgvnControlsFork}) and are saved at
+ * once. All calls on the UI thread.
+ */
+final class AgvnControlsEditor {
+    static final float MIN_SCALE = 0.5f, MAX_SCALE = 2.5f, SCALE_STEP = 0.1f;
+    private static final float BUTTON_SCALE = 0.7f, PAD_SCALE = 0.7f, STICK_SCALE = 0.9f, OPACITY = 0.6f;
+    private static final Binding[] ARROWS = {Binding.KEY_UP, Binding.KEY_RIGHT, Binding.KEY_DOWN, Binding.KEY_LEFT};
+    private static final Binding[] WASD = {Binding.KEY_W, Binding.KEY_D, Binding.KEY_S, Binding.KEY_A};
+
+    private final XServerDisplayActivity activity;
+    private final Runnable onFinished;
+    private HorizontalScrollView toolbar;
+    private boolean active;
+
+    AgvnControlsEditor(XServerDisplayActivity activity, Runnable onFinished) {
+        this.activity = activity;
+        this.onFinished = onFinished;
+    }
+
+    boolean isActive() {
+        return active;
+    }
+
+    /** Scale after one [－]/[＋] step (direction -1 or +1), rounded to 0.1 and kept within 0.5..2.5. */
+    static float nextScale(float scale, int direction) {
+        float next = Math.round((scale + direction * SCALE_STEP) * 10f) / 10f;
+        return Math.max(MIN_SCALE, Math.min(MAX_SCALE, next));
+    }
+
+    /** Enters edit mode on the game's own copy of {@code base}; false when nothing can be edited. */
+    boolean start(ControlsProfile base) {
+        InputControlsView view = activity.getInputControlsView();
+        if (active || view == null) return false;
+        if (base == null) {
+            AppUtils.showToast(activity, R.string.agvn_controls_none);
+            return false;
+        }
+        view.releaseAll(); // a finger may hold a key: its UP would reach edit mode and never release it
+        ControlsProfile profile = AgvnControlsFork.editable(activity, base);
+        if (profile == null) {
+            AppUtils.showToast(activity, R.string.agvn_edit_failed);
+            return false;
+        }
+        if (view.getProfile() != profile || view.getVisibility() != View.VISIBLE) activity.agvnShowControls(profile);
+        view.setShowTouchscreenControls(true);
+        view.setOverlayEditStyle(true);
+        view.setEditMode(true);
+        view.clearSelection();
+        active = true;
+        toolbar().setVisibility(View.VISIBLE);
+        AppUtils.showToast(activity, R.string.agvn_edit_hint);
+        return true;
+    }
+
+    /** Leaves edit mode, saves, and gives the touches back to the game. */
+    void finish() {
+        if (!active) return;
+        active = false;
+        toolbar.setVisibility(View.GONE);
+        InputControlsView view = activity.getInputControlsView();
+        view.setEditMode(false);
+        view.setOverlayEditStyle(false);
+        view.clearSelection();
+        ControlsProfile profile = view.getProfile();
+        if (profile != null && view.isLayoutReady()) profile.save();
+        view.invalidate();
+        activity.agvnRefreshControlsSidebar();
+        onFinished.run();
+        AppUtils.showToast(activity, R.string.agvn_edit_saved);
+    }
+
+    private void add(ControlElement.Type type, Binding[] bindings, ControlElement.Shape shape, float scale) {
+        InputControlsView view = activity.getInputControlsView();
+        if (!view.isLayoutReady()) {
+            AppUtils.showToast(activity, R.string.agvn_edit_not_ready);
+            return;
+        }
+        if (!view.addElementAt(view.getMaxWidth() / 2, view.getMaxHeight() / 2, type, bindings, "")) return;
+        ControlElement element = view.getSelectedElement();
+        element.setShape(shape);
+        element.setScale(scale);
+        element.setOpacity(OPACITY);
+        saveAndRedraw(view);
+        if (type == ControlElement.Type.BUTTON) AgvnBindingPicker.pick(activity, element, changed -> {
+            if (changed) saveAndRedraw(view);
+            else if (view.getSelectedElement() == element) view.removeElement(); // cancelled: no key, no button
+        });
+    }
+
+    private ControlElement selected() {
+        ControlElement element = activity.getInputControlsView().getSelectedElement();
+        if (element == null) AppUtils.showToast(activity, R.string.agvn_edit_select_first);
+        return element;
+    }
+
+    private void rebind(ControlElement element) {
+        if (element != null) AgvnBindingPicker.pick(activity, element, changed -> {
+            if (changed) saveAndRedraw(activity.getInputControlsView());
+        });
+    }
+
+    private void resize(ControlElement element, int direction) {
+        if (element == null) return;
+        element.setScale(nextScale(element.getScale(), direction));
+        saveAndRedraw(activity.getInputControlsView());
+    }
+
+    private static void saveAndRedraw(InputControlsView view) {
+        ControlsProfile profile = view.getProfile();
+        if (profile != null && view.isLayoutReady()) profile.save();
+        view.invalidate();
+    }
+
+    private HorizontalScrollView toolbar() {
+        if (toolbar != null) return toolbar;
+        float dp = activity.getResources().getDisplayMetrics().density;
+        LinearLayout row = new LinearLayout(activity);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setPadding((int) (4 * dp), (int) (4 * dp), (int) (4 * dp), (int) (4 * dp));
+        row.addView(button(R.string.agvn_edit_add_button, 0, v -> add(ControlElement.Type.BUTTON, null, ControlElement.Shape.ROUND_RECT, BUTTON_SCALE)));
+        row.addView(button(R.string.agvn_edit_add_dpad, 0, v -> add(ControlElement.Type.D_PAD, ARROWS, ControlElement.Shape.CIRCLE, PAD_SCALE)));
+        row.addView(button(R.string.agvn_edit_add_stick, 0, v -> add(ControlElement.Type.STICK, WASD, ControlElement.Shape.CIRCLE, STICK_SCALE)));
+        row.addView(button(R.string.agvn_edit_keys, 0, v -> rebind(selected())));
+        row.addView(button(R.string.agvn_edit_smaller, R.string.agvn_edit_smaller_desc, v -> resize(selected(), -1)));
+        row.addView(button(R.string.agvn_edit_bigger, R.string.agvn_edit_bigger_desc, v -> resize(selected(), 1)));
+        row.addView(button(R.string.agvn_edit_delete, 0, v -> {
+            if (selected() != null) activity.getInputControlsView().removeElement();
+        }));
+        row.addView(button(R.string.agvn_edit_move_bar, R.string.agvn_edit_move_bar_desc, v -> flipToolbar()));
+        TextView done = button(R.string.agvn_edit_done, 0, v -> finish());
+        ((GradientDrawable) done.getBackground()).setColor(0xff2184ff);
+        row.addView(done);
+        toolbar = new HorizontalScrollView(activity);
+        toolbar.setHorizontalScrollBarEnabled(false);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(0xcc101418);
+        bg.setCornerRadius(12 * dp);
+        toolbar.setBackground(bg);
+        toolbar.addView(row);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+        lp.topMargin = lp.bottomMargin = (int) (4 * dp);
+        activity.addContentView(toolbar, lp);
+        return toolbar;
+    }
+
+    /** Moves the toolbar between the top and the bottom edge, to reach controls under it. */
+    private void flipToolbar() {
+        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) toolbar.getLayoutParams();
+        boolean top = (lp.gravity & Gravity.VERTICAL_GRAVITY_MASK) == Gravity.TOP;
+        lp.gravity = (top ? Gravity.BOTTOM : Gravity.TOP) | Gravity.CENTER_HORIZONTAL;
+        toolbar.setLayoutParams(lp);
+    }
+
+    private TextView button(int textRes, int descRes, View.OnClickListener onClick) {
+        float dp = activity.getResources().getDisplayMetrics().density;
+        TextView b = new TextView(activity);
+        b.setText(textRes);
+        if (descRes != 0) b.setContentDescription(activity.getString(descRes));
+        b.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        b.setTextColor(Color.WHITE);
+        b.setGravity(Gravity.CENTER);
+        b.setMinWidth((int) (48 * dp));
+        b.setMinHeight((int) (44 * dp));
+        b.setPadding((int) (12 * dp), 0, (int) (12 * dp), 0);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(0xff2a3038);
+        bg.setCornerRadius(8 * dp);
+        b.setBackground(bg);
+        b.setOnClickListener(onClick);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, (int) (44 * dp));
+        lp.setMargins((int) (3 * dp), 0, (int) (3 * dp), 0);
+        b.setLayoutParams(lp);
+        return b;
+    }
+}

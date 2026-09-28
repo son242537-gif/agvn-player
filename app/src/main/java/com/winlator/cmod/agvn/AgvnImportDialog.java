@@ -85,6 +85,7 @@ public final class AgvnImportDialog {
         msg.append(activity.getString(R.string.agvn_import_preview_exe, candidate.exe)).append('\n');
         msg.append(activity.getString(R.string.agvn_import_preview_fps, eff.fps > 0 ? String.valueOf(eff.fps) : activity.getString(R.string.agvn_unlimited))).append('\n');
         msg.append(activity.getString(R.string.agvn_import_preview_resolution, eff.resolution != null ? eff.resolution : activity.getString(R.string.agvn_default_value))).append('\n');
+        msg.append(activity.getString(R.string.agvn_import_preview_controls, activity.getString(AgvnLayouts.labelRes(AgvnLayouts.kindFor(p, candidate.engine))))).append('\n');
         if (eff.texturePool > 0 && candidate.engine == GameExeResolver.Engine.UNREAL) {
             msg.append(activity.getString(R.string.agvn_import_preview_pool, eff.texturePool)).append('\n');
             if (eff.texturePool > availableRamMb(activity))

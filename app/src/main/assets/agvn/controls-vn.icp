@@ -1,0 +1,14 @@
+{
+ "id": 9001,
+ "name": "AGVN · Visual novel",
+ "cursorSpeed": 1,
+ "agvnLayoutVersion": 1,
+ "elements": [
+  {"type": "BUTTON", "shape": "ROUND_RECT", "bindings": ["KEY_ESC", "NONE", "NONE", "NONE"], "scale": 0.7, "x": 0.95, "y": 0.22, "toggleSwitch": false, "text": "Esc", "iconId": 0, "opacity": 0.6},
+  {"type": "BUTTON", "shape": "ROUND_RECT", "bindings": ["MOUSE_SCROLL_UP", "NONE", "NONE", "NONE"], "scale": 0.7, "x": 0.95, "y": 0.34, "toggleSwitch": false, "text": "Lịch sử", "iconId": 0, "opacity": 0.6},
+  {"type": "BUTTON", "shape": "ROUND_RECT", "bindings": ["MOUSE_RIGHT_BUTTON", "NONE", "NONE", "NONE"], "scale": 0.7, "x": 0.95, "y": 0.46, "toggleSwitch": false, "text": "Menu", "iconId": 0, "opacity": 0.6},
+  {"type": "BUTTON", "shape": "ROUND_RECT", "bindings": ["KEY_SPACE", "NONE", "NONE", "NONE"], "scale": 0.7, "x": 0.95, "y": 0.58, "toggleSwitch": false, "text": "Space", "iconId": 0, "opacity": 0.6},
+  {"type": "BUTTON", "shape": "ROUND_RECT", "bindings": ["KEY_CTRL_L", "NONE", "NONE", "NONE"], "scale": 0.7, "x": 0.95, "y": 0.7, "toggleSwitch": true, "text": "Tua", "iconId": 0, "opacity": 0.6},
+  {"type": "BUTTON", "shape": "ROUND_RECT", "bindings": ["KEY_ENTER", "NONE", "NONE", "NONE"], "scale": 0.9, "x": 0.94, "y": 0.84, "toggleSwitch": false, "text": "Tiếp", "iconId": 0, "opacity": 0.6}
+ ]
+}

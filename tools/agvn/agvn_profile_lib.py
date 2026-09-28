@@ -16,6 +16,10 @@ IGNORED_EXES = {
     "unitycrashhandler64.exe", "unitycrashhandler32.exe", "crashreportclient.exe", "dxsetup.exe",
     "vc_redist.x64.exe", "vc_redist.x86.exe", "vcredist_x64.exe", "vcredist_x86.exe", "dotnetfx.exe",
     "ue4prereqsetup_x64.exe", "ueprereqsetup_x64.exe", "notification_helper.exe"}
+# On-screen controls layouts (AgvnLayouts.java): profile "controls" value -> bundled layout; order = ids 9000..9005.
+CONTROLS = ("pc", "vn", "rpg", "2d", "action", "mouse")
+_ENGINE_CONTROLS = {"RENPY": "vn", "KIRIKIRI": "vn", "TYRANO": "vn", "SIGLUS": "vn", "NSCRIPTER": "vn",
+                    "RPGMAKER": "rpg", "RPGMAKER_MV": "rpg", "WOLFRPG": "rpg", "GAMEMAKER": "2d", "GODOT": "2d"}
 
 
 class ProfileError(Exception):
@@ -40,24 +44,71 @@ def find_shipping(game_dir):
     return None
 
 
+def _path(game_dir, *segments):
+    """Follows lower-case path segments case-insensitively (like GameExeResolver.path); None when missing."""
+    path = game_dir
+    for seg in segments:
+        path = next((os.path.join(path, n) for n in reversed(_children(path)) if n.lower() == seg), None)
+        if path is None:
+            return None
+    return path
+
+
+def _any_file(folder, prefix, *suffixes):
+    return folder is not None and any(
+        n.lower().startswith(prefix) and n.lower().endswith(suffixes) and os.path.isfile(os.path.join(folder, n))
+        for n in _children(folder))
+
+
+def _is_file(path):
+    return path is not None and os.path.isfile(path)
+
+
+def _is_dir(path):
+    return path is not None and os.path.isdir(path)
+
+
+def _is_rpgmaker(game_dir):
+    if _is_file(_path(game_dir, "rpg_rt.ini")) or _is_file(_path(game_dir, "rpg_rt.ldb")):
+        return True
+    return _is_file(_path(game_dir, "game.ini")) and (
+        _any_file(game_dir, "rgss", ".dll") or _any_file(_path(game_dir, "system"), "rgss", ".dll")
+        or _any_file(game_dir, "", ".rgssad", ".rgss2a", ".rgss3a")
+        or _any_file(_path(game_dir, "data"), "", ".rxdata", ".rvdata", ".rvdata2"))
+
+
 def detect_engine(game_dir):
+    """Same rules and order as GameExeResolver.detectEngine (Siglus before the generic *.pck Godot rule)."""
     if find_shipping(game_dir) or os.path.isdir(os.path.join(game_dir, "Engine", "Binaries")):
         return "UNREAL"
-    names = _children(game_dir)
-    for n in names:
+    for n in _children(game_dir):
         p = os.path.join(game_dir, n)
         if os.path.isdir(p) and n.lower().endswith("_data") and os.path.exists(os.path.join(p, "globalgamemanagers")):
             return "UNITY"
         if os.path.isfile(p) and n.lower() == "unityplayer.dll":
             return "UNITY"
-    for n in names:
-        p, low = os.path.join(game_dir, n), n.lower()
-        if os.path.isfile(p) and low.endswith(".pck"):
-            return "GODOT"
-        if os.path.isfile(p) and low == "data.win":
-            return "GAMEMAKER"
-        if os.path.isdir(p) and low == "renpy":
-            return "RENPY"
+    sub = lambda *segments: _path(game_dir, *segments)  # noqa: E731
+    if _is_file(sub("scene.pck")) or _is_file(sub("gameexe.dat")):
+        return "SIGLUS"
+    if any(_is_file(sub(*rel)) for rel in (("www", "js", "rpg_core.js"), ("www", "js", "rmmz_core.js"),
+                                           ("js", "rpg_core.js"), ("js", "rmmz_core.js"))):
+        return "RPGMAKER_MV"
+    if _is_rpgmaker(game_dir):
+        return "RPGMAKER"
+    if _any_file(game_dir, "", ".wolf") or _any_file(sub("data"), "", ".wolf") or _is_file(sub("gurugurusmf4.dll")):
+        return "WOLFRPG"
+    if _any_file(game_dir, "", ".xp3"):
+        return "KIRIKIRI"
+    if _any_file(game_dir, "", ".nsa") or _is_file(sub("nscript.dat")):
+        return "NSCRIPTER"
+    if _is_dir(sub("tyrano")) or _is_file(sub("data", "system", "config.tjs")):
+        return "TYRANO"
+    if _is_dir(sub("renpy")) or _any_file(sub("game"), "", ".rpa", ".rpyc"):
+        return "RENPY"
+    if _any_file(game_dir, "", ".pck"):
+        return "GODOT"
+    if _is_file(sub("data.win")):
+        return "GAMEMAKER"
     return "UNKNOWN"
 
 
@@ -82,6 +133,12 @@ def resolve_exe(game_dir, engine):
         if "launcher" not in low and "setup" not in low and "config" not in low:
             return n
     return exes[0]
+
+
+def controls_for(engine, profile=None):
+    """Layout the app picks: the profile's "controls" when set, else by engine (like AgvnLayouts.kindFor)."""
+    chosen = (profile or {}).get("controls")
+    return chosen if chosen in CONTROLS else _ENGINE_CONTROLS.get(engine, "pc")
 
 
 def _check_resolution(res):
@@ -132,6 +189,9 @@ def validate(profile, game_dir):
     _check_resolution(weak.get("resolution"))
     _check_fps(weak.get("fpsLimit"))
     _check_pool(weak.get("texturePool"))
+    controls = profile.get("controls")
+    if controls is not None and controls not in CONTROLS:
+        raise ProfileError("Bộ phím (controls) phải là một trong: %s: %s" % (", ".join(CONTROLS), controls))
     for section, kv in (profile.get("ueEngineIni") or {}).items():
         if not INI_SECTION.match(section) or not isinstance(kv, dict):
             raise ProfileError("Mục Engine.ini không được phép: %s" % section)

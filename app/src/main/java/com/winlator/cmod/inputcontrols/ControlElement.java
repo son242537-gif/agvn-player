@@ -1176,6 +1176,17 @@ public class ControlElement {
         return false;
     }
 
+    // AGVN: releases this control if a finger holds it or it is latched (toggle switch on, L3/R3 kept pressed);
+    // used before the in-game editor or the hide button take the touches, so no key stays pressed
+    public void releaseTouch() {
+        if (currentPointerId != -1) handleTouchUp(currentPointerId);
+        if (type == Type.BUTTON && selected && !mouseMoveMode) {
+            setButtonBindingsActive(false);
+            selected = false;
+            invalidateSelf();
+        }
+    }
+
     public PointF getCurrentPosition() {
         if (currentPosition == null) {
             currentPosition = new PointF(x, y); 

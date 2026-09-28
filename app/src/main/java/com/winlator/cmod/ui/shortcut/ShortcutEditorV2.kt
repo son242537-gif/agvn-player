@@ -1157,7 +1157,7 @@ private fun ShortcutCategoryV2(
 
         "Input" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
-                SettingMappedChoice("Controls Profile", s.controlsProfile, profiles) { s.controlsProfile = it; s.extra("controlsProfile", it.takeUnless { id -> id == "0" }) }
+                SettingMappedChoice("Controls Profile", s.controlsProfile, profiles) { s.controlsProfile = it; s.shortcut.putExtra(com.winlator.cmod.agvn.AgvnLayouts.EXTRA_AUTO, null); s.extra("controlsProfile", it) } // AGVN: player's choice; "0" = controls off
                 SettingsDivider()
                 SettingToggle("Exclusive Input", s.exclusive) {
                     s.exclusive = it

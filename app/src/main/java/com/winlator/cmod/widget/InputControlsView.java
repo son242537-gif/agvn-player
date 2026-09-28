@@ -52,6 +52,7 @@ public class InputControlsView extends View {
     private static final byte MOUSE_WHEEL_DELTA = 120;
     private static final boolean AUTO_HIDE_CONTROLS = false;
     private boolean editMode = false;
+    private boolean overlayEditStyle = false; // AGVN: in-game editor keeps the game visible under a light grid
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG | Paint.FILTER_BITMAP_FLAG);
     private final Path path = new Path();
     private final Rect drawClip = new Rect();
@@ -192,9 +193,12 @@ public class InputControlsView extends View {
         snappingSize = width / 100;
         readyToDraw = true;
 
-        if (editMode) {
-            drawGrid(canvas);
-            drawCursor(canvas);
+        if (editMode && snappingSize > 0) { // AGVN: snappingSize 0 (view under 100 px) would never end the grid loops
+            if (overlayEditStyle) drawOverlayGrid(canvas); // AGVN
+            else {
+                drawGrid(canvas);
+                drawCursor(canvas);
+            }
         }
 
         if (stickElement != null) {
@@ -328,6 +332,62 @@ public class InputControlsView extends View {
 
     public ControlElement getSelectedElement() {
         return selectedElement;
+    }
+
+    // AGVN: in-game controls editor (agvn/AgvnControlsEditor). Call on the UI thread.
+    public void setOverlayEditStyle(boolean overlayEditStyle) {
+        this.overlayEditStyle = overlayEditStyle;
+        invalidate();
+    }
+
+    // AGVN: dim the game a little and draw a light grid instead of the editor's black background and red cursor
+    private void drawOverlayGrid(Canvas canvas) {
+        canvas.drawColor(0x55000000);
+        int width = getMaxWidth();
+        int height = getMaxHeight();
+        int step = snappingSize * 5;
+        paint.setStyle(Paint.Style.FILL);
+        paint.setStrokeWidth(Math.max(1f, snappingSize * 0.0625f));
+        paint.setAntiAlias(false);
+        paint.setColor(0x33ffffff);
+        for (int i = step; i < width; i += step) canvas.drawLine(i, 0, i, height, paint);
+        for (int i = step; i < height; i += step) canvas.drawLine(0, i, width, i, paint);
+        paint.setAntiAlias(true);
+    }
+
+    // AGVN: true once the view knows its size (getMaxWidth() is 0 before the first draw, and saving then corrupts the profile)
+    public synchronized boolean isLayoutReady() {
+        if (snappingSize <= 0) snappingSize = getWidth() / 100;
+        return snappingSize > 0 && getHeight() > 0;
+    }
+
+    // AGVN: adds an element centred on (x, y) with the given bindings, selects it and saves; edit mode only
+    public synchronized boolean addElementAt(int x, int y, ControlElement.Type type, Binding[] bindings, String text) {
+        if (!editMode || profile == null || !isLayoutReady()) return false;
+        if (!profile.isElementsLoaded()) profile.loadElements(this);
+        ControlElement element = new ControlElement(this);
+        element.setType(type);
+        if (bindings != null) for (int i = 0; i < bindings.length; i++) element.setBindingAt(i, bindings[i]);
+        element.setText(text);
+        element.setX((int)Mathf.roundTo(x, snappingSize));
+        element.setY((int)Mathf.roundTo(y, snappingSize));
+        profile.addElement(element);
+        profile.save();
+        selectElement(element);
+        return true;
+    }
+
+    // AGVN: deselects every element (a button's selected flag is also its toggle state, so clear it after editing)
+    public synchronized void clearSelection() {
+        deselectAllElements();
+        invalidate();
+    }
+
+    // AGVN: lets go of held and latched controls, so no key stays pressed when the editor takes the touches or the controls hide
+    public synchronized void releaseAll() {
+        if (profile == null) return;
+        for (ControlElement element : profile.getElements()) element.releaseTouch();
+        invalidate();
     }
 
     private synchronized void deselectAllElements() {
@@ -609,6 +669,7 @@ public class InputControlsView extends View {
                     if (selectedElement != null) {
                         selectedElement.setX((int)Mathf.roundTo(event.getX() - offsetX, snappingSize));
                         selectedElement.setY((int)Mathf.roundTo(event.getY() - offsetY, snappingSize));
+                        if (selectedElement.getType() == ControlElement.Type.STICK) selectedElement.setCurrentPosition(selectedElement.getX(), selectedElement.getY()); // AGVN: thumb follows the stick
                         invalidate();
                     }
                     break;

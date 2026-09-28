@@ -116,6 +116,17 @@ public class AgvnProfileTest {
         assertRejected(profile(",\"dllOverrides\":{\"a b\":\"n\"}"), dir);
     }
 
+    @Test
+    public void validatesControlsLayout() throws Exception {
+        File dir = ueGame();
+        for (String kind : AgvnLayouts.KINDS) AgvnProfileValidator.validate(profile(",\"controls\":\"" + kind + "\""), dir);
+        AgvnProfileValidator.validate(profile(""), dir); // optional
+        assertRejected(profile(",\"controls\":\"VN\""), dir);
+        assertRejected(profile(",\"controls\":\"gamepad\""), dir);
+        assertRejected(profile(",\"controls\":\"\""), dir);
+        assertTrue(profile(",\"controls\":\"rpg\"").toJson().contains("\"controls\":\"rpg\""));
+    }
+
     @Test(expected = AgvnProfileException.class)
     public void rejectsBrokenJson() throws Exception {
         AgvnProfile.parse("{not json");
