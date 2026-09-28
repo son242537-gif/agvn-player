@@ -17,9 +17,9 @@ internal fun filterDxvkForVkd3d(catalog: VersionCatalog, vkd3dVersion: String): 
 
 internal fun normalizeLocaleValue(value: String): String {
     val clean = value.trim()
-    if (clean.isBlank() || clean.equals("Default", ignoreCase = true)) return ""
+    if (clean.isBlank() || clean.equals("Mặc định", ignoreCase = true) || clean.equals("Default", ignoreCase = true)) return ""
     return if (clean.contains('.')) clean else "$clean.UTF-8"
 }
 
 internal fun localeDisplayValue(value: String): String =
-    value.trim().removeSuffix(".UTF-8").removeSuffix(".utf8").ifBlank { "Default" }
+    value.trim().removeSuffix(".UTF-8").removeSuffix(".utf8").ifBlank { "Mặc định" }

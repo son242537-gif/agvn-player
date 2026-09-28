@@ -153,7 +153,7 @@ class ContainersSettingsActivity : AppCompatActivity() {
         val container = manager.getContainerById(id) ?: return
         manager.duplicateContainerAsync(container) {
             refresh()
-            Toast.makeText(this, "Container duplicated", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Đã nhân bản môi trường chạy", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -161,13 +161,13 @@ class ContainersSettingsActivity : AppCompatActivity() {
         val manager = ContainerManager(this)
         val container = manager.getContainerById(id) ?: return
         AppCompatAlertDialog.Builder(this)
-            .setTitle("Remove container?")
-            .setMessage("${container.name} and its container files will be deleted.")
+            .setTitle("Xóa môi trường chạy?")
+            .setMessage("${container.name} và các file của nó sẽ bị xóa.")
             .setNegativeButton(android.R.string.cancel, null)
-            .setPositiveButton("Remove") { _, _ ->
+            .setPositiveButton("Xóa") { _, _ ->
                 manager.removeContainerAsync(container) {
                     refresh()
-                    Toast.makeText(this, "Container removed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Đã xóa môi trường chạy", Toast.LENGTH_SHORT).show()
                 }
             }
             .show()
@@ -207,12 +207,12 @@ private fun ContainersSettingsScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Containers") },
+                title = { Text("Môi trường chạy") },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Outlined.ArrowBack, null) } }
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAdd) { Icon(Icons.Outlined.Add, "New container") }
+            FloatingActionButton(onClick = onAdd) { Icon(Icons.Outlined.Add, "Môi trường chạy mới") }
         }
     ) { padding ->
         if (containers.isEmpty()) {
@@ -226,8 +226,8 @@ private fun ContainersSettingsScreen(
                         Box(contentAlignment = Alignment.Center) { Icon(Icons.Outlined.Dns, null, modifier = Modifier.size(36.dp)) }
                     }
                     Spacer(Modifier.height(14.dp))
-                    Text("No containers", style = MaterialTheme.typography.titleLarge)
-                    Text("Create a Windows environment for your games.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("Chưa có môi trường chạy", style = MaterialTheme.typography.titleLarge)
+                    Text("Tạo môi trường Windows để chơi game.", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         } else {
@@ -287,8 +287,8 @@ private fun SettingsContainerCard(
                 Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                ActionButton(Icons.Outlined.Edit, "Edit", Modifier.weight(1f)) { onEdit(container.id) }
-                ActionButton(Icons.Outlined.Info, "Properties", Modifier.weight(1f)) { onProperties(container.id) }
+                ActionButton(Icons.Outlined.Edit, "Sửa", Modifier.weight(1f)) { onEdit(container.id) }
+                ActionButton(Icons.Outlined.Info, "Thuộc tính", Modifier.weight(1f)) { onProperties(container.id) }
                 ContainerMoreButton(
                     modifier = Modifier.weight(1f),
                     onDuplicate = { onDuplicate(container.id) },
@@ -327,10 +327,10 @@ private fun ContainerMoreButton(
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box(modifier) {
-        ActionButton(Icons.Outlined.MoreVert, "More", Modifier.fillMaxWidth()) { expanded = true }
+        ActionButton(Icons.Outlined.MoreVert, "Thêm", Modifier.fillMaxWidth()) { expanded = true }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             DropdownMenuItem(
-                text = { Text("Duplicate") },
+                text = { Text("Nhân bản") },
                 leadingIcon = { Icon(Icons.Outlined.ContentCopy, null) },
                 onClick = {
                     expanded = false
@@ -338,7 +338,7 @@ private fun ContainerMoreButton(
                 }
             )
             DropdownMenuItem(
-                text = { Text("Remove") },
+                text = { Text("Xóa") },
                 leadingIcon = { Icon(Icons.Outlined.DeleteOutline, null) },
                 onClick = {
                     expanded = false
@@ -386,7 +386,7 @@ private fun ContainerPropertiesDialog(container: Container, onDismiss: () -> Uni
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Outlined.Storage, null) },
-        title = { Text("Container properties") },
+        title = { Text("Thuộc tính môi trường chạy") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 Text(
@@ -405,14 +405,14 @@ private fun ContainerPropertiesDialog(container: Container, onDismiss: () -> Uni
                     ) {
                         CircularProgressIndicator(Modifier.size(28.dp), strokeWidth = 3.dp)
                         Spacer(Modifier.width(12.dp))
-                        Text("Calculating storage…", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Đang tính dung lượng…", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            StorageValue("Drive C", driveSize)
-                            StorageValue("Cache", cacheSize)
-                            StorageValue("Total", totalSize, emphasize = true)
+                            StorageValue("Ổ C", driveSize)
+                            StorageValue("Bộ đệm", cacheSize)
+                            StorageValue("Tổng", totalSize, emphasize = true)
                         }
                         Surface(
                             modifier = Modifier.size(90.dp),
@@ -423,7 +423,7 @@ private fun ContainerPropertiesDialog(container: Container, onDismiss: () -> Uni
                             Box(contentAlignment = Alignment.Center) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text("$usedPercent%", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
-                                    Text("storage", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text("bộ nhớ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
                             }
                         }
@@ -452,14 +452,14 @@ private fun ContainerPropertiesDialog(container: Container, onDismiss: () -> Uni
                 if (clearing) {
                     CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
                     Spacer(Modifier.width(8.dp))
-                    Text("Clearing…")
+                    Text("Đang dọn…")
                 } else {
-                    Text("Clear cache")
+                    Text("Xóa bộ đệm")
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Close") }
+            TextButton(onClick = onDismiss) { Text("Đóng") }
         }
     )
 }

@@ -45,16 +45,16 @@ public class RendererOptionsDialog extends ContentDialog {
 
     private static final String[] FILTER_LABELS_VULKAN = {
         "Bilinear",
-        "Nearest neighbor",
+        "Điểm gần nhất",
         "Snapdragon Super Resolution",
         "AMD FidelityFX Super Resolution",
         "Lanczos 2",
-        "Color Boost"
+        "Tăng màu"
     };
 
     private static final String[] FILTER_LABELS_EGL = {
         "Bilinear",
-        "Nearest neighbor"
+        "Điểm gần nhất"
     };
 
     public RendererOptionsDialog(View anchorView, Config config, boolean isNativeMode) {

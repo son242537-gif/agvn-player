@@ -54,7 +54,7 @@
     <string name="do_you_want_to_duplicate_this_container">Nhân bản môi trường chạy này?</string>
     <string name="do_you_want_to_remove_this_shortcut">Xóa game này khỏi thư viện?</string>
     <string name="do_you_want_to_remove_this_controller">Xóa tay cầm này?</string>
-    <string name="do_you_want_to_remove_this_wine_version">Do you want to remove this wine version?</string>
+    <string name="do_you_want_to_remove_this_wine_version">Bạn có muốn xóa phiên bản Wine này không?</string>
     <string name="do_you_want_to_remove_this_preset">Xóa preset này?</string>
     <string name="do_you_want_to_end_this_process">Kết thúc tiến trình này?</string>
     <string name="controls_editor">Chỉnh sửa điều khiển</string>
@@ -62,27 +62,27 @@
     <string name="disabled">Tắt</string>
     <string name="container">Môi trường chạy</string>
     <string name="screen_size">Độ phân giải</string>
-    <string name="new_environment_variable">New Environment Variable</string>
-    <string name="environment_variables">Environment Variables</string>
-    <string name="value">Value</string>
-    <string name="processor_affinity">Processor Affinity</string>
-    <string name="processor_affinity_32_bit_apps">Processor Affinity (32-bit apps)</string>
+    <string name="new_environment_variable">Biến môi trường mới</string>
+    <string name="environment_variables">Biến môi trường</string>
+    <string name="value">Giá trị</string>
+    <string name="processor_affinity">Chọn nhân CPU</string>
+    <string name="processor_affinity_32_bit_apps">Chọn nhân CPU (ứng dụng 32-bit)</string>
     <string name="cursor_speed">Tốc độ con trỏ</string>
     <string name="relative_mouse_movement">Di chuột tương đối</string>
-    <string name="toggle_switch">Toggle Switch</string>
+    <string name="toggle_switch">Công tắc bật/tắt</string>
     <string name="profile_exported_to">Đã xuất hồ sơ ra</string>
     <string name="unable_to_import_profile">Không nhập được hồ sơ</string>
-    <string name="wine_configuration">Wine Configuration</string>
-    <string name="registry_keys">Registry Keys</string>
-    <string name="csmt">CSMT (Command Stream Multi-Thread)</string>
-    <string name="gpu_name">GPU Name</string>
-    <string name="offscreen_rendering_mode">Offscreen Rendering Mode</string>
-    <string name="strict_shader_math">Strict Shader Math</string>
-    <string name="video_memory_size">Video Memory Size</string>
+    <string name="wine_configuration">Cấu hình Wine</string>
+    <string name="registry_keys">Khóa Registry</string>
+    <string name="csmt">CSMT (xử lý lệnh đa luồng)</string>
+    <string name="gpu_name">Tên GPU</string>
+    <string name="offscreen_rendering_mode">Chế độ vẽ ngoài màn hình</string>
+    <string name="strict_shader_math">Tính toán shader chính xác</string>
+    <string name="video_memory_size">Dung lượng bộ nhớ video</string>
     <string name="show_fps">Hiện FPS</string>
     <string name="none">Không</string>
     <string name="auto">Tự động</string>
-    <string name="custom_text">Custom Text</string>
+    <string name="custom_text">Chữ tùy chỉnh</string>
     <string name="icon">Biểu tượng</string>
     <string name="import_profile">Nhập hồ sơ</string>
     <string name="export_profile">Xuất hồ sơ</string>
@@ -106,7 +106,7 @@
     <string name="bindings">phím gán</string>
     <string name="show_touchscreen_controls">Hiện nút điều khiển cảm ứng</string>
     <string name="dxwrapper">DX Wrapper</string>
-    <string name="mouse_warp_override">Mouse Warp Override</string>
+    <string name="mouse_warp_override">Ghi đè di chuyển chuột</string>
     <string name="direct3d">Direct3D</string>
     <string name="directsound">DirectSound</string>
     <string name="directmusic">DirectMusic</string>
@@ -118,43 +118,43 @@
     <string name="opengl">OpenGL</string>
     <string name="settings">Cài đặt</string>
     <string name="exec_arguments">Tham số chạy</string>
-    <string name="win_components">Win Components</string>
-    <string name="drives">Drives</string>
-    <string name="range">Range</string>
+    <string name="win_components">Thành phần Windows</string>
+    <string name="drives">Ổ đĩa</string>
+    <string name="range">Phạm vi</string>
     <string name="enable">Bật</string>
     <string name="disable">Tắt</string>
-    <string name="force">Force</string>
-    <string name="installed_wine">Installed Wine</string>
-    <string name="install_wine">Install Wine</string>
-    <string name="arch">Arch</string>
+    <string name="force">Lực</string>
+    <string name="installed_wine">Wine đã cài</string>
+    <string name="install_wine">Cài Wine</string>
+    <string name="arch">Kiến trúc</string>
     <string name="version">Phiên bản</string>
-    <string name="dxvk_version">DXVK Version</string>
-    <string name="vkd3d_version">VKD3D Version</string>
-    <string name="unable_to_install_wine">Unable to install Wine</string>
-    <string name="unable_to_remove_this_wine_version">Unable to remove this wine version</string>
-    <string name="wine_version">Wine Version</string>
-    <string name="removing_wine">Removing Wine…</string>
-    <string name="preparing_installation">Preparing installation…</string>
-    <string name="finishing_installation">Finishing installation…</string>
+    <string name="dxvk_version">Phiên bản DXVK</string>
+    <string name="vkd3d_version">Phiên bản VKD3D</string>
+    <string name="unable_to_install_wine">Không cài được Wine</string>
+    <string name="unable_to_remove_this_wine_version">Không xóa được phiên bản Wine này</string>
+    <string name="wine_version">Phiên bản Wine</string>
+    <string name="removing_wine">Đang xóa Wine…</string>
+    <string name="preparing_installation">Đang chuẩn bị cài đặt…</string>
+    <string name="finishing_installation">Đang hoàn tất cài đặt…</string>
     <string name="storage_info">Dung lượng</string>
-    <string name="drive_c">Drive C:</string>
+    <string name="drive_c">Ổ C:</string>
     <string name="cache">Bộ nhớ đệm</string>
     <string name="total">Tổng</string>
     <string name="clear_cache">Xóa bộ nhớ đệm</string>
     <string name="estimated_used_space">Dung lượng đã dùng (ước tính)</string>
     <string name="advanced">Nâng cao</string>
     <string name="box64">Box64</string>
-    <string name="system">System</string>
-    <string name="box64_preset">Box64 Preset</string>
-    <string name="box64_version">Box64 Version</string>
-    <string name="letter">Letter</string>
-    <string name="target_path">Target Path</string>
+    <string name="system">Hệ thống</string>
+    <string name="box64_preset">Preset Box64</string>
+    <string name="box64_version">Phiên bản Box64</string>
+    <string name="letter">Ký tự ổ</string>
+    <string name="target_path">Đường dẫn đích</string>
     <string name="xserver">XServer</string>
-    <string name="use_dri3_extension">Use DRI3 extension</string>
+    <string name="use_dri3_extension">Dùng tiện ích DRI3</string>
     <string name="width">Rộng</string>
     <string name="height">Cao</string>
-    <string name="old">old</string>
-    <string name="_new">new</string>
+    <string name="old">cũ</string>
+    <string name="_new">mới</string>
     <string name="task_manager">Quản lý tiến trình</string>
     <string name="process_name">Tên tiến trình</string>
     <string name="pid">PID</string>
@@ -167,11 +167,11 @@
     <string name="vertical">Dọc</string>
     <string name="open_file">Mở file</string>
     <string name="download_file">Tải file</string>
-    <string name="do_you_want_to_download_the_selected_profiles">Do you want to download the selected profiles?</string>
+    <string name="do_you_want_to_download_the_selected_profiles">Bạn có muốn tải về các cấu hình đã chọn không?</string>
     <string name="downloading_file">Đang tải file...</string>
-    <string name="unable_to_load_profile_list">Unable to load profile list</string>
+    <string name="unable_to_load_profile_list">Không tải được danh sách cấu hình</string>
     <string name="copy">Sao chép</string>
-    <string name="installed_version">Installed Version</string>
+    <string name="installed_version">Phiên bản đã cài</string>
     <string name="unable_to_download_file">Không tải được file</string>
     <string name="stability">Ổn định</string>
     <string name="compatibility">Tương thích</string>
@@ -180,180 +180,180 @@
     <string name="preset">Preset</string>
     <string name="you_cannot_remove_this_preset">Không thể xóa preset này</string>
     <string name="dxwrapper_help_content"><![CDATA[
-        <i><b>WineD3D</b></i> is a translation layer for DirectX 1-11 to OpenGL.<br /><br />
-        <i><b>DXVK</b></i> is a translation layer for Direct3D 9-11 to Vulkan.<br /><br />
-        <i><b>VKD3D</b></i> is a translation layer for Direct3D 12 API to Vulkan.<br /><br />
-        <i><b>CNC DDraw</b></i> is an implementation of DirectDraw for better compatibility with classic games.
+        <i><b>WineD3D</b></i> chuyển DirectX 1-11 sang OpenGL.<br /><br />
+        <i><b>DXVK</b></i> chuyển Direct3D 9-11 sang Vulkan.<br /><br />
+        <i><b>VKD3D</b></i> chuyển Direct3D 12 sang Vulkan.<br /><br />
+        <i><b>CNC DDraw</b></i> là bản DirectDraw giúp game cổ chạy ổn định hơn.
     ]]></string>
     <string name="box64_env_var_help__dynarec_safeflags"><![CDATA[
-        Handling of flags on CALL/RET opcodes<br /><br />
-        <b>0</b> : Treats CALL/RET as if it never needed flags (faster, unstable)<br />
-        <b>1</b> : Most RET will need flags, most CALLS will not<br />
-        <b>2</b> : All CALL/RET will need flags (slower)
+        Xử lý cờ (flags) ở lệnh CALL/RET<br /><br />
+        <b>0</b> : Coi như CALL/RET không bao giờ cần cờ (nhanh hơn, kém ổn định)<br />
+        <b>1</b> : Đa số RET cần cờ, đa số CALL thì không<br />
+        <b>2</b> : Mọi CALL/RET đều cần cờ (chậm hơn)
     ]]></string>
-    <string name="box64_env_var_help__dynarec_fastnan">Generation of -NAN like on x86</string>
-    <string name="box64_env_var_help__dynarec_fastround">Generation of precise x86 rounding</string>
-    <string name="box64_env_var_help__dynarec_x87double">Use of Float/Double for x87 emulation</string>
+    <string name="box64_env_var_help__dynarec_fastnan">Tạo giá trị -NAN giống như trên x86</string>
+    <string name="box64_env_var_help__dynarec_fastround">Làm tròn số chính xác như x86</string>
+    <string name="box64_env_var_help__dynarec_x87double">Dùng Float/Double để giả lập x87</string>
     <string name="box64_env_var_help__dynarec_bigblock"><![CDATA[
-        Dynarec building BigBlock<br /><br />
-        <b>0</b> : Don\'t try to build block as big as possible<br />
-        <b>1</b> : Build Dynarec block as big as possible<br />
-        <b>2</b> : Build Dynarec block bigger (continue when block overlaps, but only for blocks in elf memory)<br />
-        <b>3</b> : Build Dynarec block bigger (continue when block overlaps, for all types of memory)
+        Dynarec tạo khối lớn (BigBlock)<br /><br />
+        <b>0</b> : Không cố tạo khối lớn nhất có thể<br />
+        <b>1</b> : Tạo khối Dynarec lớn nhất có thể<br />
+        <b>2</b> : Tạo khối Dynarec lớn hơn (tiếp tục khi các khối chồng nhau, chỉ với khối trong bộ nhớ elf)<br />
+        <b>3</b> : Tạo khối Dynarec lớn hơn (tiếp tục khi các khối chồng nhau, với mọi loại bộ nhớ)
     ]]></string>
     <string name="box64_env_var_help__dynarec_strongmem"><![CDATA[
-        Simulation of Strong Memory model<br /><br />
-        <b>0</b> : Don\'t try anything special<br />
-        <b>1</b> : Enable some Memory Barrier when writing to memory (on some MOV opcode)<br />
-        <b>2</b> : All 1 plus a Memory Barrier on every write to memory using MOV<br />
-        <b>3</b> : All 2 plus Memory Barrier when reading from memory and on some SSE/SSE2 opcodes
+        Mô phỏng mô hình bộ nhớ mạnh (Strong Memory)<br /><br />
+        <b>0</b> : Không làm gì đặc biệt<br />
+        <b>1</b> : Thêm Memory Barrier khi ghi bộ nhớ (ở một số lệnh MOV)<br />
+        <b>2</b> : Như mức 1, thêm Memory Barrier ở mọi lần ghi bộ nhớ bằng MOV<br />
+        <b>3</b> : Như mức 2, thêm Memory Barrier khi đọc bộ nhớ và ở một số lệnh SSE/SSE2
     ]]></string>
-    <string name="box64_env_var_help__dynarec_forward">Defines the max allowed forward value when building Block</string>
-    <string name="box64_env_var_help__dynarec_callret">Optimization of CALL/RET opcodes</string>
-    <string name="box64_env_var_help__dynarec_wait">Defines whether or not Dynarec will wait for the FillBlock to be ready</string>
+    <string name="box64_env_var_help__dynarec_forward">Giá trị forward tối đa khi tạo Block</string>
+    <string name="box64_env_var_help__dynarec_callret">Tối ưu lệnh CALL/RET</string>
+    <string name="box64_env_var_help__dynarec_wait">Dynarec có chờ FillBlock sẵn sàng hay không</string>
     <string name="box64_env_var_help__dynarec_weakbarrier"><![CDATA[
-        Tweak memory barriers to reduce performance impact of strong memory emulation<br /><br />
-        <b>0</b> : Use regular safe barriers<br />
-        <b>1</b> : Use weak barriers for mild performance boost<br />
-        <b>2</b> : Use weak barriers, additionally disable last write barriers]]></string>
+        Tinh chỉnh memory barrier để giảm ảnh hưởng hiệu năng của giả lập bộ nhớ mạnh<br /><br />
+        <b>0</b> : Dùng barrier an toàn thông thường<br />
+        <b>1</b> : Dùng barrier yếu để tăng nhẹ hiệu năng<br />
+        <b>2</b> : Dùng barrier yếu, đồng thời tắt barrier ở lần ghi cuối]]></string>
     <string name="box64_env_var_help__dynarec_aligned_atomics"><![CDATA[
-        Generate aligned atomics only (only available on Arm64 for now).<br /><br />
-        <b>0</b> : Generate unaligned atomics handling code.<br />
-        <b>1</b> : Generate aligned atomics only, which is faster and smaller code size, but will cause SIGBUS for LOCK prefixed opcodes operating on aligned data addresses.]]></string>
+        Chỉ tạo lệnh nguyên tử (atomic) căn chỉnh (hiện chỉ có trên Arm64).<br /><br />
+        <b>0</b> : Tạo mã xử lý atomic không căn chỉnh.<br />
+        <b>1</b> : Chỉ tạo atomic căn chỉnh, nhanh và gọn hơn, nhưng sẽ gây SIGBUS với lệnh có tiền tố LOCK trên địa chỉ dữ liệu không căn chỉnh.]]></string>
     <string name="box64_env_var_help__dynarec_df"><![CDATA[
-        Enable or disable the use of deferred flags.<br /><br />
-        <b>0</b> : Disable the use of deferred flags.<br />
-        <b>1</b> : Enable the use of deferred flags.]]></string>
+        Bật hoặc tắt cờ trì hoãn (deferred flags).<br /><br />
+        <b>0</b> : Tắt cờ trì hoãn.<br />
+        <b>1</b> : Bật cờ trì hoãn.]]></string>
     <string name="box64_env_var_help__dynarec_dirty"><![CDATA[
-        Allow continue running a block that is unprotected and potentially dirty.<br /><br />
-        <b>0</b> : Do not allow continue running a block that is unprotected and potentially dirty.<br />
-        <b>1</b> : Allow continue to run a dynablock that write data in the same page as code. It can gets faster in loading time of some game but can also get unexpected crashes.<br />
-        <b>2</b> : Will also, when it detect an HotPage, flag that page as NEVERCLEAN, and so it will not be write protected but Block build from that page will always be tested. It can be faster that way (but some SMC case might not be trapped).]]></string>
+        Cho phép tiếp tục chạy khối không được bảo vệ và có thể đã bị sửa (dirty).<br /><br />
+        <b>0</b> : Không cho tiếp tục chạy khối không được bảo vệ và có thể đã bị sửa.<br />
+        <b>1</b> : Cho tiếp tục chạy dynablock ghi dữ liệu vào cùng trang với mã. Có thể giúp một số game tải nhanh hơn nhưng cũng có thể gây crash bất ngờ.<br />
+        <b>2</b> : Ngoài ra, khi phát hiện HotPage sẽ đánh dấu trang đó là NEVERCLEAN, nên trang không bị chống ghi nhưng khối tạo từ trang đó luôn được kiểm tra. Cách này có thể nhanh hơn (nhưng một số trường hợp SMC có thể bị bỏ sót).]]></string>
     <string name="box64_env_var_help__dynarec_nativeflags"><![CDATA[
-        Enable or disable the use of native flags.<br /><br />
-        <b>0</b> : Do not use native flags.<br />
-        <b>1</b> : Use native flags when possible.]]></string>
+        Bật hoặc tắt cờ gốc (native flags).<br /><br />
+        <b>0</b> : Không dùng cờ gốc.<br />
+        <b>1</b> : Dùng cờ gốc khi có thể.]]></string>
     <string name="box64_env_var_help__dynarec_pause"><![CDATA[
-        Enable x86 PAUSE emulation, may help the performance of spinlocks.<br /><br />
-        <b>0</b> : Ignore x86 PAUSE instruction.<br />
-        <b>1</b> : Use YIELD to emulate x86 PAUSE instruction.<br />
-        <b>2</b> : Use WFI to emulate x86 PAUSE instruction.<br />
-        <b>3</b> : Use SEVL+WFE to emulate x86 PAUSE instruction.
+        Giả lập lệnh x86 PAUSE, có thể giúp hiệu năng của spinlock.<br /><br />
+        <b>0</b> : Bỏ qua lệnh x86 PAUSE.<br />
+        <b>1</b> : Dùng YIELD để giả lập lệnh x86 PAUSE.<br />
+        <b>2</b> : Dùng WFI để giả lập lệnh x86 PAUSE.<br />
+        <b>3</b> : Dùng SEVL+WFE để giả lập lệnh x86 PAUSE.
     ]]></string>
     <string name="box64_env_var_help__avx"><![CDATA[
-        AVX and AVX2 implemented, along with BMI1, BMI2, ADX, FMA, F16C and RDANDR extension!<br /><br />
-        <b>0</b> : Disable AVX extension<br />
-        <b>1</b> : enable AVX, BMI1, F16C and VAES extension.<br />
-        <b>2</b> : All 1 plus enable AVX2, BMI2, FMA, ADX,VPCLMULQDQ and RDRAND.<br />\
+        Hỗ trợ AVX và AVX2, cùng các tiện ích BMI1, BMI2, ADX, FMA, F16C và RDRAND!<br /><br />
+        <b>0</b> : Tắt AVX<br />
+        <b>1</b> : Bật AVX, BMI1, F16C và VAES.<br />
+        <b>2</b> : Như mức 1, thêm AVX2, BMI2, FMA, ADX, VPCLMULQDQ và RDRAND.<br />\
     ]]></string>
-    <string name="box64_env_var_help__maxcpu">Maximum number of CPUs presented to programs by Box64</string>
-    <string name="box64_env_var_help__unityplayer">Detect UnityPlayer.dll and apply strongmem settings</string>
-    <string name="box64_env_var_help__mmap32">Force every memory allocation in 32bit address spaces</string>
-    <string name="fexcore_env_var_help__tsoenabled">Enables TSO IR ops (required for multithreaded apps).</string>
-    <string name="fexcore_env_var_help__vectortsoenabled">Makes vector load/stores atomic when TSO is enabled.</string>
-    <string name="fexcore_env_var_help__halfbarriertsoenabled">Uses half-barrier atomics for unaligned loads/stores under TSO.</string>
-    <string name="fexcore_env_var_help__memcpysettsoenabled">Makes REP MOVS / REP STOS atomic under TSO.</string>
-    <string name="fexcore_env_var_help__multiblock">Enables multiblock code compilation. Can cause longer JIT compilation and stutter.</string>
-    <string name="fexcore_env_var_help__hostfeatures">Controls CPU feature forcing.</string>
-    <string name="fexcore_env_var_help__smalltscscale">Scales TSC on low-frequency systems.</string>
-    <string name="fexcore_env_var_help__smc_checks">Self-Modifying Code checks.</string>
-    <string name="fexcore_env_var_help__volatilemetadata">Uses volatile metadata from PE files for TSO when available.</string>
-    <string name="fexcore_env_var_help__monohacks">Special SMC + JIT block hacks for Mono detection.</string>
-    <string name="fexcore_env_var_help__hidehypervisorbit">Hides CPUID hypervisor bit (useful for apps that crash with it).</string>
-    <string name="fexcore_env_var_help__disablel2cache">Disables FEXCore JIT L2 cache lookup, saving memory but introducing stutters.</string>
-    <string name="fexcore_env_var_help__dynamicl1cache">Switches FEXCore JIT L1 cache to be dynamically sized, saving memory but introducing stutters.</string>
-    <string name="fexcore_env_var_help__x87reducedprecision">Emulates X87 floating point using 64-bit precision. This reduces emulation accuracy and may result in rendering bugs.</string>
-    <string name="columns">Columns</string>
-    <string name="directinput_mapper_type">DirectInput Mapper Type</string>
-    <string name="desktop">Desktop</string>
-    <string name="theme">Theme</string>
-    <string name="background">Background</string>
-    <string name="max_device_memory">Max Device Memory</string>
+    <string name="box64_env_var_help__maxcpu">Số CPU tối đa mà Box64 cho chương trình thấy</string>
+    <string name="box64_env_var_help__unityplayer">Phát hiện UnityPlayer.dll và áp dụng cài đặt strongmem</string>
+    <string name="box64_env_var_help__mmap32">Buộc mọi vùng nhớ cấp phát nằm trong không gian địa chỉ 32-bit</string>
+    <string name="fexcore_env_var_help__tsoenabled">Bật lệnh TSO IR (cần cho ứng dụng đa luồng).</string>
+    <string name="fexcore_env_var_help__vectortsoenabled">Đọc/ghi vector nguyên tử khi bật TSO.</string>
+    <string name="fexcore_env_var_help__halfbarriertsoenabled">Dùng half-barrier cho đọc/ghi không căn chỉnh khi bật TSO.</string>
+    <string name="fexcore_env_var_help__memcpysettsoenabled">Làm REP MOVS / REP STOS nguyên tử khi bật TSO.</string>
+    <string name="fexcore_env_var_help__multiblock">Biên dịch nhiều khối mã cùng lúc. Có thể làm biên dịch JIT lâu hơn và gây giật.</string>
+    <string name="fexcore_env_var_help__hostfeatures">Điều khiển việc ép tính năng CPU.</string>
+    <string name="fexcore_env_var_help__smalltscscale">Điều chỉnh TSC trên máy có tần số thấp.</string>
+    <string name="fexcore_env_var_help__smc_checks">Kiểm tra mã tự sửa đổi (SMC).</string>
+    <string name="fexcore_env_var_help__volatilemetadata">Dùng metadata volatile từ file PE cho TSO nếu có.</string>
+    <string name="fexcore_env_var_help__monohacks">Mẹo SMC + khối JIT riêng khi phát hiện Mono.</string>
+    <string name="fexcore_env_var_help__hidehypervisorbit">Ẩn bit hypervisor của CPUID (hữu ích với ứng dụng bị crash vì nó).</string>
+    <string name="fexcore_env_var_help__disablel2cache">Tắt tra cứu bộ đệm L2 của JIT FEXCore, tiết kiệm bộ nhớ nhưng gây giật.</string>
+    <string name="fexcore_env_var_help__dynamicl1cache">Cho bộ đệm L1 của JIT FEXCore đổi kích thước linh hoạt, tiết kiệm bộ nhớ nhưng gây giật.</string>
+    <string name="fexcore_env_var_help__x87reducedprecision">Giả lập số thực X87 bằng độ chính xác 64-bit. Giảm độ chính xác và có thể gây lỗi hình ảnh.</string>
+    <string name="columns">Số cột</string>
+    <string name="directinput_mapper_type">Kiểu ánh xạ DirectInput</string>
+    <string name="desktop">Màn hình nền</string>
+    <string name="theme">Giao diện</string>
+    <string name="background">Hình nền</string>
+    <string name="max_device_memory">Bộ nhớ thiết bị tối đa</string>
     <string name="frame_rate">Tốc độ khung hình</string>
     <string name="configuration">Cấu hình</string>
     <string name="browse">Duyệt</string>
     <string name="magnifier">Kính lúp</string>
     <string name="bring_to_front">Đưa lên trước</string>
     <string name="options">Tùy chọn</string>
-    <string name="enable_experimental_wow64_mode">Enable experimental WoW64 mode</string>
+    <string name="enable_experimental_wow64_mode">Bật chế độ WoW64 thử nghiệm</string>
     <string name="logs">Nhật ký</string>
-    <string name="enable_wine_debug">Enable Wine debug</string>
+    <string name="enable_wine_debug">Bật debug Wine</string>
     <string name="enable_winlator_logs">Bật nhật ký ứng dụng</string>
-    <string name="enable_box64_logs">Enable Box64 logs</string>
+    <string name="enable_box64_logs">Bật log Box64</string>
     <string name="export">Xuất</string>
     <string name="logs_exported_to">Đã xuất nhật ký ra</string>
     <string name="general">Chung</string>
-    <string name="msg_warning_install_wine">Warning: Installing a new version of Wine is recommended for testing purposes only.</string>
-    <string name="startup_selection">Startup Selection</string>
-    <string name="sync_cpu_topology">Sync with Wine</string>
-    <string name="wine_debug_channel">Wine Debug Channel</string>
+    <string name="msg_warning_install_wine">Cảnh báo: Chỉ nên cài phiên bản Wine mới để thử nghiệm.</string>
+    <string name="startup_selection">Chế độ khởi động</string>
+    <string name="sync_cpu_topology">Đồng bộ với Wine</string>
+    <string name="wine_debug_channel">Kênh debug Wine</string>
     <string name="game_controller">Tay cầm chơi game</string>
     <string name="vibration">Rung</string>
     <string name="vibration_slot">Khe %1$d</string>
 
     <string name="experimental">Thử nghiệm</string>
     <string name="glibc_exp_edition">Dựa trên</string>
-    <string name="enabled_async">Enable Async</string>
-    <string name="enabled_async_cache">Enable Async Cache</string>
-    <string name="vkd3d_feature_level">VKD3D Feature Level</string>
+    <string name="enabled_async">Bật Async</string>
+    <string name="enabled_async_cache">Bật bộ đệm Async</string>
+    <string name="vkd3d_feature_level">Mức tính năng VKD3D</string>
     <string name="filter">Lọc</string>
     <string name="all">Tất cả</string>
-    <string name="group">Group</string>
-    <string name="new_group">New Group</string>
-    <string name="import_group">Import Group</string>
-    <string name="new_file">New File</string>
-    <string name="new_item">New Item</string>
-    <string name="group_edit">Group Edit</string>
-    <string name="group_name">Group Name</string>
-    <string name="do_you_want_to_duplicate_this_group">Do you want to duplicate this group?</string>
-    <string name="do_you_want_to_remove_this_group">Do you want to remove this group?</string>
-    <string name="do_you_want_to_duplicate_this_process">Do you want to duplicate this process?</string>
-    <string name="do_you_want_to_remove_this_process">Do you want to remove this process?</string>
-    <string name="do_you_want_to_remove_this_variable">Do you want to remove this variable?</string>
-    <string name="variable_name">Variable Name</string>
-    <string name="variable_already_exists">Variable already exists</string>
-    <string name="cannot_remove_default_profile">Cannot remove default profile.</string>
-    <string name="cannot_edit_default_profile">Cannot edit default profile.</string>
-    <string name="do_you_want_to_restore_default_profile">Do you want to restore default profile?</string>
+    <string name="group">Nhóm</string>
+    <string name="new_group">Nhóm mới</string>
+    <string name="import_group">Nhập nhóm</string>
+    <string name="new_file">Tệp mới</string>
+    <string name="new_item">Mục mới</string>
+    <string name="group_edit">Sửa nhóm</string>
+    <string name="group_name">Tên nhóm</string>
+    <string name="do_you_want_to_duplicate_this_group">Bạn có muốn nhân bản nhóm này không?</string>
+    <string name="do_you_want_to_remove_this_group">Bạn có muốn xóa nhóm này không?</string>
+    <string name="do_you_want_to_duplicate_this_process">Bạn có muốn nhân bản tiến trình này không?</string>
+    <string name="do_you_want_to_remove_this_process">Bạn có muốn xóa tiến trình này không?</string>
+    <string name="do_you_want_to_remove_this_variable">Bạn có muốn xóa biến này không?</string>
+    <string name="variable_name">Tên biến</string>
+    <string name="variable_already_exists">Biến đã tồn tại</string>
+    <string name="cannot_remove_default_profile">Không thể xóa cấu hình mặc định.</string>
+    <string name="cannot_edit_default_profile">Không thể sửa cấu hình mặc định.</string>
+    <string name="do_you_want_to_restore_default_profile">Bạn có muốn khôi phục cấu hình mặc định không?</string>
     <string name="simulate_touch_screen">Giả lập màn hình cảm ứng</string>
-    <string name="install_content">Install Content</string>
-    <string name="content_type">Content Type</string>
-    <string name="contents">Contents</string>
-    <string name="do_you_want_to_install_content">Do you want to install additional content?</string>
-    <string name="pls_make_sure_content_trustworthy">Contents contain executable files. Unsafe executable files may compromise your data or device security. Before installing, PLEASE make sure that the additional content you are installing is trustworthy.</string>
-    <string name="content_suffix_is_wcp_packed_xz_zst">The content files have the .wcp extension and are compressed using either xz or zst formats.</string>
-    <string name="installing_content">Installing Content…</string>
-    <string name="unable_to_install_content">Unable to install content.</string>
+    <string name="install_content">Cài thành phần</string>
+    <string name="content_type">Loại thành phần</string>
+    <string name="contents">Thành phần</string>
+    <string name="do_you_want_to_install_content">Bạn có muốn cài thêm thành phần không?</string>
+    <string name="pls_make_sure_content_trustworthy">Thành phần có chứa file thực thi. File thực thi không an toàn có thể gây hại cho dữ liệu hoặc thiết bị của bạn. Trước khi cài, HÃY chắc chắn rằng thành phần bạn cài là đáng tin cậy.</string>
+    <string name="content_suffix_is_wcp_packed_xz_zst">File thành phần có đuôi .wcp và được nén bằng xz hoặc zst.</string>
+    <string name="installing_content">Đang cài thành phần…</string>
+    <string name="unable_to_install_content">Không cài được thành phần.</string>
     <string name="install_failed">Cài đặt thất bại</string>
-    <string name="file_cannot_be_recognied">File cannot be recognized.</string>
-    <string name="profile_not_found_in_content">Profile not found in content.</string>
-    <string name="profile_cannot_be_recognized">Profile cannot be recognized</string>
-    <string name="content_already_exist">The content you\'re trying to install already exists.</string>
-    <string name="content_info">Content Info</string>
-    <string name="version_code">Version Code</string>
-    <string name="description">Description</string>
-    <string name="file_list">File List</string>
+    <string name="file_cannot_be_recognied">Không nhận dạng được file.</string>
+    <string name="profile_not_found_in_content">Không tìm thấy cấu hình trong thành phần.</string>
+    <string name="profile_cannot_be_recognized">Không nhận dạng được cấu hình</string>
+    <string name="content_already_exist">Thành phần bạn muốn cài đã có sẵn.</string>
+    <string name="content_info">Thông tin thành phần</string>
+    <string name="version_code">Mã phiên bản</string>
+    <string name="description">Mô tả</string>
+    <string name="file_list">Danh sách file</string>
     <string name="_continue">Tiếp tục</string>
-    <string name="content_installed_success">Content installed successfully!</string>
-    <string name="content_cannot_be_trusted">Content cannot be trusted.</string>
-    <string name="content_is_incomplete">Content is incomplete.</string>
-    <string name="warning_content_has_untrusted_files">Warning: The additional content contains untrusted files. Generally, the following files should not be modified. Please decide whether to proceed with the installation.</string>
+    <string name="content_installed_success">Cài thành phần thành công!</string>
+    <string name="content_cannot_be_trusted">Thành phần không đáng tin cậy.</string>
+    <string name="content_is_incomplete">Thành phần không đầy đủ.</string>
+    <string name="warning_content_has_untrusted_files">Cảnh báo: Thành phần này chứa file không đáng tin cậy. Thông thường các file dưới đây không nên bị sửa đổi. Hãy cân nhắc có tiếp tục cài hay không.</string>
     <string name="warning">Cảnh báo</string>
-    <string name="do_you_want_to_remove_this_content">Do you want to remove this content?</string>
+    <string name="do_you_want_to_remove_this_content">Bạn có muốn xóa thành phần này không?</string>
     <string name="add_to_home_screen">Thêm ra màn hình chính</string>
     <string name="shortcut_not_available">Game này không còn dùng được. Hãy xóa và thêm lại.</string>
-    <string name="enable_file_provider">Enable File Provider</string>
+    <string name="enable_file_provider">Bật File Provider</string>
     <string name="take_effect_next_startup">Tùy chọn này có hiệu lực ở lần mở sau.</string>
     <string name="imagefs">Imagefs</string>
-    <string name="reinstall_imagefs">Reinstall Imagefs</string>
-    <string name="do_you_want_to_reinstall_imagefs">Do you want to reinstall imagefs? This operation will restore system files, your containers won\'t be changed.</string>
-    <string name="unable_to_remove_content_since_container_using">Unable to remove this content, because a container is currently using this Wine.</string>
-    <string name="get_more_contents_form_github">You can access https://github.com/longjunyu2/winlator/releases to get more contents.</string>
+    <string name="reinstall_imagefs">Cài lại Imagefs</string>
+    <string name="do_you_want_to_reinstall_imagefs">Bạn có muốn cài lại imagefs không? Thao tác này khôi phục file hệ thống, các môi trường chạy của bạn sẽ không bị thay đổi.</string>
+    <string name="unable_to_remove_content_since_container_using">Không xóa được thành phần này vì có môi trường chạy đang dùng bản Wine này.</string>
+    <string name="get_more_contents_form_github">Bạn có thể vào https://github.com/longjunyu2/winlator/releases để lấy thêm thành phần.</string>
     <string name="setup_failed">Cài đặt thất bại</string>
-    <string name="graphics_driver_configuration">Graphics Driver Configuration</string>
-    <string name="select_graphics_driver_version">Select Graphics Driver Version:</string>
-    <string name="graphics_driver_version">Graphics Driver Version</string>
-    <string name="graphics_driver_available_extensions">Available Extensions</string>
+    <string name="graphics_driver_configuration">Cấu hình driver đồ họa</string>
+    <string name="select_graphics_driver_version">Chọn phiên bản driver đồ họa:</string>
+    <string name="graphics_driver_version">Phiên bản driver đồ họa</string>
+    <string name="graphics_driver_available_extensions">Tiện ích mở rộng có sẵn</string>
     <string name="add_to_homescreen">Thêm ra màn hình chính</string>
     <string name="add_save">Thêm bản lưu</string>
     <string name="saves">Bản lưu</string>
@@ -398,80 +398,80 @@
     <string name="sound">Âm thanh</string>
     <string name="icon_set_successfully">Đã đổi biểu tượng</string>
 <string name="unable_to_set_icon">Không đổi được biểu tượng</string>
-    <string name="do_you_want_to_remove_this_sound_font">Do you want to remove this soundfont?</string>
-    <string name="sound_font_removed_success">Soundfont removed successfully!</string>
-    <string name="sound_font_removed_failed">Soundfont removed failed!</string>
-    <string name="sound_font_installed_success">Soundfont installed successfully!</string>
-    <string name="sound_font_installed_failed">Soundfont installed failed!</string>
-    <string name="sound_font_already_exist">Soundfont you want to install is already exist.</string>
-    <string name="unable_to_install_soundfont">Unable to install soundfont</string>
-    <string name="installing_soundfont">Installing SoundFont…</string>
-    <string name="sound_font_bad_format">Bad SoundFont Format.</string>
-    <string name="cannot_remove_default_sound_font">Cannot remove default soundfont</string>
-    <string name="enable_dinput_for_wine_game">Enable DInput for Games in Wine</string>
-    <string name="enable_xinput_for_wine_game">Enable XInput for Games in Wine</string>
+    <string name="do_you_want_to_remove_this_sound_font">Bạn có muốn xóa SoundFont này không?</string>
+    <string name="sound_font_removed_success">Đã xóa SoundFont!</string>
+    <string name="sound_font_removed_failed">Xóa SoundFont thất bại!</string>
+    <string name="sound_font_installed_success">Đã cài SoundFont!</string>
+    <string name="sound_font_installed_failed">Cài SoundFont thất bại!</string>
+    <string name="sound_font_already_exist">SoundFont bạn muốn cài đã có sẵn.</string>
+    <string name="unable_to_install_soundfont">Không cài được SoundFont</string>
+    <string name="installing_soundfont">Đang cài SoundFont…</string>
+    <string name="sound_font_bad_format">Định dạng SoundFont không hợp lệ.</string>
+    <string name="cannot_remove_default_sound_font">Không thể xóa SoundFont mặc định</string>
+    <string name="enable_dinput_for_wine_game">Bật DInput cho game trong Wine</string>
+    <string name="enable_xinput_for_wine_game">Bật XInput cho game trong Wine</string>
     <string name="help_xinput"><![CDATA[
-        If your game utilizes the <i><b>XInput API</b></i> for game controller support, please enable this option.<br/><br/>
-        This option will affect both <i><b>virtual</b></i> (provided by Input Controls) and <i><b>physical</b></i> game controllers.
+        Nếu game của bạn dùng <i><b>XInput API</b></i> để hỗ trợ tay cầm, hãy bật tùy chọn này.<br/><br/>
+        Tùy chọn này ảnh hưởng cả tay cầm <i><b>ảo</b></i> (từ Phím ảo) và tay cầm <i><b>thật</b></i>.
     ]]></string>
     <string name="help_dinput"><![CDATA[
-        If your game utilizes the <i><b>DInput API</b></i> for game controller support, please enable this option.<br/><br/>
-        This option will affect both <i><b>virtual</b></i> (provided by Input Controls) and <i><b>physical</b></i> game controllers.
+        Nếu game của bạn dùng <i><b>DInput API</b></i> để hỗ trợ tay cầm, hãy bật tùy chọn này.<br/><br/>
+        Tùy chọn này ảnh hưởng cả tay cầm <i><b>ảo</b></i> (từ Phím ảo) và tay cầm <i><b>thật</b></i>.
     ]]></string>
-    <string name="help_exclusive_xinput">Certain games like Rayman Origins and Need for Speed: Most Wanted 2005 when using DInput require this to be disabled.</string>
-    <string name="enable_xinput_and_dinput_same_time">Some games may support both APIs. Enabling both XInput and DInput simultaneously in such games may cause control issues, as seen in titles like The Binding of Isaac and the Resident Evil series.</string>
-    <string name="warning_gamepad_mouse_mix">Warning: Mixing gamepad and mouse bindings on the same controller may cause unexpected behavior in games. It is recommended to use only gamepad bindings or only mouse/keyboard bindings.</string>
-    <string name="startup_normal">Normal (Load all services)</string>
-    <string name="startup_essential">Essential (Load only essential services)</string>
-    <string name="startup_aggressive">Aggressive (Stop services on startup)</string>
+    <string name="help_exclusive_xinput">Một số game như Rayman Origins và Need for Speed: Most Wanted 2005 khi dùng DInput cần tắt tùy chọn này.</string>
+    <string name="enable_xinput_and_dinput_same_time">Một số game hỗ trợ cả hai API. Bật cùng lúc XInput và DInput trong các game này có thể gây lỗi điều khiển, ví dụ The Binding of Isaac và dòng Resident Evil.</string>
+    <string name="warning_gamepad_mouse_mix">Cảnh báo: Trộn phím tay cầm và chuột trên cùng một tay cầm có thể gây lỗi trong game. Nên chỉ dùng phím tay cầm, hoặc chỉ dùng chuột/bàn phím.</string>
+    <string name="startup_normal">Bình thường (tải mọi dịch vụ)</string>
+    <string name="startup_essential">Thiết yếu (chỉ tải dịch vụ cần thiết)</string>
+    <string name="startup_aggressive">Tối giản (dừng dịch vụ khi khởi động)</string>
     <string name="lc_all" translatable="false">LC_ALL</string>
     <string name="toggle_orientation">Xoay màn hình</string>
     <string name="help_file_provider"><![CDATA[
-        <i><b>File Provider</b></i> allows access to AGVN Player\'s internal data through android file manager.<br/><br/>
+        <i><b>File Provider</b></i> cho phép truy cập dữ liệu bên trong AGVN Player qua trình quản lý file của Android.<br/><br/>
     ]]></string>
-    <string name="proton_options">Proton options</string>
+    <string name="proton_options">Tùy chọn Proton</string>
     <string name="reconfigure">Cấu hình lại</string>
-    <string name="do_you_want_to_reconfigure_wine">Do you want to reconfigure this container on the next startup? This will remove the timestamp to trigger Wine Configuration.</string>
+    <string name="do_you_want_to_reconfigure_wine">Bạn có muốn cấu hình lại môi trường chạy này ở lần khởi động tới không? Việc này sẽ xóa mốc thời gian để chạy lại Cấu hình Wine.</string>
 
     <!-- OpenXR specific text -->
     <string name="xr" translatable="false">XR</string>
-    <string name="primary_controller">Primary controller</string>
-    <string name="left_controller">Left controller</string>
-    <string name="right_controller">Right controller</string>
-    <string name="button_a">Button A</string>
-    <string name="button_b">Button B</string>
-    <string name="button_x">Button X</string>
-    <string name="button_y">Button Y</string>
-    <string name="button_grip">Grip button</string>
-    <string name="button_trigger">Trigger button</string>
-    <string name="thumbstick_left">Thumbstick left</string>
-    <string name="thumbstick_right">Thumbstick right</string>
-    <string name="thumbstick_up">Thumbstick up</string>
-    <string name="thumbstick_down">Thumbstick down</string>
-    <string name="secondary_executable">Path:</string>
-    <string name="enter_secondary_exec_path"> ex: "D:/Games/My Game/My Game.exe"</string>
-    <string name="exec_delay">Delayed Execution (seconds):</string>
-    <string name="enter_delay_seconds">Enter the delay in seconds:</string>
-    <string name="use_secondary_executable">Use secondary executable?</string>
-    <string name="secondary_exec">Secondary Executable</string>
-    <string name="secondary_exe_path_subtext">(Spaces in paths must be wrapped in quotes)</string>
+    <string name="primary_controller">Tay cầm chính</string>
+    <string name="left_controller">Tay cầm trái</string>
+    <string name="right_controller">Tay cầm phải</string>
+    <string name="button_a">Nút A</string>
+    <string name="button_b">Nút B</string>
+    <string name="button_x">Nút X</string>
+    <string name="button_y">Nút Y</string>
+    <string name="button_grip">Nút Grip</string>
+    <string name="button_trigger">Nút Trigger</string>
+    <string name="thumbstick_left">Cần analog sang trái</string>
+    <string name="thumbstick_right">Cần analog sang phải</string>
+    <string name="thumbstick_up">Cần analog lên trên</string>
+    <string name="thumbstick_down">Cần analog xuống dưới</string>
+    <string name="secondary_executable">Đường dẫn:</string>
+    <string name="enter_secondary_exec_path"> VD: \"D:/Games/My Game/My Game.exe\"</string>
+    <string name="exec_delay">Chạy trễ (giây):</string>
+    <string name="enter_delay_seconds">Nhập thời gian trễ (giây):</string>
+    <string name="use_secondary_executable">Dùng file chạy phụ?</string>
+    <string name="secondary_exec">File chạy phụ</string>
+    <string name="secondary_exe_path_subtext">(Đường dẫn có dấu cách phải đặt trong ngoặc kép)</string>
     <string name="pip_mode">Cửa sổ nổi (PiP)</string>
     <string name="configure">Cấu hình</string>
-    <string name="enable_sendinput_mode">Use Windows SendInput Mode</string>
-    <string name="enable_touchscreen_timeout">Touchscreen Timeout (Requires Restart)</string>
+    <string name="enable_sendinput_mode">Dùng chế độ SendInput của Windows</string>
+    <string name="enable_touchscreen_timeout">Tự ẩn cảm ứng (cần khởi động lại)</string>
     <string name="enable_touchscreen_haptics">Rung khi chạm màn hình</string>
-    <string name="help_steamgrid">SteamGrid API Key</string>
-    <string name="disable_xinput_for_shortcut">Disable Xinput (For Exclusive M/KB Control)</string>
+    <string name="help_steamgrid">Khóa API SteamGrid</string>
+    <string name="disable_xinput_for_shortcut">Tắt XInput (chỉ dùng chuột/bàn phím)</string>
     <string name="fullscreen_stretched">Toàn màn hình (kéo giãn)</string>
-    <string name="export_container">Export Container</string>
-    <string name="exporting_container">Exporting Container...</string>
+    <string name="export_container">Xuất môi trường chạy</string>
+    <string name="exporting_container">Đang xuất môi trường chạy…</string>
 
     <string name="brightness">Độ sáng</string>
     <string name="contrast">Độ tương phản</string>
     <string name="gamma">Gamma</string>
     <string name="color_adjustment">Chỉnh màu</string>
-    <string name="enable_fxaa">Enable FXAA</string>
-    <string name="enable_crt_shader">Enable CRT Shader</string>
+    <string name="enable_fxaa">Bật FXAA</string>
+    <string name="enable_crt_shader">Bật hiệu ứng CRT</string>
 
     <string name="do_you_want_to_add_a_new_profile">Thêm hồ sơ mới?</string>
 
@@ -481,8 +481,8 @@
 
     <string name="screen_effect">Hiệu ứng màn hình</string>
 
-    <string name="enable_toon_shader">Enable Toon Shader</string>
-    <string name="enable_ntsc_effect">Enable NTSC Effect</string>
+    <string name="enable_toon_shader">Bật hiệu ứng hoạt hình</string>
+    <string name="enable_ntsc_effect">Bật hiệu ứng NTSC</string>
     <string name="enter_profile_name">Nhập tên hồ sơ</string>
 
     <!-- In res/values/strings.xml -->
@@ -498,173 +498,173 @@
     <string name="invert_x_axis_right">Đảo trục X (cần phải)</string>
     <string name="invert_y_axis_right">Đảo trục Y (cần phải)</string>
     <string name="save">Lưu</string>
-    <string name="use_xr">Use OpenXR integration</string>
+    <string name="use_xr">Dùng tích hợp OpenXR</string>
 
 
 
     <string name="not_connected">Chưa kết nối</string>
-    <string name="preferences_button_text">   PREFERENCES   </string>
-    <string name="help_button_text">   HELP   </string>
-    <string name="exit_button_text">   EXIT   </string>
-    <string name="extra_keys_config_desc">Here you can set value of extra-keys variable like in Termux app (read <a href="http://wiki.termux.com/wiki/Touch_Keyboard#Extra_Keys_Row">this</a>) and more \n
-E.g. <b>META</b> for <i>META key</i>, \n
-<b>KEYBOARD</b> for <i>soft keyboard toggling key</i>, \n
-<b>PREFERENCES</b> for <i>preferences opening key</i>, \n
-<b>MOUSE_HELPER</b> for <i>mouse helper toggling key</i>, \n
-<b>STYLUS_HELPER</b> for <i>stylus click override overlay toggling key</i>, \n
-<b>EXIT</b> for <i>application exit key</i>.</string>
-    <string name="notification_content_text">Pull down to show options</string>
-    <string name="notification_open_preferences">Preferences</string>
-    <string name="notification_exit">Exit</string>
-    <string name="notification_restart_activity">Restart</string>
-    <string name="notification_toggle_soft_keyboard">Toggle IME</string>
-    <string name="notification_toggle_additional_key_bar">Toggle additional keyboard</string>
-    <string name="notification_release_pointer_and_keyboard_capture">Release captures</string>
-    <string name="notification_toggle_fullscreen">Toggle fullscreen</string>
+    <string name="preferences_button_text">   TÙY CHỌN   </string>
+    <string name="help_button_text">   TRỢ GIÚP   </string>
+    <string name="exit_button_text">   THOÁT   </string>
+    <string name="extra_keys_config_desc">Tại đây bạn có thể đặt giá trị biến extra-keys giống ứng dụng Termux (đọc <a href="http://wiki.termux.com/wiki/Touch_Keyboard#Extra_Keys_Row">tại đây</a>) và thêm nữa \n
+VD: <b>META</b> cho <i>phím META</i>, \n
+<b>KEYBOARD</b> cho <i>phím bật/tắt bàn phím ảo</i>, \n
+<b>PREFERENCES</b> cho <i>phím mở tùy chọn</i>, \n
+<b>MOUSE_HELPER</b> cho <i>phím bật/tắt hỗ trợ chuột</i>, \n
+<b>STYLUS_HELPER</b> cho <i>phím bật/tắt lớp phủ click bằng bút</i>, \n
+<b>EXIT</b> cho <i>phím thoát ứng dụng</i>.</string>
+    <string name="notification_content_text">Kéo xuống để xem tùy chọn</string>
+    <string name="notification_open_preferences">Tùy chọn</string>
+    <string name="notification_exit">Thoát</string>
+    <string name="notification_restart_activity">Khởi động lại</string>
+    <string name="notification_toggle_soft_keyboard">Bật/tắt bàn phím ảo</string>
+    <string name="notification_toggle_additional_key_bar">Bật/tắt bàn phím phụ</string>
+    <string name="notification_release_pointer_and_keyboard_capture">Nhả chuột và bàn phím</string>
+    <string name="notification_toggle_fullscreen">Bật/tắt toàn màn hình</string>
 
-    <string name="pref_main">Preferences</string>
-    <string name="pref_output">Output</string>
-    <string name="pref_pointer">Pointer</string>
-    <string name="pref_kbd">Keyboard</string>
-    <string name="pref_other">Other</string>
-    <string name="pref_version">Version</string>
-    <string name="pref_ekbar">Extra key bar preferences</string>
-    <string name="pref_userActions">Response to user actions</string>
+    <string name="pref_main">Tùy chọn</string>
+    <string name="pref_output">Hiển thị</string>
+    <string name="pref_pointer">Con trỏ</string>
+    <string name="pref_kbd">Bàn phím</string>
+    <string name="pref_other">Khác</string>
+    <string name="pref_version">Phiên bản</string>
+    <string name="pref_ekbar">Tùy chọn thanh phím phụ</string>
+    <string name="pref_userActions">Phản hồi thao tác người dùng</string>
 
-    <string name="pref_displayResolutionMode">Display resolution mode</string>
-    <string name="pref_displayScale">Display scale, %</string>
-    <string name="pref_displayResolutionExact">Display resolution</string>
-    <string name="pref_displayResolutionCustom">Display resolution</string>
-    <string name="pref_adjustResolution">Adjust the set resolution to fit screen orientation</string>
-    <string name="pref_displayStretch">Stretch to fit display</string>
-    <string name="pref_Reseed">Reseed screen while soft keyboard is open</string>
-    <string name="pref_Reseed_summary">The screen size will be adjusted while Soft Keyboard is open.</string>
-    <string name="pref_PIP">PIP mode</string>
-    <string name="pref_PIP_summary">Show app in picture-in-picture mode when home button or recents button is pressed</string>
-    <string name="pref_fullscreen">Fullscreen</string>
-    <string name="pref_fullscreen_summary">Toggle immersive mode in your device display</string>
-    <string name="pref_forceOrientation">Screen orientation</string>
-    <string name="pref_hideCutout">Hide display cutout (if any)</string>
-    <string name="pref_keepScreenOn">Keep Screen On</string>
+    <string name="pref_displayResolutionMode">Chế độ độ phân giải</string>
+    <string name="pref_displayScale">Tỉ lệ hiển thị, %</string>
+    <string name="pref_displayResolutionExact">Độ phân giải</string>
+    <string name="pref_displayResolutionCustom">Độ phân giải</string>
+    <string name="pref_adjustResolution">Tự chỉnh độ phân giải theo hướng màn hình</string>
+    <string name="pref_displayStretch">Kéo giãn vừa màn hình</string>
+    <string name="pref_Reseed">Đổi kích thước màn hình khi mở bàn phím ảo</string>
+    <string name="pref_Reseed_summary">Kích thước màn hình sẽ được chỉnh lại khi bàn phím ảo đang mở.</string>
+    <string name="pref_PIP">Chế độ PIP</string>
+    <string name="pref_PIP_summary">Hiện ứng dụng dạng cửa sổ nổi khi bấm nút Home hoặc nút đa nhiệm</string>
+    <string name="pref_fullscreen">Toàn màn hình</string>
+    <string name="pref_fullscreen_summary">Bật/tắt chế độ toàn màn hình trên thiết bị</string>
+    <string name="pref_forceOrientation">Hướng màn hình</string>
+    <string name="pref_hideCutout">Ẩn phần tai thỏ (nếu có)</string>
+    <string name="pref_keepScreenOn">Giữ màn hình luôn sáng</string>
 
-    <string name="pref_touchMode">Touchscreen input mode</string>
-    <string name="pref_scaleTouchpad">Apply display scale factor to touchpad</string>
-    <string name="pref_showStylusClickOverride">Show stylus click options</string>
-    <string name="pref_showStylusClickOverride_summary">Stylus touch override, left, middle or right click (stylus only)</string>
-    <string name="pref_stylusIsMouse">Enable stylus mouse mode</string>
-    <string name="pref_stylusIsMouse_summary">Make your stylus work like a mouse. When activated, stylus will only move the cursor and send mouse clicks, ignoring pressure, angle, and tilt.</string>
-    <string name="pref_stylusButtonContactModifierMode">Stylus button contact modifier mode</string>
-    <string name="pref_stylusButtonContactModifierMode_summary">Enable this option to send right or middle mouse buttons only when stylus touches the screen while the button is pressed.</string>
-    <string name="pref_showMouseHelper">Show mouse click helper overlay</string>
-    <string name="pref_showMouseHelper_summary">Onscreen mouse buttons usable with touchpad</string>
-    <string name="pref_pointerCapture">Capture external pointer devices when possible</string>
-    <string name="pref_pointerCapture_summary">Intercept all hardware pointer events. Pointer is back to Android after pressing Escape key.</string>
-    <string name="pref_transformCapturedPointer">Transform captured pointer movements</string>
-    <string name="pref_capturedPointerSpeedFactor">Captured pointer speed factor, %</string>
-    <string name="pref_tapToMove">Enable tap-to-move for touchpads</string>
+    <string name="pref_touchMode">Chế độ cảm ứng</string>
+    <string name="pref_scaleTouchpad">Áp dụng tỉ lệ hiển thị cho touchpad</string>
+    <string name="pref_showStylusClickOverride">Hiện tùy chọn click bằng bút</string>
+    <string name="pref_showStylusClickOverride_summary">Ghi đè chạm bút thành click trái, giữa hoặc phải (chỉ với bút)</string>
+    <string name="pref_stylusIsMouse">Bật chế độ bút làm chuột</string>
+    <string name="pref_stylusIsMouse_summary">Cho bút hoạt động như chuột. Khi bật, bút chỉ di chuyển con trỏ và gửi click chuột, bỏ qua lực nhấn, góc và độ nghiêng.</string>
+    <string name="pref_stylusButtonContactModifierMode">Chế độ nút bút khi chạm</string>
+    <string name="pref_stylusButtonContactModifierMode_summary">Bật để chỉ gửi click chuột phải hoặc giữa khi bút chạm màn hình trong lúc giữ nút.</string>
+    <string name="pref_showMouseHelper">Hiện lớp phủ hỗ trợ click chuột</string>
+    <string name="pref_showMouseHelper_summary">Nút chuột trên màn hình dùng cùng touchpad</string>
+    <string name="pref_pointerCapture">Chiếm chuột ngoài khi có thể</string>
+    <string name="pref_pointerCapture_summary">Nhận mọi sự kiện chuột phần cứng. Bấm phím Esc để trả chuột lại cho Android.</string>
+    <string name="pref_transformCapturedPointer">Biến đổi chuyển động chuột đã chiếm</string>
+    <string name="pref_capturedPointerSpeedFactor">Tốc độ chuột đã chiếm, %</string>
+    <string name="pref_tapToMove">Chạm để di chuyển trên touchpad</string>
 
-    <string name="pref_showAdditionalKbd">Show additional keyboard</string>
-    <string name="pref_showAdditionalKbd_summary">Show keyboard with additional keys.</string>
-    <string name="pref_showIMEWhileExternalConnected">Show IME with external keyboard</string>
-    <string name="pref_showIMEWhileExternalConnected_summary">Show software keyboard while hardware keyboard is connected.</string>
-    <string name="pref_preferScancodes">Prefer scancodes when possible</string>
-    <string name="pref_preferScancodes_summary">Let X server handle hardware keyboard layout (with DE settings or setxkbmap).</string>
-    <string name="pref_hardwareKbdScancodesWorkaround">Hardware keyboard scancodes workaround</string>
-    <string name="pref_hardwareKbdScancodesWorkaround_summary">Fixes scancodes on some devices. Might cause problems with multiple layouts.</string>
-    <string name="pref_dexMetaKeyCapture">Intercept system shortcuts</string>
-    <string name="pref_dexMetaKeyCapture_summary">Samsung Dex only. Allows interception of &quot;Alt+F4&quot;, &quot;Meta+D&quot;, &quot;Meta+E&quot;, etc.</string>
-    <string name="pref_enableAccessibilityService">Enable Accessibility service for intercepting system shortcuts manually.</string>
-    <string name="pref_enableAccessibilityService_summary">Open Accessibility settings.</string>
-    <string name="pref_enableAccessibilityServiceAutomatically">Enable Accessibility service for intercepting system shortcuts automatically.</string>
-    <string name="pref_enableAccessibilityServiceAutomatically_summary">Requires WRITE_SECURE_SETTINGS permission.</string>
-    <string name="pref_pauseKeyInterceptingWithEsc">Pause key intercepting with Esc key</string>
-    <string name="pref_filterOutWinkey">Filter out intercepted Win (Meta/Mod4) key.</string>
-    <string name="pref_filterOutWinkey_summary">Allows you to use Dex shortcuts while intercepting. Requires Accessibility service to work.</string>
-    <string name="pref_enableGboardCJK">Workaround to enable CJK Gboard</string>
-    <string name="pref_enableGboardCJK_summary">May require Android 14 and Gboard 14</string>
+    <string name="pref_showAdditionalKbd">Hiện bàn phím phụ</string>
+    <string name="pref_showAdditionalKbd_summary">Hiện bàn phím có thêm các phím phụ.</string>
+    <string name="pref_showIMEWhileExternalConnected">Hiện bàn phím ảo khi có bàn phím ngoài</string>
+    <string name="pref_showIMEWhileExternalConnected_summary">Hiện bàn phím ảo khi đang cắm bàn phím thật.</string>
+    <string name="pref_preferScancodes">Ưu tiên scancode khi có thể</string>
+    <string name="pref_preferScancodes_summary">Để X server xử lý bố cục bàn phím thật (qua cài đặt DE hoặc setxkbmap).</string>
+    <string name="pref_hardwareKbdScancodesWorkaround">Sửa lỗi scancode bàn phím thật</string>
+    <string name="pref_hardwareKbdScancodesWorkaround_summary">Sửa scancode trên một số máy. Có thể gây lỗi khi dùng nhiều bố cục.</string>
+    <string name="pref_dexMetaKeyCapture">Chặn phím tắt hệ thống</string>
+    <string name="pref_dexMetaKeyCapture_summary">Chỉ cho Samsung Dex. Cho phép chặn &quot;Alt+F4&quot;, &quot;Meta+D&quot;, &quot;Meta+E&quot;, v.v.</string>
+    <string name="pref_enableAccessibilityService">Bật dịch vụ Trợ năng để chặn phím tắt hệ thống thủ công.</string>
+    <string name="pref_enableAccessibilityService_summary">Mở cài đặt Trợ năng.</string>
+    <string name="pref_enableAccessibilityServiceAutomatically">Tự động bật dịch vụ Trợ năng để chặn phím tắt hệ thống.</string>
+    <string name="pref_enableAccessibilityServiceAutomatically_summary">Cần quyền WRITE_SECURE_SETTINGS.</string>
+    <string name="pref_pauseKeyInterceptingWithEsc">Tạm dừng chặn phím bằng phím Esc</string>
+    <string name="pref_filterOutWinkey">Lọc bỏ phím Win (Meta/Mod4) bị chặn.</string>
+    <string name="pref_filterOutWinkey_summary">Cho phép dùng phím tắt Dex khi đang chặn. Cần dịch vụ Trợ năng.</string>
+    <string name="pref_enableGboardCJK">Mẹo bật Gboard CJK</string>
+    <string name="pref_enableGboardCJK_summary">Có thể cần Android 14 và Gboard 14</string>
 
-    <string name="pref_clipboardEnable">Clipboard sharing</string>
-    <string name="pref_requestNotificationPermission">Request notification permission</string>
-    <string name="pref_xrMode">Meta Oculus XR mode</string>
-    <string name="pref_configureResponseToUserActions">Configure response to user actions</string>
-    <string name="pref_storeSecondaryDisplayPreferencesSeparately">Store preferences for secondary displays separately</string>
-    <string name="pref_storeSecondaryDisplayPreferencesSeparately_summary">Open this screen on display you want to configure</string>
+    <string name="pref_clipboardEnable">Chia sẻ bộ nhớ tạm</string>
+    <string name="pref_requestNotificationPermission">Xin quyền thông báo</string>
+    <string name="pref_xrMode">Chế độ XR Meta Oculus</string>
+    <string name="pref_configureResponseToUserActions">Cấu hình phản hồi thao tác người dùng</string>
+    <string name="pref_storeSecondaryDisplayPreferencesSeparately">Lưu tùy chọn riêng cho màn hình phụ</string>
+    <string name="pref_storeSecondaryDisplayPreferencesSeparately_summary">Mở màn hình này trên màn hình bạn muốn cấu hình</string>
 
-    <string name="pref_adjustHeightForEK">Adjust display height for extra keys bar</string>
-    <string name="pref_adjustHeightForEK_summary">May cause screen flickering during toggling EK bar.</string>
-    <string name="pref_useTermuxEKBarBehaviour">Deactivate special keys on additional key bar after each keypress</string>
-    <string name="pref_useTermuxEKBarBehaviour_summary">Use long-tap to lock special keys</string>
-    <string name="pref_opacityEKBar">Opacity of extra keys bar, %</string>
-    <string name="pref_extra_keys_config">Extra keys config</string>
+    <string name="pref_adjustHeightForEK">Chỉnh chiều cao màn hình cho thanh phím phụ</string>
+    <string name="pref_adjustHeightForEK_summary">Có thể làm màn hình nháy khi bật/tắt thanh phím phụ.</string>
+    <string name="pref_useTermuxEKBarBehaviour">Nhả phím đặc biệt trên thanh phím phụ sau mỗi lần bấm</string>
+    <string name="pref_useTermuxEKBarBehaviour_summary">Nhấn giữ để khóa phím đặc biệt</string>
+    <string name="pref_opacityEKBar">Độ mờ thanh phím phụ, %</string>
+    <string name="pref_extra_keys_config">Cấu hình phím phụ</string>
 
-    <string name="pref_swipeUpAction">Three finger swipe up</string>
-    <string name="pref_swipeDownAction">Three finger swipe down</string>
-    <string name="pref_volumeUpAction">Volume up</string>
-    <string name="pref_volumeDownAction">Volume down</string>
-    <string name="pref_backButtonAction">Back button</string>
-    <string name="pref_notificationTapAction">Notification tap</string>
-    <string name="pref_notificationButton0Action">Notification first button</string>
-    <string name="pref_notificationButton1Action">Notification second button</string>
-    <string name="pref_mediaKeysAction">Media keys</string>
+    <string name="pref_swipeUpAction">Vuốt ba ngón lên</string>
+    <string name="pref_swipeDownAction">Vuốt ba ngón xuống</string>
+    <string name="pref_volumeUpAction">Tăng âm lượng</string>
+    <string name="pref_volumeDownAction">Giảm âm lượng</string>
+    <string name="pref_backButtonAction">Nút Quay lại</string>
+    <string name="pref_notificationTapAction">Chạm thông báo</string>
+    <string name="pref_notificationButton0Action">Nút thứ nhất của thông báo</string>
+    <string name="pref_notificationButton1Action">Nút thứ hai của thông báo</string>
+    <string name="pref_mediaKeysAction">Phím đa phương tiện</string>
 
-    <string name="pref_summary_requiresExactOrCustom">Requires "display resolution mode" to be "exact" or "custom"</string>
-    <string name="pref_summary_requiresIntercepting">Requires intercepting system shortcuts with Dex mode or with Accessibility service</string>
-    <string name="pref_summary_requiresTrackpadAndNative">Requires "Touchscreen input mode" to be "Trackpad" and "Display resolution mode" to be not "native"</string>
+    <string name="pref_summary_requiresExactOrCustom">Cần đặt \"Chế độ độ phân giải\" là \"exact\" hoặc \"custom\"</string>
+    <string name="pref_summary_requiresIntercepting">Cần chặn phím tắt hệ thống bằng chế độ Dex hoặc dịch vụ Trợ năng</string>
+    <string name="pref_summary_requiresTrackpadAndNative">Cần đặt \"Chế độ cảm ứng\" là \"Touchpad\" và \"Chế độ độ phân giải\" khác \"native\"</string>
     <string name="fexcore_config">FEXCore</string>
-    <string name="fexcore_preset">FEXCore Preset</string>
-    <string name="installed_driver">Installed Driver</string>
-    <string name="driver_repositories">Driver Repositories</string>
-    <string name="check_for_driver_updates">Check for driver updates</string>
-    <string name="install_driver_from_file">Install Driver from File</string>
-    <string name="adrenotools_gpu_drivers">Adrenotools GPU Drivers</string>
-    <string name="install_drivers">Install Drivers</string>
-    <string name="install_drivers_message">You will now be prompted to pick a driver. These must be the same ones used in other emulators like Yuzu, Dolphin, Citra, etc.</string>
-    <string name="install_drivers_warning">Be warned that because of limitations of current PC emulators, Qualcomm Drivers may not work on chipsets below 8 Gen2 without getting patched.</string>
-    <string name="enable_vulkan_api_dump">Enable dumping of Vulkan api calls to file.</string>
-    <string name="dll_emulator">32bit Emulator</string>
-    <string name="open_with_android_browser">Open Android Browser in Wine</string>
-    <string name="share_android_clipboard">Share Android Clipboard with Wine</string>
+    <string name="fexcore_preset">Preset FEXCore</string>
+    <string name="installed_driver">Driver đã cài</string>
+    <string name="driver_repositories">Kho driver</string>
+    <string name="check_for_driver_updates">Kiểm tra cập nhật driver</string>
+    <string name="install_driver_from_file">Cài driver từ file</string>
+    <string name="adrenotools_gpu_drivers">Driver GPU Adrenotools</string>
+    <string name="install_drivers">Cài driver</string>
+    <string name="install_drivers_message">Bạn sẽ được yêu cầu chọn một driver. Đây phải là driver dùng cho các giả lập khác như Yuzu, Dolphin, Citra…</string>
+    <string name="install_drivers_warning">Lưu ý: do giới hạn của giả lập PC hiện nay, driver Qualcomm có thể không chạy trên chip thấp hơn 8 Gen2 nếu chưa được vá.</string>
+    <string name="enable_vulkan_api_dump">Ghi lại các lệnh gọi API Vulkan ra file.</string>
+    <string name="dll_emulator">Giả lập 32-bit</string>
+    <string name="open_with_android_browser">Mở trình duyệt Android từ Wine</string>
+    <string name="share_android_clipboard">Chia sẻ bộ nhớ tạm Android với Wine</string>
     <string name="ddraw_wrapper">DDraw Wrapper</string>
-    <string name="fexcore_version">FEXCore Version</string>
-    <string name="graphics_driver_max_device_memory">Max Device Memory</string>
-    <string name="graphics_driver_sync_frame">Sync Every Frame</string>
-    <string name="graphics_driver_disable_present_wait">Disable KHR_present_wait</string>
-    <string name="graphics_driver_present_modes">Present Modes</string>
-    <string name="graphics_driver_resource_type">Memory Resource Type</string>
-    <string name="graphics_driver_vulkan_version">Vulkan Version</string>
-    <string name="graphics_driver_bcn_emulation">BCn Emulation</string>
-    <string name="graphics_driver_bcn_emulation_type">BCn Emulation Type</string>
-    <string name="graphics_driver_bcn_emulation_cache">BCn Emulation Cache</string>
+    <string name="fexcore_version">Phiên bản FEXCore</string>
+    <string name="graphics_driver_max_device_memory">Bộ nhớ thiết bị tối đa</string>
+    <string name="graphics_driver_sync_frame">Đồng bộ mỗi khung hình</string>
+    <string name="graphics_driver_disable_present_wait">Tắt KHR_present_wait</string>
+    <string name="graphics_driver_present_modes">Chế độ trình chiếu</string>
+    <string name="graphics_driver_resource_type">Loại tài nguyên bộ nhớ</string>
+    <string name="graphics_driver_vulkan_version">Phiên bản Vulkan</string>
+    <string name="graphics_driver_bcn_emulation">Giả lập BCn</string>
+    <string name="graphics_driver_bcn_emulation_type">Kiểu giả lập BCn</string>
+    <string name="graphics_driver_bcn_emulation_cache">Bộ đệm giả lập BCn</string>
     <string name="vkbasalt">vkBasalt</string>
-    <string name="vkbasalt_sharpness_effects">Sharpness Effect</string>
-    <string name="vkbasalt_sharpness_level">Sharpness Level</string>
-    <string name="num_controllers">Number of Controllers</string>
-    <string name="vkbasalt_sharpness_denoise">Sharpeness Denoise</string>
+    <string name="vkbasalt_sharpness_effects">Hiệu ứng làm nét</string>
+    <string name="vkbasalt_sharpness_level">Mức làm nét</string>
+    <string name="num_controllers">Số tay cầm</string>
+    <string name="vkbasalt_sharpness_denoise">Khử nhiễu khi làm nét</string>
     <string name="shutdown">Tắt</string>
     <string name="disable_mouse">Bật/tắt chuột</string>
     <string name="installing_wine_files">Đang cài file Wine...</string>
     <string name="installing_drivers_files">Đang cài file driver hệ thống...</string>
     <string name="high_refresh_rate">Bật tần số quét cao</string>
     <string name="pause_resume_wine">Tạm dừng game khi ứng dụng chạy nền</string>
-    <string name="release_protons">Release Protons</string>
-    <string name="available_protons">Available Protons</string>
-    <string name="download_from_contents">Download from Contents</string>
-    <string name="select_local_file">Select Local File</string>
-    <string name="download_proton">Download Proton</string>
-    <string name="delete_proton">Delete Proton</string>
-    <string name="select_proton">Select Proton</string>
-    <string name="downloading_proton">Downloading Proton…</string>
-    <string name="unable_to_install_proton">Unable to install Proton</string>
-    <string name="no_protons_to_delete">No removable Proton is selected</string>
-    <string name="download_proton_description">Install a GitHub release Proton package</string>
-    <string name="download_from_contents_description">Browse Proton or Wine packages from Contents</string>
-    <string name="select_local_file_description">Install a Proton or Wine package from storage</string>
-    <string name="delete_proton_description">Remove the selected installed package</string>
-    <string name="proton_package_installed">Installed</string>
-    <string name="proton_package_not_installed">Tap to download and install</string>
+    <string name="release_protons">Bản phát hành Proton</string>
+    <string name="available_protons">Proton có sẵn</string>
+    <string name="download_from_contents">Tải từ Thành phần</string>
+    <string name="select_local_file">Chọn file trên máy</string>
+    <string name="download_proton">Tải Proton</string>
+    <string name="delete_proton">Xóa Proton</string>
+    <string name="select_proton">Chọn Proton</string>
+    <string name="downloading_proton">Đang tải Proton…</string>
+    <string name="unable_to_install_proton">Không cài được Proton</string>
+    <string name="no_protons_to_delete">Chưa chọn Proton nào có thể xóa</string>
+    <string name="download_proton_description">Cài gói Proton từ bản phát hành GitHub</string>
+    <string name="download_from_contents_description">Duyệt các gói Proton hoặc Wine trong Thành phần</string>
+    <string name="select_local_file_description">Cài gói Proton hoặc Wine từ bộ nhớ máy</string>
+    <string name="delete_proton_description">Xóa gói đã cài đang chọn</string>
+    <string name="proton_package_installed">Đã cài</string>
+    <string name="proton_package_not_installed">Chạm để tải và cài</string>
     <string name="install">Cài</string>
     <string name="select">Chọn</string>
-    <string name="wine_version_locked_for_existing_container">Wine version is locked for existing containers</string>
+    <string name="wine_version_locked_for_existing_container">Không đổi được phiên bản Wine của môi trường chạy đã tạo</string>
     <string name="library">Thư viện</string>
     <string name="configure_container">Cấu hình môi trường chạy</string>
     <string name="launch_environment">Mở môi trường chạy</string>
@@ -672,7 +672,7 @@ E.g. <b>META</b> for <i>META key</i>, \n
     <string name="storage">Bộ nhớ</string>
     <string name="quick_settings">Cài đặt nhanh</string>
     <string name="advanced_settings">Cài đặt nâng cao</string>
-    <string name="global_compatibility_profile">Global Compatibility Profile</string>
+    <string name="global_compatibility_profile">Cấu hình tương thích chung</string>
     <string name="profile_compatibility">Tương thích</string>
     <string name="profile_balanced">Cân bằng</string>
     <string name="profile_performance">Hiệu năng</string>

@@ -34,7 +34,7 @@ public final class OrientationOverflowView extends AppCompatImageButton {
         super(activity);
         this.activity = activity;
         setImageResource(R.drawable.ui_ic_more);
-        setContentDescription("More");
+        setContentDescription("Thêm");
         setScaleType(ScaleType.CENTER_INSIDE);
         setPadding(dp(11), dp(11), dp(11), dp(11));
         setMinimumWidth(dp(48));
@@ -75,7 +75,7 @@ public final class OrientationOverflowView extends AppCompatImageButton {
         popup.setClippingEnabled(true);
 
         content.addView(createRow(
-                "Lock screen orientation",
+                "Khóa hướng màn hình",
                 activity.isOrientationLocked(),
                 false,
                 v -> {
@@ -84,7 +84,7 @@ public final class OrientationOverflowView extends AppCompatImageButton {
                 }
         ));
         content.addView(createRow(
-                "Vertical mode",
+                "Chế độ dọc",
                 activity.isVerticalModeEnabled(),
                 true,
                 v -> {
@@ -93,7 +93,7 @@ public final class OrientationOverflowView extends AppCompatImageButton {
                 }
         ));
         content.addView(createRow(
-                "Horizontal mode",
+                "Chế độ ngang",
                 activity.isHorizontalModeEnabled(),
                 true,
                 v -> {

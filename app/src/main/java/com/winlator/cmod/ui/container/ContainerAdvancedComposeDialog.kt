@@ -144,7 +144,7 @@ private fun AdvancedContainerScreen(containerId: Int, onCancel: () -> Unit, onSa
     val context = androidx.compose.ui.platform.LocalContext.current
     val container = remember(containerId) { ContainerManager(context).getContainerById(containerId) } ?: return
     var tab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Environment", "Components", "Startup & Input", "CPU")
+    val tabs = listOf("Biến môi trường", "Thành phần", "Khởi động & điều khiển", "CPU")
 
     val envRows = remember(container.getEnvVars()) {
         mutableStateListOf<AdvancedEnvEntry>().apply { addAll(parseAdvancedEnv(container.getEnvVars())) }
@@ -176,9 +176,9 @@ private fun AdvancedContainerScreen(containerId: Int, onCancel: () -> Unit, onSa
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
         ) {
             Column(Modifier.fillMaxSize().padding(16.dp)) {
-                Text("Advanced", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
+                Text("Nâng cao", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Environment, Windows components, startup, game controller and processor affinity",
+                    "Biến môi trường, thành phần Windows, khởi động, tay cầm và chọn nhân CPU",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
@@ -241,7 +241,7 @@ private fun AdvancedContainerScreen(containerId: Int, onCancel: () -> Unit, onSa
                     modifier = Modifier.fillMaxWidth().padding(top = 14.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    TextButton(onClick = onCancel, modifier = Modifier.weight(1f)) { Text("Cancel") }
+                    TextButton(onClick = onCancel, modifier = Modifier.weight(1f)) { Text("Hủy") }
                     Button(
                         onClick = {
                             container.setEnvVars(envRows.joinToString(" ") {
@@ -263,7 +263,7 @@ private fun AdvancedContainerScreen(containerId: Int, onCancel: () -> Unit, onSa
                             onSaved()
                         },
                         modifier = Modifier.weight(1f)
-                    ) { Text("Save") }
+                    ) { Text("Lưu") }
                 }
             }
         }
@@ -289,7 +289,7 @@ private fun AdvancedEnvironmentPage(rows: MutableList<AdvancedEnvEntry>) {
             ) {
                 Icon(Icons.Outlined.Add, null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.size(7.dp))
-                Text("Add variable")
+                Text("Thêm biến")
             }
         }
     }
@@ -303,14 +303,14 @@ private fun AdvancedEnvironmentPage(rows: MutableList<AdvancedEnvEntry>) {
                     val clean = name.trim().replace(" ", "")
                     if (clean.isNotEmpty() && rows.none { it.name == clean }) rows.add(AdvancedEnvEntry(clean, value.trim()))
                     addOpen = false
-                }) { Text("Add") }
+                }) { Text("Thêm") }
             },
-            dismissButton = { TextButton(onClick = { addOpen = false }) { Text("Cancel") } },
-            title = { Text("Add environment variable") },
+            dismissButton = { TextButton(onClick = { addOpen = false }) { Text("Hủy") } },
+            title = { Text("Thêm biến môi trường") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                    OutlinedTextField(name, { name = it }, label = { Text("Name") }, singleLine = true)
-                    OutlinedTextField(value, { value = it }, label = { Text("Value") }, singleLine = true)
+                    OutlinedTextField(name, { name = it }, label = { Text("Tên") }, singleLine = true)
+                    OutlinedTextField(value, { value = it }, label = { Text("Giá trị") }, singleLine = true)
                 }
             }
         )
@@ -330,7 +330,7 @@ private fun AdvancedEnvRow(item: AdvancedEnvEntry, onValue: (String) -> Unit, on
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
-            IconButton(onClick = onRemove) { Icon(Icons.Outlined.Delete, "Remove") }
+            IconButton(onClick = onRemove) { Icon(Icons.Outlined.Delete, "Xóa") }
             if (spec.kind == AdvancedEnvKind.CHECKBOX) {
                 val off = spec.options.getOrElse(0) { "0" }
                 val on = spec.options.getOrElse(1) { "1" }
@@ -357,7 +357,7 @@ private fun AdvancedEnvRow(item: AdvancedEnvEntry, onValue: (String) -> Unit, on
 
 @Composable
 private fun AdvancedComponentsPage(values: MutableMap<String, Int>) {
-    val entries = listOf("Builtin (Wine)", "Native (Windows)")
+    val entries = listOf("Có sẵn (Wine)", "Gốc (Windows)")
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp)) {
         items(componentRows) { (key, label) ->
             val selected = (values[key] ?: 0).coerceIn(0, 1)
@@ -379,26 +379,26 @@ private fun AdvancedStartupInputPage(
     onDInput: (Boolean) -> Unit
 ) {
     val startupEntries = listOf(
-        "Normal (Load all services)",
-        "Essential (Load only essential services)",
-        "Aggressive (Stop services on startup)"
+        "Bình thường (tải mọi dịch vụ)",
+        "Thiết yếu (chỉ tải dịch vụ cần thiết)",
+        "Tối giản (dừng dịch vụ khi khởi động)"
     )
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp)) {
         item {
-            Text("System", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 6.dp))
-            AdvancedChoice("Startup Selection", startupEntries[startup.coerceIn(0, 2)], startupEntries) {
+            Text("Hệ thống", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 6.dp))
+            AdvancedChoice("Chế độ khởi động", startupEntries[startup.coerceIn(0, 2)], startupEntries) {
                 onStartup(startupEntries.indexOf(it).coerceAtLeast(0))
             }
         }
         item { HorizontalDivider(Modifier.padding(vertical = 10.dp)) }
         item {
-            Text("Game Controller", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 6.dp))
-            AdvancedToggle("Enable XInput for Games in Wine", xinput, exclusive, onXInput)
-            AdvancedToggle("Enable DInput for Games in Wine", dinput, exclusive, onDInput)
-            AdvancedToggle("Exclusive Input", exclusive, true, onExclusive)
+            Text("Tay cầm", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(bottom = 6.dp))
+            AdvancedToggle("Bật XInput cho game trong Wine", xinput, exclusive, onXInput)
+            AdvancedToggle("Bật DInput cho game trong Wine", dinput, exclusive, onDInput)
+            AdvancedToggle("Nhập độc quyền", exclusive, true, onExclusive)
             if (!exclusive) {
                 Text(
-                    "With Exclusive Input disabled, XInput and DInput stay enabled together, matching the classic editor.",
+                    "Khi tắt Nhập độc quyền, XInput và DInput sẽ cùng được bật, giống trình sửa cũ.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp)
@@ -411,13 +411,13 @@ private fun AdvancedStartupInputPage(
 @Composable
 private fun AdvancedCpuPage(sync: Boolean, onSync: (Boolean) -> Unit, cpu64: MutableList<Boolean>, cpu32: MutableList<Boolean>) {
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        item { AdvancedToggle("Sync with Wine", sync, true, onSync) }
+        item { AdvancedToggle("Đồng bộ với Wine", sync, true, onSync) }
         item {
-            Text("Processor Affinity", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text("Chọn nhân CPU", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             CpuSelector(cpu64)
         }
         item {
-            Text("Processor Affinity (32-bit apps)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text("Chọn nhân CPU (ứng dụng 32-bit)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             CpuSelector(cpu32)
         }
     }
@@ -492,7 +492,7 @@ private fun AdvancedMultiChoice(selected: String, entries: List<String>, onSelec
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 11.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(selected.ifBlank { "None" }, modifier = Modifier.weight(1f), maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(selected.ifBlank { "Không có" }, modifier = Modifier.weight(1f), maxLines = 2, overflow = TextOverflow.Ellipsis)
             Icon(Icons.Outlined.KeyboardArrowDown, null)
         }
     }
@@ -502,8 +502,8 @@ private fun AdvancedMultiChoice(selected: String, entries: List<String>, onSelec
         }
         AlertDialog(
             onDismissRequest = { open = false },
-            confirmButton = { TextButton(onClick = { onSelected(draft.joinToString(",")); open = false }) { Text("Done") } },
-            dismissButton = { TextButton(onClick = { open = false }) { Text("Cancel") } },
+            confirmButton = { TextButton(onClick = { onSelected(draft.joinToString(",")); open = false }) { Text("Xong") } },
+            dismissButton = { TextButton(onClick = { open = false }) { Text("Hủy") } },
             text = {
                 LazyColumn(Modifier.heightIn(max = 430.dp)) {
                     items(entries) { option ->

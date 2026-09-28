@@ -151,25 +151,25 @@ public class SidebarCleanupView extends View implements SharedPreferences.OnShar
 
             addHudOptionRow(metrics,
                     "FPS", WinlatorHUD.SHOW_FPS,
-                    "Renderer", WinlatorHUD.SHOW_RENDERER);
+                    "Bộ dựng hình", WinlatorHUD.SHOW_RENDERER);
             addHudOptionRow(metrics,
-                    "GPU Usage", WinlatorHUD.SHOW_GPU_USAGE,
-                    "GPU Name", WinlatorHUD.SHOW_GPU_NAME);
+                    "Tải GPU", WinlatorHUD.SHOW_GPU_USAGE,
+                    "Tên GPU", WinlatorHUD.SHOW_GPU_NAME);
             addHudOptionRow(metrics,
-                    "CPU Usage", WinlatorHUD.SHOW_CPU_USAGE,
-                    "CPU Temp", WinlatorHUD.SHOW_CPU_TEMP);
+                    "Tải CPU", WinlatorHUD.SHOW_CPU_USAGE,
+                    "Nhiệt CPU", WinlatorHUD.SHOW_CPU_TEMP);
             addHudOptionRow(metrics,
                     "RAM", WinlatorHUD.SHOW_RAM,
-                    "Power", WinlatorHUD.SHOW_POWER);
+                    "Công suất", WinlatorHUD.SHOW_POWER);
             addHudOptionRow(metrics,
-                    "Battery Temp", WinlatorHUD.SHOW_BATTERY_TEMP,
-                    "Charge State", WinlatorHUD.SHOW_CHARGE_STATE);
+                    "Nhiệt pin", WinlatorHUD.SHOW_BATTERY_TEMP,
+                    "Trạng thái sạc", WinlatorHUD.SHOW_CHARGE_STATE);
 
             SharedPreferences hudPrefs = getContext().getSharedPreferences(
                     WinlatorHUD.PREFS, Context.MODE_PRIVATE);
             Switch dualCell = new Switch(getContext());
             dualCell.setTag("dual_cell");
-            dualCell.setText("Dual-cell correction");
+            dualCell.setText("Hiệu chỉnh pin 2 cell");
             dualCell.setTextColor(resolveColor(R.attr.ingameSidebarOnSurface, 0xFFFFFFFF));
             dualCell.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
             dualCell.setGravity(Gravity.CENTER_VERTICAL);

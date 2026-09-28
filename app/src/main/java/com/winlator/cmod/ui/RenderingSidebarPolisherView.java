@@ -25,7 +25,7 @@ import com.winlator.cmod.container.Container;
 
 public class RenderingSidebarPolisherView extends View {
     private static final String[] VULKAN_UPSCALERS = {
-            "SGSR", "FSR", "Lanczos 2", "Color Boost"
+            "SGSR", "FSR", "Lanczos 2", "Tăng màu"
     };
 
     private boolean applied;

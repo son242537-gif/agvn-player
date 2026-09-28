@@ -93,13 +93,13 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
     fun rescan() {
         if (busy) return
         busy = true
-        message = "Scanning common save locations…"
+        message = "Đang quét các vị trí lưu phổ biến…"
         scope.launch {
             roots = withContext(Dispatchers.IO) { GameSaveManager.rediscoverSaveRoots(shortcut) }
             message = if (roots.isEmpty()) {
                 "Chưa tìm thấy thư mục lưu riêng của game. Sao lưu thủ công sẽ lưu toàn bộ hồ sơ Wine."
             } else {
-                "Detected ${roots.size} save location${if (roots.size == 1) "" else "s"}."
+                "Tìm thấy ${roots.size} vị trí lưu game."
             }
             busy = false
         }
@@ -187,7 +187,7 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                 if (loading) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(modifier = Modifier.height(22.dp))
-                        Text("  Detecting…", style = MaterialTheme.typography.bodyMedium)
+                        Text("  Đang dò tìm…", style = MaterialTheme.typography.bodyMedium)
                     }
                 } else if (roots.isEmpty()) {
                     Text(
@@ -217,7 +217,7 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                         onClick = {
                             if (!busy) {
                                 busy = true
-                                message = "Backing up saves…"
+                                message = "Đang sao lưu…"
                                 scope.launch {
                                     val result = withContext(Dispatchers.IO) {
                                         GameSaveManager.backup(shortcut, false)
@@ -225,9 +225,9 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                                     refreshLatest()
                                     message = when {
                                         result.ok && result.wholeProfile ->
-                                            "Backup complete: ${result.fileCount} files. No per-game folder was detected, so the Wine profile was used."
-                                        result.ok -> "Backup complete: ${result.fileCount} files."
-                                        else -> "Backup failed: ${result.error ?: "unknown error"}"
+                                            "Sao lưu xong: ${result.fileCount} file. Không tìm thấy thư mục lưu riêng nên đã sao lưu cả hồ sơ Wine."
+                                        result.ok -> "Sao lưu xong: ${result.fileCount} file."
+                                        else -> "Sao lưu thất bại: ${result.error ?: "lỗi không rõ"}"
                                     }
                                     busy = false
                                 }
@@ -243,15 +243,15 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                         onClick = {
                             if (!busy) {
                                 busy = true
-                                message = "Restoring latest backup…"
+                                message = "Đang khôi phục bản sao lưu mới nhất…"
                                 scope.launch {
                                     val result = withContext(Dispatchers.IO) {
                                         GameSaveManager.restoreLatest(shortcut)
                                     }
                                     message = if (result.ok) {
-                                        "Restored ${result.fileCount} files."
+                                        "Đã khôi phục ${result.fileCount} file."
                                     } else {
-                                        "Restore failed: ${result.error ?: "unknown error"}"
+                                        "Khôi phục thất bại: ${result.error ?: "lỗi không rõ"}"
                                     }
                                     busy = false
                                 }

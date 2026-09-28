@@ -157,8 +157,8 @@ private class ContainerEditorStateV2(
     )
     var soundFont by mutableStateOf(editing?.getMIDISoundFont().orEmpty())
     var fullscreen by mutableStateOf(editing?.isFullscreenStretched ?: false)
-    var desktopTheme by mutableStateOf(if (editing?.desktopTheme.orEmpty().startsWith("LIGHT", true)) "Light" else "Dark")
-    var desktopBackground by mutableStateOf(if (editing?.desktopTheme.orEmpty().contains(",COLOR,", true)) "Solid Color" else "Image")
+    var desktopTheme by mutableStateOf(if (editing?.desktopTheme.orEmpty().startsWith("LIGHT", true)) "Sáng" else "Tối")
+    var desktopBackground by mutableStateOf(if (editing?.desktopTheme.orEmpty().contains(",COLOR,", true)) "Màu đơn" else "Hình ảnh")
     var wallpaperStamp by mutableStateOf(
         WineThemeManager.getUserWallpaperFile(context).takeIf { it.isFile }?.lastModified() ?: 0L
     )
@@ -330,8 +330,8 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
     val state = remember(editing?.id) { ContainerEditorStateV2(context, manager, editing) }
     val scope = rememberCoroutineScope()
 
-    var category by remember { mutableStateOf("General") }
-    val categories = listOf("General", "Video", "Compatibility", "Input", "Storage", "Environment", "Advanced")
+    var category by remember { mutableStateOf("Chung") }
+    val categories = listOf("Chung", "Hình ảnh", "Tương thích", "Điều khiển", "Ổ đĩa", "Môi trường", "Nâng cao")
     val landscape = LocalConfiguration.current.screenWidthDp > LocalConfiguration.current.screenHeightDp
     var revision by remember { mutableIntStateOf(0) }
     var installing by remember { mutableStateOf<Set<String>>(emptySet()) }
@@ -371,7 +371,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
     val graphicsEntries = remember { context.resources.getStringArray(R.array.graphics_driver_entries).toList() }
     val wrapperEntries = remember { context.resources.getStringArray(R.array.dxwrapper_entries).toList() }
     val audioEntries = remember { context.resources.getStringArray(R.array.audio_driver_entries).toList() }
-    val localeEntries = remember { listOf("Default") + context.resources.getStringArray(R.array.some_lc_all).toList() }
+    val localeEntries = remember { listOf("Mặc định") + context.resources.getStringArray(R.array.some_lc_all).toList() }
     val soundFonts = remember(revision) { loadContainerSoundFontsV2(context) }
     val gpuNames = remember { loadContainerGpuNamesV2(context) }
     val fexPresets = remember { FEXCorePresetManager.getPresets(context).associate { it.id to it.name } }
@@ -391,7 +391,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
         scope.launch {
             val installed = installRuntimeComponent(context, type, version)
             installing = installing - key
-            if (installed == null) Toast.makeText(context, "Unable to install $version", Toast.LENGTH_SHORT).show()
+            if (installed == null) Toast.makeText(context, "Không cài được $version", Toast.LENGTH_SHORT).show()
             else {
                 done(installed)
                 revision++
@@ -406,7 +406,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
         scope.launch {
             val installedId = installWineRuntimeComponent(context, option)
             installing = installing - key
-            if (installedId == null) Toast.makeText(context, "Unable to install ${option.label}", Toast.LENGTH_LONG).show()
+            if (installedId == null) Toast.makeText(context, "Không cài được ${option.label}", Toast.LENGTH_LONG).show()
             else {
                 state.runtime = installedId
                 contents.syncContents()
@@ -422,7 +422,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
         scope.launch {
             val installed = installAdrenoDriver(context, option)
             installing = installing - key
-            if (installed == null) Toast.makeText(context, "Unable to install ${option.label}", Toast.LENGTH_SHORT).show()
+            if (installed == null) Toast.makeText(context, "Không cài được ${option.label}", Toast.LENGTH_SHORT).show()
             else {
                 state.driverVersion = installed
                 state.graphics("version", installed)
@@ -501,7 +501,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
         if (creating || state.runtime.isBlank()) return
         val wineInfo = WineInfo.fromIdentifier(context, contents, state.runtime)
         if (wineInfo.path.isNullOrBlank()) {
-            Toast.makeText(context, "Selected Wine/Proton is not installed.", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Wine/Proton đã chọn chưa được cài.", Toast.LENGTH_LONG).show()
             return
         }
         creating = true
@@ -560,7 +560,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
             }
             manager.createContainerAsync(data, contents) { created ->
                 creating = false
-                if (created == null) Toast.makeText(context, "Unable to create container.", Toast.LENGTH_LONG).show()
+                if (created == null) Toast.makeText(context, "Không tạo được môi trường chạy.", Toast.LENGTH_LONG).show()
                 else {
                     applyMouseWarp(created)
                     onCreated()
@@ -568,7 +568,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
             }
         } catch (_: Exception) {
             creating = false
-            Toast.makeText(context, "Unable to create container.", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Không tạo được môi trường chạy.", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -579,7 +579,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text(if (editing == null) "New container" else state.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                title = { Text(if (editing == null) "Môi trường chạy mới" else state.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Outlined.ArrowBack, null) } }
             )
         },
@@ -595,7 +595,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 10.dp).height(50.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text(if (creating) "Creating…" else "Create container", fontWeight = FontWeight.SemiBold)
+                        Text(if (creating) "Đang tạo…" else "Tạo môi trường chạy", fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -619,7 +619,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
                     ) {
                         item {
                             Text(
-                                "Container settings",
+                                "Cài đặt môi trường chạy",
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.SemiBold,
                                 modifier = Modifier.padding(8.dp)
@@ -716,38 +716,38 @@ private fun ContainerCategoryV2(
                 target.parentFile?.mkdirs()
                 if (!ImageUtils.save(bitmap, target, Bitmap.CompressFormat.PNG, 100)) error("Unable to save image")
                 val stamp = target.lastModified().takeIf { it > 0L } ?: System.currentTimeMillis()
-                s.desktopBackground = "Image"
+                s.desktopBackground = "Hình ảnh"
                 s.wallpaperStamp = stamp
             }.onFailure {
-                Toast.makeText(context, "Unable to set wallpaper image.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Không đặt được hình nền.", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     when (category) {
-        "General" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        "Chung" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
-                SettingText("Name", s.name) { s.name = it }
+                SettingText("Tên", s.name) { s.name = it }
                 SettingsDivider()
                 SettingWineRuntimeChoice("Wine / Proton", s.runtime, runtimes, installing, installWine) { s.runtime = it }
             }
             SettingsCard {
                 SettingChoice(
-                    "Audio Driver",
+                    "Driver âm thanh",
                     audioEntries.firstOrNull { StringUtils.parseIdentifier(it).equals(s.audio, true) } ?: s.audio,
                     audioEntries
                 ) { s.audio = StringUtils.parseIdentifier(it) }
                 if (s.audio == "oboe") {
                     SettingsDivider()
                     val latencyLabel = when (s.oboeProfile) {
-                        "ultra" -> "Low Latency"
-                        "stable" -> "Stable"
-                        else -> "Automatic"
+                        "ultra" -> "Độ trễ thấp"
+                        "stable" -> "Ổn định"
+                        else -> "Tự động"
                     }
-                    SettingChoice("Oboe latency", latencyLabel, listOf("Automatic", "Low Latency", "Stable")) {
+                    SettingChoice("Độ trễ Oboe", latencyLabel, listOf("Tự động", "Độ trễ thấp", "Ổn định")) {
                         s.oboeProfile = when (it) {
-                            "Low Latency" -> "ultra"
-                            "Stable" -> "stable"
+                            "Độ trễ thấp" -> "ultra"
+                            "Ổn định" -> "stable"
                             else -> "low"
                         }
                     }
@@ -755,9 +755,9 @@ private fun ContainerCategoryV2(
                     val apiLabel = when (s.oboeApi) {
                         "aaudio" -> "AAudio"
                         "opensles" -> "OpenSL ES"
-                        else -> "Automatic"
+                        else -> "Tự động"
                     }
-                    SettingChoice("Oboe backend", apiLabel, listOf("Automatic", "AAudio", "OpenSL ES")) {
+                    SettingChoice("Backend Oboe", apiLabel, listOf("Tự động", "AAudio", "OpenSL ES")) {
                         s.oboeApi = when (it) {
                             "AAudio" -> "aaudio"
                             "OpenSL ES" -> "opensles"
@@ -766,27 +766,27 @@ private fun ContainerCategoryV2(
                     }
                 }
                 SettingsDivider()
-                val hudEntries = listOf("Off", "Classic", "Modern")
-                SettingChoice("Winlator HUD", hudEntries.getOrElse(s.hudMode) { "Off" }, hudEntries) {
+                val hudEntries = listOf("Tắt", "Cổ điển", "Hiện đại")
+                SettingChoice("HUD Winlator", hudEntries.getOrElse(s.hudMode) { "Tắt" }, hudEntries) {
                     s.hudMode = hudEntries.indexOf(it).coerceAtLeast(0)
                 }
             }
             SettingsCard {
-                SettingChoice("Locale (LC_ALL)", localeDisplayValue(s.locale), localeEntries) {
+                SettingChoice("Ngôn ngữ vùng (LC_ALL)", localeDisplayValue(s.locale), localeEntries) {
                     s.locale = normalizeLocaleValue(it)
                 }
                 SettingsDivider()
-                SettingChoice("MIDI SoundFont", s.soundFont.ifBlank { "Disabled" }, soundFonts) {
-                    s.soundFont = if (it == "Disabled") "" else it
+                SettingChoice("MIDI SoundFont", s.soundFont.ifBlank { "Tắt" }, soundFonts) {
+                    s.soundFont = if (it == "Tắt") "" else it
                 }
                 SettingsDivider()
-                SettingToggle("Fullscreen Stretched", s.fullscreen) { s.fullscreen = it }
+                SettingToggle("Kéo giãn toàn màn hình", s.fullscreen) { s.fullscreen = it }
             }
             SettingsCard {
-                SettingChoice("Desktop Theme", s.desktopTheme, listOf("Dark", "Light")) { s.desktopTheme = it }
+                SettingChoice("Giao diện desktop", s.desktopTheme, listOf("Tối", "Sáng")) { s.desktopTheme = it }
                 SettingsDivider()
-                SettingChoice("Desktop Background", s.desktopBackground, listOf("Image", "Solid Color")) { s.desktopBackground = it }
-                if (s.desktopBackground == "Image") {
+                SettingChoice("Hình nền desktop", s.desktopBackground, listOf("Hình ảnh", "Màu đơn")) { s.desktopBackground = it }
+                if (s.desktopBackground == "Hình ảnh") {
                     SettingsDivider()
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(start = 14.dp, end = 8.dp, top = 5.dp, bottom = 5.dp),
@@ -794,34 +794,34 @@ private fun ContainerCategoryV2(
                     ) {
                         Column(Modifier.weight(1f)) {
                             Text(
-                                "Wallpaper image",
+                                "Ảnh hình nền",
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                if (s.wallpaperStamp > 0L) "Custom image" else "Default wallpaper",
+                                if (s.wallpaperStamp > 0L) "Ảnh tùy chỉnh" else "Hình nền mặc định",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium
                             )
                         }
                         TextButton(onClick = { wallpaperPicker.launch("image/*") }) {
-                            Text(if (s.wallpaperStamp > 0L) "Change" else "Choose")
+                            Text(if (s.wallpaperStamp > 0L) "Đổi" else "Chọn")
                         }
                     }
                 }
                 SettingsDivider()
-                SettingChoice("Mouse Warp Override", s.mouseWarp, listOf("disable", "enable", "force")) { s.mouseWarp = it }
+                SettingChoice("Ghi đè di chuyển chuột", s.mouseWarp, listOf("disable", "enable", "force")) { s.mouseWarp = it }
             }
         }
 
-        "Video" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        "Hình ảnh" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
                 var customScreenSelected by remember {
                     mutableStateOf(screenEntries.none { normalizeResolution(it).equals(s.screen, true) })
                 }
                 val shownScreen = if (customScreenSelected) "Custom"
                 else screenEntries.firstOrNull { normalizeResolution(it).equals(s.screen, true) } ?: "Custom"
-                SettingChoice("Screen Size", shownScreen, screenEntries) {
+                SettingChoice("Độ phân giải", shownScreen, screenEntries) {
                     if (it.equals("Custom", true)) {
                         customScreenSelected = true
                     } else {
@@ -831,78 +831,78 @@ private fun ContainerCategoryV2(
                 }
                 if (shownScreen == "Custom") {
                     SettingsDivider()
-                    SettingText("Custom resolution", s.screen) { s.screen = it }
+                    SettingText("Độ phân giải tùy chỉnh", s.screen) { s.screen = it }
                 }
                 SettingsDivider()
-                SettingChoice("Renderer", s.renderer, listOf("Vulkan", "EGL", "DisplayX")) {
+                SettingChoice("Bộ dựng hình", s.renderer, listOf("Vulkan", "EGL", "DisplayX")) {
                     s.renderer = it
                     s.surfaceFormat = if (it == "DisplayX") "rgba8" else "bgra8"
                     if (it == "EGL" && s.filterMode > 1) s.filterMode = 0
                 }
                 SettingsDivider()
                 SettingChoice(
-                    "Surface format",
+                    "Định dạng bề mặt",
                     if (s.surfaceFormat == "bgra8") "BGRA" else "RGBA",
                     listOf("RGBA", "BGRA")
                 ) { s.surfaceFormat = if (it == "BGRA") "bgra8" else "rgba8" }
                 if (s.renderer == "DisplayX") {
                     SettingsDivider()
-                    SettingToggle("Bypass X11", s.trueDisplayX) {
+                    SettingToggle("Bỏ qua X11", s.trueDisplayX) {
                         s.trueDisplayX = it
                     }
                     SettingsDivider()
-                    SettingToggle("Performance mode", s.displayXPerformanceMode) {
+                    SettingToggle("Chế độ hiệu năng", s.displayXPerformanceMode) {
                         s.displayXPerformanceMode = it
                     }
                     SettingsDivider()
-                    SettingToggle("Present at refresh rate", s.displayXPresentAtRefreshRate) {
+                    SettingToggle("Trình chiếu theo tần số quét", s.displayXPresentAtRefreshRate) {
                         s.displayXPresentAtRefreshRate = it
                     }
                     SettingsDivider()
-                    SettingToggle("Submit every buffer", s.displayXBackPressure) {
+                    SettingToggle("Gửi mọi buffer", s.displayXBackPressure) {
                         s.displayXBackPressure = it
                     }
                     SettingsDivider()
-                    SettingToggle("Precise presentation", s.displayXPrecisePresentation) {
+                    SettingToggle("Trình chiếu chính xác", s.displayXPrecisePresentation) {
                         s.displayXPrecisePresentation = it
                     }
                 } else {
                     if (s.renderer != "EGL") {
                         SettingsDivider()
-                        SettingChoice("Present Mode", s.rendererPresentMode, listOf("fifo", "mailbox")) {
+                        SettingChoice("Chế độ trình chiếu", s.rendererPresentMode, listOf("fifo", "mailbox")) {
                             s.rendererPresentMode = it
                         }
                         catalog?.let { c ->
                             SettingsDivider()
-                            SettingMappedChoice("Renderer Driver", s.rendererDriver, c.rendererDrivers) {
+                            SettingMappedChoice("Driver dựng hình", s.rendererDriver, c.rendererDrivers) {
                                 s.rendererDriver = it
                             }
                         }
                     }
                     SettingsDivider()
-                    val filters = if (s.renderer == "EGL") listOf("Bilinear", "Nearest neighbor")
+                    val filters = if (s.renderer == "EGL") listOf("Bilinear", "Điểm gần nhất")
                     else listOf(
                         "Bilinear",
-                        "Nearest neighbor",
+                        "Điểm gần nhất",
                         "Snapdragon Super Resolution",
                         "AMD FidelityFX Super Resolution",
                         "Lanczos 2 (16-tap)",
-                        "Color Boost"
+                        "Tăng màu"
                     )
-                    SettingChoice("Texture Filter", filters.getOrElse(s.filterMode) { filters.first() }, filters) {
+                    SettingChoice("Lọc texture", filters.getOrElse(s.filterMode) { filters.first() }, filters) {
                         s.filterMode = filters.indexOf(it).coerceAtLeast(0)
                     }
                 }
             }
             SettingsCard {
                 SettingChoice(
-                    "Graphics Driver",
+                    "Driver đồ họa",
                     graphicsEntries.firstOrNull { StringUtils.parseIdentifier(it).equals(s.graphicsDriver, true) } ?: s.graphicsDriver,
                     graphicsEntries
                 ) { s.selectGraphicsDriver(StringUtils.parseIdentifier(it)) }
                 catalog?.let { c ->
                     SettingsDivider()
-                    SettingDriverChoice("Driver Version", s.driverVersion, c.drivers, installing, installDriver) {
+                    SettingDriverChoice("Phiên bản driver", s.driverVersion, c.drivers, installing, installDriver) {
                         s.driverVersion = it
                         s.graphics("version", it)
                     }
@@ -912,56 +912,56 @@ private fun ContainerCategoryV2(
                     }
                     SettingsDivider()
                 }
-                SettingChoice("Vulkan Version", s.vulkanVersion, listOf("1.1", "1.2", "1.3")) {
+                SettingChoice("Phiên bản Vulkan", s.vulkanVersion, listOf("1.1", "1.2", "1.3")) {
                     s.vulkanVersion = it; s.graphics("vulkanVersion", it)
                 }
                 SettingsDivider()
-                SettingChoice("GPU Name", s.gpuName, gpuNames) { s.gpuName = it; s.graphics("gpuName", it) }
+                SettingChoice("Tên GPU", s.gpuName, gpuNames) { s.gpuName = it; s.graphics("gpuName", it) }
                 SettingsDivider()
-                SettingChoice("Max Device Memory", s.maxMemory, listOf("0", "512", "1024", "2048", "4096", "8192", "12288", "16384")) {
+                SettingChoice("Bộ nhớ thiết bị tối đa", s.maxMemory, listOf("0", "512", "1024", "2048", "4096", "8192", "12288", "16384")) {
                     s.maxMemory = it; s.graphics("maxDeviceMemory", it)
                 }
                 SettingsDivider()
-                SettingChoice("Driver Present Mode", s.driverPresentMode, listOf("mailbox", "fifo", "immediate", "relaxed")) {
+                SettingChoice("Chế độ trình chiếu của driver", s.driverPresentMode, listOf("mailbox", "fifo", "immediate", "relaxed")) {
                     s.driverPresentMode = it; s.graphics("presentMode", it)
                 }
                 SettingsDivider()
-                SettingToggle("Sync Frame", s.syncFrame) { s.syncFrame = it; s.graphics("syncFrame", if (it) "1" else "0") }
+                SettingToggle("Đồng bộ khung hình", s.syncFrame) { s.syncFrame = it; s.graphics("syncFrame", if (it) "1" else "0") }
                 SettingsDivider()
-                SettingToggle("Disable Present Wait", s.disablePresentWait) {
+                SettingToggle("Tắt Present Wait", s.disablePresentWait) {
                     s.disablePresentWait = it; s.graphics("disablePresentWait", if (it) "1" else "0")
                 }
                 SettingsDivider()
-                SettingChoice("Resource Type", s.resourceType, listOf("auto", "dmabuf", "ahb", "opaque")) {
+                SettingChoice("Loại tài nguyên", s.resourceType, listOf("auto", "dmabuf", "ahb", "opaque")) {
                     s.resourceType = it; s.graphics("resourceType", it)
                 }
                 SettingsDivider()
-                SettingChoice("BCN Emulation", s.bcn, listOf("none", "partial", "full", "auto")) {
+                SettingChoice("Giả lập BCN", s.bcn, listOf("none", "partial", "full", "auto")) {
                     s.bcn = it; s.graphics("bcnEmulation", it)
                 }
                 SettingsDivider()
-                SettingChoice("BCN Emulation Type", s.bcnType, listOf("software", "compute")) {
+                SettingChoice("Kiểu giả lập BCN", s.bcnType, listOf("software", "compute")) {
                     s.bcnType = it; s.graphics("bcnEmulationType", it)
                 }
                 SettingsDivider()
-                SettingToggle("BCN Emulation Cache", s.bcnCache) {
+                SettingToggle("Bộ đệm giả lập BCN", s.bcnCache) {
                     s.bcnCache = it; s.graphics("bcnEmulationCache", if (it) "1" else "0")
                 }
             }
         }
 
-        "Compatibility" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        "Tương thích" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
                 val shownWrapper = wrapperEntries.firstOrNull { StringUtils.parseIdentifier(it).equals(s.wrapper, true) } ?: s.wrapper
                 SettingChoice("DX Wrapper", shownWrapper, wrapperEntries) { s.wrapper = StringUtils.parseIdentifier(it) }
                 if (s.wrapper.contains("dxvk", true)) catalog?.let { c ->
                     val dxvkCatalog = filterDxvkForVkd3d(c.dxvk, s.vkd3dVersion)
                     SettingsDivider()
-                    SettingInstallChoice("DXVK Version", s.dxvkVersion, dxvkCatalog, installing, "DXVK", { v ->
+                    SettingInstallChoice("Phiên bản DXVK", s.dxvkVersion, dxvkCatalog, installing, "DXVK", { v ->
                         installRuntime("DXVK", v) { installed -> s.selectDxvkVersion(installed) }
                     }) { s.selectDxvkVersion(it) }
                     SettingsDivider()
-                    SettingInstallChoice("VKD3D Version", s.vkd3dVersion, c.vkd3d, installing, "VKD3D", { v ->
+                    SettingInstallChoice("Phiên bản VKD3D", s.vkd3dVersion, c.vkd3d, installing, "VKD3D", { v ->
                         installRuntime("VKD3D", v) { installed ->
                             s.vkd3dVersion = installed
                             s.wrapperValue("vkd3dVersion", installed)
@@ -977,15 +977,15 @@ private fun ContainerCategoryV2(
                         }
                     }
                     SettingsDivider()
-                    SettingChoice("VKD3D Feature Level", s.vkd3dLevel, listOf("12_0", "12_1", "12_2", "11_1", "11_0", "10_1", "10_0", "9_3", "9_2", "9_1")) {
+                    SettingChoice("Mức tính năng VKD3D", s.vkd3dLevel, listOf("12_0", "12_1", "12_2", "11_1", "11_0", "10_1", "10_0", "9_3", "9_2", "9_1")) {
                         s.vkd3dLevel = it; s.wrapperValue("vkd3dLevel", it)
                     }
                     SettingsDivider()
-                    SettingText("Frame Rate", s.frameRate) {
+                    SettingText("Giới hạn FPS", s.frameRate) {
                         s.frameRate = it.filter(Char::isDigit).take(4); s.wrapperValue("framerate", s.frameRate.ifBlank { "0" })
                     }
                     SettingsDivider()
-                    SettingToggle("Max Frame Latency", s.maxFrameLatency) {
+                    SettingToggle("Độ trễ khung hình tối đa", s.maxFrameLatency) {
                         s.maxFrameLatency = it; s.wrapperValue("maxFrameLatency", if (it) "1" else "0")
                     }
                     val asyncMode = dxvkAsyncMode(s.dxvkVersion)
@@ -995,7 +995,7 @@ private fun ContainerCategoryV2(
                     }
                     if (asyncMode == DxvkAsyncMode.GPL_ASYNC) {
                         SettingsDivider()
-                        SettingToggle("Async Cache", s.asyncCache) { s.asyncCache = it; s.wrapperValue("asyncCache", if (it) "1" else "0") }
+                        SettingToggle("Bộ đệm Async", s.asyncCache) { s.asyncCache = it; s.wrapperValue("asyncCache", if (it) "1" else "0") }
                     }
                     SettingsDivider()
                     DDrawWrapperChoice(s.ddrawWrapper) {
@@ -1005,10 +1005,10 @@ private fun ContainerCategoryV2(
             }
             SettingsCard {
                 if (arm64) {
-                    SettingChoice("32-bit Emulator", s.emulator, listOf("FEXCore", "WOWBox64")) { s.emulator = it }
+                    SettingChoice("Giả lập 32-bit", s.emulator, listOf("FEXCore", "WOWBox64")) { s.emulator = it }
                     catalog?.let { c ->
                         SettingsDivider()
-                        SettingInstallChoice("FEXCore Version", s.fexVersion, c.fex, installing, "FEXCore", { v ->
+                        SettingInstallChoice("Phiên bản FEXCore", s.fexVersion, c.fex, installing, "FEXCore", { v ->
                             installRuntime("FEXCore", v) { installed -> s.fexVersion = installed }
                         }) { s.fexVersion = it }
                     }
@@ -1020,7 +1020,7 @@ private fun ContainerCategoryV2(
                         val type = if (arm64) "WOWBox64" else "Box64"
                         val versions = if (arm64) c.wow else c.box
                         if (arm64) SettingsDivider()
-                        SettingInstallChoice("$type Version", s.boxVersion, versions, installing, type, { v ->
+                        SettingInstallChoice("Phiên bản $type", s.boxVersion, versions, installing, type, { v ->
                             installRuntime(type, v) { installed -> s.boxVersion = installed }
                         }) { s.boxVersion = it }
                     }
@@ -1030,57 +1030,57 @@ private fun ContainerCategoryV2(
             }
         }
 
-        "Input" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        "Điều khiển" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
-                SettingToggle("Exclusive Input", s.exclusive) { enabled ->
+                SettingToggle("Nhập độc quyền", s.exclusive) { enabled ->
                     s.exclusive = enabled
                     if (!enabled) {
                         s.xinput = true; s.dinput = true
                     } else if (s.xinput && s.dinput) s.dinput = false
                 }
                 SettingsDivider()
-                SettingToggle("Enable XInput", s.xinput, s.exclusive) {
+                SettingToggle("Bật XInput", s.xinput, s.exclusive) {
                     s.xinput = it; if (s.exclusive && it && s.dinput) s.dinput = false
                 }
                 SettingsDivider()
-                SettingToggle("Enable DInput", s.dinput, s.exclusive) {
+                SettingToggle("Bật DInput", s.dinput, s.exclusive) {
                     s.dinput = it; if (s.exclusive && it && s.xinput) s.xinput = false
                 }
             }
         }
 
-        "Storage" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        "Ổ đĩa" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             DriveLettersEditorV2(
                 initialDrives = s.drives,
-                subtitle = "Changes are saved with this container"
+                subtitle = "Thay đổi được lưu cùng môi trường chạy này"
             ) { s.drives = it }
         }
 
-        "Environment" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        "Môi trường" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             EnvironmentVariablesEditor(cleanContainerEnvironment(s.envVars), onChanged = { s.setEnvironment(it) })
         }
 
         else -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
                 val startupEntries = listOf(
-                    "Normal (Load all services)",
-                    "Essential (Load only essential services)",
-                    "Aggressive (Stop services on startup)"
+                    "Bình thường (tải mọi dịch vụ)",
+                    "Thiết yếu (chỉ tải dịch vụ cần thiết)",
+                    "Tối giản (dừng dịch vụ khi khởi động)"
                 )
-                SettingChoice("Startup Selection", startupEntries[s.startup.coerceIn(0, 2)], startupEntries) {
+                SettingChoice("Chế độ khởi động", startupEntries[s.startup.coerceIn(0, 2)], startupEntries) {
                     s.startup = startupEntries.indexOf(it).coerceAtLeast(0)
                 }
             }
             SettingsCard {
-                SettingToggle("Sync CPU Topology", s.syncCpu) { s.syncCpu = it }
+                SettingToggle("Đồng bộ cấu trúc CPU", s.syncCpu) { s.syncCpu = it }
                 SettingsDivider()
-                CpuSelectorRow("Processor Affinity", s.cpu64) { index, checked -> s.cpu64[index] = checked }
+                CpuSelectorRow("Chọn nhân CPU", s.cpu64) { index, checked -> s.cpu64[index] = checked }
                 SettingsDivider()
-                CpuSelectorRow("Processor Affinity (32-bit apps)", s.cpu32) { index, checked -> s.cpu32[index] = checked }
+                CpuSelectorRow("Chọn nhân CPU (ứng dụng 32-bit)", s.cpu32) { index, checked -> s.cpu32[index] = checked }
             }
             SettingsCard {
                 containerComponentRowsV2.forEachIndexed { index, (key, label) ->
-                    val entries = listOf("Builtin (Wine)", "Native (Windows)")
+                    val entries = listOf("Có sẵn (Wine)", "Gốc (Windows)")
                     val selected = entries[(s.components[key] ?: 0).coerceIn(0, 1)]
                     SettingChoice(label, selected, entries) { s.components[key] = entries.indexOf(it).coerceAtLeast(0) }
                     if (index != containerComponentRowsV2.lastIndex) SettingsDivider()
@@ -1101,7 +1101,7 @@ private fun ContainerVulkanExtensionsV2(
         runCatching { GPUInformation.enumerateExtensions(driver, context).toList().sorted() }.getOrDefault(emptyList())
     }
     if (extensions.isEmpty()) {
-        SettingText("Disabled Vulkan Extensions", blacklisted, 2) { onChanged(it.replace(" ", "")) }
+        SettingText("Tiện ích Vulkan đã tắt", blacklisted, 2) { onChanged(it.replace(" ", "")) }
         return
     }
     val disabled = blacklisted.split(',').map(String::trim).filter(String::isNotBlank).toSet()
@@ -1109,8 +1109,8 @@ private fun ContainerVulkanExtensionsV2(
     var open by remember { mutableStateOf(false) }
     Surface(onClick = { open = true }, color = Color.Transparent, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 11.dp)) {
-            Text("Vulkan Extensions", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text("$enabledCount of ${extensions.size} enabled", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+            Text("Tiện ích Vulkan", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("Đã bật $enabledCount/${extensions.size}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
         }
     }
     if (open) {
@@ -1122,10 +1122,10 @@ private fun ContainerVulkanExtensionsV2(
             confirmButton = {
                 TextButton(onClick = {
                     onChanged(extensions.filterNot { it in selected }.joinToString(",")); open = false
-                }) { Text("Done") }
+                }) { Text("Xong") }
             },
-            dismissButton = { TextButton(onClick = { open = false }) { Text("Cancel") } },
-            title = { Text("Vulkan Extensions") },
+            dismissButton = { TextButton(onClick = { open = false }) { Text("Hủy") } },
+            title = { Text("Tiện ích Vulkan") },
             text = {
                 LazyColumn(Modifier.heightIn(max = 460.dp)) {
                     items(extensions) { extension ->
@@ -1158,7 +1158,7 @@ private fun loadContainerGpuNamesV2(context: Context): List<String> {
 }
 
 private fun loadContainerSoundFontsV2(context: Context): List<String> {
-    val result = linkedSetOf("Disabled", MidiManager.DEFAULT_SF2_FILE)
+    val result = linkedSetOf("Tắt", MidiManager.DEFAULT_SF2_FILE)
     MidiManager.getSoundFontDir(context).listFiles()?.filter(File::isFile)?.sortedBy { it.name.lowercase() }?.forEach { result.add(it.name) }
     return result.toList()
 }
@@ -1178,8 +1178,8 @@ private fun serializeContainerComponentsV2(values: Map<String, Int>): String = c
 }
 
 private fun containerDesktopThemeValueV2(theme: String, background: String, wallpaperStamp: Long): String {
-    val themeId = if (theme.equals("Light", true)) WineThemeManager.Theme.LIGHT else WineThemeManager.Theme.DARK
-    val backgroundId = if (background.equals("Solid Color", true)) WineThemeManager.BackgroundType.COLOR else WineThemeManager.BackgroundType.IMAGE
+    val themeId = if (theme.equals("Sáng", true)) WineThemeManager.Theme.LIGHT else WineThemeManager.Theme.DARK
+    val backgroundId = if (background.equals("Màu đơn", true)) WineThemeManager.BackgroundType.COLOR else WineThemeManager.BackgroundType.IMAGE
     return if (backgroundId == WineThemeManager.BackgroundType.IMAGE)
         "$themeId,$backgroundId,#0277bd,$wallpaperStamp"
     else

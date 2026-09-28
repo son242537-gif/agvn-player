@@ -152,7 +152,7 @@ fun WinlatorThemePreferenceCard(modifier: Modifier = Modifier) {
             }
             Spacer(Modifier.width(11.dp))
             Column(Modifier.weight(1f)) {
-                Text("Theme", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+                Text("Giao diện", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
                 Text(current.displayName, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Icon(Icons.Outlined.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -174,9 +174,9 @@ fun WinlatorThemePreferenceCard(modifier: Modifier = Modifier) {
                     .padding(horizontal = 18.dp)
                     .padding(bottom = 24.dp)
             ) {
-                Text("Appearance", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold)
+                Text("Giao diện", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Choose the Winlator theme. Changes are applied immediately.",
+                    "Chọn giao diện cho ứng dụng. Thay đổi được áp dụng ngay.",
                     modifier = Modifier.padding(top = 4.dp, bottom = 14.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant

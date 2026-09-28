@@ -208,7 +208,7 @@ internal fun OnboardingComponentsScreen(
                     if (!managerMode && !hasInstalledRuntime) {
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            if (!ready.value) "Wait for $bundledRuntimeName to finish installing, or install another Wine/Proton version."
+                            if (!ready.value) "Hãy chờ $bundledRuntimeName cài xong, hoặc cài một phiên bản Wine/Proton khác."
                             else "Hãy cài ít nhất một phiên bản Wine hoặc Proton để tiếp tục.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -278,7 +278,7 @@ internal fun OnboardingComponentsScreen(
                 if (!managerMode && !hasInstalledRuntime) {
                     item {
                         Text(
-                            if (!ready.value) "Continue unlocks when $bundledRuntimeName finishes installing or another Wine/Proton layer is installed."
+                            if (!ready.value) "Nút Tiếp tục sẽ mở khi $bundledRuntimeName cài xong hoặc đã cài một bản Wine/Proton khác."
                             else "Hãy cài ít nhất một phiên bản Wine hoặc Proton để tiếp tục.",
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodySmall
@@ -504,7 +504,7 @@ private fun InstallProgressCard(label: String?, progress: Int) {
                     Text("Cài thành phần", fontWeight = FontWeight.SemiBold)
                     Text(
                         if (progress >= 0) "${label ?: "Đang cài"} • ${progress}%"
-                        else label ?: "Installing component…",
+                        else label ?: "Đang cài thành phần…",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall,
                         maxLines = 1,
@@ -532,7 +532,7 @@ private fun LoadingCard() {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 3.dp)
             Spacer(Modifier.width(12.dp))
-            Text("Loading component catalog…")
+            Text("Đang tải danh sách thành phần…")
         }
     }
 }

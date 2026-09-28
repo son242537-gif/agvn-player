@@ -82,29 +82,29 @@ internal fun ContainerWrapperInline(containerId: Int, callbacks: ContainerInline
     }
 
     VCPanel {
-        Text("DirectX wrapper", Modifier.padding(horizontal = 12.dp, vertical = 9.dp), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Text("Wrapper DirectX", Modifier.padding(horizontal = 12.dp, vertical = 9.dp), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         VCChoice("DX Wrapper", wrapper, wrapperEntries) { wrapper = it }
         VCDivider()
         if (StringUtils.parseIdentifier(wrapper).contains("dxvk", true)) {
-            VCDownloadChoice("DXVK Version", dxvkVersion, dxvk, installedDxvk, "DXVK", callbacks) { dxvkVersion = it }
+            VCDownloadChoice("Phiên bản DXVK", dxvkVersion, dxvk, installedDxvk, "DXVK", callbacks) { dxvkVersion = it }
             VCDivider()
-            VCDownloadChoice("VKD3D Version", vkd3dVersion, vkd3d, installedVkd3d, "VKD3D", callbacks) { vkd3dVersion = it }
+            VCDownloadChoice("Phiên bản VKD3D", vkd3dVersion, vkd3d, installedVkd3d, "VKD3D", callbacks) { vkd3dVersion = it }
             VCDivider()
-            VCChoice("VKD3D Feature Level", vkd3dLevel, arrayOf("12_0", "12_1", "12_2", "11_1", "11_0", "10_1", "10_0", "9_3", "9_2", "9_1")) { vkd3dLevel = it }
-            VCField("Frame Rate Limit", frameRate) { frameRate = it.filter(Char::isDigit).take(4) }
-            VCToggle("Max Frame Latency", maxLatency) { maxLatency = it }
-            VCToggle("Async shaders", asyncShaders) { asyncShaders = it }
-            VCToggle("Async shader cache", asyncCache) { asyncCache = it }
+            VCChoice("Mức tính năng VKD3D", vkd3dLevel, arrayOf("12_0", "12_1", "12_2", "11_1", "11_0", "10_1", "10_0", "9_3", "9_2", "9_1")) { vkd3dLevel = it }
+            VCField("Giới hạn FPS", frameRate) { frameRate = it.filter(Char::isDigit).take(4) }
+            VCToggle("Độ trễ khung hình tối đa", maxLatency) { maxLatency = it }
+            VCToggle("Shader Async", asyncShaders) { asyncShaders = it }
+            VCToggle("Bộ đệm shader Async", asyncCache) { asyncCache = it }
             VCChoice("DDraw Wrapper", ddraw, arrayOf("wined3d", "cnc-ddraw")) { ddraw = it }
         } else {
             VCToggle("CSMT", csmt) { csmt = it }
-            VCToggle("Strict Shader Math", strictMath) { strictMath = it }
-            VCChoice("Offscreen Rendering", offscreen, arrayOf("fbo", "backbuffer")) { offscreen = it }
-            VCChoice("WineD3D Renderer", wineRenderer, arrayOf("gl", "vulkan", "gdi")) { wineRenderer = it }
-            VCField("Video Memory (MB)", videoMemory) { videoMemory = it.filter(Char::isDigit).take(6) }
+            VCToggle("Tính shader chính xác", strictMath) { strictMath = it }
+            VCChoice("Vẽ ngoài màn hình", offscreen, arrayOf("fbo", "backbuffer")) { offscreen = it }
+            VCChoice("Bộ dựng hình WineD3D", wineRenderer, arrayOf("gl", "vulkan", "gdi")) { wineRenderer = it }
+            VCField("Bộ nhớ video (MB)", videoMemory) { videoMemory = it.filter(Char::isDigit).take(6) }
         }
         OutlinedButton(onClick = callbacks::onManageComponents, modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 7.dp)) {
-            Text("Manage installed versions")
+            Text("Quản lý phiên bản đã cài")
         }
         VCSave {
             val parsedWrapper = StringUtils.parseIdentifier(wrapper)
@@ -161,30 +161,30 @@ internal fun ContainerCompatibilityInline(containerId: Int, callbacks: Container
 
     VCPanel {
         if (arm64) {
-            VCReadOnly("64-bit Emulator", "FEXCore")
+            VCReadOnly("Giả lập 64-bit", "FEXCore")
             VCDivider()
-            VCChoice("32-bit Emulator", emulator32, arrayOf("FEXCore", "WOWBox64")) { emulator32 = it }
+            VCChoice("Giả lập 32-bit", emulator32, arrayOf("FEXCore", "WOWBox64")) { emulator32 = it }
             VCDivider()
-            VCDownloadChoice("FEXCore Version", fexVersion, fexVersions, installedFex, "FEXCore", callbacks) { fexVersion = it }
+            VCDownloadChoice("Phiên bản FEXCore", fexVersion, fexVersions, installedFex, "FEXCore", callbacks) { fexVersion = it }
             VCDivider()
-            VCPresetChoice("FEXCore Preset", fexPreset, fexPresets.map { it.name }.toTypedArray(), fexPresets.map { it.id }.toTypedArray()) { fexPreset = it }
+            VCPresetChoice("Preset FEXCore", fexPreset, fexPresets.map { it.name }.toTypedArray(), fexPresets.map { it.id }.toTypedArray()) { fexPreset = it }
             if (emulator32 == "WOWBox64") {
                 VCDivider()
-                VCDownloadChoice("WOWBox64 Version", boxVersion, boxVersions, installedBox, "WOWBox64", callbacks) { boxVersion = it }
+                VCDownloadChoice("Phiên bản WOWBox64", boxVersion, boxVersions, installedBox, "WOWBox64", callbacks) { boxVersion = it }
                 VCDivider()
-                VCPresetChoice("Box64 Preset", boxPreset, boxPresets.map { it.name }.toTypedArray(), boxPresets.map { it.id }.toTypedArray()) { boxPreset = it }
+                VCPresetChoice("Preset Box64", boxPreset, boxPresets.map { it.name }.toTypedArray(), boxPresets.map { it.id }.toTypedArray()) { boxPreset = it }
             }
         } else {
-            VCReadOnly("64-bit Emulator", "Box64")
+            VCReadOnly("Giả lập 64-bit", "Box64")
             VCDivider()
-            VCReadOnly("32-bit Emulator", "Box64")
+            VCReadOnly("Giả lập 32-bit", "Box64")
             VCDivider()
-            VCDownloadChoice("Box64 Version", boxVersion, boxVersions, installedBox, "Box64", callbacks) { boxVersion = it }
+            VCDownloadChoice("Phiên bản Box64", boxVersion, boxVersions, installedBox, "Box64", callbacks) { boxVersion = it }
             VCDivider()
-            VCPresetChoice("Box64 Preset", boxPreset, boxPresets.map { it.name }.toTypedArray(), boxPresets.map { it.id }.toTypedArray()) { boxPreset = it }
+            VCPresetChoice("Preset Box64", boxPreset, boxPresets.map { it.name }.toTypedArray(), boxPresets.map { it.id }.toTypedArray()) { boxPreset = it }
         }
         OutlinedButton(onClick = callbacks::onManageComponents, modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 7.dp)) {
-            Text("Manage installed versions")
+            Text("Quản lý phiên bản đã cài")
         }
         VCSave {
             container.setEmulator(if (arm64 && emulator32 == "FEXCore") "FEXCore" else "Box64")
@@ -261,7 +261,7 @@ private fun VCDownloadChoice(label: String, selected: String, entries: Array<Str
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(value, Modifier.weight(1f))
-                            if (!ready) Text("Download", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            if (!ready) Text("Tải về", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     },
                     onClick = { open = false; if (ready) onSelected(value) else callbacks.onInstallComponent(type, value) }
@@ -303,7 +303,7 @@ private fun VCToggle(label: String, checked: Boolean, onChange: (Boolean) -> Uni
 @Composable
 private fun VCSave(onClick: () -> Unit) {
     Button(onClick = onClick, modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp)) {
-        Text("Save", fontWeight = FontWeight.SemiBold)
+        Text("Lưu", fontWeight = FontWeight.SemiBold)
     }
 }
 

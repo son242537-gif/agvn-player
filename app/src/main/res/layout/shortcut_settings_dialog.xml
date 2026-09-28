@@ -154,7 +154,7 @@
                     android:id="@+id/TVWrapperVersionLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Current Version:"
+                    android:text="Phiên bản hiện tại:"
                     android:textColor="@color/ui_text_muted"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -228,7 +228,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Renderer"
+                android:text="Bộ dựng hình"
                 android:textColor="@color/ui_text_muted"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -301,7 +301,7 @@
                         android:id="@+id/TVEmulator64Label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="64bit Emulator"
+                        android:text="Giả lập 64-bit"
                         android:textColor="@color/ui_text_muted"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -643,13 +643,13 @@
                         android:id="@+id/CBEnableRelativeMouse"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Enable Relative Mouse" />
+                        android:text="Bật chuột tương đối" />
 
                     <CheckBox
                         android:id="@+id/CBDisableMouse"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Disable Mouse" />
+                        android:text="Tắt chuột" />
 
                     <CheckBox
                         android:id="@+id/CBTouchscreenMode"
@@ -720,7 +720,7 @@
                             android:id="@+id/CBExclusiveXInput"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Exclusive Input" />
+                            android:text="Nhập độc quyền" />
                         <ImageView
                             android:id="@+id/BTExclusiveXInputHelp"
                             style="@style/HelpButton"

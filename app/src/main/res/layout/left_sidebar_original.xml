@@ -179,7 +179,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Rendering"
+                    android:text="Hình ảnh"
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -192,7 +192,7 @@
                     <TextView
                         android:layout_width="92dp"
                         android:layout_height="wrap_content"
-                        android:text="FPS Limiter"
+                        android:text="Giới hạn FPS"
                         android:textColor="#FFFFFF"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -215,7 +215,7 @@
                         android:id="@+id/SWEnableFSR"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
-                        android:text="Super Resolution"
+                        android:text="Tăng độ phân giải"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                     <LinearLayout
@@ -228,7 +228,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Upscaler Mode"
+                            android:text="Chế độ upscale"
                             android:textColor="#0055ff"
                             android:textSize="13sp" />
                         <Spinner
@@ -242,7 +242,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:text="Sharpness"
+                        android:text="Độ nét"
                         android:textColor="#0055ff"
                         android:textSize="13sp" />
                     <com.winlator.cmod.widget.SeekBar
@@ -270,7 +270,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Post Effect"
+                            android:text="Hiệu ứng hậu kỳ"
                             android:textColor="#0055ff"
                             android:textSize="13sp" />
                         <Spinner
@@ -311,7 +311,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:text="Effect"
+                            android:text="Hiệu ứng"
                             android:textColor="?attr/ingameSidebarOnSurfaceVariant"
                             android:textSize="12sp" />
 
@@ -334,7 +334,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Strength"
+                                android:text="Cường độ"
                                 android:textColor="?attr/ingameSidebarOnSurfaceVariant"
                                 android:textSize="13sp" />
 
@@ -369,7 +369,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Frame Generation"
+                        android:text="Tạo khung hình"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -392,7 +392,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Save Preset"
+                        android:text="Lưu preset"
                         android:textColor="#DDF6FF"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -413,7 +413,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Display and Effects"
+                    android:text="Hiển thị và hiệu ứng"
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -431,7 +431,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Picture in Picture"
+                        android:text="Cửa sổ nổi"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -449,7 +449,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Toggle Fullscreen"
+                        android:text="Bật/tắt toàn màn hình"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -467,7 +467,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Magnifier"
+                        android:text="Kính lúp"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -485,7 +485,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Soft Stretch"
+                        android:text="Kéo giãn mềm"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -505,7 +505,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Controls"
+                    android:text="Điều khiển"
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -578,7 +578,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Touch Controls Opacity"
+                        android:text="Độ mờ phím ảo"
                         android:textColor="#0055ff"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -604,7 +604,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Show Keyboard"
+                        android:text="Hiện bàn phím"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -622,7 +622,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Vibration"
+                        android:text="Rung"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -634,7 +634,7 @@
                     android:background="@drawable/sidebar_card"
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
-                    android:text="Relative Mouse"
+                    android:text="Chuột tương đối"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp" />
                 <Switch
@@ -645,7 +645,7 @@
                     android:background="@drawable/sidebar_card"
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
-                    android:text="Disable Mouse"
+                    android:text="Tắt chuột"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp" />
             </LinearLayout>
@@ -676,7 +676,7 @@
                     android:background="@drawable/sidebar_card"
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
-                    android:text="Enable HUD"
+                    android:text="Bật HUD"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp" />
                 <LinearLayout
@@ -693,7 +693,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Style"
+                        android:text="Kiểu"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                     <Spinner
@@ -718,7 +718,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="HUD Metrics"
+                        android:text="Thông số HUD"
                         android:textColor="#0055ff"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -782,7 +782,7 @@
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
-                            android:text="Batt/Temp"
+                            android:text="Pin/Nhiệt độ"
                             android:textColor="#FFFFFF"
                             android:textSize="12sp" />
 
@@ -791,7 +791,7 @@
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
-                            android:text="Renderer"
+                            android:text="Bộ dựng hình"
                             android:textColor="#FFFFFF"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -817,7 +817,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="HUD Size"
+                        android:text="Kích thước HUD"
                         android:textColor="#0055ff"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -832,7 +832,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="HUD Opacity"
+                        android:text="Độ mờ HUD"
                         android:textColor="#0055ff"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -856,7 +856,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Reset HUD"
+                        android:text="Đặt lại HUD"
                         android:textColor="#DDF6FF"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -883,7 +883,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Show Logs"
+                        android:text="Xem log"
                         android:textColor="#DDF6FF"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -904,7 +904,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Task Manager"
+                    android:text="Quản lý tác vụ"
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -950,7 +950,7 @@
                             android:id="@+id/TVMemoryTitle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Memory"
+                            android:text="Bộ nhớ"
                             android:textColor="#0055ff"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -977,7 +977,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Processes"
+                        android:text="Tiến trình"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -1013,7 +1013,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="+ New Task"
+                        android:text="+ Tác vụ mới"
                         android:textColor="#DDF6FF"
                         android:textSize="14sp"
                         android:textStyle="bold" />

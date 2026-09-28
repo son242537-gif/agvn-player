@@ -17,7 +17,7 @@ import com.winlator.cmod.widget.VulkanXServerView;
 
 public class ReshadeSidebarPanelView extends FrameLayout {
     private static final String[] EFFECTS = {
-            "Off",
+            "Tắt",
             "Game Clarity",
             "Cinematic",
             "Vivid",

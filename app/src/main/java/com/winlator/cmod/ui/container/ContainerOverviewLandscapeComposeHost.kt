@@ -69,12 +69,12 @@ private data class LandscapeSection(val id: String, val title: String, val subti
 private fun LandscapeContainerOverview(model: ContainerOverviewModel, callbacks: ContainerOverviewCallbacks) {
     val sections = remember(model) {
         listOf(
-            LandscapeSection(ContainerOverviewComposeHost.SECTION_SYSTEM, "System", "Wine ${model.wineVersion}", Icons.Outlined.Settings),
-            LandscapeSection(ContainerOverviewComposeHost.SECTION_VIDEO, "Video", "${model.renderer}  •  ${model.screenSize}", Icons.Outlined.DesktopWindows),
-            LandscapeSection(ContainerOverviewComposeHost.SECTION_AUDIO, "Audio", model.audioDriver, Icons.Outlined.VolumeUp),
-            LandscapeSection(ContainerOverviewComposeHost.SECTION_COMPATIBILITY, "Compatibility", model.emulator, Icons.Outlined.VerifiedUser),
-            LandscapeSection(ContainerOverviewComposeHost.SECTION_STORAGE, "Storage", "", Icons.Outlined.Folder),
-            LandscapeSection(ContainerOverviewComposeHost.SECTION_ADVANCED, "Advanced", "", Icons.Outlined.Tune)
+            LandscapeSection(ContainerOverviewComposeHost.SECTION_SYSTEM, "Hệ thống", "Wine ${model.wineVersion}", Icons.Outlined.Settings),
+            LandscapeSection(ContainerOverviewComposeHost.SECTION_VIDEO, "Hình ảnh", "${model.renderer}  •  ${model.screenSize}", Icons.Outlined.DesktopWindows),
+            LandscapeSection(ContainerOverviewComposeHost.SECTION_AUDIO, "Âm thanh", model.audioDriver, Icons.Outlined.VolumeUp),
+            LandscapeSection(ContainerOverviewComposeHost.SECTION_COMPATIBILITY, "Tương thích", model.emulator, Icons.Outlined.VerifiedUser),
+            LandscapeSection(ContainerOverviewComposeHost.SECTION_STORAGE, "Ổ đĩa", "", Icons.Outlined.Folder),
+            LandscapeSection(ContainerOverviewComposeHost.SECTION_ADVANCED, "Nâng cao", "", Icons.Outlined.Tune)
         )
     }
     var selected by remember { mutableStateOf(ContainerOverviewComposeHost.SECTION_SYSTEM) }
@@ -90,7 +90,7 @@ private fun LandscapeContainerOverview(model: ContainerOverviewModel, callbacks:
                         .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()).height(48.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary)
-                ) { Text("Launch Environment", fontWeight = FontWeight.SemiBold) }
+                ) { Text("Mở môi trường chạy", fontWeight = FontWeight.SemiBold) }
             }
         }
     ) { padding ->

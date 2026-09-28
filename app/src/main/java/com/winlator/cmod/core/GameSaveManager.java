@@ -168,18 +168,18 @@ public final class GameSaveManager {
         try {
             File profile = profileDir(shortcut);
             if (!profile.isDirectory()) {
-                return new BackupResult(false, null, 0, false, "Wine profile not found");
+                return new BackupResult(false, null, 0, false, "Không tìm thấy hồ sơ Wine");
             }
 
             List<String> roots = getSaveRoots(shortcut);
             boolean wholeProfile = roots.isEmpty();
             if (automatic && wholeProfile) {
-                return new BackupResult(false, null, 0, false, "No per-game save location detected");
+                return new BackupResult(false, null, 0, false, "Không tìm thấy vị trí lưu riêng của game");
             }
 
             File gameDir = getGameDir(shortcut);
             if (!gameDir.exists() && !gameDir.mkdirs()) {
-                return new BackupResult(false, null, 0, wholeProfile, "Could not create save folder");
+                return new BackupResult(false, null, 0, wholeProfile, "Không tạo được thư mục lưu");
             }
 
             File out = automatic
@@ -200,19 +200,19 @@ public final class GameSaveManager {
             int count = writeZip(profile, effectiveRoots, tmp);
             if (count == 0) {
                 tmp.delete();
-                return new BackupResult(false, null, 0, wholeProfile, "No save files to back up");
+                return new BackupResult(false, null, 0, wholeProfile, "Không có file lưu nào để sao lưu");
             }
 
             if (out.exists() && !out.delete()) {
                 tmp.delete();
-                return new BackupResult(false, null, count, wholeProfile, "Could not replace previous backup");
+                return new BackupResult(false, null, count, wholeProfile, "Không thay được bản sao lưu cũ");
             }
             if (!tmp.renameTo(out)) {
                 FileUtils.copy(tmp, out);
                 tmp.delete();
             }
             if (!out.isFile()) {
-                return new BackupResult(false, null, count, wholeProfile, "Could not finish backup");
+                return new BackupResult(false, null, count, wholeProfile, "Không hoàn tất được sao lưu");
             }
 
             return new BackupResult(true, out.getAbsolutePath(), count, wholeProfile, null);
@@ -225,12 +225,12 @@ public final class GameSaveManager {
 
     public static RestoreResult restoreLatest(Shortcut shortcut) {
         File archive = getLatestBackup(shortcut);
-        if (archive == null) return new RestoreResult(false, 0, "No backup found");
+        if (archive == null) return new RestoreResult(false, 0, "Không tìm thấy bản sao lưu");
 
         try {
             File profile = profileDir(shortcut);
             if (!profile.exists() && !profile.mkdirs()) {
-                return new RestoreResult(false, 0, "Could not create Wine profile");
+                return new RestoreResult(false, 0, "Không tạo được hồ sơ Wine");
             }
             File canonicalProfile = profile.getCanonicalFile();
             String base = canonicalProfile.getPath() + File.separator;
