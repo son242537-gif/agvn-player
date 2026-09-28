@@ -44,10 +44,12 @@ public class AgvnGameScannerTest {
 
     @Test
     public void defaultProfileIsValidForDetectedGame() throws Exception {
-        File dir = tmp.newFolder("My: Game");
+        File dir = tmp.newFolder("My Game");
         touch(new File(dir, "Game/Binaries/Win64/Game-Win64-Shipping.exe"));
+        // characters Windows forbids in names are replaced (tested on the string: Windows cannot create such a folder)
+        assertEquals("My  Game", AgvnProfile.defaultFor("My: Game").name);
         AgvnProfile p = AgvnProfile.defaultFor(dir.getName());
-        assertEquals("My  Game", p.name);
+        assertEquals("My Game", p.name);
         assertEquals("Game/Binaries/Win64/Game-Win64-Shipping.exe", AgvnProfileValidator.validate(p, dir));
         assertTrue(p.isSimulatedTouchscreen());
     }
