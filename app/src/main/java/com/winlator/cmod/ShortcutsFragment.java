@@ -139,6 +139,7 @@ public class ShortcutsFragment extends Fragment {
     private boolean isGridView = false;
     private final ArrayList<Shortcut> allShortcuts = new ArrayList<>();
     private final Set<String> artworkRequests = Collections.synchronizedSet(new HashSet<>());
+    private static final Set<String> artworkChecked = Collections.synchronizedSet(new HashSet<>()); // AGVN
 
     private Shortcut shortcutForIconUpdate;
     private ActivityResultLauncher<String> iconPickerLauncher;
@@ -497,6 +498,10 @@ public class ShortcutsFragment extends Fragment {
             File autoIcon = new File(getImagesDir(false), baseName + ".png");
             File cover = new File(getImagesDir(true), baseName + ".png");
             File banner = new File(getBannerDir(), baseName + ".png");
+            if (artworkChecked.add(baseName)) { // AGVN: redraw artwork made by an older AGVN version
+                com.winlator.cmod.agvn.AgvnCovers.dropIfOutdated(cover);
+                com.winlator.cmod.agvn.AgvnCovers.dropIfOutdated(banner);
+            }
             String iconPath = userIcon.exists() ? userIcon.getPath() :
                     (autoIcon.exists() ? autoIcon.getPath() : null);
 
@@ -541,7 +546,7 @@ public class ShortcutsFragment extends Fragment {
         // AGVN: offline cover (image in the game folder, else drawn from the exe icon + name); no online lookup
         if (!cover.exists()) {
             com.winlator.cmod.agvn.AgvnCovers.requestAsync(shortcut.name, shortcut.getExtra("agvnGameDir"),
-                    resolveExeFile(shortcut), cover, () -> {
+                    resolveExeFile(shortcut), cover, false, () -> {
                         if (getActivity() != null) getActivity().runOnUiThread(() -> refreshArtworkAndLauncherShortcuts(shortcut));
                     });
             return;
@@ -568,6 +573,14 @@ public class ShortcutsFragment extends Fragment {
     }
 
     private void requestBanner(Shortcut shortcut, File banner) {
+        // AGVN: offline banner, same sources as the cover; no online lookup
+        if (!banner.exists()) {
+            com.winlator.cmod.agvn.AgvnCovers.requestAsync(shortcut.name, shortcut.getExtra("agvnGameDir"),
+                    resolveExeFile(shortcut), banner, true, () -> {
+                        if (getActivity() != null) getActivity().runOnUiThread(() -> refreshArtworkAndLauncherShortcuts(shortcut));
+                    });
+            return;
+        }
         final String bannerKey = "banner:" + shortcut.file.getPath();
         if (!banner.exists() && artworkRequests.add(bannerKey)) {
             fetchBannerFromSteamGrid(shortcut, banner, () -> {

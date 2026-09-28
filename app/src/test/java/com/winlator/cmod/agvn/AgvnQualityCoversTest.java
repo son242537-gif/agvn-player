@@ -22,19 +22,39 @@ public class AgvnQualityCoversTest {
     }
 
     @Test
-    public void mediumNeverHeavierThanPreset() {
-        DeviceTierRules.Preset preset = new DeviceTierRules.Preset();
-        preset.fps = 27;
-        preset.resolution = "960x544";
-        preset.texturePool = 768;
-        LaunchPresetResolver.Effective eff = AgvnQuality.capped(new LaunchPresetResolver.Effective("1920x1080", 0, 2048), preset);
-        assertEquals("960x544", eff.resolution);
-        assertEquals(27, eff.fps);
-        assertEquals(768, eff.texturePool);
-        eff = AgvnQuality.capped(new LaunchPresetResolver.Effective("854x480", 24, 512), preset);
-        assertEquals("854x480", eff.resolution);
-        assertEquals(24, eff.fps);
-        assertEquals(512, eff.texturePool);
+    public void sliderStepsGoFromCoolToSharp() {
+        assertEquals(AgvnQuality.Level.LOWEST, AgvnQuality.Level.atStep(0));
+        assertEquals(AgvnQuality.Level.HIGHEST, AgvnQuality.Level.atStep(4));
+        assertEquals(AgvnQuality.Level.HIGHEST, AgvnQuality.Level.atStep(9));
+        assertEquals(2, AgvnQuality.Level.MEDIUM.step());
+        int lastFps = 0;
+        for (int step = 0; step < 5; step++) {
+            AgvnQuality.Level l = AgvnQuality.Level.atStep(step);
+            assertTrue(l.fps > lastFps);
+            lastFps = l.fps;
+        }
+        assertEquals(AgvnQuality.Level.HIGH, AgvnQuality.recommended(DeviceTier.FLAGSHIP));
+        assertEquals(AgvnQuality.Level.LOW, AgvnQuality.recommended(DeviceTier.YEU));
+        assertEquals(AgvnQuality.Level.AUTO, AgvnQuality.Level.of("bogus"));
+    }
+
+    @Test
+    public void findsEngineArt() throws Exception {
+        File ue = tmp.newFolder("UE Game");
+        File splash = new File(ue, "Proj/Content/Splash/Splash.bmp");
+        assertTrue(splash.getParentFile().mkdirs());
+        assertTrue(splash.createNewFile());
+        assertEquals(splash, AgvnCoverSources.find(ue));
+        assertEquals(splash, AgvnCoverSources.find(new File(ue, "Proj")));
+
+        File rpg = tmp.newFolder("RPG");
+        File titles = new File(rpg, "www/img/titles1");
+        assertTrue(titles.mkdirs());
+        java.nio.file.Files.write(new File(titles, "small.png").toPath(), new byte[10]);
+        java.nio.file.Files.write(new File(titles, "Big.png").toPath(), new byte[100]);
+        java.nio.file.Files.write(new File(titles, "enc.png_").toPath(), new byte[1000]);
+        assertEquals("Big.png", AgvnCoverSources.find(rpg).getName());
+        assertNull(AgvnCoverSources.find(tmp.newFolder("Empty")));
     }
 
     @Test
@@ -44,10 +64,10 @@ public class AgvnQualityCoversTest {
         assertTrue(exe.getParentFile().mkdirs());
         assertTrue(exe.createNewFile());
         assertEquals(new File(root, "Game"), AgvnCovers.gameDirFor(null, exe));
-        assertNull(AgvnCovers.findLocal(root));
+        assertNull(AgvnCoverSources.findLocal(root));
         assertTrue(new File(root, "Header.JPG").createNewFile());
         assertTrue(new File(root, "Poster.png").createNewFile());
-        assertEquals("Poster.png", AgvnCovers.findLocal(root).getName());
+        assertEquals("Poster.png", AgvnCoverSources.findLocal(root).getName());
         assertEquals(root, AgvnCovers.gameDirFor("", exe));
         assertEquals(root, AgvnCovers.gameDirFor(root.getPath(), exe));
     }
