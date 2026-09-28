@@ -23,6 +23,7 @@ final class AgvnControlsEditor {
     private static final float BUTTON_SCALE = 0.7f, PAD_SCALE = 0.7f, STICK_SCALE = 0.9f, OPACITY = 0.6f;
     private static final Binding[] ARROWS = {Binding.KEY_UP, Binding.KEY_RIGHT, Binding.KEY_DOWN, Binding.KEY_LEFT};
     private static final Binding[] WASD = {Binding.KEY_W, Binding.KEY_D, Binding.KEY_S, Binding.KEY_A};
+    private static final Binding[] MOUSE_MOVE = {Binding.MOUSE_MOVE_UP, Binding.MOUSE_MOVE_RIGHT, Binding.MOUSE_MOVE_DOWN, Binding.MOUSE_MOVE_LEFT};
 
     private final XServerDisplayActivity activity;
     private final Runnable onFinished;
@@ -143,6 +144,8 @@ final class AgvnControlsEditor {
                 .tool(R.string.agvn_edit_add_button, 0, v -> add(ControlElement.Type.BUTTON, null, ControlElement.Shape.ROUND_RECT, BUTTON_SCALE))
                 .tool(R.string.agvn_edit_add_dpad, 0, v -> add(ControlElement.Type.D_PAD, ARROWS, ControlElement.Shape.CIRCLE, PAD_SCALE))
                 .tool(R.string.agvn_edit_add_stick, 0, v -> add(ControlElement.Type.STICK, WASD, ControlElement.Shape.CIRCLE, STICK_SCALE))
+                .tool(R.string.agvn_edit_add_trackpad, R.string.agvn_edit_add_trackpad_desc,
+                        v -> add(ControlElement.Type.TRACKPAD, MOUSE_MOVE, ControlElement.Shape.ROUND_RECT, STICK_SCALE))
                 .tool(R.string.agvn_edit_keys, 0, v -> rebind(selected()))
                 .tool(R.string.agvn_edit_smaller, R.string.agvn_edit_smaller_desc, v -> resize(selected(), -1))
                 .tool(R.string.agvn_edit_bigger, R.string.agvn_edit_bigger_desc, v -> resize(selected(), 1))
