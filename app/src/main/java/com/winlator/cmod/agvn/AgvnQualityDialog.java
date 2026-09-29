@@ -70,7 +70,7 @@ public final class AgvnQualityDialog {
             name.setText(name(activity, shown) + (shown == suggested ? "  ★" : ""));
             desc.setText(description(activity, shown));
             LaunchPresetResolver.Effective eff = AgvnQuality.effective(activity, shortcut, level);
-            String fps = eff.fps > 0 ? eff.fps + " FPS" : activity.getString(R.string.agvn_unlimited);
+            String fps = eff.fps > 0 ? eff.fps + " FPS" : activity.getString(R.string.agvn_quality_fps_unlimited);
             String res = eff.resolution != null ? eff.resolution.replace('x', '×') : activity.getString(R.string.agvn_default_value);
             detail.setText(activity.getString(R.string.agvn_quality_detail, res, fps));
             note.setText(auto[0] ? activity.getString(R.string.agvn_quality_auto_note) + "\n" + activity.getString(R.string.agvn_quality_restart_note)

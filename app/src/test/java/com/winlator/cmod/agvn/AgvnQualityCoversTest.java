@@ -22,17 +22,26 @@ public class AgvnQualityCoversTest {
     }
 
     @Test
+    public void oldRatCaoCapIsDroppedButOtherCapsStay() {
+        assertEquals("A=1", AgvnQuality.withoutOldHighestCap("A=1 DXVK_FRAME_RATE=40"));
+        assertEquals("A=1 DXVK_FRAME_RATE=60", AgvnQuality.withoutOldHighestCap("A=1 DXVK_FRAME_RATE=60"));
+        assertEquals("", AgvnQuality.withoutOldHighestCap(null));
+        assertEquals("A=1", AgvnQuality.withFps("A=1 DXVK_FRAME_RATE=40", AgvnQuality.Level.HIGHEST.fps));
+    }
+
+    @Test
     public void sliderStepsGoFromCoolToSharp() {
         assertEquals(AgvnQuality.Level.LOWEST, AgvnQuality.Level.atStep(0));
         assertEquals(AgvnQuality.Level.HIGHEST, AgvnQuality.Level.atStep(4));
         assertEquals(AgvnQuality.Level.HIGHEST, AgvnQuality.Level.atStep(9));
         assertEquals(2, AgvnQuality.Level.MEDIUM.step());
         int lastFps = 0;
-        for (int step = 0; step < 5; step++) {
+        for (int step = 0; step < 4; step++) {
             AgvnQuality.Level l = AgvnQuality.Level.atStep(step);
             assertTrue(l.fps > lastFps);
             lastFps = l.fps;
         }
+        assertEquals(0, AgvnQuality.Level.HIGHEST.fps); // Rất cao: no cap, the game and its cheat menu decide
         assertEquals(AgvnQuality.Level.HIGH, AgvnQuality.recommended(DeviceTier.FLAGSHIP));
         assertEquals(AgvnQuality.Level.LOW, AgvnQuality.recommended(DeviceTier.YEU));
         assertEquals(AgvnQuality.Level.AUTO, AgvnQuality.Level.of("bogus"));

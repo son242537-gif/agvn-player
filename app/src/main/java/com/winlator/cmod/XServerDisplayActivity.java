@@ -448,6 +448,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             shortcut = new Shortcut(container, new File(shortcutPath));
         }
         com.winlator.cmod.agvn.AgvnControls.applyDefault(this, shortcut);
+        com.winlator.cmod.agvn.AgvnQuality.upgrade(shortcut);
 
         taskAffinityMask = (short) ProcessHelper.getAffinityMask(container.getCPUList(true));
         taskAffinityMaskWoW64 = (short) ProcessHelper.getAffinityMask(container.getCPUListWoW64(true));
