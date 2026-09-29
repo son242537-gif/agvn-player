@@ -102,6 +102,8 @@ public class AgvnSetupActivity extends AppCompatActivity implements AgvnFirstRun
 
     @Override
     public void onRetry() {
+        // Check the installed files again too: an environment usually fails because the runtime is incomplete.
+        state.setCoreDone(false);
         state.setCoreFailed(false);
         state.setContainerFailed(false);
         advance();

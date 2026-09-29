@@ -85,7 +85,10 @@ internal fun AgvnSetupSteps(state: AgvnSetupState, actions: AgvnSetupActions) {
             if (!state.accessDone && !state.accessSkipped) {
                 if (state.accessAsked) {
                     Text(
-                        stringResource(R.string.agvn_setup_access_denied),
+                        stringResource(
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) R.string.agvn_setup_access_denied
+                            else R.string.agvn_setup_access_denied_legacy
+                        ),
                         color = Color(0xFFFFB74D),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(start = 52.dp, end = 16.dp, bottom = 6.dp)

@@ -178,7 +178,7 @@ public class AdrenotoolsManager {
         hasExtracted = TarCompressorUtils.extract(TarCompressorUtils.Type.ZSTD, mContext, src, dst);
 
         if (!hasExtracted)
-            dst.delete();
+            FileUtils.delete(dst); // AGVN: remove a partly written driver, not only an empty folder
 
         return hasExtracted;
     }
@@ -196,7 +196,7 @@ public class AdrenotoolsManager {
         hasExtracted = TarCompressorUtils.extract(TarCompressorUtils.Type.ZSTD, mContext, src, dst, listener);
 
         if (!hasExtracted)
-            dst.delete();
+            FileUtils.delete(dst); // AGVN: remove a partly written driver, not only an empty folder
 
         return hasExtracted;
     }

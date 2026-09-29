@@ -59,12 +59,14 @@ public abstract class ImageFsInstaller {
         return success;
     }
 
-    public static void installWineFromAssets(final DownloadProgressDialog dialog, final AppCompatActivity activity) {
+    /** @return false when a runtime did not extract completely (it is removed then). */
+    public static boolean installWineFromAssets(final DownloadProgressDialog dialog, final AppCompatActivity activity) {
         String[] versions = activity.getResources().getStringArray(R.array.wine_entries);
         File rootDir = ImageFs.find(activity).getRootDir();
         final byte compressionRatio = 22;
 
         if (dialog != null) activity.runOnUiThread(() -> dialog.setMessage(R.string.installing_wine_files));
+        boolean success = true;
 
         for (String version : versions) {
             File outFile = new File(rootDir, "opt/" + version);
@@ -72,7 +74,7 @@ public abstract class ImageFsInstaller {
             final long contentLength = (long)(FileUtils.getSize(activity, version + ".tar.zst") * (100.0f / compressionRatio));
             AtomicLong totalSizeRef = new AtomicLong();
 
-            TarCompressorUtils.extract(TarCompressorUtils.Type.ZSTD, activity, version + ".tar.zst", outFile, (file, size) -> {
+            boolean extracted = TarCompressorUtils.extract(TarCompressorUtils.Type.ZSTD, activity, version + ".tar.zst", outFile, (file, size) -> {
                 if (size > 0) {
                     long totalSize = totalSizeRef.addAndGet(size);
                     final int progress = (int)(((float)totalSize / contentLength) * 100);
@@ -80,13 +82,20 @@ public abstract class ImageFsInstaller {
                 }
                 return file;
             });
+            if (!extracted) { // AGVN: e.g. storage full; a half-written runtime must not look installed
+                FileUtils.delete(outFile);
+                success = false;
+            }
          }
+        return success;
     }
 
-    public static void installDriversFromAssets(final DownloadProgressDialog dialog, final AppCompatActivity activity) {
+    /** @return false when a bundled driver did not extract completely. */
+    public static boolean installDriversFromAssets(final DownloadProgressDialog dialog, final AppCompatActivity activity) {
         
         if (dialog != null) activity.runOnUiThread(() -> dialog.setMessage(R.string.installing_drivers_files));
         AdrenotoolsManager adrenotoolsManager = new AdrenotoolsManager(activity);
+        boolean success = true;
         String[] adrenotoolsAssetDrivers = activity.getResources().getStringArray(R.array.wrapper_graphics_driver_version_entries);
 
         for (String driver : adrenotoolsAssetDrivers) {
@@ -95,15 +104,16 @@ public abstract class ImageFsInstaller {
             final byte compressionRatio = 22;
             final long contentLength = (long)(FileUtils.getSize(activity, adrenotoolsManager.getAssetPath(driver)) * (100.0f / compressionRatio));
             AtomicLong totalSizeRef = new AtomicLong();
-            adrenotoolsManager.extractDriverFromResources(driver, (file, size) -> {
+            if (!adrenotoolsManager.extractDriverFromResources(driver, (file, size) -> {
                 if (size > 0) {
                     long totalSize = totalSizeRef.addAndGet(size);
                     final int progress = (int)(((float)totalSize / contentLength) * 100);
                     if (dialog != null) activity.runOnUiThread(() -> dialog.setProgress(progress));
                 }
                 return file;
-            });
-         }   
+            })) success = false;
+         }
+        return success;
     }
 
     public static void installFromAssets(final MainActivity activity, onInstallationFinish callback) {
@@ -182,10 +192,13 @@ public abstract class ImageFsInstaller {
                     });
 
             if (success) {
-                installWineFromAssets(null, activity);
+                boolean wineOk = installWineFromAssets(null, activity);
                 if (listener != null) activity.runOnUiThread(() -> listener.onProgress(88));
-                installDriversFromAssets(null, activity);
+                boolean driversOk = installDriversFromAssets(null, activity);
                 if (listener != null) activity.runOnUiThread(() -> listener.onProgress(96));
+                success = wineOk && driversOk; // AGVN: a cut-off runtime or driver is retried, not marked installed
+            }
+            if (success) {
                 imageFs.createImgVersionFile(LATEST_VERSION);
                 FileUtils.symlink("libSDL2-2.0.so",
                         new File(imageFs.getLibDir(), "libSDL2-2.0.so.0").getAbsolutePath());

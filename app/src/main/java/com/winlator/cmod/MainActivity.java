@@ -426,6 +426,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mainToolbar.setVisibility((visible && !isLandscapeOrientation()) ? View.VISIBLE : View.GONE);
     }
 
+    /** AGVN: file manager above the library, so Back returns to the library (used by "Tự chọn file .exe"). */
+    public void openFileManagerFromLibrary() {
+        getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down)
+                .addToBackStack(null)
+                .replace(R.id.FLFragmentContainer, new FileManagerFragment())
+                .commit();
+    }
+
     public void navigateToMainDestination(int menuItemId) {
         if (navigationView == null) return;
         MenuItem destination = navigationView.getMenu().findItem(menuItemId);

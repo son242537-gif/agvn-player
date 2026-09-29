@@ -24,15 +24,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.winlator.cmod.MainActivity
+import com.winlator.cmod.R
+import com.winlator.cmod.ui.LandscapeMainNavigation
 
 @Composable
 internal fun LibraryRootWithoutEmptyDescription(
@@ -48,10 +52,35 @@ internal fun LibraryRootWithoutEmptyDescription(
     }
 
     val activity = LocalContext.current as? MainActivity
+    val configuration = LocalConfiguration.current
+    val landscape = configuration.screenWidthDp > configuration.screenHeightDp
+    // Same bars as the filled library: landscape uses the in-screen navigation, portrait the toolbar + bottom bar.
+    DisposableEffect(activity, landscape) {
+        activity?.setBottomNavigationVisible(!landscape)
+        activity?.setMainToolbarVisible(!landscape)
+        onDispose {
+            activity?.setBottomNavigationVisible(true)
+            activity?.setMainToolbarVisible(true)
+        }
+    }
+    Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        if (landscape) {
+            LandscapeMainNavigation(
+                activity, R.id.main_menu_shortcuts, "Thư viện",
+                actionIcon = Icons.Outlined.HelpOutline,
+                actionDescription = "Hướng dẫn",
+                onAction = { activity?.let { com.winlator.cmod.agvn.AgvnGuideActivity.open(it) } }
+            )
+        }
+        EmptyLibraryContent(activity, Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun EmptyLibraryContent(activity: MainActivity?, modifier: Modifier) {
     Column(
-        Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+        modifier
+            .fillMaxWidth()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 18.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
