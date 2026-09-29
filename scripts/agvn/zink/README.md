@@ -16,7 +16,7 @@ GameHub dùng Mesa 25.1.4, nên cùng game đó chạy được trên GameHub.
 | Thành phần | Nguồn | Kiểm chứng |
 |---|---|---|
 | Mesa 25.1.9 | thẻ `mesa-25.1.9` (commit `4a433b82…`), lấy qua bản sao trên GitHub | Thẻ có chữ ký PGP của Eric Engestrom, người quản lý phát hành Mesa (khoá `57551DE1 5B968F63 41C248F6 8D8E31AF C32428A6`, có trong `docs/release-maintainers-keys.asc` của Mesa). Cùng một thẻ trên hai bản sao độc lập (chaotic-cx, AHMETBAYIR). Script so khớp SHA của thẻ và commit. |
-| Header X11/xcb/drm/zstd | 20 gói `-dev` của Ubuntu 26.04 (resolute) | SHA-256 lấy từ danh mục gói. Mã băm của danh mục nằm trong `InRelease`, có chữ ký của Ubuntu Archive Automatic Signing Key (2018). Chỉ giải nén bằng `dpkg-deb -x`, không chạy mã nào trong gói. |
+| Header X11/xcb/drm/zstd | 22 gói `-dev` của Ubuntu 26.04 (resolute) | SHA-256 lấy từ danh mục gói. Mã băm của danh mục nằm trong `InRelease`, có chữ ký của Ubuntu Archive Automatic Signing Key (2018). Chỉ giải nén bằng `dpkg-deb -x`, không chạy mã nào trong gói. |
 | Thư viện để liên kết | imagefs của app (`imagefs_sha256` trong `scripts/agvn/pins.txt`) | Zink liên kết đúng với những thư viện nó sẽ nạp trên máy. |
 | Trình biên dịch | Android NDK 29.0.14206865 (`scripts/agvn/cloud-setup.sh`) | |
 

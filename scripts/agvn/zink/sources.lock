@@ -14,6 +14,8 @@ api 29
 # Signing Key (2018). libxcb 1.17.0 matches the imagefs runtime; the libraries themselves come from the imagefs.
 deb libxcb1-dev 1.17.0-2ubuntu1 9be071fbb1cc4cb311d477456dbe4e1e97ae9b46468cff51b015c76700da9887 pool/main/libx/libxcb/libxcb1-dev_1.17.0-2ubuntu1_amd64.deb
 deb libxcb-randr0-dev 1.17.0-2ubuntu1 8fd6b940c8508ea88e993ea23a3030de3ef1c34a51c355d5a4c0f6549bbb31a2 pool/main/libx/libxcb/libxcb-randr0-dev_1.17.0-2ubuntu1_amd64.deb
+deb libxcb-render0-dev 1.17.0-2ubuntu1 bea5eec4d84ae0c145cc32cd15e2ec7c458e66cd16b3b8cf4656e0966e437541 pool/main/libx/libxcb/libxcb-render0-dev_1.17.0-2ubuntu1_amd64.deb
+deb libxcb-shape0-dev 1.17.0-2ubuntu1 ccfcd6aec94f6244f9e10a02d712db7ca1a6be4e7421828d73ebc45bf0f8f379 pool/main/libx/libxcb/libxcb-shape0-dev_1.17.0-2ubuntu1_amd64.deb
 deb libxcb-glx0-dev 1.17.0-2ubuntu1 c057d27eea77da87b1981341de6d6d350be380c6029d51f9ad2f7e680dca8b53 pool/main/libx/libxcb/libxcb-glx0-dev_1.17.0-2ubuntu1_amd64.deb
 deb libxcb-shm0-dev 1.17.0-2ubuntu1 8f31234bf98ef4ba4d6a55155a340599920840c3aa7100853a8e9bd60c382257 pool/main/libx/libxcb/libxcb-shm0-dev_1.17.0-2ubuntu1_amd64.deb
 deb libxcb-dri3-dev 1.17.0-2ubuntu1 5292fc3eca88f162dbbebda148ad7a866e716baf77a91a1c612d8485adb41af9 pool/main/libx/libxcb/libxcb-dri3-dev_1.17.0-2ubuntu1_amd64.deb
