@@ -40,7 +40,9 @@ public final class AgvnGameScanner {
             "android", "dcim", "pictures", "music", "movies", "alarms", "notifications", "ringtones", "podcasts",
             "audiobooks", "recordings", "documents", "agvn-player", "winlator", "miui", "tencent", "lost.dir",
             "engine", "binaries", "content", "_commonredist", "redist", "directx"));
-    static final int MAX_VISITED = 3000;
+    static final int MAX_VISITED = 5000;
+    /** Folders that hold nothing but one folder ("NINJA DISGRACE/Shinobi/Shinobi.exe") passed at the depth limit. */
+    static final int MAX_WRAPPERS = 2;
 
     private AgvnGameScanner() {}
 
@@ -62,7 +64,7 @@ public final class AgvnGameScanner {
     public static List<File> scan(List<Root> roots) {
         Walk w = new Walk();
         for (Root root : roots) {
-            if (root.dir != null && root.dir.isDirectory()) walk(root.dir, root.depth, w, !root.includeSelf);
+            if (root.dir != null && root.dir.isDirectory()) walk(root.dir, root.depth, w, !root.includeSelf, 0);
         }
         return w.games;
     }
@@ -75,7 +77,7 @@ public final class AgvnGameScanner {
         int visited;
     }
 
-    private static void walk(File dir, int depthLeft, Walk w, boolean isRoot) {
+    private static void walk(File dir, int depthLeft, Walk w, boolean isRoot, int wrappers) {
         if (w.visited++ > MAX_VISITED) return;
         String key = canonical(dir);
         Integer before = w.budget.get(key);
@@ -86,15 +88,40 @@ public final class AgvnGameScanner {
             w.budget.put(key, Integer.MAX_VALUE);
             return;
         }
-        if (depthLeft <= 0) return;
+        if (depthLeft <= 0) {
+            // a download unpacked into a folder of its own name: the wrapper costs no depth (a few in a row at most)
+            File only = wrappers < MAX_WRAPPERS ? onlySubfolder(dir) : null;
+            if (only != null) walk(only, 0, w, false, wrappers + 1);
+            return;
+        }
         File[] children = dir.listFiles(File::isDirectory);
         if (children == null) return;
         Arrays.sort(children);
         for (File child : children) {
-            String name = child.getName().toLowerCase(Locale.ROOT);
-            if (name.startsWith(".") || SKIP.contains(name)) continue;
-            walk(child, depthLeft - 1, w, false);
+            if (!skipped(child)) walk(child, depthLeft - 1, w, false, 0);
         }
+    }
+
+    /** The single sub-folder of a folder that has no .exe of its own, else null. */
+    static File onlySubfolder(File dir) {
+        File[] entries = dir.listFiles();
+        if (entries == null) return null;
+        File only = null;
+        for (File e : entries) {
+            if (e.isDirectory()) {
+                if (skipped(e)) continue;
+                if (only != null) return null;
+                only = e;
+            } else if (e.getName().toLowerCase(Locale.ROOT).endsWith(".exe")) {
+                return null;
+            }
+        }
+        return only;
+    }
+
+    private static boolean skipped(File dir) {
+        String name = dir.getName().toLowerCase(Locale.ROOT);
+        return name.startsWith(".") || SKIP.contains(name);
     }
 
     static String canonical(File f) {

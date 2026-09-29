@@ -56,17 +56,18 @@ public final class AgvnGameImporter {
 
     /**
      * Game folders found anywhere a player is likely to copy them: folders picked with "Chọn thư mục khác" (3 levels,
-     * the folder itself included), internal storage/AGVN (3 levels), Download, Games, the storage root itself, and
-     * the same places on SD cards / USB drives. Each folder is listed once.
+     * the folder itself included), internal storage/AGVN, Download and Games (3 levels), the storage root (2 levels:
+     * /sdcard/NINJA DISGRACE/Shinobi), and the same places on SD cards / USB drives. A folder holding just one folder
+     * (a download unpacked into its own folder) costs no level. Each folder is listed once.
      */
     public static List<File> listGameDirs(List<File> extraRoots) {
         List<AgvnGameScanner.Root> roots = new ArrayList<>();
         for (File extra : extraRoots) roots.add(new AgvnGameScanner.Root(extra, AgvnGameRoots.DEPTH, true));
         for (File volume : storageVolumes()) {
             roots.add(new AgvnGameScanner.Root(new File(volume, "AGVN"), 3));
-            roots.add(new AgvnGameScanner.Root(new File(volume, "Download"), 2));
-            roots.add(new AgvnGameScanner.Root(new File(volume, "Games"), 2));
-            roots.add(new AgvnGameScanner.Root(volume, 1));
+            roots.add(new AgvnGameScanner.Root(new File(volume, "Download"), 3));
+            roots.add(new AgvnGameScanner.Root(new File(volume, "Games"), 3));
+            roots.add(new AgvnGameScanner.Root(volume, 2));
         }
         return AgvnGameScanner.scan(roots);
     }
