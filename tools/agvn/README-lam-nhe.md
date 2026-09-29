@@ -13,6 +13,7 @@ Kết quả đo trên máy thật (xem `docs/agvn/device-findings.md`): giảm �
 | `do-bo-nho-anh.py <thư mục>` | Đo bộ nhớ GPU của texture, xuất CSV + top 30 file nặng nhất + ước tính tiết kiệm |
 | `tao-agvn-profile.py <thư mục>` | Tạo `agvn-profile.json` (tự tìm exe, kiểm tra đúng luật của app) |
 | `tao-agvn-profile.py <thư mục> --check` | Kiểm tra profile có sẵn, in ra exe mà app sẽ chạy |
+| `them-vao-kho-cau-hinh.py <thư mục>` | Đưa profile đã thử trên máy thật vào kho có sẵn trong app: người chơi tải game ở đâu cũng tự nhận cấu hình (thêm `--match <file>` khi exe là tên chung như Game.exe) |
 | `do-tai.sh [mẫu] [giây]` | Đo RAM trống, PSS của app, nhiệt độ pin, trạng thái nhiệt, % GPU bận qua adb |
 | `agvn_profile_lib.py` | Luật chung (giống hệt app: `GameExeResolver`, `AgvnProfileValidator`) |
 | `texture_headers.py` | Đọc kích thước DDS/PNG/JPG/TGA/BMP chỉ từ phần đầu file |

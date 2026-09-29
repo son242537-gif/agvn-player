@@ -252,5 +252,42 @@ class TextureTest(unittest.TestCase):
             self.assertTrue(lines[1].startswith("Game/Content/big.dds,2048,2048,DXT5,1,4.00"))
 
 
+class CatalogTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.game = os.path.join(self.tmp.name, "MyGame")
+        touch(self.game, "MyGame/Binaries/Win64/MyGame-Win64-Shipping.exe")
+        touch(self.game, "agvn-profile.json", json.dumps({"schemaVersion": 1, "name": "My Game", "fpsLimit": 30}).encode())
+        self.catalog = os.path.join(self.tmp.name, "game-profiles.json")
+        with open(self.catalog, "w", encoding="utf-8") as f:
+            json.dump({"schemaVersion": 1, "entries": []}, f)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_adds_then_replaces_entry(self):
+        kho = load_script("them-vao-kho-cau-hinh.py")
+        entry = kho.entry_for(self.game)
+        self.assertEqual("my-game", entry["id"])
+        self.assertEqual(["MyGame/Binaries/Win64/MyGame-Win64-Shipping.exe"], entry["match"])
+        self.assertEqual(1, kho.add(self.catalog, entry))
+        self.assertEqual(1, kho.add(self.catalog, entry))
+
+    def test_generic_exe_needs_a_second_file(self):
+        kho = load_script("them-vao-kho-cau-hinh.py")
+        self.assertFalse(kho.is_specific(["Game.exe"]))
+        self.assertTrue(kho.is_specific(["Game.exe", "www/data/System.json"]))
+        self.assertFalse(kho.is_specific(["../x.exe"]))
+
+    def test_bundled_catalog_is_valid(self):
+        kho = load_script("them-vao-kho-cau-hinh.py")
+        with open(kho.CATALOG, encoding="utf-8") as f:
+            catalog = json.load(f)
+        self.assertEqual(1, catalog["schemaVersion"])
+        for e in catalog["entries"]:
+            self.assertTrue(kho.is_specific(e["match"]), e["id"])
+            self.assertEqual(1, e["profile"]["schemaVersion"], e["id"])
+
+
 if __name__ == "__main__":
     unittest.main()

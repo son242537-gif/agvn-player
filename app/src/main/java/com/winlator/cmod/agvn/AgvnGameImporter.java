@@ -95,6 +95,11 @@ public final class AgvnGameImporter {
     }
 
     public static Candidate load(File gameDir) throws AgvnProfileException {
+        return load(gameDir, AgvnProfileCatalog.EMPTY);
+    }
+
+    /** The folder's own agvn-profile.json, else a matching bundled profile, else auto settings. */
+    public static Candidate load(File gameDir, AgvnProfileCatalog catalog) throws AgvnProfileException {
         File profileFile = new File(gameDir, AgvnProfile.FILE_NAME);
         AgvnProfile profile;
         if (profileFile.isFile()) {
@@ -102,7 +107,8 @@ public final class AgvnGameImporter {
             if (json == null || json.isEmpty()) throw new AgvnProfileException("Không đọc được file agvn-profile.json.");
             profile = AgvnProfile.parse(json);
         } else {
-            profile = AgvnProfile.defaultFor(gameDir.getName());
+            profile = catalog.find(gameDir);
+            if (profile == null) profile = AgvnProfile.defaultFor(gameDir.getName());
         }
         String exe = AgvnProfileValidator.validate(profile, gameDir);
         return new Candidate(gameDir, profile, exe, GameExeResolver.detectEngine(gameDir));

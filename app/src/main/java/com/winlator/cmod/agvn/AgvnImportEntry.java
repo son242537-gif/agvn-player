@@ -39,8 +39,9 @@ public final class AgvnImportEntry {
     public static List<AgvnImportEntry> scan(Context ctx) {
         List<File> dirs = AgvnGameImporter.listGameDirs(AgvnGameRoots.load(ctx));
         AgvnLibraryIndex library = new AgvnLibraryIndex(new ContainerManager(ctx).loadShortcuts());
+        AgvnProfileCatalog catalog = AgvnProfileCatalog.get(ctx);
         List<AgvnImportEntry> out = new ArrayList<>();
-        for (File dir : dirs) out.add(build(ctx, dir, library));
+        for (File dir : dirs) out.add(build(ctx, dir, library, catalog));
         Collections.sort(out, (a, b) -> {
             if ((a.existing == null) != (b.existing == null)) return a.existing == null ? -1 : 1;
             return a.sortKey.compareTo(b.sortKey);
@@ -48,7 +49,7 @@ public final class AgvnImportEntry {
         return out;
     }
 
-    private static AgvnImportEntry build(Context ctx, File dir, AgvnLibraryIndex library) {
+    private static AgvnImportEntry build(Context ctx, File dir, AgvnLibraryIndex library, AgvnProfileCatalog catalog) {
         File profileFile = new File(dir, AgvnProfile.FILE_NAME);
         boolean hasProfile = profileFile.isFile();
         GameExeResolver.Engine engine = GameExeResolver.detectEngine(dir);
@@ -61,6 +62,13 @@ public final class AgvnImportEntry {
                 if (p.exe != null && !p.exe.trim().isEmpty()) exe = p.exe.trim();
             } catch (Exception ignored) {
                 // a broken profile is reported when the player taps the game
+            }
+        } else {
+            AgvnProfile p = catalog.find(dir);
+            if (p != null) {
+                hasProfile = true;
+                title = p.name.trim();
+                if (p.exe != null && !p.exe.trim().isEmpty()) exe = p.exe.trim();
             }
         }
         if (title == null) title = AgvnGameTitle.pretty(dir.getName());
