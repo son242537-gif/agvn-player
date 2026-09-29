@@ -7,6 +7,8 @@
 /captures
 .externalNativeBuild
 .cxx
+# Kotlin 2.x compiler daemon state and crash logs
+.kotlin/
 app/src/main/assets/imagefs.txz
 app/src/main/assets/proton-9.0-arm64ec.txz
 app/src/main/assets/proton-9.0-x86_64.txz
