@@ -101,7 +101,8 @@ meson setup "$BUILD" "$SRC" --cross-file "$CROSS" --prefix=/usr --libdir=lib \
     -Dglvnd=disabled -Degl=disabled -Dgbm=disabled -Dllvm=disabled \
     -Dxmlconfig=disabled -Dexpat=disabled -Dzstd=enabled -Dzlib=disabled \
     -Dlibunwind=disabled -Dvalgrind=disabled -Dlmsensors=disabled -Dandroid-libbacktrace=disabled \
-    -Dgallium-va=disabled -Dgallium-vdpau=disabled -Dgallium-xa=disabled -Dvideo-codecs=
+    -Dgallium-va=disabled -Dgallium-vdpau=disabled -Dgallium-xa=disabled -Dvideo-codecs= \
+    -Dxlib-lease=disabled
 ninja -C "$BUILD"
 DEST="$WORK/dest"
 rm -rf "$DEST" && DESTDIR="$DEST" meson install -C "$BUILD" --no-rebuild --quiet
