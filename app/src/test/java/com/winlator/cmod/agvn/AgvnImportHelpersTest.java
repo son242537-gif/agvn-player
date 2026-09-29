@@ -16,13 +16,18 @@ public class AgvnImportHelpersTest {
         for (int i = 0; i < AgvnGameRoots.MAX; i++) known.add(new File("/sd/f" + i));
         List<String> paths = AgvnGameRoots.remember(known, new File("/sd/f3"));
         assertEquals(AgvnGameRoots.MAX, paths.size());
-        assertEquals("/sd/f3", paths.get(0));
-        assertEquals("/sd/f0", paths.get(1));
+        assertEquals(abs("/sd/f3"), paths.get(0));
+        assertEquals(abs("/sd/f0"), paths.get(1));
 
         paths = AgvnGameRoots.remember(known, new File("/sd/new"));
         assertEquals(AgvnGameRoots.MAX, paths.size());
-        assertEquals("/sd/new", paths.get(0));
-        assertEquals("/sd/f8", paths.get(AgvnGameRoots.MAX - 1));
+        assertEquals(abs("/sd/new"), paths.get(0));
+        assertEquals(abs("/sd/f8"), paths.get(AgvnGameRoots.MAX - 1));
+    }
+
+    /** Absolute form on the build machine ("C:\\sd\\f3" on Windows), as the code under test stores it. */
+    private static String abs(String path) {
+        return new File(path).getAbsolutePath();
     }
 
     @Test
