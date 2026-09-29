@@ -1,0 +1,10 @@
+AGVN Player v0.1.1 - agvn.io.vn
+
+Mới:
+- Màn "Thêm game" mới, toàn màn hình: mỗi game một dòng có ảnh nhỏ, tên dễ đọc (bỏ các chữ như GAMEHUB, AGVN, CHEAT), loại game và nơi để game.
+- Ô "Tìm game" gõ không dấu cũng tìm được. Game "Chưa thêm" ở trên, game đã có trong thư viện ở dưới (có dấu tích, bấm lại để cập nhật).
+- "Chọn thư mục khác": tự chọn thư mục có game ngay trong app, app nhớ thư mục đó cho lần sau.
+- Nút "?" (Hướng dẫn) trên thanh trên của thư viện; Hướng dẫn tự mở một lần sau khi cài hoặc cập nhật.
+Sửa lỗi:
+- Thêm lại game đã có sẽ cập nhật đúng game đó, không tạo thêm một game trùng trong thư viện.
+Góp ý và báo lỗi: gửi file "Xuất nhật ký lỗi" qua agvn.io.vn.

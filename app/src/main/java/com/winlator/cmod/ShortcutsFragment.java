@@ -95,6 +95,7 @@ public class ShortcutsFragment extends Fragment {
     private static final int MENU_HORIZONTAL_MODE = 7;
     private static final int MENU_GROUP_LOCK = 8;
     private static final int MENU_GROUP_ORIENTATION_MODE = 9;
+    private static final int MENU_HELP = 10; // AGVN
     private static final String STEAMGRID_BASE_URL = "https://www.steamgriddb.com/api/v2/";
     private static String STEAMGRID_API_KEY = "0324c52513634547a7b32d6d323635d0";
     private static final ExecutorService DYNAMIC_SHORTCUT_EXECUTOR = Executors.newSingleThreadExecutor();
@@ -276,6 +277,10 @@ public class ShortcutsFragment extends Fragment {
         addItem.setIcon(R.drawable.ui_ic_add);
         addItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
+        MenuItem helpItem = menu.add(0, MENU_HELP, 2, "Hướng dẫn"); // AGVN
+        helpItem.setIcon(R.drawable.ui_ic_help);
+        helpItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
         MainActivity activity = (MainActivity) requireActivity();
         SubMenu moreMenu = menu.addSubMenu(0, MENU_MORE, 3, "Thêm");
         MenuItem moreItem = moreMenu.getItem();
@@ -304,6 +309,10 @@ public class ShortcutsFragment extends Fragment {
         if (item.getItemId() == MENU_FILE_MANAGER) {
             // AGVN: "+" adds a game (the file manager stays reachable from "Tự chọn file .exe")
             com.winlator.cmod.agvn.AgvnImportDialog.show((MainActivity) requireActivity());
+            return true;
+        }
+        if (item.getItemId() == MENU_HELP) {
+            com.winlator.cmod.agvn.AgvnGuideActivity.open(requireActivity());
             return true;
         }
         MainActivity activity = (MainActivity) requireActivity();

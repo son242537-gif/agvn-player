@@ -55,11 +55,13 @@ public final class AgvnGameImporter {
     }
 
     /**
-     * Game folders found anywhere a player is likely to copy them: internal storage/AGVN (3 levels), Download,
-     * Games, the storage root itself, and the same places on SD cards / USB drives.
+     * Game folders found anywhere a player is likely to copy them: folders picked with "Chọn thư mục khác" (3 levels,
+     * the folder itself included), internal storage/AGVN (3 levels), Download, Games, the storage root itself, and
+     * the same places on SD cards / USB drives. Each folder is listed once.
      */
-    public static List<File> listGameDirs() {
+    public static List<File> listGameDirs(List<File> extraRoots) {
         List<AgvnGameScanner.Root> roots = new ArrayList<>();
+        for (File extra : extraRoots) roots.add(new AgvnGameScanner.Root(extra, AgvnGameRoots.DEPTH, true));
         for (File volume : storageVolumes()) {
             roots.add(new AgvnGameScanner.Root(new File(volume, "AGVN"), 3));
             roots.add(new AgvnGameScanner.Root(new File(volume, "Download"), 2));
@@ -70,7 +72,7 @@ public final class AgvnGameImporter {
     }
 
     /** Internal storage first, then removable volumes mounted under /storage. */
-    static List<File> storageVolumes() {
+    public static List<File> storageVolumes() {
         List<File> volumes = new ArrayList<>();
         volumes.add(Environment.getExternalStorageDirectory());
         File[] mounted = new File("/storage").listFiles();
@@ -119,6 +121,7 @@ public final class AgvnGameImporter {
         File desktopDir = container.getDesktopDir();
         desktopDir.mkdirs();
         File desktopFile = new File(desktopDir, name + ".desktop");
+        Map<String, String> kept = keptExtras(container, desktopFile);
         try (PrintWriter writer = new PrintWriter(desktopFile, "UTF-8")) {
             writer.println("[Desktop Entry]");
             writer.println("Name=" + name);
@@ -130,6 +133,7 @@ public final class AgvnGameImporter {
         AgvnControls.ensureProfiles(ctx);
         Shortcut shortcut = new Shortcut(container, desktopFile);
         LaunchPresetResolver.Effective eff = LaunchPresetResolver.resolve(c.profile, tier, DeviceTierManager.getRules(ctx).preset(tier));
+        for (Map.Entry<String, String> e : kept.entrySet()) shortcut.putExtra(e.getKey(), e.getValue());
         applyProfile(shortcut, c, profileCopy, eff);
         shortcut.putExtra(EXTRA_TIER, tier.name());
         shortcut.saveData();
@@ -137,6 +141,20 @@ public final class AgvnGameImporter {
         PreLaunchCheck.applyUeConfig(shortcut);
         extractIcon(container, exeFile, name);
         return desktopFile;
+    }
+
+    /** Extras a re-import must not lose: the launcher-shortcut id, favourite flag, last run and a picked cover. */
+    static final String[] KEPT_EXTRAS = {"uuid", "favorite", "lastRunAt", "customCoverArtPath"};
+
+    private static Map<String, String> keptExtras(Container container, File desktopFile) {
+        Map<String, String> kept = new java.util.HashMap<>();
+        if (!desktopFile.isFile()) return kept;
+        Shortcut old = new Shortcut(container, desktopFile);
+        for (String key : KEPT_EXTRAS) {
+            String value = old.getExtra(key);
+            if (!value.isEmpty()) kept.put(key, value);
+        }
+        return kept;
     }
 
     static void applyProfile(Shortcut shortcut, Candidate c, File profileCopy, LaunchPresetResolver.Effective eff) {

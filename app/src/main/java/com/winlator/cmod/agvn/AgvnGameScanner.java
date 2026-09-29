@@ -5,9 +5,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -20,10 +22,17 @@ public final class AgvnGameScanner {
     public static final class Root {
         final File dir;
         final int depth;
+        /** The root itself may be the game (a folder the player picked by hand). */
+        final boolean includeSelf;
 
         public Root(File dir, int depth) {
+            this(dir, depth, false);
+        }
+
+        public Root(File dir, int depth, boolean includeSelf) {
             this.dir = dir;
             this.depth = depth;
+            this.includeSelf = includeSelf;
         }
     }
 
@@ -51,21 +60,30 @@ public final class AgvnGameScanner {
     }
 
     public static List<File> scan(List<Root> roots) {
-        List<File> games = new ArrayList<>();
-        Set<String> seen = new HashSet<>();
-        int[] visited = {0};
+        Walk w = new Walk();
         for (Root root : roots) {
-            if (root.dir != null && root.dir.isDirectory()) walk(root.dir, root.depth, games, seen, visited, true);
+            if (root.dir != null && root.dir.isDirectory()) walk(root.dir, root.depth, w, !root.includeSelf);
         }
-        return games;
+        return w.games;
     }
 
-    private static void walk(File dir, int depthLeft, List<File> games, Set<String> seen, int[] visited, boolean isRoot) {
-        if (visited[0]++ > MAX_VISITED) return;
+    /** Scan state: a folder reached again from a root with a bigger depth budget is searched again. */
+    private static final class Walk {
+        final List<File> games = new ArrayList<>();
+        final Map<String, Integer> budget = new HashMap<>();
+        final Set<String> checked = new HashSet<>();
+        int visited;
+    }
+
+    private static void walk(File dir, int depthLeft, Walk w, boolean isRoot) {
+        if (w.visited++ > MAX_VISITED) return;
         String key = canonical(dir);
-        if (!seen.add(key)) return;
-        if (!isRoot && isGameDir(dir)) {
-            games.add(dir);
+        Integer before = w.budget.get(key);
+        if (before != null && before >= depthLeft) return;
+        w.budget.put(key, depthLeft);
+        if (!isRoot && w.checked.add(key) && isGameDir(dir)) {
+            w.games.add(dir);
+            w.budget.put(key, Integer.MAX_VALUE);
             return;
         }
         if (depthLeft <= 0) return;
@@ -75,11 +93,11 @@ public final class AgvnGameScanner {
         for (File child : children) {
             String name = child.getName().toLowerCase(Locale.ROOT);
             if (name.startsWith(".") || SKIP.contains(name)) continue;
-            walk(child, depthLeft - 1, games, seen, visited, false);
+            walk(child, depthLeft - 1, w, false);
         }
     }
 
-    private static String canonical(File f) {
+    static String canonical(File f) {
         try {
             return f.getCanonicalPath();
         } catch (IOException e) {
