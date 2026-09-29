@@ -33,6 +33,7 @@
         <item>Ở thư viện, bấm ⋮ trên game rồi chọn \"Chỉnh đồ họa: mát máy ↔ đẹp\".</item>
         <item>Kéo thanh sang trái (Siêu nhẹ, Thấp) để máy mát và mượt hơn. Kéo sang phải (Cao, Rất cao) để hình đẹp hơn nhưng máy nóng hơn.</item>
         <item>Mức có dấu ★ là mức app gợi ý cho máy của bạn. Bấm \"Về mức gợi ý\" nếu muốn app tự chỉnh.</item>
+        <item>Mức Rất cao không giới hạn FPS, để không đè lên cài đặt FPS của game và menu cheat. Máy nóng quá thì trong game mở menu, mục Hình ảnh, chọn \"Giới hạn FPS\" 60.</item>
         <item>Bấm \"Lưu\" rồi thoát game và mở lại để áp dụng.</item>
     </string-array>
 

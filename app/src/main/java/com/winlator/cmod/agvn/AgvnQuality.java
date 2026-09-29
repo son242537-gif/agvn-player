@@ -13,6 +13,8 @@ import java.io.File;
  * "Đồ họa" slider chosen outside the game: 5 steps from Siêu nhẹ (coolest) to Rất cao (sharpest), plus AUTO = the
  * step recommended for this phone, which also honours the AGVN game profile the same way as at import
  * (LaunchPresetResolver). Writes the shortcut's resolution, FPS cap (DXVK_FRAME_RATE) and Unreal texture pool.
+ * Rất cao sets no FPS cap: the game and its cheat menu keep control of FPS (an outside cap silently overrode their
+ * own FPS options); the in-game "Giới hạn FPS" menu still caps it live when the phone gets hot.
  */
 public final class AgvnQuality {
     public static final String EXTRA_QUALITY = "agvnQuality";
@@ -23,9 +25,10 @@ public final class AgvnQuality {
         LOW("854x480", 24, 512, DeviceTier.YEU),
         MEDIUM("960x544", 27, 768, DeviceTier.TRUNG_BINH),
         HIGH("1280x720", 30, 1024, DeviceTier.FLAGSHIP),
-        HIGHEST("1600x900", 40, 1536, DeviceTier.FLAGSHIP);
+        HIGHEST("1600x900", 0, 1536, DeviceTier.FLAGSHIP);
 
         final String resolution;
+        /** 0 = no cap. */
         final int fps;
         final int texturePool;
         final DeviceTier tier;
@@ -91,6 +94,25 @@ public final class AgvnQuality {
         shortcut.putExtra(AgvnGameImporter.EXTRA_TIER, tierFor(ctx, level).name());
         shortcut.putExtra(EXTRA_QUALITY, level.name());
         shortcut.saveData();
+    }
+
+    /** FPS cap Rất cao wrote before it became uncapped (v0.1.2). */
+    static final int OLD_HIGHEST_FPS = 40;
+
+    /** Drops the old 40 FPS cap from a game saved at Rất cao, so it matches what the slider now shows. Safe to repeat. */
+    public static void upgrade(Shortcut shortcut) {
+        if (shortcut == null || current(shortcut) != Level.HIGHEST) return;
+        String env = shortcut.getExtra("envVars");
+        String cleaned = withoutOldHighestCap(env);
+        if (cleaned.equals(env)) return;
+        shortcut.putExtra("envVars", cleaned);
+        shortcut.saveData();
+    }
+
+    static String withoutOldHighestCap(String envVars) {
+        String env = envVars == null ? "" : envVars;
+        EnvVars vars = new EnvVars(env);
+        return String.valueOf(OLD_HIGHEST_FPS).equals(vars.get("DXVK_FRAME_RATE")) ? withFps(env, 0) : env;
     }
 
     /** Sets or removes DXVK_FRAME_RATE, keeping every other variable. */
