@@ -52,6 +52,14 @@
     <string name="agvn_import_grant">Cấp quyền</string>
     <string name="agvn_internal_storage">Bộ nhớ trong</string>
     <string name="agvn_import_preview_controls">Bộ phím: %1$s</string>
+    <string name="agvn_import_preview_html">Cách chạy: Chạy nhẹ, không giả lập Windows (nhanh, mát máy, đỡ tốn pin)</string>
+    <string name="agvn_html_back_title">Tạm dừng</string>
+    <string name="agvn_html_menu">Mở menu trong game</string>
+    <string name="agvn_html_exit">Thoát game</string>
+    <string name="agvn_html_use_windows">Game bị lỗi? Chạy bằng Windows</string>
+    <string name="agvn_html_keep_playing">Chơi tiếp</string>
+    <string name="agvn_html_no_webview">Máy đang tắt hoặc đang cập nhật \"Android System WebView\", nên game được chạy bằng Windows.</string>
+    <string name="agvn_html_crashed">Game bị dừng vì thiếu bộ nhớ hoặc lỗi. Hãy mở lại, nếu vẫn lỗi thì chọn \"Chạy bằng Windows\".</string>
     <string name="agvn_import_preview_japanese">Ngôn ngữ Windows: tiếng Nhật (để chữ trong game Nhật không bị lỗi)</string>
     <string name="agvn_controls_pc">Máy tính</string>
     <string name="agvn_controls_vn">Visual novel</string>

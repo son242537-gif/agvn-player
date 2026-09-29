@@ -84,7 +84,7 @@ class ProfileRulesTest(unittest.TestCase):
         touch(self.tmp.name, "evil.exe")
         bad = [{"exe": "../evil.exe"}, {"exe": "C:/evil.exe"}, {"args": ["a;b"]}, {"env": {"A": "$(x)"}},
                {"resolution": "320x240"}, {"fpsLimit": 5}, {"texturePool": 9000}, {"ueEngineIni": {"[x]": {}}},
-               {"name": "a/b"}, {"schemaVersion": 2}, {"locale": "japanese"}, {"locale": "ja_JP;x"}]
+               {"name": "a/b"}, {"schemaVersion": 2}, {"locale": "japanese"}, {"locale": "ja_JP;x"}, {"runner": "exe"}]
         for extra in bad:
             p = {"schemaVersion": 1, "name": "g"}
             p.update(extra)

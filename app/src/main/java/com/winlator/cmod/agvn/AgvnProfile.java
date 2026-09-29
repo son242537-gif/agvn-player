@@ -53,6 +53,8 @@ public final class AgvnProfile {
     public String controls;
     /** Wine LC_ALL, e.g. "ja_JP"; "" = container default; missing = chosen by engine (see {@link AgvnLocale}). */
     public String locale;
+    /** "html" or "wine" for RPG Maker MV/MZ and Tyrano games; missing = html when index.html is there. */
+    public String runner;
 
     public static AgvnProfile parse(String json) throws AgvnProfileException {
         AgvnProfile profile;
