@@ -3,6 +3,8 @@ package com.winlator.cmod.agvn;
 
 import android.webkit.WebResourceResponse;
 
+import com.winlator.cmod.core.FileUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,10 +12,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Serves a web game's files to the WebView. Games made on Windows often name files with the wrong upper/lower case
@@ -22,6 +28,12 @@ import java.util.Map;
  */
 public final class AgvnHtmlFiles {
     private static final Map<String, String> MIME = new HashMap<>();
+    /** Served from the app, not the game folder. */
+    public static final String COMPAT_PATH = "/__agvn/compat.js";
+    private static final Pattern HEAD = Pattern.compile("<head(\\s[^>]*)?>", Pattern.CASE_INSENSITIVE);
+    /** 1x1 fully transparent PNG. */
+    static final byte[] TRANSPARENT_PNG = Base64.getDecoder().decode(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=");
     private static final Map<String, String> CORS = Collections.singletonMap("Access-Control-Allow-Origin", "*");
 
     static {
@@ -40,11 +52,24 @@ public final class AgvnHtmlFiles {
 
     private AgvnHtmlFiles() {}
 
-    /** The response for URL path {@code urlPath}: the game file, or 404. */
-    public static WebResourceResponse serve(File root, String urlPath) {
+    /**
+     * The response for URL path {@code urlPath}: the game file (index.html with {@code compatJs} loaded first, see
+     * assets/agvn/html-compat.js), a transparent picture for a missing .png so the game does not stop, or 404.
+     */
+    public static WebResourceResponse serve(File root, String urlPath, String compatJs) {
+        if (COMPAT_PATH.equals(urlPath) && compatJs != null)
+            return text("application/javascript", compatJs);
         File file = resolve(root, urlPath);
-        if (file == null) return new WebResourceResponse("text/plain", "UTF-8", 404, "Not Found", CORS, empty());
+        if (file == null) {
+            if (urlPath != null && urlPath.toLowerCase(Locale.ROOT).endsWith(".png"))
+                return new WebResourceResponse("image/png", null, 200, "OK", CORS, new ByteArrayInputStream(TRANSPARENT_PNG));
+            return new WebResourceResponse("text/plain", "UTF-8", 404, "Not Found", CORS, empty());
+        }
         String mime = mimeType(file.getName());
+        if (compatJs != null && file.getName().equalsIgnoreCase("index.html")) {
+            String html = FileUtils.readString(file);
+            if (html != null) return text("text/html", inject(html));
+        }
         try {
             WebResourceResponse r = new WebResourceResponse(mime, isText(mime) ? "UTF-8" : null, new FileInputStream(file));
             r.setResponseHeaders(CORS);
@@ -52,6 +77,22 @@ public final class AgvnHtmlFiles {
         } catch (IOException e) {
             return blocked();
         }
+    }
+
+    /** {@code html} with the compatibility script as the very first script, before the engine's. */
+    static String inject(String html) {
+        String tag = "<script src=\"" + COMPAT_PATH + "\"></script>";
+        Matcher head = HEAD.matcher(html);
+        if (head.find()) return html.substring(0, head.end()) + tag + html.substring(head.end());
+        int script = html.toLowerCase(Locale.ROOT).indexOf("<script");
+        return script >= 0 ? html.substring(0, script) + tag + html.substring(script) : tag + html;
+    }
+
+    private static WebResourceResponse text(String mime, String body) {
+        WebResourceResponse r = new WebResourceResponse(mime, "UTF-8",
+                new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
+        r.setResponseHeaders(CORS);
+        return r;
     }
 
     public static WebResourceResponse blocked() {

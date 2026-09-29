@@ -3,6 +3,8 @@ import importlib.util
 import io
 import json
 import os
+import shutil
+import subprocess
 import struct
 import sys
 import tempfile
@@ -287,6 +289,14 @@ class CatalogTest(unittest.TestCase):
         for e in catalog["entries"]:
             self.assertTrue(kho.is_specific(e["match"]), e["id"])
             self.assertEqual(1, e["profile"]["schemaVersion"], e["id"])
+
+
+class HtmlCompatTest(unittest.TestCase):
+    @unittest.skipIf(shutil.which("node") is None, "node is not installed")
+    def test_compat_script_in_simulated_rpg_maker(self):
+        sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_compat_sim.js")
+        out = subprocess.run(["node", sim], capture_output=True, text=True)
+        self.assertEqual(0, out.returncode, out.stdout + out.stderr)
 
 
 if __name__ == "__main__":
