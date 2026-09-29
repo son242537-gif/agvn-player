@@ -40,8 +40,8 @@
     <string name="agvn_guide_controls_title">Phím ảo trên màn hình</string>
     <string name="agvn_guide_controls_summary">Thêm, di chuyển, đổi phím ngay trong game</string>
     <string-array name="agvn_guide_controls_steps">
-        <item>Trong game có thanh nhỏ ở giữa phía trên: \"✎ Sửa\" để chỉnh phím, \"👁 Ẩn\" để ẩn hoặc hiện bộ phím, \"⌨\" để mở bàn phím.</item>
-        <item>Bấm \"✎ Sửa\": kéo nút để di chuyển. Chạm một nút để chọn, rồi dùng \"Phím…\" để đổi phím, \"－\" / \"＋\" để thu nhỏ hoặc phóng to, \"Xóa\" để bỏ nút.</item>
+        <item>Trong game có thanh nhỏ ở giữa phía trên: \"✎ Sửa\" để chỉnh phím, \"👁 Ẩn\" để ẩn hoặc hiện bộ phím, \"⌨\" để mở bàn phím. Thanh tự ẩn sau 3 giây để không che game, chỉ còn một vạch mờ ở mép trên: chạm vào vạch đó để hiện lại.</item>
+        <item>Bấm \"✎ Sửa\": kéo nút để di chuyển. Chạm một nút để chọn, rồi dùng \"Phím…\" để đổi phím, \"－\" / \"＋\" để thu nhỏ hoặc phóng to, \"Kiểu…\" để đổi hình dạng (tròn, vuông, chữ nhật, bo tròn) và độ mờ, \"Xóa\" để bỏ nút.</item>
         <item>\"+ Nút\" hiện đủ bàn phím và chuột, chạm vào phím bạn muốn. \"+ Vùng xoay\" thêm vùng vuốt để xoay camera trong game 3D.</item>
         <item>Tick ô \"Giữ\" khi chọn phím nếu muốn nút đó bấm một lần là giữ, bấm lần nữa là thả (ví dụ giữ chuột để kéo thả).</item>
         <item>Bấm \"Xong\" để lưu. Bộ phím được lưu riêng cho từng game.</item>

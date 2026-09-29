@@ -620,7 +620,8 @@ public class ControlElement {
                     }
                     case RECT:
                     case ROUND_RECT: {
-                        float radius = h * 0.45f;
+                        // AGVN: RECT is a rectangle with slightly rounded corners, ROUND_RECT the pill (they looked the same)
+                        float radius = shape == Shape.RECT ? snappingSize * 0.35f * scale : h * 0.45f;
                         drawSoftRoundRect(canvas, boundingBox.left, boundingBox.top, boundingBox.right, boundingBox.bottom, radius, active);
                         break;
                     }
