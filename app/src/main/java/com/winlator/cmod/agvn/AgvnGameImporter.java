@@ -121,6 +121,7 @@ public final class AgvnGameImporter {
         File desktopDir = container.getDesktopDir();
         desktopDir.mkdirs();
         File desktopFile = new File(desktopDir, name + ".desktop");
+        Map<String, String> kept = keptExtras(container, desktopFile);
         try (PrintWriter writer = new PrintWriter(desktopFile, "UTF-8")) {
             writer.println("[Desktop Entry]");
             writer.println("Name=" + name);
@@ -132,6 +133,7 @@ public final class AgvnGameImporter {
         AgvnControls.ensureProfiles(ctx);
         Shortcut shortcut = new Shortcut(container, desktopFile);
         LaunchPresetResolver.Effective eff = LaunchPresetResolver.resolve(c.profile, tier, DeviceTierManager.getRules(ctx).preset(tier));
+        for (Map.Entry<String, String> e : kept.entrySet()) shortcut.putExtra(e.getKey(), e.getValue());
         applyProfile(shortcut, c, profileCopy, eff);
         shortcut.putExtra(EXTRA_TIER, tier.name());
         shortcut.saveData();
@@ -139,6 +141,20 @@ public final class AgvnGameImporter {
         PreLaunchCheck.applyUeConfig(shortcut);
         extractIcon(container, exeFile, name);
         return desktopFile;
+    }
+
+    /** Extras a re-import must not lose: the launcher-shortcut id, favourite flag, last run and a picked cover. */
+    static final String[] KEPT_EXTRAS = {"uuid", "favorite", "lastRunAt", "customCoverArtPath"};
+
+    private static Map<String, String> keptExtras(Container container, File desktopFile) {
+        Map<String, String> kept = new java.util.HashMap<>();
+        if (!desktopFile.isFile()) return kept;
+        Shortcut old = new Shortcut(container, desktopFile);
+        for (String key : KEPT_EXTRAS) {
+            String value = old.getExtra(key);
+            if (!value.isEmpty()) kept.put(key, value);
+        }
+        return kept;
     }
 
     static void applyProfile(Shortcut shortcut, Candidate c, File profileCopy, LaunchPresetResolver.Effective eff) {

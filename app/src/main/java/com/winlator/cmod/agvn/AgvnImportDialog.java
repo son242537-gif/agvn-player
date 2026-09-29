@@ -17,12 +17,17 @@ import com.winlator.cmod.container.ContainerManager;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * "Thêm game": asks for storage access when needed, then opens the full-screen game list ({@link AgvnAddGameHost}).
  * Tapping a game previews the settings it will get and imports it (again, for a game already in the library).
  */
 public final class AgvnImportDialog {
+    /** One import at a time, in tap order. */
+    private static final ExecutorService IO = Executors.newSingleThreadExecutor();
+
     private AgvnImportDialog() {}
 
     public static void show(MainActivity activity) {
@@ -85,15 +90,27 @@ public final class AgvnImportDialog {
             target = containers.get(0);
         }
         if (existing != null) candidate.profile.name = existing.name;
-        try {
-            AgvnGameImporter.importGame(activity, target, candidate, tier);
-        } catch (Exception e) {
-            showError(activity, activity.getString(R.string.agvn_import_failed, String.valueOf(e.getMessage())));
-            return;
-        }
-        Toast.makeText(activity, activity.getString(R.string.agvn_import_done, candidate.profile.name), Toast.LENGTH_LONG).show();
-        if (onImported != null) onImported.run();
-        activity.navigateToMainDestination(R.id.main_menu_shortcuts);
+        Container container = target;
+        // writing the shortcut and reading the exe icon touch storage: keep them off the main thread
+        IO.execute(() -> {
+            Exception error = null;
+            try {
+                AgvnGameImporter.importGame(activity, container, candidate, tier);
+            } catch (Exception e) {
+                error = e;
+            }
+            Exception failure = error;
+            activity.runOnUiThread(() -> {
+                if (activity.isFinishing() || activity.isDestroyed()) return;
+                if (failure != null) {
+                    showError(activity, activity.getString(R.string.agvn_import_failed, String.valueOf(failure.getMessage())));
+                    return;
+                }
+                Toast.makeText(activity, activity.getString(R.string.agvn_import_done, candidate.profile.name), Toast.LENGTH_LONG).show();
+                if (onImported != null) onImported.run();
+                activity.navigateToMainDestination(R.id.main_menu_shortcuts);
+            });
+        });
     }
 
     private static void openStoragePermission(MainActivity activity) {
