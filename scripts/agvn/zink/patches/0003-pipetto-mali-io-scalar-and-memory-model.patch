@@ -1,0 +1,48 @@
+Source: Pipetto-crypto/mesa 12ef937ea2799d1da502329b92d1b155b6a04e5a ("disable a broken NIR spirv pass on Mali"),
+ported by AGVN to mesa-25.1.9 (same two changes, new line numbers). Present in Ludashi's opengl_zink.tzst (its
+DWARF has the vukan_memory_model_feats member).
+Why: on the Mali (ARM proprietary) Vulkan driver, scalarised shader I/O and the memory-model capability break shaders.
+
+diff --git a/src/gallium/drivers/zink/zink_compiler.c b/src/gallium/drivers/zink/zink_compiler.c
+index 1d751d5149..b318e81b8c 100644
+--- a/src/gallium/drivers/zink/zink_compiler.c
++++ b/src/gallium/drivers/zink/zink_compiler.c
+@@ -6126,7 +6126,7 @@ zink_shader_create(struct zink_screen *screen, struct nir_shader *nir)
+    zs->has_edgeflags = nir->info.stage == MESA_SHADER_VERTEX &&
+                        nir->info.outputs_written & VARYING_BIT_EDGE;
+ 
+-   zs->sinfo.have_vulkan_memory_model = screen->info.have_KHR_vulkan_memory_model;
++   zs->sinfo.have_vulkan_memory_model = screen->info.vukan_memory_model_feats.vulkanMemoryModel;
+    zs->sinfo.have_workgroup_memory_explicit_layout = screen->info.have_KHR_workgroup_memory_explicit_layout;
+    zs->sinfo.broken_arbitary_type_const = screen->driver_compiler_workarounds.broken_const;
+    if (screen->info.have_KHR_shader_float_controls) {
+@@ -6191,7 +6191,8 @@ zink_shader_init(struct zink_screen *screen, struct zink_shader *zs)
+       NIR_PASS_V(nir, nir_lower_alu_vec8_16_srcs);
+    }
+ 
+-   NIR_PASS_V(nir, nir_lower_io_to_scalar, nir_var_shader_in | nir_var_shader_out, NULL, NULL);
++   if (zink_driverid(screen) != VK_DRIVER_ID_ARM_PROPRIETARY)
++      NIR_PASS_V(nir, nir_lower_io_to_scalar, nir_var_shader_in | nir_var_shader_out, NULL, NULL);
+    optimize_nir(nir, NULL, true);
+    NIR_PASS_V(nir, bound_image_arrays);
+    NIR_PASS_V(nir, flatten_image_arrays);
+diff --git a/src/gallium/drivers/zink/zink_device_info.py b/src/gallium/drivers/zink/zink_device_info.py
+index 0af02cc08e..e59a29fbbe 100644
+--- a/src/gallium/drivers/zink/zink_device_info.py
++++ b/src/gallium/drivers/zink/zink_device_info.py
+@@ -80,7 +80,6 @@ EXTENSIONS = [
+               features=True),
+     Extension("VK_KHR_external_memory"),
+     Extension("VK_KHR_external_memory_fd"),
+-    Extension("VK_KHR_vulkan_memory_model"),
+     Extension("VK_KHR_workgroup_memory_explicit_layout", alias="explicit_layout", features=True),
+     Extension("VK_KHR_pipeline_executable_properties",
+               alias="pipestats",
+@@ -330,6 +329,7 @@ EXTENSIONS = [
+     Extension("VK_KHR_shader_float_controls",
+               alias="float_controls"),
+     Extension("VK_KHR_format_feature_flags2"),
++    Extension("VK_KHR_vulkan_memory_model", alias="vukan_memory_model", features=True),
+ ]
+ 
+ # constructor: Versions(device_version(major, minor, patch), struct_version(major, minor))

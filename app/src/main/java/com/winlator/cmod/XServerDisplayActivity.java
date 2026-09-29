@@ -2400,14 +2400,17 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
     private void extractOpenGLDriver(File rootDir) {
         String selectedDriver = getSelectedOpenGLDriver();
+        // AGVN: the marker carries the bundled build's revision, so a new opengl_zink.tzst reaches existing containers
+        String marker = com.winlator.cmod.agvn.AgvnGlDriver.marker(selectedDriver);
         String installedDriver = container.getExtra("installedOpenGLDriver", "");
 
-        if (!firstTimeBoot && selectedDriver.equals(installedDriver))
+        if (!firstTimeBoot && marker.equals(installedDriver))
             return;
 
         Log.d("XServerDisplayActivity", "Installing OpenGL driver " + selectedDriver
                 + " (installed: '" + installedDriver + "')");
 
+        com.winlator.cmod.agvn.AgvnGlDriver.removeOldGallium(rootDir); // AGVN: drop the previous Mesa's libgallium
         boolean extracted = TarCompressorUtils.extract(TarCompressorUtils.Type.ZSTD, this,
                 "graphics_driver/opengl_" + selectedDriver + ".tzst", rootDir);
         if (!extracted) {
@@ -2415,7 +2418,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             return;
         }
 
-        container.putExtra("installedOpenGLDriver", selectedDriver);
+        container.putExtra("installedOpenGLDriver", marker);
         container.saveData();
     }
 
