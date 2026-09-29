@@ -17,7 +17,7 @@ import java.util.Map;
  *  "args": ["-dx11"], "env": {"DXVK_HUD": "0"}, "resolution": "1280x720", "fpsLimit": 30,
  *  "texturePool": 1024, "simulatedTouchscreen": true,
  *  "weakDevice": {"resolution": "854x480", "fpsLimit": 24, "texturePool": 512}, "controls": "action",
- *  "ueEngineIni": {"/Script/Engine.RendererSettings": {"r.TextureStreamingPoolSize": "512"}}}
+ *  "locale": "ja_JP", "ueEngineIni": {"/Script/Engine.RendererSettings": {"r.TextureStreamingPoolSize": "512"}}}
  * </pre>
  * Fields are public for Gson; treat instances as read-only after {@link #parse}.
  */
@@ -51,6 +51,8 @@ public final class AgvnProfile {
     public Map<String, Map<String, String>> ueEngineIni = new LinkedHashMap<>();
     /** On-screen controls layout: pc, vn, rpg, 2d, action or mouse (see {@link AgvnLayouts}); missing = chosen by engine. */
     public String controls;
+    /** Wine LC_ALL, e.g. "ja_JP"; "" = container default; missing = chosen by engine (see {@link AgvnLocale}). */
+    public String locale;
 
     public static AgvnProfile parse(String json) throws AgvnProfileException {
         AgvnProfile profile;

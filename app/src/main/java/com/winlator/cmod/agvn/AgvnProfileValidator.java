@@ -48,6 +48,8 @@ public final class AgvnProfileValidator {
         }
         if (p.controls != null && !AgvnLayouts.isKind(p.controls))
             throw new AgvnProfileException("Bộ phím (controls) phải là một trong: " + String.join(", ", AgvnLayouts.KINDS) + ": " + p.controls);
+        if (!AgvnLocale.isValid(p.locale))
+            throw new AgvnProfileException("Ngôn ngữ (locale) phải có dạng ja_JP hoặc ja_JP.UTF-8: " + p.locale);
         for (Map.Entry<String, Map<String, String>> section : p.ueEngineIni.entrySet()) {
             if (!INI_SECTION.matcher(section.getKey()).matches() || section.getValue() == null)
                 throw new AgvnProfileException("Mục Engine.ini không được phép: " + section.getKey());

@@ -171,6 +171,7 @@ public final class AgvnGameImporter {
         boolean unreal = c.engine == GameExeResolver.Engine.UNREAL;
         shortcut.putExtra(EXTRA_TEXTURE_POOL, String.valueOf(unreal ? eff.texturePool : 0));
         shortcut.putExtra(EXTRA_ENGINE, c.engine.name());
+        shortcut.putExtra("lc_all", AgvnLocale.forGame(p, c.engine, c.gameDir.getName(), c.exe));
     }
 
     /** "KEY=VALUE KEY2=VALUE2"; the FPS cap uses DXVK's DXVK_FRAME_RATE, mod DLLs go to WINEDLLOVERRIDES. */
