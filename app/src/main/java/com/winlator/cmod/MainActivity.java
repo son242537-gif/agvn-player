@@ -204,6 +204,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             onNavigationItemSelected(navigationView.getMenu().findItem(menuItemId));
             navigationView.setCheckedItem(menuItemId);
             selectBottomDestination(menuItemId);
+            // AGVN: show "Hướng dẫn" once after install/update (not over a crash report or Big Picture, not on rotation)
+            if (savedInstanceState == null && !isBigPictureModeEnabled && !com.winlator.cmod.agvn.CrashRecorder.hasPendingCrash(this))
+                com.winlator.cmod.agvn.AgvnGuideActivity.openOnce(this);
 
             if (!ImageFsInstaller.installIfNeeded(this, () -> requestAppPermissions())) {
                 if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED)

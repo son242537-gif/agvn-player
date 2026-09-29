@@ -12,7 +12,7 @@
     <string name="agvn_export_done">Xuất xong: %1$s (thư mục Download)</string>
     <string name="agvn_export_failed">Không xuất được nhật ký: %1$s</string>
     <string name="agvn_settings_section">AGVN</string>
-    <string name="agvn_import_title">Thêm game AGVN</string>
+    <string name="agvn_import_title">Thêm game</string>
     <string name="agvn_import_manual">Tự chọn file .exe</string>
     <string name="agvn_close">Đóng</string>
     <string name="agvn_cancel">Hủy</string>
@@ -139,4 +139,31 @@
     <string name="agvn_quality_restart_note">Có tác dụng từ lần mở game tiếp theo.</string>
     <string name="agvn_quality_detail">Độ phân giải %1$s · %2$s</string>
     <string name="agvn_quality_applied">Đã đặt đồ họa: %1$s</string>
+    <!-- "Thêm game" screen -->
+    <string name="agvn_add_hint">Chạm vào một game để thêm vào thư viện. App tự tìm trong thư mục AGVN, Download và thẻ nhớ.</string>
+    <string name="agvn_add_search">Tìm game</string>
+    <string name="agvn_add_clear_search">Xóa chữ đã gõ</string>
+    <string name="agvn_add_rescan">Tìm lại</string>
+    <string name="agvn_add_back">Quay lại</string>
+    <string name="agvn_add_section_new">Chưa thêm (%1$d)</string>
+    <string name="agvn_add_section_added">Đã có trong thư viện (%1$d)</string>
+    <string name="agvn_add_added">Đã có trong thư viện</string>
+    <string name="agvn_add_profile_badge">Cấu hình AGVN</string>
+    <string name="agvn_add_engine_unknown">Game Windows</string>
+    <string name="agvn_add_sd_card">Thẻ nhớ</string>
+    <string name="agvn_add_empty_title">Chưa tìm thấy game nào</string>
+    <string name="agvn_add_empty_body">Chép nguyên thư mục game (đã giải nén, có file .exe) từ máy tính vào Bộ nhớ trong/AGVN hoặc Download, rồi bấm \"Tìm lại\". Nếu game nằm chỗ khác, bấm \"Chọn thư mục khác\".</string>
+    <string name="agvn_add_no_match">Không có game nào khớp \"%1$s\"</string>
+    <string name="agvn_add_pick_folder">Chọn thư mục khác</string>
+    <string name="agvn_add_pick_exe">Tự chọn file .exe (nâng cao)</string>
+    <string name="agvn_add_folder_nothing">Không thấy game nào trong thư mục này</string>
+    <string name="agvn_import_update">Cập nhật</string>
+    <!-- in-app folder picker for "Chọn thư mục khác" -->
+    <string name="agvn_folder_title">Chọn thư mục có game</string>
+    <string name="agvn_folder_hint">Mở tới thư mục chứa game (hoặc thư mục chứa nhiều game) rồi bấm \"Quét thư mục này\".</string>
+    <string name="agvn_folder_drives">Chọn nơi lưu game</string>
+    <string name="agvn_folder_up">Lên trên</string>
+    <string name="agvn_folder_scan">Quét thư mục này</string>
+    <string name="agvn_folder_empty">Thư mục này không có thư mục con</string>
+    <string name="agvn_folder_sd">Thẻ nhớ (%1$s)</string>
 </resources>

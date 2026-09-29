@@ -8,12 +8,13 @@
     <string name="agvn_guide_close">Đóng</string>
 
     <string name="agvn_guide_add_title">Thêm game</string>
-    <string name="agvn_guide_add_summary">Chép thư mục game vào máy, app tự tìm</string>
+    <string name="agvn_guide_add_summary">Chép thư mục game vào máy, bấm + là app tự tìm</string>
     <string-array name="agvn_guide_add_steps">
         <item>Chép nguyên thư mục game (đã giải nén, có file .exe) từ máy tính vào điện thoại, ví dụ: Bộ nhớ trong/AGVN/Tên game. Không chép file .zip hay file cài đặt (setup).</item>
-        <item>Có thể để game trong thư mục AGVN hoặc Download (ở bộ nhớ trong hay thẻ nhớ), hoặc ngay ngoài cùng thẻ nhớ (Thẻ nhớ/Tên game). Đừng để trong thư mục Documents vì app không tìm ở đó.</item>
-        <item>Mở AGVN Player, bấm \"Thêm game\" (hoặc nút + ở thư viện). App tự tìm game trong máy.</item>
-        <item>Chạm vào tên game rồi bấm \"Nhập\". App tự chọn phím ảo và đồ họa hợp với game và máy của bạn.</item>
+        <item>Nên để game trong thư mục AGVN hoặc Download (ở bộ nhớ trong hay thẻ nhớ). Đừng để trong thư mục Documents vì app không tìm ở đó.</item>
+        <item>Bấm nút + ở thư viện (hoặc \"Thêm game\" trong Cài đặt). App tự tìm game và hiện danh sách: game \"Chưa thêm\" ở trên, game đã có trong thư viện ở dưới (có dấu tích). Gõ vài chữ vào ô \"Tìm game\" để lọc nhanh, không cần gõ dấu.</item>
+        <item>Chạm vào tên game rồi bấm \"Nhập\" (game đã có thì nút là \"Cập nhật\"). App tự chọn phím ảo và đồ họa hợp với game và máy của bạn.</item>
+        <item>Game nằm ở chỗ khác? Bấm \"Chọn thư mục khác\", mở tới thư mục có game rồi bấm \"Quét thư mục này\". App nhớ thư mục đó cho những lần sau.</item>
         <item>Nếu app báo chưa được phép đọc bộ nhớ: bấm \"Cấp quyền\", rồi bật Cho phép quản lý tất cả tệp (Android 11 trở lên) hoặc vào Quyền → Bộ nhớ → Cho phép (Android 9, 10).</item>
     </string-array>
 

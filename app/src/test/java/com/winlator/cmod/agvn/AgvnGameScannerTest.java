@@ -47,10 +47,27 @@ public class AgvnGameScannerTest {
         File dir = tmp.newFolder("My Game");
         touch(new File(dir, "Game/Binaries/Win64/Game-Win64-Shipping.exe"));
         // characters Windows forbids in names are replaced (tested on the string: Windows cannot create such a folder)
-        assertEquals("My  Game", AgvnProfile.defaultFor("My: Game").name);
+        assertEquals("My Game", AgvnProfile.defaultFor("My: Game").name);
         AgvnProfile p = AgvnProfile.defaultFor(dir.getName());
         assertEquals("My Game", p.name);
         assertEquals("Game/Binaries/Win64/Game-Win64-Shipping.exe", AgvnProfileValidator.validate(p, dir));
         assertTrue(p.isSimulatedTouchscreen());
+    }
+
+    @Test
+    public void pickedFolderCountsItselfAndEachGameIsListedOnce() throws Exception {
+        File sd = tmp.newFolder("sd2");
+        touch(new File(sd, "Games PC/One Game/Game.exe"));
+        touch(new File(sd, "Games PC/One Game/UnityPlayer.dll"));
+        touch(new File(sd, "AGVN/a/b/Deep Game/agvn-profile.json"));
+        File picked = new File(sd, "Games PC/One Game");
+        List<File> games = AgvnGameScanner.scan(Arrays.asList(
+                new AgvnGameScanner.Root(picked, 3, true),
+                new AgvnGameScanner.Root(sd, 2),                        // reaches AGVN/a/b but not Deep Game
+                new AgvnGameScanner.Root(new File(sd, "AGVN"), 3),       // AGVN again with a bigger budget
+                new AgvnGameScanner.Root(new File(sd, "Games PC"), 2)));  // One Game again
+        StringBuilder names = new StringBuilder();
+        for (File g : games) names.append(g.getName()).append('|');
+        assertEquals("One Game|Deep Game|", names.toString());
     }
 }

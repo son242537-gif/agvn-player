@@ -5,8 +5,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.Settings;
 import android.widget.Toast;
 
@@ -19,11 +17,10 @@ import com.winlator.cmod.container.ContainerManager;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 /**
- * "Thêm game AGVN": scans storage for game folders (with or without agvn-profile.json; ✦ = configured automatically),
- * previews the resulting settings and imports the chosen one into the library.
+ * "Thêm game": asks for storage access when needed, then opens the full-screen game list ({@link AgvnAddGameHost}).
+ * Tapping a game previews the settings it will get and imports it (again, for a game already in the library).
  */
 public final class AgvnImportDialog {
     private AgvnImportDialog() {}
@@ -38,39 +35,11 @@ public final class AgvnImportDialog {
                     .show();
             return;
         }
-        AlertDialog progress = new AlertDialog.Builder(activity)
-                .setMessage(R.string.agvn_import_scanning).setCancelable(false).show();
-        Handler main = new Handler(Looper.getMainLooper());
-        Executors.newSingleThreadExecutor().execute(() -> {
-            List<File> dirs = AgvnGameImporter.listGameDirs();
-            main.post(() -> {
-                progress.dismiss();
-                if (!activity.isFinishing()) showList(activity, dirs);
-            });
-        });
+        AgvnAddGameHost.show(activity);
     }
 
-    private static void showList(MainActivity activity, List<File> dirs) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity).setTitle(R.string.agvn_import_title);
-        if (dirs.isEmpty()) {
-            builder.setMessage(R.string.agvn_import_empty);
-        } else {
-            String root = android.os.Environment.getExternalStorageDirectory().getPath();
-            String[] names = new String[dirs.size()];
-            for (int i = 0; i < names.length; i++) {
-                File dir = dirs.get(i);
-                String where = dir.getParent() != null ? dir.getParent().replace(root, activity.getString(R.string.agvn_internal_storage)) : "";
-                boolean auto = !new File(dir, AgvnProfile.FILE_NAME).isFile();
-                names[i] = dir.getName() + (auto ? " ✦" : "") + "\n   " + where;
-            }
-            builder.setItems(names, (d, which) -> preview(activity, dirs.get(which), DeviceTierManager.current(activity)));
-        }
-        builder.setNeutralButton(R.string.agvn_import_manual, (d, w) -> activity.openFileManagerFromLibrary())
-                .setNegativeButton(R.string.agvn_close, null)
-                .show();
-    }
-
-    private static void preview(MainActivity activity, File gameDir, DeviceTier tier) {
+    /** Settings preview for one game; {@code onImported} runs after a successful import. */
+    static void preview(MainActivity activity, File gameDir, DeviceTier tier, AgvnLibraryIndex.Existing existing, Runnable onImported) {
         AgvnGameImporter.Candidate candidate;
         try {
             candidate = AgvnGameImporter.load(gameDir);
@@ -94,27 +63,36 @@ public final class AgvnImportDialog {
         new AlertDialog.Builder(activity)
                 .setTitle(p.name)
                 .setMessage(msg.toString().trim())
-                .setPositiveButton(R.string.agvn_import_confirm, (d, w) -> doImport(activity, candidate, tier))
+                .setPositiveButton(existing != null ? R.string.agvn_import_update : R.string.agvn_import_confirm,
+                        (d, w) -> doImport(activity, candidate, tier, existing, onImported))
                 .setNeutralButton(activity.getString(R.string.agvn_import_change_tier, tier.label), (d, w) ->
                         AgvnTierDialog.choose(activity, activity.getString(R.string.agvn_tier_for_game), tier.ordinal() + 1,
-                                chosen -> preview(activity, gameDir, chosen != null ? chosen : DeviceTierManager.detect(activity))))
+                                chosen -> preview(activity, gameDir, chosen != null ? chosen : DeviceTierManager.detect(activity), existing, onImported)))
                 .setNegativeButton(R.string.agvn_cancel, null)
                 .show();
     }
 
-    private static void doImport(MainActivity activity, AgvnGameImporter.Candidate candidate, DeviceTier tier) {
-        List<Container> containers = new ContainerManager(activity).getContainers();
-        if (containers.isEmpty()) {
-            showError(activity, activity.getString(R.string.agvn_import_no_container));
-            return;
+    /** Imports into the container the game already lives in (same name, so the shortcut is updated), else the first one. */
+    private static void doImport(MainActivity activity, AgvnGameImporter.Candidate candidate, DeviceTier tier,
+                                 AgvnLibraryIndex.Existing existing, Runnable onImported) {
+        Container target = existing != null ? existing.container : null;
+        if (target == null) {
+            List<Container> containers = new ContainerManager(activity).getContainers();
+            if (containers.isEmpty()) {
+                showError(activity, activity.getString(R.string.agvn_import_no_container));
+                return;
+            }
+            target = containers.get(0);
         }
+        if (existing != null) candidate.profile.name = existing.name;
         try {
-            AgvnGameImporter.importGame(activity, containers.get(0), candidate, tier);
+            AgvnGameImporter.importGame(activity, target, candidate, tier);
         } catch (Exception e) {
             showError(activity, activity.getString(R.string.agvn_import_failed, String.valueOf(e.getMessage())));
             return;
         }
         Toast.makeText(activity, activity.getString(R.string.agvn_import_done, candidate.profile.name), Toast.LENGTH_LONG).show();
+        if (onImported != null) onImported.run();
         activity.navigateToMainDestination(R.id.main_menu_shortcuts);
     }
 

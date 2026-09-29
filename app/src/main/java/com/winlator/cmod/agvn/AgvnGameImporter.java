@@ -55,11 +55,13 @@ public final class AgvnGameImporter {
     }
 
     /**
-     * Game folders found anywhere a player is likely to copy them: internal storage/AGVN (3 levels), Download,
-     * Games, the storage root itself, and the same places on SD cards / USB drives.
+     * Game folders found anywhere a player is likely to copy them: folders picked with "Chọn thư mục khác" (3 levels,
+     * the folder itself included), internal storage/AGVN (3 levels), Download, Games, the storage root itself, and
+     * the same places on SD cards / USB drives. Each folder is listed once.
      */
-    public static List<File> listGameDirs() {
+    public static List<File> listGameDirs(List<File> extraRoots) {
         List<AgvnGameScanner.Root> roots = new ArrayList<>();
+        for (File extra : extraRoots) roots.add(new AgvnGameScanner.Root(extra, AgvnGameRoots.DEPTH, true));
         for (File volume : storageVolumes()) {
             roots.add(new AgvnGameScanner.Root(new File(volume, "AGVN"), 3));
             roots.add(new AgvnGameScanner.Root(new File(volume, "Download"), 2));
@@ -70,7 +72,7 @@ public final class AgvnGameImporter {
     }
 
     /** Internal storage first, then removable volumes mounted under /storage. */
-    static List<File> storageVolumes() {
+    public static List<File> storageVolumes() {
         List<File> volumes = new ArrayList<>();
         volumes.add(Environment.getExternalStorageDirectory());
         File[] mounted = new File("/storage").listFiles();

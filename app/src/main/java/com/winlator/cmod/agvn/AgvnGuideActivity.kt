@@ -20,6 +20,17 @@ class AgvnGuideActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_TOPIC = "agvn_guide_topic"
+        /** Bump the suffix to show the guide once more after an update that changes it a lot. */
+        const val PREF_SHOWN = "agvn_guide_shown_v1"
+
+        /** Opens the guide the first time the library starts after install or update; later calls do nothing. */
+        @JvmStatic
+        fun openOnce(activity: android.app.Activity) {
+            val prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(activity)
+            if (prefs.getBoolean(PREF_SHOWN, false)) return
+            prefs.edit().putBoolean(PREF_SHOWN, true).apply()
+            open(activity)
+        }
 
         /** Opens the guide, optionally with one topic (see [AgvnGuideContent]) already open. */
         @JvmStatic
