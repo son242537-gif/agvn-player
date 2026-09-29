@@ -52,6 +52,7 @@
     <string name="agvn_import_grant">Cấp quyền</string>
     <string name="agvn_internal_storage">Bộ nhớ trong</string>
     <string name="agvn_import_preview_controls">Bộ phím: %1$s</string>
+    <string name="agvn_import_preview_japanese">Ngôn ngữ Windows: tiếng Nhật (để chữ trong game Nhật không bị lỗi)</string>
     <string name="agvn_controls_pc">Máy tính</string>
     <string name="agvn_controls_vn">Visual novel</string>
     <string name="agvn_controls_rpg">RPG</string>

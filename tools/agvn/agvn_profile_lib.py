@@ -192,6 +192,9 @@ def validate(profile, game_dir):
     controls = profile.get("controls")
     if controls is not None and controls not in CONTROLS:
         raise ProfileError("Bộ phím (controls) phải là một trong: %s: %s" % (", ".join(CONTROLS), controls))
+    locale = profile.get("locale")
+    if locale not in (None, "") and not (isinstance(locale, str) and re.match(r"^[a-z]{2}_[A-Z]{2}(\.UTF-8)?$", locale)):
+        raise ProfileError("Ngôn ngữ (locale) phải có dạng ja_JP hoặc ja_JP.UTF-8: %s" % locale)
     for section, kv in (profile.get("ueEngineIni") or {}).items():
         if not INI_SECTION.match(section) or not isinstance(kv, dict):
             raise ProfileError("Mục Engine.ini không được phép: %s" % section)
