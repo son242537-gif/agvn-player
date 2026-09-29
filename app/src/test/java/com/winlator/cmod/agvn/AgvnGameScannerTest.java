@@ -43,6 +43,35 @@ public class AgvnGameScannerTest {
     }
 
     @Test
+    public void wrapperFolderAtTheDepthLimitIsLookedInto() throws Exception {
+        File sd = tmp.newFolder("sd3");
+        // copied from the PC as is: E:\NINJA DISGRACE\Shinobi\Shinobi.exe
+        touch(new File(sd, "NINJA DISGRACE/Shinobi/Shinobi.exe"));
+        touch(new File(sd, "NINJA DISGRACE/Shinobi/UnityPlayer.dll"));
+        touch(new File(sd, "NINJA DISGRACE/Shinobi/UnityCrashHandler64.exe"));
+        touch(new File(sd, "NINJA DISGRACE/read me.txt"));                    // files beside the folder are fine
+        touch(new File(sd, "Pack/A/B/Game/Game.exe"));                         // two wrappers in a row
+        touch(new File(sd, "Pack/A/B/Game/UnityPlayer.dll"));
+        touch(new File(sd, "Deep/1/2/3/Game/Game.exe"));                       // three wrappers: too deep
+        touch(new File(sd, "Deep/1/2/3/Game/UnityPlayer.dll"));
+        touch(new File(sd, "Two/Left/Game.exe"));                              // two folders: not a wrapper
+        touch(new File(sd, "Two/Left/UnityPlayer.dll"));
+        touch(new File(sd, "Two/Right/x.txt"));
+        touch(new File(sd, "Setup/setup.exe"));                                // has an exe: not a wrapper
+        touch(new File(sd, "Setup/Game/Game.exe"));
+        touch(new File(sd, "Setup/Game/UnityPlayer.dll"));
+        List<File> games = AgvnGameScanner.scan(Arrays.asList(new AgvnGameScanner.Root(sd, 1)));
+        StringBuilder names = new StringBuilder();
+        for (File g : games) names.append(g.getParentFile().getName()).append('/').append(g.getName()).append('|');
+        assertEquals("NINJA DISGRACE/Shinobi|", names.toString());
+        // one more level of depth reaches the others that sit two folders down
+        games = AgvnGameScanner.scan(Arrays.asList(new AgvnGameScanner.Root(sd, 2)));
+        names.setLength(0);
+        for (File g : games) names.append(g.getName()).append('|');
+        assertEquals("Shinobi|Game|Game|Left|", names.toString()); // Deep (3 wrappers) stays out
+    }
+
+    @Test
     public void defaultProfileIsValidForDetectedGame() throws Exception {
         File dir = tmp.newFolder("My Game");
         touch(new File(dir, "Game/Binaries/Win64/Game-Win64-Shipping.exe"));
