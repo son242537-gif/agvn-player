@@ -5,6 +5,8 @@ Mới:
 - Game Nhật (KiriKiri, Siglus, NScripter, Wolf RPG) tự bật ngôn ngữ Windows tiếng Nhật để chữ không bị lỗi font.
 - Kho cấu hình AGVN có sẵn trong app: game AGVN tải ở đâu về cũng tự nhận cấu hình đã thử trên máy thật (có nhãn "Cấu hình AGVN").
 - Đồ họa "Rất cao" không còn giới hạn FPS (trước là 40): game và menu cheat tự chỉnh FPS, không bị đè. Máy nóng quá thì vào menu trong game, mục Hình ảnh, "Giới hạn FPS" chọn 60.
+- Thanh "⌨ Sửa Hiện" trong game tự ẩn sau 3 giây, chỉ còn một vạch mờ ở mép trên; chạm vạch để hiện lại. Khi ẩn, chạm vào chỗ đó là bấm vào game.
+- Phím ảo: nút "Kiểu…" trong chế độ Sửa để đổi hình dạng (tròn, vuông, chữ nhật, bo tròn) và độ mờ của từng nút, hoặc của tất cả nút cùng lúc.
 Lưu ý:
 - File lưu của game chạy nhẹ nằm trong app. Game đang chơi dở bằng Windows sẽ bắt đầu lại khi chuyển sang chạy nhẹ.
 Góp ý và báo lỗi: gửi file "Xuất nhật ký lỗi" qua agvn.io.vn.

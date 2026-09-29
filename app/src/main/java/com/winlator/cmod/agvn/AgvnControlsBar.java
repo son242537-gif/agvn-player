@@ -23,7 +23,8 @@ import com.winlator.cmod.widget.InputControlsView;
  * Small bar at the top centre of the game screen: [⌨] opens the Android keyboard, [✎ Sửa] edits the on-screen controls
  * right on the game ({@link AgvnControlsEditor}), [👁 Ẩn / 👁 Hiện] hides or shows them for this game (remembered in the
  * shortcut, extra agvnControlsHidden). Hidden controls are really gone (View.GONE), so touches reach the game.
- * Long-press a button for its full name. The bar hides while the sidebar drawer is open.
+ * Long-press a button for its full name. The bar tucks itself away after 3 s without a tap, leaving a thin line at the
+ * top edge that brings it back ({@link AgvnBarAutoHide}); it hides while the sidebar drawer is open.
  */
 public final class AgvnControlsBar {
     private static final int BG_NORMAL = 0x99000000, BG_HIDDEN = 0x99b71c1c;
@@ -32,8 +33,11 @@ public final class AgvnControlsBar {
     private final LinearLayout bar;
     private final TextView eye;
     private final AgvnControlsEditor editor;
+    private final AgvnBarAutoHide autoHide;
     /** Profile that was on screen before the player hid it (-1: none), shown again by [👁]. */
     private int hiddenProfileId = -1;
+    /** The sidebar drawer started to open and hid the bar. */
+    private boolean drawerHid;
 
     private AgvnControlsBar(XServerDisplayActivity activity) {
         this.activity = activity;
@@ -48,11 +52,13 @@ public final class AgvnControlsBar {
                 FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
         lp.topMargin = (int) (6 * dp);
         activity.addContentView(bar, lp);
+        autoHide = new AgvnBarAutoHide(activity, bar);
         editor = new AgvnControlsEditor(activity, () -> {
-            bar.setVisibility(View.VISIBLE);
+            autoHide.reveal();
             updateEye();
         });
         watchDrawer();
+        autoHide.reveal(); // up for the first seconds of the game, then tucked away
     }
 
     /** Called once after the game screen and its sidebar are set up; applies the game's saved hidden state. */
@@ -114,7 +120,7 @@ public final class AgvnControlsBar {
         if (!editor.start(base, new Rect(at[0], at[1], at[0] + bar.getWidth(), at[1] + bar.getHeight()))) return;
         hiddenProfileId = -1;
         AgvnControlsFork.setHidden(activity.agvnShortcut(), false);
-        bar.setVisibility(View.GONE);
+        autoHide.suspend(); // the editor has its own toolbar
     }
 
     /** The profile hidden by [👁], else the game's profile, else its AGVN layout. */
@@ -138,14 +144,20 @@ public final class AgvnControlsBar {
         ((DrawerLayout) root).addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
-                if (slideOffset <= 0f || (bar.getVisibility() == View.GONE && !editor.isActive())) return;
-                editor.finish(); // opening the menu ends editing (saved)
-                bar.setVisibility(View.GONE);
+                if (slideOffset <= 0f) { // back to closed; a drawer that never fully opened gets no onDrawerClosed
+                    if (drawerHid) autoHide.reveal();
+                    drawerHid = false;
+                    return;
+                }
+                if (editor.isActive()) editor.finish(); // opening the menu ends editing (saved)
+                autoHide.suspend();
+                drawerHid = true;
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
-                bar.setVisibility(View.VISIBLE);
+                drawerHid = false;
+                autoHide.reveal();
                 if (isShown()) { // the sidebar showed the controls again: do not hide them at the next launch
                     hiddenProfileId = -1;
                     AgvnControlsFork.setHidden(activity.agvnShortcut(), false);

@@ -14,8 +14,8 @@ import com.winlator.cmod.widget.InputControlsView;
 
 /**
  * Edits the on-screen controls on the game screen, GameHub style: the game stays visible and running, the player drags
- * controls to move them and uses a toolbar to add a button / arrow pad / WASD stick, change keys, resize or delete
- * the selected control. Edits go to the game's own copy of the profile ({@link AgvnControlsFork}) and are saved at
+ * controls to move them and uses a toolbar to add a button / arrow pad / WASD stick, change keys, resize, restyle
+ * (shape, opacity: {@link AgvnStyleDialog}) or delete the selected control. Edits go to the game's own copy of the profile ({@link AgvnControlsFork}) and are saved at
  * once; leaving without a change undoes the copy ({@link AgvnEditSession}). All calls on the UI thread.
  */
 final class AgvnControlsEditor {
@@ -132,6 +132,11 @@ final class AgvnControlsEditor {
         saveAndRedraw(activity.getInputControlsView());
     }
 
+    private void style(ControlElement element) {
+        InputControlsView view = activity.getInputControlsView();
+        if (element != null && view.getProfile() != null) AgvnStyleDialog.show(activity, view, element, () -> saveAndRedraw(view));
+    }
+
     private static void saveAndRedraw(InputControlsView view) {
         ControlsProfile profile = view.getProfile();
         if (profile != null && view.isLayoutReady()) profile.save();
@@ -149,6 +154,7 @@ final class AgvnControlsEditor {
                 .tool(R.string.agvn_edit_keys, 0, v -> rebind(selected()))
                 .tool(R.string.agvn_edit_smaller, R.string.agvn_edit_smaller_desc, v -> resize(selected(), -1))
                 .tool(R.string.agvn_edit_bigger, R.string.agvn_edit_bigger_desc, v -> resize(selected(), 1))
+                .tool(R.string.agvn_edit_style, R.string.agvn_edit_style_desc, v -> style(selected()))
                 .tool(R.string.agvn_edit_delete, 0, v -> {
                     if (selected() != null) activity.getInputControlsView().removeElement();
                 });

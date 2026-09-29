@@ -75,6 +75,7 @@
     <string name="agvn_bar_edit_label">✎ Sửa</string>
     <string name="agvn_bar_hide_label">👁 Ẩn</string>
     <string name="agvn_bar_show_label">👁 Hiện</string>
+    <string name="agvn_bar_reveal">Hiện thanh ⌨ Sửa Hiện</string>
     <string name="agvn_controls_auto">Tự động (AGVN)</string>
     <string name="agvn_controls_hidden">Đã ẩn bộ phím ảo. Bấm 👁 để hiện lại.</string>
     <string name="agvn_controls_shown">Đã hiện bộ phím ảo</string>
@@ -94,6 +95,19 @@
     <string name="agvn_edit_smaller_desc">Thu nhỏ nút</string>
     <string name="agvn_edit_bigger_desc">Phóng to nút</string>
     <string name="agvn_edit_delete">Xóa</string>
+    <string name="agvn_edit_style">Kiểu…</string>
+    <string name="agvn_edit_style_desc">Đổi hình dạng và độ mờ của nút</string>
+    <string name="agvn_style_title">Kiểu nút</string>
+    <string name="agvn_style_shape">Hình dạng</string>
+    <string name="agvn_style_circle">Tròn</string>
+    <string name="agvn_style_square">Vuông</string>
+    <string name="agvn_style_rect">Chữ nhật</string>
+    <string name="agvn_style_round_rect">Bo tròn</string>
+    <string name="agvn_style_opacity">Độ mờ</string>
+    <string name="agvn_style_opacity_value">Rõ %1$d%%</string>
+    <string name="agvn_style_faint">Mờ</string>
+    <string name="agvn_style_clear">Rõ</string>
+    <string name="agvn_style_all">Áp dụng cho tất cả nút trên màn hình</string>
     <string name="agvn_edit_move_bar">⇅</string>
     <string name="agvn_edit_move_bar_desc">Chuyển thanh công cụ lên trên hoặc xuống dưới</string>
     <string name="agvn_edit_done">Xong</string>
