@@ -47,7 +47,7 @@ public final class AgvnImportDialog {
     static void preview(MainActivity activity, File gameDir, DeviceTier tier, AgvnLibraryIndex.Existing existing, Runnable onImported) {
         AgvnGameImporter.Candidate candidate;
         try {
-            candidate = AgvnGameImporter.load(gameDir);
+            candidate = AgvnGameImporter.load(gameDir, AgvnProfileCatalog.get(activity));
         } catch (AgvnProfileException e) {
             showError(activity, e.getMessage());
             return;
