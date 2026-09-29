@@ -1,0 +1,9 @@
+AGVN Player v0.1.2 - agvn.io.vn
+
+Mới:
+- "Chạy nhẹ" cho game RPG Maker MV/MZ và TyranoBuilder: game chạy thẳng trên Android, không cần giả lập Windows, nên nhanh hơn, mát máy và đỡ tốn pin. Bấm nút Quay lại để mở menu game, thoát, hoặc chuyển sang "Chạy bằng Windows" nếu game bị lỗi.
+- Game Nhật (KiriKiri, Siglus, NScripter, Wolf RPG) tự bật ngôn ngữ Windows tiếng Nhật để chữ không bị lỗi font.
+- Kho cấu hình AGVN có sẵn trong app: game AGVN tải ở đâu về cũng tự nhận cấu hình đã thử trên máy thật (có nhãn "Cấu hình AGVN").
+Lưu ý:
+- File lưu của game chạy nhẹ nằm trong app. Game đang chơi dở bằng Windows sẽ bắt đầu lại khi chuyển sang chạy nhẹ.
+Góp ý và báo lỗi: gửi file "Xuất nhật ký lỗi" qua agvn.io.vn.

@@ -150,7 +150,8 @@ public final class AgvnGameImporter {
     }
 
     /** Extras a re-import must not lose: the launcher-shortcut id, favourite flag, last run and a picked cover. */
-    static final String[] KEPT_EXTRAS = {"uuid", "favorite", "lastRunAt", "customCoverArtPath"};
+    static final String[] KEPT_EXTRAS = {"uuid", "favorite", "lastRunAt", "customCoverArtPath",
+            AgvnHtmlGame.EXTRA_RUNNER};
 
     private static Map<String, String> keptExtras(Container container, File desktopFile) {
         Map<String, String> kept = new java.util.HashMap<>();
@@ -178,6 +179,12 @@ public final class AgvnGameImporter {
         shortcut.putExtra(EXTRA_TEXTURE_POOL, String.valueOf(unreal ? eff.texturePool : 0));
         shortcut.putExtra(EXTRA_ENGINE, c.engine.name());
         shortcut.putExtra("lc_all", AgvnLocale.forGame(p, c.engine, c.gameDir.getName(), c.exe));
+        File index = AgvnHtmlGame.indexFor(c.gameDir, c.engine);
+        // a player who picked "Chạy bằng Windows" keeps it on re-import unless the profile decides
+        boolean pickedWine = p.runner == null && AgvnHtmlGame.RUNNER_WINE.equals(shortcut.getExtra(AgvnHtmlGame.EXTRA_RUNNER));
+        boolean html = AgvnHtmlGame.useHtml(p, index) && !pickedWine;
+        shortcut.putExtra(AgvnHtmlGame.EXTRA_RUNNER, html ? AgvnHtmlGame.RUNNER_HTML : pickedWine ? AgvnHtmlGame.RUNNER_WINE : null);
+        shortcut.putExtra(AgvnHtmlGame.EXTRA_INDEX, html ? index.getAbsolutePath() : null);
     }
 
     /** "KEY=VALUE KEY2=VALUE2"; the FPS cap uses DXVK's DXVK_FRAME_RATE, mod DLLs go to WINEDLLOVERRIDES. */

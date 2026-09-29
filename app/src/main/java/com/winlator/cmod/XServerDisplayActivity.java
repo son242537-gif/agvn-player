@@ -301,6 +301,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // AGVN: RPG Maker MV/MZ and Tyrano games set to "Chạy nhẹ" open in a WebView instead of Wine
+        if (com.winlator.cmod.agvn.AgvnHtmlGame.redirect(this)) {
+            finish();
+            return;
+        }
         AppUtils.hideSystemUI(this);
         AppUtils.keepScreenOn(this);
 
