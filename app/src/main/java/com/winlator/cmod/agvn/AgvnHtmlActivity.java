@@ -38,6 +38,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     private WebView webView;
     private File root;
     private String host;
+    /** assets/agvn/html-compat.js; null when unreadable (the game then runs without it). */
+    private String compatJs;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -50,6 +52,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         }
         root = index.getParentFile();
         host = AgvnHtmlGame.hostFor(index);
+        boolean rpgMaker = AgvnHtmlFiles.resolve(root, "/js/rpg_core.js") != null || AgvnHtmlFiles.resolve(root, "/js/rmmz_core.js") != null;
+        if (rpgMaker) compatJs = com.winlator.cmod.core.FileUtils.readString(this, "agvn/html-compat.js");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         try {
@@ -80,7 +84,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
             Uri url = request.getUrl();
             if (!host.equals(url.getHost())) return AgvnHtmlFiles.blocked(); // no network: nothing leaves the phone
-            return AgvnHtmlFiles.serve(root, url.getEncodedPath());
+            return AgvnHtmlFiles.serve(root, url.getEncodedPath(), compatJs);
         }
 
         @Override
