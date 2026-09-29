@@ -78,6 +78,20 @@
         </activity>
 
         <activity
+            android:name="com.winlator.cmod.agvn.AgvnSetupActivity"
+            android:theme="@style/AppThemeFullscreen.Dark"
+            android:screenOrientation="sensor"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|density|navigation"
+            android:exported="false" />
+
+        <activity
+            android:name="com.winlator.cmod.agvn.AgvnGuideActivity"
+            android:theme="@style/AppThemeFullscreen.Dark"
+            android:screenOrientation="sensor"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|density|navigation"
+            android:exported="false" />
+
+        <activity
             android:name="com.winlator.cmod.agvn.LicensesActivity"
             android:label="@string/agvn_licenses"
             android:theme="@style/AppTheme.Dark"

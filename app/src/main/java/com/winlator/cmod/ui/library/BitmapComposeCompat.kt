@@ -34,6 +34,7 @@ import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material.icons.outlined.GridView
+import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Photo
@@ -133,7 +134,7 @@ internal fun LibraryRoot(
                 Spacer(Modifier.height(7.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                     LibraryFilter.values().forEach { option ->
-                        LibraryFilterChip(option.name, option == filter) { filterName = option.name }
+                        LibraryFilterChip(option.label, option == filter) { filterName = option.name }
                     }
                 }
             },
@@ -157,7 +158,7 @@ internal fun LibraryRoot(
         }
         Row(Modifier.padding(vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             LibraryFilter.values().forEach { option ->
-                LibraryFilterChip(option.name, option == filter) { filterName = option.name }
+                LibraryFilterChip(option.label, option == filter) { filterName = option.name }
             }
         }
         if (visible.isEmpty()) {
@@ -229,6 +230,7 @@ private fun LibraryLandscapeHeader(
             onGridViewChanged(!grid)
         }
         LibraryTopIcon(Icons.Outlined.Add, false) { activity?.let { com.winlator.cmod.agvn.AgvnImportDialog.show(it) } }
+        LibraryTopIcon(Icons.Outlined.HelpOutline, false) { activity?.let { com.winlator.cmod.agvn.AgvnGuideActivity.open(it) } }
         LibraryTopIcon(Icons.Outlined.Home, true) {}
         LibraryTopIcon(Icons.Outlined.SportsEsports, false) { activity?.navigateToMainDestination(R.id.main_menu_input_controls) }
         LibraryTopIcon(Icons.Outlined.Settings, false) { activity?.navigateToMainDestination(R.id.main_menu_settings) }
@@ -305,10 +307,12 @@ private fun LibraryFilterChip(label: String, selected: Boolean, click: () -> Uni
 @Composable
 internal fun CompactArtworkCard(item: LibraryItem, cb: LibraryCallbacks) {
     RequestArtworkCompat(item, cb)
+    var longPressMenu by remember { mutableStateOf(false) } // AGVN: long-press shows the simple menu
+    if (longPressMenu) LibraryItemMenuCompat(item, cb) { longPressMenu = false }
     Surface(
         modifier = Modifier.fillMaxWidth().height(92.dp).combinedClickable(
             onClick = { cb.onOpen(item.shortcutPath) },
-            onLongClick = { cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SETTINGS) }
+            onLongClick = { longPressMenu = true }
         ),
         shape = RoundedCornerShape(15.dp),
         color = MaterialTheme.colorScheme.surface,
@@ -353,10 +357,12 @@ internal fun CompactArtworkCard(item: LibraryItem, cb: LibraryCallbacks) {
 @Composable
 internal fun CoverArtworkCard(item: LibraryItem, cb: LibraryCallbacks) {
     RequestArtworkCompat(item, cb)
+    var longPressMenu by remember { mutableStateOf(false) } // AGVN: long-press shows the simple menu
+    if (longPressMenu) LibraryItemMenuCompat(item, cb) { longPressMenu = false }
     Surface(
         modifier = Modifier.fillMaxWidth().combinedClickable(
             onClick = { cb.onOpen(item.shortcutPath) },
-            onLongClick = { cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SETTINGS) }
+            onLongClick = { longPressMenu = true }
         ),
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface,

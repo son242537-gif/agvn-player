@@ -131,4 +131,4 @@ object LibraryComposeHost {
     }
 }
 
-internal enum class LibraryFilter { All, Favorites, Recent }
+internal enum class LibraryFilter(val label: String) { All("Tất cả"), Favorites("Yêu thích"), Recent("Gần đây") }

@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         applyImmersiveMode();
 
         if (!sharedPreferences.getBoolean(OnboardingActivity.PREF_ONBOARDING_COMPLETE, false)) {
-            startActivity(new Intent(this, OnboardingActivity.class));
+            startActivity(new Intent(this, com.winlator.cmod.agvn.AgvnSetupActivity.class)); // AGVN: offline first start
             finish();
             return;
         }
@@ -197,10 +197,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (selectedMenuItemId > 0) {
                 menuItemId = selectedMenuItemId;
             } else {
-                List<Shortcut> shortcuts = containerManager.loadShortcuts();
-                menuItemId = (shortcuts != null && !shortcuts.isEmpty())
-                        ? R.id.main_menu_shortcuts
-                        : R.id.main_menu_containers;
+                menuItemId = R.id.main_menu_shortcuts; // AGVN: the library is home, also when it is empty
             }
 
             if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(false);

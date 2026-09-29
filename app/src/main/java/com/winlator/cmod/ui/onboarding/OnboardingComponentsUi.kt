@@ -404,10 +404,10 @@ private fun CoreComponentCard(
                 Text(bundledRuntimeName, fontWeight = FontWeight.SemiBold)
                 val status = when {
                     busy -> "Working…"
-                    installed && inUse -> "Bundled • Installed • In use"
-                    installed -> "Bundled • Installed"
-                    !ready.value -> "Bundled • Installing ${progress.value}%"
-                    else -> "Bundled • Not installed"
+                    installed && inUse -> "Có sẵn trong app • Đã cài • Đang dùng"
+                    installed -> "Có sẵn trong app • Đã cài"
+                    !ready.value -> "Có sẵn trong app • Đang cài ${progress.value}%"
+                    else -> "Có sẵn trong app • Chưa cài"
                 }
                 Text(status, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
             }
