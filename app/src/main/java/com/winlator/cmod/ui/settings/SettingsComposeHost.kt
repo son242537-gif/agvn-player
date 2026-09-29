@@ -32,6 +32,7 @@ import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Dns
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.FolderOpen
+import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.Memory
@@ -40,6 +41,7 @@ import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.Storage
+import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
@@ -64,6 +66,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -159,6 +162,7 @@ object SettingsComposeHost {
 @Composable
 private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
     val context = LocalContext.current
+    var advancedOpen by rememberSaveable { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val landscape = configuration.screenWidthDp > configuration.screenHeightDp
     val activity = context as? MainActivity
@@ -184,6 +188,11 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
             verticalArrangement = Arrangement.spacedBy(7.dp)
         ) {
             item("agvn-title") { SectionTitle(stringResource(R.string.agvn_settings_section)) }
+            item("agvn-guide") {
+                NavigationRow(Icons.Outlined.HelpOutline, stringResource(R.string.agvn_guide_title), stringResource(R.string.agvn_guide_open_summary)) {
+                    com.winlator.cmod.agvn.AgvnGuideActivity.open(context)
+                }
+            }
             item("agvn-tier") {
                 var tierSummary by remember { mutableStateOf(com.winlator.cmod.agvn.AgvnTierDialog.summary(context)) }
                 NavigationRow(Icons.Outlined.Speed, stringResource(R.string.agvn_tier_title), tierSummary) {
@@ -207,50 +216,6 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
             item("appearance-title") { SectionTitle("GIAO DIỆN") }
             item("theme") { WinlatorThemePreferenceCard() }
 
-            item("environment-title") { SectionTitle("MÔI TRƯỜNG") }
-            item("containers") {
-                NavigationRow(Icons.Outlined.Dns, "Môi trường chạy", "Tạo và quản lý môi trường Windows") {
-                    context.startActivity(Intent(context, ContainersSettingsActivity::class.java))
-                }
-            }
-            item("components") {
-                NavigationRow(Icons.Outlined.Apps, "Thành phần", "Wine, Proton, DXVK, VKD3D and runtimes", callbacks::onOpenComponents)
-            }
-
-            item("presets-title") { SectionTitle("PRESET") }
-            item("presets") {
-                GroupCard {
-                    PresetChoiceRow(
-                        icon = Icons.Outlined.Memory,
-                        title = stringResource(R.string.box64_preset),
-                        choices = model.box64Presets,
-                        selectedId = model.selectedBox64Preset,
-                        kind = "box64",
-                        onSelected = callbacks::onBox64PresetSelected,
-                        onAction = callbacks::onPresetAction
-                    )
-                    GroupDivider()
-                    PresetChoiceRow(
-                        icon = Icons.Outlined.Speed,
-                        title = stringResource(R.string.fexcore_preset),
-                        choices = model.fexPresets,
-                        selectedId = model.selectedFexPreset,
-                        kind = "fexcore",
-                        onSelected = callbacks::onFexPresetSelected,
-                        onAction = callbacks::onPresetAction
-                    )
-                }
-            }
-
-            item("sound-title") { SectionTitle(stringResource(R.string.sound)) }
-            item("soundfonts") {
-                SoundFontCard(model.soundFonts, callbacks::onInstallSoundFont, callbacks::onRemoveSoundFont)
-            }
-
-            item("paths-title") { SectionTitle("THƯ MỤC") }
-            item("winlator-path") { NavigationRow(Icons.Outlined.Storage, "Thư mục dữ liệu", model.winlatorPath, callbacks::onChooseWinlatorPath) }
-            item("shortcut-path") { NavigationRow(Icons.Outlined.FolderOpen, "Thư mục xuất game", model.shortcutPath, callbacks::onChooseShortcutPath) }
-
             item("game-saves-title") { SectionTitle("BẢN LƯU GAME") }
             item("game-saves") {
                 GroupCard {
@@ -262,78 +227,132 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
                 }
             }
 
-            item("big-picture-title") { SectionTitle("CHẾ ĐỘ BIG PICTURE") }
-            item("big-picture") {
-                GroupCard {
-                    ToggleRow("Mở chế độ Big Picture khi khởi động", model.bigPicture) { callbacks.onBooleanChanged("enable_big_picture_mode", it) }
-                    GroupDivider()
-                    ToggleRow("Đặt khóa API SteamGrid? (Ảnh bìa)", model.customApiKeyEnabled) { callbacks.onBooleanChanged("enable_custom_api_key", it) }
-                }
-            }
-            if (model.customApiKeyEnabled) {
-                item("api-key") { EditableValueCard("Khóa API SteamGridDB", model.customApiKey, callbacks::onCustomApiKeyChanged) }
-            }
-
-            item("xserver-title") { SectionTitle(stringResource(R.string.xserver)) }
-            item("xserver") {
-                GroupCard {
-                    CursorSpeedRow(model.cursorSpeedPercent, callbacks::onCursorSpeedChanged)
-                    GroupDivider()
-                    ToggleRow(stringResource(R.string.use_dri3_extension), model.useDri3) { callbacks.onBooleanChanged("use_dri3", it) }
-                    if (model.xrSupported) {
-                        GroupDivider()
-                        ToggleRow(stringResource(R.string.use_xr), model.useXr) { callbacks.onBooleanChanged("use_xr", it) }
-                    }
-                    GroupDivider()
-                    ToggleRow("Bắt chuột ngoài", model.cursorLock) { callbacks.onBooleanChanged("cursor_lock", it) }
-                    GroupDivider()
-                    ToggleRow("Tắt XInput (chỉ dùng chuột/bàn phím)", model.xInput) { callbacks.onBooleanChanged("xinput_toggle", it) }
-                }
-            }
-
-            item("logs-title") { SectionTitle(stringResource(R.string.logs)) }
-            item("logs") {
-                GroupCard {
-                    ToggleRow(stringResource(R.string.enable_wine_debug), model.wineDebug) { callbacks.onBooleanChanged("enable_wine_debug", it) }
-                    if (model.wineDebug) {
-                        GroupDivider()
-                        WineDebugChannelsRow(
-                            selectedValue = model.wineDebugChannels,
-                            options = model.wineDebugOptions,
-                            onSave = callbacks::onWineDebugChannelsChanged
-                        )
-                    }
-                    GroupDivider()
-                    ToggleRow(stringResource(R.string.enable_winlator_logs), model.winlatorLogs) { callbacks.onBooleanChanged("enable_winlator_logs", it) }
-                    GroupDivider()
-                    ToggleRow(stringResource(R.string.enable_box64_logs), model.box64Logs) { callbacks.onBooleanChanged("enable_box64_logs", it) }
-                }
-            }
-
-            item("experimental-title") { SectionTitle(stringResource(R.string.experimental)) }
-            item("experimental") {
-                GroupCard {
-                    ToggleRow(stringResource(R.string.enable_file_provider), model.fileProvider) { callbacks.onBooleanChanged("enable_file_provider", it) }
-                    GroupDivider()
-                    ToggleRow(stringResource(R.string.open_with_android_browser), model.openInBrowser) { callbacks.onBooleanChanged("open_with_android_browser", it) }
-                    GroupDivider()
-                    ToggleRow(stringResource(R.string.share_android_clipboard), model.shareClipboard) { callbacks.onBooleanChanged("share_android_clipboard", it) }
-                    GroupDivider()
-                    ToggleRow(stringResource(R.string.pause_resume_wine), model.pauseWine) { callbacks.onBooleanChanged("pause_resume_wine", it) }
-                    GroupDivider()
-                    ToggleRow(stringResource(R.string.high_refresh_rate), model.highRefreshRate) { callbacks.onBooleanChanged("high_refresh_rate_mode", it) }
-                    GroupDivider()
-                    ToggleRow(stringResource(R.string.remove_loading_bar_when_booting_games), model.removeLoadingBar) { callbacks.onBooleanChanged("remove_loading_bar_when_booting_games", it) }
-                }
-            }
-            item("contents-url") { EditableValueCard("Link tải thành phần", model.contentsUrl, callbacks::onContentsUrlChanged) }
-
-            item("imagefs-title") { SectionTitle(stringResource(R.string.imagefs)) }
-            item("imagefs") { NavigationRow(Icons.Outlined.Refresh, stringResource(R.string.reinstall_imagefs), null, callbacks::onReinstallImageFs) }
-
             item("about-title") { SectionTitle("GIỚI THIỆU") }
             item("about") {
                 NavigationRow(Icons.Outlined.Info, "Giới thiệu", null) { activity?.showAboutDialog() }
+            }
+
+            item("advanced-title") { SectionTitle("Nâng cao (cho người rành)") }
+            item("advanced-toggle") {
+                NavigationRow(
+                    Icons.Outlined.Tune,
+                    if (advancedOpen) "Ẩn cài đặt nâng cao" else "Hiện cài đặt nâng cao",
+                    "Wine, driver, môi trường chạy, nhật ký… Người chơi bình thường không cần chỉnh."
+                ) { advancedOpen = !advancedOpen }
+            }
+            if (advancedOpen) {
+                item("environment-title") { SectionTitle("MÔI TRƯỜNG") }
+                item("containers") {
+                    NavigationRow(Icons.Outlined.Dns, "Môi trường chạy", "Tạo và quản lý môi trường Windows") {
+                        context.startActivity(Intent(context, ContainersSettingsActivity::class.java))
+                    }
+                }
+                item("components") {
+                    NavigationRow(Icons.Outlined.Apps, "Tải thêm Wine / Proton / DXVK / driver", "Không bắt buộc: app đã cài sẵn đủ để chơi", callbacks::onOpenComponents)
+                }
+
+                item("presets-title") { SectionTitle("PRESET") }
+                item("presets") {
+                    GroupCard {
+                        PresetChoiceRow(
+                            icon = Icons.Outlined.Memory,
+                            title = stringResource(R.string.box64_preset),
+                            choices = model.box64Presets,
+                            selectedId = model.selectedBox64Preset,
+                            kind = "box64",
+                            onSelected = callbacks::onBox64PresetSelected,
+                            onAction = callbacks::onPresetAction
+                        )
+                        GroupDivider()
+                        PresetChoiceRow(
+                            icon = Icons.Outlined.Speed,
+                            title = stringResource(R.string.fexcore_preset),
+                            choices = model.fexPresets,
+                            selectedId = model.selectedFexPreset,
+                            kind = "fexcore",
+                            onSelected = callbacks::onFexPresetSelected,
+                            onAction = callbacks::onPresetAction
+                        )
+                    }
+                }
+
+                item("sound-title") { SectionTitle(stringResource(R.string.sound)) }
+                item("soundfonts") {
+                    SoundFontCard(model.soundFonts, callbacks::onInstallSoundFont, callbacks::onRemoveSoundFont)
+                }
+
+                item("paths-title") { SectionTitle("THƯ MỤC") }
+                item("winlator-path") { NavigationRow(Icons.Outlined.Storage, "Thư mục dữ liệu", model.winlatorPath, callbacks::onChooseWinlatorPath) }
+                item("shortcut-path") { NavigationRow(Icons.Outlined.FolderOpen, "Thư mục xuất game", model.shortcutPath, callbacks::onChooseShortcutPath) }
+
+                item("big-picture-title") { SectionTitle("CHẾ ĐỘ BIG PICTURE") }
+                item("big-picture") {
+                    GroupCard {
+                        ToggleRow("Mở chế độ Big Picture khi khởi động", model.bigPicture) { callbacks.onBooleanChanged("enable_big_picture_mode", it) }
+                        GroupDivider()
+                        ToggleRow("Đặt khóa API SteamGrid? (Ảnh bìa)", model.customApiKeyEnabled) { callbacks.onBooleanChanged("enable_custom_api_key", it) }
+                    }
+                }
+                if (model.customApiKeyEnabled) {
+                    item("api-key") { EditableValueCard("Khóa API SteamGridDB", model.customApiKey, callbacks::onCustomApiKeyChanged) }
+                }
+
+                item("xserver-title") { SectionTitle(stringResource(R.string.xserver)) }
+                item("xserver") {
+                    GroupCard {
+                        CursorSpeedRow(model.cursorSpeedPercent, callbacks::onCursorSpeedChanged)
+                        GroupDivider()
+                        ToggleRow(stringResource(R.string.use_dri3_extension), model.useDri3) { callbacks.onBooleanChanged("use_dri3", it) }
+                        if (model.xrSupported) {
+                            GroupDivider()
+                            ToggleRow(stringResource(R.string.use_xr), model.useXr) { callbacks.onBooleanChanged("use_xr", it) }
+                        }
+                        GroupDivider()
+                        ToggleRow("Bắt chuột ngoài", model.cursorLock) { callbacks.onBooleanChanged("cursor_lock", it) }
+                        GroupDivider()
+                        ToggleRow("Tắt XInput (chỉ dùng chuột/bàn phím)", model.xInput) { callbacks.onBooleanChanged("xinput_toggle", it) }
+                    }
+                }
+
+                item("logs-title") { SectionTitle(stringResource(R.string.logs)) }
+                item("logs") {
+                    GroupCard {
+                        ToggleRow(stringResource(R.string.enable_wine_debug), model.wineDebug) { callbacks.onBooleanChanged("enable_wine_debug", it) }
+                        if (model.wineDebug) {
+                            GroupDivider()
+                            WineDebugChannelsRow(
+                                selectedValue = model.wineDebugChannels,
+                                options = model.wineDebugOptions,
+                                onSave = callbacks::onWineDebugChannelsChanged
+                            )
+                        }
+                        GroupDivider()
+                        ToggleRow(stringResource(R.string.enable_winlator_logs), model.winlatorLogs) { callbacks.onBooleanChanged("enable_winlator_logs", it) }
+                        GroupDivider()
+                        ToggleRow(stringResource(R.string.enable_box64_logs), model.box64Logs) { callbacks.onBooleanChanged("enable_box64_logs", it) }
+                    }
+                }
+
+                item("experimental-title") { SectionTitle(stringResource(R.string.experimental)) }
+                item("experimental") {
+                    GroupCard {
+                        ToggleRow(stringResource(R.string.enable_file_provider), model.fileProvider) { callbacks.onBooleanChanged("enable_file_provider", it) }
+                        GroupDivider()
+                        ToggleRow(stringResource(R.string.open_with_android_browser), model.openInBrowser) { callbacks.onBooleanChanged("open_with_android_browser", it) }
+                        GroupDivider()
+                        ToggleRow(stringResource(R.string.share_android_clipboard), model.shareClipboard) { callbacks.onBooleanChanged("share_android_clipboard", it) }
+                        GroupDivider()
+                        ToggleRow(stringResource(R.string.pause_resume_wine), model.pauseWine) { callbacks.onBooleanChanged("pause_resume_wine", it) }
+                        GroupDivider()
+                        ToggleRow(stringResource(R.string.high_refresh_rate), model.highRefreshRate) { callbacks.onBooleanChanged("high_refresh_rate_mode", it) }
+                        GroupDivider()
+                        ToggleRow(stringResource(R.string.remove_loading_bar_when_booting_games), model.removeLoadingBar) { callbacks.onBooleanChanged("remove_loading_bar_when_booting_games", it) }
+                    }
+                }
+                item("contents-url") { EditableValueCard("Link tải thành phần", model.contentsUrl, callbacks::onContentsUrlChanged) }
+
+                item("imagefs-title") { SectionTitle(stringResource(R.string.imagefs)) }
+                item("imagefs") { NavigationRow(Icons.Outlined.Refresh, stringResource(R.string.reinstall_imagefs), null, callbacks::onReinstallImageFs) }
             }
         }
     }

@@ -403,11 +403,11 @@ private fun CoreComponentCard(
             Column(Modifier.weight(1f)) {
                 Text(bundledRuntimeName, fontWeight = FontWeight.SemiBold)
                 val status = when {
-                    busy -> "Working…"
-                    installed && inUse -> "Bundled • Installed • In use"
-                    installed -> "Bundled • Installed"
-                    !ready.value -> "Bundled • Installing ${progress.value}%"
-                    else -> "Bundled • Not installed"
+                    busy -> "Đang xử lý…"
+                    installed && inUse -> "Có sẵn trong app • Đã cài • Đang dùng"
+                    installed -> "Có sẵn trong app • Đã cài"
+                    !ready.value -> "Có sẵn trong app • Đang cài ${progress.value}%"
+                    else -> "Có sẵn trong app • Chưa cài"
                 }
                 Text(status, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
             }
@@ -452,8 +452,8 @@ private fun ComponentCard(
                     val status = when {
                         busy && installingProgress >= 0 ->
                             "${installingLabel ?: "Đang cài"} • ${installingProgress}%"
-                        busy -> installingLabel ?: "Working…"
-                        item.inUse -> "${item.type} • In use"
+                        busy -> installingLabel ?: "Đang xử lý…"
+                        item.inUse -> "${item.type} • Đang dùng"
                         else -> item.type
                     }
                     Text(

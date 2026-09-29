@@ -272,7 +272,7 @@ public class ShortcutsFragment extends Fragment {
         });
         searchItem.setActionView(searchView);
 
-        MenuItem addItem = menu.add(0, MENU_FILE_MANAGER, 2, "Mở Quản lý file");
+        MenuItem addItem = menu.add(0, MENU_FILE_MANAGER, 2, "Thêm game");
         addItem.setIcon(R.drawable.ui_ic_add);
         addItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
@@ -302,11 +302,8 @@ public class ShortcutsFragment extends Fragment {
             return true;
         }
         if (item.getItemId() == MENU_FILE_MANAGER) {
-            getParentFragmentManager().beginTransaction()
-                    .setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down)
-                    .addToBackStack(null)
-                    .replace(R.id.FLFragmentContainer, new FileManagerFragment())
-                    .commit();
+            // AGVN: "+" adds a game (the file manager stays reachable from "Tự chọn file .exe")
+            com.winlator.cmod.agvn.AgvnImportDialog.show((MainActivity) requireActivity());
             return true;
         }
         MainActivity activity = (MainActivity) requireActivity();

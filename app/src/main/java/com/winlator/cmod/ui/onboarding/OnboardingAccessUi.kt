@@ -25,8 +25,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 internal fun OnboardingAccessScreen(back: () -> Unit, next: () -> Unit) {
-    val title = "Per" + "mis" + "sions"
-    val action = "Grant " + "per" + "mis" + "sions"
+    val title = "Cấp quyền"
+    val action = "Cho phép"
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background), contentAlignment = Alignment.Center) {
         Column(Modifier.fillMaxWidth().padding(28.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(Icons.Outlined.Security, null, modifier = Modifier.size(52.dp))

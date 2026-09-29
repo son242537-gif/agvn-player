@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2026 agvn.io.vn — MIT License. Hướng dẫn cho khách (màn cài đặt đầu tiên + mục Hướng dẫn). -->
+<resources>
+    <string name="agvn_guide_title">Hướng dẫn</string>
+    <string name="agvn_guide_subtitle">Chạm vào từng mục để xem cách làm</string>
+    <string name="agvn_guide_open">Xem hướng dẫn</string>
+    <string name="agvn_guide_open_summary">Thêm game, chơi game, chỉnh đồ họa và phím ảo</string>
+    <string name="agvn_guide_close">Đóng</string>
+
+    <string name="agvn_guide_add_title">Thêm game</string>
+    <string name="agvn_guide_add_summary">Chép thư mục game vào máy, app tự tìm</string>
+    <string-array name="agvn_guide_add_steps">
+        <item>Chép nguyên thư mục game (đã giải nén, có file .exe) từ máy tính vào điện thoại, ví dụ: Bộ nhớ trong/AGVN/Tên game. Không chép file .zip hay file cài đặt (setup).</item>
+        <item>Có thể để game trong thư mục AGVN hoặc Download (ở bộ nhớ trong hay thẻ nhớ), hoặc ngay ngoài cùng thẻ nhớ (Thẻ nhớ/Tên game). Đừng để trong thư mục Documents vì app không tìm ở đó.</item>
+        <item>Mở AGVN Player, bấm \"Thêm game\" (hoặc nút + ở thư viện). App tự tìm game trong máy.</item>
+        <item>Chạm vào tên game rồi bấm \"Nhập\". App tự chọn phím ảo và đồ họa hợp với game và máy của bạn.</item>
+        <item>Nếu app báo chưa được phép đọc bộ nhớ: bấm \"Cấp quyền\", rồi bật Cho phép quản lý tất cả tệp (Android 11 trở lên) hoặc vào Quyền → Bộ nhớ → Cho phép (Android 9, 10).</item>
+    </string-array>
+
+    <string name="agvn_guide_play_title">Chơi game và thoát game</string>
+    <string name="agvn_guide_play_summary">Bấm ▶ để chơi, nút Quay lại để mở menu</string>
+    <string-array name="agvn_guide_play_steps">
+        <item>Ở thư viện, bấm nút ▶ trên bìa game (hoặc chạm vào bìa rồi bấm \"Chơi\"). Lần đầu mở game sẽ lâu hơn một chút.</item>
+        <item>Trong game, bấm nút Quay lại của điện thoại (hoặc chạm 4 ngón cùng lúc) để mở menu bên trái.</item>
+        <item>Để thoát game: lưu game trước, mở menu rồi bấm nút nguồn màu đỏ ở dưới cùng. Game tắt ngay, không hỏi lại.</item>
+        <item>Nút tạm dừng trong menu sẽ đóng băng game. Muốn chơi tiếp: bấm nút Quay lại của điện thoại để mở lại menu (khi đang tạm dừng, chạm 4 ngón không mở được menu), rồi bấm nút chơi.</item>
+    </string-array>
+
+    <string name="agvn_guide_graphics_title">Chỉnh đồ họa (máy nóng, game giật)</string>
+    <string name="agvn_guide_graphics_summary">Kéo thanh: bên trái mát máy, bên phải đẹp hơn</string>
+    <string-array name="agvn_guide_graphics_steps">
+        <item>Ở thư viện, bấm ⋮ trên game rồi chọn \"Chỉnh đồ họa: mát máy ↔ đẹp\".</item>
+        <item>Kéo thanh sang trái (Siêu nhẹ, Thấp) để máy mát và mượt hơn. Kéo sang phải (Cao, Rất cao) để hình đẹp hơn nhưng máy nóng hơn.</item>
+        <item>Mức có dấu ★ là mức app gợi ý cho máy của bạn. Bấm \"Về mức gợi ý\" nếu muốn app tự chỉnh.</item>
+        <item>Bấm \"Lưu\" rồi thoát game và mở lại để áp dụng.</item>
+    </string-array>
+
+    <string name="agvn_guide_controls_title">Phím ảo trên màn hình</string>
+    <string name="agvn_guide_controls_summary">Thêm, di chuyển, đổi phím ngay trong game</string>
+    <string-array name="agvn_guide_controls_steps">
+        <item>Trong game có thanh nhỏ ở giữa phía trên: \"✎ Sửa\" để chỉnh phím, \"👁 Ẩn\" để ẩn hoặc hiện bộ phím, \"⌨\" để mở bàn phím.</item>
+        <item>Bấm \"✎ Sửa\": kéo nút để di chuyển. Chạm một nút để chọn, rồi dùng \"Phím…\" để đổi phím, \"－\" / \"＋\" để thu nhỏ hoặc phóng to, \"Xóa\" để bỏ nút.</item>
+        <item>\"+ Nút\" hiện đủ bàn phím và chuột, chạm vào phím bạn muốn. \"+ Vùng xoay\" thêm vùng vuốt để xoay camera trong game 3D.</item>
+        <item>Tick ô \"Giữ\" khi chọn phím nếu muốn nút đó bấm một lần là giữ, bấm lần nữa là thả (ví dụ giữ chuột để kéo thả).</item>
+        <item>Bấm \"Xong\" để lưu. Bộ phím được lưu riêng cho từng game.</item>
+    </string-array>
+
+    <string name="agvn_guide_mouse_title">Dùng chuột bằng tay</string>
+    <string name="agvn_guide_mouse_summary">Chạm là click, chạm giữ rồi kéo là kéo thả</string>
+    <string-array name="agvn_guide_mouse_steps">
+        <item>Chạm 1 ngón = bấm chuột trái đúng chỗ bạn chạm.</item>
+        <item>Bấm chuột phải: chạm 1 ngón vào chỗ cần bấm trước, rồi chạm 2 ngón cùng lúc = bấm chuột phải tại chỗ đó.</item>
+        <item>Chạm giữ rồi kéo = giữ chuột trái và kéo (kéo thả đồ vật, kéo khung chọn…).</item>
+        <item>Vuốt lên hoặc xuống bằng 2 ngón để lăn chuột (cuộn trang).</item>
+    </string-array>
+
+    <string name="agvn_guide_trouble_title">Game lỗi hoặc không mở được</string>
+    <string name="agvn_guide_trouble_summary">Hạ đồ họa, đóng app khác, gửi nhật ký lỗi</string>
+    <string-array name="agvn_guide_trouble_steps">
+        <item>Hạ đồ họa xuống \"Siêu nhẹ\" (⋮ trên game, \"Chỉnh đồ họa\") rồi mở lại game.</item>
+        <item>Đóng bớt các app khác đang chạy để game có đủ RAM.</item>
+        <item>Kiểm tra thư mục game đã chép đủ, không thiếu file.</item>
+        <item>Vẫn lỗi: vào Cài đặt, bấm \"Xuất nhật ký lỗi\". File nhật ký nằm trong thư mục Download, hãy gửi file đó cho AGVN để được hỗ trợ.</item>
+    </string-array>
+
+    <string name="agvn_guide_expert_title">Cho người rành</string>
+    <string name="agvn_guide_expert_summary">Tải thêm Wine, driver, chỉnh chi tiết</string>
+    <string-array name="agvn_guide_expert_steps">
+        <item>App đã cài sẵn mọi thứ để chơi, bạn không cần tải thêm gì.</item>
+        <item>Nếu bạn rành về Wine/driver: vào Cài đặt, mở \"Nâng cao (cho người rành)\" để tải thêm Wine, Proton, DXVK, driver đồ họa và quản lý môi trường chạy.</item>
+        <item>Muốn chỉnh chi tiết một game: bấm ⋮ trên game rồi chọn \"Cấu hình\".</item>
+    </string-array>
+
+    <!-- Màn cài đặt đầu tiên -->
+    <string name="agvn_setup_welcome">Chào mừng đến AGVN Player</string>
+    <string name="agvn_setup_intro">App đang tự cài mọi thứ cần để chơi game. Không cần tải thêm gì, chỉ mất khoảng 1–2 phút.</string>
+    <string name="agvn_setup_step_core">Cài bộ chạy game</string>
+    <string name="agvn_setup_step_core_system">Đang giải nén hệ thống… %1$d%%</string>
+    <string name="agvn_setup_step_core_wine">Đang cài Wine/Proton…</string>
+    <string name="agvn_setup_step_core_driver">Đang cài driver đồ họa…</string>
+    <string name="agvn_setup_step_container">Chuẩn bị môi trường chơi game</string>
+    <string name="agvn_setup_step_access">Cho phép đọc thư mục game</string>
+    <string name="agvn_setup_access_why">App cần quyền này để tự tìm game bạn chép vào máy (thư mục AGVN, Download ở bộ nhớ trong hoặc thẻ nhớ). App không đọc ảnh hay tin nhắn của bạn.</string>
+    <string name="agvn_setup_access_button">Cho phép</string>
+    <string name="agvn_setup_access_later">Để sau</string>
+    <string name="agvn_setup_access_denied">Chưa được cho phép. Ở màn hình vừa mở, hãy bật \"Cho phép quản lý tất cả tệp\". Bạn cũng có thể bấm \"Để sau\", app sẽ hỏi lại khi thêm game.</string>
+    <string name="agvn_setup_access_denied_legacy">Chưa được cho phép. Bấm \"Cho phép\" lần nữa và chọn Cho phép trong hộp thoại. Nếu hộp thoại không hiện, vào Cài đặt điện thoại → Ứng dụng → AGVN Player → Quyền → Bộ nhớ → Cho phép. Bạn cũng có thể bấm \"Để sau\".</string>
+    <string name="agvn_setup_done">Xong</string>
+    <string name="agvn_setup_failed">Cài chưa thành công. Hãy kiểm tra máy còn trống ít nhất 2 GB rồi bấm \"Thử lại\".</string>
+    <string name="agvn_setup_retry">Thử lại</string>
+    <string name="agvn_setup_start">Bắt đầu</string>
+    <string name="agvn_setup_guide_header">Trong lúc chờ, xem nhanh cách dùng</string>
+    <string name="agvn_setup_guide_header_done">Xem nhanh cách dùng</string>
+    <string name="agvn_setup_swipe_hint">Vuốt ngang để xem tiếp</string>
+</resources>

@@ -65,7 +65,7 @@ public final class AgvnImportDialog {
             }
             builder.setItems(names, (d, which) -> preview(activity, dirs.get(which), DeviceTierManager.current(activity)));
         }
-        builder.setNeutralButton(R.string.agvn_import_manual, (d, w) -> activity.navigateToMainDestination(R.id.main_menu_file_manager))
+        builder.setNeutralButton(R.string.agvn_import_manual, (d, w) -> activity.openFileManagerFromLibrary())
                 .setNegativeButton(R.string.agvn_close, null)
                 .show();
     }

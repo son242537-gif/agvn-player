@@ -74,6 +74,10 @@ public final class OrientationOverflowView extends AppCompatImageButton {
         popup.setElevation(dp(10));
         popup.setClippingEnabled(true);
 
+        content.addView(createPlainRow("Hướng dẫn", v -> { // AGVN
+            popup.dismiss();
+            com.winlator.cmod.agvn.AgvnGuideActivity.open(activity);
+        }));
         content.addView(createRow(
                 "Khóa hướng màn hình",
                 activity.isOrientationLocked(),
@@ -103,6 +107,13 @@ public final class OrientationOverflowView extends AppCompatImageButton {
         ));
 
         popup.showAsDropDown(this, -(dp(310) - getWidth()), 0);
+    }
+
+    /** A row without a checkbox (AGVN: "Hướng dẫn"). */
+    private View createPlainRow(String label, OnClickListener click) {
+        View row = createRow(label, false, false, click);
+        ((LinearLayout) row).removeViewAt(1);
+        return row;
     }
 
     private View createRow(String label, boolean checked, boolean radio, OnClickListener click) {

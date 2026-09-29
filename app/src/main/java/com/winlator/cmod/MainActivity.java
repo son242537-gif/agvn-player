@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         applyImmersiveMode();
 
         if (!sharedPreferences.getBoolean(OnboardingActivity.PREF_ONBOARDING_COMPLETE, false)) {
-            startActivity(new Intent(this, OnboardingActivity.class));
+            startActivity(new Intent(this, com.winlator.cmod.agvn.AgvnSetupActivity.class)); // AGVN: offline first start
             finish();
             return;
         }
@@ -197,10 +197,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (selectedMenuItemId > 0) {
                 menuItemId = selectedMenuItemId;
             } else {
-                List<Shortcut> shortcuts = containerManager.loadShortcuts();
-                menuItemId = (shortcuts != null && !shortcuts.isEmpty())
-                        ? R.id.main_menu_shortcuts
-                        : R.id.main_menu_containers;
+                menuItemId = R.id.main_menu_shortcuts; // AGVN: the library is home, also when it is empty
             }
 
             if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(false);
@@ -427,6 +424,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void setMainToolbarVisible(boolean visible) {
         if (mainToolbar == null) return;
         mainToolbar.setVisibility((visible && !isLandscapeOrientation()) ? View.VISIBLE : View.GONE);
+    }
+
+    /** AGVN: file manager above the library, so Back returns to the library (used by "Tự chọn file .exe"). */
+    public void openFileManagerFromLibrary() {
+        getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down)
+                .addToBackStack(null)
+                .replace(R.id.FLFragmentContainer, new FileManagerFragment())
+                .commit();
     }
 
     public void navigateToMainDestination(int menuItemId) {

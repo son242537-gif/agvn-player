@@ -28,7 +28,7 @@
     <string name="agvn_import_failed">Không nhập được game: %1$s</string>
     <string name="agvn_import_done">Đã thêm \"%1$s\" vào thư viện</string>
     <string name="agvn_import_error_title">Profile game không hợp lệ</string>
-    <string name="agvn_import_summary">Nhập game từ thư mục /sdcard/AGVN</string>
+    <string name="agvn_import_summary">Tự tìm game trong thư mục AGVN, Download và thẻ nhớ</string>
     <string name="agvn_tier_title">Chế độ thiết bị</string>
     <string name="agvn_tier_auto">Tự động (%1$s)</string>
     <string name="agvn_tier_for_game">Mức cấu hình cho game này</string>
