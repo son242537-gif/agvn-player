@@ -104,7 +104,7 @@ Chỉnh thế nào: Tự bật khi bạn chọn bản gplasync; nên để bật
 [Bộ đệm giả lập BCN]
 Là gì: Lưu các texture BCn (ảnh bề mặt nén kiểu PC) đã giải nén vào bộ nhớ máy để lần sau dùng lại, khỏi giải nén lại.
 Vì sao chỉnh: Giúp lần chơi sau tải nhanh hơn, bớt giật khi vào màn chơi.
-Chỉnh thế nào: Bạn cứ để tắt (mặc định). Chỉ có tác dụng khi app giải nén texture bằng CPU (ví dụ máy Snapdragon chọn Giả lập BCN là full). Bật nếu game tải chậm; tốn thêm dung lượng lưu trữ.
+Chỉnh thế nào: Bạn cứ để tắt (mặc định). Chỉ có tác dụng khi app giải nén texture bằng CPU (máy Mali, hoặc driver không phải Turnip). Bật nếu game tải chậm; tốn thêm dung lượng lưu trữ.
 
 [Bộ đệm shader Async]
 Là gì: Lưu các shader mà DXVK đã dựng vào bộ nhớ trong để lần chơi sau dùng lại, đỡ phải dựng lại từ đầu. Chỉ có tác dụng với bản DXVK có chữ gplasync.
@@ -284,7 +284,7 @@ Chỉnh thế nào: Muốn dùng bộ giả lập 64-bit khác thì phải tạo
 [Giả lập BCN]
 Là gì: BCn là kiểu nén texture (ảnh bề mặt) của game PC mà nhiều GPU điện thoại, nhất là Mali, không đọc được. Mục này quyết định app có chuyển đổi các texture đó không.
 Vì sao chỉnh: Đổi khi bạn thấy texture bị đen, tím, nhòe, mất hình, hoặc game tự tắt khi tải màn chơi.
-Chỉnh thế nào: Bạn nên để auto (mặc định; Turnip tự đọc được BCn). full: chuyển mọi texture, chắc nhất nhưng tốn CPU và RAM. partial: chỉ báo là hỗ trợ. none: tắt. Máy Mali: auto hoặc full.
+Chỉnh thế nào: Máy Snapdragon dùng driver Turnip không cần mục này: app tự tắt vì Turnip tự đọc được BCn. Driver khác và máy Mali: để auto (mặc định); full chuyển mọi texture, chắc nhất nhưng tốn CPU và RAM; none: tắt.
 
 [Giả lập màn hình cảm ứng]
 Là gì: Chạm vào đâu, game nhận là bấm chuột trái đúng chỗ đó; chạm giữ rồi kéo là giữ chuột trái để kéo. Khi tắt, màn hình thành bàn di chuột: vuốt để di con trỏ, chạm để bấm.

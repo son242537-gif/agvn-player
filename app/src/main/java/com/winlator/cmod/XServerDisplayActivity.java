@@ -2575,7 +2575,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
         String disablePresentWait = graphicsDriverConfig.get("disablePresentWait");
         envVars.put("WRAPPER_DISABLE_PRESENT_WAIT", disablePresentWait);
 
-        String bcnEmulation = graphicsDriverConfig.get("bcnEmulation");
+        // AGVN: Turnip reads BCn textures itself; the wrapper's emulation only slows loading and costs RAM
+        String bcnEmulation = com.winlator.cmod.agvn.AgvnBcn.effective(graphicsDriverConfig.get("bcnEmulation"), adrenoToolsDriverId);
         String bcnEmulationType = graphicsDriverConfig.get("bcnEmulationType");
 
         switch (bcnEmulation) {
