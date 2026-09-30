@@ -74,6 +74,12 @@ public final class AgvnSessionLog {
         write(new File(dir, EVENTS), "[" + time + "] " + text + "\n", true);
     }
 
+    /** One more log file to copy when the session ends, e.g. Wine's own log when "Bật debug Wine" is on. */
+    public static void addLog(File log) {
+        File dir = current;
+        if (dir != null && log != null) write(new File(dir, RUNNING), "log=" + log.getPath() + "\n", true);
+    }
+
     /** Replaces one small file of the running session, e.g. the RAM peaks (no-op without a session). */
     public static void note(String name, String text) {
         File dir = current;

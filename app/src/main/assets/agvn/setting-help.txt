@@ -24,7 +24,7 @@ Chỉnh thế nào: Mặc định: Tương thích. Game lỗi: thử Ổn địn
 [Bật debug Wine]
 Là gì: Wine là phần giúp game Windows chạy trên điện thoại. Bật mục này để Wine ghi cảnh báo và lỗi vào tệp nhật ký trong thư mục AGVN-Player/logs, kèm nút “Xem log” trong menu game.
 Vì sao chỉnh: Dùng khi game văng, treo hoặc báo lỗi và bạn cần gửi nhật ký cho AGVN để được giúp.
-Chỉnh thế nào: Mặc định tắt. Bật, mở game tới lúc lỗi, thoát game, rồi bấm “Xuất nhật ký lỗi” ở đầu Cài đặt. Mục “Kênh debug Wine” cứ để mặc định. Xong nhớ tắt vì ghi nhật ký làm game chậm hơn.
+Chỉnh thế nào: Mặc định tắt. Bật, mở game tới lúc lỗi, thoát game, rồi trong thư viện bấm ⋮ ở game đó → “Gửi nhật ký” (có kèm nhật ký Wine), hoặc bấm “Xuất nhật ký lỗi” ở đầu Cài đặt. Mục “Kênh debug Wine” cứ để mặc định. Xong nhớ tắt vì ghi nhật ký làm game chậm hơn.
 
 [Bật DInput]
 Là gì: DInput (DirectInput) là kiểu đọc tay cầm cũ, hay gặp ở game PC đời cũ.

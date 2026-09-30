@@ -1135,9 +1135,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         boolean enableWineDebug = preferences.getBoolean("enable_wine_debug", false);
         String wineDebugChannels = preferences.getString("wine_debug_channels",
                 SettingsFragment.DEFAULT_WINE_DEBUG_CHANNELS);
-        envVars.put("WINEDEBUG", enableWineDebug && !wineDebugChannels.isEmpty()
-                ? "+" + wineDebugChannels.replace(",", ",+")
-                : "-all");
+        envVars.put("WINEDEBUG", com.winlator.cmod.agvn.AgvnWineDebug.spec(enableWineDebug, wineDebugChannels)); // AGVN: "warn+all", not "+warn"
 
         String rootPath = imageFs.getRootDir().getPath();
         FileUtils.clear(imageFs.getTmpDir());
@@ -1226,8 +1224,10 @@ public class XServerDisplayActivity extends AppCompatActivity {
                             audioDriver.equals("pulse-audio-gn")));
         }
 
+        com.winlator.cmod.agvn.AgvnMediaFoundation.apply(envVars); // AGVN: MP4 video frames in normal memory
         guestProgramLauncherComponent.setEnvVars(envVars);
         if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.start(shortcut, envVars); // AGVN: logs of this play session
+        if (shortcut != null && debugDialog != null) com.winlator.cmod.agvn.AgvnSessionLog.addLog(debugDialog.getLogFile()); // AGVN: and Wine's own log
         guestProgramLauncherComponent.setTerminationCallback((status) -> {
             com.winlator.cmod.agvn.AgvnSessionLog.event("Wine kết thúc, mã thoát " + status);
             runOnUiThread(this::exit);

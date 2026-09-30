@@ -91,7 +91,7 @@ private val advancedEnvSpecs = mapOf(
     "MESA_GL_VERSION_OVERRIDE" to AdvancedEnvSpec(AdvancedEnvKind.TEXT),
     "PULSE_LATENCY_MSEC" to AdvancedEnvSpec(AdvancedEnvKind.NUMBER),
     "WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER" to AdvancedEnvSpec(AdvancedEnvKind.CHECKBOX, listOf("0", "1")),
-    "WINE_NEW_MEDIASOURCE" to AdvancedEnvSpec(AdvancedEnvKind.CHECKBOX, listOf("0", "1")),
+    "WINE_NEW_MEDIA_SOURCE" to AdvancedEnvSpec(AdvancedEnvKind.CHECKBOX, listOf("0", "1")),
     "GALLIUM_HUD" to AdvancedEnvSpec(AdvancedEnvKind.MULTI, listOf("simple", "fps", "frametime")),
     "WINE_LARGE_ADDRESS_AWARE" to AdvancedEnvSpec(AdvancedEnvKind.CHECKBOX, listOf("0", "1")),
     "WINEDLLOVERRIDES" to AdvancedEnvSpec(AdvancedEnvKind.TEXT)
