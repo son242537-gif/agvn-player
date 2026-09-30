@@ -34,7 +34,7 @@ public final class AgvnMemoryWatch {
 
     private final Activity activity;
     private final Runnable exitGame;
-    private final AgvnMemoryRules rules = new AgvnMemoryRules();
+    private final AgvnMemoryRules rules = new AgvnMemoryRules(AgvnMemoryProbe.totalMb());
     private final long startedMs = SystemClock.uptimeMillis();
     private ScheduledExecutorService poller;
     private View bar;
