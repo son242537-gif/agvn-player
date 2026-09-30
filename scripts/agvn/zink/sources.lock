@@ -1,0 +1,36 @@
+# Pinned inputs of scripts/agvn/zink/build-zink.sh (checked before use; any mismatch stops the build).
+# Copyright (c) 2026 agvn.io.vn - MIT License. How these were verified: scripts/agvn/zink/README.md.
+#
+# mesa <tag> <tag-object-sha> <commit-sha> <git-url>  (tag signed by Mesa release manager Eric Engestrom,
+#       key 57551DE15B968F6341C248F68D8E31AFC32428A6; the same tag object is on two independent mirrors)
+mesa mesa-25.1.9 66c868b938e8ad3e3e5b8fef257f5db39d474dc3 4a433b82f7c88ebecda1af6b1da69440b2a6ceb4 https://github.com/chaotic-cx/mesa-mirror
+# ndk <version> (installed by scripts/agvn/cloud-setup.sh); api = Android API level of the build (ELF TLS, same as Ludashi's)
+ndk 29.0.14206865
+api 29
+#
+# deb <package> <version> <sha256> <path under http://archive.ubuntu.com/ubuntu/>
+# Headers and .pc files only (unpacked with dpkg-deb -x, no package code runs). Ubuntu 26.04 "resolute" main;
+# SHA-256 taken from the Packages index whose hash is in InRelease signed by the Ubuntu Archive Automatic
+# Signing Key (2018). libxcb 1.17.0 matches the imagefs runtime; the libraries themselves come from the imagefs.
+deb libxcb1-dev 1.17.0-2ubuntu1 9be071fbb1cc4cb311d477456dbe4e1e97ae9b46468cff51b015c76700da9887 pool/main/libx/libxcb/libxcb1-dev_1.17.0-2ubuntu1_amd64.deb
+deb libxcb-randr0-dev 1.17.0-2ubuntu1 8fd6b940c8508ea88e993ea23a3030de3ef1c34a51c355d5a4c0f6549bbb31a2 pool/main/libx/libxcb/libxcb-randr0-dev_1.17.0-2ubuntu1_amd64.deb
+deb libxcb-render0-dev 1.17.0-2ubuntu1 bea5eec4d84ae0c145cc32cd15e2ec7c458e66cd16b3b8cf4656e0966e437541 pool/main/libx/libxcb/libxcb-render0-dev_1.17.0-2ubuntu1_amd64.deb
+deb libxcb-shape0-dev 1.17.0-2ubuntu1 ccfcd6aec94f6244f9e10a02d712db7ca1a6be4e7421828d73ebc45bf0f8f379 pool/main/libx/libxcb/libxcb-shape0-dev_1.17.0-2ubuntu1_amd64.deb
+deb libxcb-glx0-dev 1.17.0-2ubuntu1 c057d27eea77da87b1981341de6d6d350be380c6029d51f9ad2f7e680dca8b53 pool/main/libx/libxcb/libxcb-glx0-dev_1.17.0-2ubuntu1_amd64.deb
+deb libxcb-shm0-dev 1.17.0-2ubuntu1 8f31234bf98ef4ba4d6a55155a340599920840c3aa7100853a8e9bd60c382257 pool/main/libx/libxcb/libxcb-shm0-dev_1.17.0-2ubuntu1_amd64.deb
+deb libxcb-dri3-dev 1.17.0-2ubuntu1 5292fc3eca88f162dbbebda148ad7a866e716baf77a91a1c612d8485adb41af9 pool/main/libx/libxcb/libxcb-dri3-dev_1.17.0-2ubuntu1_amd64.deb
+deb libxcb-present-dev 1.17.0-2ubuntu1 069b3d5f73fce112fb0a78f4baede17d2871cfd4750faef35f4b9c8b2a1507ae pool/main/libx/libxcb/libxcb-present-dev_1.17.0-2ubuntu1_amd64.deb
+deb libxcb-sync-dev 1.17.0-2ubuntu1 7410df6cb6a959a4e4ffa52269777f27c40c07689953aada936e0d8fe0a0d893 pool/main/libx/libxcb/libxcb-sync-dev_1.17.0-2ubuntu1_amd64.deb
+deb libxcb-xfixes0-dev 1.17.0-2ubuntu1 37e9fbf87b3a2bb53ea256e9ad7cf38692a8170b741b8043292fa3ce9e4f28a7 pool/main/libx/libxcb/libxcb-xfixes0-dev_1.17.0-2ubuntu1_amd64.deb
+deb libx11-dev 2:1.8.13-1 8a10cc3e38d8f85992d3ad5b3375ebb4214d318c92062bec955e4429edbc3a00 pool/main/libx/libx11/libx11-dev_1.8.13-1_amd64.deb
+deb libx11-xcb-dev 2:1.8.13-1 f9c9a78b7de4c0c169655a582f11b68602392581665110fa68beac846af6a911 pool/main/libx/libx11/libx11-xcb-dev_1.8.13-1_amd64.deb
+deb libxext-dev 2:1.3.4-1build3 5de129b859b79eab3a273c77dcc450a521fd28cff3920b679ad6ad99fcf6fbb6 pool/main/libx/libxext/libxext-dev_1.3.4-1build3_amd64.deb
+deb libxfixes-dev 1:6.0.0-2build2 67aa2c4649d448ce4c984b63b63a24b926efab282a8ef18cce94a4edb9b0cecb pool/main/libx/libxfixes/libxfixes-dev_6.0.0-2build2_amd64.deb
+deb libxxf86vm-dev 1:1.1.4-2 2613080981f2f4d3467b9570f6c6933b2e1c43533608c7d241931242110b4899 pool/main/libx/libxxf86vm/libxxf86vm-dev_1.1.4-2_amd64.deb
+deb libxshmfence-dev 1.3.3-1build1 700d0318623b051c5a8ad76a0f7ea250dab1696705cab6a4a81354bdae621387 pool/main/libx/libxshmfence/libxshmfence-dev_1.3.3-1build1_amd64.deb
+deb libdrm-dev 2.4.131-1 cfec0a51730336538df6c2bbb4f5b473bdcac9281def27981edbdccec99a9be9 pool/main/libd/libdrm/libdrm-dev_2.4.131-1_amd64.deb
+deb x11proto-dev 2025.1-1 a800a05f9e22011add40fe7deef712be53c721d9e23281bfd07ede46e514dd45 pool/main/x/xorgproto/x11proto-dev_2025.1-1_all.deb
+deb libzstd-dev 1.5.7+dfsg-3 6d81369284ba3fd094f635fe6b9f8dfc71baaca36c1f758fe62244839e25ecf0 pool/main/libz/libzstd/libzstd-dev_1.5.7+dfsg-3_amd64.deb
+deb libxau-dev 1:1.0.11-1build2 55a7100aa12d940c41e0735212122cc835192bce385e7bbfe14b234759aad51c pool/main/libx/libxau/libxau-dev_1.0.11-1build2_amd64.deb
+deb libxdmcp-dev 1:1.1.5-2 6f80b42ba84d5a55e4d3cf1850954bc2e37af585d47fc85721c8928f3c4c98e6 pool/main/libx/libxdmcp/libxdmcp-dev_1.1.5-2_amd64.deb
+deb xtrans-dev 1.6.0-1build1 8237f5a3911ec103734ad7636235515df9ba0f1506385f782e264d07d32757c9 pool/main/x/xtrans/xtrans-dev_1.6.0-1build1_all.deb

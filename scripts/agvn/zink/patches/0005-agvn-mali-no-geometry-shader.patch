@@ -1,0 +1,20 @@
+Source: AGVN, reconstructed from Ludashi's opengl_zink.tzst (not published by Ludashi). Verified against its
+libgallium-24.3.0.so: at the end of init_driver_workarounds it stores 0 at zink_screen+0xed0
+(= info 0xe40 + feats 0x70 + features 0x10 + geometryShader 0x10, from its DWARF) when driverID == 9 (ARM).
+Why: geometry shaders are unusable on the Mali blob.
+
+diff --git a/src/gallium/drivers/zink/zink_screen.c b/src/gallium/drivers/zink/zink_screen.c
+index 2027eeb..8caf42f 100644
+--- a/src/gallium/drivers/zink/zink_screen.c
++++ b/src/gallium/drivers/zink/zink_screen.c
+@@ -3095,6 +3095,10 @@ init_driver_workarounds(struct zink_screen *screen)
+ 
+    if (!screen->resizable_bar)
+       screen->info.have_EXT_host_image_copy = false;
++
++   /* Winlator/AGVN: geometry shaders are unusable on the Mali blob */
++   if (zink_driverid(screen) == VK_DRIVER_ID_ARM_PROPRIETARY)
++      screen->info.feats.features.geometryShader = VK_FALSE;
+ }
+ 
+ static void

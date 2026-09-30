@@ -10,8 +10,10 @@ web GitHub để mở và merge PR.
 
 - `agvn/main`: đã merge PR #25–#35. Phiên bản 0.1.2 (mã 4), chưa phát hành; ghi chú phát hành ở
   `docs/agvn/release/ghi-chu-phat-hanh-v0.1.2.txt`.
-- **PR #34 (nháp, nhánh `agvn/p27-zink-release`)**: dựng lại Zink bằng Mesa 25.1.9 bản phát hành. Script, bản vá và
-  ghim đã xong và đã kiểm chứng. **Chưa chạy dựng**, nên chưa có file `opengl_zink.tzst` mới. Chưa được merge.
+- **PR #34 (nháp, nhánh `agvn/p27-zink-release`)**: Zink mới (Mesa 25.1.9 bản phát hành) **đã dựng xong trên cloud**
+  và đã nằm trong nhánh: `opengl_zink.tzst` 3,3 MB (bản cũ 17,5 MB), SHA-256 `ebae37b8…3cded`. Bản đầu (`c1e75643…`)
+  đã hết văng trên POCO. Bản hiện tại thêm bản vá `0007` giới hạn vùng đệm GPU của Zink ở 256 MB (mã phiên bản
+  `zink@3`). Cần thử lại RAM trên POCO rồi mới merge.
 - Tạm dừng theo lời anh Sơn: Ren'Py / ONScripter / mkxp-z và việc chuyển app sang giấy phép GPL.
 
 ## Việc làm tiếp (theo thứ tự)
@@ -29,8 +31,12 @@ Game này chạy tốt trên GameHub (Mesa 25.1.4). Nguyên nhân văng đã rõ
 1. **Thử nhanh cho lỗi chớp** (không cần dựng lại gì): Cài đặt → tắt **"Dùng tiện ích DRI3"** → mở lại game ở cấu
    hình thấp. Nếu hết chớp thì lỗi nằm ở khâu đưa hình lên màn hình (DRI3/Present), không phải ở game. Đọc log theo
    mục "Đọc log" bên dưới, tìm dòng `zink`, `MESA`, `wrapper`, `present`.
-2. **Dựng Zink mới** (xem `scripts/agvn/zink/README.md`). Script chỉ chạy trên Linux, nên trên Windows dùng **WSL2
-   Ubuntu 24.04**. Chạy mã dựng của Mesa là bước anh Sơn phải đồng ý trước.
+2. **Thử Zink mới:** file đã có trong nhánh `agvn/p27-zink-release`, không cần dựng lại. Dựng APK từ nhánh đó (mục
+   "Dựng và cài APK", thay `agvn/main` bằng `agvn/p27-zink-release`), cài lên POCO và chạy theo "Device Test
+   Checklist" của PR #34. Nếu máy đã hết chớp và hết văng thì bỏ trạng thái nháp rồi merge.
+
+   Chỉ khi cần dựng lại (xem `scripts/agvn/zink/README.md`): script chỉ chạy trên Linux, nên trên Windows dùng
+   **WSL2 Ubuntu 24.04**. Chạy mã dựng của Mesa là bước anh Sơn phải đồng ý trước.
    ```bash
    # trong WSL
    git clone https://github.com/son242537-gif/agvn-player ~/ap && cd ~/ap && git checkout agvn/p27-zink-release
@@ -39,10 +45,8 @@ Game này chạy tốt trên GameHub (Mesa 25.1.4). Nguyên nhân văng đã rõ
    cp /mnt/c/AGVN/ap/app/src/main/assets/imagefs.tar.zst app/src/main/assets/   # imagefs đã tải sẵn ở Windows
    ANDROID_HOME=/opt/android-sdk bash scripts/agvn/zink/build-zink.sh
    ```
-   Script tự kiểm SHA của mọi nguồn và tự kiểm file kết quả. Xong thì commit
-   `app/src/main/assets/graphics_driver/opengl_zink.tzst` vào nhánh `agvn/p27-zink-release`, dựng APK trên Windows,
-   cài lên POCO và chạy theo "Device Test Checklist" của PR #34. Nếu máy đã hết chớp và hết văng thì bỏ trạng thái
-   nháp rồi merge.
+   Script tự kiểm SHA của mọi nguồn và tự kiểm file kết quả trước khi thay
+   `app/src/main/assets/graphics_driver/opengl_zink.tzst`.
 3. Nếu Zink mới vẫn chớp: so env của app với GameHub (xem `ZINK_DEBUG`, `MESA_VK_WSI_*`, `WRAPPER_*` trong
    `XServerDisplayActivity.applyOpenGLDriverEnvVars` và `extractGraphicsDriverFiles`). Thử lần lượt
    `ZINK_DEBUG=compact,flushsync` và `MESA_VK_WSI_PRESENT_MODE=fifo` trong mục biến môi trường của game.

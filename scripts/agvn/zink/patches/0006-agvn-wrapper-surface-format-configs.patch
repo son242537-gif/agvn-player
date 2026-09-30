@@ -1,0 +1,68 @@
+Source: AGVN, reconstructed from Ludashi's opengl_zink.tzst (not published by Ludashi). Verified against its
+libgallium-24.3.0.so (inlined dri_fill_in_modes, 0x708d50..0x709194): getenv("WRAPPER_SURFACE_FORMAT"),
+strcmp with "bgra8"; "bgra8" skips pipe_formats[11..14] (RGBA8888/RGBX8888 UNORM/SRGB), any other value skips
+[4..7] (BGRA8888/BGRX8888 UNORM/SRGB); the upstream loader RGBA-ordering filter is gone.
+Why: the app always sets WRAPPER_SURFACE_FORMAT (GuestProgramLauncherComponent); the GL visuals must match the
+Vulkan wrapper's swapchain channel order, or colours come out swapped.
+
+diff --git a/src/gallium/frontends/dri/dri_screen.c b/src/gallium/frontends/dri/dri_screen.c
+index 327e839..2b4180b 100644
+--- a/src/gallium/frontends/dri/dri_screen.c
++++ b/src/gallium/frontends/dri/dri_screen.c
+@@ -33,6 +33,9 @@
+ #include "dri_context.h"
+ #include "dri_helpers.h"
+ 
++#include <stdlib.h>
++#include <string.h>
++
+ #include "util/u_inlines.h"
+ #include "pipe/p_screen.h"
+ #include "util/format/u_formats.h"
+@@ -344,7 +347,6 @@ dri_fill_in_modes(struct dri_screen *screen)
+    unsigned i;
+    struct pipe_screen *p_screen = screen->base.screen;
+    bool mixed_color_depth;
+-   bool allow_rgba_ordering;
+    bool allow_rgb10;
+    bool allow_fp16;
+ 
+@@ -353,7 +355,12 @@ dri_fill_in_modes(struct dri_screen *screen)
+    if (!driQueryOptionb(&screen->dev->option_cache, "always_have_depth_buffer"))
+       zs_formats[num_zs_formats++] = PIPE_FORMAT_NONE;
+ 
+-   allow_rgba_ordering = dri_loader_get_cap(screen, DRI_LOADER_CAP_RGBA_ORDERING);
++   /* Winlator/AGVN: expose only the 8888 channel order that matches the
++    * Vulkan wrapper's swapchain (WRAPPER_SURFACE_FORMAT=rgba8|bgra8), instead
++    * of asking the loader for RGBA-ordering support. */
++   const char *wrapper_fmt = getenv("WRAPPER_SURFACE_FORMAT");
++   bool wrapper_bgra = wrapper_fmt && !strcmp(wrapper_fmt, "bgra8");
++   bool wrapper_rgba = wrapper_fmt && !wrapper_bgra;
+    allow_rgb10 = driQueryOptionb(&screen->dev->option_cache, "allow_rgb10_configs");
+    allow_fp16 = dri_loader_get_cap(screen, DRI_LOADER_CAP_FP16);
+ 
+@@ -389,16 +396,17 @@ dri_fill_in_modes(struct dri_screen *screen)
+       unsigned num_msaa_modes = 0; /* includes a single-sample mode */
+       uint8_t msaa_modes[MSAA_VISUAL_MAX_SAMPLES];
+ 
+-      /* Expose only BGRA ordering if the loader doesn't support RGBA ordering. */
+-      if (!allow_rgba_ordering &&
++      if (wrapper_bgra &&
+           (pipe_formats[f] == PIPE_FORMAT_RGBA8888_UNORM ||
+            pipe_formats[f] == PIPE_FORMAT_RGBX8888_UNORM ||
+            pipe_formats[f] == PIPE_FORMAT_RGBA8888_SRGB  ||
+-           pipe_formats[f] == PIPE_FORMAT_RGBX8888_SRGB  ||
+-           pipe_formats[f] == PIPE_FORMAT_R5G5B5A1_UNORM ||
+-           pipe_formats[f] == PIPE_FORMAT_R5G5B5X1_UNORM ||
+-           pipe_formats[f] == PIPE_FORMAT_R4G4B4A4_UNORM ||
+-           pipe_formats[f] == PIPE_FORMAT_R4G4B4X4_UNORM))
++           pipe_formats[f] == PIPE_FORMAT_RGBX8888_SRGB))
++         continue;
++      if (wrapper_rgba &&
++          (pipe_formats[f] == PIPE_FORMAT_BGRA8888_UNORM ||
++           pipe_formats[f] == PIPE_FORMAT_BGRX8888_UNORM ||
++           pipe_formats[f] == PIPE_FORMAT_BGRA8888_SRGB  ||
++           pipe_formats[f] == PIPE_FORMAT_BGRX8888_SRGB))
+          continue;
+ 
+       if (!allow_rgb10 &&
