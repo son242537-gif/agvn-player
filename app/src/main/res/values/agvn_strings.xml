@@ -242,4 +242,12 @@
     <string name="agvn_ram_growing">Bộ nhớ tăng liên tục dù không có thao tác, có thể do lỗi video hoặc lỗi game.</string>
     <string name="agvn_ram_exit">Thoát game an toàn</string>
     <string name="agvn_ram_later">Để sau</string>
+    <string name="agvn_heat_title_capped">Máy nóng, CPU đang bị hạ xung</string>
+    <string name="agvn_heat_title_hot">Máy đang nóng lên</string>
+    <string name="agvn_heat_capped">Nhân CPU mạnh nhất chỉ còn chạy tối đa %1$d%% tốc độ, nên game có thể chậm và giật.</string>
+    <string name="agvn_heat_hot">Android báo máy sắp phải hạ xung vì nóng.</string>
+    <string name="agvn_heat_charging">Máy đang sạc: rút sạc sẽ mát hơn.</string>
+    <string name="agvn_heat_fps">Hạ Giới hạn FPS xuống 20 cũng giúp máy mát hơn.</string>
+    <string name="agvn_heat_fps20">Hạ FPS 20</string>
+    <string name="agvn_heat_later">Để sau</string>
 </resources>

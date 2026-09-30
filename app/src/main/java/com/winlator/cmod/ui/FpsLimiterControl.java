@@ -245,6 +245,23 @@ public class FpsLimiterControl extends LinearLayout {
         initializing = false;
     }
 
+    /** AGVN: sets the limit from outside (the heat warning's "Hạ FPS 20"), then saves and applies it like the slider. */
+    public void setLimit(int fps) {
+        initializing = true;
+        if (fps <= 0) {
+            slider.setProgress(0);
+        } else if (fps < SLIDER_MAX_FPS && fps % STEP_FPS == 0) {
+            slider.setProgress(fps / STEP_FPS);
+            customValue.setText("");
+        } else {
+            slider.setProgress(CUSTOM_POSITION);
+            customValue.setText(String.valueOf(fps));
+        }
+        updateLimitUi();
+        initializing = false;
+        saveAndApply();
+    }
+
     private void saveAndApply() {
         XServerDisplayActivity activity = findActivity();
         if (activity == null) return;

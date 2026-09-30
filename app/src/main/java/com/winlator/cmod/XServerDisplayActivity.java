@@ -217,6 +217,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private boolean simulateTouchScreen = false;
     private com.winlator.cmod.agvn.GameSessionGuard agvnSessionGuard;
     private com.winlator.cmod.agvn.AgvnMemoryWatch agvnMemoryWatch;
+    private com.winlator.cmod.agvn.AgvnHeatWatch agvnHeatWatch;
     private String agvnEffectiveExePath; // AGVN: exe actually launched (Unreal bootstrap -> Shipping redirect)
 
     private SensorManager sensorManager;
@@ -837,6 +838,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
         agvnSessionGuard.start();
         if (agvnMemoryWatch == null) agvnMemoryWatch = new com.winlator.cmod.agvn.AgvnMemoryWatch(this, this::exit);
         agvnMemoryWatch.start();
+        if (agvnHeatWatch == null) agvnHeatWatch = new com.winlator.cmod.agvn.AgvnHeatWatch(this);
+        agvnHeatWatch.start();
         if (!isInPictureInPictureMode())
             ProcessHelper.resumeAllWineProcesses();
     }
@@ -846,6 +849,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (taskManagerSidebar != null) taskManagerSidebar.stop();
         if (agvnSessionGuard != null) agvnSessionGuard.stop();
         if (agvnMemoryWatch != null) agvnMemoryWatch.stop();
+        if (agvnHeatWatch != null) agvnHeatWatch.stop();
         super.onPause();
 
         if (!isInPictureInPictureMode()) {
@@ -923,6 +927,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (!exiting.compareAndSet(false, true)) return;
         if (agvnSessionGuard != null) agvnSessionGuard.destroy();
         if (agvnMemoryWatch != null) agvnMemoryWatch.finish();
+        if (agvnHeatWatch != null) agvnHeatWatch.finish();
         NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID);
         boolean removeLoadingBar = PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("remove_loading_bar_when_booting_games", false);
@@ -991,6 +996,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (taskManagerSidebar != null) taskManagerSidebar.stop();
         if (agvnSessionGuard != null) agvnSessionGuard.destroy();
         if (agvnMemoryWatch != null) agvnMemoryWatch.stop();
+        if (agvnHeatWatch != null) agvnHeatWatch.stop();
         super.onDestroy();
     }
 

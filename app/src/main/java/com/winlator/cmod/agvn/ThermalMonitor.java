@@ -36,9 +36,30 @@ public final class ThermalMonitor {
         return pm != null ? pm.getCurrentThermalStatus() : -1;
     }
 
+    private static volatile float lastHeadroom = Float.NaN;
+    private static volatile long lastHeadroomMs = Long.MIN_VALUE / 2;
+
+    /** Android returns NaN when asked more than once a second, and two guards ask: a reading under 1.5 s old is reused. */
     public static float headroom(Context ctx) {
         if (Build.VERSION.SDK_INT < 30) return Float.NaN;
+        long now = android.os.SystemClock.uptimeMillis();
+        if (now - lastHeadroomMs < 1500) return lastHeadroom;
         PowerManager pm = (PowerManager) ctx.getSystemService(Context.POWER_SERVICE);
-        return pm != null ? pm.getThermalHeadroom(10) : Float.NaN;
+        float h = pm != null ? pm.getThermalHeadroom(10) : Float.NaN;
+        if (!Float.isNaN(h)) {
+            lastHeadroom = h;
+            lastHeadroomMs = now;
+        }
+        return h;
+    }
+
+    /** Plugged into a charger or a USB port. */
+    public static boolean charging(Context ctx) {
+        try {
+            Intent battery = ctx.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+            return battery != null && battery.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) != 0;
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 }
