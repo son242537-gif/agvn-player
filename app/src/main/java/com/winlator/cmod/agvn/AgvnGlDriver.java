@@ -11,9 +11,10 @@ import java.io.File;
 public final class AgvnGlDriver {
     /**
      * Bump when a bundled opengl_zink.tzst changes. 1 = Ludashi's Mesa 24.3.0 debug build (aborted games that bind a
-     * too-big uniform buffer); 2 = AGVN's Mesa 25.1.9 release build (scripts/agvn/zink/build-zink.sh).
+     * too-big uniform buffer); 2 = AGVN's Mesa 25.1.9 release build (scripts/agvn/zink/build-zink.sh); 3 = the same
+     * with the freed-buffer cache capped at 256 MB (patch 0007).
      */
-    static final int ZINK_REVISION = 2;
+    static final int ZINK_REVISION = 3;
 
     private AgvnGlDriver() {}
 

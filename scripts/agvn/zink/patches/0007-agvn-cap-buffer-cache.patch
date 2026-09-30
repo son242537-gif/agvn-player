@@ -1,0 +1,19 @@
+Source: AGVN. Caps Zink's cache of freed buffers at 256 MB (1/8 of 2 GB) instead of 1/8 of the Vulkan heap.
+Why: phones share RAM with the GPU. On a POCO F8 Pro (11 GB RAM, Turnip) the uncapped cache may hold about 1 GB.
+Reporting a 2 GB heap to Zink (WRAPPER_VMEM_MAX_SIZE=2048), which sets the same cap, lowered a game's GPU memory
+(dumpsys meminfo "GL mtrack") from 2.78 GB to 2.52 GB.
+
+diff --git a/src/gallium/drivers/zink/zink_bo.c b/src/gallium/drivers/zink/zink_bo.c
+index fee3aa2..7ec6c27 100644
+--- a/src/gallium/drivers/zink/zink_bo.c
++++ b/src/gallium/drivers/zink/zink_bo.c
+@@ -1347,6 +1347,9 @@ zink_bo_init(struct zink_screen *screen)
+    uint64_t total_mem = 0;
+    for (uint32_t i = 0; i < screen->info.mem_props.memoryHeapCount; ++i)
+       total_mem += screen->info.mem_props.memoryHeaps[i].size;
++   /* AGVN: phones share RAM with the GPU, so every freed buffer kept for reuse costs
++    * real RAM. Size the cache as if the heap were 2 GB (at most 256 MB). */
++   total_mem = MIN2(total_mem, 2048ull * 1024 * 1024);
+    /* Create managers. */
+    pb_cache_init(&screen->pb.bo_cache, screen->info.mem_props.memoryTypeCount,
+                  500000, 2.0f, 0,

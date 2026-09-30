@@ -11,8 +11,9 @@ web GitHub để mở và merge PR.
 - `agvn/main`: đã merge PR #25–#35. Phiên bản 0.1.2 (mã 4), chưa phát hành; ghi chú phát hành ở
   `docs/agvn/release/ghi-chu-phat-hanh-v0.1.2.txt`.
 - **PR #34 (nháp, nhánh `agvn/p27-zink-release`)**: Zink mới (Mesa 25.1.9 bản phát hành) **đã dựng xong trên cloud**
-  và đã nằm trong nhánh: `opengl_zink.tzst` 3,3 MB (bản cũ 17,5 MB), SHA-256 `c1e75643…3d60a`. Chờ thử trên POCO rồi
-  mới merge.
+  và đã nằm trong nhánh: `opengl_zink.tzst` 3,3 MB (bản cũ 17,5 MB), SHA-256 `ebae37b8…3cded`. Bản đầu (`c1e75643…`)
+  đã hết văng trên POCO. Bản hiện tại thêm bản vá `0007` giới hạn vùng đệm GPU của Zink ở 256 MB (mã phiên bản
+  `zink@3`). Cần thử lại RAM trên POCO rồi mới merge.
 - Tạm dừng theo lời anh Sơn: Ren'Py / ONScripter / mkxp-z và việc chuyển app sang giấy phép GPL.
 
 ## Việc làm tiếp (theo thứ tự)

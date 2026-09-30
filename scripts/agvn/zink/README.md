@@ -39,6 +39,11 @@ Mọi thứ đều ghim trong `sources.lock`. File tải về sai một byte là
 Nếu tác giả Ludashi (StevenMXZ) công bố bản vá gốc (commit `9ffbe0175b`), nên so lại với `0005`/`0006`. Cách
 dựng lại từ mã máy không nhìn thấy những sửa đổi giữ nguyên số dòng.
 
+4. `0007`: của AGVN. Giới hạn vùng đệm giữ lại các bộ đệm GPU đã dùng xong ở 256 MB. Bản gốc cho giữ tới 1/8 bộ
+   nhớ mà driver Vulkan báo, tức khoảng 1 GB trên máy 11 GB RAM. Điện thoại dùng chung RAM cho CPU và GPU, nên phần
+   giữ lại này là RAM thật. Khi thử cùng mức giới hạn trên POCO F8 Pro, bộ nhớ GPU của game giảm từ 2,78 GB xuống
+   2,52 GB.
+
 ## Cách chạy (Linux x86_64: máy cloud hoặc WSL)
 
 ```bash
