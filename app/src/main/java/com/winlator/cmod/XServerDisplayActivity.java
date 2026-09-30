@@ -2373,7 +2373,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         inputControlsView.requestFocus();
 
         touchpadView.setSensitivity(profile.getCursorSpeed() * globalCursorSpeed);
-        touchpadView.setPointerButtonRightEnabled(false);
+        // AGVN: keep the two-finger tap right-click with on-screen controls; fingers on a control never reach the touchpad
 
         inputControlsView.invalidate();
         winHandler.sendGamepadState();
