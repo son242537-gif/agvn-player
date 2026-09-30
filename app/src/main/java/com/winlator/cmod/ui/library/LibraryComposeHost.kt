@@ -88,6 +88,8 @@ object LibraryComposeHost {
     const val ACTION_REMOVE = "remove"
     const val ACTION_FAVORITE = "favorite"
     const val ACTION_QUALITY = "quality"
+    const val ACTION_SAVE_IMPORT = "save_import"
+    const val ACTION_SAVE_EXPORT = "save_export"
 
     @JvmStatic
     fun create(

@@ -29,11 +29,16 @@ final class AgvnUnityQuality {
 
     /** Registry key (relative to HKCU) of the game's PlayerPrefs, or null when app.info lacks company or product. */
     static String prefsKey(File appInfo) throws IOException {
+        String[] names = companyProduct(appInfo);
+        return names != null ? "Software\\" + names[0] + "\\" + names[1] : null;
+    }
+
+    /** {company, product} from the first two lines of app.info, or null when either is missing. */
+    static String[] companyProduct(File appInfo) throws IOException {
         List<String> lines = Files.readAllLines(appInfo.toPath(), StandardCharsets.UTF_8);
         if (lines.size() < 2) return null;
         String company = lines.get(0).trim(), product = lines.get(1).trim();
-        if (company.isEmpty() || product.isEmpty()) return null;
-        return "Software\\" + company + "\\" + product;
+        return company.isEmpty() || product.isEmpty() ? null : new String[]{company, product};
     }
 
     /** {@code <exe>_Data/app.info} next to the exe, else the only {@code *_Data/app.info} in the exe's folder. */

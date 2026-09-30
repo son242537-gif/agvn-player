@@ -145,6 +145,8 @@ public class ShortcutsFragment extends Fragment {
     private Shortcut shortcutForIconUpdate;
     private ActivityResultLauncher<String> iconPickerLauncher;
     private ActivityResultLauncher<String> contentPickerLauncher;
+    private ActivityResultLauncher<String[]> savePickerLauncher; // AGVN: "Nhập save"
+    private Shortcut shortcutForSaveImport;
     private com.winlator.cmod.core.Callback<Uri> pendingContentPickerCallback;
 
     public static final int IMPORT_SHORTCUT = 1005;
@@ -154,6 +156,10 @@ public class ShortcutsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
+        savePickerLauncher = registerForActivityResult(new ActivityResultContracts.OpenMultipleDocuments(), uris -> {
+            if (uris != null && !uris.isEmpty() && shortcutForSaveImport != null && getActivity() != null)
+                com.winlator.cmod.agvn.AgvnSaveDialogs.importPicked(getActivity(), shortcutForSaveImport, uris);
+        });
         iconPickerLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
             if (uri != null && shortcutForIconUpdate != null) {
                 updateShortcutIcon(uri, shortcutForIconUpdate);
@@ -731,6 +737,15 @@ public class ShortcutsFragment extends Fragment {
         }
         else if (LibraryComposeHost.ACTION_QUALITY.equals(action)) {
             com.winlator.cmod.agvn.AgvnQualityDialog.show(requireActivity(), shortcut, this::loadShortcutsList);
+        }
+        else if (LibraryComposeHost.ACTION_SAVE_EXPORT.equals(action)) {
+            com.winlator.cmod.agvn.AgvnSaveDialogs.exportSaves(requireActivity(), shortcut);
+        }
+        else if (LibraryComposeHost.ACTION_SAVE_IMPORT.equals(action)) {
+            com.winlator.cmod.agvn.AgvnSaveDialogs.askImport(requireActivity(), shortcut, () -> {
+                shortcutForSaveImport = shortcut;
+                savePickerLauncher.launch(new String[]{"*/*"});
+            });
         }
         else if (LibraryComposeHost.ACTION_ICON.equals(action)) {
             shortcutForIconUpdate = shortcut;

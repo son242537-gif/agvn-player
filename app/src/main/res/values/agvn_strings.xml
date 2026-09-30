@@ -190,4 +190,17 @@
     <string name="agvn_folder_scan">Quét thư mục này</string>
     <string name="agvn_folder_empty">Thư mục này không có thư mục con</string>
     <string name="agvn_folder_sd">Thẻ nhớ (%1$s)</string>
+    <string name="agvn_save_import">Nhập save</string>
+    <string name="agvn_save_export">Xuất save</string>
+    <string name="agvn_save_pick">Chọn file save</string>
+    <string name="agvn_save_working">Đang xử lý save…</string>
+    <string name="agvn_save_import_where">Save sẽ được chép vào:\n%1$s\n\nChọn file save hoặc file .zip trong máy. File .zip do AGVN xuất ra sẽ được trả về đúng chỗ cũ. Save đang có được sao lưu trước khi chép.</string>
+    <string name="agvn_save_import_unknown">Chưa biết game này lưu save ở đâu. Hãy mở game, lưu một lần, rồi thử lại.</string>
+    <string name="agvn_save_import_none">Không có file nào được nhập: file đã chọn không phải save của game này.</string>
+    <string name="agvn_save_imported">Đã nhập %1$d file save vào:\n%2$s</string>
+    <string name="agvn_save_imported_backup">\n\nSave cũ đã được sao lưu ở:\n%1$s</string>
+    <string name="agvn_save_exported">Đã xuất %1$d file save vào:\n%2$s\n\nChép file .zip này sang máy khác rồi dùng \"Nhập save\" để chơi tiếp.</string>
+    <string name="agvn_save_export_empty">Chưa có save nào để xuất. Hãy chơi và lưu game trước.</string>
+    <string name="agvn_save_html_note">Game này chạy bằng trình duyệt có sẵn trong app, save nằm trong bộ nhớ của trình duyệt đó. AGVN chưa nhập/xuất được save cho loại game này.</string>
+    <string name="agvn_save_error">Không xử lý được save: %1$s</string>
 </resources>
