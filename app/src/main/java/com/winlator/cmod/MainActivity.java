@@ -127,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return;
         }
 
+        // AGVN: sessions whose process Android killed get their logs and exit reason now
+        new Thread(() -> com.winlator.cmod.agvn.AgvnSessionLog.finishPending(getApplicationContext()), "AgvnSessionLog").start();
+
         notificationService = new Intent(this, NotificationService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && (Build.VERSION.SDK_INT < 33 || ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED))
             createNotificationChannel();

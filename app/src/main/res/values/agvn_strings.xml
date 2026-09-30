@@ -230,4 +230,10 @@
     <string name="agvn_update_allow_done">Đã bật \"Cho phép từ nguồn này\" chưa? Bấm \"Cài tiếp\" để cài bản mới.</string>
     <string name="agvn_update_continue">Cài tiếp</string>
     <string name="agvn_update_confirm">Bấm \"Cập nhật\" trên hộp thoại của Android để cài.</string>
+    <!-- Game session logs (AgvnSessionLog, AgvnLogShare) -->
+    <string name="agvn_logs_working">Đang gom nhật ký của game…</string>
+    <string name="agvn_logs_none">Chưa có nhật ký nào của game này. Hãy mở game một lần rồi thử lại.</string>
+    <string name="agvn_logs_saved">Đã lưu nhật ký của game vào:\n%1$s\n\nGửi file này cho AGVN để được giúp sửa lỗi.</string>
+    <string name="agvn_logs_share">Chia sẻ</string>
+    <string name="agvn_logs_error">Không gom được nhật ký: %1$s</string>
 </resources>

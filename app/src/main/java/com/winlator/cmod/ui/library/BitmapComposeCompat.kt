@@ -43,6 +43,7 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material3.DropdownMenu
@@ -523,6 +524,15 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_EXPORT)
                 }
+            }
+            LibraryActionTileCompat(
+                Icons.Outlined.BugReport,
+                "Gửi nhật ký",
+                Modifier.fillMaxWidth().padding(top = 8.dp),
+                horizontal = landscape
+            ) {
+                close()
+                cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SEND_LOGS)
             }
             LibraryActionTileCompat(
                 Icons.Outlined.DeleteOutline,

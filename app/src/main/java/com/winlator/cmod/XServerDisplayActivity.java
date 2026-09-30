@@ -960,6 +960,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
                     break;
                 }
             }
+            // AGVN: the game has ended, so its engine logs are complete
+            if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.finish(this, "Game kết thúc bình thường (thoát từ menu hoặc game tự đóng)");
             if (shortcut != null && GameSaveManager.shouldAutoBackup(this, shortcut)) {
                 GameSaveManager.BackupResult saveResult = GameSaveManager.backup(shortcut, true);
                 if (saveResult.ok) {
@@ -1219,7 +1221,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
         }
 
         guestProgramLauncherComponent.setEnvVars(envVars);
-        guestProgramLauncherComponent.setTerminationCallback((status) -> runOnUiThread(this::exit));
+        if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.start(shortcut, envVars); // AGVN: logs of this play session
+        guestProgramLauncherComponent.setTerminationCallback((status) -> {
+            com.winlator.cmod.agvn.AgvnSessionLog.event("Wine kết thúc, mã thoát " + status);
+            runOnUiThread(this::exit);
+        });
 
         environment.addComponent(guestProgramLauncherComponent);
 
