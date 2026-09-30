@@ -1101,6 +1101,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 com.winlator.cmod.agvn.AgvnGamepadMode.mapToXInput(exclusiveXInput, inputType)))
             containerDataChanged = true;
         com.winlator.cmod.agvn.VcRuntimeMarker.apply(new File(container.getRootDir(), ".wine/system.reg")); // AGVN: Visual C++ 2015-2022 markers
+        com.winlator.cmod.agvn.AgvnFontFallback.apply(new File(container.getRootDir(), ".wine/user.reg")); // AGVN: MS Gothic etc. for Japanese games
 
         if (shortcut != null)
             startupSelection = shortcut.getExtra("startupSelection", String.valueOf(container.getStartupSelection()));
