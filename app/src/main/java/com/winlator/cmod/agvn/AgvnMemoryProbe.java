@@ -33,6 +33,12 @@ final class AgvnMemoryProbe {
         return kb < 0 ? -1 : kb / 1024;
     }
 
+    /** The phone's RAM (MemTotal) in MB, or 0 when unreadable. */
+    static long totalMb() {
+        long kb = kb(read(new File("/proc/meminfo")), "MemTotal:");
+        return kb < 0 ? 0 : kb / 1024;
+    }
+
     /** Resident memory of all our processes, and the DMA-BUF buffers they hold. */
     static Usage appUsage() {
         long rssKb = 0, dmabufBytes = 0;

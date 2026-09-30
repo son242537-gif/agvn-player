@@ -13,19 +13,30 @@ public class AgvnMemoryWatchTest {
 
     @Test
     public void lowFreeRamWarnsAfterTwoSamplesThenWaits() {
-        AgvnMemoryRules rules = new AgvnMemoryRules();
+        AgvnMemoryRules rules = new AgvnMemoryRules(11_000); // POCO F8 Pro: warns under 1.1 GB free
         long t = START + 10 * S;
-        assertEquals(NONE, rules.feed(t, START, 1100, 3000, t));
-        assertEquals(AgvnMemoryRules.Reason.LOW_FREE, rules.feed(t + 5 * S, START, 1100, 3000, t));
-        assertEquals("cooldown", NONE, rules.feed(t + 10 * S, START, 1100, 3000, t));
-        assertEquals("cooldown", NONE, rules.feed(t + 15 * S, START, 1100, 3000, t));
-        assertEquals("under 600 MB breaks the cooldown", AgvnMemoryRules.Reason.LOW_FREE, rules.feed(t + 20 * S, START, 500, 3000, t));
+        assertEquals(NONE, rules.feed(t, START, 1000, 3000, t));
+        assertEquals(AgvnMemoryRules.Reason.LOW_FREE, rules.feed(t + 5 * S, START, 1000, 3000, t));
+        assertEquals("cooldown", NONE, rules.feed(t + 10 * S, START, 1000, 3000, t));
+        assertEquals("cooldown", NONE, rules.feed(t + 15 * S, START, 1000, 3000, t));
+        assertEquals("under half the threshold breaks the cooldown", AgvnMemoryRules.Reason.LOW_FREE, rules.feed(t + 20 * S, START, 500, 3000, t));
+    }
+
+    @Test
+    public void theThresholdFollowsThePhonesRam() {
+        AgvnMemoryRules small = new AgvnMemoryRules(5_800); // a 6 GB phone running a big game normally
+        assertEquals(600, small.lowFreeMb);
+        long t = START + 10 * S;
+        assertEquals(NONE, small.feed(t, START, 1000, 3000, t));
+        assertEquals(NONE, small.feed(t + 5 * S, START, 1000, 3000, t));
+        assertEquals(1200, new AgvnMemoryRules(0).lowFreeMb);
+        assertEquals(1200, new AgvnMemoryRules(16_000).lowFreeMb);
     }
 
     @Test
     public void memoryClimbingWhileIdleIsALeak() {
         // the report: +288 MB every 16 s at a black screen, nobody touching anything
-        AgvnMemoryRules rules = new AgvnMemoryRules();
+        AgvnMemoryRules rules = new AgvnMemoryRules(11_000);
         AgvnMemoryRules.Reason seen = NONE;
         long used = 500;
         for (long t = START; t <= START + 240 * S && seen == NONE; t += 5 * S) {
@@ -37,16 +48,27 @@ public class AgvnMemoryWatchTest {
 
     @Test
     public void loadingOrPlayingIsNotALeak() {
-        AgvnMemoryRules loading = new AgvnMemoryRules();
+        AgvnMemoryRules loading = new AgvnMemoryRules(11_000);
         long used = 500;
         for (long t = START; t < START + 90 * S; t += 5 * S) {
             used += 200; // fast growth, but in the first 90 s
             assertEquals(NONE, loading.feed(t, START, 4000, used, START));
         }
-        AgvnMemoryRules playing = new AgvnMemoryRules();
+        AgvnMemoryRules playing = new AgvnMemoryRules(11_000);
         for (long t = START + 100 * S; t < START + 300 * S; t += 5 * S) {
             used += 200; // fast growth while the player keeps touching the screen
             assertEquals(NONE, playing.feed(t, START, 4000, used, t - S));
+        }
+    }
+
+    @Test
+    public void aLevelLoadingWhileNobodyTouchesIsNotALeak() {
+        // any game: 1.5 GB in 30 s at a loading screen, then flat
+        AgvnMemoryRules rules = new AgvnMemoryRules(11_000);
+        long used = 2000;
+        for (long t = START + 200 * S; t < START + 500 * S; t += 5 * S) {
+            if (t < START + 230 * S) used += 250;
+            assertEquals(NONE, rules.feed(t, START, 4000, used, START));
         }
     }
 
