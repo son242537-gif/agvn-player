@@ -22,28 +22,37 @@ public class AgvnHeatRulesTest {
     public void aCappedCpuWarnsAfterTwoSamplesThenWaits() {
         AgvnHeatRules rules = new AgvnHeatRules();
         long t = 1_000_000;
-        assertEquals(NONE, rules.feed(t, 0.71f, NAN));
-        assertEquals(AgvnHeatRules.Reason.CPU_CAPPED, rules.feed(t + 5_000, 0.71f, NAN));
-        assertEquals(NONE, rules.feed(t + 10_000, 0.71f, NAN));
-        assertEquals("5 minutes of quiet", NONE, rules.feed(t + 15_000, 0.71f, NAN));
-        assertEquals("still capped after them", AgvnHeatRules.Reason.CPU_CAPPED, rules.feed(t + 400_000, 0.71f, NAN));
+        assertEquals(NONE, rules.feed(t, 0.71f, NAN, 40f));
+        assertEquals(AgvnHeatRules.Reason.CPU_CAPPED, rules.feed(t + 5_000, 0.71f, NAN, 40f));
+        assertEquals(NONE, rules.feed(t + 10_000, 0.71f, NAN, 40f));
+        assertEquals("5 minutes of quiet", NONE, rules.feed(t + 15_000, 0.71f, NAN, 40f));
+        assertEquals("still capped after them", AgvnHeatRules.Reason.CPU_CAPPED, rules.feed(t + 400_000, 0.71f, NAN, 40f));
     }
 
     @Test
     public void fullSpeedOrOneSlowSampleIsFine() {
         AgvnHeatRules rules = new AgvnHeatRules();
-        assertEquals(NONE, rules.feed(0, 0.70f, NAN));
-        assertEquals("back to full speed resets the count", NONE, rules.feed(5_000, 1f, NAN));
-        assertEquals(NONE, rules.feed(10_000, 0.70f, NAN));
-        assertEquals(NONE, rules.feed(15_000, 0.90f, 0.5f));
+        assertEquals(NONE, rules.feed(0, 0.70f, NAN, 40f));
+        assertEquals("back to full speed resets the count", NONE, rules.feed(5_000, 1f, NAN, 40f));
+        assertEquals(NONE, rules.feed(10_000, 0.70f, NAN, 40f));
+        assertEquals(NONE, rules.feed(15_000, 0.90f, 0.5f, 40f));
+    }
+
+    @Test
+    public void aCapOnACoolPhoneIsPowerSavingNotHeat() {
+        AgvnHeatRules rules = new AgvnHeatRules();
+        for (long t = 0; t < 60_000; t += 5_000) assertEquals(NONE, rules.feed(t, 0.70f, 0.3f, 33f));
+        AgvnHeatRules unknown = new AgvnHeatRules();
+        unknown.feed(0, 0.70f, NAN, NAN);
+        assertEquals("no temperature at all: the cap alone counts", AgvnHeatRules.Reason.CPU_CAPPED, unknown.feed(5_000, 0.70f, NAN, NAN));
     }
 
     @Test
     public void headroomNearThrottlingWarnsAndMissingReadingsDoNotReset() {
         AgvnHeatRules rules = new AgvnHeatRules();
-        assertEquals(NONE, rules.feed(0, NAN, 0.9f));
-        assertEquals("Android asked too often: NaN keeps the count", NONE, rules.feed(5_000, NAN, NAN));
-        assertEquals(AgvnHeatRules.Reason.NEAR_THROTTLING, rules.feed(10_000, NAN, 0.88f));
+        assertEquals(NONE, rules.feed(0, NAN, 0.9f, 40f));
+        assertEquals("Android asked too often: NaN keeps the count", NONE, rules.feed(5_000, NAN, NAN, 40f));
+        assertEquals(AgvnHeatRules.Reason.NEAR_THROTTLING, rules.feed(10_000, NAN, 0.88f, 40f));
     }
 
     @Test

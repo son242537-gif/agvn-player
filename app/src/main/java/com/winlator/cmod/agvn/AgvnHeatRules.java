@@ -7,24 +7,32 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 /**
- * When to tell the player the phone is too hot for full speed, from one sample every 5 s:
- * - the system capped the fastest CPU cores under 85% of their top speed, twice in a row. HyperOS does this at
- *   73–82 °C while Android's thermal status still reads "none" (POCO F8 Pro, 01/10/2026: 3.07 of 4.32 GHz, charging);
+ * When to tell the player the phone is too hot for full speed, from one sample every 5 s, on any phone and game:
+ * - the system capped the fastest CPU cores under 85% of their top speed while the phone is warm (battery at 38 °C or
+ *   more, or thermal headroom at 0.6 or more), twice in a row. HyperOS does this at 73–82 °C while Android's thermal
+ *   status still reads "none" (POCO F8 Pro, 01/10/2026: 3.07 of 4.32 GHz, charging). A cap on a cool phone is a power
+ *   saving mode, not heat, and does not warn;
  * - or Android's thermal headroom reached 0.85 (1.0 = throttling), twice in a row.
  * A reading the phone does not give (NaN) keeps the count as it was. After a warning the rules wait 5 minutes.
  */
 final class AgvnHeatRules {
     enum Reason { NONE, CPU_CAPPED, NEAR_THROTTLING }
 
-    static final float CAP_WARN = 0.85f, HEADROOM_WARN = 0.85f;
+    static final float CAP_WARN = 0.85f, HEADROOM_WARN = 0.85f, WARM_HEADROOM = 0.6f, WARM_BATTERY_C = 38f;
     static final long COOLDOWN_MS = 5 * 60_000L;
 
     private int cappedCount, hotCount;
     private long lastWarn = Long.MIN_VALUE / 2;
 
-    /** {@code cpuCap}: see {@link #fastestCap}; {@code headroom}: PowerManager.getThermalHeadroom. NaN = unknown. */
-    Reason feed(long nowMs, float cpuCap, float headroom) {
-        if (!Float.isNaN(cpuCap)) cappedCount = cpuCap < CAP_WARN ? cappedCount + 1 : 0;
+    /**
+     * {@code cpuCap}: see {@link #fastestCap}; {@code headroom}: PowerManager.getThermalHeadroom; {@code batteryC}: the
+     * battery temperature. NaN = unknown; with neither temperature known, a cap alone counts.
+     */
+    Reason feed(long nowMs, float cpuCap, float headroom, float batteryC) {
+        boolean warm = (!Float.isNaN(batteryC) && batteryC >= WARM_BATTERY_C)
+                || (!Float.isNaN(headroom) && headroom >= WARM_HEADROOM)
+                || (Float.isNaN(batteryC) && Float.isNaN(headroom));
+        if (!Float.isNaN(cpuCap)) cappedCount = cpuCap < CAP_WARN && warm ? cappedCount + 1 : 0;
         if (!Float.isNaN(headroom)) hotCount = headroom >= HEADROOM_WARN ? hotCount + 1 : 0;
         Reason reason = cappedCount >= 2 ? Reason.CPU_CAPPED : hotCount >= 2 ? Reason.NEAR_THROTTLING : Reason.NONE;
         if (reason == Reason.NONE || nowMs - lastWarn < COOLDOWN_MS) return Reason.NONE;

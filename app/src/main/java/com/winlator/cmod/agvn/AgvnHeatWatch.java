@@ -70,7 +70,7 @@ public final class AgvnHeatWatch {
             }
             long now = SystemClock.uptimeMillis();
             if (now - peaksWrittenMs >= PEAKS_EVERY_MS) writePeaks();
-            AgvnHeatRules.Reason reason = rules.feed(now, cap, headroom);
+            AgvnHeatRules.Reason reason = rules.feed(now, cap, headroom, battery);
             if (reason == AgvnHeatRules.Reason.NONE) return;
             AgvnSessionLog.event("Cảnh báo nóng (" + reason + "): CPU mạnh nhất tối đa " + percent(cap) + " tốc độ, headroom "
                     + headroom + ", pin " + battery + " °C, " + (charging ? "đang sạc" : "không sạc"));
