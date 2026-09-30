@@ -11,11 +11,6 @@ Là gì: Dịch shader (mã vẽ hiệu ứng) ở nền thay vì bắt game đ�
 Vì sao chỉnh: Giảm khựng, giật khi lần đầu gặp cảnh hoặc hiệu ứng mới.
 Chỉnh thế nào: Thường tự bật khi bạn chọn bản DXVK async; nên để bật, nhất là máy yếu. Nếu vật thể hoặc hiệu ứng thoáng mất, nháy, hay game lỗi, thử tắt.
 
-[Backend Oboe]
-Là gì: Kiểu kết nối âm thanh Android cho Oboe: Tự động, AAudio (mới, độ trễ thấp) hoặc OpenSL ES (cũ). Chỉ hiện khi cấu hình cũ còn lưu lựa chọn Oboe.
-Vì sao chỉnh: Bản hiện tại phát tiếng Oboe bằng PulseAudio-GN, nên đổi mục này không làm âm thanh thay đổi.
-Chỉnh thế nào: Để Tự động. Có lỗi tiếng thì đổi Driver âm thanh (PulseAudio-GN, PulseAudio, ALSA) thay vì mục này.
-
 [Biến]
 Là gì: Chọn biến môi trường muốn thêm. Biến môi trường là dòng cài đặt gửi cho Wine, driver hoặc DXVK khi mở game. Chọn “Tùy chỉnh…” để tự gõ tên.
 Vì sao chỉnh: Dùng khi được hướng dẫn thêm một biến cụ thể để sửa lỗi hoặc thử hiệu năng.
@@ -33,8 +28,8 @@ Chỉnh thế nào: Mặc định tắt. Bật, mở game tới lúc lỗi, tho�
 
 [Bật DInput]
 Là gì: DInput (DirectInput) là kiểu đọc tay cầm cũ, hay gặp ở game PC đời cũ.
-Vì sao chỉnh: Bật khi game cũ không nhận tay cầm. Khi Nhập độc quyền bật, bật DInput sẽ tự tắt công tắc Bật XInput.
-Chỉnh thế nào: Mặc định tắt. Chỉ chỉnh được khi Nhập độc quyền đang bật. Nếu bật DInput mà nút bấm bị loạn hoặc nhận hai lần, quay lại mục Bật XInput.
+Vì sao chỉnh: Bật khi game cũ không nhận tay cầm. Khi Nhập độc quyền bật, bật DInput sẽ tự tắt XInput: game chỉ thấy tay cầm qua DInput, như một tay cầm thường chứ không phải tay cầm Xbox.
+Chỉnh thế nào: Mặc định tắt. Chỉ chỉnh được khi Nhập độc quyền đang bật. Nếu nút bấm bị loạn, quay lại Bật XInput, hoặc tắt Nhập độc quyền để game thấy tay cầm qua cả hai kiểu.
 
 [Bật File Provider]
 Là gì: Cho phép xem và chép tệp bên trong AGVN Player (như ổ C của máy Windows ảo) bằng trình quản lý tệp của Android (ứng dụng Tệp).
@@ -58,7 +53,7 @@ Chỉnh thế nào: Mặc định tắt. Trên máy yếu game thường chỉ 2
 
 [Bật XInput]
 Là gì: XInput là kiểu đọc tay cầm Xbox mà phần lớn game PC mới dùng.
-Vì sao chỉnh: Chọn khi game hỗ trợ tay cầm Xbox. Khi Nhập độc quyền bật, bật XInput sẽ tự tắt DInput, nên game không thấy tay cầm qua DInput nữa.
+Vì sao chỉnh: Chọn khi game hỗ trợ tay cầm Xbox. Khi Nhập độc quyền bật, bật XInput sẽ tự tắt DInput, nên game chỉ thấy tay cầm qua XInput. Tắt cả XInput lẫn DInput thì game không nhận tay cầm.
 Chỉnh thế nào: Mặc định bật. Chỉ chỉnh được khi Nhập độc quyền đang bật. Game cũ không nhận tay cầm thì chuyển sang mục Bật DInput.
 
 [Bắt chuột ngoài]
@@ -139,7 +134,7 @@ Chỉnh thế nào: Mặc định bật. Máy nóng nhanh hoặc tụt pin thì 
 [Chế độ khởi động]
 Là gì: Chọn các dịch vụ nền của Windows (trong Wine) được bật khi mở game hoặc môi trường chạy.
 Vì sao chỉnh: Tắt bớt dịch vụ có thể giúp khởi động nhẹ hơn một chút, nhưng một số game và trình cài đặt cần các dịch vụ này mới chạy đúng.
-Chỉnh thế nào: Để Thiết yếu (chỉ tải dịch vụ cần thiết), là mặc định. Tối giản (dừng dịch vụ khi khởi động) tắt thêm nhiều dịch vụ, kể cả cài đặt .msi; game hoặc trình cài đặt lỗi thì chọn lại Thiết yếu.
+Chỉnh thế nào: Để Thiết yếu (mặc định): tắt dịch vụ Plug and Play và RPC cho nhẹ. Bình thường: bật đủ dịch vụ như Wine gốc, chọn khi game hoặc trình cài đặt báo lỗi dịch vụ. Tối giản tắt thêm nhiều dịch vụ, kể cả cài đặt .msi.
 
 [Chế độ trình chiếu]
 Là gì: Cách app đưa hình game lên màn hình khi Bộ dựng hình là Vulkan. fifo chờ đúng nhịp quét của màn hình; mailbox luôn hiện khung hình mới nhất.
@@ -309,12 +304,12 @@ Chỉnh thế nào: Mặc định None. Máy yếu nên để None vì làm nét
 [HUD]
 Là gì: HUD là bảng thông số nhỏ hiện đè lên game. Cổ điển: FPS (khung hình mỗi giây), tên GPU, RAM. Hiện đại: thêm mức dùng CPU và GPU, nhiệt độ, pin, biểu đồ.
 Vì sao chỉnh: Bật khi muốn xem game có mượt không (FPS), máy có nóng hay sắp hết RAM không, nhất là lúc thử cài đặt đồ họa mới.
-Chỉnh thế nào: Chơi bình thường chọn Tắt; muốn kiểm tra thì chọn Cổ điển cho gọn. Lựa chọn này áp dụng cho cả môi trường chạy. Trong game cũng bật/tắt được bằng công tắc “Bật HUD” ở menu.
+Chỉnh thế nào: Chơi bình thường chọn Tắt; muốn kiểm tra thì chọn Cổ điển cho gọn. Lựa chọn này chỉ áp dụng cho game này. Trong game cũng bật/tắt được bằng công tắc “Bật HUD” ở menu.
 
 [HUD Winlator]
 Là gì: Bảng thông số nhỏ hiện trên màn hình khi chơi. Cổ điển: FPS, tên GPU, RAM. Hiện đại: thêm mức dùng CPU/GPU, nhiệt độ, pin.
 Vì sao chỉnh: Bật để xem FPS khi thử cấu hình, hoặc để tìm lý do game giật, máy nóng.
-Chỉnh thế nào: Chơi bình thường nên để Tắt. Xem nhanh FPS: chọn Cổ điển. Xem thêm nhiệt độ, pin: chọn Hiện đại. Lựa chọn áp dụng cho mọi game trong cùng môi trường chạy.
+Chỉnh thế nào: Chơi bình thường nên để Tắt. Xem nhanh FPS: chọn Cổ điển. Xem thêm nhiệt độ, pin: chọn Hiện đại. Áp dụng cho các game trong môi trường chạy này chưa chọn HUD riêng.
 
 [Hình nền desktop]
 Là gì: Nền của màn hình Windows giả lập, nằm phía sau cửa sổ game: Hình ảnh hoặc Màu đơn.
@@ -329,7 +324,7 @@ Chỉnh thế nào: Bạn nên để compute (mặc định). Trên máy Snapdra
 [Kéo giãn toàn màn hình]
 Là gì: Kéo hình game phủ kín màn hình điện thoại, bỏ viền đen hai bên.
 Vì sao chỉnh: Bật khi muốn hình to hết màn hình. Nếu tỷ lệ độ phân giải khác tỷ lệ màn hình, hình sẽ bị bè hoặc méo.
-Chỉnh thế nào: Mặc định tắt (giữ đúng tỷ lệ). Muốn kín màn hình mà không méo, chọn Độ phân giải cùng tỷ lệ máy, ví dụ 1280x576 (20:9). Game mở từ thư viện dùng công tắc trong cài đặt của game.
+Chỉnh thế nào: Mặc định tắt (giữ đúng tỷ lệ). Muốn kín màn hình mà không méo, chọn Độ phân giải cùng tỷ lệ máy, ví dụ 1280x576 (20:9). Game chưa chỉnh mục này riêng sẽ theo lựa chọn của môi trường chạy.
 
 [Loại tài nguyên]
 Là gì: Cách driver xin vùng bộ nhớ mà CPU và GPU cùng đọc ghi. auto tự thử lần lượt dmabuf, ahb, opaque cho tới khi được.
@@ -349,7 +344,7 @@ Chỉnh thế nào: Bạn nên để Bilinear (mịn, mặc định). Game 2D ki
 [MIDI SoundFont]
 Là gì: Bộ tiếng nhạc cụ dùng để phát nhạc MIDI. Nhiều game cũ, như game RPG Maker 2000/2003, dùng nhạc MIDI.
 Vì sao chỉnh: Để Tắt thì game dùng nhạc MIDI sẽ không có nhạc nền. Đổi bộ khác để đổi chất lượng tiếng nhạc.
-Chỉnh thế nào: Game thiếu nhạc nền: chọn wt_210k_G.sf2 (có sẵn). Game không dùng MIDI: để Tắt. Nếu chọn trong cài đặt của game mà không có tác dụng, hãy chọn ở môi trường chạy.
+Chỉnh thế nào: Game thiếu nhạc nền: chọn wt_210k_G.sf2 (có sẵn). Game không dùng MIDI: để Tắt. Chọn trong cài đặt của game thì chỉ đổi cho game đó; chọn ở môi trường chạy thì đổi cho các game chưa chọn riêng.
 
 [Môi trường chạy]
 Là gì: Môi trường chạy là một máy Windows ảo riêng, gồm bản Wine/Proton (phần giúp chạy game Windows), driver và cài đặt. Mục này cho biết game đang chạy trong môi trường nào.
@@ -377,7 +372,7 @@ Vì sao chỉnh: Sai vùng thì game Nhật (KiriKiri, Siglus, NScripter, Wolf R
 Chỉnh thế nào: Khi thêm game, app tự chọn ja_JP cho game Nhật. Chữ lỗi hoặc văng: game Nhật chọn ja_JP, game Trung chọn zh_CN hoặc zh_TW. Không lỗi thì để nguyên.
 
 [Nhập độc quyền]
-Là gì: Khi bật, bạn chọn một kiểu tay cầm cho game: Bật XInput hoặc Bật DInput. Khi tắt, cả hai cùng bật. Áp dụng cho tay cầm thật và tay cầm ảo, không ảnh hưởng chuột, bàn phím.
+Là gì: Khi bật, bạn chọn một kiểu tay cầm cho game: XInput hoặc DInput; tắt cả hai thì game không nhận tay cầm. Khi tắt, game thấy tay cầm qua cả hai kiểu. Áp dụng cho tay cầm thật và tay cầm ảo, không ảnh hưởng chuột, bàn phím.
 Vì sao chỉnh: Bật để tránh game nhận tay cầm hai lần (một nút ra hai lệnh). Một số game dùng DInput, như Rayman Origins hay NFS Most Wanted 2005, cần tắt mục này.
 Chỉnh thế nào: Mặc định bật, dùng XInput. Game cũ không nhận tay cầm: bật mục Bật DInput. Vẫn không được thì tắt Nhập độc quyền.
 
@@ -422,8 +417,8 @@ Vì sao chỉnh: Đổi khi game văng, treo hoặc lỗi lạ (chọn mức an 
 Chỉnh thế nào: Mặc định: Trung gian. Game lỗi, nhất là game dùng nhiều luồng: thử Tương thích rồi Ổn định. Muốn nhanh hơn: thử Hiệu năng, lỗi thì quay lại Trung gian.
 
 [Processor Affinity (32-bit apps)]
-Là gì: Chọn nhân CPU cho chương trình Windows 32-bit khi bạn mở thẳng môi trường chạy này (không qua game trong thư viện).
-Vì sao chỉnh: Game mở từ thư viện dùng mục Chọn nhân CPU (của game hoặc của môi trường chạy), nên mục này hiếm khi cần đổi.
+Là gì: Chọn nhân CPU cho chương trình Windows 32-bit chạy trong môi trường chạy này.
+Vì sao chỉnh: Game đã tự chọn nhân ở mục Chọn nhân CPU thì dùng nhân đó cho cả chương trình 32-bit; game chưa chọn thì dùng mục này. Hiếm khi cần đổi.
 Chỉnh thế nào: Để nguyên như mặc định. Nếu muốn thử, chỉ giữ các nhân mạnh, thường là các số lớn (ví dụ CPU4–CPU7).
 
 [Renderer]
@@ -487,14 +482,14 @@ Vì sao chỉnh: Với vài driver, tính năng này có thể làm game đứng
 Chỉnh thế nào: Bạn cứ để tắt (mặc định). Game đứng hình hoặc treo khi đang chơi, hay giật đều đều: thử bật; không đỡ thì tắt lại. Không ảnh hưởng DXVK 1.10.3.
 
 [Tắt XInput]
-Là gì: XInput là cách game Windows đọc tay cầm. Công tắc này được đặt ra để riêng game này bỏ qua tay cầm, chỉ nhận chuột và bàn phím.
-Vì sao chỉnh: Dành cho lúc tay cầm (tay cầm thật hoặc nút tay cầm trong phím ảo) làm game này loạn phím hay nhân vật tự chạy.
-Chỉnh thế nào: Để tắt (mặc định). Ở bản này công tắc có thể chưa có tác dụng; nếu tay cầm gây lỗi, hãy ngắt tay cầm khi chơi hoặc chọn bộ phím ảo không có nút tay cầm.
+Là gì: Khi bật, game này không nhận tay cầm nào (tay cầm thật hay nút tay cầm trong phím ảo), chỉ nhận chuột và bàn phím. Nút phím ảo gán vào phím hoặc chuột vẫn dùng được.
+Vì sao chỉnh: Dành cho lúc tay cầm làm game này loạn phím hay nhân vật tự chạy.
+Chỉnh thế nào: Để tắt (mặc định). Chỉ bật khi game này lỗi vì tay cầm. Muốn tắt tay cầm cho mọi game thì dùng mục Tắt XInput (chỉ dùng chuột/bàn phím) trong Cài đặt. Đổi xong mở lại game.
 
 [Tắt XInput (chỉ dùng chuột/bàn phím)]
-Là gì: XInput là cách game Windows đọc tay cầm. Công tắc này được đặt ra để mọi game bỏ qua tay cầm, chỉ nhận chuột và bàn phím.
+Là gì: Khi bật, mọi game không nhận tay cầm nào (tay cầm thật hay nút tay cầm trong phím ảo), chỉ nhận chuột và bàn phím. Nút phím ảo gán vào phím hoặc chuột vẫn dùng được.
 Vì sao chỉnh: Dành cho lúc tay cầm (tay cầm thật hoặc nút tay cầm trong phím ảo) làm game loạn phím hay nhân vật tự chạy.
-Chỉnh thế nào: Để tắt (mặc định). Ở bản này công tắc có thể chưa có tác dụng; nếu tay cầm gây lỗi, hãy ngắt tay cầm khi chơi hoặc chọn bộ phím ảo không có nút tay cầm.
+Chỉnh thế nào: Để tắt (mặc định). Chỉ muốn tắt cho một game thì dùng mục Tắt XInput trong cài đặt của game đó. Đổi xong mở lại game.
 
 [Tự động sao lưu]
 Là gì: Mỗi khi game đóng, app tự sao lưu thư mục bản lưu của game. Bản tự động mới luôn thay bản tự động cũ, không đụng tới các bản bạn tự sao lưu.
@@ -554,17 +549,12 @@ Chỉnh thế nào: Máy yếu: 854x480 (16:9); tầm trung: 960x544 (16:9); má
 [Độ phân giải tùy chỉnh]
 Là gì: Ô để tự gõ độ phân giải, hiện khi bạn chọn Custom ở mục Độ phân giải.
 Vì sao chỉnh: Dùng khi cần kích thước không có trong danh sách, ví dụ khớp tỷ lệ màn hình máy hoặc giảm thêm cho máy yếu.
-Chỉnh thế nào: Gõ dạng RỘNGxCAO bằng số và chữ x thường, ví dụ 1024x576. Gõ sai dạng có thể làm game không mở được. Máy yếu nên giữ khoảng 854x480 đến 960x544.
+Chỉnh thế nào: Gõ dạng RỘNGxCAO, ví dụ 1024x576; chữ x thường hay hoa đều được, mỗi chiều từ 200 đến 7680. Gõ sai thì app giữ độ phân giải cũ. Máy yếu nên giữ khoảng 854x480 đến 960x544.
 
 [Độ trễ khung hình tối đa]
 Là gì: Khi bật, DXVK chỉ cho game chuẩn bị trước tối đa 1 khung hình (game DirectX 10/11).
 Vì sao chỉnh: Giảm độ trễ giữa lúc bạn bấm và lúc hình phản hồi, hợp game hành động.
 Chỉnh thế nào: Bạn cứ để tắt (mặc định). Bật nếu thấy thao tác bị trễ; FPS giảm hoặc giật hơn thì tắt lại. Máy yếu nên để tắt.
-
-[Độ trễ Oboe]
-Là gì: Mức độ trễ cho trình phát tiếng Oboe (Tự động, Độ trễ thấp, Ổn định). Chỉ hiện khi cấu hình cũ còn lưu lựa chọn Oboe.
-Vì sao chỉnh: Bản hiện tại phát tiếng Oboe bằng PulseAudio-GN, nên đổi mục này không làm âm thanh thay đổi.
-Chỉnh thế nào: Để Tự động. Nếu tiếng bị rè, trễ hoặc mất, hãy đổi Driver âm thanh (PulseAudio-GN, PulseAudio, ALSA) thay vì mục này.
 
 [Ẩn thanh tải khi mở game]
 Là gì: Bỏ màn hình chờ “Đang khởi động…” (tên game, ảnh bìa, thanh tiến trình) lúc mở game, và màn hình chờ lúc thoát game.

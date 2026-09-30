@@ -76,6 +76,7 @@ import com.winlator.cmod.R
 import com.winlator.cmod.ShortcutsFragment
 import com.winlator.cmod.XrActivity
 import com.winlator.cmod.XServerDisplayActivity
+import com.winlator.cmod.agvn.AgvnScreenSize
 import com.winlator.cmod.box64.Box64PresetManager
 import com.winlator.cmod.container.Container
 import com.winlator.cmod.container.ContainerManager
@@ -197,11 +198,8 @@ private class ShortcutEditorStateV2(val shortcut: Shortcut) {
     var gpuName by mutableStateOf(readConfig(graphicsConfig, "gpuName", ';').ifBlank { "Device" })
     var blacklistedExtensions by mutableStateOf(readConfig(graphicsConfig, "blacklistedExtensions", ';'))
 
-    var audio by mutableStateOf(StringUtils.parseIdentifier(shortcut.getExtra("audioDriver", container.getAudioDriver())))
-    var oboeProfile by mutableStateOf(shortcut.getExtra("oboeProfile", container.getExtra("oboeProfile", "low")))
-    var oboeApi by mutableStateOf(shortcut.getExtra("oboeApi", container.getExtra("oboeApi", "auto")))
-    var oboeAdaptive by mutableStateOf(shortcut.getExtra("oboeAdaptive", container.getExtra("oboeAdaptive", "1")) != "0")
-    var oboeExclusive by mutableStateOf(shortcut.getExtra("oboeExclusive", container.getExtra("oboeExclusive", "0")) == "1")
+    // AGVN: an old "oboe" is played by PulseAudio-GN (Container.normalizeAudioDriver), so show that
+    var audio by mutableStateOf(Container.normalizeAudioDriver(StringUtils.parseIdentifier(shortcut.getExtra("audioDriver", container.getAudioDriver()))))
     var wrapper by mutableStateOf(StringUtils.parseIdentifier(shortcut.getExtra("dxwrapper", container.getDXWrapper())))
     var wrapperConfig by mutableStateOf(shortcut.getExtra("dxwrapperConfig", container.getDXWrapperConfig()))
     var dxvkVersion by mutableStateOf(readConfig(wrapperConfig, "version", ',').ifBlank { DefaultVersion.DXVK })
@@ -226,7 +224,8 @@ private class ShortcutEditorStateV2(val shortcut: Shortcut) {
     var boxPreset by mutableStateOf(shortcut.getExtra("box64Preset", container.getBox64Preset()))
 
     var controlsProfile by mutableStateOf(shortcut.getExtra("controlsProfile", "")) // AGVN: missing = automatic layout, "0" = off
-    var fullscreen by mutableStateOf(shortcut.getExtra("fullscreenStretched", "0") == "1")
+    // AGVN: no choice of its own = the environment's; the toggle then stores "1" or "0" so the game can differ
+    var fullscreen by mutableStateOf(shortcut.getExtra("fullscreenStretched", if (container.isFullscreenStretched) "1" else "0") == "1")
     private var inputType by mutableIntStateOf(shortcut.getExtra("inputType", container.getInputType().toString()).toIntOrNull() ?: container.getInputType())
     var exclusive by mutableStateOf(shortcut.getExtra("exclusiveXInput").let { if (it.isBlank()) container.isExclusiveXInput() else it == "1" })
     var xinput by mutableStateOf((inputType and WinHandler.FLAG_INPUT_TYPE_XINPUT.toInt()) != 0)
@@ -875,39 +874,9 @@ private fun ShortcutCategoryV2(
                 SettingChoice("Driver âm thanh", audioEntries.firstOrNull { StringUtils.parseIdentifier(it).equals(s.audio, true) } ?: s.audio, audioEntries) {
                     s.audio = StringUtils.parseIdentifier(it); s.extra("audioDriver", s.audio)
                 }
-                if (s.audio == "oboe") {
-                    SettingsDivider()
-                    val latencyLabel = when (s.oboeProfile) {
-                        "ultra" -> "Độ trễ thấp"
-                        "stable" -> "Ổn định"
-                        else -> "Tự động"
-                    }
-                    SettingChoice("Độ trễ Oboe", latencyLabel, listOf("Tự động", "Độ trễ thấp", "Ổn định")) {
-                        s.oboeProfile = when (it) {
-                            "Độ trễ thấp" -> "ultra"
-                            "Ổn định" -> "stable"
-                            else -> "low"
-                        }
-                        s.extra("oboeProfile", s.oboeProfile)
-                    }
-                    SettingsDivider()
-                    val apiLabel = when (s.oboeApi) {
-                        "aaudio" -> "AAudio"
-                        "opensles" -> "OpenSL ES"
-                        else -> "Tự động"
-                    }
-                    SettingChoice("Backend Oboe", apiLabel, listOf("Tự động", "AAudio", "OpenSL ES")) {
-                        s.oboeApi = when (it) {
-                            "AAudio" -> "aaudio"
-                            "OpenSL ES" -> "opensles"
-                            else -> "auto"
-                        }
-                        s.extra("oboeApi", s.oboeApi)
-                    }
-                }
                 SettingsDivider()
                 SettingToggle("Kéo giãn toàn màn hình", s.fullscreen) {
-                    s.fullscreen = it; s.extra("fullscreenStretched", if (it) "1" else null)
+                    s.fullscreen = it; s.extra("fullscreenStretched", if (it) "1" else "0")
                 }
             }
             SettingsCard {
@@ -928,7 +897,8 @@ private fun ShortcutCategoryV2(
                 SettingsDivider()
                 val sound = s.midiSoundFont.ifBlank { "Tắt" }
                 SettingChoice("MIDI SoundFont", sound, soundFonts) {
-                    s.midiSoundFont = if (it == "Tắt") "" else it; s.extra("midiSoundFont", s.midiSoundFont.ifBlank { null })
+                    // AGVN: "" (off) is stored too, so a game can turn off the environment's SoundFont
+                    s.midiSoundFont = if (it == "Tắt") "" else it; s.extra("midiSoundFont", s.midiSoundFont)
                 }
             }
             ShortcutGameSavesCard(s, context)
@@ -954,7 +924,7 @@ private fun ShortcutCategoryV2(
                     SettingsDivider()
                     SettingText("Độ phân giải tùy chỉnh", s.screen) { value ->
                         s.screen = value
-                        if (Regex("\\d{2,5}x\\d{2,5}").matches(value.trim())) s.extra("screenSize", normalizeResolution(value))
+                        AgvnScreenSize.normalize(value)?.let { s.extra("screenSize", it) }
                     }
                 }
                 SettingsDivider()

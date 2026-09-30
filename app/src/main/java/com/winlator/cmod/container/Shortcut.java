@@ -155,14 +155,8 @@ public class Shortcut {
                 extraData.put(name, value);
             }
             else extraData.remove(name);
-
-            if ("hudMode".equals(name) && container != null && value != null) {
-                int mode = 0;
-                try { mode = Integer.parseInt(value); } catch (NumberFormatException ignored) {}
-                container.putExtra("hudMode", String.valueOf(mode));
-                container.setShowFPS(mode != 0);
-                container.saveData();
-            }
+            // AGVN: a game's "hudMode" stays on the game (XServerDisplayActivity.effectiveHudMode); it used to be copied
+            // to the environment, which turned the HUD on or off for every game there
         }
         catch (JSONException e) {}
     }

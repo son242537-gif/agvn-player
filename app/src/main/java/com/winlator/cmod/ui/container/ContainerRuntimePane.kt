@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.winlator.cmod.R
+import com.winlator.cmod.agvn.AgvnScreenSize
 import com.winlator.cmod.box64.Box64PresetManager
 import com.winlator.cmod.container.ContainerManager
 import com.winlator.cmod.core.StringUtils
@@ -191,9 +192,7 @@ internal fun ContainerRuntimePane(
                 if (screenChoice.equals("Custom", true)) {
                     SettingsDivider(); SettingText("Độ phân giải tùy chỉnh", screen) {
                         screen = it
-                        if (Regex("\\d{2,5}x\\d{2,5}", RegexOption.IGNORE_CASE).matches(it.trim())) {
-                            container.setScreenSize(normalizeResolution(it)); container.saveData()
-                        }
+                        AgvnScreenSize.normalize(it)?.let { size -> container.setScreenSize(size); container.saveData() }
                     }
                 }
             }
