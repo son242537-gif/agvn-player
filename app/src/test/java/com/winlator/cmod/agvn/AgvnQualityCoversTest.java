@@ -30,6 +30,15 @@ public class AgvnQualityCoversTest {
     }
 
     @Test
+    public void inGameFpsLimitStartsFromTheSliderCap() {
+        assertEquals("24", AgvnQuality.fpsCapOf("A=1 DXVK_FRAME_RATE=24"));
+        assertEquals("", AgvnQuality.fpsCapOf("A=1"));
+        assertEquals("", AgvnQuality.fpsCapOf(null));
+        assertEquals("", AgvnQuality.fpsCapOf("DXVK_FRAME_RATE=0"));
+        assertEquals("", AgvnQuality.fpsCapOf("DXVK_FRAME_RATE=abc"));
+    }
+
+    @Test
     public void sliderStepsGoFromCoolToSharp() {
         assertEquals(AgvnQuality.Level.LOWEST, AgvnQuality.Level.atStep(0));
         assertEquals(AgvnQuality.Level.HIGHEST, AgvnQuality.Level.atStep(4));

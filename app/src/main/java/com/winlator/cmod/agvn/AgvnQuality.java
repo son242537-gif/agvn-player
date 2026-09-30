@@ -6,13 +6,15 @@ import android.content.Context;
 import com.winlator.cmod.container.Shortcut;
 import com.winlator.cmod.core.EnvVars;
 import com.winlator.cmod.core.FileUtils;
+import com.winlator.cmod.ui.FpsLimiterControl;
 
 import java.io.File;
 
 /**
  * "Đồ họa" slider chosen outside the game: 5 steps from Siêu nhẹ (coolest) to Rất cao (sharpest), plus AUTO = the
  * step recommended for this phone, which also honours the AGVN game profile the same way as at import
- * (LaunchPresetResolver). Writes the shortcut's resolution, FPS cap (DXVK_FRAME_RATE) and Unreal texture pool.
+ * (LaunchPresetResolver). Writes the shortcut's resolution, FPS cap (DXVK_FRAME_RATE, which the in-game "Giới hạn
+ * FPS" also starts from, so it holds for every renderer) and Unreal texture pool.
  * Rất cao sets no FPS cap: the game and its cheat menu keep control of FPS (an outside cap silently overrode their
  * own FPS options); the in-game "Giới hạn FPS" menu still caps it live when the phone gets hot.
  */
@@ -89,6 +91,10 @@ public final class AgvnQuality {
         LaunchPresetResolver.Effective eff = effective(ctx, shortcut, level);
         if (eff.resolution != null) shortcut.putExtra("screenSize", eff.resolution);
         shortcut.putExtra("envVars", withFps(shortcut.getExtra("envVars"), eff.fps));
+        // drop an older in-game "Giới hạn FPS" choice so the X server paces every renderer at this cap (fpsCap)
+        shortcut.putExtra(FpsLimiterControl.EXTRA_LIMIT, null);
+        shortcut.putExtra(FpsLimiterControl.EXTRA_ENABLED, null);
+        shortcut.putExtra("graphicsFpsPreset", null);
         if (GameExeResolver.Engine.UNREAL.name().equals(shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE)))
             shortcut.putExtra(AgvnGameImporter.EXTRA_TEXTURE_POOL, String.valueOf(eff.texturePool));
         shortcut.putExtra(AgvnGameImporter.EXTRA_TIER, tierFor(ctx, level).name());
@@ -113,6 +119,19 @@ public final class AgvnQuality {
         String env = envVars == null ? "" : envVars;
         EnvVars vars = new EnvVars(env);
         return String.valueOf(OLD_HIGHEST_FPS).equals(vars.get("DXVK_FRAME_RATE")) ? withFps(env, 0) : env;
+    }
+
+    /**
+     * The game's FPS cap from this slider (its DXVK_FRAME_RATE), or "" when uncapped. The in-game "Giới hạn FPS"
+     * starts from it, so OpenGL, WineD3D and VKD3D games are capped too, not only DXVK ones.
+     */
+    public static String fpsCap(Shortcut shortcut) {
+        return shortcut == null ? "" : fpsCapOf(shortcut.getExtra("envVars"));
+    }
+
+    static String fpsCapOf(String envVars) {
+        String fps = new EnvVars(envVars == null ? "" : envVars).get("DXVK_FRAME_RATE");
+        return fps.matches("[1-9][0-9]{0,3}") ? fps : "";
     }
 
     /** Sets or removes DXVK_FRAME_RATE, keeping every other variable. */

@@ -33,8 +33,8 @@ import com.winlator.cmod.widget.XServerRendererView;
 import java.io.File;
 
 public class FpsLimiterControl extends LinearLayout {
-    private static final String EXTRA_ENABLED = "nativeFpsLimiterEnabled";
-    private static final String EXTRA_LIMIT = "nativeFpsLimit";
+    public static final String EXTRA_ENABLED = "nativeFpsLimiterEnabled";
+    public static final String EXTRA_LIMIT = "nativeFpsLimit";
     private static final int SLIDER_MAX_FPS = 120;
     private static final int STEP_FPS = 5;
     private static final int CUSTOM_POSITION = SLIDER_MAX_FPS / STEP_FPS;
@@ -213,6 +213,10 @@ public class FpsLimiterControl extends LinearLayout {
             oldPreset = shortcutStore.getExtra("graphicsFpsPreset", "");
             oldEnabled = shortcutStore.getExtra(EXTRA_ENABLED, "");
 
+            // AGVN: no in-game choice for this game yet, so start from its "Đồ họa" FPS cap. Presents are paced
+            // here for every renderer (DXVK, VKD3D, WineD3D, OpenGL); DXVK_FRAME_RATE alone reaches only DXVK.
+            if (savedLimit.isEmpty() && oldPreset.isEmpty() && oldEnabled.isEmpty())
+                savedLimit = com.winlator.cmod.agvn.AgvnQuality.fpsCap(shortcutStore);
             if (savedLimit.isEmpty() && oldPreset.isEmpty() && oldEnabled.isEmpty()) {
                 savedLimit = container.getExtra(EXTRA_LIMIT, "");
                 oldPreset = container.getExtra("graphicsFpsPreset", "");
