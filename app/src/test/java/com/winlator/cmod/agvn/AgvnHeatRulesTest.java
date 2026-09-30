@@ -2,6 +2,7 @@
 package com.winlator.cmod.agvn;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Rule;
@@ -19,14 +20,16 @@ public class AgvnHeatRulesTest {
     @Rule public TemporaryFolder tmp = new TemporaryFolder();
 
     @Test
-    public void aCappedCpuWarnsAfterTwoSamplesThenWaits() {
+    public void aCappedCpuWarnsAfterTwoSamplesOncePerGame() {
         AgvnHeatRules rules = new AgvnHeatRules();
         long t = 1_000_000;
         assertEquals(NONE, rules.feed(t, 0.71f, NAN, 40f));
         assertEquals(AgvnHeatRules.Reason.CPU_CAPPED, rules.feed(t + 5_000, 0.71f, NAN, 40f));
         assertEquals(NONE, rules.feed(t + 10_000, 0.71f, NAN, 40f));
-        assertEquals("5 minutes of quiet", NONE, rules.feed(t + 15_000, 0.71f, NAN, 40f));
-        assertEquals("still capped after them", AgvnHeatRules.Reason.CPU_CAPPED, rules.feed(t + 400_000, 0.71f, NAN, 40f));
+        assertEquals(NONE, rules.feed(t + 15_000, 0.71f, NAN, 40f));
+        assertEquals("never again in this game", NONE, rules.feed(t + 3_600_000, 0.71f, 0.95f, 40f));
+        assertTrue("one warning per game, from either guard", AgvnHeatWatch.firstHeatWarning(rules));
+        assertFalse(AgvnHeatWatch.firstHeatWarning(rules));
     }
 
     @Test

@@ -13,16 +13,15 @@ import java.nio.file.Files;
  *   status still reads "none" (POCO F8 Pro, 01/10/2026: 3.07 of 4.32 GHz, charging). A cap on a cool phone is a power
  *   saving mode, not heat, and does not warn;
  * - or Android's thermal headroom reached 0.85 (1.0 = throttling), twice in a row.
- * A reading the phone does not give (NaN) keeps the count as it was. After a warning the rules wait 5 minutes.
+ * A reading the phone does not give (NaN) keeps the count as it was. One warning per game session, never repeated:
+ * the player knows, and "Hạ FPS 20" stays in the in-game menu.
  */
 final class AgvnHeatRules {
     enum Reason { NONE, CPU_CAPPED, NEAR_THROTTLING }
 
     static final float CAP_WARN = 0.85f, HEADROOM_WARN = 0.85f, WARM_HEADROOM = 0.6f, WARM_BATTERY_C = 38f;
-    static final long COOLDOWN_MS = 5 * 60_000L;
-
     private int cappedCount, hotCount;
-    private long lastWarn = Long.MIN_VALUE / 2;
+    private boolean warned;
 
     /**
      * {@code cpuCap}: see {@link #fastestCap}; {@code headroom}: PowerManager.getThermalHeadroom; {@code batteryC}: the
@@ -35,9 +34,8 @@ final class AgvnHeatRules {
         if (!Float.isNaN(cpuCap)) cappedCount = cpuCap < CAP_WARN && warm ? cappedCount + 1 : 0;
         if (!Float.isNaN(headroom)) hotCount = headroom >= HEADROOM_WARN ? hotCount + 1 : 0;
         Reason reason = cappedCount >= 2 ? Reason.CPU_CAPPED : hotCount >= 2 ? Reason.NEAR_THROTTLING : Reason.NONE;
-        if (reason == Reason.NONE || nowMs - lastWarn < COOLDOWN_MS) return Reason.NONE;
-        lastWarn = nowMs;
-        cappedCount = hotCount = 0;
+        if (reason == Reason.NONE || warned) return Reason.NONE;
+        warned = true;
         return reason;
     }
 

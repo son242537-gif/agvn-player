@@ -74,6 +74,8 @@ public final class GameSessionGuard {
 
     private void warn(SessionGuard.Decision decision) {
         if (activity.isFinishing()) return;
+        // AGVN: heat is told once per game, by this dialog or by the heat bar, whichever comes first
+        if (decision == SessionGuard.Decision.WARN_THERMAL && !AgvnHeatWatch.firstHeatWarning(activity)) return;
         Log.w(TAG, "session guard: " + decision);
         int messageRes = decision == SessionGuard.Decision.WARN_THERMAL ? R.string.agvn_guard_thermal : R.string.agvn_guard_low_ram;
         String message = activity.getString(messageRes);

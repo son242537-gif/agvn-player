@@ -12,7 +12,10 @@ import com.winlator.cmod.ui.FpsLimiterControl;
 import com.winlator.cmod.widget.XServerRendererView;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +31,7 @@ public final class AgvnHeatWatch {
     private static final long POLL_S = 5, PEAKS_EVERY_MS = 60_000;
     private static final int LOWER_FPS = 20;
     private static final File CPUFREQ = new File("/sys/devices/system/cpu/cpufreq");
+    private static final Set<Object> warnedSessions = Collections.newSetFromMap(new WeakHashMap<>());
 
     private final XServerDisplayActivity activity;
     private final AgvnHeatRules rules = new AgvnHeatRules();
@@ -74,7 +78,7 @@ public final class AgvnHeatWatch {
             if (reason == AgvnHeatRules.Reason.NONE) return;
             AgvnSessionLog.event("Cảnh báo nóng (" + reason + "): CPU mạnh nhất tối đa " + percent(cap) + " tốc độ, headroom "
                     + headroom + ", pin " + battery + " °C, " + (charging ? "đang sạc" : "không sạc"));
-            activity.runOnUiThread(() -> showBar(reason, cap, charging));
+            if (firstHeatWarning(activity)) activity.runOnUiThread(() -> showBar(reason, cap, charging));
         } catch (RuntimeException e) {
             Log.w(TAG, "heat watch sample failed", e);
         }
@@ -94,6 +98,14 @@ public final class AgvnHeatWatch {
         if (canLower) AgvnWarningBar.show(activity, title, detail.toString(), later,
                 new AgvnWarningBar.Choice(R.string.agvn_heat_fps20, this::lowerFps));
         else AgvnWarningBar.show(activity, title, detail.toString(), later);
+    }
+
+    /**
+     * True the first time a heat warning is due in this game session ({@code session}: the game's activity), whichever
+     * guard gives it: this bar or {@link GameSessionGuard}'s dialog. The player asked to be told once per game.
+     */
+    static synchronized boolean firstHeatWarning(Object session) {
+        return warnedSessions.add(session);
     }
 
     /** Through the in-game "Giới hạn FPS" when it exists, so it shows and keeps the new limit. */
