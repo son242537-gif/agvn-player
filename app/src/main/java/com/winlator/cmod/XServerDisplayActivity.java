@@ -2716,7 +2716,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
             TarCompressorUtils.extract(TarCompressorUtils.Type.ZSTD, this, "ddrawrapper/nglide.tzst", windowsDir,
                     onExtractFileListener);
 
-            if (ddrawrapper.contains("None")) {
+            // AGVN: the stored choices are lowercase ("none", "wined3d"); both mean Wine's own ddraw, so put it back
+            if (ddrawrapper.contains("None") || ddrawrapper.equalsIgnoreCase("none") || ddrawrapper.equalsIgnoreCase("wined3d")) {
                 Log.d(TAG, "No DDRaw wrapper has been selected, restoring original ddraw files");
                 restoreOriginalDllFiles(new String[] { "ddraw.dll", "d3dimm.dll" });
             } else {
