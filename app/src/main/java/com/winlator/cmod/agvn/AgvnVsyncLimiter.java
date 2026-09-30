@@ -38,12 +38,10 @@ public final class AgvnVsyncLimiter {
     public void onFrame(int windowId, Runnable release, XServerRendererView view) {
         this.view = view;
         lastFrameNs = System.nanoTime();
-        List<Runnable> now;
         synchronized (this) {
-            now = slots.onFrame(windowId, release);
+            slots.onFrame(windowId, release);
             if (loop == null) loop = new Loop();
         }
-        for (Runnable r : now) r.run();
     }
 
     /** One vsync thread. After a stop, the next frame starts a new one. */
@@ -69,7 +67,7 @@ public final class AgvnVsyncLimiter {
                 armFallback();
             } catch (RuntimeException e) {
                 Log.w(TAG, "vsync limiter did not start", e);
-                stop(v);
+                stop(v, false);
             }
         }
 
@@ -122,7 +120,7 @@ public final class AgvnVsyncLimiter {
             try {
                 int fps = v != null ? v.getFpsLimit() : 0;
                 if (fps <= 0 || System.nanoTime() - lastFrameNs > STOP_WHEN_IDLE_NS) {
-                    stop(v);
+                    stop(v, fps <= 0);
                     return;
                 }
                 long vsyncs = lastVsyncNs == 0 ? 1 : Math.round((vsyncNs - lastVsyncNs) / (double) periodNs);
@@ -142,7 +140,7 @@ public final class AgvnVsyncLimiter {
                 armFallback();
             } catch (RuntimeException e) {
                 Log.w(TAG, "vsync limiter stopped", e);
-                stop(v);
+                stop(v, false);
             }
         }
 
@@ -151,8 +149,12 @@ public final class AgvnVsyncLimiter {
             handler.postDelayed(fallback, Math.max(40, 4 * periodNs / 1_000_000L));
         }
 
-        /** Gives every held buffer back and lets the renderer draw on every change again. */
-        void stop(XServerRendererView v) {
+        /**
+         * Gives every held buffer back and lets the renderer draw on every change again. The refresh rate hint is only
+         * cleared when the limit is turned off: a game that pauses drawing for a while keeps it, so the screen does not
+         * switch refresh rates back and forth.
+         */
+        void stop(XServerRendererView v, boolean limitOff) {
             if (stopped) return;
             stopped = true;
             List<Runnable> held;
@@ -160,7 +162,7 @@ public final class AgvnVsyncLimiter {
                 held = slots.drain();
                 if (v != null) {
                     v.setPacedPresentation(false);
-                    AgvnFramePacing.hintFrameRate(v, 0);
+                    if (limitOff) AgvnFramePacing.hintFrameRate(v, 0);
                 }
                 if (loop == this) loop = null;
             }

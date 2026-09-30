@@ -57,14 +57,14 @@ public class AgvnFramePacingTest {
         AgvnFrameSlots slots = new AgvnFrameSlots();
         slots.setVsyncsPerFrame(2);
         // the game fills its three buffers at once, then waits for one back
-        for (String b : new String[]{"a", "b", "c"}) assertTrue(slots.onFrame(1, buffer(b)).isEmpty());
+        for (String b : new String[]{"a", "b", "c"}) slots.onFrame(1, buffer(b));
         assertFalse(slots.onVsync(1).show);
         AgvnFrameSlots.Tick t = slots.onVsync(1);
         assertTrue(t.show);
         runAll(t.releases);
         assertEquals(Arrays.asList("a"), released);
         // it draws its next frame in time; nothing moves until the second vsync
-        assertTrue(slots.onFrame(1, buffer("a2")).isEmpty());
+        slots.onFrame(1, buffer("a2"));
         assertFalse(slots.onVsync(1).show);
         t = slots.onVsync(1);
         assertTrue(t.show);
@@ -73,24 +73,45 @@ public class AgvnFramePacingTest {
     }
 
     @Test
-    public void aSlowGameIsNotHeldBackFurther() {
-        AgvnFrameSlots slots = new AgvnFrameSlots();
-        slots.setVsyncsPerFrame(2);
-        for (String b : new String[]{"a", "b", "c"}) slots.onFrame(1, buffer(b));
-        slots.onVsync(1);
-        runAll(slots.onVsync(1).releases); // "a" back
-        // the next frame takes 3 vsyncs: the missed vsyncs redraw only what else changed and release nothing
-        slots.onVsync(1);
-        AgvnFrameSlots.Tick waiting = slots.onVsync(1);
-        assertTrue(waiting.show);
-        assertTrue(waiting.releases.isEmpty());
-        assertTrue(slots.onVsync(1).releases.isEmpty());
-        // the late frame comes: the game gets its oldest buffer at once, not the one on screen
-        runAll(slots.onFrame(1, buffer("a2")));
-        assertEquals(Arrays.asList("a", "b"), released);
-        AgvnFrameSlots.Tick shown = slots.onVsync(1);
-        assertTrue("the late frame goes on screen at the next vsync", shown.show);
-        assertTrue("already released", shown.releases.isEmpty());
+    public void aGameAtTheScreensRateNeverStalls() {
+        for (int buffers = 2; buffers <= 4; buffers++) {
+            for (double draw : new double[]{0.05, 0.3, 0.9}) {
+                int[] r = play(1, buffers, new double[]{draw}, 600);
+                String what = buffers + " buffers, " + draw + " vsync per frame: ";
+                assertTrue(what + r[0] + " frames", r[0] >= 590 && r[0] <= 600 + buffers);
+                assertTrue(what + "waited " + r[1] + " vsyncs", r[1] <= 1);
+            }
+        }
+    }
+
+    @Test
+    public void unevenFramesNeverLoseABuffer() {
+        // 01/10: at 60 FPS on 60 Hz the game froze for 5 s every few seconds. A frame longer than a vsync followed by a
+        // quick one lost a buffer each time, until the game held none (the old logic stalls after 6-15 frames here).
+        double[][] patterns = {{0.3, 1.3, 0.2, 0.9}, {0.8, 1.1, 0.4}, {1.2, 0.1}, {0.5, 2.4, 0.1, 0.1}};
+        for (int n = 1; n <= 3; n++) {
+            for (int buffers = 2; buffers <= 4; buffers++) {
+                for (double[] pattern : patterns) {
+                    int[] r = play(n, buffers, pattern, 900);
+                    String what = "N=" + n + ", " + buffers + " buffers, " + Arrays.toString(pattern) + ": ";
+                    double perFrame = 0; // each frame takes its drawing time, and at least N vsyncs under the limit
+                    for (double d : pattern) perFrame += Math.max(n, d) / pattern.length;
+                    double expected = 900 / perFrame;
+                    assertTrue(what + r[0] + " frames, expected about " + expected, r[0] >= expected * 0.9);
+                    assertTrue(what + "waited " + r[1] + " vsyncs", r[1] <= n + 1);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void theLimitHoldsAndASlowGameIsNeverBlocked() {
+        int[] fast = play(2, 3, new double[]{0.3}, 600); // 30 FPS on 60 Hz
+        assertTrue(fast[0] + " frames", fast[0] >= 295 && fast[0] <= 303);
+        assertTrue("waited " + fast[1], fast[1] <= 2);
+        int[] slow = play(2, 3, new double[]{2.6}, 600); // slower than the limit
+        assertTrue(slow[0] + " frames", slow[0] >= 225);
+        assertEquals("never waits for a buffer", 0, slow[1]);
     }
 
     @Test
@@ -103,10 +124,46 @@ public class AgvnFramePacingTest {
         AgvnFrameSlots.Tick t = slots.onVsync(3); // the vsync thread was late by two vsyncs
         assertTrue(t.show);
         runAll(t.releases);
-        assertEquals(Arrays.asList("a", "x"), released);
+        assertEquals("one per window", Arrays.asList("a", "x"), released);
         assertFalse(slots.holdsNothing());
         runAll(slots.drain());
         assertEquals(Arrays.asList("a", "x", "b"), released);
         assertTrue(slots.holdsNothing());
+    }
+
+    /**
+     * A game with {@code buffers} images whose frames take {@code draw} vsyncs in turn, starting the next one as soon
+     * as it has a free image, for {@code vsyncs} vsyncs. Returns {frames presented, longest wait for an image in vsyncs}.
+     */
+    private static int[] play(int vsyncsPerFrame, int buffers, double[] draw, int vsyncs) {
+        final int steps = 20;
+        AgvnFrameSlots slots = new AgvnFrameSlots();
+        slots.setVsyncsPerFrame(vsyncsPerFrame);
+        int[] free = {buffers};
+        int presented = 0, longestWait = 0, waitStart = -1;
+        double drawVsyncs = draw[0];
+        double drawn = -1; // progress of the frame being drawn; -1 = not drawing
+        for (int step = 0; step < vsyncs * steps; step++) {
+            if (drawn < 0 && free[0] > 0) {
+                free[0]--;
+                drawn = 0;
+                if (waitStart >= 0) longestWait = Math.max(longestWait, step - waitStart);
+                waitStart = -1;
+            }
+            if (drawn >= 0) {
+                drawn += 1.0 / steps;
+                if (drawn >= drawVsyncs - 1e-9) {
+                    slots.onFrame(1, () -> free[0]++);
+                    presented++;
+                    drawVsyncs = draw[presented % draw.length];
+                    drawn = -1;
+                }
+            } else if (waitStart < 0) {
+                waitStart = step;
+            }
+            if ((step + 1) % steps == 0) runAll(slots.onVsync(1).releases);
+        }
+        if (waitStart >= 0) longestWait = Math.max(longestWait, vsyncs * steps - waitStart);
+        return new int[]{presented, (longestWait + steps - 1) / steps};
     }
 }
