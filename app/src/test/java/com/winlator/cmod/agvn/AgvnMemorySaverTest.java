@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import com.winlator.cmod.agvn.AgvnQuality.Level;
 import com.winlator.cmod.core.WineRegistryEditor;
 
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -92,6 +93,8 @@ public class AgvnMemorySaverTest {
 
     @Test
     public void unityQualityIsSetAndRemovedInUserReg() throws Exception {
+        // WineRegistryEditor renames over existing files, which java.io.File cannot do on Windows.
+        Assume.assumeTrue("rename-over needs a POSIX file system", File.separatorChar == '/');
         File userReg = tmp.newFile("user.reg");
         Files.write(userReg.toPath(), ("WINE REGISTRY Version 2\n;; All keys relative to \\\\User\\\\S-1-5-21-0-0-0-1000\n\n"
                 + "#arch=win64\n").getBytes(StandardCharsets.UTF_8));
