@@ -400,6 +400,7 @@ private fun NavigationRow(icon: ImageVector, title: String, subtitle: String?, o
                 Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
                 if (!subtitle.isNullOrBlank()) Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
+            SettingHelpButton(title)
             Icon(Icons.Outlined.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
@@ -433,6 +434,7 @@ private fun ToggleRow(
                 )
             }
         }
+        SettingHelpButton(title)
         Switch(checked = checked, onCheckedChange = onChecked)
     }
 }
@@ -485,6 +487,7 @@ private fun PresetChoiceRow(
                         Text(title, fontWeight = FontWeight.Medium)
                         Text(selected?.name.orEmpty(), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
+                    SettingHelpButton(title)
                     Icon(Icons.Outlined.KeyboardArrowDown, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
