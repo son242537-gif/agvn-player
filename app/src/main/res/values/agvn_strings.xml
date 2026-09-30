@@ -236,4 +236,10 @@
     <string name="agvn_logs_saved">Đã lưu nhật ký của game vào:\n%1$s\n\nGửi file này cho AGVN để được giúp sửa lỗi.</string>
     <string name="agvn_logs_share">Chia sẻ</string>
     <string name="agvn_logs_error">Không gom được nhật ký: %1$s</string>
+    <!-- In-game memory warning (AgvnMemoryWatch) -->
+    <string name="agvn_ram_title">Game đang dùng quá nhiều RAM, nên lưu game rồi thoát</string>
+    <string name="agvn_ram_detail">RAM trống còn %1$s. App và game đang dùng %2$s, trong đó bộ nhớ đồ họa %3$s.</string>
+    <string name="agvn_ram_growing">Bộ nhớ tăng liên tục dù không có thao tác, có thể do lỗi video hoặc lỗi game.</string>
+    <string name="agvn_ram_exit">Thoát game an toàn</string>
+    <string name="agvn_ram_later">Để sau</string>
 </resources>

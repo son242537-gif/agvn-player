@@ -216,6 +216,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private boolean isMouseDisabled = false;
     private boolean simulateTouchScreen = false;
     private com.winlator.cmod.agvn.GameSessionGuard agvnSessionGuard;
+    private com.winlator.cmod.agvn.AgvnMemoryWatch agvnMemoryWatch;
     private String agvnEffectiveExePath; // AGVN: exe actually launched (Unreal bootstrap -> Shipping redirect)
 
     private SensorManager sensorManager;
@@ -834,6 +835,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
         handler.postDelayed(savePlaytimeRunnable, SAVE_INTERVAL_MS);
         if (agvnSessionGuard == null) agvnSessionGuard = new com.winlator.cmod.agvn.GameSessionGuard(this);
         agvnSessionGuard.start();
+        if (agvnMemoryWatch == null) agvnMemoryWatch = new com.winlator.cmod.agvn.AgvnMemoryWatch(this, this::exit);
+        agvnMemoryWatch.start();
         if (!isInPictureInPictureMode())
             ProcessHelper.resumeAllWineProcesses();
     }
@@ -842,6 +845,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     public void onPause() {
         if (taskManagerSidebar != null) taskManagerSidebar.stop();
         if (agvnSessionGuard != null) agvnSessionGuard.stop();
+        if (agvnMemoryWatch != null) agvnMemoryWatch.stop();
         super.onPause();
 
         if (!isInPictureInPictureMode()) {
@@ -918,6 +922,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private void exit() {
         if (!exiting.compareAndSet(false, true)) return;
         if (agvnSessionGuard != null) agvnSessionGuard.destroy();
+        if (agvnMemoryWatch != null) agvnMemoryWatch.finish();
         NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID);
         boolean removeLoadingBar = PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("remove_loading_bar_when_booting_games", false);
@@ -985,6 +990,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         }
         if (taskManagerSidebar != null) taskManagerSidebar.stop();
         if (agvnSessionGuard != null) agvnSessionGuard.destroy();
+        if (agvnMemoryWatch != null) agvnMemoryWatch.stop();
         super.onDestroy();
     }
 
@@ -2619,12 +2625,14 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
+        com.winlator.cmod.agvn.AgvnMemoryWatch.touched(); // AGVN: memory growth only counts while nobody plays
         if (isPaused && (drawerLayout == null || !drawerLayout.isDrawerOpen(GravityCompat.START))) return true;
         return super.dispatchTouchEvent(event);
     }
 
     @Override
     public boolean dispatchGenericMotionEvent(MotionEvent event) {
+        com.winlator.cmod.agvn.AgvnMemoryWatch.touched();
         boolean handledByWinHandler = false;
         boolean handledByTouchpadView = false;
 
@@ -2654,6 +2662,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        com.winlator.cmod.agvn.AgvnMemoryWatch.touched();
 
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             if (event.getKeyCode() == KeyEvent.KEYCODE_BUTTON_MODE || event.getKeyCode() == KeyEvent.KEYCODE_HOME

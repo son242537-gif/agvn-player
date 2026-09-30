@@ -32,6 +32,7 @@ import java.util.Locale;
 public final class AgvnSessionLog {
     private static final String TAG = "AGVN";
     static final String RUNNING = "dang-chay.txt", SUMMARY = "tom-tat.txt", EVENTS = "su-kien.txt", ENV = "moi-truong.txt";
+    static final String RAM = "ram.txt";
     static final int KEEP = 5;
     static final String[] ENV_PREFIXES = {"WRAPPER_", "DXVK_", "VKD3D_", "MESA_", "TU_", "ZINK_", "GALLIUM_", "WINE",
             "PROTON_", "GST_", "BOX64_", "FEX_", "LC_ALL", "VK_", "__GL_", "vblank_mode"};
@@ -73,6 +74,12 @@ public final class AgvnSessionLog {
         write(new File(dir, EVENTS), "[" + time + "] " + text + "\n", true);
     }
 
+    /** Replaces one small file of the running session, e.g. the RAM peaks (no-op without a session). */
+    public static void note(String name, String text) {
+        File dir = current;
+        if (dir != null) write(new File(dir, name), text, false);
+    }
+
     /** Normal end of a game: collects the engine's logs and writes the summary. */
     public static synchronized void finish(Context context, String how) {
         File dir = current;
@@ -111,6 +118,7 @@ public final class AgvnSessionLog {
                 + "App: " + AgvnUpdater.installedName(context) + " (" + AgvnUpdater.installedCode(context) + ")\n"
                 + "Máy: " + Build.MANUFACTURER + " " + Build.MODEL + ", Android " + Build.VERSION.RELEASE + "\n"
                 + "Nhật ký engine đã chép: " + copied + " file\n"
+                + "RAM: " + (new File(dir, RAM).isFile() ? read(new File(dir, RAM)).trim() : "không đo") + "\n"
                 + "Sự kiện: " + (new File(dir, EVENTS).isFile() ? EVENTS : "không có") + "; môi trường đồ hoạ: " + ENV + "\n";
         write(new File(dir, SUMMARY), summary, false);
         running.delete();
