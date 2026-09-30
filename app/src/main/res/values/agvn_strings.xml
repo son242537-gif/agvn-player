@@ -148,9 +148,9 @@
     <string name="agvn_quality_medium">Trung bình</string>
     <string name="agvn_quality_high">Cao</string>
     <string name="agvn_quality_highest">Rất cao</string>
-    <string name="agvn_quality_lowest_desc">Mát nhất, hình mờ. Dùng khi máy yếu hoặc đang nóng</string>
-    <string name="agvn_quality_low_desc">Mát máy, hình tạm ổn</string>
-    <string name="agvn_quality_medium_desc">Mát vừa phải, hình rõ</string>
+    <string name="agvn_quality_lowest_desc">Mát nhất, ít RAM nhất, hình mờ. Dùng khi máy yếu hoặc đang nóng</string>
+    <string name="agvn_quality_low_desc">Mát máy, bớt RAM, hình tạm ổn</string>
+    <string name="agvn_quality_medium_desc">Mát vừa phải, bớt chút RAM, hình rõ</string>
     <string name="agvn_quality_high_desc">Hình đẹp, máy ấm hơn</string>
     <string name="agvn_quality_highest_desc">Đẹp nhất, không giới hạn FPS: game và menu cheat tự chỉnh FPS. Máy nóng, pin tụt nhanh, chỉ nên dùng cho máy flagship</string>
     <string name="agvn_quality_cool">◀ Mát máy</string>

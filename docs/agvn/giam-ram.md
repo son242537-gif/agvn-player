@@ -1,0 +1,62 @@
+# Giảm RAM khi hạ thanh "Đồ họa"
+
+Điện thoại dùng chung RAM cho CPU và GPU. Vì vậy texture và bộ đệm đồ hoạ của game là RAM thật: trong
+`dumpsys meminfo`, chúng nằm ở các dòng `GL mtrack` và `Gfx dev`. Không lớp dịch nào (DXVK, VKD3D, Zink) tự thu nhỏ
+được texture mà game đã tạo. Muốn bớt RAM thì phải bảo engine của game dùng ít đi, hoặc bớt phần mà chính lớp dịch
+giữ lại. Tài liệu này ghi lại AGVN làm gì ở từng mức và vì sao.
+
+## AGVN làm gì ở từng mức
+
+| Thành phần | Siêu nhẹ | Thấp | Trung bình | Cao, Rất cao |
+|---|---|---|---|---|
+| Giới hạn FPS (mọi loại game, qua X server) | 20 | 24 | 27 | Cao: 30. Rất cao: không giới hạn |
+| DXVK: khối bộ nhớ 16 MB (`dxvk.maxChunkSize=16`) | có | có | có | không |
+| DXVK: giải phóng pipeline library không dùng (`dxvk.trackPipelineLifetime=True`) | có | có | không | không |
+| Ren'Py: bộ đệm ảnh (`config.image_cache_size_mb`) | 128 MB | 192 MB | 256 MB | để game tự chọn |
+| Unity: mức chất lượng thấp nhất của game | có | có | không | không |
+| Unreal: texture pool (`r.Streaming.PoolSize`) | 384 MB | 512 MB | 768 MB | Cao: 1024 MB. Rất cao: 1536 MB |
+| Zink (OpenGL): vùng đệm bộ đệm GPU đã dùng xong | 256 MB | 256 MB | 256 MB | 256 MB |
+
+Mức "Tự động" dùng mức gợi ý cho máy: máy yếu là Thấp, máy tầm trung là Trung bình, máy flagship là Cao.
+
+## Chi tiết
+
+- **Giới hạn FPS:** `DXVK_FRAME_RATE` chỉ có tác dụng với DXVK. Vì vậy "Giới hạn FPS" trong game cũng bắt đầu từ mức
+  của thanh. X server giữ nhịp khung hình ở tầng Present, nên áp được cho OpenGL, WineD3D, VKD3D và DXVK
+  (`PresentExtension`). Cách này cần bật "Dùng tiện ích DRI3".
+- **DXVK 2.3.1:**
+  - Theo mặc định, DXVK xin bộ nhớ theo khối 64 MB cho mỗi loại bộ nhớ của Turnip, và giữ lại một khối trống mỗi
+    loại. Khối 16 MB bớt phần xin thừa này.
+  - Theo mặc định, DXVK chỉ giải phóng pipeline library cho game 32-bit. Ở Siêu nhẹ và Thấp, nó làm vậy cho mọi game.
+    Đổi lại, game có thể khựng nhẹ khi gặp lại shader cũ.
+  - Nguồn: `dxvk.conf` và `src/dxvk/dxvk_memory.cpp` của bản v2.3.1.
+- **Ren'Py:**
+  - AGVN ghi file `game/zz_agvn_mem.rpy`, chạy ở `init 999`, tức sau code của game. Ở mức Cao, AGVN xoá file này cùng
+    với `.rpyc` mà Ren'Py dịch ra.
+  - Mặc định của Ren'Py là 300–400 MB, và một số game tự nâng lên rất cao.
+  - File nằm trong thư mục game, nên cũng có tác dụng khi chạy game bằng app khác.
+- **Unity:**
+  - AGVN ghi giá trị `HKCU\Software\<công ty>\<tên game>\UnityGraphicsQuality_h1669003810 = 0` vào `user.reg` của
+    container. Công ty và tên game lấy từ hai dòng đầu của `<exe>_Data/app.info`.
+  - Ở mức cao hơn, AGVN xoá giá trị này, nhưng chỉ khi chính AGVN đã ghi nó.
+  - Mức thấp nhất của Unity thường giảm độ phân giải texture và tắt bóng. Game có menu cài đặt riêng có thể ghi đè.
+- **Zink:** bản vá `scripts/agvn/zink/patches/0007-agvn-cap-buffer-cache.patch`. Trên POCO F8 Pro, bộ nhớ GPU của một
+  game OpenGL giảm từ 2,78 GB xuống 2,52 GB.
+
+## Những cách không giúp hoặc chưa làm
+
+- **Giới hạn VRAM báo cho game:** `WRAPPER_VMEM_MAX_SIZE`, `dxgi.maxDeviceMemory`, `VideoMemorySize` của WineD3D.
+  Cách này chỉ giúp những game tự chọn chất lượng theo VRAM. Lần đo với game Unreal DX11 trong `device-findings.md`
+  không bớt được RAM. Với WineD3D, d3d8/d3d9 còn có thể báo lỗi hết bộ nhớ.
+- **Một số tuỳ chọn DXVK:**
+  - `dxvk.maxMemoryBudget` chỉ dùng để gỡ lỗi.
+  - `d3d9.textureMemory` không đổi lượng bộ nhớ dùng thật.
+  - `samplerLodBias` vẫn giữ nguyên texture đầy đủ trong bộ nhớ.
+- **VKD3D-Proton, Mesa, Turnip:** không có biến môi trường nào giới hạn bộ nhớ.
+- **Chưa làm, cần máy thật để đo:**
+  - Wrapper của GameNative đổi BCn sang ASTC thay vì giải nén ra RGBA8 (lớn gấp 4–8 lần). Cách này chỉ có ích với
+    driver không hỗ trợ BCn, như driver Qualcomm và Mali. Turnip hỗ trợ BCn sẵn.
+  - Trên Mali, bộ giải BCn bằng compute và bộ giải BCn của wrapper đang cùng bật (`ENABLE_BCN_COMPUTE` và
+    `WRAPPER_EMULATE_BCN=3`).
+  - Cờ V8 `--optimize-for-size` cho game NW.js (RPG Maker MV/MZ, Tyrano).
+  - Giảm số luồng dịch shader của DXVK.

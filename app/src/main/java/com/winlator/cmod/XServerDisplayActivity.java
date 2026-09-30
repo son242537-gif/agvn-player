@@ -694,6 +694,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             }
             Executors.newSingleThreadExecutor().execute(() -> {
                 if (shortcut != null) agvnEffectiveExePath = com.winlator.cmod.agvn.AgvnExeRedirect.effectivePath(shortcut.path, container); // AGVN
+                com.winlator.cmod.agvn.AgvnMemorySaver.applyGameSettings(this, shortcut); // AGVN: Ren'Py/Unity RAM per step
                 setupWineSystemFiles();
                 extractGraphicsDriverFiles();
                 changeWineAudioDriver();
@@ -1141,6 +1142,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 envVars.putAll(shortcut.getExtra("envVars"));
                 com.winlator.cmod.agvn.GameDllOverrides.applyAtLaunch(envVars, agvnExePath(), container); // AGVN
             }
+            if (dxwrapper.contains("dxvk")) com.winlator.cmod.agvn.AgvnMemorySaver.applyDxvk(this, shortcut, envVars); // AGVN
 
             applyOpenGLDriverEnvVars();
 
