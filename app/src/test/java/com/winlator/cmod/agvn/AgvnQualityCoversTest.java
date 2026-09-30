@@ -41,7 +41,7 @@ public class AgvnQualityCoversTest {
         int lastFps = 0;
         for (int step = 0; step < 4; step++) {
             AgvnQuality.Level l = AgvnQuality.Level.atStep(step);
-            assertTrue(l.fps > lastFps);
+            assertTrue(l.fps >= lastFps); // Trung bình and Cao both 30: a 60 Hz screen shows 20 or 30 evenly
             lastFps = l.fps;
         }
         assertEquals(0, AgvnQuality.Level.HIGHEST.fps); // Rất cao: no cap, the game and its cheat menu decide

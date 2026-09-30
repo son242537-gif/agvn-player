@@ -9,7 +9,7 @@ giữ lại. Tài liệu này ghi lại AGVN làm gì ở từng mức và vì s
 
 | Thành phần | Siêu nhẹ | Thấp | Trung bình | Cao, Rất cao |
 |---|---|---|---|---|
-| FPS lúc vào game (mọi loại game; chỉnh lại được trong game) | 20 | 24 | 27 | Cao: 30. Rất cao: không giới hạn |
+| FPS lúc vào game (mọi loại game; chỉnh lại được trong game) | 20 | 24 (màn 60 Hz chạy 20) | 30 | Cao: 30. Rất cao: không giới hạn |
 | DXVK: khối bộ nhớ 16 MB (`dxvk.maxChunkSize=16`) | có | có | có | không |
 | DXVK: giải phóng pipeline library không dùng (`dxvk.trackPipelineLifetime=True`) | có | có | không | không |
 | Ren'Py: bộ đệm ảnh (`config.image_cache_size_mb`) | 128 MB | 192 MB | 256 MB | để game tự chọn |
@@ -24,6 +24,10 @@ Mức "Tự động" dùng mức gợi ý cho máy: máy yếu là Thấp, máy 
 - **Giới hạn FPS:**
   - Thanh chỉ đặt mức bắt đầu của "Giới hạn FPS" trong game.
   - X server giữ nhịp khung hình ở tầng Present, nên áp được cho OpenGL, WineD3D, VKD3D và DXVK (`PresentExtension`).
+  - Nhịp này bám vsync của màn hình (`AgvnVsyncLimiter`): mỗi khung đứng yên đúng N nhịp màn hình, game được trả
+    buffer ngay lúc khung trước lên màn. Vì vậy FPS thật chỉ là ước số của tần số màn: màn 60 Hz chạy 60, 30 hoặc 20;
+    màn 120 Hz thêm 40 và 24. Mức không chia đều được làm tròn về ước số gần nhất, không vượt quá mức đã chọn hơn 10%
+    (24 và 27 trên màn 60 Hz thành 20). Trong game, ô "Giới hạn FPS" hiện cả hai số, ví dụ "25 → 20 FPS".
   - Trong game, người chơi nâng, hạ hoặc tắt được. Khi tắt, game và menu cheat tự chỉnh FPS.
   - AGVN không còn ghi `DXVK_FRAME_RATE`: DXVK khoá cứng mức này, trong game không nâng lên được. Game cũ có biến này
     được chuyển sang "Giới hạn FPS" khi mở (`AgvnQuality.upgrade`).

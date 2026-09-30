@@ -79,7 +79,7 @@ public class DeviceTierTest {
         AgvnProfile p = AgvnProfile.parse("{\"schemaVersion\":1,\"name\":\"g\"}");
         LaunchPresetResolver.Effective e = LaunchPresetResolver.resolve(p, DeviceTier.TRUNG_BINH, rules.preset(DeviceTier.TRUNG_BINH));
         assertEquals("960x544", e.resolution);
-        assertEquals(27, e.fps);
+        assertEquals(30, e.fps);
         assertEquals(768, e.texturePool);
     }
 }

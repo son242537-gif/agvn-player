@@ -24,7 +24,8 @@ public final class AgvnQuality {
         AUTO(null, 0, 0, null),
         LOWEST("640x360", 20, 384, DeviceTier.YEU),
         LOW("854x480", 24, 512, DeviceTier.YEU),
-        MEDIUM("960x544", 27, 768, DeviceTier.TRUNG_BINH),
+        // FPS a 60 Hz screen shows evenly: 20 or 30 (24 runs as 20 there, as 24 on 120 Hz; see AgvnFramePacing)
+        MEDIUM("960x544", 30, 768, DeviceTier.TRUNG_BINH),
         HIGH("1280x720", 30, 1024, DeviceTier.FLAGSHIP),
         HIGHEST("1600x900", 0, 1536, DeviceTier.FLAGSHIP);
 

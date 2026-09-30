@@ -294,7 +294,7 @@ Chỉnh thế nào: Game nhập bằng AGVN thường đã bật sẵn; visual n
 [Giới hạn FPS]
 Là gì: Giới hạn FPS cứng của DXVK, cho game DirectX 8–11. 0 là không giới hạn.
 Vì sao chỉnh: Dùng khi game chạy quá nhanh hoặc lỗi vật lý lúc FPS cao.
-Chỉnh thế nào: Để 0 (mặc định). Muốn máy đỡ nóng, bạn mở menu trong game, mục Hình ảnh, đặt Giới hạn FPS 24–30. Chỉ đặt số ở đây khi game lỗi lúc FPS cao: mức này khóa cứng, trong game không nâng lên được.
+Chỉnh thế nào: Để 0 (mặc định). Muốn máy đỡ nóng, bạn mở menu trong game, mục Hình ảnh, đặt Giới hạn FPS 30 hoặc 20: màn 60 Hz chỉ chiếu đều được 60, 30 và 20 FPS. Chỉ đặt số ở đây khi game lỗi lúc FPS cao: mức này khóa cứng, trong game không nâng lên được.
 
 [Gửi mọi buffer]
 Là gì: Chỉ có khi Bộ dựng hình là DisplayX. Khi bật, Android hiện lần lượt mọi khung hình game gửi lên, không bỏ khung cũ để nhảy tới khung mới nhất.

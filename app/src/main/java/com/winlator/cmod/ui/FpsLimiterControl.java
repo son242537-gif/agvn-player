@@ -296,7 +296,8 @@ public class FpsLimiterControl extends LinearLayout {
 
         if (position <= 0) valueLabel.setText("Tắt");
         else if (customMode) valueLabel.setText("Tùy chỉnh");
-        else valueLabel.setText((position * STEP_FPS) + " FPS");
+        else valueLabel.setText(com.winlator.cmod.agvn.AgvnFramePacing.label(position * STEP_FPS,
+                com.winlator.cmod.agvn.AgvnFramePacing.refreshHz(this))); // AGVN: "25 → 20 FPS" on 60 Hz
     }
 
     private void resolveShortcutFile(XServerDisplayActivity activity) {

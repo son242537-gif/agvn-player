@@ -50,4 +50,10 @@ public abstract class XServerRendererView extends SurfaceView {
 
     public abstract void setFpsLimit(int fps);
     public abstract int getFpsLimit();
+
+    /** AGVN: under an FPS limit, draw only when {@link #requestPacedFrame} asks (renderers that can; others ignore it). */
+    public void setPacedPresentation(boolean paced) {}
+
+    /** AGVN: draw the newest content now, to be shown no earlier than {@code desiredPresentNs} (0 = as soon as it can). */
+    public void requestPacedFrame(long desiredPresentNs) {}
 }
