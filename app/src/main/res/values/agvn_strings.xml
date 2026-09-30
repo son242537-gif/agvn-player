@@ -159,7 +159,7 @@
     <string name="agvn_quality_auto_note">Đang dùng mức gợi ý (tự chỉnh theo máy và game)</string>
     <string name="agvn_quality_reset">Về mức gợi ý</string>
     <string name="agvn_quality_save">Lưu</string>
-    <string name="agvn_quality_restart_note">Có tác dụng từ lần mở game tiếp theo.</string>
+    <string name="agvn_quality_restart_note">Có tác dụng từ lần mở game tiếp theo. FPS vẫn chỉnh lại được trong game, ở mục "Giới hạn FPS".</string>
     <string name="agvn_quality_fps_unlimited">FPS không giới hạn</string>
     <string name="agvn_quality_detail">Độ phân giải %1$s · %2$s</string>
     <string name="agvn_quality_applied">Đã đặt đồ họa: %1$s</string>

@@ -15,27 +15,21 @@ public class AgvnQualityCoversTest {
     @Rule public TemporaryFolder tmp = new TemporaryFolder();
 
     @Test
-    public void withFpsKeepsOtherVariables() {
-        assertEquals("A=1 DXVK_FRAME_RATE=24", AgvnQuality.withFps("A=1 DXVK_FRAME_RATE=60", 24));
-        assertEquals("A=1", AgvnQuality.withFps("A=1 DXVK_FRAME_RATE=60", 0));
-        assertEquals("DXVK_FRAME_RATE=30", AgvnQuality.withFps(null, 30));
+    public void fpsCapIsNoLongerForcedOnDxvk() {
+        assertEquals("A=1", AgvnQuality.withoutFpsCap("A=1 DXVK_FRAME_RATE=60"));
+        assertEquals("A=1", AgvnQuality.withoutFpsCap("A=1"));
+        assertEquals("", AgvnQuality.withoutFpsCap(null));
     }
 
     @Test
-    public void oldRatCaoCapIsDroppedButOtherCapsStay() {
-        assertEquals("A=1", AgvnQuality.withoutOldHighestCap("A=1 DXVK_FRAME_RATE=40"));
-        assertEquals("A=1 DXVK_FRAME_RATE=60", AgvnQuality.withoutOldHighestCap("A=1 DXVK_FRAME_RATE=60"));
-        assertEquals("", AgvnQuality.withoutOldHighestCap(null));
-        assertEquals("A=1", AgvnQuality.withFps("A=1 DXVK_FRAME_RATE=40", AgvnQuality.Level.HIGHEST.fps));
-    }
-
-    @Test
-    public void inGameFpsLimitStartsFromTheSliderCap() {
-        assertEquals("24", AgvnQuality.fpsCapOf("A=1 DXVK_FRAME_RATE=24"));
-        assertEquals("", AgvnQuality.fpsCapOf("A=1"));
-        assertEquals("", AgvnQuality.fpsCapOf(null));
-        assertEquals("", AgvnQuality.fpsCapOf("DXVK_FRAME_RATE=0"));
-        assertEquals("", AgvnQuality.fpsCapOf("DXVK_FRAME_RATE=abc"));
+    public void oldCapsMoveToTheInGameLimiter() {
+        assertEquals("24", AgvnQuality.startFpsFromOldCap("A=1 DXVK_FRAME_RATE=24", false));
+        assertEquals("40", AgvnQuality.startFpsFromOldCap("DXVK_FRAME_RATE=40", false));
+        assertEquals("0", AgvnQuality.startFpsFromOldCap("DXVK_FRAME_RATE=40", true)); // Rất cao's old cap: off
+        assertEquals("60", AgvnQuality.startFpsFromOldCap("DXVK_FRAME_RATE=60", true));
+        assertEquals("", AgvnQuality.startFpsFromOldCap("A=1", false));
+        assertEquals("", AgvnQuality.startFpsFromOldCap("DXVK_FRAME_RATE=abc", false));
+        assertEquals("", AgvnQuality.startFpsFromOldCap(null, true));
     }
 
     @Test

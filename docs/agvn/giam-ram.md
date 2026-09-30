@@ -9,7 +9,7 @@ giữ lại. Tài liệu này ghi lại AGVN làm gì ở từng mức và vì s
 
 | Thành phần | Siêu nhẹ | Thấp | Trung bình | Cao, Rất cao |
 |---|---|---|---|---|
-| Giới hạn FPS (mọi loại game, qua X server) | 20 | 24 | 27 | Cao: 30. Rất cao: không giới hạn |
+| FPS lúc vào game (mọi loại game; chỉnh lại được trong game) | 20 | 24 | 27 | Cao: 30. Rất cao: không giới hạn |
 | DXVK: khối bộ nhớ 16 MB (`dxvk.maxChunkSize=16`) | có | có | có | không |
 | DXVK: giải phóng pipeline library không dùng (`dxvk.trackPipelineLifetime=True`) | có | có | không | không |
 | Ren'Py: bộ đệm ảnh (`config.image_cache_size_mb`) | 128 MB | 192 MB | 256 MB | để game tự chọn |
@@ -21,9 +21,13 @@ Mức "Tự động" dùng mức gợi ý cho máy: máy yếu là Thấp, máy 
 
 ## Chi tiết
 
-- **Giới hạn FPS:** `DXVK_FRAME_RATE` chỉ có tác dụng với DXVK. Vì vậy "Giới hạn FPS" trong game cũng bắt đầu từ mức
-  của thanh. X server giữ nhịp khung hình ở tầng Present, nên áp được cho OpenGL, WineD3D, VKD3D và DXVK
-  (`PresentExtension`). Cách này cần bật "Dùng tiện ích DRI3".
+- **Giới hạn FPS:**
+  - Thanh chỉ đặt mức bắt đầu của "Giới hạn FPS" trong game.
+  - X server giữ nhịp khung hình ở tầng Present, nên áp được cho OpenGL, WineD3D, VKD3D và DXVK (`PresentExtension`).
+  - Trong game, người chơi nâng, hạ hoặc tắt được. Khi tắt, game và menu cheat tự chỉnh FPS.
+  - AGVN không còn ghi `DXVK_FRAME_RATE`: DXVK khoá cứng mức này, trong game không nâng lên được. Game cũ có biến này
+    được chuyển sang "Giới hạn FPS" khi mở (`AgvnQuality.upgrade`).
+  - Cách này cần bật "Dùng tiện ích DRI3".
 - **DXVK 2.3.1:**
   - Theo mặc định, DXVK xin bộ nhớ theo khối 64 MB cho mỗi loại bộ nhớ của Turnip, và giữ lại một khối trống mỗi
     loại. Khối 16 MB bớt phần xin thừa này.

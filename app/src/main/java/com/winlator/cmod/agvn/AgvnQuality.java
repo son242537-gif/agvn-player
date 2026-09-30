@@ -13,10 +13,9 @@ import java.io.File;
 /**
  * "Đồ họa" slider chosen outside the game: 5 steps from Siêu nhẹ (coolest) to Rất cao (sharpest), plus AUTO = the
  * step recommended for this phone, which also honours the AGVN game profile the same way as at import
- * (LaunchPresetResolver). Writes the shortcut's resolution, FPS cap (DXVK_FRAME_RATE, which the in-game "Giới hạn
- * FPS" also starts from, so it holds for every renderer) and Unreal texture pool.
- * Rất cao sets no FPS cap: the game and its cheat menu keep control of FPS (an outside cap silently overrode their
- * own FPS options); the in-game "Giới hạn FPS" menu still caps it live when the phone gets hot.
+ * (LaunchPresetResolver). Writes the shortcut's resolution, the FPS the in-game "Giới hạn FPS" starts from, and the
+ * Unreal texture pool. The FPS is only a starting point: the X server paces every renderer at it, and the player can
+ * raise, lower or turn it off in game. Rất cao starts with no cap, so the game and its cheat menu control FPS.
  */
 public final class AgvnQuality {
     public static final String EXTRA_QUALITY = "agvnQuality";
@@ -90,11 +89,8 @@ public final class AgvnQuality {
     public static void apply(Context ctx, Shortcut shortcut, Level level) {
         LaunchPresetResolver.Effective eff = effective(ctx, shortcut, level);
         if (eff.resolution != null) shortcut.putExtra("screenSize", eff.resolution);
-        shortcut.putExtra("envVars", withFps(shortcut.getExtra("envVars"), eff.fps));
-        // drop an older in-game "Giới hạn FPS" choice so the X server paces every renderer at this cap (fpsCap)
-        shortcut.putExtra(FpsLimiterControl.EXTRA_LIMIT, null);
-        shortcut.putExtra(FpsLimiterControl.EXTRA_ENABLED, null);
-        shortcut.putExtra("graphicsFpsPreset", null);
+        shortcut.putExtra("envVars", withoutFpsCap(shortcut.getExtra("envVars")));
+        setStartFps(shortcut, eff.fps);
         if (GameExeResolver.Engine.UNREAL.name().equals(shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE)))
             shortcut.putExtra(AgvnGameImporter.EXTRA_TEXTURE_POOL, String.valueOf(eff.texturePool));
         shortcut.putExtra(AgvnGameImporter.EXTRA_TIER, tierFor(ctx, level).name());
@@ -102,43 +98,50 @@ public final class AgvnQuality {
         shortcut.saveData();
     }
 
+    /**
+     * Sets where the in-game "Giới hạn FPS" starts (0 = off) and drops an older in-game choice. Nothing else caps FPS:
+     * DXVK_FRAME_RATE is not written, because DXVK enforces it and nothing in game (its own options, a cheat menu,
+     * "Giới hạn FPS") can lift it.
+     */
+    static void setStartFps(Shortcut shortcut, int fps) {
+        shortcut.putExtra(FpsLimiterControl.EXTRA_LIMIT, String.valueOf(Math.max(0, fps)));
+        shortcut.putExtra(FpsLimiterControl.EXTRA_ENABLED, null);
+        shortcut.putExtra("graphicsFpsPreset", null);
+    }
+
     /** FPS cap Rất cao wrote before it became uncapped (v0.1.2). */
     static final int OLD_HIGHEST_FPS = 40;
 
-    /** Drops the old 40 FPS cap from a game saved at Rất cao, so it matches what the slider now shows. Safe to repeat. */
+    /**
+     * Games saved by v0.1.2 carry their step's cap as DXVK_FRAME_RATE. Moves it to where "Giới hạn FPS" starts, so it
+     * can be changed in game, unless the player already chose a limit there. Rất cao's old 40 FPS becomes off. Safe to
+     * repeat.
+     */
     public static void upgrade(Shortcut shortcut) {
-        if (shortcut == null || current(shortcut) != Level.HIGHEST) return;
+        if (shortcut == null) return;
         String env = shortcut.getExtra("envVars");
-        String cleaned = withoutOldHighestCap(env);
-        if (cleaned.equals(env)) return;
-        shortcut.putExtra("envVars", cleaned);
+        String start = startFpsFromOldCap(env, current(shortcut) == Level.HIGHEST);
+        if (start.isEmpty()) return;
+        boolean chosenInGame = !shortcut.getExtra(FpsLimiterControl.EXTRA_LIMIT).isEmpty()
+                || !shortcut.getExtra(FpsLimiterControl.EXTRA_ENABLED).isEmpty()
+                || !shortcut.getExtra("graphicsFpsPreset").isEmpty();
+        if (!chosenInGame) setStartFps(shortcut, Integer.parseInt(start));
+        shortcut.putExtra("envVars", withoutFpsCap(env));
         shortcut.saveData();
     }
 
-    static String withoutOldHighestCap(String envVars) {
-        String env = envVars == null ? "" : envVars;
-        EnvVars vars = new EnvVars(env);
-        return String.valueOf(OLD_HIGHEST_FPS).equals(vars.get("DXVK_FRAME_RATE")) ? withFps(env, 0) : env;
-    }
-
-    /**
-     * The game's FPS cap from this slider (its DXVK_FRAME_RATE), or "" when uncapped. The in-game "Giới hạn FPS"
-     * starts from it, so OpenGL, WineD3D and VKD3D games are capped too, not only DXVK ones.
-     */
-    public static String fpsCap(Shortcut shortcut) {
-        return shortcut == null ? "" : fpsCapOf(shortcut.getExtra("envVars"));
-    }
-
-    static String fpsCapOf(String envVars) {
+    /** Where "Giới hạn FPS" should start for an old DXVK_FRAME_RATE ("0" = off), or "" when there is none. */
+    static String startFpsFromOldCap(String envVars, boolean highest) {
         String fps = new EnvVars(envVars == null ? "" : envVars).get("DXVK_FRAME_RATE");
-        return fps.matches("[1-9][0-9]{0,3}") ? fps : "";
+        if (!fps.matches("[0-9]{1,4}")) return "";
+        int value = Integer.parseInt(fps);
+        return String.valueOf(highest && value == OLD_HIGHEST_FPS ? 0 : value);
     }
 
-    /** Sets or removes DXVK_FRAME_RATE, keeping every other variable. */
-    static String withFps(String envVars, int fps) {
+    /** Removes DXVK_FRAME_RATE, keeping every other variable. */
+    static String withoutFpsCap(String envVars) {
         EnvVars vars = new EnvVars(envVars == null ? "" : envVars);
-        if (fps > 0) vars.put("DXVK_FRAME_RATE", fps);
-        else vars.remove("DXVK_FRAME_RATE");
+        vars.remove("DXVK_FRAME_RATE");
         return vars.toString();
     }
 

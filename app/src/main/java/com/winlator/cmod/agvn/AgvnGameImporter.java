@@ -170,7 +170,8 @@ public final class AgvnGameImporter {
         shortcut.putExtra("execArgs", String.join(" ", p.args));
         File exeDir = new File(c.gameDir, c.exe).getParentFile();
         String dlls = GameDllOverrides.build(GameDllOverrides.detect(exeDir), p.dllOverrides);
-        shortcut.putExtra("envVars", buildEnvVars(p.env, eff.fps, dlls));
+        shortcut.putExtra("envVars", buildEnvVars(p.env, dlls));
+        AgvnQuality.setStartFps(shortcut, eff.fps);
         AgvnLayouts.applyImport(shortcut, AgvnLayouts.kindFor(p, c.engine));
         if (eff.resolution != null) shortcut.putExtra("screenSize", eff.resolution);
         shortcut.putExtra("simTouchScreen", p.isSimulatedTouchscreen() ? "1" : "0");
@@ -188,8 +189,11 @@ public final class AgvnGameImporter {
         shortcut.putExtra(AgvnHtmlGame.EXTRA_INDEX, html ? index.getAbsolutePath() : null);
     }
 
-    /** "KEY=VALUE KEY2=VALUE2"; the FPS cap uses DXVK's DXVK_FRAME_RATE, mod DLLs go to WINEDLLOVERRIDES. */
-    static String buildEnvVars(Map<String, String> env, int fpsLimit, String dllOverrides) {
+    /**
+     * "KEY=VALUE KEY2=VALUE2"; mod DLLs go to WINEDLLOVERRIDES. A profile's DXVK_FRAME_RATE is dropped: the FPS cap is
+     * where the in-game "Giới hạn FPS" starts (AgvnQuality.setStartFps), which the player can change in game.
+     */
+    static String buildEnvVars(Map<String, String> env, String dllOverrides) {
         StringBuilder sb = new StringBuilder();
         String overrides = dllOverrides != null ? dllOverrides : "";
         String fromEnv = env.get("WINEDLLOVERRIDES");
@@ -199,10 +203,6 @@ public final class AgvnGameImporter {
             if (e.getKey().equals("DXVK_FRAME_RATE") || e.getKey().equals("WINEDLLOVERRIDES")) continue;
             if (sb.length() > 0) sb.append(' ');
             sb.append(e.getKey()).append('=').append(e.getValue());
-        }
-        if (fpsLimit > 0) {
-            if (sb.length() > 0) sb.append(' ');
-            sb.append("DXVK_FRAME_RATE=").append(fpsLimit);
         }
         return sb.toString();
     }
