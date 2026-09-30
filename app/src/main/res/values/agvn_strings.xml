@@ -203,4 +203,31 @@
     <string name="agvn_save_export_empty">Chưa có save nào để xuất. Hãy chơi và lưu game trước.</string>
     <string name="agvn_save_html_note">Game này chạy bằng trình duyệt có sẵn trong app, save nằm trong bộ nhớ của trình duyệt đó. AGVN chưa nhập/xuất được save cho loại game này.</string>
     <string name="agvn_save_error">Không xử lý được save: %1$s</string>
+    <!-- In-app update (AgvnUpdateDialogs, AgvnUpdateInstall) -->
+    <string name="agvn_update_title">Cập nhật ứng dụng</string>
+    <string name="agvn_update_summary">Đang dùng bản %1$s</string>
+    <string name="agvn_update_current">Bản đang dùng: %1$s</string>
+    <string name="agvn_update_auto">Tự kiểm tra bản mới mỗi ngày khi mở app</string>
+    <string name="agvn_update_beta">Nhận bản thử nghiệm (dành cho người thử app, có thể còn lỗi)</string>
+    <string name="agvn_update_check">Kiểm tra cập nhật</string>
+    <string name="agvn_update_close">Đóng</string>
+    <string name="agvn_update_checking">Đang kiểm tra bản mới…</string>
+    <string name="agvn_update_latest">Đây đã là bản mới nhất (%1$s).</string>
+    <string name="agvn_update_not_published">Chưa có bản cập nhật nào được đăng.</string>
+    <string name="agvn_update_available_title">Có bản mới %1$s</string>
+    <string name="agvn_update_available">Bản mới: %1$s (%2$s)\nBản đang dùng: %3$s\n\n%4$sGame, save và cài đặt vẫn giữ nguyên. Tệp khá nặng, nên dùng Wi-Fi.</string>
+    <string name="agvn_update_now">Cập nhật</string>
+    <string name="agvn_update_later">Để sau</string>
+    <string name="agvn_update_downloading">Đang tải… %1$d%%</string>
+    <string name="agvn_update_verifying">Đang kiểm tra tệp tải về…</string>
+    <string name="agvn_update_paused">Đã dừng tải. Lần sau bấm Cập nhật sẽ tải tiếp.</string>
+    <string name="agvn_update_failed">Không cập nhật được: %1$s</string>
+    <string name="agvn_update_no_network">không kết nối được máy chủ, hãy kiểm tra mạng rồi thử lại</string>
+    <string name="agvn_update_no_space">Máy còn trống %1$s, cần khoảng %2$s để tải và cài bản mới. Hãy xóa bớt dữ liệu rồi thử lại.</string>
+    <string name="agvn_update_allow_title">Cho phép cài bản mới</string>
+    <string name="agvn_update_allow">Android cần cho phép AGVN Player cài ứng dụng (chỉ một lần). Bấm \"Mở cài đặt\", bật \"Cho phép từ nguồn này\", rồi quay lại app.</string>
+    <string name="agvn_update_open_settings">Mở cài đặt</string>
+    <string name="agvn_update_allow_done">Đã bật \"Cho phép từ nguồn này\" chưa? Bấm \"Cài tiếp\" để cài bản mới.</string>
+    <string name="agvn_update_continue">Cài tiếp</string>
+    <string name="agvn_update_confirm">Bấm \"Cập nhật\" trên hộp thoại của Android để cài.</string>
 </resources>

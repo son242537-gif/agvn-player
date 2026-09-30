@@ -43,6 +43,9 @@ A Vietnamese-first emulation environment for PC games on weak Android phones (Ad
 2. **No features requiring root or in-app ADB self-pairing** (security risk for non-technical users).
 
 3. **No in-app telemetry, ads, or external links** (except agvn.io.vn in About screen and diagnostic exports).
+   - Exception, approved by the maintainer: the in-app updater (`agvn/AgvnUpdater`).
+     - It reads `agvn-update.txt` and the APK named there, only from this repository's GitHub Releases.
+     - It sends nothing about the device.
 
 4. **Do not break upstream structure needlessly:** Keep diffs small and focused; new code in new files where sensible.
 
@@ -66,6 +69,15 @@ export AGVN_VERSION_CODE=2
 ./gradlew assembleRelease --no-daemon
 # Output: app/build/outputs/apk/release/app-release.apk
 ```
+
+### Publish an Update (maintainer's PC only)
+Phones update themselves from GitHub Releases (Cài đặt → Cập nhật ứng dụng). The script builds with the release key,
+so it runs only on the maintainer's PC, after `gh auth login`:
+```powershell
+.\tools\agvn\dang-ban-cap-nhat.ps1 -Notes "..."                        # test build: release "beta"
+.\tools\agvn\dang-ban-cap-nhat.ps1 -Stable -Version 0.1.3 -NotesFile ...  # release v0.1.3, for every phone
+```
+See [`docs/agvn/cap-nhat-ung-dung.md`](./docs/agvn/cap-nhat-ung-dung.md).
 
 ### Build & Run Unit Tests
 ```bash

@@ -10,6 +10,8 @@
     <uses-feature android:name="oculus.software.overlay_keyboard" android:required="false" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- AGVN: the in-app updater opens Android's installer on a checked update (agvn/AgvnUpdateInstall) -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.VIBRATE" />

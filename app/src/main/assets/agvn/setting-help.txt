@@ -171,6 +171,11 @@ Là gì: Chọn bộ nút hiện trên màn hình cho game này. “Tự động
 Vì sao chỉnh: Đổi khi bộ nút tự chọn không hợp game, thiếu phím cần dùng, hoặc bạn chỉ muốn chạm trực tiếp hay dùng tay cầm.
 Chỉnh thế nào: Nên để “Tự động (AGVN)”. Chọn một bộ cụ thể thì app không tự đổi nữa. Muốn dời, thêm hay đổi nút, trong game bấm “✎ Sửa”; bộ phím được lưu riêng cho game này.
 
+[Cập nhật ứng dụng]
+Là gì: Tìm và cài bản AGVN Player mới ngay trong app, không cần máy tính. App chỉ tải thông tin phiên bản và tệp cài từ trang GitHub của AGVN, không gửi dữ liệu gì của máy.
+Vì sao chỉnh: Bản mới sửa lỗi và giúp game chạy tốt hơn. Game, save và cài đặt vẫn giữ nguyên sau khi cập nhật.
+Chỉnh thế nào: Bấm vào, chọn Kiểm tra cập nhật. Có bản mới thì bấm Cập nhật, chờ tải xong rồi bấm Cập nhật trên hộp thoại của Android. Tệp nặng vài trăm MB, nên dùng Wi-Fi.
+
 [DDraw Wrapper]
 Là gì: Bộ chuyển đổi cho game rất cũ dùng DirectDraw hoặc Direct3D 7 trở xuống. Chỉ có tác dụng khi DX Wrapper là DXVK+VKD3D. none và wined3d dùng DirectDraw có sẵn của Wine.
 Vì sao chỉnh: Đổi khi game rất cũ bị màn hình đen, sai màu, giật, chậm hoặc không vào được.

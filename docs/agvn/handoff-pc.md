@@ -63,6 +63,10 @@ BGRA/RGBA, mức xếp hạng máy.
 
 ## Dựng và cài APK (PowerShell, trong `C:\AGVN\ap`)
 
+Từ bản có mục **Cập nhật ứng dụng** trở đi, không cần cắm cáp nữa. Đăng bản bằng
+`.\tools\agvn\dang-ban-cap-nhat.ps1`, rồi bấm cập nhật trên điện thoại (xem `docs/agvn/cap-nhat-ung-dung.md`).
+Cách cài bằng adb dưới đây vẫn dùng được:
+
 ```powershell
 git checkout agvn/main; git pull
 $env:AGVN_KEYSTORE_PROPS = "C:\AGVN\Keys\keystore.properties"

@@ -211,6 +211,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (!ImageFsInstaller.installIfNeeded(this, () -> requestAppPermissions())) {
                 if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED)
                     startForegroundService(notificationService);
+                // AGVN: once a day, say when a new version is out (not while the image installs or over a crash report)
+                if (savedInstanceState == null && !isBigPictureModeEnabled && !com.winlator.cmod.agvn.CrashRecorder.hasPendingCrash(this))
+                    com.winlator.cmod.agvn.AgvnUpdateDialogs.checkDaily(this);
             }
         }
     }

@@ -41,6 +41,7 @@ import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.Storage
+import androidx.compose.material.icons.outlined.SystemUpdate
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.AlertDialog
@@ -191,6 +192,12 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
             item("agvn-guide") {
                 NavigationRow(Icons.Outlined.HelpOutline, stringResource(R.string.agvn_guide_title), stringResource(R.string.agvn_guide_open_summary)) {
                     com.winlator.cmod.agvn.AgvnGuideActivity.open(context)
+                }
+            }
+            item("agvn-update") {
+                val version = remember { com.winlator.cmod.agvn.AgvnUpdater.installedName(context) }
+                NavigationRow(Icons.Outlined.SystemUpdate, stringResource(R.string.agvn_update_title), stringResource(R.string.agvn_update_summary, version)) {
+                    activity?.let { com.winlator.cmod.agvn.AgvnUpdateDialogs.show(it) }
                 }
             }
             item("agvn-tier") {
