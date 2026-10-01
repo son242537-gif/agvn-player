@@ -53,13 +53,27 @@ Script làm những việc sau:
 1. Đọc phiên bản trong `gradle.properties`. Mã phải lớn hơn bản đang đăng, vì Android chỉ cài đè bản có mã lớn hơn.
    Nếu chưa tăng, script dừng và báo.
 2. Chạy bài kiểm tra và dựng APK ký bằng khoá phát hành (`-PagvnRequireReleaseSigning=true`).
-3. Tạo `build\agvn-update\AGVN-Player-<phiên bản>.apk` và `agvn-update.txt` (mã, tên, đường tải, dung lượng,
+3. Tạo `build\agvn-update\AGVN-Player.apk` và `agvn-update.txt` (mã, tên, đường tải, dung lượng,
    SHA-256, ghi chú).
 4. Đăng release `v<phiên bản>`. Release được tạo ở dạng nháp, tải đủ hai file lên rồi mới công bố. Nhờ vậy điện
    thoại không bao giờ thấy thông tin trỏ tới một APK chưa có.
 
 Muốn cài bằng cáp thì dùng đúng APK trong `build\agvn-update`. Bản dựng tay bằng `gradlew` cũng dùng mã trong
-`gradle.properties`, nên cài đè được.
+`gradle.properties`, nhưng chỉ ký khoá phát hành khi tìm thấy `keystore.properties`. Không có thì nó ký khoá debug,
+và Android báo `INSTALL_FAILED_UPDATE_INCOMPATIBLE` khi cài đè. Chạy một lần
+`setx AGVN_KEYSTORE_PROPS "C:\AGVN\Keys\keystore.properties"` rồi mở cửa sổ PowerShell mới để bản dựng tay cũng ký đúng khoá.
+
+## Link tải cho người chơi
+
+Mọi release đều có file `AGVN-Player.apk` cùng tên (từ 0.1.5; bản 0.1.4 tên `AGVN-Player-0.1.4.apk`), nên link này
+luôn tải bản mới nhất. Bấm là tải ngay, không mở trang GitHub:
+
+https://github.com/son242537-gif/agvn-player/releases/latest/download/AGVN-Player.apk
+
+- Dùng làm nút "Tải AGVN Player" trên agvn.io.vn, hoặc cho một địa chỉ ngắn như `agvn.io.vn/tai` chuyển hướng về đây.
+  Ra bản mới không phải đổi link.
+- Chrome hỏi "Tệp này có thể gây hại": chọn "Vẫn tải xuống". Mọi file APK tải từ web đều bị hỏi như vậy.
+- Mở link trong Facebook, Messenger hay Zalo mà không tải: bấm ⋮ → "Mở bằng trình duyệt", rồi bấm lại link.
 
 ## An toàn
 
