@@ -101,6 +101,6 @@ if ($DryRun) { Write-Host "Chạy thử (-DryRun): không đăng lên GitHub."; 
 gh release create $tag $apk $manifest --repo $Repo --target $commit --title "AGVN Player $name" --notes-file $notesFile --draft
 if ($LASTEXITCODE -ne 0) { Stop-With "Không tạo được release $tag." }
 gh release edit $tag --repo $Repo --draft=false --latest
-if ($LASTEXITCODE -ne 0) { Stop-With "Đã tải lên nhưng chưa công bố được release $tag: mở trang Releases trên GitHub và bấm Publish." }
+if ($LASTEXITCODE -ne 0) { Stop-With "Đã tải lên nhưng chưa công bố được release ${tag}: mở trang Releases trên GitHub và bấm Publish." }
 Write-Host "Xong: AGVN Player $name đã đăng. Trên điện thoại: Cài đặt > Cập nhật ứng dụng > Kiểm tra cập nhật." -ForegroundColor Green
 Write-Host "Muốn cài bằng cáp thì dùng đúng APK này: adb install -r $apk"
