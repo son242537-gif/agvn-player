@@ -21,6 +21,10 @@ public abstract class ProcessHelper {
     private static final ArrayList<Callback<String>> debugCallbacks = new ArrayList<>();
     private static final byte SIGCONT = 18;
     private static final byte SIGSTOP = 19;
+
+    // AGVN: sched_setaffinity / sched_getaffinity of one thread (process_helper.c in libwinlator); errno, or -1
+    public static native int nativeSetProcessAffinity(int pid, int mask);
+    public static native int nativeGetProcessAffinity(int pid);
     private static final byte SIGTERM = 15;
     private static final byte SIGKILL = 9;
 

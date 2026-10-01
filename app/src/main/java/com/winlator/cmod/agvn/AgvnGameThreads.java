@@ -46,18 +46,20 @@ final class AgvnGameThreads {
         }
     }
 
-    /** A thread's CPU use over a span, in percent of one core. */
+    /** A thread's CPU use over a span, in percent of one core; {@code main} for the process's first thread. */
     static final class Busy {
         final int tid;
         final String name;
         final int core;
         final int percent;
+        final boolean main;
 
-        Busy(int tid, String name, int core, int percent) {
+        Busy(int tid, String name, int core, int percent, boolean main) {
             this.tid = tid;
             this.name = name;
             this.core = core;
             this.percent = percent;
+            this.main = main;
         }
     }
 
@@ -100,7 +102,8 @@ final class AgvnGameThreads {
             Sample before = from.threads.get(s.id);
             long used = s.ticks - (before != null ? before.ticks : 0); // a thread started meanwhile used all of it
             if (used <= 0) continue;
-            out.add(new Busy(s.id, s.name, s.core, (int) Math.round(100.0 * used * 1e9 / ticksPerSecond / spanNs)));
+            out.add(new Busy(s.id, s.name, s.core, (int) Math.round(100.0 * used * 1e9 / ticksPerSecond / spanNs),
+                    s.id == to.pid));
         }
         Collections.sort(out, (a, b) -> b.percent - a.percent);
         return out;
@@ -121,13 +124,35 @@ final class AgvnGameThreads {
         return s != null && ticksPerSecond > 0 ? s.ticks * 1_000_000_000L / ticksPerSecond : -1;
     }
 
-    /** The ids of the busiest threads that used at least {@code minPercent} of a core, at most {@code max}. */
-    static int[] top(List<Busy> busiestFirst, int minPercent, int max) {
-        int n = 0;
-        while (n < Math.min(max, busiestFirst.size()) && busiestFirst.get(n).percent >= minPercent) n++;
-        int[] ids = new int[n];
-        for (int i = 0; i < n; i++) ids[i] = busiestFirst.get(i).tid;
+    /**
+     * The threads to hint, in id order: the main thread (under Wine and FEX it runs the game's loop; its id is the
+     * process id) whenever it ran, then the busiest others from {@code minPercent} of a core, at most {@code max}.
+     */
+    static List<Busy> pick(List<Busy> busiestFirst, int minPercent, int max) {
+        List<Busy> picked = new ArrayList<>();
+        for (Busy b : busiestFirst) if (b.main && b.percent > 0) picked.add(b);
+        for (Busy b : busiestFirst) {
+            if (picked.size() >= max || b.percent < minPercent) break;
+            if (!b.main) picked.add(b);
+        }
+        Collections.sort(picked, (a, b) -> Integer.compare(a.tid, b.tid));
+        return picked;
+    }
+
+    static int[] ids(List<Busy> threads) {
+        int[] ids = new int[threads.size()];
+        for (int i = 0; i < ids.length; i++) ids[i] = threads.get(i).tid;
         return ids;
+    }
+
+    /** "30722 Game.exe (main), 30756 dxvk-cs", for the logs. */
+    static String label(List<Busy> threads) {
+        StringBuilder s = new StringBuilder();
+        for (Busy b : threads) {
+            if (s.length() > 0) s.append(", ");
+            s.append(b.tid).append(' ').append(b.name).append(b.main ? " (main)" : "");
+        }
+        return s.toString();
     }
 
     /** All the threads together, in percent of one core (200 = two whole cores). */
@@ -137,55 +162,8 @@ final class AgvnGameThreads {
         return sum;
     }
 
-    /**
-     * The process that runs the game: {@code windowPid} when it is one of this user's processes, otherwise the one of
-     * them that used the most CPU since the last call ({@code seen} keeps their CPU times; the first call compares
-     * with zero), leaving out this app's own process and Wine's server. 0 when none is found.
-     */
-    static int findGame(File proc, int windowPid, int uid, int selfPid, Map<Integer, Long> seen) {
-        if (windowPid > 0 && windowPid != selfPid && ownedBy(proc, windowPid, uid)) return windowPid;
-        String[] pids = proc.list();
-        if (pids == null) return 0;
-        Map<Integer, Long> now = new HashMap<>();
-        int best = 0;
-        long bestUsed = -1;
-        for (String name : pids) {
-            if (name.isEmpty() || !Character.isDigit(name.charAt(0))) continue;
-            int pid;
-            try {
-                pid = Integer.parseInt(name);
-            } catch (NumberFormatException e) {
-                continue;
-            }
-            if (pid == selfPid || !ownedBy(proc, pid, uid)) continue;
-            Sample s = parse(text(new File(proc, pid + "/stat")));
-            if (s == null || s.name.equals("wineserver")) continue;
-            now.put(pid, s.ticks);
-            Long before = seen.get(pid);
-            long used = s.ticks - (before != null ? before : 0);
-            if (used > bestUsed) {
-                best = pid;
-                bestUsed = used;
-            }
-        }
-        seen.clear();
-        seen.putAll(now);
-        return best;
-    }
-
-    /** True when the process exists and runs as {@code uid}. */
-    static boolean ownedBy(File proc, int pid, int uid) {
-        String status = text(new File(proc, pid + "/status"));
-        if (status == null) return false;
-        for (String line : status.split("\n")) {
-            if (!line.startsWith("Uid:")) continue;
-            String[] ids = line.substring(4).trim().split("\\s+");
-            return ids[0].equals(String.valueOf(uid));
-        }
-        return false;
-    }
-
-    private static String text(File f) {
+    /** A small /proc or /sys file, or null when it cannot be read. */
+    static String text(File f) {
         try (FileInputStream in = new FileInputStream(f)) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             byte[] buf = new byte[4096];

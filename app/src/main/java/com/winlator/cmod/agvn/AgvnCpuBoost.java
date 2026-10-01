@@ -26,7 +26,7 @@ final class AgvnCpuBoost {
     private boolean unsupported;
 
     /** Aims the session at these threads and frame time, creating it if needed. Called on the game CPU thread. */
-    synchronized void aim(Context context, int[] newTids, long newTargetNs) {
+    synchronized void aim(Context context, int[] newTids, String label, long newTargetNs) {
         if (Build.VERSION.SDK_INT < 31 || unsupported || failures >= GIVE_UP_AFTER || newTids.length == 0) return;
         try {
             if (session != null && !Arrays.equals(tids, newTids)) {
@@ -45,8 +45,8 @@ final class AgvnCpuBoost {
                 session.updateTargetWorkDuration(newTargetNs);
             }
             if (!Arrays.equals(tids, newTids) || newTargetNs != targetNs) {
-                Log.i(TAG, "performance hints: game threads " + Arrays.toString(newTids) + ", "
-                        + newTargetNs / 100_000 / 10.0 + " ms per frame");
+                Log.i(TAG, "performance hints: game threads " + label + "; " + newTargetNs / 100_000 / 10.0
+                        + " ms per frame");
             }
             tids = newTids;
             targetNs = newTargetNs;

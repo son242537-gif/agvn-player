@@ -76,13 +76,14 @@ public class AgvnFrameStallsTest {
         AgvnFrameStalls stalls = new AgvnFrameStalls();
         stalls.onFrame(1000 * MS, AgvnFrameStalls.Mode.TIMER, 30, 0);
         AgvnFrameStalls.Stall loading = stalls.onFrame(6000 * MS, AgvnFrameStalls.Mode.TIMER, 30, 0);
-        loading.cpu = Arrays.asList(new AgvnGameThreads.Busy(500, "Game.exe", 3, 96),
-                new AgvnGameThreads.Busy(501, "dxvk-cs", 1, 20));
-        assertTrue(loading.vietnamese(), loading.vietnamese().endsWith(
-                "; CPU của game: thread \"Game.exe\" dùng 96% một nhân (nhân 3), cả game 116% → game đang bận (tải hoặc tính)"));
-        assertTrue(loading.english(), loading.english().endsWith("-> busy (loading or computing)"));
+        loading.cpu = Arrays.asList(new AgvnGameThreads.Busy(500, "Game.exe", 3, 96, true),
+                new AgvnGameThreads.Busy(501, "dxvk-cs", 1, 20, false));
+        assertTrue(loading.vietnamese(), loading.vietnamese().endsWith("; CPU của game: thread chính \"Game.exe\" (500) "
+                + "dùng 96% một nhân (nhân 3), cả game 116% → game đang bận (tải hoặc tính)"));
+        assertTrue(loading.english(), loading.english().endsWith(
+                "main thread \"Game.exe\" (500) 96% of a core on cpu 3, all threads 116% -> busy (loading or computing)"));
         AgvnFrameStalls.Stall waiting = stalls.onFrame(8000 * MS, AgvnFrameStalls.Mode.TIMER, 30, 0);
-        waiting.cpu = Collections.singletonList(new AgvnGameThreads.Busy(500, "Game.exe", 0, 2));
+        waiting.cpu = Collections.singletonList(new AgvnGameThreads.Busy(501, "dxvk-cs", 0, 2, false));
         assertTrue(waiting.vietnamese(), waiting.vietnamese().endsWith("→ game đang chờ, không tính gì"));
         AgvnFrameStalls.Stall unmeasured = stalls.onFrame(10000 * MS, AgvnFrameStalls.Mode.TIMER, 30, 0);
         assertFalse(unmeasured.english(), unmeasured.english().contains("CPU"));

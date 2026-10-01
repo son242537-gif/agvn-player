@@ -5,6 +5,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -78,9 +79,22 @@ public class AgvnGameThreadsTest {
         assertEquals(15, busy.get(1).percent);
         assertEquals(10, busy.get(2).percent);
         assertEquals(120, AgvnGameThreads.total(busy));
-        assertArrayEquals("from 15% of a core, at most 2", new int[]{500, 502}, AgvnGameThreads.top(busy, 15, 2));
-        assertArrayEquals(new int[]{500}, AgvnGameThreads.top(busy, 30, 3));
+        assertTrue("the process's first thread", busy.get(0).main);
+        List<AgvnGameThreads.Busy> two = AgvnGameThreads.pick(busy, 15, 2);
+        assertArrayEquals("from 15% of a core, at most 2", new int[]{500, 502}, AgvnGameThreads.ids(two));
+        assertEquals("500 Game.exe (main), 502 loader", AgvnGameThreads.label(two));
+        assertArrayEquals(new int[]{500}, AgvnGameThreads.ids(AgvnGameThreads.pick(busy, 30, 3)));
         assertNull("a process that is gone", AgvnGameThreads.read(proc, 777, 0));
+    }
+
+    @Test
+    public void theMainThreadIsHintedEvenWhenAnotherIsBusier() {
+        List<AgvnGameThreads.Busy> busiestFirst = java.util.Arrays.asList(
+                new AgvnGameThreads.Busy(756, "worker", 2, 90, false), new AgvnGameThreads.Busy(753, "render", 1, 60, false),
+                new AgvnGameThreads.Busy(722, "Game.exe", 4, 12, true), new AgvnGameThreads.Busy(870, "audio", 0, 5, false));
+        assertArrayEquals("in id order, so a new order of the same threads changes nothing", new int[]{722, 753, 756},
+                AgvnGameThreads.ids(AgvnGameThreads.pick(busiestFirst, 30, 3)));
+        assertArrayEquals(new int[]{722, 756}, AgvnGameThreads.ids(AgvnGameThreads.pick(busiestFirst, 30, 2)));
     }
 
     @Test
@@ -92,12 +106,12 @@ public class AgvnGameThreadsTest {
         process(proc, 602, UID, "Game.exe", 3_000);
         process(proc, 300, 0, "system", 99_999); // not ours
         Map<Integer, Long> seen = new HashMap<>();
-        assertEquals("the window's own process", 601, AgvnGameThreads.findGame(proc, 601, UID, SELF, seen));
-        assertEquals("a window pid that is not ours", 602, AgvnGameThreads.findGame(proc, 300, UID, SELF, seen));
+        assertEquals("the window's own process", 601, AgvnGameProcess.findGame(proc, 601, UID, SELF, seen));
+        assertEquals("a window pid that is not ours", 602, AgvnGameProcess.findGame(proc, 300, UID, SELF, seen));
         process(proc, 601, UID, "explorer.exe", 2_000); // grew 1800 since the last call, the game only 100
         process(proc, 602, UID, "Game.exe", 3_100);
-        assertEquals("the most CPU since the last call", 601, AgvnGameThreads.findGame(proc, 0, UID, SELF, seen));
-        assertEquals(0, AgvnGameThreads.findGame(new File(proc, "none"), 0, UID, SELF, seen));
+        assertEquals("the most CPU since the last call", 601, AgvnGameProcess.findGame(proc, 0, UID, SELF, seen));
+        assertEquals(0, AgvnGameProcess.findGame(new File(proc, "none"), 0, UID, SELF, seen));
     }
 
     @Test
@@ -108,6 +122,6 @@ public class AgvnGameThreadsTest {
         write(new File(proc, "500/task/501/schedstat"), "2512345678 100 42\n");
         assertEquals(2_512_345_678L, AgvnGameThreads.cpuNs(proc, 500, 501, 100));
         assertEquals(-1, AgvnGameThreads.cpuNs(proc, 500, 999, 100));
-        assertFalse("no status: not a process of ours", AgvnGameThreads.ownedBy(proc, 500, UID));
+        assertFalse("no status: not a process of ours", AgvnGameProcess.ownedBy(proc, 500, UID));
     }
 }
