@@ -27,7 +27,7 @@ import java.util.Map;
  *   time the FPS limit aims at (60 FPS without a limit), and reports the CPU time the busiest of them spent per frame.
  *   That is the work, not the gap between frames: a visual novel that sends a frame a second is idle, not late. During a
  *   pause the work so far is reported, so loading counts too. A busy main thread is also pinned to the fastest cores
- *   ({@link AgvnMainThreadPin}).</li>
+ *   ({@link AgvnMainThreadPin}) and given nice -2 ({@link AgvnMainThreadPriority}).</li>
  * </ul>
  * The game's process is the one that owns the frame's window (_NET_WM_PID), or else this user's busiest process. The
  * thread stops once that process has been gone and no frame has come for 10 s; the next frame starts it again.
@@ -40,6 +40,7 @@ final class AgvnGameCpu {
 
     private final AgvnCpuBoost boost = new AgvnCpuBoost();
     private final AgvnMainThreadPin pin = new AgvnMainThreadPin();
+    private final AgvnMainThreadPriority priority = new AgvnMainThreadPriority();
     private final long ticksPerSecond = AgvnGameProcess.clockTicks();
     // guarded by this
     private int windowId = -1, windowPid, gamePid, frames;
@@ -152,6 +153,7 @@ final class AgvnGameCpu {
                 }
                 for (AgvnGameThreads.Busy b : picked) { // an idle main thread keeps its pin; turning off releases it
                     if (b.main) pin.update(on, b.tid, b.percent >= BUSY_PERCENT);
+                    if (b.main) priority.update(on, b.tid, b.percent >= BUSY_PERCENT);
                 }
             }
             lastPick = snap;
@@ -162,6 +164,7 @@ final class AgvnGameCpu {
         else if (!on) {
             boost.close();
             pin.release();
+            priority.release();
             cpuSeen.clear();
         }
         return now - gameSeenNs <= GONE_NS || now - last <= GONE_NS;
@@ -181,6 +184,7 @@ final class AgvnGameCpu {
     private void stop() {
         boost.close();
         pin.release();
+        priority.release();
         synchronized (this) {
             seen.clear();
             cpuSeen.clear();

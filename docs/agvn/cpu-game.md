@@ -58,6 +58,12 @@ còn **ghim thread chính vào cụm nhân có xung tối đa cao nhất** (`Agv
 giây. Cpu6–7 khi đó chỉ được chạy tối đa 3072 trên 4320 MHz. Trên máy này app không chọn được nhân cho thread. Muốn máy
 chạy nhanh hơn thì phải dùng chế độ hiệu năng của chính hệ thống (Game Turbo).
 
+Cùng lúc đó app nâng thread chính lên **nice −2** (`AgvnMainThreadPriority`). Đo ngày 01/10, GameHub chạy thread chính
+của cùng game ở nice −2, và HyperOS đặt nó trên cpu6–7 ở 35/40 mẫu. Thread của AGVN ở nice 0 thì nằm ở cpu5, dù
+affinity, cpuset và các thread khác giống hệt. App chỉ nâng một lần cho mỗi thread chính, nên nếu game tự đổi mức ưu
+tiên sau đó thì app để nguyên. Tắt ô hoặc thoát game thì thread trở về mức cũ. Logcat ghi
+`game main thread <tid> priority nice 0 -> -2`.
+
 Android chỉ nhận gợi ý cho thread chạy dưới user của app. Tiến trình game là tiến trình con của app nên chạy cùng
 user. Máy không hỗ trợ thì logcat ghi `performance hints: this phone does not support them`. Máy từ chối 3 lần liên
 tiếp thì app thôi gửi gợi ý, và logcat ghi lý do (`AgvnCpuBoost`).
