@@ -81,7 +81,8 @@ if ($LASTEXITCODE -ne 0) { Stop-With "Dựng APK thất bại (xem lỗi ở tr�
 
 $out = "build\agvn-update"
 New-Item -ItemType Directory -Force $out -ErrorAction Stop | Out-Null
-# One name in every release: releases/latest/download/AGVN-Player.apk is then a fixed link to the newest APK
+# Never rename: the public download link releases/latest/download/AGVN-Player.apk (fixed on 2026-10-01) needs
+# this name in every release to give the newest APK
 $apkName = "AGVN-Player.apk"
 $apk = Join-Path $out $apkName
 Copy-Item app\build\outputs\apk\release\app-release.apk $apk -Force -ErrorAction Stop

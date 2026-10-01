@@ -65,10 +65,11 @@ và Android báo `INSTALL_FAILED_UPDATE_INCOMPATIBLE` khi cài đè. Chạy mộ
 
 ## Link tải cho người chơi
 
-Mọi release đều có file `AGVN-Player.apk` cùng tên (từ 0.1.5; bản 0.1.4 tên `AGVN-Player-0.1.4.apk`), nên link này
-luôn tải bản mới nhất. Bấm là tải ngay, không mở trang GitHub:
+Link tải chính thức, chốt từ 01/10/2026 và không đổi nữa. Bấm là tải ngay bản mới nhất, không mở trang GitHub:
 
 https://github.com/son242537-gif/agvn-player/releases/latest/download/AGVN-Player.apk
+
+Link chạy được vì mọi release đều có file tên đúng `AGVN-Player.apk` (script tự đặt). Không bao giờ đổi tên file này.
 
 - Dùng làm nút "Tải AGVN Player" trên agvn.io.vn, hoặc cho một địa chỉ ngắn như `agvn.io.vn/tai` chuyển hướng về đây.
   Ra bản mới không phải đổi link.
