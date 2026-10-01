@@ -7,6 +7,8 @@ import android.view.Surface;
 import android.view.SurfaceView;
 import android.view.View;
 
+import com.winlator.cmod.widget.XServerRendererView;
+
 import java.util.Locale;
 
 /**
@@ -39,6 +41,14 @@ public final class AgvnFramePacing {
         String shown = Math.abs(real - Math.round(real)) < 0.05
                 ? String.valueOf(Math.round(real)) : String.format(new Locale("vi", "VN"), "%.1f", real);
         return fps + " → " + shown + " FPS";
+    }
+
+    /**
+     * True when the player switched on "Khớp nhịp màn hình" for this game. Off, the FPS limit is upstream's timer: on
+     * 01/10 one game froze 5-9 s twice in 30 s at 35-48 FPS with the vsync limit on, so it stays a choice per game.
+     */
+    public static boolean enabled(XServerRendererView view) {
+        return view != null && view.isVsyncPacing();
     }
 
     /** The screen's current refresh rate, or 60 when the view is not on a screen. */

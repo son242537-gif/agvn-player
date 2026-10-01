@@ -21,7 +21,9 @@ import java.util.List;
  * <p>Choreographer runs on its own thread and feeds {@link AgvnFrameSlots}. On the vsyncs it picks, the renderer draws
  * the newest content and asks Android to show it at a given vsync (frame timelines, Android 13+), so each frame stays
  * exactly N vsyncs. If vsyncs stop coming (screen off), a timer keeps giving the game its buffers. The thread stops
- * when the limit is turned off or the game sends nothing for 5 s, and gives back every buffer it held.
+ * when the limit or "Khớp nhịp màn hình" is turned off or the game sends nothing for 5 s, and gives back every buffer
+ * it held. Pauses of a second or more between game frames are logged with what the limit did meanwhile
+ * ({@link AgvnFrameStalls}), whichever limiter runs.
  */
 public final class AgvnVsyncLimiter {
     private static final String TAG = "AGVN";
@@ -30,11 +32,22 @@ public final class AgvnVsyncLimiter {
     private static final long STOP_WHEN_IDLE_NS = 5_000_000_000L, HINT_EVERY_NS = 10_000_000_000L;
 
     private final AgvnFrameSlots slots = new AgvnFrameSlots();
+    private final AgvnFrameStalls stalls = new AgvnFrameStalls();
     private volatile XServerRendererView view;
     private volatile long lastFrameNs;
     private Loop loop; // guarded by this
 
-    /** A game frame came under an FPS limit; {@code release} gives its buffer back. Called on the X server thread. */
+    /** Every game frame, whatever limits it, before {@link #onFrame}: logs a pause of a second or more before it. */
+    public void notePresent(int limit, boolean paced) {
+        AgvnFrameStalls.Mode mode = limit <= 0 ? AgvnFrameStalls.Mode.NO_LIMIT
+                : paced ? AgvnFrameStalls.Mode.VSYNC : AgvnFrameStalls.Mode.TIMER;
+        AgvnFrameStalls.Stall stall = stalls.onFrame(System.nanoTime(), mode, limit, slots.heldCount());
+        if (stall == null) return;
+        Log.w(TAG, stall.english());
+        AgvnSessionLog.event(stall.vietnamese());
+    }
+
+    /** A game frame came under the vsync limit; {@code release} gives its buffer back. Called on the X server thread. */
     public void onFrame(int windowId, Runnable release, XServerRendererView view) {
         this.view = view;
         lastFrameNs = System.nanoTime();
@@ -67,7 +80,7 @@ public final class AgvnVsyncLimiter {
                 armFallback();
             } catch (RuntimeException e) {
                 Log.w(TAG, "vsync limiter did not start", e);
-                stop(v, false);
+                stop(v, false, "error");
             }
         }
 
@@ -117,10 +130,16 @@ public final class AgvnVsyncLimiter {
         void tick(long vsyncNs, long desiredPresentNs) {
             if (stopped) return;
             XServerRendererView v = view;
+            long now = System.nanoTime();
+            stalls.onTick(now);
             try {
                 int fps = v != null ? v.getFpsLimit() : 0;
-                if (fps <= 0 || System.nanoTime() - lastFrameNs > STOP_WHEN_IDLE_NS) {
-                    stop(v, fps <= 0);
+                if (fps <= 0 || !AgvnFramePacing.enabled(v)) {
+                    stop(v, true, "turned off");
+                    return;
+                }
+                if (now - lastFrameNs > STOP_WHEN_IDLE_NS) {
+                    stop(v, false, "no game frame for 5 s");
                     return;
                 }
                 long vsyncs = lastVsyncNs == 0 ? 1 : Math.round((vsyncNs - lastVsyncNs) / (double) periodNs);
@@ -129,10 +148,13 @@ public final class AgvnVsyncLimiter {
                     slots.setVsyncsPerFrame(AgvnFramePacing.vsyncsPerFrame(1e9 / periodNs, fps));
                     AgvnFrameSlots.Tick t = slots.onVsync((int) Math.min(8, vsyncs));
                     if (t.show) v.requestPacedFrame(desiredPresentNs);
+                    if (!t.releases.isEmpty()) stalls.onBack(now);
                     for (Runnable r : t.releases) r.run();
                 }
                 if (fps != hintedFps || vsyncNs - lastHintNs > HINT_EVERY_NS) {
                     AgvnFramePacing.hintFrameRate(v, fps);
+                    Log.i(TAG, "vsync limiter: screen " + Math.round(1e10 / periodNs) / 10.0 + " Hz, limit " + fps
+                            + " FPS, a frame every " + AgvnFramePacing.vsyncsPerFrame(1e9 / periodNs, fps) + " vsyncs");
                     hintedFps = fps;
                     lastHintNs = vsyncNs;
                 }
@@ -140,7 +162,7 @@ public final class AgvnVsyncLimiter {
                 armFallback();
             } catch (RuntimeException e) {
                 Log.w(TAG, "vsync limiter stopped", e);
-                stop(v, false);
+                stop(v, false, "error");
             }
         }
 
@@ -151,15 +173,17 @@ public final class AgvnVsyncLimiter {
 
         /**
          * Gives every held buffer back and lets the renderer draw on every change again. The refresh rate hint is only
-         * cleared when the limit is turned off: a game that pauses drawing for a while keeps it, so the screen does not
-         * switch refresh rates back and forth.
+         * cleared when the limit or the pacing is turned off: a game that pauses drawing for a while keeps it, so the
+         * screen does not switch refresh rates back and forth.
          */
-        void stop(XServerRendererView v, boolean limitOff) {
+        void stop(XServerRendererView v, boolean limitOff, String why) {
             if (stopped) return;
             stopped = true;
             List<Runnable> held;
             synchronized (AgvnVsyncLimiter.this) {
                 held = slots.drain();
+                stalls.onStop(System.nanoTime(), held.size());
+                Log.i(TAG, "vsync limiter stops (" + why + "), gives back " + held.size() + " held buffers");
                 if (v != null) {
                     v.setPacedPresentation(false);
                     if (limitOff) AgvnFramePacing.hintFrameRate(v, 0);

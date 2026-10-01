@@ -51,6 +51,12 @@ public abstract class XServerRendererView extends SurfaceView {
     public abstract void setFpsLimit(int fps);
     public abstract int getFpsLimit();
 
+    private volatile boolean vsyncPacing;
+
+    /** AGVN: true when this game's FPS limit is set to follow the screen's vsync (AgvnVsyncLimiter); off by default. */
+    public boolean isVsyncPacing() { return vsyncPacing; }
+    public void setVsyncPacing(boolean on) { vsyncPacing = on; }
+
     /** AGVN: under an FPS limit, draw only when {@link #requestPacedFrame} asks (renderers that can; others ignore it). */
     public void setPacedPresentation(boolean paced) {}
 
