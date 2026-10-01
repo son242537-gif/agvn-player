@@ -187,11 +187,11 @@
     <string name="agvn_import_update">Cập nhật</string>
     <!-- in-app folder picker for "Chọn thư mục khác" -->
     <string name="agvn_folder_title">Chọn thư mục có game</string>
-    <string name="agvn_folder_hint">Mở tới thư mục chứa game (hoặc thư mục chứa nhiều game) rồi bấm \"Quét thư mục này\".</string>
+    <string name="agvn_folder_hint">Mở tới thư mục chứa game (hoặc thư mục chứa nhiều game) rồi bấm \"Quét thư mục này\". Hoặc chạm vào một file .exe để thêm đúng file đó.</string>
     <string name="agvn_folder_drives">Chọn nơi lưu game</string>
     <string name="agvn_folder_up">Lên trên</string>
     <string name="agvn_folder_scan">Quét thư mục này</string>
-    <string name="agvn_folder_empty">Thư mục này không có thư mục con</string>
+    <string name="agvn_folder_empty">Thư mục này không có thư mục con hay file .exe</string>
     <string name="agvn_folder_sd">Thẻ nhớ (%1$s)</string>
     <string name="agvn_save_import">Nhập save</string>
     <string name="agvn_save_export">Xuất save</string>

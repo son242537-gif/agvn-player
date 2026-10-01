@@ -4,6 +4,7 @@ package com.winlator.cmod.agvn;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -12,7 +13,8 @@ import java.util.Map;
 /**
  * Guesses the engine of a Windows game folder and the exe that should be launched.
  * Unreal: <Project>/Binaries/Win64/<Project>-Win64-Shipping.exe (the root <Game>.exe is only a bootstrap that
- * needs VC++/.NET redists under Wine). Other engines: the single sensible exe in the folder root.
+ * needs VC++/.NET redists under Wine). Other engines: the single sensible exe in the folder root, or each game of a
+ * collection ({@link #gameExes}).
  */
 public final class GameExeResolver {
     /** Stored by name in the shortcut extra "agvnEngine": never rename or remove a value. */
@@ -22,6 +24,11 @@ public final class GameExeResolver {
             "unitycrashhandler64.exe", "unitycrashhandler32.exe", "crashreportclient.exe", "dxsetup.exe",
             "vc_redist.x64.exe", "vc_redist.x86.exe", "vcredist_x64.exe", "vcredist_x86.exe", "dotnetfx.exe",
             "ue4prereqsetup_x64.exe", "ueprereqsetup_x64.exe", "notification_helper.exe");
+    /** Name parts of exes that only serve a game (launcher, setup, crash reporter, settings...), never a game of their own. */
+    private static final String[] HELPERS = {"launcher", "setup", "config", "crash", "report", "update", "patch", "install",
+            "redist", "setting", "editor", "server", "tool", "helper", "physx", "dotnet", "oalinst", "nwjc", "bssndrpt"};
+    /** More game exes than this in one folder: a folder of tools rather than a collection, so it stays one game. */
+    static final int MAX_GAMES = 8;
 
     private GameExeResolver() {}
 
@@ -84,11 +91,36 @@ public final class GameExeResolver {
             }
         }
         if (exes.size() == 1) return exes.get(0).getName();
+        for (File exe : exes) if (!isHelper(exe.getName().toLowerCase(Locale.ROOT))) return exe.getName();
         for (File exe : exes) {
             String n = exe.getName().toLowerCase(Locale.ROOT);
             if (!n.contains("launcher") && !n.contains("setup") && !n.contains("config")) return exe.getName();
         }
         return exes.get(0).getName();
+    }
+
+    /**
+     * The exes that each start a game: one per game for a collection that ships several games in one folder (often next
+     * to a launcher that only starts one of them), else just {@link #resolveExe}; empty when nothing fits. Only a folder
+     * of an unknown engine can be a collection: a known engine has one main exe.
+     */
+    public static List<String> gameExes(File gameDir, Engine engine) {
+        List<String> games = new ArrayList<>();
+        if (engine == Engine.UNKNOWN) {
+            for (File f : listOrEmpty(gameDir)) {
+                String n = f.getName().toLowerCase(Locale.ROOT);
+                if (f.isFile() && n.endsWith(".exe") && !IGNORED.contains(n) && !n.startsWith("unins") && !isHelper(n))
+                    games.add(f.getName());
+            }
+        }
+        if (games.size() > 1 && games.size() <= MAX_GAMES) return games;
+        String main = resolveExe(gameDir, engine);
+        return main != null ? Collections.singletonList(main) : Collections.<String>emptyList();
+    }
+
+    private static boolean isHelper(String lowerName) {
+        for (String part : HELPERS) if (lowerName.contains(part)) return true;
+        return false;
     }
 
     /** Searches <dir>/<Project>/Binaries/Win64/*-Win64-Shipping.exe and <dir>/Binaries/Win64. */

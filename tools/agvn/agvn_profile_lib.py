@@ -16,6 +16,9 @@ IGNORED_EXES = {
     "unitycrashhandler64.exe", "unitycrashhandler32.exe", "crashreportclient.exe", "dxsetup.exe",
     "vc_redist.x64.exe", "vc_redist.x86.exe", "vcredist_x64.exe", "vcredist_x86.exe", "dotnetfx.exe",
     "ue4prereqsetup_x64.exe", "ueprereqsetup_x64.exe", "notification_helper.exe"}
+# Name parts of exes that only serve a game (launcher, setup, crash reporter, settings...), never a game of their own.
+HELPER_PARTS = ("launcher", "setup", "config", "crash", "report", "update", "patch", "install", "redist", "setting",
+                "editor", "server", "tool", "helper", "physx", "dotnet", "oalinst", "nwjc", "bssndrpt")
 # On-screen controls layouts (AgvnLayouts.java): profile "controls" value -> bundled layout; order = ids 9000..9005.
 CONTROLS = ("pc", "vn", "rpg", "2d", "action", "mouse")
 _ENGINE_CONTROLS = {"RENPY": "vn", "KIRIKIRI": "vn", "TYRANO": "vn", "SIGLUS": "vn", "NSCRIPTER": "vn",
@@ -128,6 +131,9 @@ def resolve_exe(game_dir, engine):
                 return n
     if len(exes) == 1:
         return exes[0]
+    for n in exes:
+        if not any(part in n.lower() for part in HELPER_PARTS):
+            return n
     for n in exes:
         low = n.lower()
         if "launcher" not in low and "setup" not in low and "config" not in low:
