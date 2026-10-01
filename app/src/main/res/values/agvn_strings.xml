@@ -208,7 +208,6 @@
     <string name="agvn_update_summary">Đang dùng bản %1$s</string>
     <string name="agvn_update_current">Bản đang dùng: %1$s</string>
     <string name="agvn_update_auto">Tự kiểm tra bản mới mỗi ngày khi mở app</string>
-    <string name="agvn_update_beta">Nhận bản thử nghiệm (dành cho người thử app, có thể còn lỗi)</string>
     <string name="agvn_update_check">Kiểm tra cập nhật</string>
     <string name="agvn_update_close">Đóng</string>
     <string name="agvn_update_checking">Đang kiểm tra bản mới…</string>
