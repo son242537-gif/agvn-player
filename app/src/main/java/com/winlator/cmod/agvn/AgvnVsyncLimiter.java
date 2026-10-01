@@ -22,33 +22,32 @@ import java.util.List;
  * the newest content and asks Android to show it at a given vsync (frame timelines, Android 13+), so each frame stays
  * exactly N vsyncs. If vsyncs stop coming (screen off), a timer keeps giving the game its buffers. The thread stops
  * when the limit or "Khớp nhịp màn hình" is turned off or the game sends nothing for 5 s, and gives back every buffer
- * it held. Pauses of a second or more between game frames are logged with what the limit did meanwhile
- * ({@link AgvnFrameStalls}), whichever limiter runs.
+ * it held. It tells {@link AgvnFrameStalls} what it did, for the stall logs ({@link AgvnFrameWatch}).
  */
-public final class AgvnVsyncLimiter {
+final class AgvnVsyncLimiter {
     private static final String TAG = "AGVN";
     /** Time the renderer needs to draw and queue a frame before a frame timeline's deadline. */
     private static final long DRAW_NS = 6_000_000L;
     private static final long STOP_WHEN_IDLE_NS = 5_000_000_000L, HINT_EVERY_NS = 10_000_000_000L;
 
     private final AgvnFrameSlots slots = new AgvnFrameSlots();
-    private final AgvnFrameStalls stalls = new AgvnFrameStalls();
+    private final AgvnFrameStalls stalls;
     private volatile XServerRendererView view;
     private volatile long lastFrameNs;
     private Loop loop; // guarded by this
 
-    /** Every game frame, whatever limits it, before {@link #onFrame}: logs a pause of a second or more before it. */
-    public void notePresent(int limit, boolean paced) {
-        AgvnFrameStalls.Mode mode = limit <= 0 ? AgvnFrameStalls.Mode.NO_LIMIT
-                : paced ? AgvnFrameStalls.Mode.VSYNC : AgvnFrameStalls.Mode.TIMER;
-        AgvnFrameStalls.Stall stall = stalls.onFrame(System.nanoTime(), mode, limit, slots.heldCount());
-        if (stall == null) return;
-        Log.w(TAG, stall.english());
-        AgvnSessionLog.event(stall.vietnamese());
+    /** {@code stalls} hears each vsync tick, buffer release and stop, for the stall logs. */
+    AgvnVsyncLimiter(AgvnFrameStalls stalls) {
+        this.stalls = stalls;
+    }
+
+    /** Game buffers held now. */
+    int heldCount() {
+        return slots.heldCount();
     }
 
     /** A game frame came under the vsync limit; {@code release} gives its buffer back. Called on the X server thread. */
-    public void onFrame(int windowId, Runnable release, XServerRendererView view) {
+    void onFrame(int windowId, Runnable release, XServerRendererView view) {
         this.view = view;
         lastFrameNs = System.nanoTime();
         synchronized (this) {

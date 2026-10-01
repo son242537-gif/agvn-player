@@ -57,6 +57,12 @@ public abstract class XServerRendererView extends SurfaceView {
     public boolean isVsyncPacing() { return vsyncPacing; }
     public void setVsyncPacing(boolean on) { vsyncPacing = on; }
 
+    private volatile boolean cpuBoost;
+
+    /** AGVN: true when this game sends Android performance hints for its busiest threads (AgvnCpuBoost); off by default. */
+    public boolean isCpuBoost() { return cpuBoost; }
+    public void setCpuBoost(boolean on) { cpuBoost = on; }
+
     /** AGVN: under an FPS limit, draw only when {@link #requestPacedFrame} asks (renderers that can; others ignore it). */
     public void setPacedPresentation(boolean paced) {}
 

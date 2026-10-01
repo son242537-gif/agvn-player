@@ -164,6 +164,8 @@
     <!-- In-game "Giới hạn FPS": the FPS limit on the screen's vsync (AgvnVsyncLimiter), per game -->
     <string name="agvn_vsync_pacing">Khớp nhịp màn hình (thử nghiệm)</string>
     <string name="agvn_vsync_pacing_hint">Khung hình đều hơn. Game đứng hình vài giây thì tắt mục này.</string>
+    <string name="agvn_cpu_boost">Ưu tiên nhân CPU mạnh (thử nghiệm)</string>
+    <string name="agvn_cpu_boost_hint">Báo Android khi game không kịp FPS, để chạy game trên nhân mạnh hơn. Máy có thể nóng hơn.</string>
     <string name="agvn_quality_detail">Độ phân giải %1$s · %2$s</string>
     <string name="agvn_quality_applied">Đã đặt đồ họa: %1$s</string>
     <!-- "Thêm game" screen -->

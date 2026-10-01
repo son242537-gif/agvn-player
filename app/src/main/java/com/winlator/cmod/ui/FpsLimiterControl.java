@@ -37,6 +37,7 @@ public class FpsLimiterControl extends LinearLayout {
     public static final String EXTRA_ENABLED = "nativeFpsLimiterEnabled";
     public static final String EXTRA_LIMIT = "nativeFpsLimit";
     public static final String EXTRA_PACING = "agvnVsyncPacing"; // AGVN: "1" = the limit follows the screen's vsync
+    public static final String EXTRA_CPU_BOOST = "agvnCpuBoost"; // AGVN: "1" = performance hints for the game's threads
     private static final int SLIDER_MAX_FPS = 120;
     private static final int STEP_FPS = 5;
     private static final int CUSTOM_POSITION = SLIDER_MAX_FPS / STEP_FPS;
@@ -46,6 +47,7 @@ public class FpsLimiterControl extends LinearLayout {
     private final NumericEditText customValue;
     private final CheckBox pacing; // AGVN
     private final TextView pacingHint; // AGVN
+    private final CheckBox cpuBoost; // AGVN
 
     private boolean initializing = true;
     private boolean stateLoaded;
@@ -142,6 +144,21 @@ public class FpsLimiterControl extends LinearLayout {
             updateLimitUi();
             if (!initializing) saveAndApply();
         });
+        // AGVN: Android performance hints for the game's busiest threads (AgvnCpuBoost), per game, with or without a limit
+        cpuBoost = new CheckBox(context);
+        cpuBoost.setText(R.string.agvn_cpu_boost);
+        cpuBoost.setTextColor(onSurface);
+        cpuBoost.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        cpuBoost.setButtonTintList(ColorStateList.valueOf(primary));
+        sliderGroup.addView(cpuBoost, new LayoutParams(pacingParams));
+        TextView cpuBoostHint = new TextView(context);
+        cpuBoostHint.setText(R.string.agvn_cpu_boost_hint);
+        cpuBoostHint.setTextColor(onSurfaceVariant);
+        cpuBoostHint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        sliderGroup.addView(cpuBoostHint, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        cpuBoost.setOnCheckedChangeListener((button, checked) -> {
+            if (!initializing) saveAndApply();
+        });
 
         customValue.setOnTouchListener((v, event) -> {
             disallowParentIntercept(v);
@@ -230,6 +247,7 @@ public class FpsLimiterControl extends LinearLayout {
         String oldPreset;
         String oldEnabled;
         String savedPacing;
+        String savedCpuBoost;
 
         Shortcut shortcutStore = openShortcutStore(container);
         if (shortcutStore != null) {
@@ -237,20 +255,24 @@ public class FpsLimiterControl extends LinearLayout {
             oldPreset = shortcutStore.getExtra("graphicsFpsPreset", "");
             oldEnabled = shortcutStore.getExtra(EXTRA_ENABLED, "");
             savedPacing = shortcutStore.getExtra(EXTRA_PACING, "");
+            savedCpuBoost = shortcutStore.getExtra(EXTRA_CPU_BOOST, "");
 
             if (savedLimit.isEmpty() && oldPreset.isEmpty() && oldEnabled.isEmpty()) {
                 savedLimit = container.getExtra(EXTRA_LIMIT, "");
                 oldPreset = container.getExtra("graphicsFpsPreset", "");
                 oldEnabled = container.getExtra(EXTRA_ENABLED, "");
                 savedPacing = container.getExtra(EXTRA_PACING, "");
+                savedCpuBoost = container.getExtra(EXTRA_CPU_BOOST, "");
             }
         } else {
             savedLimit = container.getExtra(EXTRA_LIMIT, "");
             oldPreset = container.getExtra("graphicsFpsPreset", "");
             oldEnabled = container.getExtra(EXTRA_ENABLED, "");
             savedPacing = container.getExtra(EXTRA_PACING, "");
+            savedCpuBoost = container.getExtra(EXTRA_CPU_BOOST, "");
         }
         pacing.setChecked("1".equals(savedPacing));
+        cpuBoost.setChecked("1".equals(savedCpuBoost));
 
         int limit = parsePositiveOrZero(savedLimit);
         if (savedLimit.isEmpty()) {
@@ -303,11 +325,13 @@ public class FpsLimiterControl extends LinearLayout {
                 shortcutStore.putExtra(EXTRA_ENABLED, null);
                 shortcutStore.putExtra(EXTRA_LIMIT, String.valueOf(chosen));
                 shortcutStore.putExtra(EXTRA_PACING, pacing.isChecked() ? "1" : null);
+                shortcutStore.putExtra(EXTRA_CPU_BOOST, cpuBoost.isChecked() ? "1" : null);
                 shortcutStore.saveData();
             } else {
                 container.putExtra(EXTRA_ENABLED, null);
                 container.putExtra(EXTRA_LIMIT, String.valueOf(chosen));
                 container.putExtra(EXTRA_PACING, pacing.isChecked() ? "1" : null);
+                container.putExtra(EXTRA_CPU_BOOST, cpuBoost.isChecked() ? "1" : null);
                 container.saveData();
             }
         }
@@ -325,6 +349,7 @@ public class FpsLimiterControl extends LinearLayout {
 
     private void applyEffectiveLimit(XServerRendererView renderer) {
         renderer.setVsyncPacing(pacing.isChecked()); // AGVN
+        renderer.setCpuBoost(cpuBoost.isChecked()); // AGVN
         renderer.setFpsLimit(getChosenLimit());
     }
 

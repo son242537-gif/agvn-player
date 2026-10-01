@@ -45,7 +45,7 @@ public class PresentExtension implements Extension, XResourceManager.OnResourceL
     private final Object limiterLock = new Object();
     private HashMap<Integer, Long> limiterDeadlines;
     private ScheduledThreadPoolExecutor limiterExecutor;
-    private final com.winlator.cmod.agvn.AgvnVsyncLimiter vsyncLimiter = new com.winlator.cmod.agvn.AgvnVsyncLimiter(); // AGVN: FPS limit on the vsync grid
+    private final com.winlator.cmod.agvn.AgvnFrameWatch frameWatch = new com.winlator.cmod.agvn.AgvnFrameWatch(); // AGVN: vsync limit, stall logs, game CPU
 
     private static abstract class ClientOpcodes {
         private static final byte QUERY_VERSION = 0;
@@ -187,7 +187,7 @@ public class PresentExtension implements Extension, XResourceManager.OnResourceL
         if (targetFps > 1000) targetFps = 1000;
         // AGVN: the vsync limit when it is switched on for this game under the FPS limit, otherwise upstream's timer
         boolean paced = targetFps > 0 && com.winlator.cmod.agvn.AgvnFramePacing.enabled(client.xServer.getXServerView());
-        vsyncLimiter.notePresent(targetFps, paced); // AGVN: logs pauses of a second or more between frames
+        frameWatch.onPresent(window, targetFps, paced, client.xServer.getXServerView()); // AGVN
 
         if (targetFps <= 0) {
             long ust = System.nanoTime() / 1000;
@@ -205,7 +205,7 @@ public class PresentExtension implements Extension, XResourceManager.OnResourceL
         pixmap.drawable.updateDirect();
         sendCompleteNotify(window, serial, Kind.PIXMAP, Mode.COPY, ust, msc);
         if (paced) {
-            vsyncLimiter.onFrame(window.id, () -> sendIdleNotify(window, pixmap, serial, idleFence),
+            frameWatch.onPacedFrame(window.id, () -> sendIdleNotify(window, pixmap, serial, idleFence),
                     client.xServer.getXServerView());
         } else {
             scheduleIdleNotify(window, pixmap, serial, idleFence, targetFps);

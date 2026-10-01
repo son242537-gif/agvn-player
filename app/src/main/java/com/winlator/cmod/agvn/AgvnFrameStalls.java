@@ -1,9 +1,12 @@
 /* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
+import java.util.List;
+
 /**
- * Pauses of a second or more between game frames, and what the FPS limit did meanwhile, so the logs tell whether the
- * limit kept the game waiting or the game stopped for another reason. Pure logic: {@link AgvnVsyncLimiter} feeds it.
+ * Pauses of a second or more between game frames, and what the FPS limit and the game's CPU did meanwhile, so the logs
+ * tell whether the limit kept the game waiting, the game was busy (loading, computing) or it waited on something else.
+ * Pure logic: {@link AgvnFrameWatch} and {@link AgvnVsyncLimiter} feed it.
  *
  * <p>Without a limit, and under upstream's timer, every buffer goes back at once or within a frame, so the limit cannot
  * hold a game for a second. Under the vsync limit the held buffers go back one per few vsyncs: once frames stop, all
@@ -14,6 +17,8 @@ final class AgvnFrameStalls {
     static final long STALL_NS = 1_000_000_000L;
     /** Held buffers are all back well within this once frames stop (3 buffers, 3 vsyncs each on 60 Hz: 150 ms). */
     static final long BACK_WITHIN_MS = 300;
+    /** The game's busiest thread counts as busy from half a core, and as waiting under a tenth of one. */
+    static final int BUSY_PERCENT = 50, WAITING_PERCENT = 10;
 
     enum Mode { NO_LIMIT, TIMER, VSYNC }
 
@@ -30,6 +35,8 @@ final class AgvnFrameStalls {
         final long lastBackMs;
         /** Vsync limit: the longest time its thread did not run during the pause, in ms. */
         final long longestPauseMs;
+        /** The game's threads from 0.5 s into the pause, busiest first; null when not measured. */
+        List<AgvnGameThreads.Busy> cpu;
 
         Stall(long ms, Mode mode, int limit, int held, int drained, long lastBackMs, long longestPauseMs) {
             this.ms = ms;
@@ -58,7 +65,16 @@ final class AgvnFrameStalls {
                 s.append(", last buffer back ").append(lastBackMs >= 0 ? "at +" + lastBackMs + " ms" : "never");
                 s.append(", longest vsync thread pause ").append(longestPauseMs).append(" ms -> ");
             }
-            return s.append(limitHeld() ? "the FPS limit may have held the game" : "not held by the FPS limit").toString();
+            s.append(limitHeld() ? "the FPS limit may have held the game" : "not held by the FPS limit");
+            if (cpu == null) return s.toString();
+            s.append("; game CPU: ");
+            if (cpu.isEmpty()) return s.append("no thread ran -> waiting, not computing").toString();
+            AgvnGameThreads.Busy b = cpu.get(0);
+            s.append('"').append(b.name).append("\" ").append(b.percent).append("% of a core on cpu ").append(b.core)
+                    .append(", all threads ").append(AgvnGameThreads.total(cpu)).append('%');
+            if (b.percent >= BUSY_PERCENT) s.append(" -> busy (loading or computing)");
+            else if (b.percent < WAITING_PERCENT) s.append(" -> waiting, not computing");
+            return s.toString();
         }
 
         /** For the game's session events. */
@@ -72,8 +88,16 @@ final class AgvnFrameStalls {
                 s.append(", bộ đệm cuối trả ").append(lastBackMs >= 0 ? "ở +" + lastBackMs + " ms" : "không có");
                 s.append(", luồng vsync nghỉ lâu nhất ").append(longestPauseMs).append(" ms → ");
             }
-            return s.append(limitHeld() ? "có thể do giới hạn FPS giữ game" : "không phải do giới hạn FPS giữ game")
-                    .toString();
+            s.append(limitHeld() ? "có thể do giới hạn FPS giữ game" : "không phải do giới hạn FPS giữ game");
+            if (cpu == null) return s.toString();
+            s.append("; CPU của game: ");
+            if (cpu.isEmpty()) return s.append("không thread nào chạy → game đang chờ, không tính gì").toString();
+            AgvnGameThreads.Busy b = cpu.get(0);
+            s.append("thread \"").append(b.name).append("\" dùng ").append(b.percent).append("% một nhân (nhân ")
+                    .append(b.core).append("), cả game ").append(AgvnGameThreads.total(cpu)).append('%');
+            if (b.percent >= BUSY_PERCENT) s.append(" → game đang bận (tải hoặc tính)");
+            else if (b.percent < WAITING_PERCENT) s.append(" → game đang chờ, không tính gì");
+            return s.toString();
         }
     }
 

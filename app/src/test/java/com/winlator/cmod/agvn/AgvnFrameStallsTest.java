@@ -8,6 +8,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 public class AgvnFrameStallsTest {
     private static final long MS = 1_000_000L;
 
@@ -66,6 +69,23 @@ public class AgvnFrameStallsTest {
         assertEquals(1, stall.held);
         assertEquals(-1, stall.drained);
         assertTrue(stall.limitHeld());
+    }
+
+    @Test
+    public void theGamesCpuTellsLoadingFromWaiting() {
+        AgvnFrameStalls stalls = new AgvnFrameStalls();
+        stalls.onFrame(1000 * MS, AgvnFrameStalls.Mode.TIMER, 30, 0);
+        AgvnFrameStalls.Stall loading = stalls.onFrame(6000 * MS, AgvnFrameStalls.Mode.TIMER, 30, 0);
+        loading.cpu = Arrays.asList(new AgvnGameThreads.Busy(500, "Game.exe", 3, 96),
+                new AgvnGameThreads.Busy(501, "dxvk-cs", 1, 20));
+        assertTrue(loading.vietnamese(), loading.vietnamese().endsWith(
+                "; CPU của game: thread \"Game.exe\" dùng 96% một nhân (nhân 3), cả game 116% → game đang bận (tải hoặc tính)"));
+        assertTrue(loading.english(), loading.english().endsWith("-> busy (loading or computing)"));
+        AgvnFrameStalls.Stall waiting = stalls.onFrame(8000 * MS, AgvnFrameStalls.Mode.TIMER, 30, 0);
+        waiting.cpu = Collections.singletonList(new AgvnGameThreads.Busy(500, "Game.exe", 0, 2));
+        assertTrue(waiting.vietnamese(), waiting.vietnamese().endsWith("→ game đang chờ, không tính gì"));
+        AgvnFrameStalls.Stall unmeasured = stalls.onFrame(10000 * MS, AgvnFrameStalls.Mode.TIMER, 30, 0);
+        assertFalse(unmeasured.english(), unmeasured.english().contains("CPU"));
     }
 
     @Test
