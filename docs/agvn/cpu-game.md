@@ -46,11 +46,17 @@ còn **ghim thread chính vào cụm nhân có xung tối đa cao nhất** (`Agv
   `cpuN/cpu_capacity` của từng nhân (`AgvnCpuCores`). Máy chỉ có một loại nhân thì app không ghim.
 - Nhân mà thread được chạy lấy từ `/proc/<tid>/status` (`Cpus_allowed_list`).
 - Chỉ ghim vào những nhân thread đó vốn được chạy, nên danh sách CPU của game vẫn có hiệu lực.
-- Wine đặt lại danh sách CPU, hoặc nhân bị tắt tạm làm thread bị dời đi: lần kiểm tra sau (2 giây) app ghim lại.
 - Tắt ô hoặc thoát game: thread chính trở về danh sách CPU cũ.
 - Logcat ghi `fastest cores: cpus 6-7` (một lần), `game main thread <tid> pinned to cpus 6-7 (was 0-7)` và
   `back on cpus …`. Không ghim được thì logcat ghi một lần lý do: `fastest cores unknown …`,
   `cannot read the cores of the game's main thread …` hoặc `cannot pin the game's main thread … errno N`.
+- Đang ghim thì app kiểm tra mỗi 100 ms. Thread bị dời đi thì app ghim lại, và log ghi nó bị dời sang đâu cùng trạng
+  thái của các nhân nhanh. Nếu chưa lần nào giữ được mà hệ thống trả thread về ngay sau 3 lần ghim, app thôi ghim
+  (`the system put the game's main thread … back …`).
+
+Đo ngày 01/10 lúc 17:27 trên POCO F8 Pro (HyperOS): hệ thống trả thread về cpu0–7 ngay sau mỗi lần ghim, mười lần một
+giây. Cpu6–7 khi đó chỉ được chạy tối đa 3072 trên 4320 MHz. Trên máy này app không chọn được nhân cho thread. Muốn máy
+chạy nhanh hơn thì phải dùng chế độ hiệu năng của chính hệ thống (Game Turbo).
 
 Android chỉ nhận gợi ý cho thread chạy dưới user của app. Tiến trình game là tiến trình con của app nên chạy cùng
 user. Máy không hỗ trợ thì logcat ghi `performance hints: this phone does not support them`. Máy từ chối 3 lần liên

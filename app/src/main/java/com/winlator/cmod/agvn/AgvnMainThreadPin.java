@@ -13,14 +13,19 @@ import java.io.File;
  * cpu6-7, even in an Android performance hint session. Only that one thread is pinned, only to the cores it was already
  * allowed (the game's CPU list still holds), and its own cores come back when the switch is turned off or the game
  * ends. Phones with one kind of core are left alone. Each reason it cannot pin is logged once.
+ *
+ * <p>On the POCO F8 Pro (HyperOS, 01/10 17:27) the system put the thread back on cpus 0-7 at once after every pin, ten
+ * times a second, so a pin that never holds is given up after three tries.
  */
 final class AgvnMainThreadPin {
     private static final String TAG = "AGVN";
     private static final File PROC = new File("/proc"), SYS_CPU = new File("/sys/devices/system/cpu");
 
     private final int fastest = AgvnCpuCores.fastest(SYS_CPU);
+    private static final int GIVE_UP_AFTER = 3;
+
     private int tid, original, pinned, resets; // the worker thread's own
-    private boolean refused, toldCores, toldUnreadable;
+    private boolean refused, held, toldCores, toldUnreadable;
 
     /** While a thread is pinned: pins it again at once if something moved it. Called every 100 ms. */
     void recheck() {
@@ -44,7 +49,18 @@ final class AgvnMainThreadPin {
             tid = 0;
             return;
         }
-        if (current == pinned && tid == mainTid) return;
+        if (current == pinned && tid == mainTid) {
+            held = true;
+            return;
+        }
+        if (tid == mainTid && !held && resets + 1 >= GIVE_UP_AFTER) { // moved back at once every time
+            refused = true;
+            tid = 0;
+            Log.w(TAG, "the system put the game's main thread " + mainTid + " back on cpus " + AgvnCpuCores.list(current)
+                    + " right after each of " + GIVE_UP_AFTER + " pins: it does not let apps choose cores here; no longer"
+                    + " pinning. " + AgvnCpuCores.state(SYS_CPU, fastest));
+            return;
+        }
         // the first pin, or Wine applied the game's CPU list again, or the kernel moved it off a parked core
         int target = current & fastest;
         if (target == 0 || target == current || tid == 0 && !busy) {
@@ -62,6 +78,8 @@ final class AgvnMainThreadPin {
             return;
         }
         if (tid != mainTid) {
+            held = false;
+            resets = 0;
             Log.i(TAG, "game main thread " + mainTid + " pinned to cpus " + AgvnCpuCores.list(target) + " (was "
                     + AgvnCpuCores.list(current) + "); cpuset " + AgvnCpuCores.cpuset(PROC, new File("/dev/cpuset"), mainTid)
                     + "; " + AgvnCpuCores.state(SYS_CPU, fastest));
