@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -48,13 +47,9 @@ public class AgvnUpdateInfoTest {
     }
 
     @Test
-    public void betaPicksTheNewerChannel() {
-        AgvnUpdateInfo stable = AgvnUpdateInfo.parse(manifest(APK, SHA));
-        AgvnUpdateInfo beta = AgvnUpdateInfo.parse(manifest(APK.replace("v0.1.3", "beta"), SHA).replace("versionCode=7", "versionCode=9"));
-        assertSame(beta, AgvnUpdateInfo.newest(stable, beta));
-        assertSame(stable, AgvnUpdateInfo.newest(stable, null));
-        assertSame(beta, AgvnUpdateInfo.newest(null, beta));
-        assertNull(AgvnUpdateInfo.newest(null, null));
+    public void oneChannelTheNewestRelease() {
+        assertEquals("https://github.com/son242537-gif/agvn-player/releases/latest/download/agvn-update.txt",
+                AgvnUpdateInfo.LATEST_URL);
     }
 
     @Test
