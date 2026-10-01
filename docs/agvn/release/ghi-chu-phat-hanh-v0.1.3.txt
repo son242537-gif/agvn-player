@@ -1,0 +1,16 @@
+AGVN Player v0.1.3 - agvn.io.vn
+
+Mới:
+- Cập nhật ngay trong app: Cài đặt > Cập nhật ứng dụng > Kiểm tra cập nhật. Không cần máy tính hay cáp. Game, save và cài đặt giữ nguyên.
+- Video MP4 trong game (Unity, Unreal) phát được, không còn màn đen chờ mãi và không còn tốn RAM vì video lỗi.
+- Khi đặt giới hạn FPS, khung hình lên đều theo nhịp màn hình. Mục "Giới hạn FPS" trong game hiện FPS chạy thật, ví dụ "25 → 20 FPS" trên màn 60 Hz.
+- Game Nhật cần font MS Gothic, MS Mincho (như WOLF RPG) được dùng font Nhật có sẵn trong app thay thế, tránh lỗi font.
+- Mỗi lần chơi đều có nhật ký. Game lỗi thì bấm ⋮ ở game đó > "Gửi nhật ký".
+- Cảnh báo khi RAM sắp hết, kèm nút "Thoát game an toàn". Cảnh báo một lần khi máy nóng làm CPU chậm lại, kèm nút "Hạ FPS 20".
+- Nhập và xuất file lưu ngay trong menu ⋮ của game.
+- Nút "?" cạnh mỗi mục cài đặt giải thích mục đó dùng làm gì.
+- Chạm hai ngón để bấm chuột phải.
+- Sửa 9 mục cài đặt trước đây không có tác dụng: âm thanh, cách khởi động, tay cầm, MIDI riêng từng game, kéo giãn hình, CPU cho game 32-bit, độ phân giải tùy chỉnh, HUD và tiếng Việt.
+- Thanh "Đồ họa": mức thấp giới hạn FPS cho mọi loại game và giảm RAM theo từng engine. Mức "Trung bình" bắt đầu ở 30 FPS.
+- Máy Adreno dùng driver Turnip chạy nhanh hơn: bỏ giả lập định dạng texture mà Turnip đã đọc được sẵn.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.
