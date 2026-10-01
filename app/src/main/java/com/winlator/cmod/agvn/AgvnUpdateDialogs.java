@@ -26,12 +26,11 @@ import java.net.UnknownHostException;
 public final class AgvnUpdateDialogs {
     private static final String TAG = "AGVN";
     static final String PREF_AUTO = "agvn_update_auto";
-    static final String PREF_BETA = "agvn_update_beta";
     static final String PREF_LAST_CHECK = "agvn_update_last_check";
 
     private AgvnUpdateDialogs() {}
 
-    /** The Settings dialog: installed version, the two switches and "Kiểm tra cập nhật". */
+    /** The Settings dialog: installed version, the daily check switch and "Kiểm tra cập nhật". */
     public static void show(Activity activity) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
         int pad = dp(activity, 20);
@@ -43,7 +42,6 @@ public final class AgvnUpdateDialogs {
         current.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         box.addView(current);
         box.addView(checkBox(activity, R.string.agvn_update_auto, prefs, PREF_AUTO, true));
-        box.addView(checkBox(activity, R.string.agvn_update_beta, prefs, PREF_BETA, false));
         new AlertDialog.Builder(activity)
                 .setTitle(R.string.agvn_update_title)
                 .setView(box)
@@ -63,14 +61,13 @@ public final class AgvnUpdateDialogs {
 
     private static void check(Activity activity, boolean manual) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
-        boolean beta = prefs.getBoolean(PREF_BETA, false);
         AlertDialog working = manual ? new AlertDialog.Builder(activity)
                 .setMessage(R.string.agvn_update_checking).setCancelable(false).show() : null;
         new Thread(() -> {
             AgvnUpdateInfo info = null;
             Exception error = null;
             try {
-                info = AgvnUpdater.fetch(beta);
+                info = AgvnUpdater.fetch();
                 prefs.edit().putLong(PREF_LAST_CHECK, System.currentTimeMillis()).apply();
             } catch (Exception e) {
                 Log.w(TAG, "update check failed", e);

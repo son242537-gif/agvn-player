@@ -71,12 +71,16 @@ export AGVN_VERSION_CODE=2
 ```
 
 ### Publish an Update (maintainer's PC only)
-Phones update themselves from GitHub Releases (Cài đặt → Cập nhật ứng dụng). The script builds with the release key,
-so it runs only on the maintainer's PC, after `gh auth login`:
+Phones update themselves from GitHub Releases (Cài đặt → Cập nhật ứng dụng). There is one channel: every phone gets the
+newest release, and there are no test builds. The script builds with the release key, so it runs only on the
+maintainer's PC, after `gh auth login`:
 ```powershell
-.\tools\agvn\dang-ban-cap-nhat.ps1 -Notes "..."                        # test build: release "beta"
-.\tools\agvn\dang-ban-cap-nhat.ps1 -Stable -Version 0.1.3 -NotesFile ...  # release v0.1.3, for every phone
+.\tools\agvn\dang-ban-cap-nhat.ps1    # release v<AGVN_VERSION_NAME> from gradle.properties
 ```
+- Before each release, a cloud session raises `AGVN_VERSION_CODE` and `AGVN_VERSION_NAME` in `gradle.properties`.
+  Android only installs a higher code over the installed one.
+- It also writes the player-facing notes to `docs/agvn/release/ghi-chu-phat-hanh-v<version>.txt`.
+
 See [`docs/agvn/cap-nhat-ung-dung.md`](./docs/agvn/cap-nhat-ung-dung.md).
 
 ### Build & Run Unit Tests

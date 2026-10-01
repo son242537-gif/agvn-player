@@ -18,10 +18,8 @@ import java.util.Locale;
 public final class AgvnUpdateInfo {
     public static final String REPO = "son242537-gif/agvn-player";
     static final String RELEASES = "https://github.com/" + REPO + "/releases/";
-    /** Newest normal release (GitHub leaves pre-releases out of "latest"). */
-    public static final String STABLE_URL = RELEASES + "latest/download/agvn-update.txt";
-    /** Test builds: one pre-release tagged "beta" whose files are replaced by each test build. */
-    public static final String BETA_URL = RELEASES + "download/beta/agvn-update.txt";
+    /** The newest release. One channel: every phone gets the same version. */
+    public static final String LATEST_URL = RELEASES + "latest/download/agvn-update.txt";
     /** Only APKs attached to this repository's releases are downloaded. */
     static final String APK_PREFIX = RELEASES + "download/";
     static final long DAY_MS = 24L * 60 * 60 * 1000;
@@ -76,13 +74,6 @@ public final class AgvnUpdateInfo {
 
     public boolean isNewerThan(long installedVersionCode) {
         return versionCode > installedVersionCode;
-    }
-
-    /** The newer of two updates; either may be null. */
-    static AgvnUpdateInfo newest(AgvnUpdateInfo a, AgvnUpdateInfo b) {
-        if (a == null) return b;
-        if (b == null) return a;
-        return b.versionCode > a.versionCode ? b : a;
     }
 
     /** True when the daily check is due: a day has passed, or the clock went back. */
