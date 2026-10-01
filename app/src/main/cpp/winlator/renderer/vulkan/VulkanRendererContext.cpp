@@ -405,8 +405,7 @@ void VulkanRendererContext::createSwapchain() {
     uint32_t fmtN=0; vk_.GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice,surface,&fmtN,nullptr);
     std::vector<VkSurfaceFormatKHR> fmts(fmtN); vk_.GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice,surface,&fmtN,fmts.data());
     swapchainFmt = VK_FORMAT_R8G8B8A8_UNORM;
-    // AGVN: no extra image. Paced frames queue at most one ahead, and each extra image was up to a vsync of latency.
-    uint32_t imgCount=std::max(caps.minImageCount,3u);
+    uint32_t imgCount=caps.minImageCount+1;
     if (caps.maxImageCount>0&&imgCount>caps.maxImageCount) imgCount=caps.maxImageCount;
 
     uint32_t pmCount=0;
@@ -1262,7 +1261,9 @@ void VulkanRendererContext::renderFrame() {
     }
 
     uint32_t imgIdx;
+    auto acquireStart = std::chrono::steady_clock::now();
     VkResult res=vk_.AcquireNextImageKHR(device,swapchain,UINT64_MAX,imgAvailSems[currentFrame],VK_NULL_HANDLE,&imgIdx);
+    logIfSlow("vkAcquireNextImageKHR", acquireStart); // AGVN: frame stall logs
     if (res==VK_ERROR_OUT_OF_DATE_KHR||res==VK_ERROR_SURFACE_LOST_KHR){fbResized.store(true);return;}
     if (res!=VK_SUCCESS&&res!=VK_SUBOPTIMAL_KHR) return;
     if (imgIdx >= swapchainFBs.size() || imgIdx >= swapchainImages.size()) {
@@ -1416,7 +1417,9 @@ void VulkanRendererContext::renderFrame() {
         pi.pNext = &presentTimes;
     }
 
+    auto presentStart = std::chrono::steady_clock::now();
     res = vk_.QueuePresentKHR(graphicsQueue, &pi);
+    logIfSlow("vkQueuePresentKHR", presentStart);
 
     if (res==VK_ERROR_OUT_OF_DATE_KHR||res==VK_ERROR_SURFACE_LOST_KHR||res==VK_SUBOPTIMAL_KHR) fbResized.store(true);
     currentFrame=(currentFrame+1)%MAX_FRAMES_IN_FLIGHT;
@@ -1822,6 +1825,11 @@ void VulkanRendererContext::setPresentMode(VkPresentModeKHR mode) {
     if (requestedPresentMode==target) { RLOG("setPresentMode: already set, skipping"); return; }
     requestedPresentMode=target;
     fbResized.store(true); dirtyCV.notify_one();
+}
+
+void VulkanRendererContext::logIfSlow(const char* what, std::chrono::steady_clock::time_point start) const {
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count();
+    if (ms >= 200) RLOG_E("AGVN: %s took %lld ms (frame pacing %s)", what, (long long)ms, paced.load() ? "on" : "off");
 }
 
 bool VulkanRendererContext::frameWanted() const {

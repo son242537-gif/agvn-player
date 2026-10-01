@@ -111,6 +111,7 @@ struct VkTable {
 #include <algorithm>
 #include <utility>
 #include <thread>
+#include <chrono>
 #include <atomic>
 #include <mutex>
 #include <shared_mutex>
@@ -381,6 +382,7 @@ public:
     bool presentTimesUsed = false;
     uint32_t presentId = 0;
     bool frameWanted() const;
+    void logIfSlow(const char* what, std::chrono::steady_clock::time_point start) const;
     std::thread       renderThread;
     std::atomic<bool> isRunning{false};
     std::atomic<bool> fbResized{false};

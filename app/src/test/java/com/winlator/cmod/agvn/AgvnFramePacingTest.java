@@ -125,7 +125,7 @@ public class AgvnFramePacingTest {
         assertTrue(t.show);
         runAll(t.releases);
         assertEquals("one per window", Arrays.asList("a", "x"), released);
-        assertFalse(slots.holdsNothing());
+        assertEquals(1, slots.heldCount());
         runAll(slots.drain());
         assertEquals(Arrays.asList("a", "x", "b"), released);
         assertTrue(slots.holdsNothing());

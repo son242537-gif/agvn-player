@@ -91,4 +91,11 @@ final class AgvnFrameSlots {
     synchronized boolean holdsNothing() {
         return held.isEmpty();
     }
+
+    /** Buffers held now, all windows together. */
+    synchronized int heldCount() {
+        int n = 0;
+        for (ArrayDeque<Runnable> buffers : held.values()) n += buffers.size();
+        return n;
+    }
 }

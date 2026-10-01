@@ -17,6 +17,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -35,6 +36,7 @@ import java.io.File;
 public class FpsLimiterControl extends LinearLayout {
     public static final String EXTRA_ENABLED = "nativeFpsLimiterEnabled";
     public static final String EXTRA_LIMIT = "nativeFpsLimit";
+    public static final String EXTRA_PACING = "agvnVsyncPacing"; // AGVN: "1" = the limit follows the screen's vsync
     private static final int SLIDER_MAX_FPS = 120;
     private static final int STEP_FPS = 5;
     private static final int CUSTOM_POSITION = SLIDER_MAX_FPS / STEP_FPS;
@@ -42,6 +44,8 @@ public class FpsLimiterControl extends LinearLayout {
     private final SeekBar slider;
     private final TextView valueLabel;
     private final NumericEditText customValue;
+    private final CheckBox pacing; // AGVN
+    private final TextView pacingHint; // AGVN
 
     private boolean initializing = true;
     private boolean stateLoaded;
@@ -119,6 +123,25 @@ public class FpsLimiterControl extends LinearLayout {
         LayoutParams customParams = new LayoutParams(LayoutParams.MATCH_PARENT, dp(44));
         customParams.topMargin = dp(8);
         sliderGroup.addView(customValue, customParams);
+
+        // AGVN: the limit on the screen's vsync (AgvnVsyncLimiter), per game; off = upstream's timer
+        pacing = new CheckBox(context);
+        pacing.setText(R.string.agvn_vsync_pacing);
+        pacing.setTextColor(onSurface);
+        pacing.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        pacing.setButtonTintList(ColorStateList.valueOf(primary));
+        LayoutParams pacingParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        pacingParams.topMargin = dp(4);
+        sliderGroup.addView(pacing, pacingParams);
+        pacingHint = new TextView(context);
+        pacingHint.setText(R.string.agvn_vsync_pacing_hint);
+        pacingHint.setTextColor(onSurfaceVariant);
+        pacingHint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        sliderGroup.addView(pacingHint, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        pacing.setOnCheckedChangeListener((button, checked) -> {
+            updateLimitUi();
+            if (!initializing) saveAndApply();
+        });
 
         customValue.setOnTouchListener((v, event) -> {
             disallowParentIntercept(v);
@@ -206,23 +229,28 @@ public class FpsLimiterControl extends LinearLayout {
         String savedLimit;
         String oldPreset;
         String oldEnabled;
+        String savedPacing;
 
         Shortcut shortcutStore = openShortcutStore(container);
         if (shortcutStore != null) {
             savedLimit = shortcutStore.getExtra(EXTRA_LIMIT, "");
             oldPreset = shortcutStore.getExtra("graphicsFpsPreset", "");
             oldEnabled = shortcutStore.getExtra(EXTRA_ENABLED, "");
+            savedPacing = shortcutStore.getExtra(EXTRA_PACING, "");
 
             if (savedLimit.isEmpty() && oldPreset.isEmpty() && oldEnabled.isEmpty()) {
                 savedLimit = container.getExtra(EXTRA_LIMIT, "");
                 oldPreset = container.getExtra("graphicsFpsPreset", "");
                 oldEnabled = container.getExtra(EXTRA_ENABLED, "");
+                savedPacing = container.getExtra(EXTRA_PACING, "");
             }
         } else {
             savedLimit = container.getExtra(EXTRA_LIMIT, "");
             oldPreset = container.getExtra("graphicsFpsPreset", "");
             oldEnabled = container.getExtra(EXTRA_ENABLED, "");
+            savedPacing = container.getExtra(EXTRA_PACING, "");
         }
+        pacing.setChecked("1".equals(savedPacing));
 
         int limit = parsePositiveOrZero(savedLimit);
         if (savedLimit.isEmpty()) {
@@ -257,26 +285,29 @@ public class FpsLimiterControl extends LinearLayout {
             if (shortcutStore != null) {
                 shortcutStore.putExtra(EXTRA_ENABLED, null);
                 shortcutStore.putExtra(EXTRA_LIMIT, String.valueOf(chosen));
+                shortcutStore.putExtra(EXTRA_PACING, pacing.isChecked() ? "1" : null);
                 shortcutStore.saveData();
             } else {
                 container.putExtra(EXTRA_ENABLED, null);
                 container.putExtra(EXTRA_LIMIT, String.valueOf(chosen));
+                container.putExtra(EXTRA_PACING, pacing.isChecked() ? "1" : null);
                 container.saveData();
             }
         }
 
         XServerRendererView renderer = activity.getXServerView();
-        if (renderer != null) renderer.setFpsLimit(chosen);
+        if (renderer != null) applyEffectiveLimit(renderer);
     }
 
     private void applyCurrentLimit() {
         XServerDisplayActivity activity = findActivity();
         if (activity != null && activity.getXServerView() != null) {
-            activity.getXServerView().setFpsLimit(getChosenLimit());
+            applyEffectiveLimit(activity.getXServerView());
         }
     }
 
     private void applyEffectiveLimit(XServerRendererView renderer) {
+        renderer.setVsyncPacing(pacing.isChecked()); // AGVN
         renderer.setFpsLimit(getChosenLimit());
     }
 
@@ -296,8 +327,11 @@ public class FpsLimiterControl extends LinearLayout {
 
         if (position <= 0) valueLabel.setText("Tắt");
         else if (customMode) valueLabel.setText("Tùy chỉnh");
+        else if (!pacing.isChecked()) valueLabel.setText((position * STEP_FPS) + " FPS");
         else valueLabel.setText(com.winlator.cmod.agvn.AgvnFramePacing.label(position * STEP_FPS,
                 com.winlator.cmod.agvn.AgvnFramePacing.refreshHz(this))); // AGVN: "25 → 20 FPS" on 60 Hz
+        pacing.setVisibility(position > 0 ? VISIBLE : GONE); // AGVN: only under a limit
+        pacingHint.setVisibility(position > 0 ? VISIBLE : GONE);
     }
 
     private void resolveShortcutFile(XServerDisplayActivity activity) {
