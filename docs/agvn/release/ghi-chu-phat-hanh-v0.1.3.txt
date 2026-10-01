@@ -11,6 +11,7 @@ Mới:
 - Nút "?" cạnh mỗi mục cài đặt giải thích mục đó dùng làm gì.
 - Chạm hai ngón để bấm chuột phải.
 - Chạm thật nhanh vẫn thành cú bấm: app giữ nút đủ lâu cho game kịp nhận. Trước đây game Unity có thể bỏ qua cú chạm quá nhanh.
+- Thư mục chứa nhiều game, mỗi game một file .exe (như bộ sưu tập 3 phần), giờ hiện từng game riêng trong "Thêm game". Trước đây chỉ thêm được game đầu tiên. Trong "Chọn thư mục khác" cũng thấy file .exe: chạm vào file nào thì thêm đúng file đó.
 - Sửa 9 mục cài đặt trước đây không có tác dụng: âm thanh, cách khởi động, tay cầm, MIDI riêng từng game, kéo giãn hình, CPU cho game 32-bit, độ phân giải tùy chỉnh, HUD và tiếng Việt.
 - Thanh "Đồ họa": mức thấp giới hạn FPS cho mọi loại game và giảm RAM theo từng engine. Mức "Trung bình" bắt đầu ở 30 FPS.
 - Máy Adreno dùng driver Turnip chạy nhanh hơn: bỏ giả lập định dạng texture mà Turnip đã đọc được sẵn.
