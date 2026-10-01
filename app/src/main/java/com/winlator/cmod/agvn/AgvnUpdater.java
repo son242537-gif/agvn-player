@@ -40,10 +40,9 @@ public final class AgvnUpdater {
 
     private AgvnUpdater() {}
 
-    /** The newest update on the chosen channel, or null when none is published yet. */
-    public static AgvnUpdateInfo fetch(boolean beta) throws IOException {
-        AgvnUpdateInfo stable = AgvnUpdateInfo.parse(getText(AgvnUpdateInfo.STABLE_URL));
-        return beta ? AgvnUpdateInfo.newest(stable, AgvnUpdateInfo.parse(getText(AgvnUpdateInfo.BETA_URL))) : stable;
+    /** The newest release, or null when none is published yet. */
+    public static AgvnUpdateInfo fetch() throws IOException {
+        return AgvnUpdateInfo.parse(getText(AgvnUpdateInfo.LATEST_URL));
     }
 
     public static long installedCode(Context context) {
