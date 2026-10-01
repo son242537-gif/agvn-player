@@ -181,6 +181,7 @@ public class PresentExtension implements Extension, XResourceManager.OnResourceL
 
         final Pixmap pixmap = client.xServer.pixmapManager.getPixmap(pixmapId);
         if (pixmap == null) throw new BadPixmap(pixmapId);
+        com.winlator.cmod.agvn.AgvnInputHold.onGameFrame(); // AGVN: clicks are held until the game has drawn
 
         int targetFps = client.xServer.getXServerView() != null
                 ? client.xServer.getXServerView().getFpsLimit() : 0;

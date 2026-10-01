@@ -533,14 +533,16 @@ public class TouchpadView extends View {
     }
 
     private void pressPointerButtonLeft(Finger finger) {
-        if (pointerButtonLeftEnabled && !xServer.pointer.isButtonPressed(Pointer.Button.BUTTON_LEFT)) {
+        if (pointerButtonLeftEnabled && (!xServer.pointer.isButtonPressed(Pointer.Button.BUTTON_LEFT)
+                || xServer.isReleaseWaiting(Pointer.Button.BUTTON_LEFT))) { // AGVN: a quick second tap still clicks
             xServer.injectPointerButtonPress(Pointer.Button.BUTTON_LEFT);
             fingerPointerButtonLeft = finger;
         }
     }
 
     private void pressPointerButtonRight(Finger finger) {
-        if (pointerButtonRightEnabled && !xServer.pointer.isButtonPressed(Pointer.Button.BUTTON_RIGHT)) {
+        if (pointerButtonRightEnabled && (!xServer.pointer.isButtonPressed(Pointer.Button.BUTTON_RIGHT)
+                || xServer.isReleaseWaiting(Pointer.Button.BUTTON_RIGHT))) { // AGVN
             xServer.injectPointerButtonPress(Pointer.Button.BUTTON_RIGHT);
             fingerPointerButtonRight = finger;
         }
