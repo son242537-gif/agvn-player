@@ -24,6 +24,7 @@ import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.SdStorage
 import androidx.compose.material.icons.outlined.Smartphone
+import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -51,9 +52,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
-/** Folder picker for "Chọn thư mục khác": storage list, then folders only; "Quét thư mục này" scans the open folder. */
+/**
+ * Folder picker for "Chọn thư mục khác": storage list, then folders and the .exe files of the open folder. "Quét thư mục
+ * này" scans the open folder; tapping an .exe adds that very exe (any game, even one the scan does not pick).
+ */
 @Composable
-fun AgvnFolderBrowser(onBack: () -> Unit, onScan: (File) -> Unit) {
+fun AgvnFolderBrowser(onBack: () -> Unit, onScan: (File) -> Unit, onPickFile: (File) -> Unit) {
     var path by rememberSaveable { mutableStateOf<String?>(null) }
     val current = path?.let { File(it) }
     val context = LocalContext.current
@@ -66,11 +70,14 @@ fun AgvnFolderBrowser(onBack: () -> Unit, onScan: (File) -> Unit) {
     }
     BackHandler { if (current == null) onBack() else goUp() }
 
-    val children by produceState<List<File>?>(null, path) {
+    // (file, is an .exe): folders first, then the .exe files
+    val children by produceState<List<Pair<File, Boolean>>?>(null, path) {
         value = null
-        value = if (current == null) volumes else withContext(Dispatchers.IO) {
-            (current.listFiles { f -> f.isDirectory && !f.name.startsWith(".") } ?: emptyArray())
-                .sortedBy { AgvnGameTitle.searchKey(it.name) }
+        value = if (current == null) volumes.map { it to false } else withContext(Dispatchers.IO) {
+            val files = current.listFiles { f -> !f.name.startsWith(".") } ?: emptyArray()
+            val dirs = files.filter { it.isDirectory }.sortedBy { AgvnGameTitle.searchKey(it.name) }
+            val exes = files.filter { it.name.endsWith(".exe", ignoreCase = true) && it.isFile }.sortedBy { AgvnGameTitle.searchKey(it.name) }
+            dirs.map { it to false } + exes.map { it to true }
         }
     }
     val shownPath = current?.let { dir ->
@@ -110,13 +117,16 @@ fun AgvnFolderBrowser(onBack: () -> Unit, onScan: (File) -> Unit) {
                     )
                 } else if (list != null) {
                     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 4.dp)) {
-                        items(list, key = { it.absolutePath }) { dir ->
+                        items(list, key = { it.first.absolutePath }) { (file, exe) ->
                             val icon = when {
+                                exe -> Icons.Outlined.SportsEsports
                                 current != null -> Icons.Outlined.Folder
-                                dir == internal -> Icons.Outlined.Smartphone
+                                file == internal -> Icons.Outlined.Smartphone
                                 else -> Icons.Outlined.SdStorage
                             }
-                            FolderRow(icon, if (current == null) volumeLabel(dir) else dir.name) { path = dir.absolutePath }
+                            FolderRow(icon, if (current == null) volumeLabel(file) else file.name) {
+                                if (exe) onPickFile(file) else path = file.absolutePath
+                            }
                         }
                     }
                 }

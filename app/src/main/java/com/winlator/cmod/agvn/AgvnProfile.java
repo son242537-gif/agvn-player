@@ -82,6 +82,13 @@ public final class AgvnProfile {
         return p;
     }
 
+    /** "Collection - game2" for game2.exe: the name of one game of a folder that holds several, or of an exe picked by hand. */
+    public static String variantName(String name, String exe) {
+        String file = exe.substring(exe.lastIndexOf('/') + 1);
+        String base = file.toLowerCase(java.util.Locale.ROOT).endsWith(".exe") ? file.substring(0, file.length() - 4) : file;
+        return name + " - " + base.replaceAll("[\\\\/:*?\"<>|]", " ").trim();
+    }
+
     public boolean isSimulatedTouchscreen() {
         return simulatedTouchscreen == null || simulatedTouchscreen;
     }
