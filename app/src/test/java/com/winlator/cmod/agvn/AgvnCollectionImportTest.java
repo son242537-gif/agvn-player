@@ -92,21 +92,19 @@ public class AgvnCollectionImportTest {
     }
 
     @Test
-    public void theLibraryKnowsEachGameOfACollectionByItsExe() throws Exception {
-        File dir = collection();
+    public void theLibraryKnowsEachGameOfACollectionByItsExe() {
+        // Android paths, as shortcuts have them on the phone (the publish script runs these tests on Windows too)
+        String folder = "/storage/emulated/0/Download/My Collection";
+        File dir = new File(folder);
         AgvnLibraryIndex library = new AgvnLibraryIndex(Collections.emptyList());
         AgvnLibraryIndex.Existing imported = new AgvnLibraryIndex.Existing(null, "My Collection");
         AgvnLibraryIndex.Existing byHand = new AgvnLibraryIndex.Existing(null, "game2");
-        library.add(dir.getAbsolutePath(), quoted(new File(dir, "game1.exe")), imported);
-        library.add("", quoted(new File(dir, "game2.exe")), byHand);
+        library.add(folder, "\"" + folder + "/game1.exe\"", imported);
+        library.add("", "\"" + folder + "/game2.exe\"", byHand);
         assertSame(imported, library.find(dir, "game1.exe"));
         assertSame("a shortcut made by hand is not taken over by another game", byHand, library.find(dir, "game2.exe"));
         assertNull("not added yet, though its folder has shortcuts", library.find(dir, "game3.exe"));
         assertSame("one game per folder: any shortcut of the folder", imported, library.find(dir, null));
         assertNull(new AgvnLibraryIndex(Collections.emptyList()).find(dir, "game1.exe"));
-    }
-
-    private static String quoted(File exe) {
-        return "\"" + exe.getAbsolutePath() + "\"";
     }
 }
