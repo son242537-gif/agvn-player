@@ -12,10 +12,12 @@
     vì Android chỉ cài đè bản có mã lớn hơn.
   - Ghi chú lấy từ docs\agvn\release\ghi-chu-phat-hanh-v<phiên bản>.txt, hoặc từ -Notes / -NotesFile.
 
+  Windows mặc định không cho chạy file .ps1, nên gọi qua "powershell -ExecutionPolicy Bypass -File" (chỉ cho lần chạy đó).
+
 .EXAMPLE
-  .\tools\agvn\dang-ban-cap-nhat.ps1
+  powershell -ExecutionPolicy Bypass -File .\tools\agvn\dang-ban-cap-nhat.ps1
 .EXAMPLE
-  .\tools\agvn\dang-ban-cap-nhat.ps1 -DryRun
+  powershell -ExecutionPolicy Bypass -File .\tools\agvn\dang-ban-cap-nhat.ps1 -DryRun
 #>
 param(
     [string]$Notes = "",
