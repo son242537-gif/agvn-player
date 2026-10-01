@@ -17,14 +17,10 @@ cần bấm "Cập nhật", rồi bấm "Cập nhật" thêm một lần trên h
 - **Không cài được không cần hỏi:** app giữ mức Android 9 (targetSdk 28) như Winlator, nên Android luôn bắt bấm
   xác nhận.
 
-## Hai kênh
+## Một kênh
 
-| Kênh | Nơi để trên GitHub | Ai nhận |
-|---|---|---|
-| Chính thức | release `v0.1.3`, `v0.1.4`… (bản "Latest") | mọi máy |
-| Thử nghiệm | một pre-release tên `beta`, mỗi bản dựng thử thay file cũ | máy bật "Nhận bản thử nghiệm" |
-
-Máy bật "Nhận bản thử nghiệm" nhận bản mới nhất của cả hai kênh.
+Mỗi bản là một release `v0.1.3`, `v0.1.4`… trên GitHub. App chỉ đọc release mới nhất ("Latest"), nên mọi máy nhận cùng
+một bản. Không có bản thử nghiệm.
 
 ## Đăng bản mới (trên PC của anh Sơn)
 
@@ -35,14 +31,15 @@ Máy bật "Nhận bản thử nghiệm" nhận bản mới nhất của cả ha
 3. Có khoá ký ở `C:\AGVN\Keys\keystore.properties`. Có thể đặt đường dẫn khác bằng `-Keystore` hoặc biến
    `AGVN_KEYSTORE_PROPS`.
 
-**Mỗi lần ra bản:** trong `C:\AGVN\ap`, sau khi đã `git fetch` và checkout đúng nhánh (commit phải có trên GitHub):
+**Mỗi lần ra bản:**
+
+1. Trước đó, phiên làm việc trên cloud chuẩn bị hai thứ trên nhánh:
+   - tăng `AGVN_VERSION_CODE` và `AGVN_VERSION_NAME` trong `gradle.properties`;
+   - viết ghi chú cho người chơi vào `docs/agvn/release/ghi-chu-phat-hanh-v<phiên bản>.txt`.
+2. Trong `C:\AGVN\ap`, sau khi đã `git fetch` và checkout đúng nhánh (commit phải có trên GitHub), chạy:
 
 ```powershell
-# Bản thử nghiệm: vào release "beta"
-.\tools\agvn\dang-ban-cap-nhat.ps1 -Notes "Sửa nút ? và chuột phải"
-
-# Bản chính thức: tạo release v0.1.3 cho mọi máy
-.\tools\agvn\dang-ban-cap-nhat.ps1 -Stable -Version 0.1.3 -NotesFile docs\agvn\release\ghi-chu-phat-hanh-v0.1.3.txt
+.\tools\agvn\dang-ban-cap-nhat.ps1
 
 # Chỉ dựng và tạo file, không đăng
 .\tools\agvn\dang-ban-cap-nhat.ps1 -DryRun
@@ -50,16 +47,16 @@ Máy bật "Nhận bản thử nghiệm" nhận bản mới nhất của cả ha
 
 Script làm những việc sau:
 
-1. Lấy **mã phiên bản** lớn hơn mọi bản đã đăng, ở cả hai kênh, và lớn hơn `gradle.properties`. Android chỉ cài
-   đè bản có mã lớn hơn.
-   - Bản thử có tên dạng `0.1.2-beta.7`.
-   - Bản chính thức: sau khi đăng, ghi mã và tên mới vào `gradle.properties` rồi commit (script sẽ nhắc).
+1. Đọc phiên bản trong `gradle.properties`. Mã phải lớn hơn bản đang đăng, vì Android chỉ cài đè bản có mã lớn hơn.
+   Nếu chưa tăng, script dừng và báo.
 2. Chạy bài kiểm tra và dựng APK ký bằng khoá phát hành (`-PagvnRequireReleaseSigning=true`).
-3. Tạo `build\agvn-update\AGVN-Player-<tên>.apk` và `agvn-update.txt` (mã, tên, đường tải, dung lượng, SHA-256,
-   ghi chú).
-4. Đăng lên GitHub.
-   - Với `beta`, APK được tải lên trước, rồi mới tới `agvn-update.txt`, sau cùng xoá APK thử cũ.
-   - Nhờ thứ tự đó, điện thoại không bao giờ thấy thông tin trỏ tới một APK chưa có.
+3. Tạo `build\agvn-update\AGVN-Player-<phiên bản>.apk` và `agvn-update.txt` (mã, tên, đường tải, dung lượng,
+   SHA-256, ghi chú).
+4. Đăng release `v<phiên bản>`. Release được tạo ở dạng nháp, tải đủ hai file lên rồi mới công bố. Nhờ vậy điện
+   thoại không bao giờ thấy thông tin trỏ tới một APK chưa có.
+
+Muốn cài bằng cáp thì dùng đúng APK trong `build\agvn-update`. Bản dựng tay bằng `gradlew` cũng dùng mã trong
+`gradle.properties`, nên cài đè được.
 
 ## An toàn
 
@@ -90,6 +87,5 @@ App không gửi gì về máy điện thoại, chỉ tải hai file công khai.
 
 - **"không cùng chữ ký":** máy đang cài một bản dựng ký khoá khác, ví dụ bản debug. Cài bản ký khoá phát hành bằng
   adb một lần, từ đó cập nhật trong app được.
-- **"Chưa có bản cập nhật nào được đăng":** chưa có release chính thức nào có `agvn-update.txt`. Bản thử chỉ hiện khi
-  bật "Nhận bản thử nghiệm".
+- **"Chưa có bản cập nhật nào được đăng":** chưa có release nào có `agvn-update.txt`.
 - **HyperOS/MIUI** có thể hiện thêm màn hình quét an toàn của Xiaomi trước khi cài. Chỉ cần bấm tiếp.
