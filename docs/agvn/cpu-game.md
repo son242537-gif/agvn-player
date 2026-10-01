@@ -42,11 +42,15 @@ có thể hạ xung.
 trình game), nhưng thread chính vẫn chạy trên cpu4–5. Vì vậy khi ô này bật và thread chính dùng từ 30% một nhân, app
 còn **ghim thread chính vào cụm nhân có xung tối đa cao nhất** (`AgvnMainThreadPin`, bằng `sched_setaffinity`):
 
-- Cụm nhân lấy từ `cpufreq/policy*/cpuinfo_max_freq`. Máy chỉ có một loại nhân thì app không ghim.
+- Cụm nhân lấy từ `cpufreq/policy*/cpuinfo_max_freq`. Máy không cho đọc thư mục đó thì app đọc `cpuN/cpufreq`, rồi
+  `cpuN/cpu_capacity` của từng nhân (`AgvnCpuCores`). Máy chỉ có một loại nhân thì app không ghim.
+- Nhân mà thread được chạy lấy từ `/proc/<tid>/status` (`Cpus_allowed_list`).
 - Chỉ ghim vào những nhân thread đó vốn được chạy, nên danh sách CPU của game vẫn có hiệu lực.
 - Wine đặt lại danh sách CPU, hoặc nhân bị tắt tạm làm thread bị dời đi: lần kiểm tra sau (2 giây) app ghim lại.
 - Tắt ô hoặc thoát game: thread chính trở về danh sách CPU cũ.
-- Logcat ghi `game main thread <tid> pinned to cpus 6-7 (was 0-7)` và `back on cpus …`.
+- Logcat ghi `fastest cores: cpus 6-7` (một lần), `game main thread <tid> pinned to cpus 6-7 (was 0-7)` và
+  `back on cpus …`. Không ghim được thì logcat ghi một lần lý do: `fastest cores unknown …`,
+  `cannot read the cores of the game's main thread …` hoặc `cannot pin the game's main thread … errno N`.
 
 Android chỉ nhận gợi ý cho thread chạy dưới user của app. Tiến trình game là tiến trình con của app nên chạy cùng
 user. Máy không hỗ trợ thì logcat ghi `performance hints: this phone does not support them`. Máy từ chối 3 lần liên
