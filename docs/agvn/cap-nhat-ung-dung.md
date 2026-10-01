@@ -39,11 +39,14 @@ một bản. Không có bản thử nghiệm.
 2. Trong `C:\AGVN\ap`, sau khi đã `git fetch` và checkout đúng nhánh (commit phải có trên GitHub), chạy:
 
 ```powershell
-.\tools\agvn\dang-ban-cap-nhat.ps1
+powershell -ExecutionPolicy Bypass -File .\tools\agvn\dang-ban-cap-nhat.ps1
 
 # Chỉ dựng và tạo file, không đăng
-.\tools\agvn\dang-ban-cap-nhat.ps1 -DryRun
+powershell -ExecutionPolicy Bypass -File .\tools\agvn\dang-ban-cap-nhat.ps1 -DryRun
 ```
+
+Windows mặc định không cho chạy file `.ps1` ("running scripts is disabled on this system"). `-ExecutionPolicy Bypass`
+chỉ cho phép trong lần chạy đó, không đổi cài đặt của máy.
 
 Script làm những việc sau:
 
