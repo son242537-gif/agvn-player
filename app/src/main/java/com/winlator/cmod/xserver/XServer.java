@@ -37,6 +37,7 @@ public class XServer {
     public final CursorManager cursorManager;
     public final Keyboard keyboard = Keyboard.createKeyboard(this);
     public final Pointer pointer = new Pointer(this);
+    private final com.winlator.cmod.agvn.AgvnInputHold inputHold = new com.winlator.cmod.agvn.AgvnInputHold(); // AGVN: taps the game sees
     public final InputDeviceManager inputDeviceManager;
     public final GrabManager grabManager;
     public final CursorLocker cursorLocker;
@@ -205,15 +206,33 @@ public class XServer {
     }
 
     public void injectPointerButtonPress(Pointer.Button buttonCode) {
+        if (heldForGame(buttonCode)) inputHold.pressing(-buttonCode.code()); // AGVN
         try (XLock lock = lock(Lockable.WINDOW_MANAGER, Lockable.INPUT_DEVICE)) {
             pointer.setButton(buttonCode, true);
         }
     }
 
     public void injectPointerButtonRelease(Pointer.Button buttonCode) {
+        // AGVN: a click shorter than two game frames can be lost, so its release may come a little later
+        if (heldForGame(buttonCode) && inputHold.deferRelease(-buttonCode.code(), () -> releasePointerButton(buttonCode))) return;
+        releasePointerButton(buttonCode);
+    }
+
+    private void releasePointerButton(Pointer.Button buttonCode) {
         try (XLock lock = lock(Lockable.WINDOW_MANAGER, Lockable.INPUT_DEVICE)) {
             pointer.setButton(buttonCode, false);
         }
+    }
+
+    /** AGVN: true while the button's release waits for the game to have seen the click; a new press may come. */
+    public boolean isReleaseWaiting(Pointer.Button buttonCode) {
+        return heldForGame(buttonCode) && inputHold.isWaiting(-buttonCode.code());
+    }
+
+    /** AGVN: the buttons a game reads as held; wheel steps are single events. */
+    private static boolean heldForGame(Pointer.Button buttonCode) {
+        return buttonCode == Pointer.Button.BUTTON_LEFT || buttonCode == Pointer.Button.BUTTON_MIDDLE
+                || buttonCode == Pointer.Button.BUTTON_RIGHT;
     }
 
     public void injectKeyPress(XKeycode xKeycode) {
@@ -221,12 +240,18 @@ public class XServer {
     }
 
     public void injectKeyPress(XKeycode xKeycode, int keysym) {
+        inputHold.pressing(xKeycode.id & 0xff); // AGVN
         try (XLock lock = lock(Lockable.WINDOW_MANAGER, Lockable.INPUT_DEVICE)) {
             keyboard.setKeyPress(xKeycode.id, keysym);
         }
     }
 
     public void injectKeyRelease(XKeycode xKeycode) {
+        if (inputHold.deferRelease(xKeycode.id & 0xff, () -> releaseKey(xKeycode))) return; // AGVN: as for clicks
+        releaseKey(xKeycode);
+    }
+
+    private void releaseKey(XKeycode xKeycode) {
         try (XLock lock = lock(Lockable.WINDOW_MANAGER, Lockable.INPUT_DEVICE)) {
             keyboard.setKeyRelease(xKeycode.id);
         }

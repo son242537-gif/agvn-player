@@ -23,11 +23,11 @@ public class AgvnHeatRulesTest {
     public void aCappedCpuWarnsAfterTwoSamplesOncePerGame() {
         AgvnHeatRules rules = new AgvnHeatRules();
         long t = 1_000_000;
-        assertEquals(NONE, rules.feed(t, 0.71f, NAN, 40f));
-        assertEquals(AgvnHeatRules.Reason.CPU_CAPPED, rules.feed(t + 5_000, 0.71f, NAN, 40f));
-        assertEquals(NONE, rules.feed(t + 10_000, 0.71f, NAN, 40f));
-        assertEquals(NONE, rules.feed(t + 15_000, 0.71f, NAN, 40f));
-        assertEquals("never again in this game", NONE, rules.feed(t + 3_600_000, 0.71f, 0.95f, 40f));
+        assertEquals(NONE, rules.feed(t, 0.71f, NAN, 43f));
+        assertEquals(AgvnHeatRules.Reason.CPU_CAPPED, rules.feed(t + 5_000, 0.71f, NAN, 43f));
+        assertEquals(NONE, rules.feed(t + 10_000, 0.71f, NAN, 43f));
+        assertEquals(NONE, rules.feed(t + 15_000, 0.71f, NAN, 43f));
+        assertEquals("never again in this game", NONE, rules.feed(t + 3_600_000, 0.71f, 0.95f, 43f));
         assertTrue("one warning per game, from either guard", AgvnHeatWatch.firstHeatWarning(rules));
         assertFalse(AgvnHeatWatch.firstHeatWarning(rules));
     }
@@ -35,19 +35,23 @@ public class AgvnHeatRulesTest {
     @Test
     public void fullSpeedOrOneSlowSampleIsFine() {
         AgvnHeatRules rules = new AgvnHeatRules();
-        assertEquals(NONE, rules.feed(0, 0.70f, NAN, 40f));
-        assertEquals("back to full speed resets the count", NONE, rules.feed(5_000, 1f, NAN, 40f));
-        assertEquals(NONE, rules.feed(10_000, 0.70f, NAN, 40f));
-        assertEquals(NONE, rules.feed(15_000, 0.90f, 0.5f, 40f));
+        assertEquals(NONE, rules.feed(0, 0.70f, NAN, 43f));
+        assertEquals("back to full speed resets the count", NONE, rules.feed(5_000, 1f, NAN, 43f));
+        assertEquals(NONE, rules.feed(10_000, 0.70f, NAN, 43f));
+        assertEquals(NONE, rules.feed(15_000, 0.90f, 0.5f, 43f));
     }
 
     @Test
     public void aCapOnACoolPhoneIsPowerSavingNotHeat() {
         AgvnHeatRules rules = new AgvnHeatRules();
         for (long t = 0; t < 60_000; t += 5_000) assertEquals(NONE, rules.feed(t, 0.70f, 0.3f, 33f));
+        // 01/10: HyperOS keeps the fastest cores at 81% on a cool phone; a game warms the battery to 38-41 °C
+        AgvnHeatRules played = new AgvnHeatRules();
+        for (long t = 0; t < 60_000; t += 5_000) assertEquals(NONE, played.feed(t, 0.81f, 0.65f, 41f));
         AgvnHeatRules unknown = new AgvnHeatRules();
-        unknown.feed(0, 0.70f, NAN, NAN);
-        assertEquals("no temperature at all: the cap alone counts", AgvnHeatRules.Reason.CPU_CAPPED, unknown.feed(5_000, 0.70f, NAN, NAN));
+        for (long t = 0; t < 60_000; t += 5_000) {
+            assertEquals("no temperature at all: no cap warning", NONE, unknown.feed(t, 0.70f, NAN, NAN));
+        }
     }
 
     @Test
