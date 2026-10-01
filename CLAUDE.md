@@ -81,6 +81,9 @@ powershell -ExecutionPolicy Bypass -File .\tools\agvn\dang-ban-cap-nhat.ps1
 - Before each release, a cloud session raises `AGVN_VERSION_CODE` and `AGVN_VERSION_NAME` in `gradle.properties`.
   Android only installs a higher code over the installed one.
 - It also writes the player-facing notes to `docs/agvn/release/ghi-chu-phat-hanh-v<version>.txt`.
+- The public download link is fixed (maintainer's decision, 2026-10-01):
+  `https://github.com/son242537-gif/agvn-player/releases/latest/download/AGVN-Player.apk`.
+  Every release attaches the APK as `AGVN-Player.apk` (the script does this); never rename that asset.
 
 See [`docs/agvn/cap-nhat-ung-dung.md`](./docs/agvn/cap-nhat-ung-dung.md).
 
