@@ -75,7 +75,8 @@ Phones update themselves from GitHub Releases (Cài đặt → Cập nhật ứn
 newest release, and there are no test builds. The script builds with the release key, so it runs only on the
 maintainer's PC, after `gh auth login`:
 ```powershell
-.\tools\agvn\dang-ban-cap-nhat.ps1    # release v<AGVN_VERSION_NAME> from gradle.properties
+# release v<AGVN_VERSION_NAME> from gradle.properties; Bypass because Windows blocks .ps1 files by default
+powershell -ExecutionPolicy Bypass -File .\tools\agvn\dang-ban-cap-nhat.ps1
 ```
 - Before each release, a cloud session raises `AGVN_VERSION_CODE` and `AGVN_VERSION_NAME` in `gradle.properties`.
   Android only installs a higher code over the installed one.
