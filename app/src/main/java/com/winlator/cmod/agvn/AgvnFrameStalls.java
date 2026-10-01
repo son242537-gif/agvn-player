@@ -72,6 +72,7 @@ final class AgvnFrameStalls {
             AgvnGameThreads.Busy b = cpu.get(0);
             s.append(b.main ? "main thread \"" : "thread \"").append(b.name).append("\" (").append(b.tid).append(") ")
                     .append(b.percent).append("% of a core on cpu ").append(b.core)
+                    .append(b.allowed != 0 ? " (allowed " + AgvnCpuCores.list(b.allowed) + ")" : "")
                     .append(", all threads ").append(AgvnGameThreads.total(cpu)).append('%');
             if (b.percent >= BUSY_PERCENT) s.append(" -> busy (loading or computing)");
             else if (b.percent < WAITING_PERCENT) s.append(" -> waiting, not computing");
@@ -95,7 +96,8 @@ final class AgvnFrameStalls {
             if (cpu.isEmpty()) return s.append("không thread nào chạy → game đang chờ, không tính gì").toString();
             AgvnGameThreads.Busy b = cpu.get(0);
             s.append(b.main ? "thread chính \"" : "thread \"").append(b.name).append("\" (").append(b.tid).append(") dùng ")
-                    .append(b.percent).append("% một nhân (nhân ").append(b.core).append("), cả game ")
+                    .append(b.percent).append("% một nhân (nhân ").append(b.core)
+                    .append(b.allowed != 0 ? ", được chạy trên " + AgvnCpuCores.list(b.allowed) : "").append("), cả game ")
                     .append(AgvnGameThreads.total(cpu)).append('%');
             if (b.percent >= BUSY_PERCENT) s.append(" → game đang bận (tải hoặc tính)");
             else if (b.percent < WAITING_PERCENT) s.append(" → game đang chờ, không tính gì");

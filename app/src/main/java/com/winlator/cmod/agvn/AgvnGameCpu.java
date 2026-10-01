@@ -80,7 +80,14 @@ final class AgvnGameCpu {
             baseline = null;
         }
         AgvnGameThreads.Snapshot to = from != null ? AgvnGameThreads.read(PROC, from.pid, nowNs) : null;
-        return to != null ? AgvnGameThreads.busiest(from, to, ticksPerSecond) : null;
+        if (to == null) return null;
+        List<AgvnGameThreads.Busy> busy = AgvnGameThreads.busiest(from, to, ticksPerSecond);
+        if (!busy.isEmpty()) { // the cores the busiest thread may use now: shows whether a pin held
+            AgvnGameThreads.Busy b = busy.get(0);
+            busy.set(0, new AgvnGameThreads.Busy(b.tid, b.name, b.core, b.percent, b.main,
+                    AgvnCpuCores.allowed(PROC, b.tid)));
+        }
+        return busy;
     }
 
     private void start() { // under this
@@ -150,6 +157,7 @@ final class AgvnGameCpu {
             lastPick = snap;
             if (on && ctx != null) boost.aim(ctx, busyTids, busyLabel, target);
         }
+        if (on) pin.recheck(); // pinned again at once when something else moved it
         if (on && pid > 0) reportWork(pid, framesNow, target);
         else if (!on) {
             boost.close();

@@ -53,13 +53,20 @@ final class AgvnGameThreads {
         final int core;
         final int percent;
         final boolean main;
+        /** The cores it may run on, as a bit mask; 0 when not read. */
+        final int allowed;
 
         Busy(int tid, String name, int core, int percent, boolean main) {
+            this(tid, name, core, percent, main, 0);
+        }
+
+        Busy(int tid, String name, int core, int percent, boolean main, int allowed) {
             this.tid = tid;
             this.name = name;
             this.core = core;
             this.percent = percent;
             this.main = main;
+            this.allowed = allowed;
         }
     }
 

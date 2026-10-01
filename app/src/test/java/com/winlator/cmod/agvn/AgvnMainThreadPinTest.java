@@ -69,6 +69,23 @@ public class AgvnMainThreadPinTest {
     }
 
     @Test
+    public void whatTheLogsSayAboutCoresAndCpusets() throws IOException {
+        File cpu = tmp.newFolder("sys");
+        write(new File(cpu, "cpu6/online"), "1\n");
+        write(new File(cpu, "cpu6/cpufreq/scaling_cur_freq"), "2803200\n");
+        write(new File(cpu, "cpu6/cpufreq/cpuinfo_max_freq"), "4320000\n");
+        write(new File(cpu, "cpu6/cpufreq/scaling_max_freq"), "3532800\n");
+        write(new File(cpu, "cpu7/online"), "0\n");
+        assertEquals("cpu6 on, 2803 of 4320 MHz (allowed 3532); cpu7 off, ? of ? MHz (allowed ?)",
+                AgvnCpuCores.state(cpu, 0xC0));
+        File proc = tmp.newFolder("proc2"), cpuset = tmp.newFolder("cpuset");
+        write(new File(proc, "6861/cpuset"), "/top-app\n");
+        write(new File(cpuset, "top-app/cpus"), "0-7\n");
+        assertEquals("/top-app (cpus 0-7)", AgvnCpuCores.cpuset(proc, cpuset, 6861));
+        assertEquals("?", AgvnCpuCores.cpuset(proc, cpuset, 1));
+    }
+
+    @Test
     public void cpuListsBothWays() {
         assertEquals(0xC0, AgvnCpuCores.mask("6 7"));
         assertEquals(0x4F, AgvnCpuCores.mask("0-3,6\n"));

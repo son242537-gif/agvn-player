@@ -72,6 +72,36 @@ final class AgvnCpuCores {
         return 0;
     }
 
+    /** "cpu6 on, 2803 of 4320 MHz (allowed 3532)", per core of {@code mask}, for the logs; "?" for what cannot be read. */
+    static String state(File cpuDir, int mask) {
+        StringBuilder s = new StringBuilder();
+        for (int cpu = 0; cpu < MAX_CPUS; cpu++) {
+            if ((mask & 1 << cpu) == 0) continue;
+            File dir = new File(cpuDir, "cpu" + cpu);
+            long online = number(new File(dir, "online"));
+            if (s.length() > 0) s.append("; ");
+            s.append("cpu").append(cpu).append(online == 0 ? " off" : " on").append(", ")
+                    .append(mhz(new File(dir, "cpufreq/scaling_cur_freq"))).append(" of ")
+                    .append(mhz(new File(dir, "cpufreq/cpuinfo_max_freq"))).append(" MHz (allowed ")
+                    .append(mhz(new File(dir, "cpufreq/scaling_max_freq"))).append(')');
+        }
+        return s.toString();
+    }
+
+    /** "/top-app (cpus 0-7)": the cpuset a thread is in and its cores, for the logs; "?" for what cannot be read. */
+    static String cpuset(File proc, File cpusetRoot, int tid) {
+        String path = text(new File(proc, tid + "/cpuset"));
+        if (path == null) return "?";
+        path = path.trim();
+        int cpus = mask(text(new File(cpusetRoot, path + "/cpus")));
+        return path + " (cpus " + (cpus != 0 ? list(cpus) : "?") + ")";
+    }
+
+    private static String mhz(File khzFile) {
+        long khz = number(khzFile);
+        return khz > 0 ? String.valueOf(khz / 1000) : "?";
+    }
+
     /** "6 7", "6-7" or "0-3,6" as a bit mask; 0 for anything else. */
     static int mask(String list) {
         if (list == null) return 0;

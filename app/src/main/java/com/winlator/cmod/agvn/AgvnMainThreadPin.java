@@ -16,11 +16,16 @@ import java.io.File;
  */
 final class AgvnMainThreadPin {
     private static final String TAG = "AGVN";
-    private static final File PROC = new File("/proc");
+    private static final File PROC = new File("/proc"), SYS_CPU = new File("/sys/devices/system/cpu");
 
-    private final int fastest = AgvnCpuCores.fastest(new File("/sys/devices/system/cpu"));
-    private int tid, original, pinned; // the worker thread's own
+    private final int fastest = AgvnCpuCores.fastest(SYS_CPU);
+    private int tid, original, pinned, resets; // the worker thread's own
     private boolean refused, toldCores, toldUnreadable;
+
+    /** While a thread is pinned: pins it again at once if something moved it. Called every 100 ms. */
+    void recheck() {
+        if (tid > 0) update(true, tid, true);
+    }
 
     /** Pins {@code mainTid} while {@code on} and it is {@code busy}; puts it back otherwise. Called every 2 s. */
     void update(boolean on, int mainTid, boolean busy) {
@@ -43,7 +48,11 @@ final class AgvnMainThreadPin {
         // the first pin, or Wine applied the game's CPU list again, or the kernel moved it off a parked core
         int target = current & fastest;
         if (target == 0 || target == current || tid == 0 && !busy) {
-            if (tid != 0 && target == 0) tid = 0; // its CPU list no longer has fast cores: leave it alone
+            if (tid != 0 && target == 0) { // moved where no fast core is allowed: leave it alone
+                Log.w(TAG, "game main thread " + mainTid + " was moved to cpus " + AgvnCpuCores.list(current)
+                        + ", none of them fast; no longer pinned");
+                tid = 0;
+            }
             return;
         }
         int error = set(mainTid, target);
@@ -52,8 +61,14 @@ final class AgvnMainThreadPin {
             Log.w(TAG, "cannot pin the game's main thread " + mainTid + ": errno " + error);
             return;
         }
-        if (tid != mainTid) Log.i(TAG, "game main thread " + mainTid + " pinned to cpus " + AgvnCpuCores.list(target)
-                + " (was " + AgvnCpuCores.list(current) + ")");
+        if (tid != mainTid) {
+            Log.i(TAG, "game main thread " + mainTid + " pinned to cpus " + AgvnCpuCores.list(target) + " (was "
+                    + AgvnCpuCores.list(current) + "); cpuset " + AgvnCpuCores.cpuset(PROC, new File("/dev/cpuset"), mainTid)
+                    + "; " + AgvnCpuCores.state(SYS_CPU, fastest));
+        } else if (++resets <= 3 || resets % 100 == 0) { // something keeps moving it: say how often and to where
+            Log.w(TAG, "game main thread " + mainTid + " was moved to cpus " + AgvnCpuCores.list(current) + " (time "
+                    + resets + "), pinned again; " + AgvnCpuCores.state(SYS_CPU, fastest));
+        }
         tid = mainTid;
         original = current;
         pinned = target;
