@@ -29,6 +29,10 @@ import com.winlator.cmod.xserver.events.PresentConfigureNotify;
 import com.winlator.cmod.xserver.events.PresentIdleNotify;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 public class PresentExtension implements Extension, XResourceManager.OnResourceLifecycleListener, WindowManager.OnWindowModificationListener {
     public static final byte MAJOR_OPCODE = -103;
@@ -38,6 +42,9 @@ public class PresentExtension implements Extension, XResourceManager.OnResourceL
     private final SparseArray<Event> events = new SparseArray<>();
     private SyncExtension syncExtension;
     private XServer xServer;
+    private final Object limiterLock = new Object();
+    private HashMap<Integer, Long> limiterDeadlines;
+    private ScheduledThreadPoolExecutor limiterExecutor;
     private final com.winlator.cmod.agvn.AgvnVsyncLimiter vsyncLimiter = new com.winlator.cmod.agvn.AgvnVsyncLimiter(); // AGVN: FPS limit on the vsync grid
 
     private static abstract class ClientOpcodes {
@@ -114,6 +121,36 @@ public class PresentExtension implements Extension, XResourceManager.OnResourceL
         }
     }
 
+    private void scheduleIdleNotify(Window window, Pixmap pixmap, int serial,
+                                    int idleFence, int targetFps) {
+        final long frameDurationNs = 1_000_000_000L / targetFps;
+        final long now = System.nanoTime();
+        final long deadline;
+        final ScheduledThreadPoolExecutor executor;
+
+        synchronized (limiterLock) {
+            if (limiterDeadlines == null) limiterDeadlines = new HashMap<>();
+            Long previous = limiterDeadlines.get(window.id);
+            deadline = previous == null || previous < now
+                    ? now + frameDurationNs : previous + frameDurationNs;
+            limiterDeadlines.put(window.id, deadline);
+
+            if (limiterExecutor == null) {
+                ThreadFactory factory = runnable -> {
+                    Thread thread = new Thread(runnable, "PresentFpsLimiter");
+                    thread.setDaemon(true);
+                    return thread;
+                };
+                limiterExecutor = new ScheduledThreadPoolExecutor(1, factory);
+                limiterExecutor.setRemoveOnCancelPolicy(true);
+            }
+            executor = limiterExecutor;
+        }
+
+        executor.schedule(() -> sendIdleNotify(window, pixmap, serial, idleFence),
+                Math.max(0L, deadline - now), TimeUnit.NANOSECONDS);
+    }
+
     private static void queryVersion(XClient client, XInputStream inputStream, XOutputStream outputStream) throws IOException, XRequestError {
         inputStream.skip(8);
 
@@ -148,6 +185,9 @@ public class PresentExtension implements Extension, XResourceManager.OnResourceL
         int targetFps = client.xServer.getXServerView() != null
                 ? client.xServer.getXServerView().getFpsLimit() : 0;
         if (targetFps > 1000) targetFps = 1000;
+        // AGVN: the vsync limit when it is switched on for this game under the FPS limit, otherwise upstream's timer
+        boolean paced = targetFps > 0 && com.winlator.cmod.agvn.AgvnFramePacing.enabled(client.xServer.getXServerView());
+        vsyncLimiter.notePresent(targetFps, paced); // AGVN: logs pauses of a second or more between frames
 
         if (targetFps <= 0) {
             long ust = System.nanoTime() / 1000;
@@ -164,8 +204,12 @@ public class PresentExtension implements Extension, XResourceManager.OnResourceL
 
         pixmap.drawable.updateDirect();
         sendCompleteNotify(window, serial, Kind.PIXMAP, Mode.COPY, ust, msc);
-        vsyncLimiter.onFrame(window.id, () -> sendIdleNotify(window, pixmap, serial, idleFence),
-                client.xServer.getXServerView());
+        if (paced) {
+            vsyncLimiter.onFrame(window.id, () -> sendIdleNotify(window, pixmap, serial, idleFence),
+                    client.xServer.getXServerView());
+        } else {
+            scheduleIdleNotify(window, pixmap, serial, idleFence, targetFps);
+        }
     }
 
     private void selectInput(XClient client, XInputStream inputStream, XOutputStream outputStream) throws IOException, XRequestError {
