@@ -119,11 +119,11 @@ private fun GameList(visible: List<AgvnImportEntry>, query: String, icons: HashM
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         if (fresh.isNotEmpty()) {
             item(key = "h-new") { SectionHeader(stringResource(R.string.agvn_add_section_new, fresh.size)) }
-            items(fresh, key = { it.dir.absolutePath }) { AgvnAddGameRow(it, icons) { onPick(it) } }
+            items(fresh, key = { it.key }) { AgvnAddGameRow(it, icons) { onPick(it) } }
         }
         if (added.isNotEmpty()) {
             item(key = "h-added") { SectionHeader(stringResource(R.string.agvn_add_section_added, added.size)) }
-            items(added, key = { it.dir.absolutePath }) { AgvnAddGameRow(it, icons) { onPick(it) } }
+            items(added, key = { it.key }) { AgvnAddGameRow(it, icons) { onPick(it) } }
         }
     }
 }

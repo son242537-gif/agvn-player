@@ -13,7 +13,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/** One game on the "Thêm game" screen: readable title, "Engine · chỗ để" line and whether it is already in the library. */
+/**
+ * One game on the "Thêm game" screen: readable title, "Engine · chỗ để" line and whether it is already in the library.
+ * A folder that holds several games (a collection) gives one row per game.
+ */
 public final class AgvnImportEntry {
     public final File dir;
     public final String title;
@@ -24,8 +27,13 @@ public final class AgvnImportEntry {
     public final File exe;
     /** Shortcut the game already has, or null. */
     public final AgvnLibraryIndex.Existing existing;
+    /** The exe this row starts when the folder holds several games or the player picked it; null for the folder's game. */
+    public final String variant;
+    /** Unique per row (list key): the folder, plus the exe for a variant. */
+    public final String key;
 
-    AgvnImportEntry(File dir, String title, String detail, boolean hasProfile, File exe, AgvnLibraryIndex.Existing existing) {
+    AgvnImportEntry(File dir, String title, String detail, boolean hasProfile, File exe, AgvnLibraryIndex.Existing existing,
+                    String variant) {
         this.dir = dir;
         this.title = title;
         this.sortKey = AgvnGameTitle.searchKey(title);
@@ -33,6 +41,8 @@ public final class AgvnImportEntry {
         this.hasProfile = hasProfile;
         this.exe = exe;
         this.existing = existing;
+        this.variant = variant;
+        this.key = variant == null ? dir.getAbsolutePath() : dir.getAbsolutePath() + "|" + variant;
     }
 
     /** Scans storage (slow: call off the main thread); "Chưa thêm" games first, each group A→Z ignoring accents. */
@@ -41,7 +51,7 @@ public final class AgvnImportEntry {
         AgvnLibraryIndex library = new AgvnLibraryIndex(new ContainerManager(ctx).loadShortcuts());
         AgvnProfileCatalog catalog = AgvnProfileCatalog.get(ctx);
         List<AgvnImportEntry> out = new ArrayList<>();
-        for (File dir : dirs) out.add(build(ctx, dir, library, catalog));
+        for (File dir : dirs) out.addAll(build(ctx, dir, library, catalog, null));
         Collections.sort(out, (a, b) -> {
             if ((a.existing == null) != (b.existing == null)) return a.existing == null ? -1 : 1;
             return a.sortKey.compareTo(b.sortKey);
@@ -49,7 +59,18 @@ public final class AgvnImportEntry {
         return out;
     }
 
-    private static AgvnImportEntry build(Context ctx, File dir, AgvnLibraryIndex library, AgvnProfileCatalog catalog) {
+    /**
+     * The row for an exe picked in "Chọn thư mục khác" (slow: off the main thread): the folder's game or one of its
+     * games when it is one of them, else a game of its own named after the exe.
+     */
+    public static AgvnImportEntry forExe(Context ctx, File exe) {
+        AgvnLibraryIndex library = new AgvnLibraryIndex(new ContainerManager(ctx).loadShortcuts());
+        return build(ctx, exe.getParentFile(), library, AgvnProfileCatalog.get(ctx), exe.getName()).get(0);
+    }
+
+    /** The folder's game, one row per game when it holds several, or only the row of {@code picked} (an exe name). */
+    private static List<AgvnImportEntry> build(Context ctx, File dir, AgvnLibraryIndex library, AgvnProfileCatalog catalog,
+                                               String picked) {
         File profileFile = new File(dir, AgvnProfile.FILE_NAME);
         boolean hasProfile = profileFile.isFile();
         GameExeResolver.Engine engine = GameExeResolver.detectEngine(dir);
@@ -74,7 +95,25 @@ public final class AgvnImportEntry {
         if (title == null) title = AgvnGameTitle.pretty(dir.getName());
         if (exe == null) exe = GameExeResolver.resolveExe(dir, engine);
         String detail = engineLabel(ctx, engine) + " · " + place(ctx, dir);
-        return new AgvnImportEntry(dir, title, detail, hasProfile, exe != null ? new File(dir, exe) : null, library.find(dir));
+        List<String> games = hasProfile ? Collections.<String>emptyList() : GameExeResolver.gameExes(dir, engine);
+        List<AgvnImportEntry> rows = new ArrayList<>();
+        if (picked != null) {
+            // the folder's game when it starts this exe (an Unreal folder always starts Shipping: its root exe is a bootstrap)
+            boolean folderGame = games.size() <= 1 && (picked.equalsIgnoreCase(exe) || engine == GameExeResolver.Engine.UNREAL);
+            rows.add(row(dir, title, detail, hasProfile, picked, folderGame ? null : picked, library));
+        } else if (games.size() > 1) {
+            for (String game : games) rows.add(row(dir, title, detail, false, game, game, library));
+        } else {
+            rows.add(row(dir, title, detail, hasProfile, exe, null, library));
+        }
+        return rows;
+    }
+
+    private static AgvnImportEntry row(File dir, String title, String detail, boolean hasProfile, String exe, String variant,
+                                       AgvnLibraryIndex library) {
+        String shown = variant != null ? AgvnProfile.variantName(title, variant) : title;
+        return new AgvnImportEntry(dir, shown, detail, hasProfile, exe != null ? new File(dir, exe) : null,
+                library.find(dir, variant), variant);
     }
 
     static String engineLabel(Context ctx, GameExeResolver.Engine engine) {

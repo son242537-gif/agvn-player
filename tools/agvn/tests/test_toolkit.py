@@ -81,6 +81,10 @@ class ProfileRulesTest(unittest.TestCase):
         for rel in ("unins000.exe", "GameLauncher.exe", "game.exe", "data.win"):
             touch(g, rel)
         self.assertEqual("game.exe", resolve_exe(g, detect_engine(g)))
+        helpers = os.path.join(self.tmp.name, "helpers")
+        for rel in ("AutoUpdate.exe", "CrashReporter.exe", "Game.exe", "oalinst.exe", "x.dll"):
+            touch(helpers, rel)
+        self.assertEqual("Game.exe", resolve_exe(helpers, detect_engine(helpers)))
 
     def test_rejections(self):
         touch(self.tmp.name, "evil.exe")
