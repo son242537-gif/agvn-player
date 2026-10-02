@@ -263,6 +263,7 @@
     <string name="agvn_logs_none">Chưa có nhật ký nào của game này. Hãy mở game một lần rồi thử lại.</string>
     <string name="agvn_logs_saved">Đã lưu nhật ký của game vào:\n%1$s\n\nGửi file này cho AGVN để được giúp sửa lỗi.</string>
     <string name="agvn_logs_share">Chia sẻ</string>
+    <string name="agvn_logs_send">Gửi nhật ký</string>
     <string name="agvn_logs_error">Không gom được nhật ký: %1$s</string>
     <!-- In-game memory warning (AgvnMemoryWatch) -->
     <string name="agvn_ram_title">Game đang dùng quá nhiều RAM, nên lưu game rồi thoát</string>

@@ -63,6 +63,11 @@ public final class AgvnRenpyGame {
         return "main";
     }
 
+    /** Where Ren'Py writes this game's log.txt and traceback.txt on "Chạy nhẹ": AGVN-Player/renpy/<game folder>. */
+    static File publicDir(File agvnPlayerDir, File gameDir) {
+        return new File(agvnPlayerDir, "renpy/" + (gameDir != null ? gameDir.getName() : "_"));
+    }
+
     /**
      * The engine's environment: librenpython.so and Ren'Py read the ANDROID_* ones, AGVN's main.py the AGVN_RENPY_* ones.
      * Ren'Py saves in the first of OLD_PUBLIC/game/saves, PRIVATE/saves and PUBLIC/saves that is a writable folder,

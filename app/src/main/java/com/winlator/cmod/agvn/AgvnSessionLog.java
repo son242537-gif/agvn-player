@@ -113,10 +113,31 @@ public final class AgvnSessionLog {
         AgvnEngineLogs.Copied engine = AgvnEngineLogs.copy(files(notes, "log="), dir, start);
         AgvnEngineLogs.Copied wine = AgvnEngineLogs.copy(files(notes, "wine="), dir, 0);
         for (File f : wine.copied) f.delete(); // a copy is in the session folder; the logs/ root does not grow
+        write(new File(dir, SUMMARY), summary(context, dir, notes, how, engine, wine), false);
+        running.delete();
+    }
+
+    /**
+     * A session still running, as it is now ("Gửi nhật ký" while the game plays): its engine and Wine logs so far and a
+     * summary go to {@code into}. The session itself goes on untouched.
+     */
+    static void snapshot(Context context, File dir, File into) {
+        String notes = read(new File(dir, RUNNING));
+        long start = value(notes, "start", 0);
+        AgvnEngineLogs.Copied engine = AgvnEngineLogs.copy(files(notes, "log="), into, start);
+        AgvnEngineLogs.Copied wine = AgvnEngineLogs.copy(files(notes, "wine="), into, 0);
+        String how = "chưa kết thúc, game vẫn đang chạy (nhật ký gom lúc "
+                + new SimpleDateFormat("HH:mm:ss", Locale.ROOT).format(new Date()) + ")";
+        write(new File(into, SUMMARY), summary(context, dir, notes, how, engine, wine), false);
+    }
+
+    private static String summary(Context context, File dir, String notes, String how, AgvnEngineLogs.Copied engine,
+                                  AgvnEngineLogs.Copied wine) {
+        long start = value(notes, "start", 0);
         int copied = engine.copied.size() + wine.copied.size();
         String old = AgvnEngineLogs.oldNote(engine.old);
         SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT);
-        String summary = "AGVN Player: nhật ký phiên chơi\n"
+        return "AGVN Player: nhật ký phiên chơi\n"
                 + "Game: " + text(notes, "game") + "\n"
                 + "Bắt đầu: " + (start > 0 ? fmt.format(new Date(start)) : "?") + "\n"
                 + "Kết thúc (ghi lúc): " + fmt.format(new Date()) + "\n"
@@ -127,8 +148,6 @@ public final class AgvnSessionLog {
                 + "RAM: " + (new File(dir, RAM).isFile() ? read(new File(dir, RAM)).trim() : "không đo") + "\n"
                 + "Nhiệt: " + (new File(dir, HEAT).isFile() ? read(new File(dir, HEAT)).trim() : "không đo") + "\n"
                 + "Sự kiện: " + (new File(dir, EVENTS).isFile() ? EVENTS : "không có") + "; môi trường đồ hoạ: " + ENV + "\n";
-        write(new File(dir, SUMMARY), summary, false);
-        running.delete();
     }
 
     /** Graphics and Wine variables, one per line, sorted. */

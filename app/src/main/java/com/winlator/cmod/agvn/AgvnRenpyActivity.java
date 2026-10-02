@@ -47,7 +47,7 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
     protected void onCreate(Bundle savedInstanceState) {
         String dir = getIntent().getStringExtra(EXTRA_GAME_DIR);
         gameDir = dir != null ? new File(dir) : null;
-        publicDir = new File(SettingsFragment.DEFAULT_WINLATOR_PATH, "renpy/" + (gameDir != null ? gameDir.getName() : "_"));
+        publicDir = AgvnRenpyGame.publicDir(new File(SettingsFragment.DEFAULT_WINLATOR_PATH), gameDir);
         quitFile = new File(getCacheDir(), "agvn-renpy-quit");
         super.onCreate(savedInstanceState);
         if (mBrokenLibraries) return; // SDL shows its own error, then finish() offers Windows
