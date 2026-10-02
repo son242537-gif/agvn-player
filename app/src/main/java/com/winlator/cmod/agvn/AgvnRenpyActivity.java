@@ -127,8 +127,7 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
     private void showMenu() {
         new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
                 .setTitle(R.string.agvn_html_back_title)
-                .setItems(new CharSequence[]{getString(R.string.agvn_html_menu), getString(R.string.agvn_html_exit),
-                        getString(R.string.agvn_html_use_windows)}, (d, which) -> {
+                .setItems(AgvnHtmlGame.backMenu(this), (d, which) -> {
                     if (which == 0) pressAfterDialog(KeyEvent.KEYCODE_ESCAPE); // Ren'Py's game menu key
                     else if (which == 1) askRenpyToQuit();
                     else switchToWindows();
@@ -172,13 +171,16 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
             return;
         }
         failed = true;
-        runOnUiThread(() -> new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
-                .setTitle(R.string.agvn_renpy_failed_title)
-                .setMessage(getString(R.string.agvn_renpy_failed_message, new File(publicDir, "traceback.txt").getPath()))
-                .setPositiveButton(R.string.agvn_html_use_windows, (d, w) -> switchToWindows())
-                .setNegativeButton(R.string.agvn_close, (d, w) -> end())
-                .setCancelable(false)
-                .show());
+        boolean windows = AgvnHtmlGame.hasWindowsExe(this);
+        runOnUiThread(() -> {
+            AlertDialog.Builder b = new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                    .setTitle(R.string.agvn_renpy_failed_title)
+                    .setMessage(getString(R.string.agvn_renpy_failed_message, new File(publicDir, "traceback.txt").getPath()))
+                    .setNegativeButton(R.string.agvn_close, (d, w) -> end())
+                    .setCancelable(false);
+            if (windows) b.setPositiveButton(R.string.agvn_html_use_windows, (d, w) -> switchToWindows());
+            b.show();
+        });
     }
 
     /** Ends this process: SDL and Python cannot start twice in one process, and the app's screens live elsewhere. */

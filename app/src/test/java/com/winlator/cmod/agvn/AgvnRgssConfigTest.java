@@ -2,6 +2,7 @@
 package com.winlator.cmod.agvn;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.google.gson.JsonArray;
@@ -46,11 +47,12 @@ public class AgvnRgssConfigTest {
 
         File sf2 = new File(root, "files/rgss/wt_210k_G.sf2");
         File wrap = new File(root, "files/rgss/win32_wrap.rb");
-        JsonObject json = JsonParser.parseString(config.json(sf2, Arrays.asList(wrap))).getAsJsonObject();
+        JsonObject json = JsonParser.parseString(config.json(sf2, Arrays.asList(wrap), true)).getAsJsonObject();
         assertEquals(game.getAbsolutePath(), json.get("gameFolder").getAsString());
         assertEquals("Game", json.get("execName").getAsString());
         assertEquals(3, json.get("rgssVersion").getAsInt());
         assertTrue(json.get("fullscreen").getAsBoolean());
+        assertTrue(json.get("frameSkip").getAsBoolean());
         assertEquals(sf2.getAbsolutePath(), json.get("midiSoundFont").getAsString());
         JsonArray rtps = json.getAsJsonArray("RTP");
         assertEquals(1, rtps.size());
@@ -66,7 +68,8 @@ public class AgvnRgssConfigTest {
         AgvnRgssConfig config = new AgvnRgssConfig(game, tmp.newFolder("agvn"), tmp.newFolder("drive_c"));
         assertEquals(1, config.rgss);
         assertEquals(Collections.singletonList("Standard"), config.missingRtp);
-        JsonObject json = JsonParser.parseString(config.json(null, Collections.emptyList())).getAsJsonObject();
+        JsonObject json = JsonParser.parseString(config.json(null, Collections.emptyList(), false)).getAsJsonObject();
+        assertFalse(json.get("frameSkip").getAsBoolean());
         assertEquals(0, json.getAsJsonArray("RTP").size());
         assertEquals("", json.get("midiSoundFont").getAsString());
     }

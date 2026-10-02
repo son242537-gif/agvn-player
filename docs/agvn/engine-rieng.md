@@ -137,6 +137,13 @@ Anh Sơn chốt ngày 02/10/2026:
   - **Nhận diện:** game có `Game.ini` (hoặc `<tên exe>.ini`) với `RGSS1/2/3*.dll`, file `.rgssad/.rgss2a/.rgss3a` hay
     `Data/*.rxdata/.rvdata/.rvdata2` được đặt "Chạy nhẹ" khi nhập. RPG Maker 2000/2003 và MV/MZ không đổi. Game đã nhập
     trước bản này vẫn chạy Windows; nhập lại (Cập nhật) để chuyển.
+  - **Bản cho điện thoại (không có `.exe`, kiểu gói JoiPlay):** quét tự động và "Chọn thư mục khác" đều nhận được game
+    RPG Maker XP/VX/VX Ace, MV/MZ, Tyrano và Ren'Py 8 không có `.exe`. Trong "Chọn thư mục khác", chạm vào
+    `index.html`, `Game.ini` hoặc file `.rgss*a` để thêm đúng game đó. Những game này chỉ chạy bằng Chạy nhẹ, nên menu
+    và hộp thoại lỗi không có mục "Chạy bằng Windows".
+  - **Quét sâu hơn:** gốc bộ nhớ quét 3 tầng (`RPG/Việt hoá/Game`), AGVN, Download, Games và thư mục tự chọn 4 tầng.
+  - **Máy yếu và trung bình:** bật bỏ khung hình (`frameSkip`): khi máy chậm hơn trọn một khung hình, mkxp-z bỏ vẽ khung
+    đó để game giữ đúng tốc độ thay vì chạy chậm lại; máy kịp thì không có tác dụng.
   - **Save:** nằm trong thư mục game như trên PC và khi "Chạy bằng Windows", nên đổi cách chạy vẫn còn save.
   - **RTP:** tìm theo thứ tự `AGVN-Player/RTP/<tên>` rồi RTP đã cài trong Wine của game. Không đóng RTP vào app.
   - **Phím ảo:** D-pad và các nút OK, Hủy, Chạy, Menu, đặt đúng chỗ như bố cục RPG khi chạy Windows. OK gửi Enter, vì

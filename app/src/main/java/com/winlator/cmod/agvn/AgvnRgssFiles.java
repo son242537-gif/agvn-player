@@ -67,7 +67,9 @@ final class AgvnRgssFiles {
             File soundFont = copyAsset(context, SOUND_FONT, new File(runDir, new File(SOUND_FONT).getName()), true);
             AgvnRgssConfig config = new AgvnRgssConfig(gameDir, new File(SettingsFragment.DEFAULT_WINLATOR_PATH), driveC);
             try (OutputStream out = new FileOutputStream(new File(runDir, "mkxp.json"))) {
-                out.write(config.json(soundFont, preload).getBytes(StandardCharsets.UTF_8));
+                // weak and mid phones skip drawing a frame when they fall behind, rather than slowing the game down
+                boolean frameSkip = DeviceTierManager.current(context) != DeviceTier.FLAGSHIP;
+                out.write(config.json(soundFont, preload, frameSkip).getBytes(StandardCharsets.UTF_8));
             }
             Log.i(TAG, "RGSS" + config.rgss + " game " + gameDir + ", RTP " + config.rtpDirs + ", missing " + config.missingRtp);
             return config;

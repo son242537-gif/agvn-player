@@ -40,7 +40,7 @@ object AgvnAddGameHost {
     }
 }
 
-/** Game list, or the folder picker while "Chọn thư mục khác" is open (it also adds a tapped .exe). Scans run off the main thread. */
+/** Game list, or the folder picker while "Chọn thư mục khác" is open (it also adds a tapped game file). Scans run off the main thread. */
 @Composable
 private fun AgvnAddGameFlow(activity: MainActivity, onClose: () -> Unit) {
     var entries by remember { mutableStateOf<List<AgvnImportEntry>?>(null) }
@@ -77,9 +77,9 @@ private fun AgvnAddGameFlow(activity: MainActivity, onClose: () -> Unit) {
                 browsing = false
                 scanRevision++
             },
-            onPickFile = { exe ->
+            onPickFile = { file ->
                 scope.launch {
-                    val entry = withContext(Dispatchers.IO) { runCatching { AgvnImportEntry.forExe(activity, exe) }.getOrNull() }
+                    val entry = withContext(Dispatchers.IO) { runCatching { AgvnImportEntry.forFile(activity, file) }.getOrNull() }
                     if (entry != null && !activity.isFinishing) {
                         AgvnImportDialog.preview(activity, entry.dir, entry.variant, DeviceTierManager.current(activity), entry.existing) { onClose() }
                     }

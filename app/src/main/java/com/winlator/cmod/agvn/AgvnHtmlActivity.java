@@ -68,9 +68,11 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         try {
             webView = new WebView(this);
         } catch (RuntimeException e) {
-            // Android System WebView disabled or updating: play the Windows version instead
-            Toast.makeText(this, R.string.agvn_html_no_webview, Toast.LENGTH_LONG).show();
-            switchToWindows();
+            // Android System WebView disabled or updating: play the Windows version instead, when there is one
+            boolean windows = AgvnHtmlGame.hasWindowsExe(this);
+            Toast.makeText(this, windows ? R.string.agvn_html_no_webview : R.string.agvn_html_no_webview_no_exe, Toast.LENGTH_LONG).show();
+            if (windows) switchToWindows();
+            else finish();
             return;
         }
         webView.setBackgroundColor(Color.BLACK);
@@ -146,8 +148,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     public void onBackPressed() {
         new AlertDialog.Builder(this)
                 .setTitle(R.string.agvn_html_back_title)
-                .setItems(new CharSequence[]{getString(R.string.agvn_html_menu), getString(R.string.agvn_html_exit),
-                        getString(R.string.agvn_html_use_windows)}, (d, which) -> {
+                .setItems(AgvnHtmlGame.backMenu(this), (d, which) -> {
                     if (which == 0 && webView != null) webView.evaluateJavascript(PRESS_ESC, null);
                     else if (which == 1) finish();
                     else if (which == 2) switchToWindows();

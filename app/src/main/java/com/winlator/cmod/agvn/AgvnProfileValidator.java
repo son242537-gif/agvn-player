@@ -71,8 +71,10 @@ public final class AgvnProfileValidator {
         String suggested = GameExeResolver.resolveExe(gameDir, engine);
         String exe = p.exe != null ? p.exe.trim().replace('\\', '/') : "";
         if (exe.isEmpty()) {
-            if (suggested == null) throw new AgvnProfileException("Không tìm thấy file .exe để chạy. Hãy ghi rõ \"exe\" trong profile.");
-            return suggested;
+            if (suggested != null) return suggested;
+            // a copy made for phones without the .exe: "Chạy nhẹ" runs it, the placeholder is never started
+            if (AgvnLightGame.canRun(gameDir, engine)) return AgvnLightGame.placeholderExe(gameDir, engine);
+            throw new AgvnProfileException("Không tìm thấy file .exe để chạy. Hãy ghi rõ \"exe\" trong profile.");
         }
         if (exe.startsWith("/") || exe.matches("^[A-Za-z]:.*") || exe.contains(".."))
             throw new AgvnProfileException("Đường dẫn exe phải nằm trong thư mục game: " + exe);

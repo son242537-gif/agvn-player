@@ -36,8 +36,10 @@ final class AgvnRgssConfig {
     /**
      * mkxp.json: full screen, picture scaled with its aspect ratio kept, the game's own frame rate, MIDI through the
      * app's sound font, and mkxp-z's Win32API stand-ins (win32_wrap.rb) for scripts written for Windows.
+     * {@code frameSkip}: when the phone falls a whole frame behind, mkxp-z skips drawing one, so the game keeps its
+     * speed instead of slowing down (no effect while the phone keeps up).
      */
-    String json(File soundFont, List<File> preloadScripts) {
+    String json(File soundFont, List<File> preloadScripts, boolean frameSkip) {
         StringBuilder sb = new StringBuilder("{\n");
         field(sb, "gameFolder", quote(gameDir.getAbsolutePath()));
         if (ini != null) field(sb, "execName", quote(ini.execName()));
@@ -46,6 +48,7 @@ final class AgvnRgssConfig {
         field(sb, "fixedAspectRatio", "true");
         field(sb, "smoothScaling", "1");
         field(sb, "vsync", "true");
+        field(sb, "frameSkip", String.valueOf(frameSkip));
         field(sb, "enableSettings", "false");
         field(sb, "midiSoundFont", soundFont != null ? quote(soundFont.getAbsolutePath()) : "\"\"");
         field(sb, "RTP", array(rtpDirs));

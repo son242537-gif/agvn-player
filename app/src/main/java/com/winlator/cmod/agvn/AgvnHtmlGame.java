@@ -102,6 +102,30 @@ public final class AgvnHtmlGame {
         return intent;
     }
 
+    /** Back menu of the HTML and Ren'Py runners: the game's menu, quit, then "Chạy bằng Windows" when the game has an exe. */
+    static CharSequence[] backMenu(Activity activity) {
+        CharSequence menu = activity.getString(com.winlator.cmod.R.string.agvn_html_menu);
+        CharSequence exit = activity.getString(com.winlator.cmod.R.string.agvn_html_exit);
+        return hasWindowsExe(activity) ? new CharSequence[]{menu, exit, activity.getString(com.winlator.cmod.R.string.agvn_html_use_windows)}
+                : new CharSequence[]{menu, exit};
+    }
+
+    /** False when the game's shortcut starts no real .exe (a copy made for phones): "Chạy bằng Windows" cannot run it. */
+    static boolean hasWindowsExe(Activity activity) {
+        String path = activity.getIntent().getStringExtra("shortcut_path");
+        return path == null || exeExists(new File(path));
+    }
+
+    /** True when the exe in the .desktop file's Exec line exists, or when the line cannot be read (nothing to hide then). */
+    static boolean exeExists(File desktopFile) {
+        for (String line : FileUtils.readLines(desktopFile)) {
+            if (!line.startsWith("Exec=")) continue;
+            int end = line.lastIndexOf('"'), start = end > 0 ? line.lastIndexOf('"', end - 1) : -1;
+            return start < 0 || new File(line.substring(start + 1, end)).isFile();
+        }
+        return true;
+    }
+
     /** The "container_id:N" line launcher shortcuts rely on, or 0. */
     static int containerIdIn(File desktopFile) {
         for (String line : FileUtils.readLines(desktopFile)) {

@@ -53,8 +53,9 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
- * Folder picker for "Chọn thư mục khác": storage list, then folders and the .exe files of the open folder. "Quét thư mục
- * này" scans the open folder; tapping an .exe adds that very exe (any game, even one the scan does not pick).
+ * Folder picker for "Chọn thư mục khác": storage list, then folders and the game files of the open folder. "Quét thư mục
+ * này" scans the open folder. Tapping an .exe adds that very exe (any game, even one the scan does not pick); tapping
+ * index.html, Game.ini or an RPG Maker archive adds the game of that folder, also a phone copy without an .exe.
  */
 @Composable
 fun AgvnFolderBrowser(onBack: () -> Unit, onScan: (File) -> Unit, onPickFile: (File) -> Unit) {
@@ -70,14 +71,15 @@ fun AgvnFolderBrowser(onBack: () -> Unit, onScan: (File) -> Unit, onPickFile: (F
     }
     BackHandler { if (current == null) onBack() else goUp() }
 
-    // (file, is an .exe): folders first, then the .exe files
+    // (file, is a game file): folders first, then the .exe and other game files
     val children by produceState<List<Pair<File, Boolean>>?>(null, path) {
         value = null
         value = if (current == null) volumes.map { it to false } else withContext(Dispatchers.IO) {
             val files = current.listFiles { f -> !f.name.startsWith(".") } ?: emptyArray()
             val dirs = files.filter { it.isDirectory }.sortedBy { AgvnGameTitle.searchKey(it.name) }
-            val exes = files.filter { it.name.endsWith(".exe", ignoreCase = true) && it.isFile }.sortedBy { AgvnGameTitle.searchKey(it.name) }
-            dirs.map { it to false } + exes.map { it to true }
+            val picks = files.filter { it.isFile && (it.name.endsWith(".exe", ignoreCase = true) || AgvnLightGame.isGameFile(it.name)) }
+                .sortedBy { AgvnGameTitle.searchKey(it.name) }
+            dirs.map { it to false } + picks.map { it to true }
         }
     }
     val shownPath = current?.let { dir ->

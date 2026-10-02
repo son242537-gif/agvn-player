@@ -58,19 +58,19 @@ public final class AgvnGameImporter {
     }
 
     /**
-     * Game folders found anywhere a player is likely to copy them: folders picked with "Chọn thư mục khác" (3 levels,
-     * the folder itself included), internal storage/AGVN, Download and Games (3 levels), the storage root (2 levels:
-     * /sdcard/NINJA DISGRACE/Shinobi), and the same places on SD cards / USB drives. A folder holding just one folder
-     * (a download unpacked into its own folder) costs no level. Each folder is listed once.
+     * Game folders found anywhere a player is likely to copy them: folders picked with "Chọn thư mục khác" (4 levels,
+     * the folder itself included), internal storage/AGVN, Download and Games (4 levels), the storage root (3 levels:
+     * /sdcard/RPG/Việt hoá/Game), and the same places on SD cards / USB drives. A folder holding just one folder (a
+     * download unpacked into its own folder) costs no level. Each folder is listed once.
      */
     public static List<File> listGameDirs(List<File> extraRoots) {
         List<AgvnGameScanner.Root> roots = new ArrayList<>();
         for (File extra : extraRoots) roots.add(new AgvnGameScanner.Root(extra, AgvnGameRoots.DEPTH, true));
         for (File volume : storageVolumes()) {
-            roots.add(new AgvnGameScanner.Root(new File(volume, "AGVN"), 3));
-            roots.add(new AgvnGameScanner.Root(new File(volume, "Download"), 3));
-            roots.add(new AgvnGameScanner.Root(new File(volume, "Games"), 3));
-            roots.add(new AgvnGameScanner.Root(volume, 2));
+            roots.add(new AgvnGameScanner.Root(new File(volume, "AGVN"), 4));
+            roots.add(new AgvnGameScanner.Root(new File(volume, "Download"), 4));
+            roots.add(new AgvnGameScanner.Root(new File(volume, "Games"), 4));
+            roots.add(new AgvnGameScanner.Root(volume, 3));
         }
         return AgvnGameScanner.scan(roots);
     }
@@ -198,7 +198,9 @@ public final class AgvnGameImporter {
         shortcut.putExtra("lc_all", AgvnLocale.forGame(p, c.engine, c.gameDir.getName(), c.exe));
         File index = AgvnHtmlGame.indexFor(c.gameDir, c.engine);
         // a player who picked "Chạy bằng Windows" keeps it on re-import unless the profile decides
-        boolean pickedWine = p.runner == null && AgvnHtmlGame.RUNNER_WINE.equals(shortcut.getExtra(AgvnHtmlGame.EXTRA_RUNNER));
+        // (a game without an .exe cannot have picked Windows)
+        boolean pickedWine = p.runner == null && AgvnHtmlGame.RUNNER_WINE.equals(shortcut.getExtra(AgvnHtmlGame.EXTRA_RUNNER))
+                && new File(c.gameDir, c.exe).isFile();
         boolean html = AgvnHtmlGame.useHtml(p, index) && !pickedWine;
         boolean renpy = !html && !pickedWine && AgvnRenpyGame.useRenpy(p, c.engine, c.gameDir);
         boolean rgss = !html && !renpy && !pickedWine && AgvnRgssGame.useRgss(p, c.engine, c.gameDir);

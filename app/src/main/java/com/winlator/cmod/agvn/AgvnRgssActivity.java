@@ -19,7 +19,10 @@ import com.winlator.cmod.core.FileUtils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -83,11 +86,12 @@ public class AgvnRgssActivity extends SDLActivity {
 
     private void showMenu() {
         boolean hidden = keys != null && keys.getVisibility() != View.VISIBLE;
+        List<CharSequence> items = new ArrayList<>(Arrays.asList(getString(R.string.agvn_html_menu),
+                getString(hidden ? R.string.agvn_rgss_show_keys : R.string.agvn_rgss_hide_keys), getString(R.string.agvn_html_exit)));
+        if (AgvnHtmlGame.hasWindowsExe(this)) items.add(getString(R.string.agvn_html_use_windows)); // not for phone copies
         new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
                 .setTitle(R.string.agvn_html_back_title)
-                .setItems(new CharSequence[]{getString(R.string.agvn_html_menu),
-                        getString(hidden ? R.string.agvn_rgss_show_keys : R.string.agvn_rgss_hide_keys),
-                        getString(R.string.agvn_html_exit), getString(R.string.agvn_html_use_windows)}, (d, which) -> {
+                .setItems(items.toArray(new CharSequence[0]), (d, which) -> {
                     if (which == 0) pressAfterDialog(KeyEvent.KEYCODE_X); // RGSS's B button: opens the menu, or cancels
                     else if (which == 1) setKeysHidden(!hidden);
                     else if (which == 2) nativeSendQuit(); // as when a PC window is closed
@@ -129,13 +133,16 @@ public class AgvnRgssActivity extends SDLActivity {
         failed = true;
         Log.w(TAG, "mkxp-z stopped on an error: " + error);
         saveErrorLog(error);
-        runOnUiThread(() -> new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
-                .setTitle(R.string.agvn_rgss_failed_title)
-                .setMessage(failureMessage(error))
-                .setPositiveButton(R.string.agvn_html_use_windows, (d, w) -> switchToWindows())
-                .setNegativeButton(R.string.agvn_close, (d, w) -> end())
-                .setCancelable(false)
-                .show());
+        boolean windows = AgvnHtmlGame.hasWindowsExe(this);
+        runOnUiThread(() -> {
+            AlertDialog.Builder b = new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                    .setTitle(R.string.agvn_rgss_failed_title)
+                    .setMessage(failureMessage(error))
+                    .setNegativeButton(R.string.agvn_close, (d, w) -> end())
+                    .setCancelable(false);
+            if (windows) b.setPositiveButton(R.string.agvn_html_use_windows, (d, w) -> switchToWindows());
+            b.show();
+        });
     }
 
     /** A missing file while an RTP the game asks for is not on the phone: how to add that RTP. Else the error itself. */

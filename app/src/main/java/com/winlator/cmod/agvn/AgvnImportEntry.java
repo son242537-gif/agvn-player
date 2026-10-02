@@ -60,12 +60,15 @@ public final class AgvnImportEntry {
     }
 
     /**
-     * The row for an exe picked in "Chọn thư mục khác" (slow: off the main thread): the folder's game or one of its
-     * games when it is one of them, else a game of its own named after the exe.
+     * The row for a file picked in "Chọn thư mục khác" (slow: off the main thread). An exe: the folder's game or one of
+     * its games when it is one of them, else a game of its own named after the exe. index.html, Game.ini or an RPG Maker
+     * archive: the game of that folder (MV's www/ counts as the folder above it), also a phone copy without an exe.
      */
-    public static AgvnImportEntry forExe(Context ctx, File exe) {
+    public static AgvnImportEntry forFile(Context ctx, File file) {
         AgvnLibraryIndex library = new AgvnLibraryIndex(new ContainerManager(ctx).loadShortcuts());
-        return build(ctx, exe.getParentFile(), library, AgvnProfileCatalog.get(ctx), exe.getName()).get(0);
+        boolean exe = file.getName().toLowerCase(java.util.Locale.ROOT).endsWith(".exe");
+        File dir = exe ? file.getParentFile() : AgvnLightGame.folderOf(file);
+        return build(ctx, dir, library, AgvnProfileCatalog.get(ctx), exe ? file.getName() : null).get(0);
     }
 
     /** The folder's game, one row per game when it holds several, or only the row of {@code picked} (an exe name). */
