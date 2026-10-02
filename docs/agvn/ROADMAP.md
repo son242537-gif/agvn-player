@@ -21,6 +21,36 @@
 **Sequential path:** P1→P2→P3→P4→P5→P6→P7 (shared code files)  
 **Parallel opportunity:** P8 after P2; P9 after P4 (touches no app code)
 
+## Progress after the 10 phases (as of 2026-10-02)
+
+**Releases** (published on GitHub Releases, signed by the maintainer):
+
+| Version | Code | Built from | Notes |
+|---------|------|------------|-------|
+| 0.1.0–0.1.2 | 2–4 | `agvn/main` | Release notes in `docs/agvn/release/` |
+| 0.1.4 | 6 | `agvn/p43-release-0.1.3` (tag `v0.1.4`) | In-app update, MF video, saves, settings fixes, frame pacing, RAM/heat warnings, multi-game folders |
+| 0.1.5 | 7 | `agvn/p43-release-0.1.3` (tag `v0.1.5`) | Broken game-file check before launch, RPG Maker MV sound in the HTML runner |
+
+**`agvn/main` is behind the published app:** it stops at #36 (0.1.2, Zink Mesa 25.1.9 from #34 merged).
+Everything in 0.1.4/0.1.5 lives only on the stacked branches `agvn/p28` … `agvn/p48`, merged together into
+`agvn/p43-release-0.1.3`. Merging that release branch (or the stack #37–#51 in order) into `agvn/main` is the
+next housekeeping step, so later work does not branch from a base two releases old.
+
+| Work | PR / branch | Status |
+|------|-------------|--------|
+| Graphics steps for every engine, saves, setting help, two-finger right click, settings fixes, in-app update, Japanese fonts, BCn under Turnip, game logs, RAM watch, MF video, splash, frame pacing, heat warning | #37, #38, #40–#51 (`agvn/p28`–`p41`) | 🔶 Shipped in 0.1.4; PRs still draft, not in `agvn/main` |
+| Tap hold, multi-game folders, broken game files, HTML runner sound | `agvn/p45`–`p48` (no PR) | 🔶 Shipped in 0.1.4/0.1.5 via `agvn/p43-release-0.1.3` |
+| DDraw wrapper: restore Wine's ddraw | #39 `agvn/fix-ddraw-restore` | ⏳ Open, not released |
+| CLAUDE.md rule: fix for every game, never one game | #52 `agvn/p42-every-game-rule` | ⏳ Open |
+| Game main thread on fast cores + perf hints | `agvn/p44-game-cpu` (no PR) | 🚧 In progress, on top of 0.1.5 |
+| App under GPL-3.0-or-later; plan for native Ren'Py / RPG Maker XP–VX Ace | `agvn/p49-gpl-license` (no PR) | 🚧 Needs maintainer decision (licence change) |
+| Ren'Py 8 games run natively (Ren'Py 8.5.3 Android) | `agvn/p50-renpy8` (on p49, no PR) | 🚧 In progress |
+| Keep games alive; tell a crash from a normal exit | `agvn/p53-game-session` (on p50, no PR) | 🚧 In progress |
+
+Still open from the hand-off (`handoff-pc.md`): OpenGL games flicker black once a second at low settings (Zink
+abort fixed by #34; flicker cause unknown), Dimensity/Mali checks on a real phone, and the v0.1.0 RC report
+(`rc-test-report.md`) and weak-phone field test have not been filled in.
+
 ---
 
 ## Implementation notes (deviations decided during the build)

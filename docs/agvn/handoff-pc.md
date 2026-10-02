@@ -8,17 +8,17 @@ web GitHub để mở và merge PR.
 
 ## Trạng thái
 
-- `agvn/main`: đã merge PR #25–#35. Phiên bản 0.1.2 (mã 4), chưa phát hành; ghi chú phát hành ở
-  `docs/agvn/release/ghi-chu-phat-hanh-v0.1.2.txt`.
-- **PR #34 (nháp, nhánh `agvn/p27-zink-release`)**: Zink mới (Mesa 25.1.9 bản phát hành) **đã dựng xong trên cloud**
-  và đã nằm trong nhánh: `opengl_zink.tzst` 3,3 MB (bản cũ 17,5 MB), SHA-256 `ebae37b8…3cded`. Bản đầu (`c1e75643…`)
-  đã hết văng trên POCO. Bản hiện tại thêm bản vá `0007` giới hạn vùng đệm GPU của Zink ở 256 MB (mã phiên bản
-  `zink@3`). Cần thử lại RAM trên POCO rồi mới merge.
-- Tạm dừng theo lời anh Sơn: Ren'Py / ONScripter / mkxp-z và việc chuyển app sang giấy phép GPL.
+- **Cập nhật 02/10/2026:** `agvn/main` đã merge PR #25–#36, gồm **PR #34 (Zink Mesa 25.1.9, `zink@3`)**: game
+  OpenGL hết văng trên POCO, RAM GPU giảm khoảng 0,3 GB. `agvn/main` vẫn ở 0.1.2 (mã 4).
+- App đã phát hành **v0.1.4 (mã 6)** và **v0.1.5 (mã 7)** từ nhánh `agvn/p43-release-0.1.3` (gộp các nhánh
+  `agvn/p28`…`p48`), chưa merge vào `agvn/main`. Các PR #37, #38, #40–#51 vẫn ở trạng thái nháp dù đã có trong
+  bản phát hành. Bảng tiến độ đầy đủ: mục "Progress after the 10 phases" trong `ROADMAP.md`.
+- Ren'Py và giấy phép GPL đã làm lại trên nhánh `agvn/p49-gpl-license` → `p50-renpy8` → `p53-game-session` (chưa có PR;
+  đổi giấy phép cần anh Sơn quyết). ONScripter / mkxp-z vẫn tạm dừng.
 
 ## Việc làm tiếp (theo thứ tự)
 
-### 1. Game OpenGL: văng và chớp đen (Zink)
+### 1. Game OpenGL: chớp đen (Zink) — phần văng đã sửa ở #34
 
 Triệu chứng trên POCO:
 - ở cấu hình cao, game văng với `zink_context.c:700 assertion "…range <= …maxUniformBufferRange" failed`, rồi app
@@ -31,15 +31,13 @@ Game này chạy tốt trên GameHub (Mesa 25.1.4). Nguyên nhân văng đã rõ
 1. **Thử nhanh cho lỗi chớp** (không cần dựng lại gì): Cài đặt → tắt **"Dùng tiện ích DRI3"** → mở lại game ở cấu
    hình thấp. Nếu hết chớp thì lỗi nằm ở khâu đưa hình lên màn hình (DRI3/Present), không phải ở game. Đọc log theo
    mục "Đọc log" bên dưới, tìm dòng `zink`, `MESA`, `wrapper`, `present`.
-2. **Thử Zink mới:** file đã có trong nhánh `agvn/p27-zink-release`, không cần dựng lại. Dựng APK từ nhánh đó (mục
-   "Dựng và cài APK", thay `agvn/main` bằng `agvn/p27-zink-release`), cài lên POCO và chạy theo "Device Test
-   Checklist" của PR #34. Nếu máy đã hết chớp và hết văng thì bỏ trạng thái nháp rồi merge.
+2. **Zink mới đã merge (#34)** và có trong mọi bản từ 0.1.4. Nếu bản đang cài vẫn chớp, làm bước 3.
 
    Chỉ khi cần dựng lại (xem `scripts/agvn/zink/README.md`): script chỉ chạy trên Linux, nên trên Windows dùng
    **WSL2 Ubuntu 24.04**. Chạy mã dựng của Mesa là bước anh Sơn phải đồng ý trước.
    ```bash
    # trong WSL
-   git clone https://github.com/son242537-gif/agvn-player ~/ap && cd ~/ap && git checkout agvn/p27-zink-release
+   git clone https://github.com/son242537-gif/agvn-player ~/ap && cd ~/ap && git checkout agvn/main
    sudo bash scripts/agvn/cloud-setup.sh          # SDK + NDK 29 bản Linux vào /opt/android-sdk
    sudo apt-get install -y meson ninja-build pkgconf patch bison flex zstd binutils python3-mako python3-yaml python3-packaging
    cp /mnt/c/AGVN/ap/app/src/main/assets/imagefs.tar.zst app/src/main/assets/   # imagefs đã tải sẵn ở Windows
