@@ -1,0 +1,88 @@
+// Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE).
+//
+// AGVN: RPG Maker XP/VX/VX Ace runner ("Chạy nhẹ" with mkxp-z, docs/agvn/engine-rieng.md). libmkxp-z.so is built by
+// scripts/agvn/mkxp-z/build-mkxp-z.sh and kept in src/main/jniLibs, checked here against scripts/agvn/pins.txt. Its
+// SDL 2.28.1 needs the Java classes of the same SDL release: this script takes them from SDL's release archive (pinned
+// too) and moves them to com.winlator.cmod.agvn.sdl, the JNI prefix that SDL is built with (patch 0002), in
+// build/generated/agvn/rgss/java. HIDAPI is not built into that SDL, so SDLActivity does not start its HID manager.
+// Nothing downloaded is run on the build machine: files are only copied out of the archive.
+// Applied from build.gradle, which provides agvnPinnedAsset.
+
+import java.security.MessageDigest
+
+interface AgvnRgssArchives {
+    @javax.inject.Inject
+    ArchiveOperations getArchives()
+}
+
+def rgssSdlVersion = "2.28.1"
+// Bump when the rules below change what goes into the outputs.
+def rgssRules = "1"
+def rgssPackage = "com.winlator.cmod.agvn.sdl"
+def rgssPinned = project.ext.agvnPinnedAsset
+def rgssArchives = project.objects.newInstance(AgvnRgssArchives).archives
+def rgssSdl = new File(projectDir, "agvn-downloads/SDL2-${rgssSdlVersion}.tar.gz")
+def rgssLib = new File(projectDir, "src/main/jniLibs/arm64-v8a/libmkxp-z.so")
+def rgssOut = layout.buildDirectory.dir("generated/agvn/rgss").get().asFile
+def rgssPins = new Properties()
+rootProject.file("scripts/agvn/pins.txt").withInputStream { rgssPins.load(it) }
+
+def rgssSha256 = { File f ->
+    MessageDigest md = MessageDigest.getInstance("SHA-256")
+    f.withInputStream { input ->
+        byte[] buf = new byte[1 << 16]
+        for (int n; (n = input.read(buf)) > 0; ) md.update(buf, 0, n)
+    }
+    md.digest().collect { String.format("%02x", ((int) it) & 0xff) }.join()
+}
+
+tasks.register("downloadRgssSdl") {
+    doLast {
+        rgssPinned(rgssSdl, "mkxpz_sdl2_sha256") { File target ->
+            target.parentFile.mkdirs()
+            new URL("https://github.com/libsdl-org/SDL/releases/download/release-${rgssSdlVersion}/${target.name}").withInputStream { input ->
+                target.withOutputStream { output -> output << input }
+            }
+        }
+    }
+}
+
+tasks.register("prepareRgss") {
+    dependsOn "downloadRgssSdl"
+    doLast {
+        String want = rgssPins.getProperty("mkxpz_so_sha256")
+        if (!rgssLib.isFile() || rgssSha256(rgssLib) != want)
+            throw new GradleException("libmkxp-z.so is missing or is not the build pinned as mkxpz_so_sha256 (scripts/agvn/mkxp-z/build-mkxp-z.sh)")
+        String stamp = "sdl=${rgssSdlVersion} rules=${rgssRules} archive=${rgssPins.getProperty("mkxpz_sdl2_sha256")}"
+        File stampFile = new File(rgssOut, "stamp.txt")
+        if (stampFile.isFile() && stampFile.text == stamp) return
+        println("Preparing SDL ${rgssSdlVersion}'s Java classes for mkxp-z...")
+        rgssOut.deleteDir()
+        File javaDir = new File(rgssOut, "java/" + rgssPackage.replace('.', '/'))
+        javaDir.mkdirs()
+        String prefix = "SDL2-${rgssSdlVersion}/android-project/app/src/main/java/org/libsdl/app/"
+        int count = 0
+        rgssArchives.tarTree(rgssArchives.gzip(rgssSdl)).matching { include prefix + "*.java" }.visit { FileVisitDetails d ->
+            if (d.directory) return
+            ByteArrayOutputStream data = new ByteArrayOutputStream()
+            d.copyTo(data)
+            String text = data.toString("UTF-8").replace("org.libsdl.app", rgssPackage)
+            if (d.name == "SDLActivity.java") {
+                String hid = "mHIDDeviceManager = HIDDeviceManager.acquire(this);"
+                if (!text.contains(hid)) throw new GradleException("SDL ${rgssSdlVersion}: SDLActivity.java has changed")
+                text = text.replace(hid, "mHIDDeviceManager = null; // AGVN: no HIDAPI in mkxp-z's SDL")
+            }
+            new File(javaDir, d.name).setText(text, "UTF-8")
+            count++
+        }
+        if (!new File(javaDir, "SDLActivity.java").isFile())
+            throw new GradleException("SDL ${rgssSdlVersion}: the Android Java classes were not found in ${rgssSdl.name}")
+        stampFile.text = stamp
+        println("SDL ${rgssSdlVersion}: ${count} Java classes in ${rgssPackage}")
+    }
+}
+
+android.sourceSets.main {
+    java.srcDir(new File(rgssOut, "java"))
+}
+preBuild.dependsOn("prepareRgss")

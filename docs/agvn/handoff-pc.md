@@ -15,8 +15,9 @@ web GitHub để mở và merge PR.
   giới hạn vùng đệm GPU của Zink ở 256 MB.
 - Còn mở: #39 (DDraw) và #52 (quy tắc CLAUDE.md), cả hai tách từ bản 0.1.2. Đang làm, chưa có PR: `agvn/p44-game-cpu`.
 - Engine riêng làm lại theo lời anh Sơn ngày 02/10/2026, app chuyển sang GPL 3 (kế hoạch ở `docs/agvn/engine-rieng.md`):
-  `agvn/p49-gpl-license` → `p50-renpy8` → `p53-game-session` (Ren'Py 8), rồi RPG Maker XP/VX/VX Ace bằng mkxp-z.
-  ONScripter chưa làm. Bảng đầy đủ: mục "Progress after the 10 phases" trong `ROADMAP.md`.
+  `agvn/p49-gpl-license` → `p50-renpy8` → `p53-game-session` (Ren'Py 8), rồi RPG Maker XP/VX/VX Ace bằng mkxp-z trên
+  nhánh `claude/great-goodall-qjemo1` (đã dựng `libmkxp-z.so` trên cloud và gắn vào app, chờ thử máy theo
+  `engine-rieng.md`, đợt 3). ONScripter chưa làm. Bảng đầy đủ: mục "Progress after the 10 phases" trong `ROADMAP.md`.
 
 ## Việc làm tiếp (theo thứ tự)
 

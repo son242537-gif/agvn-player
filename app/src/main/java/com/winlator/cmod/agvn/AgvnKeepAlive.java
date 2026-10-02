@@ -15,7 +15,7 @@ import com.winlator.cmod.services.NotificationService;
  * notification "Đang chạy <game>". Without it HyperOS killed Lo Se Sb in Wine (SIGKILL, importance 300) as the player
  * switched to the file manager during its 10-minute start: the service was only started from the library, and only
  * with the notification permission. A foreground service keeps only the process that hosts it, so the Ren'Py process
- * (":renpy") has its own, {@link Renpy}.
+ * (":renpy") has its own, {@link Renpy}, and so has the RGSS process, {@link Rgss}.
  */
 public final class AgvnKeepAlive {
     public static final String EXTRA_GAME = "agvn_game";
@@ -25,6 +25,14 @@ public final class AgvnKeepAlive {
         @Override
         protected int notificationId() {
             return MainActivity.NOTIFICATION_ID + 1;
+        }
+    }
+
+    /** The same service in the RPG Maker XP/VX/VX Ace process (":rgss"). */
+    public static final class Rgss extends NotificationService {
+        @Override
+        protected int notificationId() {
+            return MainActivity.NOTIFICATION_ID + 2;
         }
     }
 
@@ -38,6 +46,11 @@ public final class AgvnKeepAlive {
     /** A Ren'Py game starts in the Ren'Py process. */
     static void startRenpy(Context context, String game) {
         start(context, Renpy.class, game);
+    }
+
+    /** An RPG Maker XP/VX/VX Ace game starts in the RGSS process. */
+    static void startRgss(Context context, String game) {
+        start(context, Rgss.class, game);
     }
 
     private static void start(Context context, Class<?> service, String game) {

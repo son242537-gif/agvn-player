@@ -65,7 +65,7 @@ def pinnedAsset = { File target, String pinKey, Closure download ->
         cached.bytes = target.bytes
     }
 }
-// for agvn-renpy.gradle (applied at the end of this file)
+// for agvn-renpy.gradle and agvn-rgss.gradle (applied at the end of this file)
 ext.agvnPinnedAsset = pinnedAsset
 
 tasks.register("downloadImageFS") {
@@ -260,3 +260,5 @@ dependencies {
 
 // AGVN: Ren'Py 8 runner (librenpython.so, its Java classes and the engine zip), see agvn-renpy.gradle
 apply from: "agvn-renpy.gradle"
+// AGVN: RPG Maker XP/VX/VX Ace runner (libmkxp-z.so is checked, SDL's Java classes are generated), see agvn-rgss.gradle
+apply from: "agvn-rgss.gradle"

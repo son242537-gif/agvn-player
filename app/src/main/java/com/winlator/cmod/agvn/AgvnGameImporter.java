@@ -201,8 +201,9 @@ public final class AgvnGameImporter {
         boolean pickedWine = p.runner == null && AgvnHtmlGame.RUNNER_WINE.equals(shortcut.getExtra(AgvnHtmlGame.EXTRA_RUNNER));
         boolean html = AgvnHtmlGame.useHtml(p, index) && !pickedWine;
         boolean renpy = !html && !pickedWine && AgvnRenpyGame.useRenpy(p, c.engine, c.gameDir);
+        boolean rgss = !html && !renpy && !pickedWine && AgvnRgssGame.useRgss(p, c.engine, c.gameDir);
         shortcut.putExtra(AgvnHtmlGame.EXTRA_RUNNER, html ? AgvnHtmlGame.RUNNER_HTML : renpy ? AgvnHtmlGame.RUNNER_RENPY
-                : pickedWine ? AgvnHtmlGame.RUNNER_WINE : null);
+                : rgss ? AgvnHtmlGame.RUNNER_RGSS : pickedWine ? AgvnHtmlGame.RUNNER_WINE : null);
         shortcut.putExtra(AgvnHtmlGame.EXTRA_INDEX, html ? index.getAbsolutePath() : null);
     }
 

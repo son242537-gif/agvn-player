@@ -16,7 +16,8 @@ import com.winlator.cmod.core.FileUtils;
 /**
  * "Giấy phép mã nguồn mở": the app's GNU GPL 3 notice, upstream MIT notice and third-party list from
  * assets/agvn/licenses.html, then the full GPL text (assets/agvn/gpl-3.0.txt), which GPL requires to be given along,
- * then Ren'Py's LICENSE.txt with the libraries in librenpython.so (assets/agvn/renpy-license.txt, app/agvn-renpy.gradle).
+ * then Ren'Py's LICENSE.txt with the libraries in librenpython.so (assets/agvn/renpy-license.txt, app/agvn-renpy.gradle),
+ * then mkxp-z and the libraries in libmkxp-z.so (assets/agvn/mkxp-z-license.txt, scripts/agvn/mkxp-z/licenses.sh).
  */
 public class LicensesActivity extends AppCompatActivity {
     @Override
@@ -30,8 +31,9 @@ public class LicensesActivity extends AppCompatActivity {
         String html = FileUtils.readString(this, "agvn/licenses.html");
         String gpl = FileUtils.readString(this, "agvn/gpl-3.0.txt");
         String renpy = FileUtils.readString(this, "agvn/renpy-license.txt");
+        String mkxpz = FileUtils.readString(this, "agvn/mkxp-z-license.txt");
         text.setText(TextUtils.concat(Html.fromHtml(html != null ? html : "", Html.FROM_HTML_MODE_LEGACY), "\n",
-                gpl != null ? gpl : "", "\n\n", renpy != null ? renpy : ""));
+                gpl != null ? gpl : "", "\n\n", renpy != null ? renpy : "", "\n\n", mkxpz != null ? mkxpz : ""));
         ScrollView scroll = new ScrollView(this);
         scroll.setBackgroundColor(Color.parseColor("#15171C"));
         scroll.addView(text);

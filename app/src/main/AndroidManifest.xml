@@ -53,6 +53,13 @@
             android:foregroundServiceType="specialUse"
             android:exported="false" />
 
+        <!-- AGVN: and in the RPG Maker XP/VX/VX Ace process -->
+        <service
+            android:name="com.winlator.cmod.agvn.AgvnKeepAlive$Rgss"
+            android:process=":rgss"
+            android:foregroundServiceType="specialUse"
+            android:exported="false" />
+
         <activity
             android:name="com.winlator.cmod.OnboardingActivity"
             android:theme="@style/AppThemeFullscreen.Dark"
@@ -112,6 +119,16 @@
         <activity
             android:name="com.winlator.cmod.agvn.AgvnRenpyActivity"
             android:process=":renpy"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:screenOrientation="sensorLandscape"
+            android:launchMode="singleTop"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|uiMode|density|fontScale"
+            android:exported="false" />
+
+        <!-- AGVN: RPG Maker XP/VX/VX Ace games on "Chạy nhẹ" with mkxp-z (agvn/AgvnRgssActivity), in their own process -->
+        <activity
+            android:name="com.winlator.cmod.agvn.AgvnRgssActivity"
+            android:process=":rgss"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:screenOrientation="sensorLandscape"
             android:launchMode="singleTop"

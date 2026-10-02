@@ -22,12 +22,18 @@ Anh Sơn quyết định ngày 02/10/2026: app phát hành theo **GNU GPL phiên
     pyjnius (MIT), FFmpeg và FriBiDi (LGPL 2.1), OpenSSL (Apache 2.0) cùng các thư viện khác. Danh sách đủ nằm trong
     `LICENSE.txt` của Ren'Py; app hiện nguyên văn file này ở cuối màn giấy phép. Mã nguồn:
     https://github.com/renpy/renpy và https://github.com/renpy/renpy-build.
+  - mkxp-z ("Chạy nhẹ" cho game RPG Maker XP/VX/VX Ace): GPL 3 hoặc mới hơn (dựng kèm shader GPLv3). `libmkxp-z.so`
+    chứa thêm Ruby (Ruby License / BSD-2-Clause), SDL2, SDL_image, SDL_sound, SDL_ttf, PhysFS (zlib), OpenAL Soft và
+    FluidSynth (LGPL 2.1), FreeType (FTL), pixman, fmt, libffi, libyaml (MIT), libogg/vorbis/theora, libjxl (BSD) cùng
+    các thư viện khác. Danh sách và giấy phép đầy đủ: `app/src/main/assets/agvn/mkxp-z-license.txt`, tạo bởi
+    `scripts/agvn/mkxp-z/licenses.sh`. Mã nguồn: https://github.com/mkxp-z/mkxp-z; bản vá và script dựng cho Android:
+    `scripts/agvn/mkxp-z`.
 
 ## Vì sao chuyển sang GPL
 
 - App đã chứa mã của Termux:X11 (GPL 3).
-- Engine riêng sắp làm (mkxp-z cho RPG Maker XP/VX/VX Ace, GPL 2 hoặc mới hơn) chạy chung tiến trình với app. Khi đó
-  cả app phải theo GPL. Xem [`engine-rieng.md`](./engine-rieng.md).
+- Engine riêng mkxp-z (RPG Maker XP/VX/VX Ace, GPL) là thư viện app nạp vào tiến trình của mình (`:rgss`), nên cả app
+  phải theo GPL. Xem [`engine-rieng.md`](./engine-rieng.md).
 
 ## Nghĩa là gì
 

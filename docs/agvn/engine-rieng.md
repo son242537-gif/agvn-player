@@ -21,7 +21,7 @@ Anh Sơn quyết định ngày 02/10/2026:
 | 0 | Giấy phép GPL 3 cho cả app | `agvn/p49-gpl-license` |
 | 1 | Ren'Py 8: game Python 3 (Ren'Py 8.x, phần lớn game mới) | `agvn/p50-renpy8` |
 | 2 | Ren'Py 7: game Python 2 (Ren'Py 6.x và 7.x) | `agvn/p51-renpy7` |
-| 3 | RPG Maker XP/VX/VX Ace bằng mkxp-z | `agvn/p52-mkxp-z` |
+| 3 | RPG Maker XP/VX/VX Ace bằng mkxp-z | `claude/great-goodall-qjemo1` |
 
 - **Ren'Py làm trước** vì Ren'Py có bản Android chính thức (RAPT), kèm thư viện dựng sẵn. Đợt này nhanh và ít rủi ro.
 - **mkxp-z làm sau** vì chưa có bản Android chính thức: phải tự dựng Ruby, SDL2 và mkxp-z cho Android. Đây là việc lớn
@@ -117,13 +117,47 @@ Anh Sơn quyết định ngày 02/10/2026:
 
 ## Đợt 3: RPG Maker XP/VX/VX Ace (mkxp-z)
 
-- **Nguồn:** mkxp-z (GPL 2 hoặc mới hơn), Ruby, SDL2, OpenAL Soft, PhysFS, SDL_sound và các thư viện liên quan. Tất cả
-  khoá theo commit.
-- **Việc cần làm:**
-  - Dựng toàn bộ cho Android arm64 bằng NDK của app.
-  - Thêm Activity riêng.
-  - Phím ảo: dùng bố cục RPG sẵn có của AGVN.
-- **RTP:** nhiều game cần gói RTP chuẩn của RPG Maker. RTP có giấy phép riêng của Kadokawa, nên không đóng gói vào app.
-  Cách xử lý game thiếu RTP sẽ chốt ở đầu đợt.
-- **Rủi ro:** lớn nhất trong ba đợt, cần nhiều phiên làm việc.
-- **Thử máy:** 3 game, một game XP, một game VX, một game VX Ace.
+Anh Sơn chốt ngày 02/10/2026:
+- làm đợt 3 ngay sau Ren'Py 8, trước Ren'Py 7;
+- cho dựng mkxp-z trên máy cloud;
+- game thiếu RTP: app tự tìm RTP, thiếu thì báo bằng tiếng Việt.
+
+- **Nguồn:** mkxp-z 2.4.2 (commit `095b9cc3`), cùng Ruby 3.1.3, SDL2 2.28.1, OpenAL Soft, FluidSynth, PhysFS, FreeType,
+  SDL_image/sound/ttf và các thư viện khác do mkxp-z ghim. Cách lấy nguồn, 4 bản vá và cách kiểm chứng ở
+  [`scripts/agvn/mkxp-z/README.md`](../../scripts/agvn/mkxp-z/README.md).
+- **Giấy phép:** mkxp-z dựng kèm shader GPLv3, nên là GPL-3.0-or-later, hợp với app (đợt 0). Giấy phép đủ của mkxp-z và
+  mọi thư viện trong `libmkxp-z.so` nằm ở cuối màn "Giấy phép mã nguồn mở".
+- **Đã làm** (nhánh `claude/great-goodall-qjemo1`, xếp trên chuỗi Ren'Py, chờ anh Sơn thử máy):
+  - **Dựng:** `scripts/agvn/mkxp-z/build-mkxp-z.sh` ra `app/src/main/jniLibs/arm64-v8a/libmkxp-z.so`. Thư viện chỉ cần
+    thư viện có sẵn của Android. SHA-256 ghi ở `mkxpz_so_sha256` trong `scripts/agvn/pins.txt`, bản dựng của app kiểm
+    lại.
+  - **Trong app:** `AgvnRgssActivity` chạy game trong tiến trình riêng `:rgss`. Lớp Java của SDL 2.28.1 do
+    `app/agvn-rgss.gradle` lấy từ gói phát hành của SDL, đổi sang gói `com.winlator.cmod.agvn.sdl` để không đụng SDL
+    của Ren'Py.
+  - **Nhận diện:** game có `Game.ini` (hoặc `<tên exe>.ini`) với `RGSS1/2/3*.dll`, file `.rgssad/.rgss2a/.rgss3a` hay
+    `Data/*.rxdata/.rvdata/.rvdata2` được đặt "Chạy nhẹ" khi nhập. RPG Maker 2000/2003 và MV/MZ không đổi. Game đã nhập
+    trước bản này vẫn chạy Windows; nhập lại (Cập nhật) để chuyển.
+  - **Save:** nằm trong thư mục game như trên PC và khi "Chạy bằng Windows", nên đổi cách chạy vẫn còn save.
+  - **RTP:** tìm theo thứ tự `AGVN-Player/RTP/<tên>` rồi RTP đã cài trong Wine của game. Không đóng RTP vào app.
+  - **Phím ảo:** D-pad và các nút OK, Hủy, Chạy, Menu, đặt đúng chỗ như bố cục RPG khi chạy Windows. OK gửi Enter, vì
+    trong XP phím Z là nút chạy nhanh. Ẩn/hiện được trong menu nút Quay lại. Tay cầm và bàn phím thật cũng dùng được.
+  - **Nút Quay lại:** cùng menu với Ren'Py: mở menu game (nút B), ẩn/hiện phím ảo, thoát game, "Chạy bằng Windows".
+  - **Game dừng vì lỗi:** app hiện lỗi gốc của game, gợi ý "Chạy bằng Windows". Nếu lỗi là thiếu file và máy chưa có RTP
+    game cần, app chỉ chỗ chép RTP.
+  - **Chữ và nhạc:** font dự phòng WenQuanYi Micro Hei đủ tiếng Việt và tiếng Nhật; nhạc MIDI qua FluidSynth với sound
+    font có sẵn trong app. Nạp sẵn 3 script của mkxp-z cho tương thích (hàm Ruby cũ, Win32API).
+  - **Nhật ký:** `adb logcat -s mkxp SDL AGVN`. Game dừng vì lỗi thì lỗi gốc và bản tóm tắt (RGSS mấy, RTP tìm được
+    hay thiếu) được lưu vào `AGVN-Player/logs/<tên game>/<giờ>/`, nên "Gửi nhật ký" ở menu ⋮ của game có cả lỗi này.
+- **Thử máy:** cần một game XP, một game VX, một game VX Ace (tốt nhất một game dùng nhạc MIDI và một game cần RTP).
+  1. Cài đè bản đang dùng. Nhập 3 game; bảng xem trước ghi "Cách chạy: Chạy nhẹ".
+  2. Mỗi game:
+     - mở game, nghe nhạc nền và tiếng động;
+     - đi bằng D-pad, giữ "Chạy", mở menu bằng "Hủy"/"Menu", xác nhận bằng "OK";
+     - chơi 10 phút, lưu, thoát, mở lại, tải save.
+  3. Nút Quay lại: thử cả bốn mục.
+  4. Lưu khi "Chạy nhẹ", rồi "Chạy bằng Windows": vẫn thấy save đó.
+  5. Game cần RTP mà máy chưa có: app báo cách chép RTP. Chép RTP vào `AGVN-Player/RTP/<tên>`, mở lại: game chạy.
+  6. Bấm Home rồi quay lại game: game chạy tiếp, có tiếng.
+  7. So RAM và nhiệt với khi chạy bằng Windows: `adb shell dumpsys meminfo com.agvn.player:rgss`.
+  8. Hồi quy: game RPG Maker 2000/2003, MV/MZ "Chạy nhẹ", Ren'Py 8 và game Windows vẫn chạy như cũ.
+  9. Màn "Giấy phép mã nguồn mở" có phần mkxp-z.
