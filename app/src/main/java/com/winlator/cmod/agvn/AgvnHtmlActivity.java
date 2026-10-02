@@ -26,10 +26,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.winlator.cmod.R;
-import com.winlator.cmod.XServerDisplayActivity;
-import com.winlator.cmod.container.Container;
-import com.winlator.cmod.container.ContainerManager;
-import com.winlator.cmod.container.Shortcut;
 
 import java.io.File;
 
@@ -160,21 +156,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
 
     /** "Chạy bằng Windows": for a game whose scripts need the PC version; the shortcut remembers the choice. */
     private void switchToWindows() {
-        String path = getIntent().getStringExtra("shortcut_path");
-        int id = getIntent().getIntExtra("container_id", 0);
-        if (id == 0 && path != null) id = AgvnHtmlGame.containerIdIn(new File(path));
-        Container container = new ContainerManager(this).getContainerById(id);
-        if (path == null || container == null) {
-            finish();
-            return;
-        }
-        Shortcut shortcut = new Shortcut(container, new File(path));
-        shortcut.putExtra(AgvnHtmlGame.EXTRA_RUNNER, AgvnHtmlGame.RUNNER_WINE);
-        shortcut.saveData();
-        Intent intent = new Intent(this, XServerDisplayActivity.class);
-        if (getIntent().getExtras() != null) intent.putExtras(getIntent().getExtras());
-        intent.removeExtra(EXTRA_INDEX_PATH);
-        startActivity(intent);
+        Intent intent = AgvnHtmlGame.toWindows(this, EXTRA_INDEX_PATH);
+        if (intent != null) startActivity(intent);
         finish();
     }
 

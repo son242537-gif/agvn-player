@@ -4,6 +4,10 @@ package com.winlator.cmod.agvn;
 import android.app.Activity;
 import android.content.Intent;
 
+import com.winlator.cmod.XServerDisplayActivity;
+import com.winlator.cmod.container.Container;
+import com.winlator.cmod.container.ContainerManager;
+import com.winlator.cmod.container.Shortcut;
 import com.winlator.cmod.core.FileUtils;
 
 import java.io.File;
@@ -14,12 +18,14 @@ import java.util.Map;
 /**
  * "Chạy nhẹ": RPG Maker MV/MZ and TyranoBuilder games are web pages (index.html + JavaScript), so they run in an
  * Android WebView ({@link AgvnHtmlActivity}) without Wine or Box64: far lighter, cooler and kinder to the battery.
- * The shortcut keeps its Wine Exec line; the extra {@link #EXTRA_RUNNER} decides which one starts.
+ * Ren'Py 8 games have their own "Chạy nhẹ" ({@link AgvnRenpyGame}). The shortcut keeps its Wine Exec line; the extra
+ * {@link #EXTRA_RUNNER} decides which one starts.
  */
 public final class AgvnHtmlGame {
     public static final String EXTRA_RUNNER = "agvnRunner";
     public static final String EXTRA_INDEX = "agvnHtmlIndex";
     public static final String RUNNER_HTML = "html";
+    public static final String RUNNER_RENPY = "renpy";
     public static final String RUNNER_WINE = "wine";
 
     private AgvnHtmlGame() {}
@@ -44,18 +50,24 @@ public final class AgvnHtmlGame {
     }
 
     public static boolean isValidRunner(String runner) {
-        return runner == null || RUNNER_HTML.equals(runner) || RUNNER_WINE.equals(runner);
+        return runner == null || RUNNER_HTML.equals(runner) || RUNNER_RENPY.equals(runner) || RUNNER_WINE.equals(runner);
+    }
+
+    /** True for "Chạy nhẹ" (HTML or Ren'Py): the game runs on Android itself, without Wine. */
+    public static boolean isLight(String runner) {
+        return RUNNER_HTML.equals(runner) || RUNNER_RENPY.equals(runner);
     }
 
     /**
-     * Called first thing by XServerDisplayActivity: opens the HTML runner instead of Wine when the shortcut asks for it.
-     * Returns true when the caller must finish(). A missing index.html (game moved) falls back to Wine.
+     * Called first thing by XServerDisplayActivity: opens "Chạy nhẹ" instead of Wine when the shortcut asks for it.
+     * Returns true when the caller must finish(). A game that moved (no index.html, no Ren'Py 8 folder) runs in Wine.
      */
     public static boolean redirect(Activity activity) {
         Intent from = activity.getIntent();
         String path = from != null ? from.getStringExtra("shortcut_path") : null;
         if (path == null || path.isEmpty()) return false;
         Map<String, String> extras = readExtras(new File(path));
+        if (RUNNER_RENPY.equals(extras.get(EXTRA_RUNNER))) return AgvnRenpyGame.start(activity, from, extras);
         if (!RUNNER_HTML.equals(extras.get(EXTRA_RUNNER))) return false;
         String index = extras.get(EXTRA_INDEX);
         if (index == null || !new File(index).isFile()) return false;
@@ -64,6 +76,26 @@ public final class AgvnHtmlGame {
         intent.putExtra(AgvnHtmlActivity.EXTRA_INDEX_PATH, index);
         activity.startActivity(intent);
         return true;
+    }
+
+    /**
+     * "Chạy bằng Windows" from a "Chạy nhẹ" game: the shortcut remembers Wine. Returns the intent that starts the game
+     * in Wine ({@code ownExtra}, the runner's own extra, left out), or null when the game is no longer in the library.
+     */
+    static Intent toWindows(Activity activity, String ownExtra) {
+        Intent from = activity.getIntent();
+        String path = from.getStringExtra("shortcut_path");
+        int id = from.getIntExtra("container_id", 0);
+        if (id == 0 && path != null) id = containerIdIn(new File(path));
+        Container container = new ContainerManager(activity).getContainerById(id);
+        if (path == null || container == null) return null;
+        Shortcut shortcut = new Shortcut(container, new File(path));
+        shortcut.putExtra(EXTRA_RUNNER, RUNNER_WINE);
+        shortcut.saveData();
+        Intent intent = new Intent(activity, XServerDisplayActivity.class);
+        if (from.getExtras() != null) intent.putExtras(from.getExtras());
+        intent.removeExtra(ownExtra);
+        return intent;
     }
 
     /** The "container_id:N" line launcher shortcuts rely on, or 0. */

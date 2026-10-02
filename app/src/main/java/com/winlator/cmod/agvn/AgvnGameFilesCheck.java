@@ -28,8 +28,8 @@ final class AgvnGameFilesCheck {
     private AgvnGameFilesCheck() {}
 
     static void run(Activity activity, Shortcut shortcut, Runnable next) {
-        if (AgvnHtmlGame.RUNNER_HTML.equals(shortcut.getExtra(AgvnHtmlGame.EXTRA_RUNNER))) {
-            next.run(); // runs in a WebView, not Wine
+        if (AgvnHtmlGame.isLight(shortcut.getExtra(AgvnHtmlGame.EXTRA_RUNNER))) {
+            next.run(); // "Chạy nhẹ" runs on Android itself, not in Wine
             return;
         }
         String gameDirPath = shortcut.getExtra(AgvnGameImporter.EXTRA_GAME_DIR);

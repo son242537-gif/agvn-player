@@ -18,6 +18,10 @@ Anh Sơn quyết định ngày 02/10/2026: app phát hành theo **GNU GPL phiên
   - DXVK, D8VK, dxwrapper: zlib.
   - Box64, FEX, Mesa, cnc-ddraw: MIT.
   - libadrenotools: BSD-2-Clause.
+  - Ren'Py 8.5.3 ("Chạy nhẹ" cho game Ren'Py): MIT. `librenpython.so` của Ren'Py chứa thêm Python (PSF), SDL2 (zlib),
+    pyjnius (MIT), FFmpeg và FriBiDi (LGPL 2.1), OpenSSL (Apache 2.0) cùng các thư viện khác. Danh sách đủ nằm trong
+    `LICENSE.txt` của Ren'Py; app hiện nguyên văn file này ở cuối màn giấy phép. Mã nguồn:
+    https://github.com/renpy/renpy và https://github.com/renpy/renpy-build.
 
 ## Vì sao chuyển sang GPL
 

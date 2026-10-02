@@ -200,7 +200,9 @@ public final class AgvnGameImporter {
         // a player who picked "Chạy bằng Windows" keeps it on re-import unless the profile decides
         boolean pickedWine = p.runner == null && AgvnHtmlGame.RUNNER_WINE.equals(shortcut.getExtra(AgvnHtmlGame.EXTRA_RUNNER));
         boolean html = AgvnHtmlGame.useHtml(p, index) && !pickedWine;
-        shortcut.putExtra(AgvnHtmlGame.EXTRA_RUNNER, html ? AgvnHtmlGame.RUNNER_HTML : pickedWine ? AgvnHtmlGame.RUNNER_WINE : null);
+        boolean renpy = !html && !pickedWine && AgvnRenpyGame.useRenpy(p, c.engine, c.gameDir);
+        shortcut.putExtra(AgvnHtmlGame.EXTRA_RUNNER, html ? AgvnHtmlGame.RUNNER_HTML : renpy ? AgvnHtmlGame.RUNNER_RENPY
+                : pickedWine ? AgvnHtmlGame.RUNNER_WINE : null);
         shortcut.putExtra(AgvnHtmlGame.EXTRA_INDEX, html ? index.getAbsolutePath() : null);
     }
 

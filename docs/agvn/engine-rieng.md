@@ -64,20 +64,42 @@ Anh Sơn quyết định ngày 02/10/2026:
   - `librenpython.so` cho arm64, 36 MB: gồm Python 3, phần C của Ren'Py và SDL2.
   - Mã Java: `SDLActivity`, `PythonSDLActivity`.
 - **Có sẵn trong SDK:** `renpy/` (engine) và `lib/` (thư viện Python).
-- **Cách làm:**
-  - Thêm một Activity riêng trong AGVN, dựa trên `PythonSDLActivity`.
-  - `main.py` của AGVN trỏ Ren'Py vào thư mục game của người chơi và đọc `game/` thẳng từ bộ nhớ. Không đóng gói lại
-    từng game như RAPT làm.
-- **Việc cần giải quyết:**
-  - RAPT dùng compileSdk 36, AGVN đang dùng 35.
-  - Chỗ lưu game: trong thư mục game hay trong app; save xuất/nhập (menu ⋮) phải dùng được.
-  - Nút Quay lại và menu.
-  - Bàn phím ảo: không cần, vì Ren'Py hỗ trợ chạm sẵn.
-  - APK nặng thêm khoảng 40–60 MB.
-- **Thử máy:**
-  - 3 game Ren'Py 8 khác nhau: mở game, chơi 10 phút, lưu, tải lại, thoát.
-  - So RAM và nhiệt với khi chạy bằng Windows.
-  - Game Ren'Py 7 phải được nhận ra và vẫn chạy bằng Windows.
+- **Đã làm** (nhánh `agvn/p50-renpy8`, chờ anh Sơn thử máy):
+  - **Dựng app:** `app/agvn-renpy.gradle` tải RAPT và SDK, kiểm SHA-256 theo `scripts/agvn/pins.txt`, rồi lấy ra:
+    - `librenpython.so` và mã Java SDL2, pyjnius đi kèm, giữ nguyên như Ren'Py dựng;
+    - `assets/agvn/renpy8.zip`: phần engine (`renpy/` đã dịch sẵn, `lib/python3.12/`) cùng `main.py` của AGVN;
+    - giấy phép của Ren'Py, hiện trong màn "Giấy phép mã nguồn mở".
+
+    Máy dựng chỉ chép file ra khỏi gói, không chạy mã tải về.
+  - **Trong app:** `AgvnRenpyActivity` chạy game trong tiến trình riêng `:renpy`. Lần đầu mở game Ren'Py, app giải
+    nén engine (khoảng 23 MB) vào bộ nhớ trong của app. Các lần sau chỉ giải nén lại khi bản cập nhật app đổi engine.
+  - **Nhận diện:** game Ren'Py 8 (có `lib/py3-*` hoặc `lib/python3.*`) được đặt "Chạy nhẹ" khi nhập game. Ren'Py 6, 7
+    vẫn chạy bằng Windows. Game đã nhập trước bản này vẫn chạy Windows; nhập lại (Cập nhật) để chuyển.
+  - **Save:** nằm trong `game/saves` của thư mục game, đúng chỗ bản PC và "Chạy bằng Windows" dùng. Đổi cách chạy vẫn
+    còn save, và xuất/nhập save ở menu ⋮ dùng được như cũ.
+  - **Nhật ký:** `log.txt`, `traceback.txt` ở `AGVN-Player/renpy/<tên thư mục game>/`; logcat thẻ `python`.
+  - **Nút Quay lại:** cùng menu với MV/MZ:
+    - "Mở menu trong game": phím Esc.
+    - "Thoát game": game tự hỏi và lưu dữ liệu như khi đóng cửa sổ trên PC.
+    - "Chạy bằng Windows": lối tắt nhớ lựa chọn này.
+  - **Game không mở được:** app báo lỗi, chỉ chỗ nhật ký và gợi ý "Chạy bằng Windows".
+  - **Liên kết web trong game** (Patreon, Discord...): không mở, theo luật 3.
+  - **compileSdk:** AGVN giữ 35; mã SDL của Ren'Py 8.5.3 biên dịch được với SDK 35.
+  - **APK:** nặng thêm 22,6 MB (556,8 MB so với 534,2 MB của 0.1.5).
+- **Thử máy:** cần 3 game Ren'Py 8 khác nhau.
+  1. Cài đè bản đang dùng. Nhập 3 game; bảng xem trước ghi "Cách chạy: Chạy nhẹ".
+  2. Mỗi game:
+     - mở game (lần đầu chờ app chuẩn bị Ren'Py);
+     - chơi 10 phút, lưu, tải lại;
+     - thử nút Quay lại với cả ba mục, rồi "Thoát game".
+  3. Lưu khi "Chạy nhẹ", rồi "Chạy bằng Windows": vẫn thấy save đó.
+  4. Bấm Home rồi quay lại game: game chạy tiếp, có tiếng.
+  5. So RAM và nhiệt với khi chạy bằng Windows: `adb shell dumpsys meminfo com.agvn.player:renpy`.
+  6. Game Ren'Py 7 vẫn chạy bằng Windows.
+  7. Hồi quy: game MV/MZ "Chạy nhẹ" và game Windows vẫn chạy như cũ.
+  8. Màn "Giấy phép mã nguồn mở" có phần Ren'Py.
+
+  Nhật ký khi lỗi: `adb logcat -s python AGVN SDL`.
 
 ## Đợt 2: Ren'Py 7
 
