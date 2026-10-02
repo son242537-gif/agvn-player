@@ -102,14 +102,6 @@ public final class AgvnHtmlGame {
         return intent;
     }
 
-    /** Back menu of the HTML and Ren'Py runners: the game's menu, quit, then "Chạy bằng Windows" when the game has an exe. */
-    static CharSequence[] backMenu(Activity activity) {
-        CharSequence menu = activity.getString(com.winlator.cmod.R.string.agvn_html_menu);
-        CharSequence exit = activity.getString(com.winlator.cmod.R.string.agvn_html_exit);
-        return hasWindowsExe(activity) ? new CharSequence[]{menu, exit, activity.getString(com.winlator.cmod.R.string.agvn_html_use_windows)}
-                : new CharSequence[]{menu, exit};
-    }
-
     /** False when the game's shortcut starts no real .exe (a copy made for phones): "Chạy bằng Windows" cannot run it. */
     static boolean hasWindowsExe(Activity activity) {
         String path = activity.getIntent().getStringExtra("shortcut_path");

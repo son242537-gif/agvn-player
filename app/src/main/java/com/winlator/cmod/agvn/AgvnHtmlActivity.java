@@ -21,7 +21,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
@@ -29,13 +28,13 @@ import com.winlator.cmod.R;
 
 import java.io.File;
 
-/** Plays an HTML game ({@link AgvnHtmlGame}) full screen in a WebView. Offline: only the game's own files load. */
+/**
+ * Plays an HTML game ({@link AgvnHtmlGame}) full screen in a WebView. Offline: only the game's own files load. The
+ * "Chạy nhẹ" toolkit ({@link AgvnLightTools}) gives the keys of the Windows layout (RPG for RPG Maker MV/MZ, visual
+ * novel for Tyrano), the ⌨ ✎ 👁 ☰ bar, the menu on Back and the HUD.
+ */
 public class AgvnHtmlActivity extends AppCompatActivity {
     public static final String EXTRA_INDEX_PATH = "agvn_html_index";
-    /** Presses Esc in the game (RPG Maker's menu / cancel key); keyCode must be forced, KeyboardEvent ignores it. */
-    private static final String PRESS_ESC = "(function(){function k(t){var e=new KeyboardEvent(t,{key:'Escape',code:'Escape',bubbles:true});"
-            + "Object.defineProperty(e,'keyCode',{get:function(){return 27}});Object.defineProperty(e,'which',{get:function(){return 27}});"
-            + "document.dispatchEvent(e);}k('keydown');setTimeout(function(){k('keyup')},120);})();";
 
     private WebView webView;
     private File root;
@@ -44,6 +43,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     private String compatJs;
     /** "Chạy bằng Windows" was picked: the Wine game now owns the keep-alive notification. */
     private boolean toWindows;
+    private AgvnLightTools tools;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -89,6 +89,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         setContentView(webView);
         hideSystemUi();
         webView.loadUrl("https://" + host + "/" + Uri.encode(index.getName()));
+        tools = AgvnLightTools.attach(this, rpgMaker ? AgvnLayouts.RPG : AgvnLayouts.VN, getIntent().getStringExtra("shortcut_name"),
+                AgvnLightGame.folderOf(index), new AgvnHtmlHost(this, webView));
     }
 
     private final class GameClient extends WebViewClient {
@@ -146,20 +148,12 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     @SuppressWarnings("deprecation")
     @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.agvn_html_back_title)
-                .setItems(AgvnHtmlGame.backMenu(this), (d, which) -> {
-                    if (which == 0 && webView != null) webView.evaluateJavascript(PRESS_ESC, null);
-                    else if (which == 1) finish();
-                    else if (which == 2) switchToWindows();
-                })
-                .setNegativeButton(R.string.agvn_html_keep_playing, null)
-                .setOnDismissListener(d -> hideSystemUi())
-                .show();
+        if (tools != null) tools.onBack();
+        else finish();
     }
 
     /** "Chạy bằng Windows": for a game whose scripts need the PC version; the shortcut remembers the choice. */
-    private void switchToWindows() {
+    void switchToWindows() {
         Intent intent = AgvnHtmlGame.toWindows(this, EXTRA_INDEX_PATH);
         toWindows = intent != null;
         if (intent != null) startActivity(intent);
@@ -182,6 +176,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        if (tools != null) tools.onPause();
         if (webView != null) {
             webView.onPause();
             webView.pauseTimers();
@@ -195,6 +190,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
             webView.onResume();
             webView.resumeTimers();
         }
+        if (tools != null) tools.onResume();
     }
 
     @Override

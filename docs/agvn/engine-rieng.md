@@ -34,6 +34,24 @@ Anh Sơn quyết định ngày 02/10/2026:
   - Game chạy "Chạy nhẹ" như MV/MZ.
   - Nút Quay lại mở menu: mở menu game, thoát, hoặc "Chạy bằng Windows". Đường lui này luôn có, và lối tắt nhớ lựa
     chọn.
+- **Bộ công cụ Chạy nhẹ** (anh Sơn chốt 02/10/2026: giống game Windows; `AgvnLightTools`), cho Ren'Py, RPG Maker
+  XP/VX/VX Ace và game HTML (MV/MZ, Tyrano):
+  - **Phím ảo:** đúng bộ phím game Windows cùng loại (`controls-*.icp`), cùng chỗ, cùng cỡ.
+    - Ren'Py, Tyrano: Tiếp, Tua, Lịch sử, Menu, Esc, Space.
+    - RPG Maker và MV/MZ: D-pad, OK, Hủy, Chạy, Menu, Enter, Space.
+    - Ren'Py nhận "Menu" là chuột phải và "Lịch sử" là lăn chuột lên, như trên PC. RPG Maker XP/VX/VX Ace nhận OK là
+      Enter.
+  - **Thanh trên cùng:** ⌨ bàn phím Android, ✎ sửa vị trí phím, 👁 ẩn/hiện phím (nhớ theo từng game), ☰ menu. Thanh
+    tự ẩn sau 3 giây như ở game Windows.
+  - **Menu bên trái** (nút Quay lại hoặc ☰): chơi tiếp, mở menu game, bàn phím, hiện phím ảo, độ mờ phím, sửa vị trí
+    phím, HUD, "Gửi nhật ký", "Chạy bằng Windows" (nếu có `.exe`), thoát game. Game vẫn chạy phía sau.
+  - **Sửa vị trí phím:** kéo để dời, － ＋ để đổi cỡ, "Mặc định" để trả về, "Xong" để lưu. Vị trí lưu cho mọi game cùng
+    loại (VN hoặc RPG), trong `files/agvn-light.properties`, vì Ren'Py và RPG Maker chạy ở tiến trình riêng.
+  - **HUD** (góc trên bên trái): RAM của game (Ren'Py, RPG Maker), RAM trống, pin, nhiệt độ; FPS chỉ đo được ở game HTML.
+  - **Bàn phím ở game HTML:** chữ gõ được gửi vào trang thành phím bấm, cho game đọc phím (plugin nhập tên của MV).
+- **Gửi nhật ký khi đang chơi:** "Gửi nhật ký" (menu ⋮ của game, menu Chạy nhẹ, hay mục dưới "Xem log" ở menu bên của
+  game Windows) gom luôn phiên đang chạy: log engine và log Wine tới lúc đó, logcat của app (mkxp-z, SDL, Ren'Py,
+  game HTML) và log của Ren'Py Chạy nhẹ. Không cần thoát game trước.
 - **Nhận diện:** `GameExeResolver` đã nhận ra engine (`RENPY`, `RPGMAKER`). Cần thêm phần đọc phiên bản:
   - Ren'Py: `renpy/__init__.py` hoặc thư mục `lib/py3-*` / `lib/py2-*`.
   - RPG Maker: RGSS1, 2 hay 3, theo `Game.ini` và `RGSS*.dll`.
@@ -182,3 +200,10 @@ Anh Sơn chốt ngày 02/10/2026:
   10. Thư viện và "Thêm game": game Ren'Py và RPG Maker (cả game đã nhập trước khi cập nhật) có ảnh bìa và icon là màn
       tiêu đề hoặc menu của game, không phải icon Ren'Py hay RPG Maker. Thử thêm một game Ren'Py đóng gói `.rpa` và một
       game MV có ảnh mã hoá.
+  11. Bộ công cụ, ở một game Ren'Py, một game RPG Maker XP/VX/VX Ace và một game MV:
+      - phím ảo hiện đúng chỗ như khi chạy Windows và bấm được; Tua (giữ) tua chữ, Lịch sử lùi lại ở Ren'Py;
+      - ⌨ mở bàn phím, gõ tên được; 👁 ẩn phím, mở lại game vẫn ẩn;
+      - ✎: kéo phím, － ＋, "Xong"; mở game khác cùng loại thấy đúng vị trí mới;
+      - nút Quay lại mở menu bên trái; thử từng mục; HUD hiện RAM, pin, nhiệt độ (FPS ở game MV).
+  12. Đang chơi, bấm "Gửi nhật ký" (menu bên của game, hoặc menu ⋮ ngoài thư viện): file zip có `app/logcat.txt` và
+      log của phiên đang chạy.

@@ -8,9 +8,6 @@ import android.os.Process;
 import android.util.Log;
 import android.view.InputDevice;
 import android.view.KeyEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import com.winlator.cmod.R;
 import com.winlator.cmod.SettingsFragment;
@@ -19,28 +16,23 @@ import com.winlator.cmod.core.FileUtils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 /**
  * Plays an RPG Maker XP/VX/VX Ace game on "Chạy nhẹ" ({@link AgvnRgssGame}) with mkxp-z (libmkxp-z.so, built by
  * scripts/agvn/mkxp-z), in its own process (":rgss"): SDL cannot start twice in one process, and a crash there never
- * takes the app down. On-screen keys ({@link AgvnRgssKeys}) play the game by touch; Back opens the same menu as the
- * other "Chạy nhẹ" runners. A game that stops on an error says why and offers "Chạy bằng Windows".
+ * takes the app down. The "Chạy nhẹ" toolkit ({@link AgvnLightTools}) gives the RPG keys of the Windows layout, the
+ * ⌨ ✎ 👁 ☰ bar, the menu on Back and the HUD. A game that stops on an error says why and offers "Chạy bằng Windows".
  */
 public class AgvnRgssActivity extends SDLActivity {
     private static final String TAG = "AGVN";
     public static final String EXTRA_GAME_DIR = "agvn_rgss_game_dir";
     public static final String EXTRA_DRIVE_C = "agvn_rgss_drive_c";
-    private static final String PREFS = "agvn_rgss";
-    private static final String PREF_KEYS_HIDDEN = "keys_hidden";
 
     private AgvnRgssConfig config;
     private File errorFile;
-    private AgvnRgssKeys keys;
+    private AgvnLightTools tools;
     private boolean failed;
 
     @Override
@@ -64,55 +56,70 @@ public class AgvnRgssActivity extends SDLActivity {
         }
         nativeSetenv("SRCDIR", runDir.getPath()); // mkxp-z reads mkxp.json there, then switches into the game folder
         nativeSetenv("AGVN_MKXPZ_ERROR_FILE", errorFile.getPath());
-        keys = new AgvnRgssKeys(this);
-        keys.setVisibility(getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean(PREF_KEYS_HIDDEN, false) ? View.GONE : View.VISIBLE);
-        mLayout.addView(keys, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        tools = AgvnLightTools.attach(this, AgvnLayouts.RPG, getIntent().getStringExtra("shortcut_name"), config.gameDir, new Host());
         AgvnKeepAlive.startRgss(this, getIntent().getStringExtra("shortcut_name")); // keeps running in the background
     }
 
     @Override
     protected void onPause() {
-        if (keys != null) keys.releaseAll(); // no key stays down while the game is in the background
+        if (tools != null) tools.onPause(); // no key stays down while the game is in the background
         super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (tools != null) tools.onResume();
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         boolean mouse = (event.getSource() & InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE;
         if (event.getKeyCode() != KeyEvent.KEYCODE_BACK || mouse) return super.dispatchKeyEvent(event);
-        if (event.getAction() == KeyEvent.ACTION_UP && !event.isCanceled()) showMenu();
+        if (event.getAction() == KeyEvent.ACTION_UP && !event.isCanceled() && tools != null) tools.onBack();
         return true;
     }
 
-    private void showMenu() {
-        boolean hidden = keys != null && keys.getVisibility() != View.VISIBLE;
-        List<CharSequence> items = new ArrayList<>(Arrays.asList(getString(R.string.agvn_html_menu),
-                getString(hidden ? R.string.agvn_rgss_show_keys : R.string.agvn_rgss_hide_keys), getString(R.string.agvn_html_exit)));
-        if (AgvnHtmlGame.hasWindowsExe(this)) items.add(getString(R.string.agvn_html_use_windows)); // not for phone copies
-        new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
-                .setTitle(R.string.agvn_html_back_title)
-                .setItems(items.toArray(new CharSequence[0]), (d, which) -> {
-                    if (which == 0) pressAfterDialog(KeyEvent.KEYCODE_X); // RGSS's B button: opens the menu, or cancels
-                    else if (which == 1) setKeysHidden(!hidden);
-                    else if (which == 2) nativeSendQuit(); // as when a PC window is closed
-                    else switchToWindows();
-                })
-                .setNegativeButton(R.string.agvn_html_keep_playing, null)
-                .show();
-    }
+    /** What the toolkit asks of mkxp-z: keys through SDL, RGSS's B button for the menu, SDL's keyboard. */
+    private final class Host implements AgvnLightTools.Host {
+        @Override
+        public void binding(String binding, boolean down) {
+            int key = AgvnLightActions.forRgss(binding);
+            if (key <= 0) return;
+            if (down) onNativeKeyDown(key);
+            else onNativeKeyUp(key);
+        }
 
-    private void setKeysHidden(boolean hidden) {
-        if (keys == null) return;
-        if (hidden) keys.releaseAll();
-        keys.setVisibility(hidden ? View.GONE : View.VISIBLE);
-        getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean(PREF_KEYS_HIDDEN, hidden).apply();
-    }
+        @Override
+        public void openGameMenu() {
+            onNativeKeyDown(KeyEvent.KEYCODE_X); // RGSS's B button: opens the menu, or cancels
+            mLayout.postDelayed(() -> onNativeKeyUp(KeyEvent.KEYCODE_X), 100); // held for a few frames, so RGSS sees it
+        }
 
-    private void pressAfterDialog(int keyCode) {
-        mLayout.postDelayed(() -> {
-            onNativeKeyDown(keyCode);
-            mLayout.postDelayed(() -> onNativeKeyUp(keyCode), 100); // held for a few frames, so RGSS sees it
-        }, 200);
+        @Override
+        public void showKeyboard() {
+            showTextInput(0, 0, 1, 1); // typed letters reach the game as keys, and as text for scripts that ask for it
+        }
+
+        @Override
+        public void quit() {
+            nativeSendQuit(); // as when a PC window is closed
+        }
+
+        @Override
+        public Runnable windows() {
+            return AgvnHtmlGame.hasWindowsExe(AgvnRgssActivity.this) ? AgvnRgssActivity.this::switchToWindows : null;
+        }
+
+        @Override
+        public int fps() {
+            return -1;
+        }
+
+        @Override
+        public long gameMb() {
+            return AgvnMemoryProbe.processMb();
+        }
     }
 
     /** "Chạy bằng Windows": the shortcut remembers Wine and the game starts there; this process ends. */

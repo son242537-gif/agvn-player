@@ -27,8 +27,9 @@ import java.util.Map;
 
 /**
  * Plays a Ren'Py 8 game on "Chạy nhẹ" ({@link AgvnRenpyGame}) with Ren'Py 8.5.3 for Android, in its own process
- * (":renpy"): Ren'Py ends that process when the game quits, and a crash there never takes the app down. Back opens
- * the same menu as the HTML runner: the game's menu, quit, or "Chạy bằng Windows".
+ * (":renpy"): Ren'Py ends that process when the game quits, and a crash there never takes the app down. Once its first
+ * screen is up, the "Chạy nhẹ" toolkit ({@link AgvnLightTools}) gives the visual novel keys of the Windows layout, the
+ * ⌨ ✎ 👁 ☰ bar, the menu on Back (the game's menu, quit, "Chạy bằng Windows"...) and the HUD.
  */
 public class AgvnRenpyActivity extends PythonSDLActivity {
     private static final String TAG = "AGVN";
@@ -39,6 +40,7 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
     private File publicDir;
     private File quitFile;
     private TextView splash;
+    private AgvnLightTools tools;
     /** True once Ren'Py shows its first screen; before that Back just leaves (a dialog then would stop Ren'Py). */
     private volatile boolean started;
     private volatile boolean failed;
@@ -106,6 +108,21 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
             mLayout.removeView(splash);
             splash = null;
         }
+        if (tools == null) {
+            tools = AgvnLightTools.attach(this, AgvnLayouts.VN, getIntent().getStringExtra("shortcut_name"), gameDir, new AgvnRenpyHost(this));
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if (tools != null) tools.onPause(); // no key stays down while the game is in the background
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (tools != null) tools.onResume();
     }
 
     @Override
@@ -118,33 +135,14 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
         boolean mouse = (event.getSource() & InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE;
         if (event.getKeyCode() != KeyEvent.KEYCODE_BACK || mouse) return super.dispatchKeyEvent(event);
         if (event.getAction() == KeyEvent.ACTION_UP && !event.isCanceled()) {
-            if (started) showMenu();
-            else end();
+            if (tools != null) tools.onBack();
+            else end(); // before the first screen a menu would stop Ren'Py
         }
         return true;
     }
 
-    private void showMenu() {
-        new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
-                .setTitle(R.string.agvn_html_back_title)
-                .setItems(AgvnHtmlGame.backMenu(this), (d, which) -> {
-                    if (which == 0) pressAfterDialog(KeyEvent.KEYCODE_ESCAPE); // Ren'Py's game menu key
-                    else if (which == 1) askRenpyToQuit();
-                    else switchToWindows();
-                })
-                .setNegativeButton(R.string.agvn_html_keep_playing, null)
-                .show();
-    }
-
-    private void pressAfterDialog(int keyCode) {
-        mLayout.postDelayed(() -> {
-            onNativeKeyDown(keyCode);
-            onNativeKeyUp(keyCode);
-        }, 200);
-    }
-
     /** As when a PC window is closed: the game asks, saves its persistent data, then quits (main.py watches the file). */
-    private void askRenpyToQuit() {
+    void askRenpyToQuit() {
         try {
             if (!quitFile.createNewFile()) Log.i(TAG, "quit already asked");
         } catch (IOException e) {
@@ -154,7 +152,7 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
     }
 
     /** "Chạy bằng Windows": the shortcut remembers Wine and the game starts there; this process ends. */
-    private void switchToWindows() {
+    void switchToWindows() {
         Intent intent = AgvnHtmlGame.toWindows(this, EXTRA_GAME_DIR);
         if (intent != null) startActivity(intent);
         end();

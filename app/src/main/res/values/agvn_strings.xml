@@ -66,7 +66,6 @@
     <string name="agvn_internal_storage">Bộ nhớ trong</string>
     <string name="agvn_import_preview_controls">Bộ phím: %1$s</string>
     <string name="agvn_import_preview_html">Cách chạy: Chạy nhẹ, không giả lập Windows (nhanh, mát máy, đỡ tốn pin)</string>
-    <string name="agvn_html_back_title">Tạm dừng</string>
     <string name="agvn_html_menu">Mở menu trong game</string>
     <string name="agvn_html_exit">Thoát game</string>
     <string name="agvn_html_use_windows">Game bị lỗi? Chạy bằng Windows</string>
@@ -80,7 +79,6 @@
     <string name="agvn_renpy_no_web">AGVN Player không mở trang web từ trong game.</string>
     <string name="agvn_renpy_failed_title">Game chưa mở được</string>
     <string name="agvn_renpy_failed_message">Game này chưa chạy được bằng Chạy nhẹ. Bạn có thể chạy bằng Windows.\n\nNhật ký lỗi (gửi cho AGVN nếu cần): %1$s</string>
-    <string name="agvn_rgss_hide_keys">Ẩn phím ảo</string>
     <string name="agvn_rgss_show_keys">Hiện phím ảo</string>
     <string name="agvn_rgss_failed_title">Game bị dừng vì lỗi</string>
     <string name="agvn_rgss_failed_message">Game này gặp lỗi khi chạy bằng Chạy nhẹ. Bạn có thể chạy bằng Windows. Lỗi gốc của game:</string>
@@ -101,6 +99,18 @@
     <string name="agvn_bar_hide_label">👁 Ẩn</string>
     <string name="agvn_bar_show_label">👁 Hiện</string>
     <string name="agvn_bar_reveal">Hiện thanh ⌨ Sửa Hiện</string>
+    <!-- "Chạy nhẹ" toolkit (AgvnLightTools): bar, menu, key editor, HUD -->
+    <string name="agvn_light_menu">Menu</string>
+    <string name="agvn_light_subtitle">Chạy nhẹ · game vẫn chạy phía sau</string>
+    <string name="agvn_light_keys_section">Phím ảo</string>
+    <string name="agvn_light_opacity">Độ mờ phím</string>
+    <string name="agvn_light_edit">Sửa vị trí phím</string>
+    <string name="agvn_light_other_section">Khác</string>
+    <string name="agvn_light_hud">HUD: RAM, pin, nhiệt độ</string>
+    <string name="agvn_light_reset">Mặc định</string>
+    <string name="agvn_light_reset_desc">Đưa mọi phím về chỗ cũ</string>
+    <string name="agvn_light_edit_hint">Kéo phím để di chuyển. Chạm một phím rồi bấm － hoặc ＋ để đổi cỡ, xong bấm Xong.</string>
+    <string name="agvn_light_saved">Đã lưu vị trí phím cho các game cùng loại</string>
     <string name="agvn_controls_auto">Tự động (AGVN)</string>
     <string name="agvn_controls_hidden">Đã ẩn bộ phím ảo. Bấm 👁 để hiện lại.</string>
     <string name="agvn_controls_shown">Đã hiện bộ phím ảo</string>
