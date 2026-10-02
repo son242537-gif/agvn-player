@@ -18,12 +18,21 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class DebugDialog extends ContentDialog implements Callback<String> {
     private final LogView logView;
     private static boolean paused = false;
     private BufferedWriter writer;
     private File logFile;
+    /** AGVN: the log goes to /sdcard once a second, not after every line (a game can write thousands a minute). */
+    private final ScheduledExecutorService flusher = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread t = new Thread(r, "DebugDialogFlush");
+        t.setDaemon(true);
+        return t;
+    });
 
     public DebugDialog(@NonNull Context context) {
         super(context, R.layout.debug_dialog);
@@ -52,6 +61,7 @@ public class DebugDialog extends ContentDialog implements Callback<String> {
         catch (IOException e) {
             throw new RuntimeException(e);
         }
+        flusher.scheduleWithFixedDelay(this::flush, 1, 1, TimeUnit.SECONDS);
     }
 
     @Override
@@ -59,10 +69,19 @@ public class DebugDialog extends ContentDialog implements Callback<String> {
         if (!getPaused()) logView.append(line+"\n");
         try {
             writer.write(line + "\n");
-            writer.flush();
         }
         catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    /** AGVN: writes out the lines still buffered, e.g. before the log is copied into the play session. */
+    public void flush() {
+        try {
+            writer.flush();
+        }
+        catch (IOException ignored) {
+            // the next flush tries again
         }
     }
     

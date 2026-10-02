@@ -50,9 +50,13 @@
     <string name="agvn_prelaunch_message">Game cần khoảng %1$d MB RAM trống, máy đang có %2$d MB.\n\nHãy mở danh sách ứng dụng gần đây và đóng bớt ứng dụng khác, rồi bấm \"Kiểm tra lại\". Nếu vẫn chơi, game có thể nạp chậm (khoảng 30–60 giây) hoặc bị tắt giữa chừng.</string>
     <string name="agvn_prelaunch_recheck">Kiểm tra lại</string>
     <string name="agvn_prelaunch_play_anyway">Vẫn chơi</string>
-    <string name="agvn_about_message">Phiên bản %1$s\n\nChơi game PC trên điện thoại, bản tiếng Việt.\nagvn.io.vn\n\nMã nguồn mở (MIT), dựa trên Winlator.</string>
+    <string name="agvn_about_message">Phiên bản %1$s\n\nChơi game PC trên điện thoại, bản tiếng Việt.\nagvn.io.vn\n\nPhần mềm tự do theo giấy phép GNU GPL 3, dựa trên Winlator.</string>
     <string name="agvn_licenses">Giấy phép mã nguồn mở</string>
     <string name="agvn_notification_running">Game đang chạy, đừng tắt thông báo này</string>
+    <string name="agvn_notification_game">Đang chạy %1$s, đừng tắt thông báo này</string>
+    <string name="agvn_debug_on_notice">Đang ghi log Wine chi tiết – game chạy chậm hơn</string>
+    <string name="agvn_startup_progress">Đang khởi động %1$s</string>
+    <string name="agvn_startup_stalled">Có thể đang treo (%1$s)</string>
     <string name="agvn_import_empty">Chưa tìm thấy game nào.\n\nHãy chép thư mục game vào Bộ nhớ trong (ví dụ Bộ nhớ trong/AGVN/Tên game), thư mục Download hoặc thẻ nhớ, rồi mở lại mục này. App tự tìm cả trong các thư mục con.</string>
     <string name="agvn_import_scanning">Đang tìm game trong máy…</string>
     <string name="agvn_import_no_permission">AGVN Player chưa được phép đọc bộ nhớ nên không thấy game.\n\nBấm "Cấp quyền" rồi bật "Cho phép quản lý tất cả tệp" cho AGVN Player, sau đó quay lại.</string>
@@ -67,6 +71,12 @@
     <string name="agvn_html_keep_playing">Chơi tiếp</string>
     <string name="agvn_html_no_webview">Máy đang tắt hoặc đang cập nhật \"Android System WebView\", nên game được chạy bằng Windows.</string>
     <string name="agvn_html_crashed">Game bị dừng vì thiếu bộ nhớ hoặc lỗi. Hãy mở lại, nếu vẫn lỗi thì chọn \"Chạy bằng Windows\".</string>
+    <string name="agvn_renpy_starting">Đang mở game…</string>
+    <string name="agvn_renpy_first_start">Lần đầu mở game Ren\'Py: app đang chuẩn bị Ren\'Py, mất từ vài giây đến nửa phút.</string>
+    <string name="agvn_renpy_unpack_failed">Không chuẩn bị được Ren\'Py. Bộ nhớ máy có thể đã đầy: hãy để trống ít nhất 100 MB rồi mở lại.</string>
+    <string name="agvn_renpy_no_web">AGVN Player không mở trang web từ trong game.</string>
+    <string name="agvn_renpy_failed_title">Game chưa mở được</string>
+    <string name="agvn_renpy_failed_message">Game này chưa chạy được bằng Chạy nhẹ. Bạn có thể chạy bằng Windows.\n\nNhật ký lỗi (gửi cho AGVN nếu cần): %1$s</string>
     <string name="agvn_import_preview_japanese">Ngôn ngữ Windows: tiếng Nhật (để chữ trong game Nhật không bị lỗi)</string>
     <string name="agvn_controls_pc">Máy tính</string>
     <string name="agvn_controls_vn">Visual novel</string>

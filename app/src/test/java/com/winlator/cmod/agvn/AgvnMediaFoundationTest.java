@@ -73,8 +73,9 @@ public class AgvnMediaFoundationTest {
     @Test
     public void wineDebugClassesCoverEveryChannel() {
         // the default pick must log warnings, e.g. "Transform failed to process output"
-        assertEquals("warn+all,err+all,fixme+all", AgvnWineDebug.spec(true, SettingsFragment.DEFAULT_WINE_DEBUG_CHANNELS));
-        assertEquals("warn+all,+mfplat,+d3d11", AgvnWineDebug.spec(true, "warn, mfplat,d3d11"));
+        assertEquals("warn+all,err+all,fixme+all,warn-heap,warn-file,warn-font",
+                AgvnWineDebug.spec(true, SettingsFragment.DEFAULT_WINE_DEBUG_CHANNELS));
+        assertEquals("warn+all,+mfplat,+d3d11,warn-heap,warn-file,warn-font", AgvnWineDebug.spec(true, "warn, mfplat,d3d11"));
         assertEquals("-all", AgvnWineDebug.spec(false, "warn,err,fixme"));
         assertEquals("-all", AgvnWineDebug.spec(true, ""));
         assertEquals("-all", AgvnWineDebug.spec(true, " , "));

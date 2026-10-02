@@ -27,8 +27,12 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class LogView extends View {
+    /** AGVN: lines kept on screen (the log file keeps all); older ones go 500 at a time. */
+    private static final int MAX_LINES = 5000, TRIM_LINES = 500;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final ArrayList<String> lines = new ArrayList<>();
+    /** AGVN: the widest line, kept as lines come instead of measuring them all again for each new one. */
+    private float maxLineWidth = 0;
     private final float rowHeight = UnitUtils.dpToPx(30);
     private final float defaultTextSize = UnitUtils.dpToPx(16);
     private final float minScrollThumbSize = UnitUtils.dpToPx(6);
@@ -163,24 +167,28 @@ public class LogView extends View {
         int height = getHeight();
         if (width == 0 || height == 0) return;
 
-        float maxWidth = 0;
-        paint.setTextSize(defaultTextSize);
-        for (int i = 0, count = lines.size(); i < count; i++) maxWidth = Math.max(paint.measureText(lines.get(i)), maxWidth);
-        scrollSize.x = Math.max(maxWidth, width);
-        scrollSize.y = Math.max(rowHeight * lines.size(), height);
-        scrollPosition.set(0, getScrollMaxTop());
+        synchronized (lock) {
+            scrollSize.x = Math.max(maxLineWidth, width);
+            scrollSize.y = Math.max(rowHeight * lines.size(), height);
+            scrollPosition.set(0, getScrollMaxTop());
+        }
     }
 
     public void clear() {
         synchronized (lock) {
             lines.clear();
+            maxLineWidth = 0;
         }
         postInvalidate();
     }
 
     public void append(String line) {
         synchronized (lock) {
-            lines.add("["+DateFormat.format("HH:mm:ss", System.currentTimeMillis())+"]  "+line.replace("\n", ""));
+            String text = "["+DateFormat.format("HH:mm:ss", System.currentTimeMillis())+"]  "+line.replace("\n", "");
+            lines.add(text);
+            paint.setTextSize(defaultTextSize);
+            maxLineWidth = Math.max(maxLineWidth, paint.measureText(text));
+            if (lines.size() > MAX_LINES + TRIM_LINES) lines.subList(0, TRIM_LINES).clear();
             computeScrollSize();
         }
     }

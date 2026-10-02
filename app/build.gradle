@@ -65,6 +65,8 @@ def pinnedAsset = { File target, String pinKey, Closure download ->
         cached.bytes = target.bytes
     }
 }
+// for agvn-renpy.gradle (applied at the end of this file)
+ext.agvnPinnedAsset = pinnedAsset
 
 tasks.register("downloadImageFS") {
     def assetDir = new File(project.rootDir, ["app","src","main","assets"].join(File.separator))
@@ -255,3 +257,6 @@ dependencies {
     // AGVN unit tests (pure-Java logic in com.winlator.cmod.agvn)
     testImplementation 'junit:junit:4.13.2'
 }
+
+// AGVN: Ren'Py 8 runner (librenpython.so, its Java classes and the engine zip), see agvn-renpy.gradle
+apply from: "agvn-renpy.gradle"
