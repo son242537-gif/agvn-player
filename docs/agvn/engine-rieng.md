@@ -155,6 +155,17 @@ Anh Sơn chốt ngày 02/10/2026:
     font có sẵn trong app. Nạp sẵn 3 script của mkxp-z cho tương thích (hàm Ruby cũ, Win32API).
   - **Nhật ký:** `adb logcat -s mkxp SDL AGVN`. Game dừng vì lỗi thì lỗi gốc và bản tóm tắt (RGSS mấy, RTP tìm được
     hay thiếu) được lưu vào `AGVN-Player/logs/<tên game>/<giờ>/`, nên "Gửi nhật ký" ở menu ⋮ của game có cả lỗi này.
+  - **Ảnh bìa và icon lấy từ chính game:** `.exe` của game Ren'Py và RPG Maker thường mang icon mặc định của engine, nên
+    thư viện, danh sách "Thêm game" và lối tắt màn hình chính dùng ảnh của game:
+    - Ren'Py: ảnh nền menu chính (`gui/main_menu`, rồi ảnh có tên kiểu `title`, `menu_bg`, rồi `presplash`), cả khi nằm
+      trong gói `game/*.rpa`. Ảnh nền một màu (mặc định của Ren'Py) bị bỏ qua. Icon là `gui/window_icon` nếu nhà làm game
+      tự vẽ; icon mặc định của Ren'Py (250x250) bị bỏ qua.
+    - RPG Maker MV/MZ: ảnh tiêu đề `data/System.json` chỉ định trong `img/titles1`. Ảnh mã hoá (`.rpgmvp`, `.png_`) đọc
+      được mà không cần khoá.
+    - RPG Maker XP/VX/VX Ace: ảnh tiêu đề (`Graphics/Titles`, `Graphics/System/Title`, `Graphics/Titles1`), cả khi nằm
+      trong gói `.rgssad/.rgss2a/.rgss3a`. Ảnh `Data/System` chỉ định được ưu tiên.
+    - Icon của những game này là ô vuông giữa ảnh đó. Không có ảnh nào thì ảnh bìa vẽ tên game, không vẽ icon mặc định
+      của RPG Maker. Game đã nhập từ trước tự đổi ảnh bìa và icon một lần sau khi cập nhật app.
 - **Thử máy:** cần một game XP, một game VX, một game VX Ace (tốt nhất một game dùng nhạc MIDI và một game cần RTP).
   1. Cài đè bản đang dùng. Nhập 3 game; bảng xem trước ghi "Cách chạy: Chạy nhẹ".
   2. Mỗi game:
@@ -168,3 +179,6 @@ Anh Sơn chốt ngày 02/10/2026:
   7. So RAM và nhiệt với khi chạy bằng Windows: `adb shell dumpsys meminfo com.agvn.player:rgss`.
   8. Hồi quy: game RPG Maker 2000/2003, MV/MZ "Chạy nhẹ", Ren'Py 8 và game Windows vẫn chạy như cũ.
   9. Màn "Giấy phép mã nguồn mở" có phần mkxp-z.
+  10. Thư viện và "Thêm game": game Ren'Py và RPG Maker (cả game đã nhập trước khi cập nhật) có ảnh bìa và icon là màn
+      tiêu đề hoặc menu của game, không phải icon Ren'Py hay RPG Maker. Thử thêm một game Ren'Py đóng gói `.rpa` và một
+      game MV có ảnh mã hoá.

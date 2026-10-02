@@ -7,7 +7,6 @@ import android.os.Environment;
 import com.winlator.cmod.SettingsFragment;
 import com.winlator.cmod.container.Container;
 import com.winlator.cmod.container.Shortcut;
-import com.winlator.cmod.core.ExeIconExtractor;
 import com.winlator.cmod.core.FileUtils;
 import com.winlator.cmod.xenvironment.ImageFs;
 
@@ -161,7 +160,7 @@ public final class AgvnGameImporter {
         shortcut.saveData();
         shortcut.genUUID();
         PreLaunchCheck.applyUeConfig(shortcut);
-        extractIcon(container, exeFile, name);
+        AgvnGameIcons.write(container, c.gameDir, c.engine, exeFile, name);
         return desktopFile;
     }
 
@@ -238,21 +237,6 @@ public final class AgvnGameImporter {
             return f.getCanonicalPath();
         } catch (IOException e) {
             return f.getAbsolutePath();
-        }
-    }
-
-    private static void extractIcon(Container container, File exeFile, String name) {
-        try {
-            File iconDir = container.getIconsDir(64);
-            iconDir.mkdirs();
-            File icon = new File(iconDir, name + ".png");
-            if (ExeIconExtractor.extractIcon(exeFile, icon)) {
-                File userIcons = new File(SettingsFragment.DEFAULT_WINLATOR_PATH, "icons");
-                userIcons.mkdirs();
-                FileUtils.copy(icon, new File(userIcons, name + ".png"));
-            }
-        } catch (Exception ignored) {
-            // the library falls back to a generic icon
         }
     }
 }

@@ -25,6 +25,8 @@ public final class AgvnImportEntry {
     public final boolean hasProfile;
     /** Exe used for the thumbnail; null when none was found. */
     public final File exe;
+    /** The folder's engine: Ren'Py and RPG Maker rows show the game's own picture instead of the engine's exe icon. */
+    public final GameExeResolver.Engine engine;
     /** Shortcut the game already has, or null. */
     public final AgvnLibraryIndex.Existing existing;
     /** The exe this row starts when the folder holds several games or the player picked it; null for the folder's game. */
@@ -32,14 +34,15 @@ public final class AgvnImportEntry {
     /** Unique per row (list key): the folder, plus the exe for a variant. */
     public final String key;
 
-    AgvnImportEntry(File dir, String title, String detail, boolean hasProfile, File exe, AgvnLibraryIndex.Existing existing,
-                    String variant) {
+    AgvnImportEntry(File dir, String title, String detail, boolean hasProfile, File exe, GameExeResolver.Engine engine,
+                    AgvnLibraryIndex.Existing existing, String variant) {
         this.dir = dir;
         this.title = title;
         this.sortKey = AgvnGameTitle.searchKey(title);
         this.detail = detail;
         this.hasProfile = hasProfile;
         this.exe = exe;
+        this.engine = engine;
         this.existing = existing;
         this.variant = variant;
         this.key = variant == null ? dir.getAbsolutePath() : dir.getAbsolutePath() + "|" + variant;
@@ -103,19 +106,19 @@ public final class AgvnImportEntry {
         if (picked != null) {
             // the folder's game when it starts this exe (an Unreal folder always starts Shipping: its root exe is a bootstrap)
             boolean folderGame = games.size() <= 1 && (picked.equalsIgnoreCase(exe) || engine == GameExeResolver.Engine.UNREAL);
-            rows.add(row(dir, title, detail, hasProfile, picked, folderGame ? null : picked, library));
+            rows.add(row(dir, title, detail, hasProfile, picked, engine, folderGame ? null : picked, library));
         } else if (games.size() > 1) {
-            for (String game : games) rows.add(row(dir, title, detail, false, game, game, library));
+            for (String game : games) rows.add(row(dir, title, detail, false, game, engine, game, library));
         } else {
-            rows.add(row(dir, title, detail, hasProfile, exe, null, library));
+            rows.add(row(dir, title, detail, hasProfile, exe, engine, null, library));
         }
         return rows;
     }
 
-    private static AgvnImportEntry row(File dir, String title, String detail, boolean hasProfile, String exe, String variant,
-                                       AgvnLibraryIndex library) {
+    private static AgvnImportEntry row(File dir, String title, String detail, boolean hasProfile, String exe,
+                                       GameExeResolver.Engine engine, String variant, AgvnLibraryIndex library) {
         String shown = variant != null ? AgvnProfile.variantName(title, variant) : title;
-        return new AgvnImportEntry(dir, shown, detail, hasProfile, exe != null ? new File(dir, exe) : null,
+        return new AgvnImportEntry(dir, shown, detail, hasProfile, exe != null ? new File(dir, exe) : null, engine,
                 library.find(dir, variant), variant);
     }
 
