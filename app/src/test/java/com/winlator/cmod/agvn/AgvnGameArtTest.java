@@ -83,7 +83,8 @@ public class AgvnGameArtTest {
         Files.write(new File(root, "www/data/System.json").toPath(),
                 "\uFEFF{\"gameTitle\":\"X\",\"title1Name\":\"Castle\",\"hasEncryptedImages\":true}".getBytes(StandardCharsets.UTF_8));
         List<AgvnArt> art = AgvnCoverSources.candidates(root);
-        assertEquals(Arrays.asList("www/img/titles1/Castle.rpgmvp", "www/img/titles1/Broken.png_", "www/img/titles1/Big.png"), names(root, art));
+        assertEquals(Arrays.asList("www/img/titles1/Castle.rpgmvp", "www/img/titles1/Broken.png_", "www/img/titles1/Big.png"),
+                names(root, art));
         assertArrayEquals(castle, art.get(0).read()); // restored without the key
         assertNull(art.get(1).read()); // not an RPGMV file: the next one is used
         assertEquals("Castle", AgvnMvArt.titleName(new File(root, "www/data/System.json")));
@@ -97,7 +98,8 @@ public class AgvnGameArtTest {
         write(new File(root, "Graphics/Titles2/Frame.png"), 2000); // a frame over the title, not the picture
         Files.createDirectories(new File(root, "Data").toPath());
         Files.write(new File(root, "Data/System.rvdata2").toPath(), marshalSystem("@title1_name", "Small", true));
-        assertEquals(Arrays.asList("Graphics/Titles1/Small.png", "Graphics/Titles1/Large.jpg"), names(root, AgvnCoverSources.candidates(root)));
+        assertEquals(Arrays.asList("Graphics/Titles1/Small.png", "Graphics/Titles1/Large.jpg"),
+                names(root, AgvnCoverSources.candidates(root)));
 
         File vx = tmp.newFolder("VX");
         write(new File(vx, "Graphics/System/Title.png"), 300);
@@ -196,9 +198,13 @@ public class AgvnGameArtTest {
         Files.write(f.toPath(), new byte[size]);
     }
 
+    /** Names relative to {@code root} with '/' (Windows paths, where the maintainer builds, use '\\'). */
     private static List<String> names(File root, List<AgvnArt> art) {
         List<String> out = new ArrayList<>();
-        for (AgvnArt a : art) out.add(a.name.startsWith(root.getPath()) ? a.name.substring(root.getPath().length() + 1) : a.name);
+        for (AgvnArt a : art) {
+            String name = a.name.startsWith(root.getPath()) ? a.name.substring(root.getPath().length() + 1) : a.name;
+            out.add(name.replace(File.separatorChar, '/'));
+        }
         return out;
     }
 }
