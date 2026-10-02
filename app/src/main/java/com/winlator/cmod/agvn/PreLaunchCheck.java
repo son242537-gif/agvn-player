@@ -14,8 +14,9 @@ import com.winlator.cmod.xenvironment.ImageFs;
 import java.io.File;
 
 /**
- * Runs right before a library game starts: refreshes the Unreal Engine.ini overrides and checks that enough RAM
- * is free. When RAM is short the player is asked to close other apps and re-check, or to play anyway.
+ * Runs right before a library game starts: refreshes the Unreal Engine.ini overrides, warns about game files that
+ * were copied only partly ({@link AgvnGameFilesCheck}) and checks that enough RAM is free. When RAM is short the
+ * player is asked to close other apps and re-check, or to play anyway.
  * AGVN never kills other apps itself (Android 14+ only lets an app kill its own processes anyway).
  */
 public final class PreLaunchCheck {
@@ -26,7 +27,8 @@ public final class PreLaunchCheck {
     public static void run(Activity activity, Shortcut shortcut, Runnable launch) {
         applyUeConfig(shortcut);
         int pool = parseInt(shortcut.getExtra(AgvnGameImporter.EXTRA_TEXTURE_POOL, "0"));
-        check(activity, RamGuard.getRequiredRamMb(pool), launch);
+        long requiredMb = RamGuard.getRequiredRamMb(pool);
+        AgvnGameFilesCheck.run(activity, shortcut, () -> check(activity, requiredMb, launch));
     }
 
     private static void check(Activity activity, long requiredMb, Runnable launch) {
