@@ -34,6 +34,15 @@ public class AgvnStartupProgressTest {
     }
 
     @Test
+    public void aRedrawRightAfterATapMeansTheGameIsUp() {
+        long start = 10_000;
+        assertTrue(AgvnStartupProgress.answers(20_000, 20_400, start)); // tapped, the game redrew 0.4 s later
+        assertFalse(AgvnStartupProgress.answers(20_000, 22_000, start)); // a redraw long after the tap
+        assertFalse(AgvnStartupProgress.answers(0, 20_400, start)); // nobody has touched the game yet
+        assertFalse(AgvnStartupProgress.answers(9_000, 9_500, start)); // a tap before this start
+    }
+
+    @Test
     public void clockReadsMinutesAndSeconds() {
         assertEquals("4:12", AgvnStartupProgress.clock(252_400));
         assertEquals("0:09", AgvnStartupProgress.clock(9_999));

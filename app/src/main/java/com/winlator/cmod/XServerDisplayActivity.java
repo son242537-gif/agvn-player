@@ -848,6 +848,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         agvnMemoryWatch.start();
         if (agvnHeatWatch == null) agvnHeatWatch = new com.winlator.cmod.agvn.AgvnHeatWatch(this);
         agvnHeatWatch.start();
+        if (agvnStatus != null) agvnStatus.followDebugSetting(preferences.getBoolean("enable_wine_debug", false)); // AGVN
         if (!isInPictureInPictureMode())
             ProcessHelper.resumeAllWineProcesses();
     }

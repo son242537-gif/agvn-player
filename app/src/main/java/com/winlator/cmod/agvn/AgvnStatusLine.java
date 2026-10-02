@@ -3,10 +3,13 @@ package com.winlator.cmod.agvn;
 
 import android.app.Activity;
 import android.graphics.drawable.GradientDrawable;
+import android.widget.Toast;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import com.winlator.cmod.R;
 
 /**
  * A small line of text at the top right of the game: that "Bật debug Wine" is on, and how a slow start is going
@@ -24,6 +27,16 @@ public final class AgvnStatusLine {
     public void setDebug(String text) {
         debug = text != null ? text : "";
         render();
+    }
+
+    /**
+     * Back on the game: "Bật debug Wine" turned off while it ran takes the notice away. Wine keeps the log it started
+     * with until the game restarts, which a toast says once.
+     */
+    public void followDebugSetting(boolean on) {
+        if (on || debug.isEmpty()) return;
+        setDebug(null);
+        Toast.makeText(activity, R.string.agvn_debug_off_next_start, Toast.LENGTH_LONG).show();
     }
 
     public void setProgress(String text) {

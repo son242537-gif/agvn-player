@@ -56,6 +56,7 @@
     <string name="agvn_notification_running">Game đang chạy, đừng tắt thông báo này</string>
     <string name="agvn_notification_game">Đang chạy %1$s, đừng tắt thông báo này</string>
     <string name="agvn_debug_on_notice">Đang ghi log Wine chi tiết – game chạy chậm hơn</string>
+    <string name="agvn_debug_off_next_start">Đã tắt debug Wine. Thoát hẳn game rồi mở lại để Wine thôi ghi log.</string>
     <string name="agvn_startup_progress">Đang khởi động %1$s</string>
     <string name="agvn_startup_stalled">Có thể đang treo (%1$s)</string>
     <string name="agvn_import_empty">Chưa tìm thấy game nào.\n\nHãy chép thư mục game vào Bộ nhớ trong (ví dụ Bộ nhớ trong/AGVN/Tên game), thư mục Download hoặc thẻ nhớ, rồi mở lại mục này. App tự tìm cả trong các thư mục con.</string>
