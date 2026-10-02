@@ -43,6 +43,9 @@ A Vietnamese-first emulation environment for PC games on weak Android phones (Ad
 2. **No features requiring root or in-app ADB self-pairing** (security risk for non-technical users).
 
 3. **No in-app telemetry, ads, or external links** (except agvn.io.vn in About screen and diagnostic exports).
+   - Exception, approved by the maintainer: the in-app updater (`agvn/AgvnUpdater`).
+     - It reads `agvn-update.txt` and the APK named there, only from this repository's GitHub Releases.
+     - It sends nothing about the device.
 
 4. **Do not break upstream structure needlessly:** Keep diffs small and focused; new code in new files where sensible.
 
@@ -66,6 +69,23 @@ export AGVN_VERSION_CODE=2
 ./gradlew assembleRelease --no-daemon
 # Output: app/build/outputs/apk/release/app-release.apk
 ```
+
+### Publish an Update (maintainer's PC only)
+Phones update themselves from GitHub Releases (Cài đặt → Cập nhật ứng dụng). There is one channel: every phone gets the
+newest release, and there are no test builds. The script builds with the release key, so it runs only on the
+maintainer's PC, after `gh auth login`:
+```powershell
+# release v<AGVN_VERSION_NAME> from gradle.properties; Bypass because Windows blocks .ps1 files by default
+powershell -ExecutionPolicy Bypass -File .\tools\agvn\dang-ban-cap-nhat.ps1
+```
+- Before each release, a cloud session raises `AGVN_VERSION_CODE` and `AGVN_VERSION_NAME` in `gradle.properties`.
+  Android only installs a higher code over the installed one.
+- It also writes the player-facing notes to `docs/agvn/release/ghi-chu-phat-hanh-v<version>.txt`.
+- The public download link is fixed (maintainer's decision, 2026-10-01):
+  `https://github.com/son242537-gif/agvn-player/releases/latest/download/AGVN-Player.apk`.
+  Every release attaches the APK as `AGVN-Player.apk` (the script does this); never rename that asset.
+
+See [`docs/agvn/cap-nhat-ung-dung.md`](./docs/agvn/cap-nhat-ung-dung.md).
 
 ### Build & Run Unit Tests
 ```bash

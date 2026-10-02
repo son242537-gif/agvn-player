@@ -216,6 +216,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private boolean isMouseDisabled = false;
     private boolean simulateTouchScreen = false;
     private com.winlator.cmod.agvn.GameSessionGuard agvnSessionGuard;
+    private com.winlator.cmod.agvn.AgvnMemoryWatch agvnMemoryWatch;
+    private com.winlator.cmod.agvn.AgvnHeatWatch agvnHeatWatch;
     private String agvnEffectiveExePath; // AGVN: exe actually launched (Unreal bootstrap -> Shipping redirect)
 
     private SensorManager sensorManager;
@@ -458,7 +460,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (shortcut != null) {
             affinityCpuList = shortcut.getExtra("cpuList", container.getCPUList(true));
             taskAffinityMask = (short) ProcessHelper.getAffinityMask(affinityCpuList);
-            taskAffinityMaskWoW64 = taskAffinityMask;
+            // AGVN: 32-bit programs keep the environment's 32-bit cores unless the game picked its own cores
+            if (!shortcut.getExtra("cpuList").isEmpty()) taskAffinityMaskWoW64 = taskAffinityMask;
         }
 
         boolean syncCpuTopology = shortcut != null
@@ -518,13 +521,13 @@ public class XServerDisplayActivity extends AppCompatActivity {
             dxwrapperConfig = shortcut.getExtra("dxwrapperConfig", container.getDXWrapperConfig());
             screenSize = shortcut.getExtra("screenSize", container.getScreenSize());
             lc_all = shortcut.getExtra("lc_all", container.getLC_ALL());
+            midiSoundFont = shortcut.getExtra("midiSoundFont", container.getMIDISoundFont()); // AGVN: the game's own choice, "" = off
             String inputType = shortcut.getExtra("inputType");
             if (!inputType.isEmpty())
                 winHandler.setInputType(Byte.parseByte(inputType));
             String xinputDisabledString = shortcut.getExtra("disableXinput", "false");
             xinputDisabledFromShortcut = parseBoolean(xinputDisabledString);
 
-            winHandler.setXInputDisabled(xinputDisabledFromShortcut);
             String sharpnessEffect = shortcut.getExtra("sharpnessEffect", "None");
             if (!sharpnessEffect.equals("None")) {
                 double sharpnessLevel = Double.parseDouble(shortcut.getExtra("sharpnessLevel", "100"));
@@ -539,6 +542,10 @@ public class XServerDisplayActivity extends AppCompatActivity {
             isRelativeMouseMovement = shortcut.getExtra("enableRelativeMouse").equals("1");
             isMouseDisabled = shortcut.getExtra("disableMouse").equals("1");
         }
+        // AGVN: "Disable XInput" in the app or the game, or XInput and DInput both off with exclusive input: no gamepad
+        winHandler.setXInputDisabled(com.winlator.cmod.agvn.AgvnGamepadMode.noGamepad(
+                preferences.getBoolean("xinput_toggle", false), xinputDisabledFromShortcut,
+                com.winlator.cmod.agvn.AgvnGamepadMode.exclusive(container, shortcut), winHandler.getInputType()));
 
         this.graphicsDriverConfig = GraphicsDriverConfigDialog.parseGraphicsDriverConfig(graphicsDriverConfig);
         this.dxwrapperConfig = DXVKConfigDialog.parseConfig(dxwrapperConfig);
@@ -582,6 +589,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
         displayxConfig.put("presentRR", presentRR ? "1" : "0");
         displayxConfig.put("backPressure", backPressure ? "1" : "0");
         displayxConfig.put("precisePresentation", precisePresentation ? "1" : "0");
+        // AGVN: a mistyped custom resolution ("1280X720", "1280x") used to crash here; fall back to the default
+        screenSize = com.winlator.cmod.agvn.AgvnScreenSize.orDefault(screenSize);
         xServer = new XServer(new ScreenInfo(screenSize), useDisplayX ? "displayx" : "egl", displayxConfig);
         xServer.setWinHandler(winHandler);
         xServer.setRelativeMouseMovement(isRelativeMouseMovement);
@@ -694,6 +703,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             }
             Executors.newSingleThreadExecutor().execute(() -> {
                 if (shortcut != null) agvnEffectiveExePath = com.winlator.cmod.agvn.AgvnExeRedirect.effectivePath(shortcut.path, container); // AGVN
+                com.winlator.cmod.agvn.AgvnMemorySaver.applyGameSettings(this, shortcut); // AGVN: Ren'Py/Unity RAM per step
                 setupWineSystemFiles();
                 extractGraphicsDriverFiles();
                 changeWineAudioDriver();
@@ -826,6 +836,10 @@ public class XServerDisplayActivity extends AppCompatActivity {
         handler.postDelayed(savePlaytimeRunnable, SAVE_INTERVAL_MS);
         if (agvnSessionGuard == null) agvnSessionGuard = new com.winlator.cmod.agvn.GameSessionGuard(this);
         agvnSessionGuard.start();
+        if (agvnMemoryWatch == null) agvnMemoryWatch = new com.winlator.cmod.agvn.AgvnMemoryWatch(this, this::exit);
+        agvnMemoryWatch.start();
+        if (agvnHeatWatch == null) agvnHeatWatch = new com.winlator.cmod.agvn.AgvnHeatWatch(this);
+        agvnHeatWatch.start();
         if (!isInPictureInPictureMode())
             ProcessHelper.resumeAllWineProcesses();
     }
@@ -834,6 +848,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
     public void onPause() {
         if (taskManagerSidebar != null) taskManagerSidebar.stop();
         if (agvnSessionGuard != null) agvnSessionGuard.stop();
+        if (agvnMemoryWatch != null) agvnMemoryWatch.stop();
+        if (agvnHeatWatch != null) agvnHeatWatch.stop();
         super.onPause();
 
         if (!isInPictureInPictureMode()) {
@@ -910,6 +926,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private void exit() {
         if (!exiting.compareAndSet(false, true)) return;
         if (agvnSessionGuard != null) agvnSessionGuard.destroy();
+        if (agvnMemoryWatch != null) agvnMemoryWatch.finish();
+        if (agvnHeatWatch != null) agvnHeatWatch.finish();
         NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID);
         boolean removeLoadingBar = PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("remove_loading_bar_when_booting_games", false);
@@ -952,6 +970,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
                     break;
                 }
             }
+            // AGVN: the game has ended, so its engine logs are complete
+            if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.finish(this, "Game kết thúc bình thường (thoát từ menu hoặc game tự đóng)");
             if (shortcut != null && GameSaveManager.shouldAutoBackup(this, shortcut)) {
                 GameSaveManager.BackupResult saveResult = GameSaveManager.backup(shortcut, true);
                 if (saveResult.ok) {
@@ -975,6 +995,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
         }
         if (taskManagerSidebar != null) taskManagerSidebar.stop();
         if (agvnSessionGuard != null) agvnSessionGuard.destroy();
+        if (agvnMemoryWatch != null) agvnMemoryWatch.stop();
+        if (agvnHeatWatch != null) agvnHeatWatch.stop();
         super.onDestroy();
     }
 
@@ -1088,16 +1110,23 @@ public class XServerDisplayActivity extends AppCompatActivity {
         }
 
         WineUtils.setJoystickRegistryKeys(container, dinputEnabled, exclusiveXInput);
+        // AGVN: DInput alone with exclusive input: winebus must not map the pad as an Xbox (XInput) controller
+        if (com.winlator.cmod.agvn.AgvnGamepadMode.applyMapping(container,
+                com.winlator.cmod.agvn.AgvnGamepadMode.mapToXInput(exclusiveXInput, inputType)))
+            containerDataChanged = true;
         com.winlator.cmod.agvn.VcRuntimeMarker.apply(new File(container.getRootDir(), ".wine/system.reg")); // AGVN: Visual C++ 2015-2022 markers
+        com.winlator.cmod.agvn.AgvnFontFallback.apply(new File(container.getRootDir(), ".wine/user.reg")); // AGVN: MS Gothic etc. for Japanese games
 
         if (shortcut != null)
             startupSelection = shortcut.getExtra("startupSelection", String.valueOf(container.getStartupSelection()));
         else
             startupSelection = String.valueOf(container.getStartupSelection());
 
-        if (!startupSelection.equals(container.getExtra("startupSelection"))) {
+        // AGVN: "/2" marks the fixed service lists, so each environment applies them once after the update
+        String appliedServices = startupSelection + "/2";
+        if (!appliedServices.equals(container.getExtra("startupSelection"))) {
             WineUtils.changeServicesStatus(container, startupSelection);
-            container.putExtra("startupSelection", startupSelection);
+            container.putExtra("startupSelection", appliedServices);
             containerDataChanged = true;
         }
         if (containerDataChanged)
@@ -1112,9 +1141,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         boolean enableWineDebug = preferences.getBoolean("enable_wine_debug", false);
         String wineDebugChannels = preferences.getString("wine_debug_channels",
                 SettingsFragment.DEFAULT_WINE_DEBUG_CHANNELS);
-        envVars.put("WINEDEBUG", enableWineDebug && !wineDebugChannels.isEmpty()
-                ? "+" + wineDebugChannels.replace(",", ",+")
-                : "-all");
+        envVars.put("WINEDEBUG", com.winlator.cmod.agvn.AgvnWineDebug.spec(enableWineDebug, wineDebugChannels)); // AGVN: "warn+all", not "+warn"
 
         String rootPath = imageFs.getRootDir().getPath();
         FileUtils.clear(imageFs.getTmpDir());
@@ -1141,6 +1168,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 envVars.putAll(shortcut.getExtra("envVars"));
                 com.winlator.cmod.agvn.GameDllOverrides.applyAtLaunch(envVars, agvnExePath(), container); // AGVN
             }
+            if (dxwrapper.contains("dxvk")) com.winlator.cmod.agvn.AgvnMemorySaver.applyDxvk(this, shortcut, envVars); // AGVN
 
             applyOpenGLDriverEnvVars();
 
@@ -1202,8 +1230,14 @@ public class XServerDisplayActivity extends AppCompatActivity {
                             audioDriver.equals("pulse-audio-gn")));
         }
 
+        com.winlator.cmod.agvn.AgvnMediaFoundation.apply(envVars); // AGVN: MP4 video frames in normal memory
         guestProgramLauncherComponent.setEnvVars(envVars);
-        guestProgramLauncherComponent.setTerminationCallback((status) -> runOnUiThread(this::exit));
+        if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.start(shortcut, envVars); // AGVN: logs of this play session
+        if (shortcut != null && debugDialog != null) com.winlator.cmod.agvn.AgvnSessionLog.addLog(debugDialog.getLogFile()); // AGVN: and Wine's own log
+        guestProgramLauncherComponent.setTerminationCallback((status) -> {
+            com.winlator.cmod.agvn.AgvnSessionLog.event("Wine kết thúc, mã thoát " + status);
+            runOnUiThread(this::exit);
+        });
 
         environment.addComponent(guestProgramLauncherComponent);
 
@@ -1336,7 +1370,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         }
 
         if (container != null) {
-            String hudModeExtra = container.getExtra("hudMode");
+            String hudModeExtra = effectiveHudMode();
             int hudMode = !hudModeExtra.isEmpty()
                     ? Integer.parseInt(hudModeExtra)
                     : (container.isShowFPS() ? 1 : 0);
@@ -1361,7 +1395,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
         boolean shouldStretch = false;
 
-        if (shortcut != null && shortcutFullscreenStretched != null) {
+        // AGVN: getExtra returns "" (not null) when the game has no choice, so fall back to the environment then
+        if (shortcut != null && !shortcutFullscreenStretched.isEmpty()) {
 
             shouldStretch = shortcutFullscreenStretched.equals("1");
         } else if (container != null && container.isFullscreenStretched()) {
@@ -1726,7 +1761,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if      (modernHud  != null) currentMode = 2;
         else if (classicHud != null) currentMode = 1;
         else if (container  != null) {
-            String extra = container.getExtra("hudMode");
+            String extra = effectiveHudMode();
             if (!extra.isEmpty())           currentMode = Integer.parseInt(extra);
             else if (container.isShowFPS()) currentMode = 1;
         }
@@ -1874,11 +1909,21 @@ public class XServerDisplayActivity extends AppCompatActivity {
         return spHudStyle.getSelectedItemPosition() == 1 ? 2 : 1;
     }
 
+    /** AGVN: the game's own HUD choice, else the environment's ("" = never chosen). */
+    public String effectiveHudMode() {
+        String mode = shortcut != null ? shortcut.getExtra("hudMode") : "";
+        return !mode.isEmpty() || container == null ? mode : container.getExtra("hudMode");
+    }
+
     private void saveHudModeToContainer(int mode) {
-        if (container == null) return;
-        container.putExtra("hudMode", String.valueOf(mode));
-        container.setShowFPS(mode != 0);
-        container.saveData();
+        if (shortcut != null) { // AGVN: a game's HUD choice is its own, not every game's in the environment
+            shortcut.putExtra("hudMode", String.valueOf(mode));
+            shortcut.saveData();
+        } else if (container != null) {
+            container.putExtra("hudMode", String.valueOf(mode));
+            container.setShowFPS(mode != 0);
+            container.saveData();
+        } else return;
         if (xServerView instanceof XServerView) {
             ((XServerView) xServerView).setShowFPS(mode != 0);
         }
@@ -2371,7 +2416,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         inputControlsView.requestFocus();
 
         touchpadView.setSensitivity(profile.getCursorSpeed() * globalCursorSpeed);
-        touchpadView.setPointerButtonRightEnabled(false);
+        // AGVN: keep the two-finger tap right-click with on-screen controls; fingers on a control never reach the touchpad
 
         inputControlsView.invalidate();
         winHandler.sendGamepadState();
@@ -2548,7 +2593,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
         String disablePresentWait = graphicsDriverConfig.get("disablePresentWait");
         envVars.put("WRAPPER_DISABLE_PRESENT_WAIT", disablePresentWait);
 
-        String bcnEmulation = graphicsDriverConfig.get("bcnEmulation");
+        // AGVN: Turnip reads BCn textures itself; the wrapper's emulation only slows loading and costs RAM
+        String bcnEmulation = com.winlator.cmod.agvn.AgvnBcn.effective(graphicsDriverConfig.get("bcnEmulation"), adrenoToolsDriverId);
         String bcnEmulationType = graphicsDriverConfig.get("bcnEmulationType");
 
         switch (bcnEmulation) {
@@ -2585,12 +2631,14 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
+        com.winlator.cmod.agvn.AgvnMemoryWatch.touched(); // AGVN: memory growth only counts while nobody plays
         if (isPaused && (drawerLayout == null || !drawerLayout.isDrawerOpen(GravityCompat.START))) return true;
         return super.dispatchTouchEvent(event);
     }
 
     @Override
     public boolean dispatchGenericMotionEvent(MotionEvent event) {
+        com.winlator.cmod.agvn.AgvnMemoryWatch.touched();
         boolean handledByWinHandler = false;
         boolean handledByTouchpadView = false;
 
@@ -2620,6 +2668,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        com.winlator.cmod.agvn.AgvnMemoryWatch.touched();
 
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
             if (event.getKeyCode() == KeyEvent.KEYCODE_BUTTON_MODE || event.getKeyCode() == KeyEvent.KEYCODE_HOME
@@ -3071,7 +3120,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
     public boolean isShowFPS() {
         if (container == null) return false;
-        String hudMode = container.getExtra("hudMode");
+        String hudMode = effectiveHudMode();
         return !hudMode.isEmpty() ? !"0".equals(hudMode) : container.isShowFPS();
     }
 

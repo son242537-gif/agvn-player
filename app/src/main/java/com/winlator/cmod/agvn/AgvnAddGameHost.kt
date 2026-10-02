@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
@@ -17,6 +18,7 @@ import com.winlator.cmod.MainActivity
 import com.winlator.cmod.R
 import com.winlator.cmod.ui.theme.WinZTheme
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -38,13 +40,14 @@ object AgvnAddGameHost {
     }
 }
 
-/** Game list, or the folder picker while "Chọn thư mục khác" is open. Scans run off the main thread. */
+/** Game list, or the folder picker while "Chọn thư mục khác" is open (it also adds a tapped .exe). Scans run off the main thread. */
 @Composable
 private fun AgvnAddGameFlow(activity: MainActivity, onClose: () -> Unit) {
     var entries by remember { mutableStateOf<List<AgvnImportEntry>?>(null) }
     var scanRevision by remember { mutableIntStateOf(0) }
     var browsing by rememberSaveable { mutableStateOf(false) }
     var pickedFolder by remember { mutableStateOf<File?>(null) }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(scanRevision) {
         entries = null
@@ -73,6 +76,14 @@ private fun AgvnAddGameFlow(activity: MainActivity, onClose: () -> Unit) {
                 pickedFolder = folder
                 browsing = false
                 scanRevision++
+            },
+            onPickFile = { exe ->
+                scope.launch {
+                    val entry = withContext(Dispatchers.IO) { runCatching { AgvnImportEntry.forExe(activity, exe) }.getOrNull() }
+                    if (entry != null && !activity.isFinishing) {
+                        AgvnImportDialog.preview(activity, entry.dir, entry.variant, DeviceTierManager.current(activity), entry.existing) { onClose() }
+                    }
+                }
             }
         )
     } else {
@@ -81,7 +92,7 @@ private fun AgvnAddGameFlow(activity: MainActivity, onClose: () -> Unit) {
             onClose = onClose,
             onRescan = { scanRevision++ },
             onPick = { entry ->
-                AgvnImportDialog.preview(activity, entry.dir, DeviceTierManager.current(activity), entry.existing) { onClose() }
+                AgvnImportDialog.preview(activity, entry.dir, entry.variant, DeviceTierManager.current(activity), entry.existing) { onClose() }
             },
             onPickFolder = { browsing = true },
             onPickExe = {

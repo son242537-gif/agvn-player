@@ -59,6 +59,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.winlator.cmod.R
+import com.winlator.cmod.agvn.AgvnScreenSize
 import com.winlator.cmod.box64.Box64Preset
 import com.winlator.cmod.box64.Box64PresetManager
 import com.winlator.cmod.container.Container
@@ -441,7 +442,8 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
 
     fun saveExisting(container: Container) {
         container.setName(state.name.trim().ifBlank { container.name })
-        container.setScreenSize(normalizeResolution(state.screen))
+        // AGVN: a mistyped custom resolution keeps the old one instead of breaking the launch
+        container.setScreenSize(AgvnScreenSize.normalize(state.screen) ?: AgvnScreenSize.orDefault(container.screenSize))
         container.setEnvVars(cleanContainerEnvironment(state.envVars))
         container.setDrives(state.drives)
         container.setCPUList(state.cpu64.indices.filter { state.cpu64[it] }.joinToString(","))
@@ -508,7 +510,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
         try {
             val data = JSONObject().apply {
                 put("name", state.name.trim().ifBlank { "Container-${manager.nextContainerId}" })
-                put("screenSize", normalizeResolution(state.screen))
+                put("screenSize", AgvnScreenSize.orDefault(state.screen))
                 put("envVars", cleanContainerEnvironment(state.envVars))
                 put("cpuList", state.cpu64.indices.filter { state.cpu64[it] }.joinToString(","))
                 put("cpuListWoW64", state.cpu32.indices.filter { state.cpu32[it] }.joinToString(","))
@@ -737,34 +739,7 @@ private fun ContainerCategoryV2(
                     audioEntries.firstOrNull { StringUtils.parseIdentifier(it).equals(s.audio, true) } ?: s.audio,
                     audioEntries
                 ) { s.audio = StringUtils.parseIdentifier(it) }
-                if (s.audio == "oboe") {
-                    SettingsDivider()
-                    val latencyLabel = when (s.oboeProfile) {
-                        "ultra" -> "Độ trễ thấp"
-                        "stable" -> "Ổn định"
-                        else -> "Tự động"
-                    }
-                    SettingChoice("Độ trễ Oboe", latencyLabel, listOf("Tự động", "Độ trễ thấp", "Ổn định")) {
-                        s.oboeProfile = when (it) {
-                            "Độ trễ thấp" -> "ultra"
-                            "Ổn định" -> "stable"
-                            else -> "low"
-                        }
-                    }
-                    SettingsDivider()
-                    val apiLabel = when (s.oboeApi) {
-                        "aaudio" -> "AAudio"
-                        "opensles" -> "OpenSL ES"
-                        else -> "Tự động"
-                    }
-                    SettingChoice("Backend Oboe", apiLabel, listOf("Tự động", "AAudio", "OpenSL ES")) {
-                        s.oboeApi = when (it) {
-                            "AAudio" -> "aaudio"
-                            "OpenSL ES" -> "opensles"
-                            else -> "auto"
-                        }
-                    }
-                }
+                // AGVN: no Oboe latency or backend rows: "oboe" is played by PulseAudio-GN, which never reads them
                 SettingsDivider()
                 val hudEntries = listOf("Tắt", "Cổ điển", "Hiện đại")
                 SettingChoice("HUD Winlator", hudEntries.getOrElse(s.hudMode) { "Tắt" }, hudEntries) {

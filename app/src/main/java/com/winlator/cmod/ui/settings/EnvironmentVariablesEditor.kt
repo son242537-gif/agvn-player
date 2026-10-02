@@ -64,7 +64,7 @@ val knownEnvironmentVariables = listOf(
     EnvVariableSpec("MESA_GL_VERSION_OVERRIDE", EnvValueKind.TEXT),
     EnvVariableSpec("PULSE_LATENCY_MSEC", EnvValueKind.NUMBER),
     EnvVariableSpec("WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER", EnvValueKind.CHECKBOX, listOf("0", "1")),
-    EnvVariableSpec("WINE_NEW_MEDIASOURCE", EnvValueKind.CHECKBOX, listOf("0", "1")),
+    EnvVariableSpec("WINE_NEW_MEDIA_SOURCE", EnvValueKind.CHECKBOX, listOf("0", "1")),
     EnvVariableSpec("GALLIUM_HUD", EnvValueKind.MULTI, listOf("simple", "fps", "frametime")),
     EnvVariableSpec("WINE_LARGE_ADDRESS_AWARE", EnvValueKind.CHECKBOX, listOf("0", "1")),
     EnvVariableSpec("WINEDLLOVERRIDES", EnvValueKind.TEXT)

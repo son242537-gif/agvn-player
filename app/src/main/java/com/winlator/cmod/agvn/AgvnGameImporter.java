@@ -35,12 +35,15 @@ public final class AgvnGameImporter {
         public final AgvnProfile profile;
         public final String exe;
         public final GameExeResolver.Engine engine;
+        /** The exe of one game of a folder that holds several, or of an exe picked by hand; null for the folder's game. */
+        public final String variant;
 
-        Candidate(File gameDir, AgvnProfile profile, String exe, GameExeResolver.Engine engine) {
+        Candidate(File gameDir, AgvnProfile profile, String exe, GameExeResolver.Engine engine, String variant) {
             this.gameDir = gameDir;
             this.profile = profile;
             this.exe = exe;
             this.engine = engine;
+            this.variant = variant;
         }
     }
 
@@ -99,8 +102,15 @@ public final class AgvnGameImporter {
         return load(gameDir, AgvnProfileCatalog.EMPTY);
     }
 
-    /** The folder's own agvn-profile.json, else a matching bundled profile, else auto settings. */
     public static Candidate load(File gameDir, AgvnProfileCatalog catalog) throws AgvnProfileException {
+        return load(gameDir, catalog, null);
+    }
+
+    /**
+     * The folder's own agvn-profile.json, else a matching bundled profile, else auto settings. {@code variant}: the exe
+     * to start instead (one game of several, or picked by hand); its name gets the exe's ("Collection - game2").
+     */
+    public static Candidate load(File gameDir, AgvnProfileCatalog catalog, String variant) throws AgvnProfileException {
         File profileFile = new File(gameDir, AgvnProfile.FILE_NAME);
         AgvnProfile profile;
         if (profileFile.isFile()) {
@@ -111,14 +121,19 @@ public final class AgvnGameImporter {
             profile = catalog.find(gameDir);
             if (profile == null) profile = AgvnProfile.defaultFor(gameDir.getName());
         }
+        if (variant != null) {
+            profile.exe = variant;
+            profile.name = AgvnProfile.variantName(profile.name, variant);
+        }
         String exe = AgvnProfileValidator.validate(profile, gameDir);
-        return new Candidate(gameDir, profile, exe, GameExeResolver.detectEngine(gameDir));
+        return new Candidate(gameDir, profile, exe, GameExeResolver.detectEngine(gameDir), variant);
     }
 
     /** Creates (or replaces) the shortcut in {@code container}; returns the .desktop file. */
     public static File importGame(Context ctx, Container container, Candidate c, DeviceTier tier) throws IOException {
         String name = c.profile.name.trim();
-        File profileDir = new File(getProfilesRoot(), c.gameDir.getName());
+        String folder = c.gameDir.getName();
+        File profileDir = new File(getProfilesRoot(), c.variant == null ? folder : AgvnProfile.variantName(folder, c.variant));
         profileDir.mkdirs();
         File profileCopy = new File(profileDir, AgvnProfile.FILE_NAME);
         if (!FileUtils.writeString(profileCopy, c.profile.toJson()))
@@ -170,7 +185,8 @@ public final class AgvnGameImporter {
         shortcut.putExtra("execArgs", String.join(" ", p.args));
         File exeDir = new File(c.gameDir, c.exe).getParentFile();
         String dlls = GameDllOverrides.build(GameDllOverrides.detect(exeDir), p.dllOverrides);
-        shortcut.putExtra("envVars", buildEnvVars(p.env, eff.fps, dlls));
+        shortcut.putExtra("envVars", buildEnvVars(p.env, dlls));
+        AgvnQuality.setStartFps(shortcut, eff.fps);
         AgvnLayouts.applyImport(shortcut, AgvnLayouts.kindFor(p, c.engine));
         if (eff.resolution != null) shortcut.putExtra("screenSize", eff.resolution);
         shortcut.putExtra("simTouchScreen", p.isSimulatedTouchscreen() ? "1" : "0");
@@ -188,8 +204,11 @@ public final class AgvnGameImporter {
         shortcut.putExtra(AgvnHtmlGame.EXTRA_INDEX, html ? index.getAbsolutePath() : null);
     }
 
-    /** "KEY=VALUE KEY2=VALUE2"; the FPS cap uses DXVK's DXVK_FRAME_RATE, mod DLLs go to WINEDLLOVERRIDES. */
-    static String buildEnvVars(Map<String, String> env, int fpsLimit, String dllOverrides) {
+    /**
+     * "KEY=VALUE KEY2=VALUE2"; mod DLLs go to WINEDLLOVERRIDES. A profile's DXVK_FRAME_RATE is dropped: the FPS cap is
+     * where the in-game "Giới hạn FPS" starts (AgvnQuality.setStartFps), which the player can change in game.
+     */
+    static String buildEnvVars(Map<String, String> env, String dllOverrides) {
         StringBuilder sb = new StringBuilder();
         String overrides = dllOverrides != null ? dllOverrides : "";
         String fromEnv = env.get("WINEDLLOVERRIDES");
@@ -199,10 +218,6 @@ public final class AgvnGameImporter {
             if (e.getKey().equals("DXVK_FRAME_RATE") || e.getKey().equals("WINEDLLOVERRIDES")) continue;
             if (sb.length() > 0) sb.append(' ');
             sb.append(e.getKey()).append('=').append(e.getValue());
-        }
-        if (fpsLimit > 0) {
-            if (sb.length() > 0) sb.append(' ');
-            sb.append("DXVK_FRAME_RATE=").append(fpsLimit);
         }
         return sb.toString();
     }

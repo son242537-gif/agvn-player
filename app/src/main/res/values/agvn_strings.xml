@@ -39,6 +39,13 @@
     <string name="agvn_guard_low_ram_title">Sắp hết RAM</string>
     <string name="agvn_guard_low_ram">RAM trống còn rất ít, game có thể bị Android tắt. Hãy lưu game ngay và đóng bớt ứng dụng khác.</string>
     <string name="agvn_guard_countdown">Tự đóng thông báo sau %1$d giây</string>
+    <!-- before a game starts: its exe or a DLL is cut short (AgvnGameFilesCheck) -->
+    <string name="agvn_broken_files_title">File game bị hỏng</string>
+    <string name="agvn_broken_files_message">Các file sau của game bị thiếu dữ liệu, thường do chép hoặc giải nén chưa xong. Game sẽ không mở được:\n\n%1$s\n\nHãy xoá thư mục game rồi chép hoặc giải nén lại. Khi giải nén, để đủ chỗ trống, giữ màn hình sáng và chờ tới khi xong 100%%.</string>
+    <string name="agvn_broken_files_line">• %1$s: có %2$s, cần ít nhất %3$s</string>
+    <string name="agvn_broken_files_empty">• %1$s: trống</string>
+    <string name="agvn_broken_files_more">… và %1$d file khác</string>
+    <string name="agvn_broken_files_open_anyway">Vẫn mở</string>
     <string name="agvn_prelaunch_title">RAM trống chưa đủ</string>
     <string name="agvn_prelaunch_message">Game cần khoảng %1$d MB RAM trống, máy đang có %2$d MB.\n\nHãy mở danh sách ứng dụng gần đây và đóng bớt ứng dụng khác, rồi bấm \"Kiểm tra lại\". Nếu vẫn chơi, game có thể nạp chậm (khoảng 30–60 giây) hoặc bị tắt giữa chừng.</string>
     <string name="agvn_prelaunch_recheck">Kiểm tra lại</string>
@@ -148,9 +155,9 @@
     <string name="agvn_quality_medium">Trung bình</string>
     <string name="agvn_quality_high">Cao</string>
     <string name="agvn_quality_highest">Rất cao</string>
-    <string name="agvn_quality_lowest_desc">Mát nhất, hình mờ. Dùng khi máy yếu hoặc đang nóng</string>
-    <string name="agvn_quality_low_desc">Mát máy, hình tạm ổn</string>
-    <string name="agvn_quality_medium_desc">Mát vừa phải, hình rõ</string>
+    <string name="agvn_quality_lowest_desc">Mát nhất, ít RAM nhất, hình mờ. Dùng khi máy yếu hoặc đang nóng</string>
+    <string name="agvn_quality_low_desc">Mát máy, bớt RAM, hình tạm ổn</string>
+    <string name="agvn_quality_medium_desc">Mát vừa phải, bớt chút RAM, hình rõ</string>
     <string name="agvn_quality_high_desc">Hình đẹp, máy ấm hơn</string>
     <string name="agvn_quality_highest_desc">Đẹp nhất, không giới hạn FPS: game và menu cheat tự chỉnh FPS. Máy nóng, pin tụt nhanh, chỉ nên dùng cho máy flagship</string>
     <string name="agvn_quality_cool">◀ Mát máy</string>
@@ -159,8 +166,11 @@
     <string name="agvn_quality_auto_note">Đang dùng mức gợi ý (tự chỉnh theo máy và game)</string>
     <string name="agvn_quality_reset">Về mức gợi ý</string>
     <string name="agvn_quality_save">Lưu</string>
-    <string name="agvn_quality_restart_note">Có tác dụng từ lần mở game tiếp theo.</string>
+    <string name="agvn_quality_restart_note">Có tác dụng từ lần mở game tiếp theo. FPS vẫn chỉnh lại được trong game, ở mục "Giới hạn FPS".</string>
     <string name="agvn_quality_fps_unlimited">FPS không giới hạn</string>
+    <!-- In-game "Giới hạn FPS": the FPS limit on the screen's vsync (AgvnVsyncLimiter), per game -->
+    <string name="agvn_vsync_pacing">Khớp nhịp màn hình (thử nghiệm)</string>
+    <string name="agvn_vsync_pacing_hint">Khung hình đều hơn. Game đứng hình vài giây thì tắt mục này.</string>
     <string name="agvn_quality_detail">Độ phân giải %1$s · %2$s</string>
     <string name="agvn_quality_applied">Đã đặt đồ họa: %1$s</string>
     <!-- "Thêm game" screen -->
@@ -184,10 +194,69 @@
     <string name="agvn_import_update">Cập nhật</string>
     <!-- in-app folder picker for "Chọn thư mục khác" -->
     <string name="agvn_folder_title">Chọn thư mục có game</string>
-    <string name="agvn_folder_hint">Mở tới thư mục chứa game (hoặc thư mục chứa nhiều game) rồi bấm \"Quét thư mục này\".</string>
+    <string name="agvn_folder_hint">Mở tới thư mục chứa game (hoặc thư mục chứa nhiều game) rồi bấm \"Quét thư mục này\". Hoặc chạm vào một file .exe để thêm đúng file đó.</string>
     <string name="agvn_folder_drives">Chọn nơi lưu game</string>
     <string name="agvn_folder_up">Lên trên</string>
     <string name="agvn_folder_scan">Quét thư mục này</string>
-    <string name="agvn_folder_empty">Thư mục này không có thư mục con</string>
+    <string name="agvn_folder_empty">Thư mục này không có thư mục con hay file .exe</string>
     <string name="agvn_folder_sd">Thẻ nhớ (%1$s)</string>
+    <string name="agvn_save_import">Nhập save</string>
+    <string name="agvn_save_export">Xuất save</string>
+    <string name="agvn_save_pick">Chọn file save</string>
+    <string name="agvn_save_working">Đang xử lý save…</string>
+    <string name="agvn_save_import_where">Save sẽ được chép vào:\n%1$s\n\nChọn file save hoặc file .zip trong máy. File .zip do AGVN xuất ra sẽ được trả về đúng chỗ cũ. Save đang có được sao lưu trước khi chép.</string>
+    <string name="agvn_save_import_unknown">Chưa biết game này lưu save ở đâu. Hãy mở game, lưu một lần, rồi thử lại.</string>
+    <string name="agvn_save_import_none">Không có file nào được nhập: file đã chọn không phải save của game này.</string>
+    <string name="agvn_save_imported">Đã nhập %1$d file save vào:\n%2$s</string>
+    <string name="agvn_save_imported_backup">\n\nSave cũ đã được sao lưu ở:\n%1$s</string>
+    <string name="agvn_save_exported">Đã xuất %1$d file save vào:\n%2$s\n\nChép file .zip này sang máy khác rồi dùng \"Nhập save\" để chơi tiếp.</string>
+    <string name="agvn_save_export_empty">Chưa có save nào để xuất. Hãy chơi và lưu game trước.</string>
+    <string name="agvn_save_html_note">Game này chạy bằng trình duyệt có sẵn trong app, save nằm trong bộ nhớ của trình duyệt đó. AGVN chưa nhập/xuất được save cho loại game này.</string>
+    <string name="agvn_save_error">Không xử lý được save: %1$s</string>
+    <!-- In-app update (AgvnUpdateDialogs, AgvnUpdateInstall) -->
+    <string name="agvn_update_title">Cập nhật ứng dụng</string>
+    <string name="agvn_update_summary">Đang dùng bản %1$s</string>
+    <string name="agvn_update_current">Bản đang dùng: %1$s</string>
+    <string name="agvn_update_auto">Tự kiểm tra bản mới mỗi ngày khi mở app</string>
+    <string name="agvn_update_check">Kiểm tra cập nhật</string>
+    <string name="agvn_update_close">Đóng</string>
+    <string name="agvn_update_checking">Đang kiểm tra bản mới…</string>
+    <string name="agvn_update_latest">Đây đã là bản mới nhất (%1$s).</string>
+    <string name="agvn_update_not_published">Chưa có bản cập nhật nào được đăng.</string>
+    <string name="agvn_update_available_title">Có bản mới %1$s</string>
+    <string name="agvn_update_available">Bản mới: %1$s (%2$s)\nBản đang dùng: %3$s\n\n%4$sGame, save và cài đặt vẫn giữ nguyên. Tệp khá nặng, nên dùng Wi-Fi.</string>
+    <string name="agvn_update_now">Cập nhật</string>
+    <string name="agvn_update_later">Để sau</string>
+    <string name="agvn_update_downloading">Đang tải… %1$d%%</string>
+    <string name="agvn_update_verifying">Đang kiểm tra tệp tải về…</string>
+    <string name="agvn_update_paused">Đã dừng tải. Lần sau bấm Cập nhật sẽ tải tiếp.</string>
+    <string name="agvn_update_failed">Không cập nhật được: %1$s</string>
+    <string name="agvn_update_no_network">không kết nối được máy chủ, hãy kiểm tra mạng rồi thử lại</string>
+    <string name="agvn_update_no_space">Máy còn trống %1$s, cần khoảng %2$s để tải và cài bản mới. Hãy xóa bớt dữ liệu rồi thử lại.</string>
+    <string name="agvn_update_allow_title">Cho phép cài bản mới</string>
+    <string name="agvn_update_allow">Android cần cho phép AGVN Player cài ứng dụng (chỉ một lần). Bấm \"Mở cài đặt\", bật \"Cho phép từ nguồn này\", rồi quay lại app.</string>
+    <string name="agvn_update_open_settings">Mở cài đặt</string>
+    <string name="agvn_update_allow_done">Đã bật \"Cho phép từ nguồn này\" chưa? Bấm \"Cài tiếp\" để cài bản mới.</string>
+    <string name="agvn_update_continue">Cài tiếp</string>
+    <string name="agvn_update_confirm">Bấm \"Cập nhật\" trên hộp thoại của Android để cài.</string>
+    <!-- Game session logs (AgvnSessionLog, AgvnLogShare) -->
+    <string name="agvn_logs_working">Đang gom nhật ký của game…</string>
+    <string name="agvn_logs_none">Chưa có nhật ký nào của game này. Hãy mở game một lần rồi thử lại.</string>
+    <string name="agvn_logs_saved">Đã lưu nhật ký của game vào:\n%1$s\n\nGửi file này cho AGVN để được giúp sửa lỗi.</string>
+    <string name="agvn_logs_share">Chia sẻ</string>
+    <string name="agvn_logs_error">Không gom được nhật ký: %1$s</string>
+    <!-- In-game memory warning (AgvnMemoryWatch) -->
+    <string name="agvn_ram_title">Game đang dùng quá nhiều RAM, nên lưu game rồi thoát</string>
+    <string name="agvn_ram_detail">RAM trống còn %1$s. App và game đang dùng %2$s, trong đó bộ nhớ đồ họa %3$s.</string>
+    <string name="agvn_ram_growing">Bộ nhớ tăng liên tục dù không có thao tác, có thể do lỗi video hoặc lỗi game.</string>
+    <string name="agvn_ram_exit">Thoát game an toàn</string>
+    <string name="agvn_ram_later">Để sau</string>
+    <string name="agvn_heat_title_capped">Máy nóng, CPU đang bị hạ xung</string>
+    <string name="agvn_heat_title_hot">Máy đang nóng lên</string>
+    <string name="agvn_heat_capped">Nhân CPU mạnh nhất chỉ còn chạy tối đa %1$d%% tốc độ, nên game có thể chậm và giật.</string>
+    <string name="agvn_heat_hot">Android báo máy sắp phải hạ xung vì nóng.</string>
+    <string name="agvn_heat_charging">Máy đang sạc: rút sạc sẽ mát hơn.</string>
+    <string name="agvn_heat_fps">Hạ Giới hạn FPS xuống 20 cũng giúp máy mát hơn.</string>
+    <string name="agvn_heat_fps20">Hạ FPS 20</string>
+    <string name="agvn_heat_later">Để sau</string>
 </resources>

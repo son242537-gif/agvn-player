@@ -15,6 +15,7 @@ import com.winlator.cmod.core.UnitUtils;
 import com.winlator.cmod.widget.LogView;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -22,6 +23,7 @@ public class DebugDialog extends ContentDialog implements Callback<String> {
     private final LogView logView;
     private static boolean paused = false;
     private BufferedWriter writer;
+    private File logFile;
 
     public DebugDialog(@NonNull Context context) {
         super(context, R.layout.debug_dialog);
@@ -44,7 +46,8 @@ public class DebugDialog extends ContentDialog implements Callback<String> {
         });
         llBottomBarPanel.addView(toolbarView);
         try {
-            writer = new BufferedWriter(new FileWriter(logView.getLogFile(context)));
+            logFile = LogView.getLogFile(context);
+            writer = new BufferedWriter(new FileWriter(logFile));
         }
         catch (IOException e) {
             throw new RuntimeException(e);
@@ -63,6 +66,11 @@ public class DebugDialog extends ContentDialog implements Callback<String> {
         }
     }
     
+    /** The file this dialog writes the log to (AGVN: copied into the play session's logs). */
+    public File getLogFile() {
+        return logFile;
+    }
+
     public static void setPaused(boolean cond) {
         paused = cond;
     }
