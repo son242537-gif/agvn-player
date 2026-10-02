@@ -1,0 +1,50 @@
+AGVN Player: SDL's Java classes move to com.winlator.cmod.agvn.sdl (JNI prefix, and the class names JNI_OnLoad
+registers natives on), so this SDL and Ren'Py's own (org.libsdl.app, inside librenpython.so) can both be in the app.
+
+diff --git a/subprojects/packagefiles/sdl2-agvn-java-package.patch b/subprojects/packagefiles/sdl2-agvn-java-package.patch
+new file mode 100644
+index 00000000..d8c7d374
+--- /dev/null
++++ b/subprojects/packagefiles/sdl2-agvn-java-package.patch
+@@ -0,0 +1,29 @@
++# AGVN Player: SDL's Java classes live in com.winlator.cmod.agvn.sdl (JNI prefix and the classes JNI_OnLoad registers),
++# so this SDL (2.28.1, for mkxp-z) and the one inside Ren'Py's librenpython.so (org.libsdl.app) can both be in the app.
++
++--- a/src/core/android/SDL_android.c
+++++ b/src/core/android/SDL_android.c
++@@ -50,7 +50,7 @@
++ #include <unistd.h>
++ #include <dlfcn.h>
++ 
++-#define SDL_JAVA_PREFIX                               org_libsdl_app
+++#define SDL_JAVA_PREFIX                               com_winlator_cmod_agvn_sdl
++ #define CONCAT1(prefix, class, function)              CONCAT2(prefix, class, function)
++ #define CONCAT2(prefix, class, function)              Java_##prefix##_##class##_##function
++ #define SDL_JAVA_INTERFACE(function)                  CONCAT1(SDL_JAVA_PREFIX, SDLActivity, function)
++@@ -524,10 +524,10 @@
++         return JNI_VERSION_1_4;
++     }
++ 
++-    register_methods(env, "org/libsdl/app/SDLActivity", SDLActivity_tab, SDL_arraysize(SDLActivity_tab));
++-    register_methods(env, "org/libsdl/app/SDLInputConnection", SDLInputConnection_tab, SDL_arraysize(SDLInputConnection_tab));
++-    register_methods(env, "org/libsdl/app/SDLAudioManager", SDLAudioManager_tab, SDL_arraysize(SDLAudioManager_tab));
++-    register_methods(env, "org/libsdl/app/SDLControllerManager", SDLControllerManager_tab, SDL_arraysize(SDLControllerManager_tab));
+++    register_methods(env, "com/winlator/cmod/agvn/sdl/SDLActivity", SDLActivity_tab, SDL_arraysize(SDLActivity_tab));
+++    register_methods(env, "com/winlator/cmod/agvn/sdl/SDLInputConnection", SDLInputConnection_tab, SDL_arraysize(SDLInputConnection_tab));
+++    register_methods(env, "com/winlator/cmod/agvn/sdl/SDLAudioManager", SDLAudioManager_tab, SDL_arraysize(SDLAudioManager_tab));
+++    register_methods(env, "com/winlator/cmod/agvn/sdl/SDLControllerManager", SDLControllerManager_tab, SDL_arraysize(SDLControllerManager_tab));
++ 
++     return JNI_VERSION_1_4;
++ }
+diff --git a/subprojects/sdl2.wrap b/subprojects/sdl2.wrap
+index dd6d1acb..a13e9e5b 100644
+--- a/subprojects/sdl2.wrap
++++ b/subprojects/sdl2.wrap
+@@ -19,6 +19,7 @@ diff_files =
+     sdl2-sane-std.patch,
+     sdl2-sse3.patch,
+     sdl2-static-angle.patch,
++    sdl2-agvn-java-package.patch,
+     end-of-diff-files.patch
+ 
+ [provide]
