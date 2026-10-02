@@ -2,7 +2,7 @@
 
 **Repository:** StevenMXZ/Winlator-Ludashi fork at `agvn/base` (upstream commit b8048ac).  
 **Application ID:** `com.agvn.player` · **Branch:** `agvn/main` (new repo, forked after phase 1).  
-**License:** MIT (upstream) + bundled GPL/LGPL libraries (Wine, proot, patchelf, Mesa); see [`docs/agvn/LICENSES.md`](./docs/agvn/LICENSES.md).
+**License:** the app (APK and repository as a whole) is GPL-3.0-or-later ([`COPYING`](./COPYING), maintainer's decision 2026-10-02); upstream Winlator and AGVN source files stay MIT ([`LICENSE`](./LICENSE)); bundled components keep their own licenses. See [`docs/agvn/LICENSES.md`](./docs/agvn/LICENSES.md).
 
 ## What is AGVN Player?
 
@@ -125,7 +125,7 @@ See [`docs/agvn/ROADMAP.md`](./docs/agvn/ROADMAP.md) for the full 10-phase plan,
 ## Attribution & Copyright
 
 - **Original:** BrunoSX (Winlator), StevenMXZ (Ludashi fork)
-- **AGVN additions:** Licensed MIT (same as upstream); source code must remain public
+- **AGVN additions:** Licensed MIT (same as upstream), distributed as part of the GPL-3.0-or-later app; source code must remain public, and every release tag is the source of that APK
 - **Third-party notices:** Wine, proot, patchelf, Mesa, DXVK, FEX, Box64, Turnip — see bundled licenses in app
 - **Copyright year:** Keep BrunoSX/StevenMXZ notices in all derivative files; add "Copyright (c) 2026 agvn.io.vn" to new AGVN modules
 
