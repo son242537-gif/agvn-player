@@ -21,6 +21,33 @@
 **Sequential path:** P1→P2→P3→P4→P5→P6→P7 (shared code files)  
 **Parallel opportunity:** P8 after P2; P9 after P4 (touches no app code)
 
+## Progress after the 10 phases (as of 2026-10-02)
+
+`agvn/main` is at **0.1.5 (code 7)**, the same code as the published tag `v0.1.5`. #53 brought in the release branch
+`agvn/p43-release-0.1.3`. Phones update themselves from GitHub Releases (see `cap-nhat-ung-dung.md`).
+
+| Version | Code | Published | What changed (player notes in `docs/agvn/release/`) |
+|---------|------|-----------|------------------------------------------------------|
+| 0.1.0–0.1.2 | 2–4 | Not on GitHub Releases | Phases 2–10, game import, controls, HTML runner, profile catalog, Zink Mesa 25.1.9 (#34) |
+| 0.1.4 | 6 | ✅ 2026-10-01 | In-app update, MF video, saves, `?` help, settings fixes, frame pacing, RAM/heat warnings, multi-game folders |
+| 0.1.5 | 7 | ✅ 2026-10-02 | Partial-copy check for game files, sound in the RPG Maker MV HTML runner |
+
+The stacked PRs for 0.1.4 (#37, #38, #40–#51) are in `agvn/main` through #53 and closed.
+
+| Open work | PR / branch | Status |
+|-----------|-------------|--------|
+| DDraw wrapper: restore Wine's ddraw | #39 `agvn/fix-ddraw-restore` | ⏳ Open, based on 0.1.2, not released |
+| CLAUDE.md rule: fix for every game, never for one game | #52 `agvn/p42-every-game-rule` | ⏳ Open, based on 0.1.2 |
+| Game main thread on fast cores + perf hints | `agvn/p44-game-cpu` (no PR) | 🚧 In progress, on 0.1.5 |
+| App under GPL-3.0-or-later; plan for native Ren'Py / RPG Maker XP–VX Ace | `agvn/p49-gpl-license` (no PR) | 🚧 Needs maintainer decision (licence change) |
+| Ren'Py 8 games run natively (Ren'Py 8.5.3 Android) | `agvn/p50-renpy8` (on p49, no PR) | 🚧 In progress |
+| Keep games alive; tell a crash from a normal exit | `agvn/p53-game-session` (on p50, no PR) | 🚧 In progress |
+
+Still open from `handoff-pc.md`:
+- OpenGL games flicker black once a second at low settings. The Zink abort is fixed by #34; the flicker cause is unknown.
+- Dimensity/Mali checks on a real phone.
+- The v0.1.0 RC report (`rc-test-report.md`) and the weak-phone field test are not filled in.
+
 ---
 
 ## Implementation notes (deviations decided during the build)

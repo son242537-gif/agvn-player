@@ -8,17 +8,19 @@ web GitHub để mở và merge PR.
 
 ## Trạng thái
 
-- `agvn/main`: đã merge PR #25–#36 và #34. Phiên bản 0.1.2 (mã 4), chưa phát hành; ghi chú phát hành ở
-  `docs/agvn/release/ghi-chu-phat-hanh-v0.1.2.txt`.
+- **Cập nhật 02/10/2026:** `agvn/main` ở **0.1.5 (mã 7)**, đúng bằng bản đã phát hành `v0.1.5`. PR #53 đã gộp nhánh
+  phát hành `agvn/p43-release-0.1.3`, và các PR nháp #37, #38, #40–#51 đã có trong đó (đã đóng). Từ giờ nhánh mới tách
+  từ `agvn/main`.
 - **PR #34 (đã merge)**: Zink mới (Mesa 25.1.9 bản phát hành, `zink@3`). Game OpenGL hết văng trên POCO. Bản vá `0007`
   giới hạn vùng đệm GPU của Zink ở 256 MB.
-- **PR #37 (nháp, nhánh `agvn/p28-quality-all-engines`)**: thanh "Đồ họa" giới hạn FPS cho mọi loại game, và ở mức
-  thấp thì bớt RAM theo từng engine (DXVK, Ren'Py, Unity; xem `docs/agvn/giam-ram.md`). Cần thử trên POCO rồi merge.
-- Tạm dừng theo lời anh Sơn: Ren'Py / ONScripter / mkxp-z và việc chuyển app sang giấy phép GPL.
+- Còn mở: #39 (DDraw) và #52 (quy tắc CLAUDE.md), cả hai tách từ bản 0.1.2. Đang làm, chưa có PR: `agvn/p44-game-cpu`;
+  `agvn/p49-gpl-license` → `p50-renpy8` → `p53-game-session` (giấy phép GPL, Ren'Py 8 chạy trực tiếp; đổi giấy phép
+  cần anh Sơn quyết). ONScripter / mkxp-z vẫn tạm dừng. Bảng đầy đủ: mục "Progress after the 10 phases" trong
+  `ROADMAP.md`.
 
 ## Việc làm tiếp (theo thứ tự)
 
-### 1. Game OpenGL: văng và chớp đen (Zink)
+### 1. Game OpenGL: chớp đen (Zink) — phần văng đã sửa ở #34
 
 Triệu chứng trên POCO:
 - ở cấu hình cao, game văng với `zink_context.c:700 assertion "…range <= …maxUniformBufferRange" failed`, rồi app
