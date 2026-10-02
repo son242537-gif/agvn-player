@@ -39,6 +39,13 @@
     <string name="agvn_guard_low_ram_title">Sắp hết RAM</string>
     <string name="agvn_guard_low_ram">RAM trống còn rất ít, game có thể bị Android tắt. Hãy lưu game ngay và đóng bớt ứng dụng khác.</string>
     <string name="agvn_guard_countdown">Tự đóng thông báo sau %1$d giây</string>
+    <!-- before a game starts: its exe or a DLL is cut short (AgvnGameFilesCheck) -->
+    <string name="agvn_broken_files_title">File game bị hỏng</string>
+    <string name="agvn_broken_files_message">Các file sau của game bị thiếu dữ liệu, thường do chép hoặc giải nén chưa xong. Game sẽ không mở được:\n\n%1$s\n\nHãy xoá thư mục game rồi chép hoặc giải nén lại. Khi giải nén, để đủ chỗ trống, giữ màn hình sáng và chờ tới khi xong 100%%.</string>
+    <string name="agvn_broken_files_line">• %1$s: có %2$s, cần ít nhất %3$s</string>
+    <string name="agvn_broken_files_empty">• %1$s: trống</string>
+    <string name="agvn_broken_files_more">… và %1$d file khác</string>
+    <string name="agvn_broken_files_open_anyway">Vẫn mở</string>
     <string name="agvn_prelaunch_title">RAM trống chưa đủ</string>
     <string name="agvn_prelaunch_message">Game cần khoảng %1$d MB RAM trống, máy đang có %2$d MB.\n\nHãy mở danh sách ứng dụng gần đây và đóng bớt ứng dụng khác, rồi bấm \"Kiểm tra lại\". Nếu vẫn chơi, game có thể nạp chậm (khoảng 30–60 giây) hoặc bị tắt giữa chừng.</string>
     <string name="agvn_prelaunch_recheck">Kiểm tra lại</string>
