@@ -50,7 +50,8 @@ public class TouchpadView extends View {
     private boolean continueClick = true;
     private int lastTouchedPosX;
     private int lastTouchedPosY;
-    private static final Byte CLICK_DELAYED_TIME = 50;
+    // AGVN: 80 ms (was 50) so a second finger landing a moment later still makes a right-click, not a left-click too
+    private static final Byte CLICK_DELAYED_TIME = 80;
     private static final Byte EFFECTIVE_TOUCH_DISTANCE = 20;
     private float resolutionScale;
     private static final int UPDATE_FORM_DELAYED_TIME = 50;
@@ -458,7 +459,11 @@ public class TouchpadView extends View {
                 break;
             case 2:
                 Finger finger2 = findSecondFinger(finger1);
-                if (finger2 != null && finger1.isTap()) pressPointerButtonRight(finger1);
+                if (finger2 != null && finger1.isTap()) {
+                    // AGVN: with the simulated touchscreen the cursor is not under the fingers, so right-click between them
+                    if (simTouchScreen) xServer.injectPointerMove((finger1.x + finger2.x) / 2, (finger1.y + finger2.y) / 2);
+                    pressPointerButtonRight(finger1);
+                }
                 break;
             case 4:
                 if (fourFingersTapCallback != null) {
@@ -528,14 +533,16 @@ public class TouchpadView extends View {
     }
 
     private void pressPointerButtonLeft(Finger finger) {
-        if (pointerButtonLeftEnabled && !xServer.pointer.isButtonPressed(Pointer.Button.BUTTON_LEFT)) {
+        if (pointerButtonLeftEnabled && (!xServer.pointer.isButtonPressed(Pointer.Button.BUTTON_LEFT)
+                || xServer.isReleaseWaiting(Pointer.Button.BUTTON_LEFT))) { // AGVN: a quick second tap still clicks
             xServer.injectPointerButtonPress(Pointer.Button.BUTTON_LEFT);
             fingerPointerButtonLeft = finger;
         }
     }
 
     private void pressPointerButtonRight(Finger finger) {
-        if (pointerButtonRightEnabled && !xServer.pointer.isButtonPressed(Pointer.Button.BUTTON_RIGHT)) {
+        if (pointerButtonRightEnabled && (!xServer.pointer.isButtonPressed(Pointer.Button.BUTTON_RIGHT)
+                || xServer.isReleaseWaiting(Pointer.Button.BUTTON_RIGHT))) { // AGVN
             xServer.injectPointerButtonPress(Pointer.Button.BUTTON_RIGHT);
             fingerPointerButtonRight = finger;
         }

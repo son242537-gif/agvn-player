@@ -100,7 +100,7 @@ fun AgvnAddGameRow(entry: AgvnImportEntry, icons: HashMap<String, ImageBitmap?>,
 /** The exe icon (loaded lazily, cached per screen) or a coloured tile with the title's first letter. */
 @Composable
 private fun GameThumb(entry: AgvnImportEntry, icons: HashMap<String, ImageBitmap?>) {
-    val key = entry.dir.absolutePath
+    val key = entry.key
     val icon by produceState(icons[key], key) {
         if (icons.containsKey(key) || entry.exe == null) return@produceState
         val loaded = withContext(iconDispatcher) { loadIcon(entry) }

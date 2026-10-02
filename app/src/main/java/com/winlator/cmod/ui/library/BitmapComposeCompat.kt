@@ -42,6 +42,9 @@ import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material.icons.outlined.Speed
+import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material.icons.outlined.BugReport
+import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -496,6 +499,19 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                LibraryActionTileCompat(Icons.Outlined.FileDownload, "Nhập save", Modifier.weight(1f), horizontal = true) {
+                    close()
+                    cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SAVE_IMPORT)
+                }
+                LibraryActionTileCompat(Icons.Outlined.Save, "Xuất save", Modifier.weight(1f), horizontal = true) {
+                    close()
+                    cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SAVE_EXPORT)
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 LibraryActionTileCompat(Icons.Outlined.Home, "Màn hình chính", Modifier.weight(1f), horizontal = landscape) {
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_HOME)
@@ -508,6 +524,15 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_EXPORT)
                 }
+            }
+            LibraryActionTileCompat(
+                Icons.Outlined.BugReport,
+                "Gửi nhật ký",
+                Modifier.fillMaxWidth().padding(top = 8.dp),
+                horizontal = landscape
+            ) {
+                close()
+                cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SEND_LOGS)
             }
             LibraryActionTileCompat(
                 Icons.Outlined.DeleteOutline,

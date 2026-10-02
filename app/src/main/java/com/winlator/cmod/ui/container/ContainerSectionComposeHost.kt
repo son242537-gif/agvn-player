@@ -686,6 +686,7 @@ private fun ChoiceSetting(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
+                com.winlator.cmod.ui.settings.SettingHelpButton(label)
                 Icon(Icons.Outlined.KeyboardArrowDown, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
@@ -777,6 +778,7 @@ private fun ActionSetting(
                     overflow = TextOverflow.Ellipsis
                 )
             }
+            com.winlator.cmod.ui.settings.SettingHelpButton(title)
             Icon(
                 if (expanded) Icons.Outlined.KeyboardArrowDown else Icons.Outlined.ChevronRight,
                 null,
@@ -1062,6 +1064,7 @@ private fun CompactTextField(
         onValueChange = onValueChange,
         modifier = Modifier.fillMaxWidth(),
         label = { Text(label) },
+        trailingIcon = { com.winlator.cmod.ui.settings.SettingHelpButton(label) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = if (numeric) KeyboardType.Number else KeyboardType.Ascii
@@ -1077,6 +1080,7 @@ private fun ToggleSetting(label: String, checked: Boolean, onCheckedChange: (Boo
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(label, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+        com.winlator.cmod.ui.settings.SettingHelpButton(label)
         Switch(checked = checked, onCheckedChange = onCheckedChange)
     }
 }

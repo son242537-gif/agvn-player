@@ -18,7 +18,7 @@
   "ram": {"flagshipMinMb": 7000, "trungBinhMinMb": 5000},
   "presets": {
     "FLAGSHIP":   {"fps": 30, "resolution": "1280x720", "texturePool": 1024},
-    "TRUNG_BINH": {"fps": 27, "resolution": "960x544",  "texturePool": 768},
+    "TRUNG_BINH": {"fps": 30, "resolution": "960x544",  "texturePool": 768},
     "YEU":        {"fps": 24, "resolution": "854x480",  "texturePool": 512}
   }
 }

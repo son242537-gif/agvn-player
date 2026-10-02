@@ -73,6 +73,7 @@ public class VulkanXServerView extends XServerRendererView implements SurfaceHol
     private FrameRating classicHudRef = null;
     private volatile int fpsWindowId = -1;
     private volatile int fpsLimit = 0;
+    private volatile boolean pacedPresentation = false;
 
     private static volatile boolean nativeLibLoaded = false;
 
@@ -136,6 +137,8 @@ public class VulkanXServerView extends XServerRendererView implements SurfaceHol
     private native void nativeSetPostFXMode(long handle, int mode);
     private native void nativeSetSwapRB(long handle, boolean enabled);
     private native void nativeSetPresentMode(long handle, int mode);
+    @FastNative private native void nativeSetPaced(long handle, boolean paced);
+    @FastNative private native void nativeRequestPacedFrame(long handle, long desiredPresentNs);
     private native int[] nativeGetSupportedPresentModes(long handle);
 
     private native void nativeInitRootWindow(long handle, long rootId, long contentId, int width, int height);
@@ -190,6 +193,7 @@ public class VulkanXServerView extends XServerRendererView implements SurfaceHol
                     } else {
 
                         nativeSetPresentMode(nativeHandle, pendingPresentMode);
+                        nativeSetPaced(nativeHandle, pacedPresentation);
                         nativeSetFilterMode(nativeHandle, pendingFilterMode);
                         nativeSetSwapRB(nativeHandle, pendingSwapRB);
                         nativeSetStretchMode(nativeHandle, pendingStretchMode);
@@ -209,6 +213,7 @@ public class VulkanXServerView extends XServerRendererView implements SurfaceHol
 
                 if (nativeHandle != 0) {
                     nativeSetPresentMode(nativeHandle, pendingPresentMode);
+                    nativeSetPaced(nativeHandle, pacedPresentation);
                     nativeSetFilterMode(nativeHandle, pendingFilterMode);
                     nativeSetSwapRB(nativeHandle, pendingSwapRB);
                     nativeSetPostFXMode(nativeHandle, pendingPostFXMode);
@@ -696,6 +701,18 @@ public class VulkanXServerView extends XServerRendererView implements SurfaceHol
         return fpsLimit;
     }
     public void setFpsLimit(int limit) { this.fpsLimit = Math.max(0, Math.min(1000, limit)); }
+
+    @Override
+    public void setPacedPresentation(boolean paced) {
+        pacedPresentation = paced;
+        synchronized (lock) { if (nativeHandle != 0) nativeSetPaced(nativeHandle, paced); }
+    }
+
+    @Override
+    public void requestPacedFrame(long desiredPresentNs) {
+        synchronized (lock) { if (nativeHandle != 0) nativeRequestPacedFrame(nativeHandle, desiredPresentNs); }
+    }
+
     public void setPipMode(boolean pip) { inPipMode = pip; }
     public int getSurfaceWidth() { return surfaceWidth; }
     public int getSurfaceHeight() { return surfaceHeight; }

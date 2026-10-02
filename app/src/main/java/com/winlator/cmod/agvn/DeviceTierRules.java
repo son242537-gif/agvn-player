@@ -60,7 +60,7 @@ public final class DeviceTierRules {
         Preset p = presets.get(tier.name());
         if (p != null) return p;
         Preset fallback = new Preset();
-        fallback.fps = tier == DeviceTier.YEU ? 24 : tier == DeviceTier.TRUNG_BINH ? 27 : 30;
+        fallback.fps = tier == DeviceTier.YEU ? 24 : 30;
         fallback.resolution = tier == DeviceTier.YEU ? "854x480" : tier == DeviceTier.TRUNG_BINH ? "960x544" : "1280x720";
         fallback.texturePool = tier == DeviceTier.YEU ? 512 : tier == DeviceTier.TRUNG_BINH ? 768 : 1024;
         return fallback;

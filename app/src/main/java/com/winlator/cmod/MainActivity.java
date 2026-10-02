@@ -127,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return;
         }
 
+        // AGVN: sessions whose process Android killed get their logs and exit reason now
+        new Thread(() -> com.winlator.cmod.agvn.AgvnSessionLog.finishPending(getApplicationContext()), "AgvnSessionLog").start();
+
         notificationService = new Intent(this, NotificationService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && (Build.VERSION.SDK_INT < 33 || ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED))
             createNotificationChannel();
@@ -211,6 +214,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (!ImageFsInstaller.installIfNeeded(this, () -> requestAppPermissions())) {
                 if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED)
                     startForegroundService(notificationService);
+                // AGVN: once a day, say when a new version is out (not while the image installs or over a crash report)
+                if (savedInstanceState == null && !isBigPictureModeEnabled && !com.winlator.cmod.agvn.CrashRecorder.hasPendingCrash(this))
+                    com.winlator.cmod.agvn.AgvnUpdateDialogs.checkDaily(this);
             }
         }
     }

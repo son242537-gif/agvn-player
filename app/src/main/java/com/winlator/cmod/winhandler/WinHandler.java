@@ -574,7 +574,7 @@ public void setVibrationEnabledForSlot(int slot, boolean enabled) {
 
     public void sendGamepadState() {
         final ControlsProfile profile = activity.getInputControlsView().getProfile();
-        if (profile == null) {
+        if (profile == null || xinputDisabled) { // AGVN: gamepad off for this game (AgvnGamepadMode.noGamepad)
             releaseSlot(OSC_DEVICE_ID);
             return;
         }
@@ -595,7 +595,7 @@ public void setVibrationEnabledForSlot(int slot, boolean enabled) {
     }
 
     public void sendGamepadState(ExternalController controller) {
-        if (controller == null)
+        if (controller == null || xinputDisabled) // AGVN: gamepad off for this game (AgvnGamepadMode.noGamepad)
             return;
 
         ControlsProfile profile = activity.getInputControlsView().getProfile();

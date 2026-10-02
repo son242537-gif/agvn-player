@@ -330,6 +330,8 @@ void VulkanRendererContext::createLogicalDevice() {
              ext.extensionName, ext.specVersion);
         if (strcmp(ext.extensionName, VK_EXT_QUEUE_FAMILY_FOREIGN_EXTENSION_NAME) == 0)
             hasForeignQueue = true;
+        if (strcmp(ext.extensionName, VK_GOOGLE_DISPLAY_TIMING_EXTENSION_NAME) == 0)
+            hasDisplayTiming = true; // AGVN: desired present times for frame pacing
     }
     if (!hasForeignQueue) {
         RLOG_E("AHB requires VK_EXT_queue_family_foreign, but the selected Vulkan device does not advertise it");
@@ -341,6 +343,7 @@ void VulkanRendererContext::createLogicalDevice() {
         VK_ANDROID_EXTERNAL_MEMORY_ANDROID_HARDWARE_BUFFER_EXTENSION_NAME,
         VK_EXT_QUEUE_FAMILY_FOREIGN_EXTENSION_NAME
     };
+    if (hasDisplayTiming) extList.push_back(VK_GOOGLE_DISPLAY_TIMING_EXTENSION_NAME);
     for (const char* ext : extList)
         RLOG("Enabled Vulkan device extension: %s", ext);
     VkDeviceCreateInfo ci{}; ci.sType=VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -1144,9 +1147,11 @@ void VulkanRendererContext::recordCmdBuf(VkCommandBuffer cb, uint32_t imgIdx,
 void VulkanRendererContext::renderLoop() {
     while (isRunning) {
         { std::unique_lock<std::mutex> lk(dirtyMutex);
-           dirtyCV.wait(lk,[this]{
-               return !isRunning||(!surfaceDetached.load()&&
-                   (needsRender.load()||fbResized.load()||cursorMoved.load())); }); }
+           // AGVN: a paced frame waits for the vsync limiter's call; if none comes for 250 ms, draw anyway
+           while (!dirtyCV.wait_for(lk,std::chrono::milliseconds(250),[this]{
+               return !isRunning||(!surfaceDetached.load()&&(fbResized.load()||frameWanted())); })) {
+               if (paced.load()&&!surfaceDetached.load()&&(needsRender.load()||cursorMoved.load())) break;
+           } }
         if (!isRunning) break;
         try { renderFrame(); }
         catch (const std::exception& e) {
@@ -1191,6 +1196,8 @@ void VulkanRendererContext::renderFrame() {
 
     needsRender.store(false,std::memory_order_relaxed);
     cursorMoved.store(false,std::memory_order_relaxed);
+    int64_t desiredPresentNs = 0;
+    if (paced.load()) { desiredPresentNs = pacedPresentNs.load(); pacedFrameAsked.store(false); }
 
     if (surfaceDetached.load(std::memory_order_acquire)) return;
     if (surfaceWidth==0||surfaceHeight==0) { swapchainRetryPending.store(true); return; }
@@ -1254,7 +1261,9 @@ void VulkanRendererContext::renderFrame() {
     }
 
     uint32_t imgIdx;
+    auto acquireStart = std::chrono::steady_clock::now();
     VkResult res=vk_.AcquireNextImageKHR(device,swapchain,UINT64_MAX,imgAvailSems[currentFrame],VK_NULL_HANDLE,&imgIdx);
+    logIfSlow("vkAcquireNextImageKHR", acquireStart); // AGVN: frame stall logs
     if (res==VK_ERROR_OUT_OF_DATE_KHR||res==VK_ERROR_SURFACE_LOST_KHR){fbResized.store(true);return;}
     if (res!=VK_SUCCESS&&res!=VK_SUBOPTIMAL_KHR) return;
     if (imgIdx >= swapchainFBs.size() || imgIdx >= swapchainImages.size()) {
@@ -1391,7 +1400,26 @@ void VulkanRendererContext::renderFrame() {
     VkPresentInfoKHR pi{}; pi.sType=VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     pi.waitSemaphoreCount=1; pi.pWaitSemaphores=sSem; pi.swapchainCount=1; pi.pSwapchains=scs; pi.pImageIndices=&imgIdx;
 
+    // AGVN: a paced frame is shown at its vsync, not before. Android keeps the last time for later presents, so once
+    // one was set, unpaced presents carry "now" instead of a stale time.
+    VkPresentTimeGOOGLE presentTime{};
+    VkPresentTimesInfoGOOGLE presentTimes{};
+    if (hasDisplayTiming && (desiredPresentNs > 0 || presentTimesUsed)) {
+        if (desiredPresentNs <= 0)
+            desiredPresentNs = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                std::chrono::steady_clock::now().time_since_epoch()).count();
+        presentTimesUsed = true;
+        presentTime.presentID = ++presentId;
+        presentTime.desiredPresentTime = (uint64_t)desiredPresentNs;
+        presentTimes.sType = VK_STRUCTURE_TYPE_PRESENT_TIMES_INFO_GOOGLE;
+        presentTimes.swapchainCount = 1;
+        presentTimes.pTimes = &presentTime;
+        pi.pNext = &presentTimes;
+    }
+
+    auto presentStart = std::chrono::steady_clock::now();
     res = vk_.QueuePresentKHR(graphicsQueue, &pi);
+    logIfSlow("vkQueuePresentKHR", presentStart);
 
     if (res==VK_ERROR_OUT_OF_DATE_KHR||res==VK_ERROR_SURFACE_LOST_KHR||res==VK_SUBOPTIMAL_KHR) fbResized.store(true);
     currentFrame=(currentFrame+1)%MAX_FRAMES_IN_FLIGHT;
@@ -1797,6 +1825,28 @@ void VulkanRendererContext::setPresentMode(VkPresentModeKHR mode) {
     if (requestedPresentMode==target) { RLOG("setPresentMode: already set, skipping"); return; }
     requestedPresentMode=target;
     fbResized.store(true); dirtyCV.notify_one();
+}
+
+void VulkanRendererContext::logIfSlow(const char* what, std::chrono::steady_clock::time_point start) const {
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count();
+    if (ms >= 200) RLOG_E("AGVN: %s took %lld ms (frame pacing %s)", what, (long long)ms, paced.load() ? "on" : "off");
+}
+
+bool VulkanRendererContext::frameWanted() const {
+    bool changed = needsRender.load() || cursorMoved.load();
+    return paced.load() ? changed && pacedFrameAsked.load() : changed;
+}
+
+void VulkanRendererContext::setPaced(bool on) {
+    { std::lock_guard<std::mutex> lk(dirtyMutex); paced.store(on); pacedFrameAsked.store(false); pacedPresentNs.store(0); }
+    dirtyCV.notify_one();
+    RLOG("frame pacing %s (VK_GOOGLE_display_timing %s)", on ? "on" : "off", hasDisplayTiming ? "yes" : "no");
+}
+
+void VulkanRendererContext::requestPacedFrame(int64_t desiredPresentNs) {
+    if (!needsRender.load() && !cursorMoved.load()) return; // nothing new for this vsync
+    { std::lock_guard<std::mutex> lk(dirtyMutex); pacedPresentNs.store(desiredPresentNs); pacedFrameAsked.store(true); }
+    dirtyCV.notify_one();
 }
 
 std::vector<int> VulkanRendererContext::getSupportedPresentModes() const {

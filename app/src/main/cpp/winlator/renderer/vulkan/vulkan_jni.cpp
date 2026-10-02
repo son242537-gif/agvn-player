@@ -341,6 +341,22 @@ Java_com_winlator_cmod_widget_VulkanXServerView_nativeSetPresentMode(
     if (r) r->setPresentMode((VkPresentModeKHR)mode);
 }
 
+extern "C" JNIEXPORT void JNICALL
+Java_com_winlator_cmod_widget_VulkanXServerView_nativeSetPaced(
+    JNIEnv*, jobject, jlong handle, jboolean paced)
+{
+    auto* r = reinterpret_cast<VulkanRendererContext*>(handle);
+    if (r) r->setPaced(paced == JNI_TRUE);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_winlator_cmod_widget_VulkanXServerView_nativeRequestPacedFrame(
+    JNIEnv*, jobject, jlong handle, jlong desiredPresentNs)
+{
+    auto* r = reinterpret_cast<VulkanRendererContext*>(handle);
+    if (r) r->requestPacedFrame((int64_t)desiredPresentNs);
+}
+
 extern "C" JNIEXPORT jintArray JNICALL
 Java_com_winlator_cmod_widget_VulkanXServerView_nativeGetSupportedPresentModes(
     JNIEnv* env, jobject, jlong handle)

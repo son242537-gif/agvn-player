@@ -111,6 +111,7 @@ struct VkTable {
 #include <algorithm>
 #include <utility>
 #include <thread>
+#include <chrono>
 #include <atomic>
 #include <mutex>
 #include <shared_mutex>
@@ -196,6 +197,9 @@ public:
     void setSharpness(float s);
     void setSwapRB(bool enabled);
     void setPresentMode(VkPresentModeKHR mode);
+    // AGVN frame pacing: under an FPS limit Java asks for each frame on the vsync grid (AgvnVsyncLimiter)
+    void setPaced(bool paced);
+    void requestPacedFrame(int64_t desiredPresentNs);
     std::vector<int> getSupportedPresentModes() const;
     VkExtent2D getSwapchainExtent() const { return swapchainExt; }
 
@@ -371,6 +375,14 @@ public:
     VkDescriptorPool winTexPool = VK_NULL_HANDLE;
 
     std::atomic<bool> needsRender{false};
+    std::atomic<bool> paced{false};
+    std::atomic<bool> pacedFrameAsked{false};
+    std::atomic<int64_t> pacedPresentNs{0};
+    bool hasDisplayTiming = false;
+    bool presentTimesUsed = false;
+    uint32_t presentId = 0;
+    bool frameWanted() const;
+    void logIfSlow(const char* what, std::chrono::steady_clock::time_point start) const;
     std::thread       renderThread;
     std::atomic<bool> isRunning{false};
     std::atomic<bool> fbResized{false};

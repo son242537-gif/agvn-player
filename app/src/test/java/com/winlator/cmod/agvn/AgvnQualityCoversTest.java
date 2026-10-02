@@ -15,18 +15,21 @@ public class AgvnQualityCoversTest {
     @Rule public TemporaryFolder tmp = new TemporaryFolder();
 
     @Test
-    public void withFpsKeepsOtherVariables() {
-        assertEquals("A=1 DXVK_FRAME_RATE=24", AgvnQuality.withFps("A=1 DXVK_FRAME_RATE=60", 24));
-        assertEquals("A=1", AgvnQuality.withFps("A=1 DXVK_FRAME_RATE=60", 0));
-        assertEquals("DXVK_FRAME_RATE=30", AgvnQuality.withFps(null, 30));
+    public void fpsCapIsNoLongerForcedOnDxvk() {
+        assertEquals("A=1", AgvnQuality.withoutFpsCap("A=1 DXVK_FRAME_RATE=60"));
+        assertEquals("A=1", AgvnQuality.withoutFpsCap("A=1"));
+        assertEquals("", AgvnQuality.withoutFpsCap(null));
     }
 
     @Test
-    public void oldRatCaoCapIsDroppedButOtherCapsStay() {
-        assertEquals("A=1", AgvnQuality.withoutOldHighestCap("A=1 DXVK_FRAME_RATE=40"));
-        assertEquals("A=1 DXVK_FRAME_RATE=60", AgvnQuality.withoutOldHighestCap("A=1 DXVK_FRAME_RATE=60"));
-        assertEquals("", AgvnQuality.withoutOldHighestCap(null));
-        assertEquals("A=1", AgvnQuality.withFps("A=1 DXVK_FRAME_RATE=40", AgvnQuality.Level.HIGHEST.fps));
+    public void oldCapsMoveToTheInGameLimiter() {
+        assertEquals("24", AgvnQuality.startFpsFromOldCap("A=1 DXVK_FRAME_RATE=24", false));
+        assertEquals("40", AgvnQuality.startFpsFromOldCap("DXVK_FRAME_RATE=40", false));
+        assertEquals("0", AgvnQuality.startFpsFromOldCap("DXVK_FRAME_RATE=40", true)); // Rất cao's old cap: off
+        assertEquals("60", AgvnQuality.startFpsFromOldCap("DXVK_FRAME_RATE=60", true));
+        assertEquals("", AgvnQuality.startFpsFromOldCap("A=1", false));
+        assertEquals("", AgvnQuality.startFpsFromOldCap("DXVK_FRAME_RATE=abc", false));
+        assertEquals("", AgvnQuality.startFpsFromOldCap(null, true));
     }
 
     @Test
@@ -38,7 +41,7 @@ public class AgvnQualityCoversTest {
         int lastFps = 0;
         for (int step = 0; step < 4; step++) {
             AgvnQuality.Level l = AgvnQuality.Level.atStep(step);
-            assertTrue(l.fps > lastFps);
+            assertTrue(l.fps >= lastFps); // Trung bình and Cao both 30: a 60 Hz screen shows 20 or 30 evenly
             lastFps = l.fps;
         }
         assertEquals(0, AgvnQuality.Level.HIGHEST.fps); // Rất cao: no cap, the game and its cheat menu decide

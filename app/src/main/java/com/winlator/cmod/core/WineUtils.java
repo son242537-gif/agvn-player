@@ -210,11 +210,27 @@ public abstract class WineUtils {
     }
 
 public static void changeServicesStatus(Container container, String startupSelection) {
+    changeServicesStatus(new File(container.getRootDir(), ".wine/system.reg"), startupSelection);
+}
+
+/** AGVN: the same on a system.reg file, so the service lists can be unit-tested without a Container. */
+public static void changeServicesStatus(File systemRegFile, String startupSelection) {
+    // AGVN: "Normal" puts back Wine's own start types, as in a new prefix (it used to write the "Essential" list)
+    final String[] normalServices = {
+        "BITS:3", "Eventlog:2", "HTTP:3", "LanmanServer:3", "NDIS:2",
+        "PlugPlay:2", "RpcSs:3", "scardsvr:3", "Schedule:3",
+        "Spooler:3", "StiSvc:3", "TermService:3",
+        "winebus:3", "winehid:3", "Winmgmt:3", "wuauserv:3",
+        "FontCache:3", "FontCache3.0.0.0:3", "MountMgr:2", "MSIServer:3", "nsiproxy:2", "SharedGpuResources:2"
+    };
+
     final String[] services = {
         "BITS:3", "Eventlog:2", "HTTP:3", "LanmanServer:3", "NDIS:2",
         "PlugPlay:4", "RpcSs:4", "scardsvr:3", "Schedule:3",
         "Spooler:3", "StiSvc:3", "TermService:3",
-        "winebus:2", "winehid:2", "Winmgmt:3", "wuauserv:3"
+        "winebus:2", "winehid:2", "Winmgmt:3", "wuauserv:3",
+        // AGVN: Wine's start types for the services only "Aggressive" turns off, so leaving it turns them back on
+        "FontCache:3", "FontCache3.0.0.0:3", "MountMgr:2", "MSIServer:3", "nsiproxy:2", "SharedGpuResources:2"
     };
 
     final String[] aggressiveServices = {
@@ -226,9 +242,7 @@ public static void changeServicesStatus(Container container, String startupSelec
         "TrkWks:3", "W32Time:3", "Winmgmt:3", "wuauserv:3"
     };
 
-    File systemRegFile = new File(container.getRootDir(), ".wine/system.reg");
-
-    byte selection = Container.STARTUP_SELECTION_NORMAL;
+    byte selection = Container.STARTUP_SELECTION_ESSENTIAL;
     try {
         selection = Byte.parseByte(startupSelection);
     } catch (NumberFormatException e) {}
@@ -236,7 +250,8 @@ public static void changeServicesStatus(Container container, String startupSelec
     try (WineRegistryEditor registryEditor = new WineRegistryEditor(systemRegFile)) {
         registryEditor.setCreateKeyIfNotExist(false);
 
-        String[] targetList = (selection == Container.STARTUP_SELECTION_AGGRESSIVE) ? aggressiveServices : services;
+        String[] targetList = (selection == Container.STARTUP_SELECTION_AGGRESSIVE) ? aggressiveServices
+                : selection == Container.STARTUP_SELECTION_NORMAL ? normalServices : services;
 
         for (String service : targetList) {
             String name = service.substring(0, service.indexOf(":"));

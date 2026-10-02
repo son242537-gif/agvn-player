@@ -133,13 +133,11 @@ public class AgvnProfileTest {
     }
 
     @Test
-    public void envVarsIncludeFpsCap() {
-        assertEquals("DXVK_HUD=0 DXVK_FRAME_RATE=24",
-                AgvnGameImporter.buildEnvVars(Collections.singletonMap("DXVK_HUD", "0"), 24, ""));
-        assertEquals("", AgvnGameImporter.buildEnvVars(Collections.emptyMap(), 0, null));
-        assertEquals("WINEDLLOVERRIDES=dinput8=n,b DXVK_FRAME_RATE=30",
-                AgvnGameImporter.buildEnvVars(Collections.emptyMap(), 30, "dinput8=n,b"));
+    public void envVarsLeaveTheFpsCapToTheGame() {
+        assertEquals("DXVK_HUD=0", AgvnGameImporter.buildEnvVars(Collections.singletonMap("DXVK_HUD", "0"), ""));
+        assertEquals("", AgvnGameImporter.buildEnvVars(Collections.singletonMap("DXVK_FRAME_RATE", "30"), null));
+        assertEquals("WINEDLLOVERRIDES=dinput8=n,b", AgvnGameImporter.buildEnvVars(Collections.emptyMap(), "dinput8=n,b"));
         assertEquals("WINEDLLOVERRIDES=mscoree=b;winhttp=n,b",
-                AgvnGameImporter.buildEnvVars(Collections.singletonMap("WINEDLLOVERRIDES", "mscoree=b"), 0, "winhttp=n,b"));
+                AgvnGameImporter.buildEnvVars(Collections.singletonMap("WINEDLLOVERRIDES", "mscoree=b"), "winhttp=n,b"));
     }
 }

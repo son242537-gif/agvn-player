@@ -8,13 +8,15 @@ web GitHub để mở và merge PR.
 
 ## Trạng thái
 
-- **Cập nhật 02/10/2026:** `agvn/main` đã merge PR #25–#36, gồm **PR #34 (Zink Mesa 25.1.9, `zink@3`)**: game
-  OpenGL hết văng trên POCO, RAM GPU giảm khoảng 0,3 GB. `agvn/main` vẫn ở 0.1.2 (mã 4).
-- App đã phát hành **v0.1.4 (mã 6)** và **v0.1.5 (mã 7)** từ nhánh `agvn/p43-release-0.1.3` (gộp các nhánh
-  `agvn/p28`…`p48`), chưa merge vào `agvn/main`. Các PR #37, #38, #40–#51 vẫn ở trạng thái nháp dù đã có trong
-  bản phát hành. Bảng tiến độ đầy đủ: mục "Progress after the 10 phases" trong `ROADMAP.md`.
-- Ren'Py và giấy phép GPL đã làm lại trên nhánh `agvn/p49-gpl-license` → `p50-renpy8` → `p53-game-session` (chưa có PR;
-  đổi giấy phép cần anh Sơn quyết). ONScripter / mkxp-z vẫn tạm dừng.
+- **Cập nhật 02/10/2026:** `agvn/main` ở **0.1.5 (mã 7)**, đúng bằng bản đã phát hành `v0.1.5`. PR #53 đã gộp nhánh
+  phát hành `agvn/p43-release-0.1.3`, và các PR nháp #37, #38, #40–#51 đã có trong đó (đã đóng). Từ giờ nhánh mới tách
+  từ `agvn/main`.
+- **PR #34 (đã merge)**: Zink mới (Mesa 25.1.9 bản phát hành, `zink@3`). Game OpenGL hết văng trên POCO. Bản vá `0007`
+  giới hạn vùng đệm GPU của Zink ở 256 MB.
+- Còn mở: #39 (DDraw) và #52 (quy tắc CLAUDE.md), cả hai tách từ bản 0.1.2. Đang làm, chưa có PR: `agvn/p44-game-cpu`;
+  `agvn/p49-gpl-license` → `p50-renpy8` → `p53-game-session` (giấy phép GPL, Ren'Py 8 chạy trực tiếp; đổi giấy phép
+  cần anh Sơn quyết). ONScripter / mkxp-z vẫn tạm dừng. Bảng đầy đủ: mục "Progress after the 10 phases" trong
+  `ROADMAP.md`.
 
 ## Việc làm tiếp (theo thứ tự)
 
@@ -25,16 +27,16 @@ Triệu chứng trên POCO:
   thoát theo;
 - ở cấu hình thấp, game vào được nhưng **màn hình chớp đen đều mỗi giây**.
 
-Game này chạy tốt trên GameHub (Mesa 25.1.4). Nguyên nhân văng đã rõ: file Zink của Ludashi là Mesa 24.3.0 dựng ở chế
-độ gỡ lỗi. Nguyên nhân chớp đen thì chưa rõ.
+Game này chạy tốt trên GameHub (Mesa 25.1.4). Nguyên nhân văng: file Zink của Ludashi là Mesa 24.3.0 dựng ở chế độ gỡ
+lỗi. **Đã sửa ở PR #34** (Mesa 25.1.9 bản phát hành, đã merge). Lỗi chớp đen thì chưa rõ nguyên nhân và chưa thử lại
+với Zink mới.
 
 1. **Thử nhanh cho lỗi chớp** (không cần dựng lại gì): Cài đặt → tắt **"Dùng tiện ích DRI3"** → mở lại game ở cấu
    hình thấp. Nếu hết chớp thì lỗi nằm ở khâu đưa hình lên màn hình (DRI3/Present), không phải ở game. Đọc log theo
    mục "Đọc log" bên dưới, tìm dòng `zink`, `MESA`, `wrapper`, `present`.
-2. **Zink mới đã merge (#34)** và có trong mọi bản từ 0.1.4. Nếu bản đang cài vẫn chớp, làm bước 3.
-
-   Chỉ khi cần dựng lại (xem `scripts/agvn/zink/README.md`): script chỉ chạy trên Linux, nên trên Windows dùng
-   **WSL2 Ubuntu 24.04**. Chạy mã dựng của Mesa là bước anh Sơn phải đồng ý trước.
+2. **Dựng lại Zink** chỉ khi cần đổi bản vá (xem `scripts/agvn/zink/README.md`). Script chỉ chạy trên Linux, nên trên
+   Windows dùng **WSL2 Ubuntu 24.04**. Chạy mã dựng của Mesa là bước anh Sơn phải đồng ý trước. Nhớ tăng
+   `AgvnGlDriver.ZINK_REVISION` khi đổi file.
    ```bash
    # trong WSL
    git clone https://github.com/son242537-gif/agvn-player ~/ap && cd ~/ap && git checkout agvn/main
@@ -62,6 +64,10 @@ Cần máy Dimensity thật để kiểm (ví dụ Dimensity 8300: POCO X6 Pro, 
 BGRA/RGBA, mức xếp hạng máy.
 
 ## Dựng và cài APK (PowerShell, trong `C:\AGVN\ap`)
+
+Từ bản có mục **Cập nhật ứng dụng** trở đi, không cần cắm cáp nữa. Đăng bản bằng
+`.\tools\agvn\dang-ban-cap-nhat.ps1`, rồi bấm cập nhật trên điện thoại (xem `docs/agvn/cap-nhat-ung-dung.md`).
+Cách cài bằng adb dưới đây vẫn dùng được:
 
 ```powershell
 git checkout agvn/main; git pull

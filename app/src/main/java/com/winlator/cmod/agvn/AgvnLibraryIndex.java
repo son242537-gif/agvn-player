@@ -31,15 +31,16 @@ public final class AgvnLibraryIndex {
     private final List<Existing> exeOwners = new ArrayList<>();
 
     public AgvnLibraryIndex(List<Shortcut> shortcuts) {
-        for (Shortcut s : shortcuts) {
-            Existing e = new Existing(s.container, s.name);
-            String gameDir = s.getExtra(AgvnGameImporter.EXTRA_GAME_DIR);
-            if (!gameDir.isEmpty()) byGameDir.put(AgvnGameScanner.canonical(new File(gameDir)), e);
-            String exe = unixExe(s.path);
-            if (exe != null) {
-                exePaths.add(AgvnGameScanner.canonical(new File(exe)));
-                exeOwners.add(e);
-            }
+        for (Shortcut s : shortcuts) add(s.getExtra(AgvnGameImporter.EXTRA_GAME_DIR), s.path, new Existing(s.container, s.name));
+    }
+
+    /** One shortcut: its AGVN game folder ("" for one made by hand) and the path of its Exec line. */
+    void add(String gameDir, String execPath, Existing e) {
+        if (!gameDir.isEmpty()) byGameDir.put(AgvnGameScanner.canonical(new File(gameDir)), e);
+        String exe = unixExe(execPath);
+        if (exe != null) {
+            exePaths.add(AgvnGameScanner.canonical(new File(exe)));
+            exeOwners.add(e);
         }
     }
 
@@ -50,6 +51,17 @@ public final class AgvnLibraryIndex {
         if (e != null) return e;
         String prefix = key + File.separator;
         for (int i = 0; i < exePaths.size(); i++) if (exePaths.get(i).startsWith(prefix)) return exeOwners.get(i);
+        return null;
+    }
+
+    /**
+     * The shortcut for one game of a folder that holds several ({@code variant}: its exe): only a shortcut that starts
+     * that exe, since the folder and its other exes belong to the other games. {@code variant} null: {@link #find(File)}.
+     */
+    public Existing find(File gameDir, String variant) {
+        if (variant == null) return find(gameDir);
+        String exe = AgvnGameScanner.canonical(new File(gameDir, variant));
+        for (int i = 0; i < exePaths.size(); i++) if (exePaths.get(i).equalsIgnoreCase(exe)) return exeOwners.get(i);
         return null;
     }
 

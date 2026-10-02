@@ -1,0 +1,567 @@
+# AGVN Player: lời giải thích cho nút "?" cạnh mỗi mục cài đặt.
+# Mỗi mục gồm 4 dòng:
+#   [Tên mục, đúng từng chữ như trên màn hình]
+#   Là gì: ...
+#   Vì sao chỉnh: ...
+#   Chỉnh thế nào: ...
+# Dòng bắt đầu bằng "#" là ghi chú. Mục thiếu một trong ba dòng sẽ không hiện nút "?".
+
+[Async]
+Là gì: Dịch shader (mã vẽ hiệu ứng) ở nền thay vì bắt game đứng chờ. Chỉ có tác dụng với bản DXVK có chữ async hoặc gplasync.
+Vì sao chỉnh: Giảm khựng, giật khi lần đầu gặp cảnh hoặc hiệu ứng mới.
+Chỉnh thế nào: Thường tự bật khi bạn chọn bản DXVK async; nên để bật, nhất là máy yếu. Nếu vật thể hoặc hiệu ứng thoáng mất, nháy, hay game lỗi, thử tắt.
+
+[Biến]
+Là gì: Chọn biến môi trường muốn thêm. Biến môi trường là dòng cài đặt gửi cho Wine, driver hoặc DXVK khi mở game. Chọn “Tùy chỉnh…” để tự gõ tên.
+Vì sao chỉnh: Dùng khi được hướng dẫn thêm một biến cụ thể để sửa lỗi hoặc thử hiệu năng.
+Chỉnh thế nào: Chỉ thêm biến bạn biết rõ công dụng. Chọn tên rồi bấm “Thêm”, sau đó chỉnh Giá trị. Biến đặt trong game sẽ đè biến cùng tên của môi trường chạy.
+
+[Box64 Preset]
+Là gì: Bộ chỉnh sẵn cho Box64 và WOWBox64, cân giữa chạy an toàn và chạy nhanh: Ổn định, Tương thích, Trung gian, Hiệu năng (xếp từ an toàn nhất đến nhanh nhất).
+Vì sao chỉnh: Đổi khi game văng, treo hoặc lỗi lạ (chọn mức an toàn hơn), hoặc khi game chạy ổn nhưng chậm (chọn mức nhanh hơn).
+Chỉnh thế nào: Mặc định: Tương thích. Game lỗi: thử Ổn định. Muốn nhanh hơn: thử Trung gian rồi Hiệu năng, lỗi thì quay lại. Game Unity nên để Tương thích hoặc Ổn định.
+
+[Bật debug Wine]
+Là gì: Wine là phần giúp game Windows chạy trên điện thoại. Bật mục này để Wine ghi cảnh báo và lỗi vào tệp nhật ký trong thư mục AGVN-Player/logs, kèm nút “Xem log” trong menu game.
+Vì sao chỉnh: Dùng khi game văng, treo hoặc báo lỗi và bạn cần gửi nhật ký cho AGVN để được giúp.
+Chỉnh thế nào: Mặc định tắt. Bật, mở game tới lúc lỗi, thoát game, rồi trong thư viện bấm ⋮ ở game đó → “Gửi nhật ký” (có kèm nhật ký Wine), hoặc bấm “Xuất nhật ký lỗi” ở đầu Cài đặt. Mục “Kênh debug Wine” cứ để mặc định. Xong nhớ tắt vì ghi nhật ký làm game chậm hơn.
+
+[Bật DInput]
+Là gì: DInput (DirectInput) là kiểu đọc tay cầm cũ, hay gặp ở game PC đời cũ.
+Vì sao chỉnh: Bật khi game cũ không nhận tay cầm. Khi Nhập độc quyền bật, bật DInput sẽ tự tắt XInput: game chỉ thấy tay cầm qua DInput, như một tay cầm thường chứ không phải tay cầm Xbox.
+Chỉnh thế nào: Mặc định tắt. Chỉ chỉnh được khi Nhập độc quyền đang bật. Nếu nút bấm bị loạn, quay lại Bật XInput, hoặc tắt Nhập độc quyền để game thấy tay cầm qua cả hai kiểu.
+
+[Bật File Provider]
+Là gì: Cho phép xem và chép tệp bên trong AGVN Player (như ổ C của máy Windows ảo) bằng trình quản lý tệp của Android (ứng dụng Tệp).
+Vì sao chỉnh: Tiện khi cần chép bản lưu, phông chữ hay tệp cấu hình vào ổ C của game. Tắt nếu bạn không dùng và không muốn ứng dụng khác xem dữ liệu của app.
+Chỉnh thế nào: Mặc định bật. Thay đổi có hiệu lực ở lần mở app sau. Cẩn thận khi xóa hay đổi tên tệp trong đó vì có thể làm hỏng môi trường chạy.
+
+[Bật log Box64]
+Là gì: Box64 là bộ dịch giúp chương trình viết cho chip máy tính (x86) chạy trên chip điện thoại (ARM). Bật mục này để Box64 ghi thêm thông tin vào nhật ký game.
+Vì sao chỉnh: Dùng khi game văng hoặc treo ngay lúc mở và AGVN cần xem Box64 báo gì.
+Chỉnh thế nào: Mặc định tắt. Chỉ có ích khi game chạy bằng Box64, hoặc chọn WOWBox64 ở mục “Giả lập 32-bit”; với FEXCore thì gần như không thêm gì. Gửi lỗi xong thì tắt.
+
+[Bật nhật ký ứng dụng]
+Là gì: Ghi nhật ký của chính app (phần Android: driver đồ họa, âm thanh, màn hình…) trong lúc chơi vào một tệp ở thư mục AGVN-Player/logs.
+Vì sao chỉnh: Hữu ích khi app tự thoát, màn hình đen hoặc lỗi nằm ngoài game, giúp AGVN tìm ra nguyên nhân.
+Chỉnh thế nào: Mặc định tắt. Chỉ bật khi cần báo lỗi: bật, chơi tới lúc lỗi, rồi bấm “Xuất nhật ký lỗi”. Gửi xong thì tắt, vì mỗi lần chơi lại thêm một tệp nhật ký tốn bộ nhớ máy.
+
+[Bật tần số quét cao]
+Là gì: Tần số quét là số lần màn hình làm mới mỗi giây (60, 90, 120 Hz…). Bật mục này thì lúc chơi, app xin chạy ở mức cao nhất mà màn hình hỗ trợ.
+Vì sao chỉnh: Chỉ có ích khi game chạy được trên 60 FPS (khung hình mỗi giây) và máy có màn hình 90 Hz trở lên.
+Chỉnh thế nào: Mặc định tắt. Trên máy yếu game thường chỉ 24–30 FPS nên bật cũng không mượt hơn mà còn tốn pin, nóng máy hơn. Máy yếu nên để tắt.
+
+[Bật XInput]
+Là gì: XInput là kiểu đọc tay cầm Xbox mà phần lớn game PC mới dùng.
+Vì sao chỉnh: Chọn khi game hỗ trợ tay cầm Xbox. Khi Nhập độc quyền bật, bật XInput sẽ tự tắt DInput, nên game chỉ thấy tay cầm qua XInput. Tắt cả XInput lẫn DInput thì game không nhận tay cầm.
+Chỉnh thế nào: Mặc định bật. Chỉ chỉnh được khi Nhập độc quyền đang bật. Game cũ không nhận tay cầm thì chuyển sang mục Bật DInput.
+
+[Bắt chuột ngoài]
+Là gì: Khi bạn dùng chuột rời (cắm dây hoặc Bluetooth), app giữ chuột lại trong game: con trỏ Android ẩn đi, mọi chuyển động và nút chuột đi thẳng vào game.
+Vì sao chỉnh: Giúp xoay góc nhìn mượt trong game 3D và con trỏ không chạy ra ngoài. Tắt thử nếu chuột rời hoạt động lạ, khó điều khiển hoặc bấm không nhận.
+Chỉnh thế nào: Mặc định bật. Không dùng chuột rời thì mục này không ảnh hưởng gì, cảm ứng vẫn như cũ. Mục này áp dụng cho mọi game.
+
+[Bỏ qua X11]
+Là gì: Chỉ có ở DisplayX. Khi bật, khung hình game vẽ bằng Vulkan (ví dụ qua DXVK, VKD3D) được gửi thẳng lên màn hình, không đi qua lớp X11 trung gian.
+Vì sao chỉnh: Có thể giảm độ trễ và tăng FPS cho game vẽ bằng Vulkan. Nếu game đen màn hình, không hiện hình hoặc văng thì cần tắt.
+Chỉnh thế nào: Mặc định tắt. Muốn thử cho mượt hơn thì bật rồi mở lại game; có lỗi hình thì tắt lại. Không chắc thì để tắt.
+
+[Bộ dựng hình]
+Là gì: Cách app vẽ hình Windows lên màn hình điện thoại. Vulkan: mặc định, có bộ lọc phóng to, làm nét. EGL: kiểu OpenGL ES cũ. DisplayX: đưa khung hình thẳng cho Android.
+Vì sao chỉnh: Đổi khi màn hình đen, nháy, sai màu, hoặc muốn thử cách chạy mượt hơn trên máy của bạn.
+Chỉnh thế nào: Để Vulkan. Lỗi hình thì thử EGL. DisplayX bớt bước sao chép nên có thể nhẹ hơn, nhưng không dùng được kính lúp. Đổi mục này sẽ tự đặt lại Định dạng bề mặt.
+
+[Bộ dựng hình Wine]
+Là gì: Chọn cách WineD3D vẽ hình 3D: gl dùng OpenGL (qua driver OpenGL của app), vulkan dùng thẳng driver Vulkan. Chỉ có tác dụng khi DX Wrapper là WineD3D.
+Vì sao chỉnh: Đổi khi game dùng WineD3D chạy chậm, lỗi hình hoặc không mở được.
+Chỉnh thế nào: Mặc định: gl, hợp với nhiều game nhất. Thử vulkan khi gl lỗi; bộ vẽ vulkan của WineD3D còn thiếu tính năng nên game cũ có thể lỗi hình. Lỗi thì quay lại gl.
+
+[Bộ dựng hình WineD3D]
+Là gì: Chọn cách WineD3D vẽ hình: gl dùng OpenGL, vulkan dùng thẳng driver Vulkan, gdi tắt hẳn 3D và chỉ vẽ 2D. Chỉ có tác dụng khi DX Wrapper là WineD3D.
+Vì sao chỉnh: Đổi khi game dùng WineD3D chạy chậm, lỗi hình hoặc không mở được.
+Chỉnh thế nào: Mặc định: gl, hợp với nhiều game nhất. Thử vulkan khi gl lỗi; game cũ có thể lỗi hình với vulkan. Chỉ chọn gdi cho game 2D, vì game 3D sẽ không chạy.
+
+[Bộ nhớ thiết bị tối đa]
+Là gì: Dung lượng bộ nhớ đồ họa (VRAM, tính bằng MB) báo cho game. 0 là báo đúng như máy. Điện thoại dùng chung RAM nên đây chỉ là con số game nhìn thấy.
+Vì sao chỉnh: Có game tự chọn chất lượng hình theo VRAM, hoặc báo thiếu bộ nhớ video rồi không chạy.
+Chỉnh thế nào: Bạn nên để 0 (mặc định). Game báo thiếu bộ nhớ video: thử 2048 hoặc 4096. Hạ số này không tiết kiệm RAM thật (đã đo trên máy thật), chỉ có ích với game tự chọn mức nhẹ theo VRAM.
+
+[Bộ nhớ video]
+Là gì: Dung lượng bộ nhớ đồ họa (VRAM), tính bằng MB, mà WineD3D báo cho game. Đây chỉ là con số báo cho game, không giữ trước RAM thật.
+Vì sao chỉnh: Đổi khi game dùng WineD3D báo thiếu bộ nhớ đồ họa, không cho chọn mức đồ họa cao hoặc không chịu chạy.
+Chỉnh thế nào: Mặc định: 2048. Game báo thiếu bộ nhớ đồ họa: thử 4096. Giảm số này không giúp bớt RAM, game DirectX 8/9 còn có thể báo hết bộ nhớ. Máy yếu: cứ để 2048.
+
+[Bộ nhớ video (MB)]
+Là gì: Dung lượng bộ nhớ đồ họa (VRAM), tính bằng MB, mà WineD3D báo cho game. Đây chỉ là con số báo cho game, không giữ trước RAM thật.
+Vì sao chỉnh: Đổi khi game dùng WineD3D báo thiếu bộ nhớ đồ họa, không cho chọn mức đồ họa cao hoặc không chịu chạy.
+Chỉnh thế nào: Mặc định: 2048. Game báo thiếu bộ nhớ đồ họa: thử 4096. Giảm số này không giúp bớt RAM, game DirectX 8/9 còn có thể báo hết bộ nhớ. Máy yếu: cứ để 2048.
+
+[Bộ đệm Async]
+Là gì: Lưu shader (mã vẽ hiệu ứng) đã dịch vào bộ nhớ máy để lần chơi sau dùng lại. Chỉ có với bản DXVK gplasync.
+Vì sao chỉnh: Lần chơi sau bớt khựng, vào lại cảnh cũ mượt hơn.
+Chỉnh thế nào: Tự bật khi bạn chọn bản gplasync; nên để bật. Tốn thêm một ít dung lượng lưu trữ. Game lỗi hình sau khi đổi driver hoặc DXVK: thử tắt.
+
+[Bộ đệm giả lập BCN]
+Là gì: Lưu các texture BCn (ảnh bề mặt nén kiểu PC) đã giải nén vào bộ nhớ máy để lần sau dùng lại, khỏi giải nén lại.
+Vì sao chỉnh: Giúp lần chơi sau tải nhanh hơn, bớt giật khi vào màn chơi.
+Chỉnh thế nào: Bạn cứ để tắt (mặc định). Chỉ có tác dụng khi app giải nén texture bằng CPU (máy Mali, hoặc driver không phải Turnip). Bật nếu game tải chậm; tốn thêm dung lượng lưu trữ.
+
+[Bộ đệm shader Async]
+Là gì: Lưu các shader mà DXVK đã dựng vào bộ nhớ trong để lần chơi sau dùng lại, đỡ phải dựng lại từ đầu. Chỉ có tác dụng với bản DXVK có chữ gplasync.
+Vì sao chỉnh: Bật để giảm giật khựng từ lần chơi thứ hai trở đi.
+Chỉnh thế nào: Mặc định: tắt. Nên bật cùng Shader Async khi dùng bản 2.3.1-arm64ec-gplasync. Tốn thêm một ít dung lượng lưu trữ. Nếu game lỗi sau khi bật thì tắt.
+
+[Chia sẻ bộ nhớ tạm Android với Wine]
+Là gì: Bộ nhớ tạm là nơi giữ chữ bạn vừa sao chép. Bật mục này thì chữ chép trên điện thoại dán được vào game, và chữ chép trong game dán được ra ứng dụng khác.
+Vì sao chỉnh: Tiện khi cần dán tên, mã kích hoạt vào game, hoặc chép chữ trong game sang ứng dụng dịch (nếu game cho chép chữ).
+Chỉnh thế nào: Mặc định tắt. Chỉ chia sẻ chữ, không chia sẻ ảnh. Tắt khi không cần để game không đọc được những gì bạn đã sao chép, như mật khẩu.
+
+[Chuột tương đối]
+Là gì: Gửi chuyển động chuột vào game theo kiểu “dịch đi bao nhiêu” thay vì vị trí con trỏ. Áp dụng cho chuột rời và cho vuốt kiểu bàn di chuột.
+Vì sao chỉnh: Bật cho game 3D xoay góc nhìn bằng chuột (bắn súng, nhập vai 3D) khi góc nhìn không xoay, xoay giật hoặc bị kẹt ở mép màn hình.
+Chỉnh thế nào: Mặc định tắt. Visual novel và game bấm menu nên để tắt. Có thể bật/tắt ngay trong menu game (công tắc “Chuột tương đối”) để thử nhanh.
+
+[Chế độ dựng hình]
+Là gì: Chỉ hiện với driver Turnip (máy chip Snapdragon, GPU Adreno). Chọn cách GPU vẽ: Sysmem vẽ thẳng vào RAM; Gmem chia hình thành ô nhỏ, vẽ trong bộ nhớ nhanh của GPU.
+Vì sao chỉnh: Đổi khi game bị lỗi hình (nhấp nháy, sọc, mảng đen, vỡ hình) hoặc muốn thử cách nào cho FPS cao hơn.
+Chỉnh thế nào: Để None (driver tự chọn). Lỗi hình thì thử Sysmem. Autotuner Profiled: driver tự đo rồi chọn cách nhanh hơn, FPS có thể dao động. Gmem chỉ thử khi các cách kia không ổn.
+
+[Chế độ hiệu năng]
+Là gì: Chỉ có ở DisplayX. Báo cho Android biết luồng gửi khung hình cần chạy kịp theo tần số quét, để hệ thống tăng xung CPU khi cần.
+Vì sao chỉnh: Giúp khung hình ra đều, bớt khựng. Đổi lại máy có thể ấm hơn và tốn pin hơn.
+Chỉnh thế nào: Mặc định bật. Máy nóng nhanh hoặc tụt pin thì thử tắt. Cần Android 13 trở lên; máy cũ hơn thì bật hay tắt như nhau.
+
+[Chế độ khởi động]
+Là gì: Chọn các dịch vụ nền của Windows (trong Wine) được bật khi mở game hoặc môi trường chạy.
+Vì sao chỉnh: Tắt bớt dịch vụ có thể giúp khởi động nhẹ hơn một chút, nhưng một số game và trình cài đặt cần các dịch vụ này mới chạy đúng.
+Chỉnh thế nào: Để Thiết yếu (mặc định): tắt dịch vụ Plug and Play và RPC cho nhẹ. Bình thường: bật đủ dịch vụ như Wine gốc, chọn khi game hoặc trình cài đặt báo lỗi dịch vụ. Tối giản tắt thêm nhiều dịch vụ, kể cả cài đặt .msi.
+
+[Chế độ trình chiếu]
+Là gì: Cách app đưa hình game lên màn hình khi Bộ dựng hình là Vulkan. fifo chờ đúng nhịp quét của màn hình; mailbox luôn hiện khung hình mới nhất.
+Vì sao chỉnh: Đổi khi bạn thấy thao tác bị trễ hoặc hình hiện không đều.
+Chỉnh thế nào: Bạn nên để fifo (mặc định, ổn định). Muốn thao tác nhạy hơn thì thử mailbox; máy không hỗ trợ mailbox sẽ tự dùng fifo. Máy yếu cứ để fifo.
+
+[Chế độ trình chiếu của driver]
+Là gì: Cách game gửi khung hình lên màn hình qua Vulkan (DXVK, VKD3D, Zink). mailbox: hiện khung mới nhất. fifo: chờ nhịp màn hình. immediate: không chờ. relaxed: như fifo, khung trễ thì hiện ngay.
+Vì sao chỉnh: Đổi khi bạn thấy hình bị nháy, chớp, xé ngang hoặc giật.
+Chỉnh thế nào: Bạn nên để mailbox (mặc định). Hình nháy hoặc chớp, nhất là game OpenGL chạy qua Zink: thử fifo. immediate và relaxed có thể làm hình bị xé, chỉ nên thử khi cần.
+
+[Chế độ vẽ ngoài màn hình]
+Là gì: Cách WineD3D vẽ những hình tạm chưa hiện lên màn hình: fbo (cách mới) hoặc backbuffer (cách cũ). Chỉ có tác dụng khi dùng WineD3D với bộ dựng hình gl.
+Vì sao chỉnh: Chỉ đổi khi game dùng WineD3D bị màn hình đen hoặc lỗi hình mà các cách khác không sửa được.
+Chỉnh thế nào: Mặc định: fbo, nên giữ nguyên. Chỉ thử backbuffer khi đã thử hết cách khác; nếu tệ hơn thì chọn lại fbo. Mở lại game để áp dụng.
+
+[Chọn nhân CPU]
+Là gì: Các nhân CPU mà game được phép chạy (CPU0, CPU1…). Ô màu trắng là nhân đang được chọn.
+Vì sao chỉnh: Giữ game ở các nhân mạnh có thể giúp game chạy đều hơn trên một số máy. Chọn quá ít nhân sẽ làm game chậm.
+Chỉnh thế nào: Để chọn tất cả (mặc định). Muốn thử thì chỉ giữ các nhân mạnh, thường là các số lớn (ví dụ CPU4–CPU7). Không chọn nhân nào thì game dùng tất cả.
+
+[Chọn nhân CPU (ứng dụng 32-bit)]
+Là gì: Chọn nhân CPU (lõi xử lý) cho chương trình 32-bit trong môi trường chạy này. Không áp dụng cho game mở từ thư viện: game dùng mục “Chọn nhân CPU” trong Cấu hình của game.
+Vì sao chỉnh: Chỉ cần khi được hướng dẫn, ví dụ game 32-bit rất cũ chạy lỗi khi dùng nhiều nhân, hoặc muốn giữ chương trình trên một số nhân nhất định.
+Chỉnh thế nào: Nên để nguyên lựa chọn có sẵn. Chạm CPU0, CPU1… để bật/tắt; ô màu trắng là nhân đang chọn. Nếu bỏ chọn hết, app tự dùng nửa số nhân phía sau (ví dụ CPU4–CPU7 trên máy 8 nhân).
+
+[CSMT]
+Là gì: CSMT cho WineD3D xử lý lệnh vẽ trên một luồng CPU riêng, chạy song song với game. Chỉ có tác dụng khi DX Wrapper là WineD3D.
+Vì sao chỉnh: Tắt thử khi game dùng WineD3D bị văng, treo, nhấp nháy hoặc lỗi hình. Khi bật, game thường chạy nhanh hơn.
+Chỉnh thế nào: Mặc định: bật, nên giữ bật. Chỉ tắt khi game lỗi và thấy khá hơn sau khi tắt; tắt có thể làm FPS giảm. Mở lại game để áp dụng.
+
+[Cấu hình phím ảo]
+Là gì: Chọn bộ nút hiện trên màn hình cho game này. “Tự động (AGVN)” chọn theo loại game: visual novel, RPG, 2D hoặc bàn phím máy tính. “Tắt phím ảo” thì không hiện nút nào.
+Vì sao chỉnh: Đổi khi bộ nút tự chọn không hợp game, thiếu phím cần dùng, hoặc bạn chỉ muốn chạm trực tiếp hay dùng tay cầm.
+Chỉnh thế nào: Nên để “Tự động (AGVN)”. Chọn một bộ cụ thể thì app không tự đổi nữa. Muốn dời, thêm hay đổi nút, trong game bấm “✎ Sửa”; bộ phím được lưu riêng cho game này.
+
+[Cập nhật ứng dụng]
+Là gì: Tìm và cài bản AGVN Player mới ngay trong app, không cần máy tính. App chỉ tải thông tin phiên bản và tệp cài từ trang GitHub của AGVN, không gửi dữ liệu gì của máy.
+Vì sao chỉnh: Bản mới sửa lỗi và giúp game chạy tốt hơn. Game, save và cài đặt vẫn giữ nguyên sau khi cập nhật.
+Chỉnh thế nào: Bấm vào, chọn Kiểm tra cập nhật. Có bản mới thì bấm Cập nhật, chờ tải xong rồi bấm Cập nhật trên hộp thoại của Android. Tệp nặng vài trăm MB, nên dùng Wi-Fi.
+
+[DDraw Wrapper]
+Là gì: Bộ chuyển đổi cho game rất cũ dùng DirectDraw hoặc Direct3D 7 trở xuống. Chỉ có tác dụng khi DX Wrapper là DXVK+VKD3D. none và wined3d dùng DirectDraw có sẵn của Wine.
+Vì sao chỉnh: Đổi khi game rất cũ bị màn hình đen, sai màu, giật, chậm hoặc không vào được.
+Chỉnh thế nào: Mặc định: none. Game 2D cũ lỗi: thử cnc-ddraw. Game 3D cũ (DirectX 7) lỗi hình: thử dd7to9 hoặc D7VK 2.2 (nếu có). Mở lại game để áp dụng.
+
+[Direct3D]
+Là gì: Bộ thư viện phụ của DirectX (d3dx9, d3dx10, d3dx11, d3dcompiler) mà nhiều game DirectX 9–11 cần. Đây không phải DXVK; DXVK chọn ở mục DX Wrapper.
+Vì sao chỉnh: Bản Gốc (Windows) là thư viện thật của Microsoft nên thường chạy đúng hơn. Bản Có sẵn (Wine) do Wine tự viết, còn thiếu chức năng, có thể làm game lỗi hình hoặc văng.
+Chỉnh thế nào: Để Gốc (Windows) (mặc định). Chỉ thử Có sẵn (Wine) khi game văng ngay lúc mở và các cách khác đều không được. Đổi xong mở lại game.
+
+[DirectMusic]
+Là gì: Thư viện nhạc DirectMusic, một số game đời cũ dùng để phát nhạc nền.
+Vì sao chỉnh: Bản Có sẵn (Wine) chưa đầy đủ, nên vài game cũ bị mất nhạc nền hoặc văng khi phát nhạc.
+Chỉnh thế nào: Để Có sẵn (Wine) (mặc định). Game cũ không có nhạc nền hoặc văng lúc phát nhạc thì thử Gốc (Windows); không đỡ thì chọn lại như cũ.
+
+[DirectPlay]
+Là gì: Thư viện chơi qua mạng (LAN, trực tuyến) của game Windows đời cũ.
+Vì sao chỉnh: Chỉ cần khi game cũ báo lỗi DirectPlay hoặc văng lúc vào phần chơi mạng. Game chơi một mình thường không cần đến.
+Chỉnh thế nào: Để Có sẵn (Wine) (mặc định). Chỉ thử Gốc (Windows) khi game báo lỗi liên quan tới DirectPlay.
+
+[DirectShow]
+Là gì: Thư viện phát video DirectShow, game dùng để chiếu video mở đầu và các đoạn phim trong game.
+Vì sao chỉnh: Đổi khi video trong game bị đen, không chạy, bị treo, hoặc game văng lúc phát phim.
+Chỉnh thế nào: Để Có sẵn (Wine) (mặc định). Video lỗi thì thử Gốc (Windows); nếu không đỡ, chọn lại Có sẵn (Wine).
+
+[DirectSound]
+Là gì: Thư viện âm thanh DirectSound mà nhiều game Windows đời cũ dùng để phát tiếng.
+Vì sao chỉnh: Đổi khi game cũ mất tiếng, tiếng rè hoặc văng lúc phát âm thanh, mà đổi Driver âm thanh vẫn không đỡ.
+Chỉnh thế nào: Để Có sẵn (Wine) (mặc định). Game cũ lỗi tiếng thì thử Gốc (Windows); nếu không đỡ, chọn lại Có sẵn (Wine).
+
+[Driver dựng hình]
+Là gì: Driver Vulkan mà app dùng để vẽ hình game lên màn hình (khi Bộ dựng hình là Vulkan). Đây không phải driver game dùng; cái đó là mục Driver Vulkan.
+Vì sao chỉnh: Đổi khi bạn gặp màn hình đen, hình nháy, hoặc app tự tắt ngay lúc mở game với Bộ dựng hình Vulkan.
+Chỉnh thế nào: Bạn nên để Hệ thống (mặc định). Lỗi hình thì thử driver khác trong danh sách (chỉ máy Snapdragon mới có thêm lựa chọn), hoặc đổi Bộ dựng hình sang EGL.
+
+[Driver OpenGL]
+Là gì: Driver cho game dùng OpenGL (một chuẩn đồ họa), và cho WineD3D khi Bộ dựng hình Wine là gl. Zink chạy OpenGL trên driver Vulkan; Freedreno là driver OpenGL riêng cho GPU Adreno.
+Vì sao chỉnh: Đổi khi game OpenGL của bạn bị đen màn hình, nháy, sai màu, tự tắt, hoặc báo thiếu phiên bản OpenGL.
+Chỉnh thế nào: Freedreno chỉ chạy trên GPU Adreno (máy Snapdragon) và báo OpenGL 3.3; Zink chạy trên mọi máy. Game OpenGL lỗi hình, đen màn hình hoặc tự tắt: thử lựa chọn còn lại. Máy MediaTek: chọn Zink.
+
+[Driver Vulkan]
+Là gì: Driver đồ họa chính game dùng (qua DXVK, VKD3D, Zink). turnip26.2.0 là driver mã nguồn mở cho GPU Adreno, v863 là driver của Qualcomm, System là driver có sẵn của máy.
+Vì sao chỉnh: Đổi khi game của bạn đen màn hình, không hiện hình 3D, tự tắt lúc mở, lỗi hình hoặc FPS thấp.
+Chỉnh thế nào: Máy Snapdragon: để turnip26.2.0 (mặc định). Máy không phải Snapdragon: dùng System. Driver bạn chọn mà không chạy được thì app tự đổi driver khác khi mở game. Mục ghi Tải về sẽ được tải khi chọn.
+
+[Driver âm thanh]
+Là gì: Cách đưa âm thanh của game ra loa điện thoại. PulseAudio-GN là bản PulseAudio mới, độ trễ thấp; PulseAudio là bản cũ; ALSA là đường tiếng gọn có sẵn trong app.
+Vì sao chỉnh: Đổi khi game không có tiếng, tiếng rè, lẹt xẹt, bị trễ, hoặc game treo lúc bắt đầu phát tiếng.
+Chỉnh thế nào: Để PulseAudio-GN (mặc định). Mất tiếng hoặc rè: thử PulseAudio, rồi ALSA. Mỗi lần đổi, mở lại game để kiểm tra.
+
+[Driver đồ họa]
+Là gì: Driver OpenGL cho game dùng OpenGL và cho WineD3D khi vẽ bằng gl. Wrapper nghĩa là Zink: OpenGL được chạy trên driver Vulkan của máy.
+Vì sao chỉnh: Chỉ cần đổi khi game OpenGL chạy lỗi và bạn biết cần driver khác.
+Chỉnh thế nào: Ở màn hình này chỉ có Wrapper, cứ để nguyên. Driver Vulkan thì chọn ở mục Phiên bản driver.
+
+[DX Wrapper]
+Là gì: Bộ dịch đồ họa DirectX của game Windows sang thứ điện thoại chạy được. DXVK+VKD3D dịch sang Vulkan; WineD3D là bộ dịch có sẵn của Wine.
+Vì sao chỉnh: Đổi khi game DirectX của bạn bị đen màn hình, lỗi hình, tự tắt lúc mở hoặc chạy quá chậm.
+Chỉnh thế nào: Bạn nên để DXVK+VKD3D (mặc định, thường nhanh hơn). Game cũ (DirectX 9 trở xuống) lỗi hình hoặc không mở được: thử WineD3D.
+
+[DXVK HUD]
+Là gì: DXVK chuyển lệnh đồ họa DirectX của game Windows sang Vulkan (cách vẽ đồ họa mà điện thoại hiểu). Bật mục này để DXVK hiện ở góc trên bên trái: FPS, GPU, driver, mức dùng GPU.
+Vì sao chỉnh: Dùng khi dò lỗi đồ họa: xem game có đang chạy qua DXVK không và được bao nhiêu FPS (khung hình mỗi giây).
+Chỉnh thế nào: Mặc định tắt. Chỉ hiện khi “DX Wrapper” là DXVK+VKD3D và game dùng DirectX 9 tới 11. Chơi bình thường nên tắt; muốn xem FPS thì dùng mục HUD.
+
+[Dùng tiện ích DRI3]
+Là gì: DRI3 giúp chuyển từng khung hình từ chip đồ họa (GPU) thẳng lên màn hình game. Nếu tắt, hình phải chép qua chip xử lý (CPU) nên chậm hơn.
+Vì sao chỉnh: Chỉ nên thử tắt khi game bị màn hình đen, nhấp nháy, sọc hình hoặc văng đúng lúc bắt đầu hiện hình, mà đổi các cài đặt đồ họa khác vẫn không hết.
+Chỉnh thế nào: Mặc định bật và nên để bật, nhất là trên máy yếu. Mục này áp dụng cho mọi game. Tắt thử mà không đỡ lỗi thì bật lại ngay.
+
+[Dùng tích hợp OpenXR]
+Là gì: Mục này chỉ hiện trên kính thực tế ảo Meta Quest. Khi bật, game và môi trường chạy mở ở chế độ thực tế ảo, điều khiển bằng tay cầm của kính.
+Vì sao chỉnh: Tắt nếu bạn muốn chơi trong cửa sổ phẳng bình thường trên kính, hoặc chế độ thực tế ảo bị lỗi hình, lỗi điều khiển.
+Chỉnh thế nào: Mặc định bật. Trên điện thoại mục này không hiện và không có tác dụng.
+
+[FEXCore Preset]
+Là gì: Mức cân bằng giữa tốc độ và độ chính xác của FEXCore. Ổn định: an toàn nhất, chậm nhất. Hiệu năng: nhanh nhất, dễ lỗi nhất.
+Vì sao chỉnh: Đổi khi game tự tắt hoặc treo ngẫu nhiên, lỗi vật lý, hoặc khi bạn muốn thêm FPS cho game nặng CPU.
+Chỉnh thế nào: Bạn nên để Trung gian (mặc định). Game tự tắt hoặc treo ngẫu nhiên: thử Tương thích rồi Ổn định. Game chạy ổn nhưng chậm: thử Hiệu năng, lỗi thì quay lại.
+
+[Ghi đè di chuyển chuột]
+Là gì: Cách Wine kéo con trỏ chuột về giữa màn hình cho game đọc chuột qua DirectInput (thường là game 3D cũ): disable, enable hoặc force.
+Vì sao chỉnh: Đổi khi xoay camera bằng chuột bị kẹt ở mép màn hình, hoặc con trỏ cứ bị giật về giữa màn hình.
+Chỉnh thế nào: Để disable (mặc định). Camera xoay bị kẹt: thử enable, rồi force. Con trỏ bị giật về giữa: chọn lại disable.
+
+[Giao diện desktop]
+Là gì: Màu của cửa sổ, nút bấm, hộp thoại kiểu Windows trong môi trường chạy: Tối hoặc Sáng. Không đổi hình ảnh bên trong game.
+Vì sao chỉnh: Đổi khi chữ trong trình cài đặt, hộp thoại báo lỗi hoặc cửa sổ cài đặt của game khó đọc (chữ tối trên nền tối).
+Chỉnh thế nào: Mặc định Tối. Hộp thoại khó đọc thì chọn Sáng. Có tác dụng từ lần mở tiếp theo.
+
+[Giá trị]
+Là gì: Giá trị của biến môi trường ở dòng này. Tùy biến mà bạn chọn trong danh sách, tích nhiều mục hoặc gõ chữ, số.
+Vì sao chỉnh: Đổi khi được hướng dẫn chỉnh một biến để sửa lỗi hình, tiếng hoặc thử hiệu năng.
+Chỉnh thế nào: Không dùng dấu cách, app sẽ tự bỏ. Nhiều mục cách nhau bằng dấu phẩy. Không chắc thì xóa biến bằng nút thùng rác. Mở lại game để áp dụng.
+
+[Giả lập 32-bit]
+Là gì: Chọn trình giả lập chạy game và chương trình Windows 32-bit trên chip điện thoại. Game 64-bit luôn chạy bằng FEXCore.
+Vì sao chỉnh: Đổi khi game 32-bit tự tắt, bị treo, lỗi hoặc chạy chậm.
+Chỉnh thế nào: Bạn nên để FEXCore (mặc định). Game 32-bit lỗi hoặc chậm: thử WOWBox64 (sẽ hiện thêm Phiên bản WOWBox64 và Box64 Preset). Không đỡ thì quay lại FEXCore.
+
+[Giả lập 64-bit]
+Là gì: Cho biết bộ giả lập đang chạy chương trình 64-bit: FEXCore với Wine/Proton arm64ec, Box64 với bản Wine khác. Mục này chỉ để xem.
+Vì sao chỉnh: Không cần chỉnh: nó tự đổi theo phiên bản Wine/Proton của môi trường chạy.
+Chỉnh thế nào: Muốn dùng bộ giả lập 64-bit khác thì phải tạo môi trường chạy với bản Wine/Proton khác. Phiên bản và preset của bộ giả lập chỉnh ở các mục bên dưới.
+
+[Giả lập BCN]
+Là gì: BCn là kiểu nén texture (ảnh bề mặt) của game PC mà nhiều GPU điện thoại, nhất là Mali, không đọc được. Mục này quyết định app có chuyển đổi các texture đó không.
+Vì sao chỉnh: Đổi khi bạn thấy texture bị đen, tím, nhòe, mất hình, hoặc game tự tắt khi tải màn chơi.
+Chỉnh thế nào: Máy Snapdragon dùng driver Turnip không cần mục này: app tự tắt vì Turnip tự đọc được BCn. Driver khác và máy Mali: để auto (mặc định); full chuyển mọi texture, chắc nhất nhưng tốn CPU và RAM; none: tắt.
+
+[Giả lập màn hình cảm ứng]
+Là gì: Chạm vào đâu, game nhận là bấm chuột trái đúng chỗ đó; chạm giữ rồi kéo là giữ chuột trái để kéo. Khi tắt, màn hình thành bàn di chuột: vuốt để di con trỏ, chạm để bấm.
+Vì sao chỉnh: Rất hợp visual novel và game bấm menu: chạm thẳng vào lựa chọn. Tắt nếu game cần rê chuột mà không bấm (để hiện chú thích) hoặc xoay góc nhìn.
+Chỉnh thế nào: Game nhập bằng AGVN thường đã bật sẵn; visual novel nên giữ nguyên. Ở cả hai kiểu, chạm 2 ngón cùng lúc là bấm chuột phải.
+
+[Giới hạn FPS]
+Là gì: Giới hạn FPS cứng của DXVK, cho game DirectX 8–11. 0 là không giới hạn.
+Vì sao chỉnh: Dùng khi game chạy quá nhanh hoặc lỗi vật lý lúc FPS cao.
+Chỉnh thế nào: Để 0 (mặc định). Muốn máy đỡ nóng, bạn mở menu trong game, mục Hình ảnh, đặt Giới hạn FPS 30 hoặc 20: màn 60 Hz chỉ chiếu đều được 60, 30 và 20 FPS. Chỉ đặt số ở đây khi game lỗi lúc FPS cao: mức này khóa cứng, trong game không nâng lên được.
+
+[Gửi mọi buffer]
+Là gì: Chỉ có khi Bộ dựng hình là DisplayX. Khi bật, Android hiện lần lượt mọi khung hình game gửi lên, không bỏ khung cũ để nhảy tới khung mới nhất.
+Vì sao chỉnh: Có thể giúp chuyển động đều hơn khi bạn thấy hình giật cục dù FPS ổn. Đổi lại, thao tác có thể trễ hơn một chút.
+Chỉnh thế nào: Bạn cứ để tắt (mặc định): ưu tiên khung mới nhất nên ít trễ. Bật thử nếu hình giật cục, thấy trễ hơn thì tắt lại. Chỉ có tác dụng trên Android 12 trở lên.
+
+[Hiệu ứng làm nét]
+Là gì: Thêm bộ lọc làm nét lên hình game. CAS làm rõ chi tiết mà vẫn tự nhiên; DLS làm nét độ sáng, đi kèm thanh “Khử nhiễu khi làm nét” để bớt hạt.
+Vì sao chỉnh: Hữu ích khi bạn hạ độ phân giải cho nhẹ máy và hình bị mờ. Kéo thanh “Mức làm nét” để tăng hay giảm độ nét.
+Chỉnh thế nào: Mặc định None. Máy yếu nên để None vì làm nét tốn thêm sức GPU. Muốn thử thì chọn CAS với mức vừa phải. Bật mà hình không đổi thì game đó không nhận hiệu ứng, hãy để None.
+
+[HUD]
+Là gì: HUD là bảng thông số nhỏ hiện đè lên game. Cổ điển: FPS (khung hình mỗi giây), tên GPU, RAM. Hiện đại: thêm mức dùng CPU và GPU, nhiệt độ, pin, biểu đồ.
+Vì sao chỉnh: Bật khi muốn xem game có mượt không (FPS), máy có nóng hay sắp hết RAM không, nhất là lúc thử cài đặt đồ họa mới.
+Chỉnh thế nào: Chơi bình thường chọn Tắt; muốn kiểm tra thì chọn Cổ điển cho gọn. Lựa chọn này chỉ áp dụng cho game này. Trong game cũng bật/tắt được bằng công tắc “Bật HUD” ở menu.
+
+[HUD Winlator]
+Là gì: Bảng thông số nhỏ hiện trên màn hình khi chơi. Cổ điển: FPS, tên GPU, RAM. Hiện đại: thêm mức dùng CPU/GPU, nhiệt độ, pin.
+Vì sao chỉnh: Bật để xem FPS khi thử cấu hình, hoặc để tìm lý do game giật, máy nóng.
+Chỉnh thế nào: Chơi bình thường nên để Tắt. Xem nhanh FPS: chọn Cổ điển. Xem thêm nhiệt độ, pin: chọn Hiện đại. Áp dụng cho các game trong môi trường chạy này chưa chọn HUD riêng.
+
+[Hình nền desktop]
+Là gì: Nền của màn hình Windows giả lập, nằm phía sau cửa sổ game: Hình ảnh hoặc Màu đơn.
+Vì sao chỉnh: Chỉ để trang trí. Nền này hiện khi bạn mở thẳng màn hình Windows của môi trường chạy; khi chơi game mở từ thư viện, nền thường bị ẩn.
+Chỉnh thế nào: Chọn Hình ảnh rồi bấm Chọn hoặc Đổi để dùng ảnh của bạn. Muốn đơn giản thì chọn Màu đơn.
+
+[Kiểu giả lập BCN]
+Là gì: Cách giải nén texture BCn (ảnh bề mặt nén kiểu PC) khi Giả lập BCN là auto hoặc full: compute dùng GPU, software dùng CPU.
+Vì sao chỉnh: Đổi khi game tải chậm, giật lúc vào màn mới, hoặc texture bị lỗi.
+Chỉnh thế nào: Bạn nên để compute (mặc định). Trên máy Snapdragon (GPU Adreno) app không dùng compute nên mục này không có tác dụng. Máy Mali: texture lỗi hoặc game tự tắt thì thử software.
+
+[Kéo giãn toàn màn hình]
+Là gì: Kéo hình game phủ kín màn hình điện thoại, bỏ viền đen hai bên.
+Vì sao chỉnh: Bật khi muốn hình to hết màn hình. Nếu tỷ lệ độ phân giải khác tỷ lệ màn hình, hình sẽ bị bè hoặc méo.
+Chỉnh thế nào: Mặc định tắt (giữ đúng tỷ lệ). Muốn kín màn hình mà không méo, chọn Độ phân giải cùng tỷ lệ máy, ví dụ 1280x576 (20:9). Game chưa chỉnh mục này riêng sẽ theo lựa chọn của môi trường chạy.
+
+[Loại tài nguyên]
+Là gì: Cách driver xin vùng bộ nhớ mà CPU và GPU cùng đọc ghi. auto tự thử lần lượt dmabuf, ahb, opaque cho tới khi được.
+Vì sao chỉnh: Chỉ đổi khi game của bạn tự tắt lúc mở hoặc lúc tải, hoặc báo lỗi bộ nhớ đồ họa.
+Chỉnh thế nào: Bạn nên để auto (mặc định). Nếu game lỗi như trên, thử lần lượt dmabuf, ahb, opaque; không đỡ thì trả về auto.
+
+[Lưu game]
+Là gì: Bật sao lưu bản lưu (tiến trình chơi) cho riêng game này. App tìm thư mục bản lưu trong ổ Windows ảo và cất bản sao vào thư mục AGVN-Player/Saves.
+Vì sao chỉnh: Nên bật trước khi xóa game, cài lại app, đổi môi trường chạy hoặc thử cài đặt lạ, để không mất tiến trình chơi.
+Chỉnh thế nào: Bấm “Sao lưu ngay” để lưu, “Khôi phục” để chép bản mới nhất đè lên bản lưu hiện tại. Game cất bản lưu ngay trong thư mục game (như nhiều game RPG Maker) thì mục này không sao lưu.
+
+[Lọc texture]
+Là gì: Cách phóng hình game cho vừa màn hình điện thoại. Không đổi chất lượng ảnh bề mặt (texture) trong game. Bộ dựng hình EGL chỉ có Bilinear và Điểm gần nhất.
+Vì sao chỉnh: Chỉnh khi bạn thấy hình mờ, vỡ hạt, hoặc muốn hình nét hơn khi chơi ở độ phân giải thấp.
+Chỉnh thế nào: Bạn nên để Bilinear (mịn, mặc định). Game 2D kiểu điểm ảnh: Điểm gần nhất. Máy yếu chơi độ phân giải thấp: thử Snapdragon Super Resolution cho nét hơn. Các kiểu làm nét và Tăng màu tốn thêm GPU.
+
+[MIDI SoundFont]
+Là gì: Bộ tiếng nhạc cụ dùng để phát nhạc MIDI. Nhiều game cũ, như game RPG Maker 2000/2003, dùng nhạc MIDI.
+Vì sao chỉnh: Để Tắt thì game dùng nhạc MIDI sẽ không có nhạc nền. Đổi bộ khác để đổi chất lượng tiếng nhạc.
+Chỉnh thế nào: Game thiếu nhạc nền: chọn wt_210k_G.sf2 (có sẵn). Game không dùng MIDI: để Tắt. Chọn trong cài đặt của game thì chỉ đổi cho game đó; chọn ở môi trường chạy thì đổi cho các game chưa chọn riêng.
+
+[Môi trường chạy]
+Là gì: Môi trường chạy là một máy Windows ảo riêng, gồm bản Wine/Proton (phần giúp chạy game Windows), driver và cài đặt. Mục này cho biết game đang chạy trong môi trường nào.
+Vì sao chỉnh: Đổi khi game không chạy hoặc hay lỗi với bản Wine/Proton hiện tại, hoặc khi bạn muốn cài đặt riêng cho game này mà không ảnh hưởng game khác.
+Chỉnh thế nào: Chọn môi trường khác sẽ chép game sang đó, bản cũ vẫn còn. Bản lưu không tự đi theo: hãy sao lưu rồi khôi phục ở bản mới. Chỉ có một môi trường thì bấm + để tạo thêm.
+
+[Mở chế độ Big Picture khi khởi động]
+Là gì: Big Picture là màn hình chọn game cỡ lớn, lướt theo ảnh bìa, hợp với TV hoặc tay cầm. Bật mục này thì mỗi lần mở app sẽ vào thẳng màn hình đó.
+Vì sao chỉnh: Bật nếu bạn chơi trên TV, màn hình lớn hoặc chủ yếu dùng tay cầm. Màn hình này có nhạc nền và tự tải ảnh bìa qua mạng khi game chưa có ảnh.
+Chỉnh thế nào: Mặc định tắt; máy yếu nên để tắt cho nhẹ. Đang ở Big Picture, bấm nút Quay lại để về màn hình thường. Nhạc nền tắt được trong phần cài đặt của Big Picture.
+
+[Mở trình duyệt Android từ Wine]
+Là gì: Khi game mở một trang web (nút trang chủ, diễn đàn, ủng hộ tác giả…), trang đó sẽ mở bằng trình duyệt trên điện thoại của bạn.
+Vì sao chỉnh: Bật nếu bạn cần mở trang web từ trong game, ví dụ trang hướng dẫn hay trang tải bản cập nhật của game.
+Chỉnh thế nào: Mặc định tắt. Khi bật, lúc game mở trang web bạn sẽ bị chuyển sang trình duyệt và game tạm dừng; quay lại app để chơi tiếp.
+
+[Mức tính năng VKD3D]
+Là gì: Mức tính năng DirectX 12 mà VKD3D báo cho game. Chỉ có tác dụng khi Phiên bản VKD3D khác None.
+Vì sao chỉnh: Đổi khi game DirectX 12 báo không hỗ trợ mức tính năng, không mở được hoặc tự tắt lúc vào.
+Chỉnh thế nào: Bạn nên để 12_1 (mặc định). Game đòi mức cao hơn: thử 12_2. Tự tắt lúc mở: thử 12_0 hoặc 11_1. VKD3D bỏ qua các mức 10_x và 9_x.
+
+[Ngôn ngữ vùng (LC_ALL)]
+Là gì: Ngôn ngữ và vùng mà Windows giả lập báo cho game. Nó quyết định bảng mã chữ, rất quan trọng với game Nhật, Trung đời cũ.
+Vì sao chỉnh: Sai vùng thì game Nhật (KiriKiri, Siglus, NScripter, Wolf RPG…) có thể lỗi chữ, lỗi tên file hoặc văng. Bản Việt hóa thường vẫn hiện đúng khi để ja_JP.
+Chỉnh thế nào: Khi thêm game, app tự chọn ja_JP cho game Nhật. Chữ lỗi hoặc văng: game Nhật chọn ja_JP, game Trung chọn zh_CN hoặc zh_TW. Không lỗi thì để nguyên.
+
+[Nhập độc quyền]
+Là gì: Khi bật, bạn chọn một kiểu tay cầm cho game: XInput hoặc DInput; tắt cả hai thì game không nhận tay cầm. Khi tắt, game thấy tay cầm qua cả hai kiểu. Áp dụng cho tay cầm thật và tay cầm ảo, không ảnh hưởng chuột, bàn phím.
+Vì sao chỉnh: Bật để tránh game nhận tay cầm hai lần (một nút ra hai lệnh). Một số game dùng DInput, như Rayman Origins hay NFS Most Wanted 2005, cần tắt mục này.
+Chỉnh thế nào: Mặc định bật, dùng XInput. Game cũ không nhận tay cầm: bật mục Bật DInput. Vẫn không được thì tắt Nhập độc quyền.
+
+[Phiên bản Box64]
+Là gì: Box64 dịch mã chương trình máy tính (x86-64) sang mã chip điện thoại (ARM) để chạy Wine và game. Mục này chỉ có khi Wine/Proton không phải bản arm64ec.
+Vì sao chỉnh: Đổi khi game văng, treo, chạy chậm hoặc lỗi lạ, hoặc khi được hướng dẫn dùng một bản Box64 cụ thể.
+Chỉnh thế nào: Mặc định: 0.4.2 (cài sẵn). Bản có chữ “Tải về” cần mạng để tải. Đổi xong mà game lỗi hơn thì chọn lại 0.4.2. Máy yếu: cứ để mặc định.
+
+[Phiên bản DXVK]
+Là gì: Bản DXVK dịch DirectX 8–11 sang Vulkan. Bản có arm64ec chạy thẳng trên chip điện thoại với game 64-bit; bản có async hoặc gplasync dịch shader (mã hiệu ứng) ở nền.
+Vì sao chỉnh: Đổi khi game lỗi hình, tự tắt lúc mở, hoặc hay khựng khi gặp hiệu ứng mới.
+Chỉnh thế nào: Mặc định 2.3.1 (máy Mali: 1.10.3). Máy Mali hoặc driver cũ: dùng 1.10.3. Dùng VKD3D thì cần bản 2.x. Máy yếu, game 64-bit: bạn có thể thử bản arm64ec, lỗi thì quay lại.
+
+[Phiên bản FEXCore]
+Là gì: Bản FEXCore, trình giả lập chạy mã máy tính (x86) của game trên chip điện thoại. Dùng cho game 64-bit, và game 32-bit khi chọn FEXCore.
+Vì sao chỉnh: Đổi khi game tự tắt, treo hoặc chạy sai mà đổi FEXCore Preset không đỡ.
+Chỉnh thế nào: Bạn nên để 2601 (bản có sẵn, mặc định). Chỉ thử bản khác khi game lỗi; bản ghi Tải về cần mạng để tải. Lỗi hơn thì quay lại 2601.
+
+[Phiên bản VKD3D]
+Là gì: VKD3D-Proton dịch DirectX 12 sang Vulkan. None là không dùng, chỉ còn bản DirectX 12 sẵn có của Wine, rất hạn chế.
+Vì sao chỉnh: Game DirectX 12 cần mục này; nếu để None, game DirectX 12 thường không chạy được.
+Chỉnh thế nào: Game không phải DirectX 12: để None (mặc định). Game DirectX 12: chọn 2.14.1, lỗi thì thử 2.8; DXVK phải là bản 2.x. Game DirectX 12 rất nặng, máy yếu khó chạy mượt.
+
+[Phiên bản Vulkan]
+Là gì: Số phiên bản Vulkan (chuẩn đồ họa mà DXVK, VKD3D, Zink dùng) được báo cho game. Mục này chỉ đổi con số được báo, không làm driver mạnh hay yếu đi.
+Vì sao chỉnh: Hiếm khi cần đổi. Bạn cứ để mặc định nếu game không có lỗi.
+Chỉnh thế nào: Để 1.3 (mặc định). DXVK 2.x và VKD3D cần 1.3: hạ xuống 1.2 hoặc 1.1 thì chúng không chạy. Chỉ thử hạ khi game dùng DXVK 1.10.3 hoặc WineD3D mà vẫn lỗi.
+
+[Phiên bản WOWBox64]
+Là gì: WOWBox64 là bản Box64 chạy chương trình 32-bit (thường là game cũ) trên Wine/Proton arm64ec. Chỉ dùng khi “Giả lập 32-bit” là WOWBox64.
+Vì sao chỉnh: Đổi khi game 32-bit văng, treo, chạy chậm hoặc lỗi lạ, hoặc khi được hướng dẫn dùng một bản cụ thể.
+Chỉnh thế nào: Mặc định: 0.4.2 (cài sẵn). Bản có chữ “Tải về” cần mạng để tải. Đổi xong mà game lỗi hơn thì chọn lại 0.4.2.
+
+[Preset Box64]
+Là gì: Bộ chỉnh sẵn cho Box64 và WOWBox64, cân giữa chạy an toàn và chạy nhanh: Ổn định, Tương thích, Trung gian, Hiệu năng (xếp từ an toàn nhất đến nhanh nhất).
+Vì sao chỉnh: Đổi khi game văng, treo hoặc lỗi lạ (chọn mức an toàn hơn), hoặc khi game chạy ổn nhưng chậm (chọn mức nhanh hơn).
+Chỉnh thế nào: Mặc định: Tương thích. Game lỗi: thử Ổn định. Muốn nhanh hơn: thử Trung gian rồi Hiệu năng, lỗi thì quay lại. Game Unity nên để Tương thích hoặc Ổn định.
+
+[Preset FEXCore]
+Là gì: Bộ chỉnh sẵn cho FEXCore, cân giữa chạy an toàn và chạy nhanh: Ổn định, Tương thích, Trung gian, Hiệu năng (xếp từ an toàn nhất đến nhanh nhất).
+Vì sao chỉnh: Đổi khi game văng, treo hoặc lỗi lạ (chọn mức an toàn hơn), hoặc khi game chạy ổn nhưng chậm (chọn mức nhanh hơn).
+Chỉnh thế nào: Mặc định: Trung gian. Game lỗi, nhất là game dùng nhiều luồng: thử Tương thích rồi Ổn định. Muốn nhanh hơn: thử Hiệu năng, lỗi thì quay lại Trung gian.
+
+[Processor Affinity (32-bit apps)]
+Là gì: Chọn nhân CPU cho chương trình Windows 32-bit chạy trong môi trường chạy này.
+Vì sao chỉnh: Game đã tự chọn nhân ở mục Chọn nhân CPU thì dùng nhân đó cho cả chương trình 32-bit; game chưa chọn thì dùng mục này. Hiếm khi cần đổi.
+Chỉnh thế nào: Để nguyên như mặc định. Nếu muốn thử, chỉ giữ các nhân mạnh, thường là các số lớn (ví dụ CPU4–CPU7).
+
+[Renderer]
+Là gì: Cách app vẽ hình của game lên màn hình điện thoại: Vulkan (mặc định) hoặc EGL, cách vẽ cổ điển bằng OpenGL ES.
+Vì sao chỉnh: Đổi khi màn hình đen, nhấp nháy, hình bị lỗi hoặc app thoát ngay lúc mở game.
+Chỉnh thế nào: Mặc định: Vulkan (có bộ lọc như Snapdragon Super Resolution). Gặp lỗi hiển thị: thử EGL; EGL chỉ có bộ lọc Bilinear và Điểm gần nhất. Mở lại game để áp dụng.
+
+[Sao lưu bản lưu cho mọi game]
+Là gì: Khi bật, mỗi lần game đóng lại, app tự tìm và nén bản lưu của game vào thư mục AGVN-Player/Saves/<tên game>/ trong bộ nhớ máy.
+Vì sao chỉnh: Bật để đỡ mất tiến trình chơi khi game lỗi, lỡ xóa dữ liệu hoặc cài lại app.
+Chỉnh thế nào: Mặc định: tắt. Chỉ sao lưu được game mà app tìm ra thư mục lưu riêng. Mỗi game giữ một bản tự động mới nhất; muốn giữ thêm thì bấm “Sao lưu ngay” trong Bản lưu game.
+
+[Shader Async]
+Là gì: Cho DXVK dựng shader (đoạn chương trình tạo hiệu ứng hình) ở chế độ nền để game không phải dừng chờ. Chỉ có tác dụng với bản DXVK có chữ async hoặc gplasync.
+Vì sao chỉnh: Bật khi game giật khựng mỗi lần gặp cảnh, vật thể hoặc hiệu ứng mới.
+Chỉnh thế nào: Mặc định: tắt. Bật thử nếu game bị khựng; đổi lại, vật thể hoặc hiệu ứng có thể hiện ra chậm một chút. Thấy hình thiếu hoặc nhấp nháy thì tắt. Mở lại game để áp dụng.
+
+[Tiện ích Vulkan đã tắt]
+Là gì: Danh sách tiện ích Vulkan (tính năng thêm của driver đồ họa) mà app giấu đi, để game cùng DXVK, VKD3D và Zink không dùng tới. Các tên cách nhau bằng dấu phẩy.
+Vì sao chỉnh: Dùng khi một tiện ích của driver làm game văng, màn hình đen hoặc lỗi hình; giấu nó đi thì game phải dùng cách khác.
+Chỉnh thế nào: Mặc định: để trống. Chỉ điền khi được hướng dẫn, gõ đúng tên (bắt đầu bằng VK_). Dấu cách sẽ bị bỏ. Game lỗi hơn thì xóa trống lại. Mở lại game để áp dụng.
+
+[Trình chiếu chính xác]
+Là gì: Chỉ có khi Bộ dựng hình là DisplayX. Khi bật, mỗi khung hình được gắn với đúng một nhịp quét của màn hình, theo mốc thời gian Android cung cấp.
+Vì sao chỉnh: Có thể giúp khung hình hiện đều hơn khi FPS không thấp mà bạn vẫn thấy hình giật nhẹ.
+Chỉnh thế nào: Bạn cứ để tắt (mặc định). Bật thử nếu hình giật nhẹ; không thấy khác hoặc thấy trễ hơn thì tắt lại. Chỉ có tác dụng trên Android 13 trở lên, máy cũ hơn sẽ bỏ qua.
+
+[Trình chiếu theo tần số quét]
+Là gì: Chỉ có ở DisplayX. Bật: khung hình được gom lại và gửi lên màn hình theo nhịp tần số quét của máy. Tắt: gửi ngay khi game vẽ xong.
+Vì sao chỉnh: Bật cho hình ra đều theo màn hình. Tắt có thể giảm độ trễ thao tác, nhưng hình có thể ra không đều.
+Chỉnh thế nào: Mặc định bật. Thấy thao tác bị trễ thì thử tắt; hình giật hoặc nháy thì bật lại.
+
+[Tên]
+Là gì: Tên của môi trường chạy hoặc của game (hiện trong thư viện). Trong hộp Thêm biến môi trường, đây là tên biến bạn tự gõ.
+Vì sao chỉnh: Tên giúp bạn phân biệt game và môi trường chạy, không làm game chạy khác đi. Riêng tên biến phải gõ đúng thì biến mới có tác dụng.
+Chỉnh thế nào: Tên game không dùng được \ / : * ? " < > | (sẽ thành _). Đổi tên game thì các bản sao lưu cũ vẫn nằm ở thư mục mang tên cũ. Tên biến viết liền, ví dụ DXVK_HUD.
+
+[Tên GPU]
+Là gì: Tên card đồ họa mà game nhìn thấy. Device là tên GPU thật của điện thoại; chọn tên khác để giả làm card đồ họa máy tính (đổi cả mã hãng và mã card).
+Vì sao chỉnh: Có game không chịu chạy, báo card đồ họa không được hỗ trợ, hoặc tự chọn cài đặt sai khi thấy GPU điện thoại.
+Chỉnh thế nào: Bạn nên để Device (mặc định). Game báo không hỗ trợ card đồ họa: thử NVIDIA GeForce GTX 1060. Mục này không làm máy mạnh hơn.
+
+[Tính shader chính xác]
+Là gì: Bật thì WineD3D xin driver bỏ kiểu tính shader (đoạn chương trình tạo hiệu ứng hình) nhanh nhưng gần đúng. Chỉ có tác dụng khi dùng WineD3D với bộ dựng hình gl.
+Vì sao chỉnh: Hiếm khi cần đổi. Với driver OpenGL của app (Zink, Freedreno), mục này gần như không làm khác đi về tốc độ hay hình ảnh.
+Chỉnh thế nào: Mặc định: bật. Cứ để nguyên nếu game chạy bình thường. Nếu tắt thử mà không thấy khác hoặc hình lỗi hơn thì bật lại.
+
+[Tạm dừng game khi ứng dụng chạy nền]
+Là gì: Khi bạn rời app (về màn hình chính, mở app khác hoặc tắt màn hình), game được tạm dừng hẳn để không chạy ngầm.
+Vì sao chỉnh: Giúp tiết kiệm pin và đỡ nóng máy khi bạn tạm rời game; quay lại app là game chạy tiếp.
+Chỉnh thế nào: Nên để bật (mặc định). Ở bản này game luôn tạm dừng khi bạn rời app, dù công tắc bật hay tắt. Muốn game vẫn chạy khi làm việc khác, dùng “Cửa sổ nổi” trong menu game.
+
+[Tắt chuột]
+Là gì: Chạm và vuốt trên màn hình sẽ không còn điều khiển chuột trong game. Nút phím ảo, tay cầm và chuột rời vẫn dùng bình thường.
+Vì sao chỉnh: Bật khi bạn chơi hoàn toàn bằng phím ảo hoặc tay cầm và hay lỡ chạm làm con trỏ chạy lung tung, bấm nhầm.
+Chỉnh thế nào: Mặc định tắt. Khi bật, chạm 4 ngón không mở được menu nữa, hãy dùng nút Quay lại. Có thể bật/tắt ngay trong menu game (công tắc “Tắt chuột”).
+
+[Tắt Present Wait]
+Là gì: Tắt tính năng present wait của driver. Tính năng này cho game (qua DXVK 2.x, VKD3D) chờ tới lúc khung hình thật sự lên màn hình để canh nhịp.
+Vì sao chỉnh: Với vài driver, tính năng này có thể làm game đứng hình, treo hoặc giật đều đều.
+Chỉnh thế nào: Bạn cứ để tắt (mặc định). Game đứng hình hoặc treo khi đang chơi, hay giật đều đều: thử bật; không đỡ thì tắt lại. Không ảnh hưởng DXVK 1.10.3.
+
+[Tắt XInput]
+Là gì: Khi bật, game này không nhận tay cầm nào (tay cầm thật hay nút tay cầm trong phím ảo), chỉ nhận chuột và bàn phím. Nút phím ảo gán vào phím hoặc chuột vẫn dùng được.
+Vì sao chỉnh: Dành cho lúc tay cầm làm game này loạn phím hay nhân vật tự chạy.
+Chỉnh thế nào: Để tắt (mặc định). Chỉ bật khi game này lỗi vì tay cầm. Muốn tắt tay cầm cho mọi game thì dùng mục Tắt XInput (chỉ dùng chuột/bàn phím) trong Cài đặt. Đổi xong mở lại game.
+
+[Tắt XInput (chỉ dùng chuột/bàn phím)]
+Là gì: Khi bật, mọi game không nhận tay cầm nào (tay cầm thật hay nút tay cầm trong phím ảo), chỉ nhận chuột và bàn phím. Nút phím ảo gán vào phím hoặc chuột vẫn dùng được.
+Vì sao chỉnh: Dành cho lúc tay cầm (tay cầm thật hoặc nút tay cầm trong phím ảo) làm game loạn phím hay nhân vật tự chạy.
+Chỉnh thế nào: Để tắt (mặc định). Chỉ muốn tắt cho một game thì dùng mục Tắt XInput trong cài đặt của game đó. Đổi xong mở lại game.
+
+[Tự động sao lưu]
+Là gì: Mỗi khi game đóng, app tự sao lưu thư mục bản lưu của game. Bản tự động mới luôn thay bản tự động cũ, không đụng tới các bản bạn tự sao lưu.
+Vì sao chỉnh: Bật để khỏi phải nhớ bấm sao lưu, phòng khi bản lưu bị hỏng hoặc bạn lỡ xóa game.
+Chỉnh thế nào: Chỉ chạy khi app đã tìm ra thư mục bản lưu riêng (xem “Vị trí lưu game”). Thoát bằng nút nguồn trong menu game, đừng vuốt tắt app. Bật “Sao lưu bản lưu cho mọi game” thì mục này luôn bật.
+
+[Visual C++ 2010]
+Là gì: Bộ thư viện chạy Visual C++ 2010 (msvcp100, msvcr100) mà nhiều game và công cụ cần để mở được.
+Vì sao chỉnh: Bản Gốc (Windows) giúp game cần Visual C++ 2010 chạy ổn định. Bản của Wine đôi khi thiếu chức năng, làm game báo lỗi hoặc văng khi mở.
+Chỉnh thế nào: Để Gốc (Windows) (mặc định). Không nên đổi sang Có sẵn (Wine), trừ khi có hướng dẫn riêng cho game đó.
+
+[Vẽ ngoài màn hình]
+Là gì: Cách WineD3D vẽ những hình tạm chưa hiện lên màn hình: fbo (cách mới) hoặc backbuffer (cách cũ). Chỉ có tác dụng khi dùng WineD3D với bộ dựng hình gl.
+Vì sao chỉnh: Chỉ đổi khi game dùng WineD3D bị màn hình đen hoặc lỗi hình mà các cách khác không sửa được.
+Chỉnh thế nào: Mặc định: fbo, nên giữ nguyên. Chỉ thử backbuffer khi đã thử hết cách khác; nếu tệ hơn thì chọn lại fbo. Mở lại game để áp dụng.
+
+[Wine / Proton]
+Là gì: Bản Wine/Proton dùng để chạy game Windows. Bản arm64ec chạy Wine thẳng trên chip điện thoại, chỉ giả lập mã x86 của game; bản x86_64 giả lập toàn bộ qua Box64.
+Vì sao chỉnh: Mỗi bản hợp với một số game khác nhau. Đổi khi game không mở được hoặc văng mà chỉnh các mục khác không đỡ.
+Chỉnh thế nào: Nên dùng Proton 9 arm64ec (có sẵn, thường nhanh hơn). Chỉ chọn được khi tạo môi trường chạy mới; bản có chữ Download phải tải về trước. Game lỗi thì thử tạo môi trường mới với bản khác.
+
+[XAudio]
+Là gì: Thư viện âm thanh XAudio2, X3DAudio, XACT (bản 2.0 đến 2.7) mà nhiều game DirectX 9–11 dùng để phát tiếng.
+Vì sao chỉnh: Đổi khi game mất tiếng, tiếng rè, tiếng bị lặp, hoặc game văng lúc phát âm thanh.
+Chỉnh thế nào: Để Có sẵn (Wine) (mặc định). Lỗi tiếng thì thử Gốc (Windows). Game mới dùng XAudio 2.8/2.9 không chịu ảnh hưởng của mục này.
+
+[Đặt khóa API SteamGrid? (Ảnh bìa)]
+Là gì: Cho phép bạn nhập khóa riêng của dịch vụ ảnh bìa SteamGridDB. Khóa API là một mã cá nhân để app được phép tải ảnh từ dịch vụ đó.
+Vì sao chỉnh: Chế độ Big Picture tự tải ảnh bìa từ SteamGridDB bằng khóa có sẵn của app. Chỉ cần khóa riêng khi ảnh bìa ở đó không tải được.
+Chỉnh thế nào: Mặc định tắt, thường không cần bật. Bật rồi dán khóa vào ô “Khóa API SteamGridDB”, bấm Lưu; tắt lại sẽ xóa khóa đã lưu. Ảnh bìa ở thư viện được tạo sẵn trong máy, không dùng khóa này.
+
+[Định dạng bề mặt]
+Là gì: Thứ tự kênh màu của khung hình (RGBA hoặc BGRA) mà game và app dùng để trao đổi hình ảnh.
+Vì sao chỉnh: Sai định dạng có thể làm màu bị đảo, ví dụ đỏ thành xanh dương, da người xanh lè.
+Chỉnh thế nào: Để mặc định: BGRA với Vulkan và EGL, RGBA với DisplayX (tự đặt khi đổi Bộ dựng hình). Màu bị đảo thì chọn giá trị còn lại.
+
+[Đồng bộ cấu trúc CPU]
+Là gì: Khi bật, Wine báo cho game đúng các nhân CPU bạn đã chọn ở mục Chọn nhân CPU, thay vì toàn bộ nhân của máy.
+Vì sao chỉnh: Nếu đã bỏ bớt nhân mà game vẫn tưởng có đủ nhân, game có thể chia việc cho quá nhiều luồng và bị giật. Bật để game chia việc theo đúng số nhân được dùng.
+Chỉnh thế nào: Mặc định tắt. Chỉ nên bật khi đã bỏ bớt nhân ở Chọn nhân CPU. Nếu game chậm hơn hoặc lỗi, tắt lại.
+
+[Đồng bộ khung hình]
+Là gì: Bắt game chờ GPU vẽ xong từng khung hình rồi mới gửi lên màn hình.
+Vì sao chỉnh: Có thể sửa hình nháy, chớp đen hoặc khung hình bị lỗi; đổi lại FPS giảm.
+Chỉnh thế nào: Bạn cứ để tắt (mặc định). Chỉ bật khi hình nháy hoặc lỗi mà đổi Chế độ trình chiếu của driver không hết. Máy yếu nên để tắt vì tốn FPS.
+
+[Đổi kênh màu đỏ/xanh dương]
+Là gì: Đổi chỗ màu đỏ và màu xanh dương trong hình game khi vẽ bằng Vulkan.
+Vì sao chỉnh: Chỉ dùng khi màu game bị đảo, ví dụ da người thành xanh dương, lửa có màu xanh.
+Chỉnh thế nào: Mặc định: tắt. Chỉ bật thử khi màu bị đảo. Nếu màu không đổi, hãy tắt lại và thử đổi “Định dạng bề mặt” (RGBA/BGRA) trong phần Hình ảnh của môi trường chạy.
+
+[Độ phân giải]
+Là gì: Kích thước màn hình Windows giả lập mà game vẽ ra, sau đó được phóng vừa màn hình điện thoại.
+Vì sao chỉnh: Thấp hơn thì nhẹ và mát máy hơn (nhưng không nhanh gấp đôi), hình mờ hơn. Cao hơn thì nét hơn nhưng nặng và nóng hơn.
+Chỉnh thế nào: Máy yếu: 854x480 (16:9); tầm trung: 960x544 (16:9); máy mạnh: 1280x720 (16:9). Game thêm qua app đã có mức riêng, mục Chỉnh đồ họa trong thư viện cũng đổi nó. Chọn Custom để tự nhập.
+
+[Độ phân giải tùy chỉnh]
+Là gì: Ô để tự gõ độ phân giải, hiện khi bạn chọn Custom ở mục Độ phân giải.
+Vì sao chỉnh: Dùng khi cần kích thước không có trong danh sách, ví dụ khớp tỷ lệ màn hình máy hoặc giảm thêm cho máy yếu.
+Chỉnh thế nào: Gõ dạng RỘNGxCAO, ví dụ 1024x576; chữ x thường hay hoa đều được, mỗi chiều từ 200 đến 7680. Gõ sai thì app giữ độ phân giải cũ. Máy yếu nên giữ khoảng 854x480 đến 960x544.
+
+[Độ trễ khung hình tối đa]
+Là gì: Khi bật, DXVK chỉ cho game chuẩn bị trước tối đa 1 khung hình (game DirectX 10/11).
+Vì sao chỉnh: Giảm độ trễ giữa lúc bạn bấm và lúc hình phản hồi, hợp game hành động.
+Chỉnh thế nào: Bạn cứ để tắt (mặc định). Bật nếu thấy thao tác bị trễ; FPS giảm hoặc giật hơn thì tắt lại. Máy yếu nên để tắt.
+
+[Ẩn thanh tải khi mở game]
+Là gì: Bỏ màn hình chờ “Đang khởi động…” (tên game, ảnh bìa, thanh tiến trình) lúc mở game, và màn hình chờ lúc thoát game.
+Vì sao chỉnh: Bật nếu game hay kẹt mãi ở màn hình “Đang khởi động…”: khi không có màn hình chờ, bạn vẫn mở được menu game bằng nút Quay lại để thoát.
+Chỉnh thế nào: Mặc định tắt. Bật không làm game mở nhanh hơn. Lúc game đang tải bạn có thể thấy màn hình đen vài giây, đó là bình thường.

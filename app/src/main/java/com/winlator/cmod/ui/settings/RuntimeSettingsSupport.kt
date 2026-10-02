@@ -482,6 +482,7 @@ internal fun SettingChoice(
                             overflow = TextOverflow.Ellipsis
                         )
                     }
+                    SettingHelpButton(displayLabel)
                     Icon(Icons.Outlined.KeyboardArrowDown, null)
                 }
             }
@@ -548,6 +549,7 @@ internal fun SettingWineRuntimeChoice(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
+                SettingHelpButton(label)
                 Icon(Icons.Outlined.KeyboardArrowDown, null)
             }
         }
@@ -608,6 +610,7 @@ internal fun SettingInstallChoice(
                     Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(selected.ifBlank { "Chọn phiên bản" }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
                 }
+                SettingHelpButton(label)
                 Icon(Icons.Outlined.KeyboardArrowDown, null)
             }
         }
@@ -671,6 +674,7 @@ internal fun SettingDriverChoice(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
+                SettingHelpButton(settingFieldLabel(label))
                 Icon(Icons.Outlined.KeyboardArrowDown, null)
             }
         }
@@ -718,6 +722,7 @@ internal fun SettingToggle(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(label, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
+        SettingHelpButton(label)
         Switch(checked = checked, onCheckedChange = onChanged, enabled = enabled)
     }
 }
@@ -733,6 +738,7 @@ internal fun SettingText(
         value = value,
         onValueChange = onChanged,
         label = { Text(label) },
+        trailingIcon = { SettingHelpButton(label) },
         modifier = Modifier.fillMaxWidth().padding(12.dp),
         minLines = minLines,
         maxLines = if (minLines > 1) 5 else 1,
@@ -747,7 +753,10 @@ internal fun CpuSelectorRow(
     onToggle: (Int, Boolean) -> Unit
 ) {
     Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 9.dp)) {
-        Text(title, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(title, modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            SettingHelpButton(title)
+        }
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(7.dp)

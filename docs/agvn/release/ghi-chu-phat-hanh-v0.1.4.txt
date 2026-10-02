@@ -1,0 +1,18 @@
+AGVN Player v0.1.4 - agvn.io.vn
+
+Mới:
+- Cập nhật ngay trong app: Cài đặt > Cập nhật ứng dụng > Kiểm tra cập nhật. Không cần máy tính hay cáp. Game, save và cài đặt giữ nguyên.
+- Video MP4 trong game (Unity, Unreal) phát được, không còn màn đen chờ mãi và không còn tốn RAM vì video lỗi.
+- Thử nghiệm: dưới "Giới hạn FPS" trong game có ô "Khớp nhịp màn hình", cho khung hình lên đều theo nhịp màn hình. Ô này mặc định tắt và lưu riêng từng game; game đứng hình thì tắt ô này.
+- Game Nhật cần font MS Gothic, MS Mincho (như WOLF RPG) được dùng font Nhật có sẵn trong app thay thế, tránh lỗi font.
+- Mỗi lần chơi đều có nhật ký. Game lỗi thì bấm ⋮ ở game đó > "Gửi nhật ký".
+- Cảnh báo khi RAM sắp hết, kèm nút "Thoát game an toàn". Cảnh báo một lần khi máy nóng làm CPU chậm lại, kèm nút "Hạ FPS 20".
+- Nhập và xuất file lưu ngay trong menu ⋮ của game.
+- Nút "?" cạnh mỗi mục cài đặt giải thích mục đó dùng làm gì.
+- Chạm hai ngón để bấm chuột phải.
+- Chạm thật nhanh vẫn thành cú bấm: app giữ nút đủ lâu cho game kịp nhận. Trước đây game Unity có thể bỏ qua cú chạm quá nhanh.
+- Thư mục chứa nhiều game, mỗi game một file .exe (như bộ sưu tập 3 phần), giờ hiện từng game riêng trong "Thêm game". Trước đây chỉ thêm được game đầu tiên. Trong "Chọn thư mục khác" cũng thấy file .exe: chạm vào file nào thì thêm đúng file đó.
+- Sửa 9 mục cài đặt trước đây không có tác dụng: âm thanh, cách khởi động, tay cầm, MIDI riêng từng game, kéo giãn hình, CPU cho game 32-bit, độ phân giải tùy chỉnh, HUD và tiếng Việt.
+- Thanh "Đồ họa": mức thấp giới hạn FPS cho mọi loại game và giảm RAM theo từng engine. Mức "Trung bình" bắt đầu ở 30 FPS.
+- Máy Adreno dùng driver Turnip chạy nhanh hơn: bỏ giả lập định dạng texture mà Turnip đã đọc được sẵn.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.

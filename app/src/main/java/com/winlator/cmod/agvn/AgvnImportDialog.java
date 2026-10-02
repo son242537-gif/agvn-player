@@ -43,11 +43,15 @@ public final class AgvnImportDialog {
         AgvnAddGameHost.show(activity);
     }
 
-    /** Settings preview for one game; {@code onImported} runs after a successful import. */
-    static void preview(MainActivity activity, File gameDir, DeviceTier tier, AgvnLibraryIndex.Existing existing, Runnable onImported) {
+    /**
+     * Settings preview for one game ({@code variant}: its exe when the folder holds several games or it was picked by
+     * hand, else null); {@code onImported} runs after a successful import.
+     */
+    static void preview(MainActivity activity, File gameDir, String variant, DeviceTier tier, AgvnLibraryIndex.Existing existing,
+                        Runnable onImported) {
         AgvnGameImporter.Candidate candidate;
         try {
-            candidate = AgvnGameImporter.load(gameDir, AgvnProfileCatalog.get(activity));
+            candidate = AgvnGameImporter.load(gameDir, AgvnProfileCatalog.get(activity), variant);
         } catch (AgvnProfileException e) {
             showError(activity, e.getMessage());
             return;
@@ -76,7 +80,7 @@ public final class AgvnImportDialog {
                         (d, w) -> doImport(activity, candidate, tier, existing, onImported))
                 .setNeutralButton(activity.getString(R.string.agvn_import_change_tier, tier.label), (d, w) ->
                         AgvnTierDialog.choose(activity, activity.getString(R.string.agvn_tier_for_game), tier.ordinal() + 1,
-                                chosen -> preview(activity, gameDir, chosen != null ? chosen : DeviceTierManager.detect(activity), existing, onImported)))
+                                chosen -> preview(activity, gameDir, variant, chosen != null ? chosen : DeviceTierManager.detect(activity), existing, onImported)))
                 .setNegativeButton(R.string.agvn_cancel, null)
                 .show();
     }

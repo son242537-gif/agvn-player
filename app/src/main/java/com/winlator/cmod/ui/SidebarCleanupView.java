@@ -133,10 +133,9 @@ public class SidebarCleanupView extends View implements SharedPreferences.OnShar
             return;
         }
 
-        String storedMode = container.getExtra("hudMode");
+        String storedMode = activity.effectiveHudMode(); // AGVN: the game's choice first, as at launch
         if (storedMode == null || storedMode.isEmpty()) {
-            container.putExtra("hudMode", "2");
-            container.saveData();
+            // AGVN: only preselect the Modern style; storing "2" here switched the HUD on from the next launch
             if (style.getCount() > 1 && style.getSelectedItemPosition() != 1) {
                 style.setSelection(1);
             }
