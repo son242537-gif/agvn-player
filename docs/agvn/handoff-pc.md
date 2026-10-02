@@ -14,7 +14,8 @@ web GitHub để mở và merge PR.
   giới hạn vùng đệm GPU của Zink ở 256 MB.
 - **PR #37 (nháp, nhánh `agvn/p28-quality-all-engines`)**: thanh "Đồ họa" giới hạn FPS cho mọi loại game, và ở mức
   thấp thì bớt RAM theo từng engine (DXVK, Ren'Py, Unity; xem `docs/agvn/giam-ram.md`). Cần thử trên POCO rồi merge.
-- Tạm dừng theo lời anh Sơn: Ren'Py / ONScripter / mkxp-z và việc chuyển app sang giấy phép GPL.
+- Engine riêng làm lại theo lời anh Sơn ngày 02/10/2026: Ren'Py và RPG Maker XP/VX/VX Ace (mkxp-z), mỗi engine một
+  đợt, app chuyển sang GPL 3. Kế hoạch ở `docs/agvn/engine-rieng.md`. ONScripter chưa làm.
 
 ## Việc làm tiếp (theo thứ tự)
 
