@@ -122,6 +122,26 @@ public class AgvnLightToolsTest {
         assertFalse(new AgvnLightPrefs(dir).keysHidden("/sdcard/Games/A"));
     }
 
+    /** The settings file is replaced whole, also over one that exists (File.renameTo refuses that on Windows). */
+    @Test
+    public void settingsFileIsReplacedWhole() throws Exception {
+        File dir = tmp.newFolder("props");
+        File file = new File(dir, "a.properties");
+        java.util.Properties props = new java.util.Properties();
+        for (int i = 1; i <= 3; i++) {
+            props.setProperty("n", String.valueOf(i));
+            assertTrue(AgvnPropsFile.store(props, file, null));
+            assertEquals(String.valueOf(i), AgvnPropsFile.load(file).getProperty("n"));
+        }
+        assertArrayEquals(new String[]{"a.properties"}, dir.list()); // no .tmp left behind
+        File busy = new File(dir, "busy.properties");
+        assertTrue(new File(busy, "inside").mkdirs()); // a folder in the way: the move fails
+        assertFalse(AgvnPropsFile.store(props, busy, null));
+        assertTrue(new File(busy, "inside").isDirectory());
+        assertFalse(new File(dir, "busy.properties.tmp").exists());
+        assertTrue(AgvnPropsFile.load(new File(dir, "missing")).isEmpty());
+    }
+
     @Test
     public void hudLeavesOutWhatItCannotMeasure() {
         assertEquals("FPS 60 · Game 412 MB · RAM trống 2,3 GB · Pin 78% · 38,5°C", AgvnLightHud.text(60, 412, 2355, 78, 38.5f));

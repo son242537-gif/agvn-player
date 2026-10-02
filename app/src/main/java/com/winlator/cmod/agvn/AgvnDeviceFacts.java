@@ -5,11 +5,7 @@ import android.content.Context;
 import android.os.Build;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -43,13 +39,7 @@ final class AgvnDeviceFacts {
         if (gpu.equals(props.getProperty("gpu")) && phone().equals(props.getProperty("phone"))) return;
         props.setProperty("gpu", gpu);
         props.setProperty("phone", phone());
-        File file = new File(ctx.getFilesDir(), FILE), tmp = new File(ctx.getFilesDir(), FILE + ".tmp");
-        try (OutputStream out = new FileOutputStream(tmp)) {
-            props.store(out, "AGVN Player: device facts other processes read");
-        } catch (IOException e) {
-            return;
-        }
-        if (!tmp.renameTo(file)) tmp.delete();
+        AgvnPropsFile.store(props, new File(ctx.getFilesDir(), FILE), "AGVN Player: device facts other processes read");
     }
 
     /** The phone the facts were read on: app data restored onto another phone must not bring its GPU along. */
@@ -58,13 +48,7 @@ final class AgvnDeviceFacts {
     }
 
     private static Properties load(Context ctx) {
-        Properties props = new Properties();
-        try (InputStream in = new FileInputStream(new File(ctx.getFilesDir(), FILE))) {
-            props.load(in);
-        } catch (IOException | RuntimeException ignored) {
-            // not yet known
-        }
-        return props;
+        return AgvnPropsFile.load(new File(ctx.getFilesDir(), FILE));
     }
 
     /** Each core's top clock in kHz (cpuinfo_max_freq); -1 for a core that is offline or cannot be read. */

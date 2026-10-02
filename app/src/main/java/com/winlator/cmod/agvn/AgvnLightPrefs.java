@@ -2,11 +2,6 @@
 package com.winlator.cmod.agvn;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Properties;
 
 /**
@@ -20,15 +15,11 @@ final class AgvnLightPrefs {
     static final String FILE_NAME = "agvn-light.properties";
 
     private final File file;
-    private final Properties props = new Properties();
+    private final Properties props;
 
     AgvnLightPrefs(File dir) {
         file = new File(dir, FILE_NAME);
-        try (InputStream in = new FileInputStream(file)) {
-            props.load(in);
-        } catch (IOException e) {
-            // first use: the defaults
-        }
+        props = AgvnPropsFile.load(file);
     }
 
     boolean keysHidden(String game) {
@@ -74,14 +65,8 @@ final class AgvnLightPrefs {
         save();
     }
 
-    /** Written whole to a temporary file, then renamed over the old one: a crash never leaves half a file. */
+    /** Written whole, then moved over the old file ({@link AgvnPropsFile}): a crash never leaves half a file. */
     private void save() {
-        File tmp = new File(file.getPath() + ".tmp");
-        try (OutputStream out = new FileOutputStream(tmp)) {
-            props.store(out, "AGVN Player: Chạy nhẹ toolkit");
-        } catch (IOException e) {
-            return;
-        }
-        if (!tmp.renameTo(file)) tmp.delete();
+        AgvnPropsFile.store(props, file, "AGVN Player: Chạy nhẹ toolkit");
     }
 }
