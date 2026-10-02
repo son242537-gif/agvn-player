@@ -60,6 +60,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         boolean rpgMaker = AgvnHtmlFiles.resolve(root, "/js/rpg_core.js") != null || AgvnHtmlFiles.resolve(root, "/js/rmmz_core.js") != null;
         if (rpgMaker) compatJs = com.winlator.cmod.core.FileUtils.readString(this, "agvn/html-compat.js");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        AgvnRefreshCap.apply(this); // 60 Hz: the page draws every refresh, the games move 60 times a second
         // with a log setting on (Cài đặt > Nhật ký), the page can be inspected over USB and logs all its console
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean logs = prefs.getBoolean("enable_wine_debug", false) || prefs.getBoolean("enable_winlator_logs", false);

@@ -20,7 +20,7 @@ import java.util.Arrays;
  */
 public final class DriverSafety {
     private static final String TAG = "AGVN";
-    private static final String PREFS = "agvn_driver_probe";
+    static final String PREFS = "agvn_driver_probe";
     private static final String SYSTEM = "System";
     private static DriverDenylist denylist;
     private static String gpuRenderer;
@@ -44,6 +44,7 @@ public final class DriverSafety {
         if (gpuRenderer == null) {
             try {
                 gpuRenderer = GPUInformation.getRenderer(null, ctx);
+                AgvnDeviceFacts.rememberGpu(ctx, gpuRenderer); // for the "Chạy nhẹ" games' processes
             } catch (Throwable e) {
                 gpuRenderer = "";
             }

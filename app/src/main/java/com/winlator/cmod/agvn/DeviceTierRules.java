@@ -51,9 +51,24 @@ public final class DeviceTierRules {
         DeviceTier chip = match(gpus, gpuRenderer);
         if (chip == null) chip = match(socs, socModel);
         if (chip == null) chip = DeviceTier.TRUNG_BINH;
-        DeviceTier byRam = totalRamMb >= ram.flagshipMinMb ? DeviceTier.FLAGSHIP
+        return DeviceTier.weaker(chip, byRam(totalRamMb));
+    }
+
+    /** How {@link #classify} came to its tier, for thiet-bi.txt: what the GPU or chip gave, what the RAM allows. */
+    public String why(String gpuRenderer, String socModel, long totalRamMb) {
+        String gpu = "GPU \"" + (gpuRenderer != null ? gpuRenderer : "") + "\"";
+        String soc = "chip \"" + (socModel != null ? socModel : "") + "\"";
+        DeviceTier byGpu = match(gpus, gpuRenderer), bySoc = match(socs, socModel);
+        String chip = byGpu != null ? gpu + " → " + byGpu
+                : bySoc != null ? gpu + " không khớp; " + soc + " → " + bySoc
+                : gpu + ", " + soc + " không rõ → " + DeviceTier.TRUNG_BINH;
+        return chip + "; RAM " + totalRamMb + " MB → " + byRam(totalRamMb) + "; lấy mức yếu hơn = "
+                + classify(gpuRenderer, socModel, totalRamMb);
+    }
+
+    private DeviceTier byRam(long totalRamMb) {
+        return totalRamMb >= ram.flagshipMinMb ? DeviceTier.FLAGSHIP
                 : totalRamMb >= ram.trungBinhMinMb ? DeviceTier.TRUNG_BINH : DeviceTier.YEU;
-        return DeviceTier.weaker(chip, byRam);
     }
 
     public Preset preset(DeviceTier tier) {

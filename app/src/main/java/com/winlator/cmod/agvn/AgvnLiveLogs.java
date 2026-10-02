@@ -9,6 +9,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -16,17 +18,21 @@ import java.util.concurrent.TimeUnit;
 /**
  * What "Gửi nhật ký" adds so the player need not quit a game first: each session still running as it is now
  * ({@link AgvnSessionLog#snapshot}), the app's own logcat, where the "Chạy nhẹ" engines write (mkxp-z, SDL, Ren'Py,
- * the HTML games' messages), and the "Chạy nhẹ" Ren'Py logs (AGVN-Player/renpy/&lt;game&gt;). Off the UI thread.
+ * the HTML games' messages), the phone's facts ({@link AgvnDeviceReport}) and the "Chạy nhẹ" Ren'Py logs
+ * (AGVN-Player/renpy/&lt;game&gt;). Off the UI thread.
  */
 final class AgvnLiveLogs {
     private static final String TAG = "AGVN";
-    static final String APP = "app", RENPY = "renpy", LOGCAT = "logcat.txt";
+    static final String APP = "app", RENPY = "renpy", LOGCAT = "logcat.txt", DEVICE = "thiet-bi.txt";
     private static final int LOGCAT_LINES = 20000;
     private static final long LOGCAT_MAX_BYTES = 4L << 20;
 
     private AgvnLiveLogs() {}
 
-    /** Fills {@code into}: "&lt;session&gt;/" for each running session, "app/logcat.txt" and "renpy/" for {@code gameDir}. */
+    /**
+     * Fills {@code into}: "&lt;session&gt;/" for each running session, "app/logcat.txt", "app/thiet-bi.txt" and "renpy/"
+     * for {@code gameDir}.
+     */
     static void collect(Context context, File[] sessions, File gameDir, File into) {
         if (sessions != null) {
             for (File session : sessions) {
@@ -36,7 +42,10 @@ final class AgvnLiveLogs {
             }
         }
         File app = new File(into, APP);
-        if (app.mkdirs()) logcat(new File(app, LOGCAT));
+        if (app.mkdirs()) {
+            logcat(new File(app, LOGCAT));
+            write(new File(app, DEVICE), AgvnDeviceReport.text(context));
+        }
         if (gameDir == null) return;
         File renpyLogs = AgvnRenpyGame.publicDir(AgvnSessionLog.root().getParentFile(), gameDir);
         List<File> files = new ArrayList<>();
@@ -70,6 +79,14 @@ final class AgvnLiveLogs {
             Thread.currentThread().interrupt();
         } finally {
             if (process != null) process.destroy();
+        }
+    }
+
+    private static void write(File f, String text) {
+        try {
+            Files.write(f.toPath(), text.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException | RuntimeException e) {
+            Log.w(TAG, "not written: " + f, e);
         }
     }
 

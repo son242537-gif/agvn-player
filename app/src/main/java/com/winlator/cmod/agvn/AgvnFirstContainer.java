@@ -24,7 +24,10 @@ import org.json.JSONObject;
 public final class AgvnFirstContainer {
     private AgvnFirstContainer() {}
 
-    /** Same defaults as the upstream first start, with the debug overlays off and the OpenGL driver pre-set. */
+    /**
+     * Same defaults as the upstream first start, with the debug overlays off, the OpenGL driver pre-set and the DXVK
+     * version the phone's Vulkan can run ({@link AgvnDxvkPick}).
+     */
     static JSONObject data(Context context, ContentsManager contents, int id) throws Exception {
         String runtime = WineInfo.MAIN_WINE_VERSION.identifier();
         WineInfo wineInfo = WineInfo.fromIdentifier(context, contents, runtime);
@@ -53,6 +56,11 @@ public final class AgvnFirstContainer {
         data.put("fexcorePreset", FEXCorePreset.INTERMEDIATE);
         data.put("wineVersion", runtime);
         OpenGLDriverDefaults.initialize(context, data);
+        try {
+            AgvnDxvkPick.apply(context, data); // DXVK by what the phone's Vulkan can run
+        } catch (Exception e) {
+            data.put("dxwrapperConfig", Container.DEFAULT_DXWRAPPERCONFIG);
+        }
         return data;
     }
 

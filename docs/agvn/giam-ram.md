@@ -12,7 +12,7 @@ giữ lại. Tài liệu này ghi lại AGVN làm gì ở từng mức và vì s
 | FPS lúc vào game (mọi loại game; chỉnh lại được trong game) | 20 | 24 | 30 | Cao: 30. Rất cao: không giới hạn |
 | DXVK: khối bộ nhớ 16 MB (`dxvk.maxChunkSize=16`) | có | có | có | không |
 | DXVK: giải phóng pipeline library không dùng (`dxvk.trackPipelineLifetime=True`) | có | có | không | không |
-| Ren'Py: bộ đệm ảnh (`config.image_cache_size_mb`) | 128 MB | 192 MB | 256 MB | để game tự chọn |
+| Ren'Py: bộ đệm ảnh (`config.image_cache_size_mb`), trong Wine và "Chạy nhẹ" | 128 MB | 192 MB | 256 MB | để game tự chọn |
 | Unity: mức chất lượng thấp nhất của game | có | có | không | không |
 | Unreal: texture pool (`r.Streaming.PoolSize`) | 384 MB | 512 MB | 768 MB | Cao: 1024 MB. Rất cao: 1536 MB |
 | Zink (OpenGL): vùng đệm bộ đệm GPU đã dùng xong | 256 MB | 256 MB | 256 MB | 256 MB |

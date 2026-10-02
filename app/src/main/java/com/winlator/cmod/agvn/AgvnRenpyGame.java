@@ -14,7 +14,8 @@ import java.util.Map;
  * "Chạy nhẹ" for Ren'Py: a Ren'Py 8 game (Python 3) runs on Ren'Py 8.5.3 built for Android ({@link AgvnRenpyActivity},
  * app/agvn-renpy.gradle) instead of Wine: far lighter, cooler and kinder to the battery. Ren'Py 6 and 7 games
  * (Python 2) still run in Wine. The game's files are read where they are; nothing in the game folder is changed except
- * what Ren'Py itself writes there on a PC (saves, cache, log). Pure Java (JVM-testable) except start().
+ * what Ren'Py itself writes there on a PC (saves, cache, log) and, on the lower "Đồ họa" steps, the image cache cap
+ * that Wine writes too ({@link AgvnRenpyCache}). Pure Java (JVM-testable) except start().
  */
 public final class AgvnRenpyGame {
     private AgvnRenpyGame() {}
@@ -94,6 +95,7 @@ public final class AgvnRenpyGame {
         String dir = extras.get(AgvnGameImporter.EXTRA_GAME_DIR);
         File gameDir = dir != null && !dir.isEmpty() ? new File(dir) : null;
         if (!canRun(gameDir)) return false;
+        AgvnMemorySaver.applyRenpyLight(activity, gameDir, extras.get(AgvnQuality.EXTRA_QUALITY));
         Intent intent = new Intent(activity, AgvnRenpyActivity.class);
         if (from.getExtras() != null) intent.putExtras(from.getExtras());
         intent.putExtra(AgvnRenpyActivity.EXTRA_GAME_DIR, gameDir.getPath());

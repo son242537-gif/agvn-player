@@ -78,6 +78,7 @@ public final class AgvnLightTools {
 
     /** Puts the toolkit on the game screen: {@code kind} is the game type of {@link AgvnLayouts} (VN or RPG). */
     static AgvnLightTools attach(Activity activity, String kind, String gameName, File gameDir, Host host) {
+        AgvnPowerSave.warn(activity);
         return new AgvnLightTools(activity, kind, gameName, gameDir, host);
     }
 

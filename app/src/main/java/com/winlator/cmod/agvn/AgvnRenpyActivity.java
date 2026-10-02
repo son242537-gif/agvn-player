@@ -57,6 +57,7 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
             end();
             return;
         }
+        AgvnRefreshCap.apply(this); // 60 Hz: Ren'Py draws every refresh
         AgvnKeepAlive.startRenpy(this, getIntent().getStringExtra("shortcut_name")); // the game keeps running in the background
         showSplash();
     }
