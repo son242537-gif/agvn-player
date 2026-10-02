@@ -92,8 +92,15 @@ Select-String -Path log-toan-bo.txt -Pattern "AGVN|XServerDisplayActivity|GuestP
 - **Game văng ở mã máy:** tìm `F/libc` (`Fatal signal`, `abort`) và `F/DEBUG` (bản ghi crash). Lỗi Zink ở trên hiện
   đúng như vậy.
 - **Log Wine/game:** Cài đặt → bật **"Bật debug Wine"** và **"Bật nhật ký ứng dụng"**, mở game, rồi
-  `& $adb pull /sdcard/AGVN-Player/logs`. Tên file theo dạng `<tên exe>_<ngày giờ>.txt` và
-  `<tên exe>_winlator_<ngày giờ>.txt`.
+  `& $adb pull /sdcard/AGVN-Player/logs`.
+  - Mỗi lần chơi có thư mục `logs/<tên game>/<ngày giờ>/`:
+    - `tom-tat.txt`: cách game kết thúc, kể cả crash của Wine và lỗi Ren'Py;
+    - `crash.txt`: bản crash của Wine, khi có;
+    - log của engine trong phiên đó (file cũ hơn phiên thì không chép).
+  - Log Wine `<tên exe>_<ngày giờ>.txt` được chuyển vào thư mục phiên khi game kết thúc. File log để lẻ ở gốc
+    `logs/` (ví dụ `<tên exe>_winlator_<ngày giờ>.txt`) bị xoá sau 3 ngày.
+  - Khi bật debug, kênh `heap`, `file`, `font` chỉ ghi lỗi, không ghi cảnh báo. Cảnh báo `heap` bật chế độ kiểm tra
+    heap của Wine, làm game Ren'Py 7 crash. Màn game hiện dòng nhỏ nhắc debug đang bật.
 - **Gói gửi hỗ trợ:** Cài đặt → **"Xuất nhật ký lỗi"** tạo `/sdcard/Download/AGVN-nhat-ky-<ngày giờ>.zip` (logcat,
   thông tin máy, cài đặt). Lấy về bằng `& $adb pull /sdcard/Download/`.
 - **RAM và nhiệt:**

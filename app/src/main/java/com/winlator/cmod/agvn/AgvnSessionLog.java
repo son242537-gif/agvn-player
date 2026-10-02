@@ -8,7 +8,6 @@ import android.util.Log;
 
 import com.winlator.cmod.container.Shortcut;
 import com.winlator.cmod.core.EnvVars;
-import com.winlator.cmod.xenvironment.ImageFs;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,7 +32,6 @@ public final class AgvnSessionLog {
     private static final String TAG = "AGVN";
     static final String RUNNING = "dang-chay.txt", SUMMARY = "tom-tat.txt", EVENTS = "su-kien.txt", ENV = "moi-truong.txt";
     static final String RAM = "ram.txt", HEAT = "nhiet.txt";
-    static final int KEEP = 5;
     static final String[] ENV_PREFIXES = {"WRAPPER_", "DXVK_", "VKD3D_", "MESA_", "TU_", "ZINK_", "GALLIUM_", "WINE",
             "PROTON_", "GST_", "BOX64_", "FEX_", "LC_ALL", "VK_", "__GL_", "vblank_mode"};
     private static volatile File current;
@@ -46,21 +44,18 @@ public final class AgvnSessionLog {
 
     /** Opens the game's session folder once Wine's environment is set; the engine's log paths are noted now. */
     public static synchronized void start(Shortcut shortcut, EnvVars env) {
+        AgvnWineTail.get().reset();
         try {
-            File exe = new File(shortcut.path.replace("\"", ""));
-            String gameDirPath = shortcut.getExtra(AgvnGameImporter.EXTRA_GAME_DIR);
-            File gameDir = !gameDirPath.isEmpty() ? new File(gameDirPath) : exe.getParentFile();
-            File profile = new File(shortcut.container.getRootDir(), ".wine/drive_c/users/" + ImageFs.USER);
-            File gameLogs = new File(root(), safeName(shortcut.name));
+            File gameLogs = new File(root(), AgvnLogFolders.safeName(shortcut.name));
             File dir = new File(gameLogs, new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.ROOT).format(new Date()));
             if (!dir.mkdirs() && !dir.isDirectory()) return;
             StringBuilder running = new StringBuilder("start=" + System.currentTimeMillis() + "\ngame=" + shortcut.name + "\n");
-            for (File f : AgvnEngineLogs.candidates(exe, gameDir, shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE), profile))
-                running.append("log=").append(f.getPath()).append('\n');
+            for (File f : AgvnEngineLogs.of(shortcut)) running.append("log=").append(f.getPath()).append('\n');
             write(new File(dir, RUNNING), running.toString(), false);
             write(new File(dir, ENV), graphicsEnv(env), false);
             current = dir;
-            prune(gameLogs);
+            AgvnLogFolders.prune(gameLogs);
+            AgvnLogFolders.pruneLoose(root(), System.currentTimeMillis());
         } catch (Exception e) {
             Log.w(TAG, "session log not started", e);
         }
@@ -74,10 +69,10 @@ public final class AgvnSessionLog {
         write(new File(dir, EVENTS), "[" + time + "] " + text + "\n", true);
     }
 
-    /** One more log file to copy when the session ends, e.g. Wine's own log when "Bật debug Wine" is on. */
+    /** Wine's own log ("Bật debug Wine"): moved into the session folder when the session ends. */
     public static void addLog(File log) {
         File dir = current;
-        if (dir != null && log != null) write(new File(dir, RUNNING), "log=" + log.getPath() + "\n", true);
+        if (dir != null && log != null) write(new File(dir, RUNNING), "wine=" + log.getPath() + "\n", true);
     }
 
     /** Replaces one small file of the running session, e.g. the RAM peaks (no-op without a session). */
@@ -86,11 +81,14 @@ public final class AgvnSessionLog {
         if (dir != null) write(new File(dir, name), text, false);
     }
 
-    /** Normal end of a game: collects the engine's logs and writes the summary. */
+    /** End of a game: collects the logs and writes the summary; a crash or Ren'Py error found replaces {@code how}. */
     public static synchronized void finish(Context context, String how) {
         File dir = current;
         current = null;
-        if (dir != null) close(context, dir, how);
+        if (dir == null) return;
+        String notes = read(new File(dir, RUNNING));
+        String error = AgvnCrashScan.sessionError(AgvnWineTail.get().crash(), files(notes, "log="), value(notes, "start", 0), dir);
+        close(context, dir, error != null ? error : how);
     }
 
     /** At app start: finishes sessions whose app process died, with the reason Android recorded. */
@@ -111,10 +109,12 @@ public final class AgvnSessionLog {
     private static void close(Context context, File dir, String how) {
         File running = new File(dir, RUNNING);
         String notes = read(running);
-        List<File> logs = new ArrayList<>();
-        for (String line : notes.split("\n")) if (line.startsWith("log=")) logs.add(new File(line.substring(4)));
-        int copied = AgvnEngineLogs.copy(logs, dir);
         long start = value(notes, "start", 0);
+        AgvnEngineLogs.Copied engine = AgvnEngineLogs.copy(files(notes, "log="), dir, start);
+        AgvnEngineLogs.Copied wine = AgvnEngineLogs.copy(files(notes, "wine="), dir, 0);
+        for (File f : wine.copied) f.delete(); // a copy is in the session folder; the logs/ root does not grow
+        int copied = engine.copied.size() + wine.copied.size();
+        String old = AgvnEngineLogs.oldNote(engine.old);
         SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ROOT);
         String summary = "AGVN Player: nhật ký phiên chơi\n"
                 + "Game: " + text(notes, "game") + "\n"
@@ -123,7 +123,7 @@ public final class AgvnSessionLog {
                 + "Cách kết thúc: " + how + "\n"
                 + "App: " + AgvnUpdater.installedName(context) + " (" + AgvnUpdater.installedCode(context) + ")\n"
                 + "Máy: " + Build.MANUFACTURER + " " + Build.MODEL + ", Android " + Build.VERSION.RELEASE + "\n"
-                + "Nhật ký engine đã chép: " + copied + " file\n"
+                + "Nhật ký engine đã chép: " + copied + " file" + (old.isEmpty() ? "" : "; bỏ qua: " + old) + "\n"
                 + "RAM: " + (new File(dir, RAM).isFile() ? read(new File(dir, RAM)).trim() : "không đo") + "\n"
                 + "Nhiệt: " + (new File(dir, HEAT).isFile() ? read(new File(dir, HEAT)).trim() : "không đo") + "\n"
                 + "Sự kiện: " + (new File(dir, EVENTS).isFile() ? EVENTS : "không có") + "; môi trường đồ hoạ: " + ENV + "\n";
@@ -140,31 +140,18 @@ public final class AgvnSessionLog {
         return String.join("\n", sorted) + "\n";
     }
 
-    /** Keeps the {@link #KEEP} newest session folders (their names sort by time). */
-    static void prune(File gameLogs) {
-        File[] sessions = gameLogs.listFiles(File::isDirectory);
-        if (sessions == null || sessions.length <= KEEP) return;
-        Arrays.sort(sessions, (a, b) -> b.getName().compareTo(a.getName()));
-        for (int i = KEEP; i < sessions.length; i++) deleteTree(sessions[i]);
-    }
-
-    static String safeName(String name) {
-        String s = name == null ? "" : name.replaceAll("[\\\\/:*?\"<>|\\p{Cntrl}]", "_").trim();
-        return s.isEmpty() ? "game" : s;
-    }
-
-    private static void deleteTree(File f) {
-        File[] children = f.listFiles();
-        if (children != null) for (File c : children) deleteTree(c);
-        f.delete();
-    }
-
     private static long value(String notes, String key, long fallback) {
         try {
             return Long.parseLong(text(notes, key));
         } catch (NumberFormatException e) {
             return fallback;
         }
+    }
+
+    private static List<File> files(String notes, String key) {
+        List<File> out = new ArrayList<>();
+        for (String line : notes.split("\n")) if (line.startsWith(key)) out.add(new File(line.substring(key.length())));
+        return out;
     }
 
     private static String text(String notes, String key) {

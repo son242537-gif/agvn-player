@@ -31,7 +31,7 @@ public final class AgvnLogShare {
     private AgvnLogShare() {}
 
     public static void share(Activity activity, Shortcut shortcut) {
-        File gameLogs = new File(AgvnSessionLog.root(), AgvnSessionLog.safeName(shortcut.name));
+        File gameLogs = new File(AgvnSessionLog.root(), AgvnLogFolders.safeName(shortcut.name));
         File[] sessions = gameLogs.listFiles(File::isDirectory);
         if (sessions == null || sessions.length == 0) {
             AgvnUpdateDialogs.message(activity, activity.getString(R.string.agvn_logs_none));
@@ -40,7 +40,7 @@ public final class AgvnLogShare {
         AlertDialog working = new AlertDialog.Builder(activity).setMessage(R.string.agvn_logs_working).setCancelable(false).show();
         new Thread(() -> {
             File zip = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-                    "AGVN-nhat-ky-" + AgvnSessionLog.safeName(shortcut.name).replace(' ', '-') + "-"
+                    "AGVN-nhat-ky-" + AgvnLogFolders.safeName(shortcut.name).replace(' ', '-') + "-"
                             + new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.ROOT).format(new Date()) + ".zip");
             String error = null;
             try {

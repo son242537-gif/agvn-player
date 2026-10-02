@@ -46,6 +46,13 @@
             android:foregroundServiceType="specialUse"
             android:exported="false" />
 
+        <!-- AGVN: the same keep-alive service in the Ren'Py process (agvn/AgvnKeepAlive) -->
+        <service
+            android:name="com.winlator.cmod.agvn.AgvnKeepAlive$Renpy"
+            android:process=":renpy"
+            android:foregroundServiceType="specialUse"
+            android:exported="false" />
+
         <activity
             android:name="com.winlator.cmod.OnboardingActivity"
             android:theme="@style/AppThemeFullscreen.Dark"

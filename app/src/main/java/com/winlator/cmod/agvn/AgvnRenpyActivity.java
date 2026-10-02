@@ -55,6 +55,7 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
             end();
             return;
         }
+        AgvnKeepAlive.startRenpy(this, getIntent().getStringExtra("shortcut_name")); // the game keeps running in the background
         showSplash();
     }
 

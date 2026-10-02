@@ -218,6 +218,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private com.winlator.cmod.agvn.GameSessionGuard agvnSessionGuard;
     private com.winlator.cmod.agvn.AgvnMemoryWatch agvnMemoryWatch;
     private com.winlator.cmod.agvn.AgvnHeatWatch agvnHeatWatch;
+    private com.winlator.cmod.agvn.AgvnStatusLine agvnStatus; // AGVN: "Bật debug Wine" is on; how a slow start goes
+    private volatile com.winlator.cmod.agvn.AgvnStartupProgress agvnStartup;
     private String agvnEffectiveExePath; // AGVN: exe actually launched (Unreal bootstrap -> Shipping redirect)
 
     private SensorManager sensorManager;
@@ -384,6 +386,10 @@ public class XServerDisplayActivity extends AppCompatActivity {
         boolean enableWinlatorLogs = preferences.getBoolean("enable_winlator_logs", false);
 
         wireSidebarListeners(enableLogs);
+        // AGVN: the game keeps the app alive while the player is in another app; the screen says when Wine logs a lot
+        com.winlator.cmod.agvn.AgvnKeepAlive.start(this, getIntent().getStringExtra("shortcut_name"));
+        agvnStatus = new com.winlator.cmod.agvn.AgvnStatusLine(this);
+        if (preferences.getBoolean("enable_wine_debug", false)) agvnStatus.setDebug(getString(R.string.agvn_debug_on_notice));
 
         imageFs = ImageFs.find(this);
 
@@ -485,6 +491,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         imageFs.setWinePath(wineInfo.path);
 
         ProcessHelper.removeAllDebugCallbacks();
+        ProcessHelper.addDebugCallback(com.winlator.cmod.agvn.AgvnWineTail.get()); // AGVN: a crash shows in the session summary, logs on or off
         if (enableLogs || enableWinlatorLogs) LogView.setFilename(getExecutable());
         if (enableLogs) {
             ProcessHelper.addDebugCallback(debugDialog = new DebugDialog(this));
@@ -601,6 +608,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         xServer.windowManager.addOnWindowModificationListener(new WindowManager.OnWindowModificationListener() {
             @Override
             public void onUpdateWindowContent(Window window) {
+                if (agvnStartup != null && window.isApplicationWindow()) agvnStartup.onWindowUpdate(); // AGVN: the game draws
                 if (!winStarted[0] && window.isApplicationWindow()) {
                     if (!simulateTouchScreen) {
                         xServerView.setCursorVisible(true);
@@ -928,6 +936,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (agvnSessionGuard != null) agvnSessionGuard.destroy();
         if (agvnMemoryWatch != null) agvnMemoryWatch.finish();
         if (agvnHeatWatch != null) agvnHeatWatch.finish();
+        if (agvnStartup != null) agvnStartup.stop();
         NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID);
         boolean removeLoadingBar = PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("remove_loading_bar_when_booting_games", false);
@@ -970,7 +979,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
                     break;
                 }
             }
-            // AGVN: the game has ended, so its engine logs are complete
+            // AGVN: the game has ended, so its engine logs are complete (Wine's own log is written out first)
+            if (debugDialog != null) debugDialog.flush();
             if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.finish(this, "Game kết thúc bình thường (thoát từ menu hoặc game tự đóng)");
             if (shortcut != null && GameSaveManager.shouldAutoBackup(this, shortcut)) {
                 GameSaveManager.BackupResult saveResult = GameSaveManager.backup(shortcut, true);
@@ -1234,6 +1244,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         guestProgramLauncherComponent.setEnvVars(envVars);
         if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.start(shortcut, envVars); // AGVN: logs of this play session
         if (shortcut != null && debugDialog != null) com.winlator.cmod.agvn.AgvnSessionLog.addLog(debugDialog.getLogFile()); // AGVN: and Wine's own log
+        if (shortcut != null) agvnStartup = com.winlator.cmod.agvn.AgvnStartupProgress.start(this, shortcut, agvnStatus); // AGVN: a slow start shows how it goes
         guestProgramLauncherComponent.setTerminationCallback((status) -> {
             com.winlator.cmod.agvn.AgvnSessionLog.event("Wine kết thúc, mã thoát " + status);
             runOnUiThread(this::exit);

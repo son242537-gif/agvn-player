@@ -42,6 +42,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     private String host;
     /** assets/agvn/html-compat.js; null when unreadable (the game then runs without it). */
     private String compatJs;
+    /** "Chạy bằng Windows" was picked: the Wine game now owns the keep-alive notification. */
+    private boolean toWindows;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -54,6 +56,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         }
         root = index.getParentFile();
         host = AgvnHtmlGame.hostFor(index);
+        AgvnKeepAlive.start(this, getIntent().getStringExtra("shortcut_name")); // the game keeps running in the background
         boolean rpgMaker = AgvnHtmlFiles.resolve(root, "/js/rpg_core.js") != null || AgvnHtmlFiles.resolve(root, "/js/rmmz_core.js") != null;
         if (rpgMaker) compatJs = com.winlator.cmod.core.FileUtils.readString(this, "agvn/html-compat.js");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -157,6 +160,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     /** "Chạy bằng Windows": for a game whose scripts need the PC version; the shortcut remembers the choice. */
     private void switchToWindows() {
         Intent intent = AgvnHtmlGame.toWindows(this, EXTRA_INDEX_PATH);
+        toWindows = intent != null;
         if (intent != null) startActivity(intent);
         finish();
     }
@@ -198,6 +202,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
             webView.destroy();
             webView = null;
         }
+        if (isFinishing() && !toWindows) AgvnKeepAlive.start(this, null); // back to the library's notification
         super.onDestroy();
     }
 }

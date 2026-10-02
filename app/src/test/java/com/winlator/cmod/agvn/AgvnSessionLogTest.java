@@ -75,11 +75,11 @@ public class AgvnSessionLogTest {
     public void keepsTheFiveNewestSessions() throws Exception {
         File gameLogs = tmp.newFolder("logs");
         for (int i = 1; i <= 7; i++) new File(gameLogs, "2026100" + i + "-120000").mkdirs();
-        AgvnSessionLog.prune(gameLogs);
+        AgvnLogFolders.prune(gameLogs);
         String[] left = gameLogs.list();
         Arrays.sort(left);
         assertArrayEquals(new String[]{"20261003-120000", "20261004-120000", "20261005-120000", "20261006-120000", "20261007-120000"}, left);
-        assertEquals("A_B_ C", AgvnSessionLog.safeName("A/B: C"));
-        assertEquals("game", AgvnSessionLog.safeName("  "));
+        assertEquals("A_B_ C", AgvnLogFolders.safeName("A/B: C"));
+        assertEquals("game", AgvnLogFolders.safeName("  "));
     }
 }
