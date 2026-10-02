@@ -3,12 +3,17 @@ package com.winlator.cmod.agvn;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.ConsoleMessage;
 import android.webkit.RenderProcessGoneDetail;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -18,6 +23,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
 import com.winlator.cmod.R;
 import com.winlator.cmod.XServerDisplayActivity;
@@ -55,6 +61,10 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         boolean rpgMaker = AgvnHtmlFiles.resolve(root, "/js/rpg_core.js") != null || AgvnHtmlFiles.resolve(root, "/js/rmmz_core.js") != null;
         if (rpgMaker) compatJs = com.winlator.cmod.core.FileUtils.readString(this, "agvn/html-compat.js");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // with a log setting on (Cài đặt > Nhật ký), the page can be inspected over USB and logs all its console
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean logs = prefs.getBoolean("enable_wine_debug", false) || prefs.getBoolean("enable_winlator_logs", false);
+        WebView.setWebContentsDebuggingEnabled(logs);
 
         try {
             webView = new WebView(this);
@@ -74,6 +84,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         s.setAllowContentAccess(false);
         s.setTextZoom(100);
         webView.setWebViewClient(new GameClient());
+        webView.setWebChromeClient(new ConsoleClient(logs));
         setContentView(webView);
         hideSystemUi();
         webView.loadUrl("https://" + host + "/" + Uri.encode(index.getName()));
@@ -103,6 +114,31 @@ public class AgvnHtmlActivity extends AppCompatActivity {
             }
             finish();
             return true;
+        }
+    }
+
+    /** Game script messages in logcat (tag AgvnHtml): warnings and errors always, everything with a log setting on. */
+    private static final class ConsoleClient extends WebChromeClient {
+        private final boolean all;
+
+        ConsoleClient(boolean all) {
+            this.all = all;
+        }
+
+        @Override
+        public boolean onConsoleMessage(ConsoleMessage m) {
+            ConsoleMessage.MessageLevel level = m.messageLevel();
+            boolean problem = level == ConsoleMessage.MessageLevel.ERROR || level == ConsoleMessage.MessageLevel.WARNING;
+            if (all || problem) {
+                Log.println(problem ? Log.WARN : Log.INFO, "AgvnHtml", m.message() + " (" + m.sourceId() + ":" + m.lineNumber() + ")");
+            }
+            return true;
+        }
+
+        /** No grey "play" picture on a game video before its first frame. */
+        @Override
+        public Bitmap getDefaultVideoPoster() {
+            return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
         }
     }
 

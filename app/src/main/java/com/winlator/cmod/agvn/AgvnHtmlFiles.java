@@ -1,6 +1,7 @@
 /* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
+import android.util.Log;
 import android.webkit.WebResourceResponse;
 
 import com.winlator.cmod.core.FileUtils;
@@ -24,7 +25,8 @@ import java.util.regex.Pattern;
 /**
  * Serves a web game's files to the WebView. Games made on Windows often name files with the wrong upper/lower case
  * ("Actor1.png" vs "actor1.png"), which Windows ignores but Android does not, so a missing file is looked up again
- * ignoring case. Nothing outside the game folder is ever served.
+ * ignoring case. A sound or video asked for in a format the game does not ship is served in the one it does
+ * ({@link #sibling}). Nothing outside the game folder is ever served.
  */
 public final class AgvnHtmlFiles {
     private static final Map<String, String> MIME = new HashMap<>();
@@ -35,6 +37,11 @@ public final class AgvnHtmlFiles {
     static final byte[] TRANSPARENT_PNG = Base64.getDecoder().decode(
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=");
     private static final Map<String, String> CORS = Collections.singletonMap("Access-Control-Allow-Origin", "*");
+    /**
+     * Formats RPG Maker picks between: .m4a/.mp4 on a phone, .ogg/.webm on a PC; encrypted .rpgmvm/.rpgmvo (MV) or with
+     * a trailing "_" (MZ). A game ships one of each pair, and the browser tells the formats apart by their content.
+     */
+    private static final String[][] SIBLINGS = {{".m4a", ".ogg"}, {".rpgmvm", ".rpgmvo"}, {".m4a_", ".ogg_"}, {".mp4", ".webm"}};
 
     static {
         String[][] types = {
@@ -59,8 +66,9 @@ public final class AgvnHtmlFiles {
     public static WebResourceResponse serve(File root, String urlPath, String compatJs) {
         if (COMPAT_PATH.equals(urlPath) && compatJs != null)
             return text("application/javascript", compatJs);
-        File file = resolve(root, urlPath);
+        File file = fileFor(root, urlPath);
         if (file == null) {
+            Log.w("AGVN", "HTML game file missing: " + urlPath);
             if (urlPath != null && urlPath.toLowerCase(Locale.ROOT).endsWith(".png"))
                 return new WebResourceResponse("image/png", null, 200, "OK", CORS, new ByteArrayInputStream(TRANSPARENT_PNG));
             return new WebResourceResponse("text/plain", "UTF-8", 404, "Not Found", CORS, empty());
@@ -77,6 +85,26 @@ public final class AgvnHtmlFiles {
         } catch (IOException e) {
             return blocked();
         }
+    }
+
+    /** The file for {@code urlPath}, else the same sound or video in its other format ({@link #sibling}), else null. */
+    static File fileFor(File root, String urlPath) {
+        File file = resolve(root, urlPath);
+        if (file != null) return file;
+        String other = sibling(urlPath);
+        return other != null ? resolve(root, other) : null;
+    }
+
+    /** {@code urlPath} with the other extension of its format pair ("/audio/a.m4a" -> "/audio/a.ogg"), or null. */
+    static String sibling(String urlPath) {
+        if (urlPath == null) return null;
+        String lower = urlPath.toLowerCase(Locale.ROOT);
+        for (String[] pair : SIBLINGS) {
+            for (int i = 0; i < 2; i++) {
+                if (lower.endsWith(pair[i])) return urlPath.substring(0, urlPath.length() - pair[i].length()) + pair[1 - i];
+            }
+        }
+        return null;
     }
 
     /** {@code html} with the compatibility script as the very first script, before the engine's. */
