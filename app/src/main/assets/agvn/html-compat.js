@@ -6,6 +6,8 @@
  *     are logged and skipped instead of stopping the game with an error screen. If they keep coming (a truly broken
  *     scene), the normal error screen is shown so the player is not stuck on a frozen picture.
  *  3. A missing sound file is skipped instead of stopping the game ("Failed to load: audio/...").
+ *  4. RPG Maker MV is told it runs on a PC, as JoiPlay does: on a phone it asks for .m4a sound and .mp4 video, which
+ *     PC games do not ship (every sound was missing, silently because of 3), and draws with the slow canvas renderer.
  */
 (function () {
     'use strict';
@@ -109,11 +111,26 @@
         return MINOR.test(String(e.message)) && recent.length <= 60;
     }
 
+    // --- 4: RPG Maker MV as on a PC (.ogg sound, .webm video, WebGL), still filling the screen and going quiet when
+    // the player leaves the app as it did on the phone: MV does both only on NW.js or a phone, and this is neither.
+    // Engine functions only: one a plugin has already replaced does not name isMobileDevice and is kept.
+    function desktopMv() {
+        if (!window.Utils || typeof Utils.isMobileDevice !== 'function') return;
+        var asOnPhone = function () { return true; };
+        [[window.Graphics, '_defaultStretchMode'], [window.WebAudio, '_shouldMuteOnHide'],
+            [window.Html5Audio, '_shouldMuteOnHide']].forEach(function (f) {
+            if (f[0] && /isMobileDevice/.test(String(f[0][f[1]]))) f[0][f[1]] = asOnPhone;
+        });
+        Utils.isMobileDevice = function () { return false; };
+        Utils.isAndroidChrome = function () { return false; };
+    }
+
     function patch() {
         var SM = window.SceneManager, AM = window.AudioManager;
         if (!SM || SM.__agvnPatched) return !!SM;
         SM.__agvnPatched = true;
         var isMz = window.Utils && Utils.RPGMAKER_NAME === 'MZ';
+        if (!isMz) desktopMv(); // before main.js starts the game: the renderer and screen size are chosen then
         var original = SM.catchException;
         SM.catchException = function (e) {
             if (isMinor(e)) {
