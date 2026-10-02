@@ -1,0 +1,7 @@
+AGVN Player v0.1.5 - agvn.io.vn
+
+Mới:
+- Trước khi mở game, app kiểm tra các file .exe và .dll của game. File nào bị thiếu dữ liệu vì chép hoặc giải nén chưa xong, app báo tên file và cách sửa, thay vì màn hình đen rồi thoát.
+Sửa lỗi:
+- Game RPG Maker MV khi "Chạy nhẹ" có lại âm thanh: nhạc nền, tiếng động và giọng nói. Video trong game cũng phát được.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.
