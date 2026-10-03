@@ -127,8 +127,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return;
         }
 
-        // AGVN: sessions whose process Android killed get their logs and exit reason now
-        new Thread(() -> com.winlator.cmod.agvn.AgvnSessionLog.finishPending(getApplicationContext()), "AgvnSessionLog").start();
+        // AGVN: sessions whose process Android killed get their logs and exit reason now; then the player is asked
+        // about what went wrong in the last game, with fixes ("Tự sửa lỗi")
+        new Thread(() -> {
+            com.winlator.cmod.agvn.AgvnSessionLog.finishPending(getApplicationContext());
+            runOnUiThread(() -> com.winlator.cmod.agvn.AgvnDoctorDialog.showIfPending(this));
+        }, "AgvnSessionLog").start();
 
         notificationService = new Intent(this, NotificationService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && (Build.VERSION.SDK_INT < 33 || ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED))
@@ -136,7 +140,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         boolean isBigPictureModeEnabled = sharedPreferences.getBoolean("enable_big_picture_mode", false);
 
-        if (isBigPictureModeEnabled && !com.winlator.cmod.agvn.CrashRecorder.hasPendingCrash(this)) {
+        if (isBigPictureModeEnabled && !com.winlator.cmod.agvn.CrashRecorder.hasPendingCrash(this)
+                && !com.winlator.cmod.agvn.AgvnDoctor.hasPending(this)) { // AGVN: the fix question shows first
             Intent intent = new Intent(MainActivity.this, BigPictureActivity.class);
             startActivity(intent);
         }

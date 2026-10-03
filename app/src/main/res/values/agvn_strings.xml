@@ -201,6 +201,7 @@
     <string name="agvn_vsync_pacing">Khớp nhịp màn hình (thử nghiệm)</string>
     <string name="agvn_vsync_pacing_hint">Khung hình đều hơn. Game đứng hình vài giây thì tắt mục này.</string>
     <string name="agvn_quality_detail">Độ phân giải %1$s · %2$s</string>
+    <string name="agvn_quality_refused">⚠ Lần trước game này không chịu chạy ở độ phân giải này.</string>
     <string name="agvn_quality_applied">Đã đặt đồ họa: %1$s</string>
     <!-- "Thêm game" screen -->
     <string name="agvn_add_hint">Chạm vào một game để thêm vào thư viện. App tự tìm trong thư mục AGVN, Download và thẻ nhớ.</string>
@@ -290,4 +291,32 @@
     <string name="agvn_heat_fps">Hạ Giới hạn FPS xuống 20 cũng giúp máy mát hơn.</string>
     <string name="agvn_heat_fps20">Hạ FPS 20</string>
     <string name="agvn_heat_later">Để sau</string>
+    <!-- Tự sửa lỗi (AgvnDoctor): problem texts are in assets/agvn/game-problems.json, these are the buttons -->
+    <string name="agvn_doctor_game">Game: %1$s</string>
+    <string name="agvn_doctor_lead">Bạn có thể:</string>
+    <string name="agvn_doctor_hint">Bấm một cách sửa: app đổi cấu hình của game rồi mở lại game.</string>
+    <string name="agvn_doctor_later">Để sau</string>
+    <string name="agvn_doctor_keep">Để vậy, không hỏi lại</string>
+    <string name="agvn_doctor_fixed">Đã sửa: %1$s. Đang mở lại game…</string>
+    <string name="agvn_doctor_saved">Đã lưu: %1$s. Có tác dụng khi mở lại game.</string>
+    <string name="agvn_fix_restore_good">Dùng lại cấu hình đã chạy được</string>
+    <string name="agvn_fix_reset">Về cấu hình gốc của AGVN</string>
+    <string name="agvn_fix_quality">Đổi Đồ họa sang %1$s (%2$s)</string>
+    <string name="agvn_fix_dxvk">Đổi DXVK sang bản %1$s</string>
+    <string name="agvn_fix_dxvk_arm64ec">Dùng DXVK chạy thẳng trên chip ARM (%1$s)</string>
+    <string name="agvn_fix_driver">Đổi driver đồ họa sang %1$s</string>
+    <string name="agvn_fix_driver_system">driver của máy (System)</string>
+    <string name="agvn_fix_wined3d">Dùng WineD3D thay DXVK (chậm hơn, dễ chạy hơn)</string>
+    <string name="agvn_fix_godot_vulkan">Cho game Godot chạy bằng Vulkan</string>
+    <string name="agvn_fix_godot_gles2">Cho game Godot chạy bằng OpenGL đời cũ (GLES2)</string>
+    <string name="agvn_fix_godot_undo">Bỏ cách chạy Godot đã đổi</string>
+    <string name="agvn_fix_render_gmem">Thử chế độ dựng hình Gmem</string>
+    <string name="agvn_fix_render_auto">Để Turnip tự chọn chế độ dựng hình</string>
+    <string name="agvn_fix_emulator_stable">Dùng giả lập CPU ổn định hơn</string>
+    <string name="agvn_fix_emulator_fast">Dùng giả lập CPU nhanh hơn (có thể kém ổn định)</string>
+    <string name="agvn_fix_wincomponent">Bật thư viện Windows \"%1$s\"</string>
+    <string name="agvn_fix_power_save">Mở cài đặt Tiết kiệm pin</string>
+    <string name="agvn_fix_app_settings">Mở cài đặt pin của AGVN</string>
+    <string name="agvn_fix_send_logs">Gửi nhật ký cho AGVN</string>
+    <string name="agvn_fix_play_anyway">Chơi luôn</string>
 </resources>

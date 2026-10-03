@@ -27,6 +27,6 @@ public class AgvnWineDebugTest {
     public void withoutWarningsForEveryChannelNothingIsAdded() {
         assertEquals("err+all,fixme+all", AgvnWineDebug.spec(true, "err,fixme"));
         assertEquals("+mfplat", AgvnWineDebug.spec(true, "mfplat"));
-        assertEquals("-all", AgvnWineDebug.spec(false, "warn,err,fixme"));
+        assertEquals("-all,err+module,err+mscoree", AgvnWineDebug.spec(false, "warn,err,fixme"));
     }
 }

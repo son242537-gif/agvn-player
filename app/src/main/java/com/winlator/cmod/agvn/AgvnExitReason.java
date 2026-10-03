@@ -15,20 +15,37 @@ final class AgvnExitReason {
 
     /** How the app process ended after {@code startMs}, from Android's records (Android 11+). */
     static String after(Context context, long startMs) {
-        if (Build.VERSION.SDK_INT >= 30 && startMs > 0) {
-            try {
-                ActivityManager am = context.getSystemService(ActivityManager.class);
-                ApplicationExitInfo first = null; // the list is newest first; the session ended with the oldest one after it began
-                for (ApplicationExitInfo info : am.getHistoricalProcessExitReasons(context.getPackageName(), 0, 16))
-                    if (info.getTimestamp() >= startMs) first = info;
-                if (first != null)
-                    return describe(first.getReason()) + " (reason=" + first.getReason() + ", importance="
-                            + first.getImportance() + " – " + importance(first.getImportance()) + ", " + first.getDescription() + ")";
-            } catch (RuntimeException e) {
-                Log.w(TAG, "exit reasons not readable", e);
-            }
+        Exit exit = exit(context, startMs);
+        if (exit == null) return "App dừng giữa phiên, không rõ lý do";
+        return describe(exit.reason) + " (reason=" + exit.reason + ", importance=" + exit.importance + " – "
+                + importance(exit.importance) + ", " + exit.description + ")";
+    }
+
+    /** The end of the app process as Android recorded it. */
+    static final class Exit {
+        final int reason, importance;
+        final String description;
+
+        Exit(int reason, int importance, String description) {
+            this.reason = reason;
+            this.importance = importance;
+            this.description = description;
         }
-        return "App dừng giữa phiên, không rõ lý do";
+    }
+
+    /** The first end of the app process after {@code startMs} (Android 11+), or null when unknown. */
+    static Exit exit(Context context, long startMs) {
+        if (Build.VERSION.SDK_INT < 30 || startMs <= 0) return null;
+        try {
+            ActivityManager am = context.getSystemService(ActivityManager.class);
+            ApplicationExitInfo first = null; // the list is newest first; the session ended with the oldest one after it began
+            for (ApplicationExitInfo info : am.getHistoricalProcessExitReasons(context.getPackageName(), 0, 16))
+                if (info.getTimestamp() >= startMs) first = info;
+            return first != null ? new Exit(first.getReason(), first.getImportance(), first.getDescription()) : null;
+        } catch (RuntimeException e) {
+            Log.w(TAG, "exit reasons not readable", e);
+            return null;
+        }
     }
 
     static String describe(int reason) {

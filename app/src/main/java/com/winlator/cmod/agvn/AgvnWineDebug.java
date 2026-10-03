@@ -25,6 +25,11 @@ import java.util.Set;
 public final class AgvnWineDebug {
     private static final String[] CLASSES = {"err", "warn", "fixme"};
     private static final String[] QUIET = {"heap", "file", "font"};
+    /**
+     * With the log off, Wine still prints the errors "Tự sửa lỗi" reads (AgvnDoctor): a DLL the game needs and cannot
+     * load (module) and a .NET game without Wine Mono (mscoree). Both print only when that goes wrong.
+     */
+    static final String QUIET_SPEC = "-all,err+module,err+mscoree";
 
     private AgvnWineDebug() {}
 
@@ -40,7 +45,7 @@ public final class AgvnWineDebug {
             }
         }
         if (picked.contains("warn")) for (String quiet : QUIET) if (!picked.contains(quiet)) out.add("warn-" + quiet);
-        return out.isEmpty() ? "-all" : String.join(",", out);
+        return out.isEmpty() ? QUIET_SPEC : String.join(",", out);
     }
 
     private static boolean isClass(String name) {

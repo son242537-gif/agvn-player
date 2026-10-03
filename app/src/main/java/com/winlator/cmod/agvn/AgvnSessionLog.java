@@ -23,6 +23,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static com.winlator.cmod.agvn.AgvnSessionNotes.files;
+import static com.winlator.cmod.agvn.AgvnSessionNotes.text;
+import static com.winlator.cmod.agvn.AgvnSessionNotes.value;
+
 /**
  * A folder per play session in AGVN-Player/logs/&lt;game&gt;/&lt;yyyyMMdd-HHmmss&gt;/ with the engine's logs, the graphics
  * environment, events (RAM warnings) and a summary with how the session ended. A session Android killed (no normal
@@ -45,11 +49,13 @@ public final class AgvnSessionLog {
     /** Opens the game's session folder once Wine's environment is set; the engine's log paths are noted now. */
     public static synchronized void start(Shortcut shortcut, EnvVars env) {
         AgvnWineTail.get().reset();
+        AgvnSessionTrack.start(System.currentTimeMillis(), AgvnGoodConfig.snapshot(shortcut));
         try {
             File gameLogs = new File(root(), AgvnLogFolders.safeName(shortcut.name));
             File dir = new File(gameLogs, new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.ROOT).format(new Date()));
             if (!dir.mkdirs() && !dir.isDirectory()) return;
-            StringBuilder running = new StringBuilder("start=" + System.currentTimeMillis() + "\ngame=" + shortcut.name + "\n");
+            StringBuilder running = new StringBuilder("start=" + System.currentTimeMillis() + "\ngame=" + shortcut.name + "\n"
+                    + "shortcut=" + shortcut.file.getPath() + "\ncontainer=" + shortcut.container.id + "\n");
             for (File f : AgvnEngineLogs.of(shortcut)) running.append("log=").append(f.getPath()).append('\n');
             write(new File(dir, RUNNING), running.toString(), false);
             write(new File(dir, ENV), graphicsEnv(env), false);
@@ -102,7 +108,9 @@ public final class AgvnSessionLog {
             for (File dir : sessions) {
                 File running = new File(dir, RUNNING);
                 if (!running.isFile() || dir.equals(current)) continue;
-                close(context, dir, AgvnExitReason.after(context, value(read(running), "start", 0)));
+                String notes = read(running);
+                close(context, dir, AgvnExitReason.after(context, value(notes, "start", 0)));
+                AgvnDoctor.afterKill(context, notes); // Android ended the game: tell the player why, if it can be helped
             }
         }
     }
@@ -159,25 +167,6 @@ public final class AgvnSessionLog {
         String[] sorted = lines.toArray(new String[0]);
         Arrays.sort(sorted);
         return String.join("\n", sorted) + "\n";
-    }
-
-    private static long value(String notes, String key, long fallback) {
-        try {
-            return Long.parseLong(text(notes, key));
-        } catch (NumberFormatException e) {
-            return fallback;
-        }
-    }
-
-    private static List<File> files(String notes, String key) {
-        List<File> out = new ArrayList<>();
-        for (String line : notes.split("\n")) if (line.startsWith(key)) out.add(new File(line.substring(key.length())));
-        return out;
-    }
-
-    private static String text(String notes, String key) {
-        for (String line : notes.split("\n")) if (line.startsWith(key + "=")) return line.substring(key.length() + 1);
-        return "";
     }
 
     private static String read(File f) {

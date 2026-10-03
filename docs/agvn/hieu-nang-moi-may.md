@@ -84,6 +84,9 @@ của Mesa/Zink (`AgvnWineTail`).
 
 ## Khi người chơi máy khác báo game chậm
 
+Game chậm đều dưới 20 FPS thì app tự hỏi người chơi ngay trên game: GPU hay CPU đang bận, kèm nút sửa (xem
+`tu-sua-loi.md`). Nếu người chơi vẫn báo chậm:
+
 1. Xin họ "Gửi nhật ký" ngay lúc game đang chậm, rồi mở `app/thiet-bi.txt`.
 2. Nếu "Tiết kiệm pin BẬT", nhờ họ tắt rồi thử lại.
 3. Nếu mức máy sai (dòng "Mức máy" nói vì sao):
