@@ -12,6 +12,7 @@ là một nút. Bấm nút là app đổi cấu hình của riêng game đó r�
 | Đang chơi | Thanh trên game; game vẫn chạy bên dưới | Game chậm đều suốt 1 phút. Sau khi bấm một cách sửa, thanh hỏi "Mở lại game ngay" (nhớ lưu game trước) hay "Để lần sau". |
 | Game vừa thoát hoặc bị lỗi | Hộp hỏi ở thư viện (hoặc Big Picture) | Game tắt ngay khi mở, crash, thiếu DirectX, thiếu file `.dll`; game "Chạy nhẹ" báo lỗi script, bị tắt đột ngột, bị treo. Bấm một cách sửa là game mở lại ngay. |
 | Android đã tắt game | Hộp hỏi khi về thư viện (trong 24 giờ) | Máy hết RAM; HyperOS tắt game khi chuyển sang app khác. |
+| Game Windows vừa hiện khung | Thanh trên game | Khung game nhỏ hơn màn hình: app phóng cho vừa luôn. Khung game lớn hơn màn hình: app đề nghị đổi màn hình game. Xem "Vừa màn hình" bên dưới. |
 
 Mỗi lỗi chỉ hỏi một lần. Cách sửa đã thử mà vẫn lỗi thì lần sau không hiện lại, cho đến khi game chạy tốt một
 lần. Thanh game chậm có nút "Để vậy, không hỏi lại" cho riêng game đó.
@@ -111,6 +112,25 @@ app đọc file này cùng lý do Android ghi lại cho tiến trình đó. Th�
   lần trong một tiến trình. Yêu cầu mở lại chỉ có hiệu lực 2 phút: người chơi trả lời "không" khi Ren'Py hỏi thoát
   thì lần thoát sau game không tự mở lại.
 
+## Vừa màn hình (game Windows)
+
+Nhiều game mở khung cố định, ví dụ 640×480 hoặc 1280×720. Khi màn hình game (mức "Đồ họa") khác cỡ khung đó, game
+hiện thành khung nhỏ ở góc, hoặc bị cắt mất một phần. Mỗi giây, `AgvnScreenFit` tìm khung của game: cửa sổ ứng dụng
+lớn nhất, không tính màn nền của Wine (`explorer.exe`). Khi game đã chạy và khung đứng yên 3 giây, app xét
+(`AgvnFitMath.verdict`):
+
+| Khung game | App làm gì |
+|---|---|
+| Nhỏ hơn 85% màn hình cả chiều ngang lẫn chiều dọc | Phóng khung game ra cả màn hình ngay, giữ đúng tỉ lệ (hoặc kéo giãn nếu game đang bật "Kéo giãn"). Chạm vào đâu trên khung là trúng chỗ đó trong game. Thanh báo có "Giữ như vậy" và "Trả lại như cũ". |
+| Lớn hơn màn hình | Phần thừa bị cắt, chuột cũng không tới được, nên không phóng nhỏ được. Thanh báo đề nghị "Đổi màn hình game thành <cỡ khung>", rồi "Mở lại game ngay". |
+| Vừa | Không làm gì. Khung đổi cỡ sau đó thì app xét lại. |
+
+- Nút ⛶ trên thanh ⌨ ✎ 👁 bật hoặc tắt "Vừa màn hình" bất cứ lúc nào. Khung lớn hơn màn hình thì ⛶ mở thanh đổi màn
+  hình.
+- Lựa chọn lưu theo game (`agvnFit` trong lối tắt: 1 bật, 0 tắt và không hỏi lại), nên lần sau game mở là vừa luôn.
+- Chỉ trình vẽ Vulkan (mặc định của AGVN) phóng được khung. Game chọn EGL hoặc DisplayX thì khung nhỏ cũng được đề nghị
+  đổi màn hình.
+
 ## Nhật ký Wine luôn có dòng lỗi
 
 Khi tắt "Bật debug Wine", app vẫn cho Wine in hai nhóm lỗi: `err+module` (thiếu hoặc hỏng file `.dll`) và
@@ -146,4 +166,8 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       thư viện vài giây rồi tự mở lại và chơi được (không tắt ngay sau khi mở).
 - [ ] Bật Big Picture rồi để một game gặp lỗi: hộp hỏi hiện trong Big Picture.
 - [ ] Chơi bình thường rồi thoát (game Windows và "Chạy nhẹ"): không có hộp nào.
+- [ ] Game Windows khung 640×480 ở mức "Cao": vài giây sau khi vào game, khung phóng ra cả màn hình, chạm trúng nút
+      trong game; "Trả lại như cũ" đưa về khung nhỏ; ⛶ bật lại; mở lại game vẫn vừa.
+- [ ] Game Windows khung 1280×720 ở mức "Thấp": thanh "Game bị tràn ra ngoài màn hình", bấm "Đổi màn hình game thành
+      1280×720" rồi "Mở lại game ngay": game mở lại thấy đủ khung.
 - [ ] `adb logcat -s AGVN`: dòng `doctor: <lỗi> for <game>` và `fix <cách sửa> -> <giá trị>`.

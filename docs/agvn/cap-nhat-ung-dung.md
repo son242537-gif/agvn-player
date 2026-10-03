@@ -10,6 +10,11 @@ cần bấm "Cập nhật", rồi bấm "Cập nhật" thêm một lần trên h
   - Nếu có, app hiện "Có bản mới x.y.z" kèm ghi chú và dung lượng. Người chơi chọn "Cập nhật" hoặc "Để sau".
   - Tắt được trong Cài đặt → Cập nhật ứng dụng.
 - **Kiểm tra bằng tay:** Cài đặt → **Cập nhật ứng dụng** → **Kiểm tra cập nhật**.
+- **Chấm đỏ:** khi có bản mới, nút "Cài đặt" (thanh dưới, thanh bên khi xoay ngang, biểu tượng ở thư viện) và mục
+  "Cập nhật ứng dụng" có chấm đỏ. Chấm mất khi máy đã lên bản đó.
+- **Thông báo của Android:** mỗi ngày một lần, app kiểm tra ngầm (cần mạng), kể cả khi người chơi không mở app. Có bản
+  mới thì hiện thông báo "Có bản mới x.y.z", mỗi bản một lần. Chạm vào thông báo là app mở và hỏi "Cập nhật" luôn.
+  Tắt "Tự kiểm tra" thì không kiểm tra ngầm nữa.
 - **Lần đầu cập nhật:** Android hỏi quyền "Cài ứng dụng không rõ nguồn gốc" cho AGVN Player (chỉ một lần). App mở
   sẵn đúng màn hình đó. Bật xong, quay lại bấm "Cài tiếp".
 - **Mất mạng giữa chừng hay bấm Hủy:** phần đã tải được giữ lại, lần sau tải tiếp.
@@ -89,7 +94,7 @@ Khoá ký chỉ nằm trên PC của anh Sơn. Kẻ xấu có sửa được fil
 thoại không cài.
 
 App không gửi gì về máy điện thoại, chỉ tải hai file công khai. Đây là ngoại lệ đã được anh Sơn đồng ý, ghi ở quy
-định 3 trong `CLAUDE.md`.
+định 3 trong `CLAUDE.md`. Lần kiểm tra ngầm mỗi ngày (`AgvnUpdateJob`) cũng chỉ đọc `agvn-update.txt` như vậy.
 
 ## Mã nguồn
 
@@ -97,7 +102,9 @@ App không gửi gì về máy điện thoại, chỉ tải hai file công khai.
   - `AgvnUpdateInfo`: đọc `agvn-update.txt`;
   - `AgvnUpdater`: tải, tải tiếp, kiểm tra, dọn file;
   - `AgvnUpdateDialogs`: mục Cài đặt và kiểm tra mỗi ngày;
-  - `AgvnUpdateInstall`: tải có thanh tiến độ và mở trình cài của Android.
+  - `AgvnUpdateInstall`: tải có thanh tiến độ và mở trình cài của Android;
+  - `AgvnUpdateBadge` và `AgvnUpdateDot.kt`: chấm đỏ;
+  - `AgvnUpdateJob`: kiểm tra ngầm mỗi ngày (JobScheduler) và thông báo.
 - Quyền `REQUEST_INSTALL_PACKAGES` và `cache-path` `updates/` trong `res/xml/file_paths.xml` (FileProvider có sẵn).
 - `tools/agvn/dang-ban-cap-nhat.ps1`: script đăng bản.
 

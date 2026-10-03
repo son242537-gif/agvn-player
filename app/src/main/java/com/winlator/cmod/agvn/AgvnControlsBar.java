@@ -20,9 +20,11 @@ import com.winlator.cmod.widget.InputControlsView;
 /**
  * Small bar at the top centre of the game screen: [⌨] opens the Android keyboard, [✎ Sửa] edits the on-screen controls
  * right on the game ({@link AgvnControlsEditor}), [👁 Ẩn / 👁 Hiện] hides or shows them for this game (remembered in the
- * shortcut, extra agvnControlsHidden). Hidden controls are really gone (View.GONE), so touches reach the game.
+ * shortcut, extra agvnControlsHidden), [⛶] fits the game's window to the screen ({@link AgvnScreenFit}). Hidden
+ * controls are really gone (View.GONE), so touches reach the game.
  * Long-press a button for its full name. The bar tucks itself away after 3 s without a tap, leaving a thin line at the
- * top edge that brings it back ({@link AgvnBarAutoHide}); it hides while the sidebar drawer is open.
+ * top edge that brings it back ({@link AgvnBarAutoHide}); it hides while the sidebar drawer is open. A ✎ stays in the
+ * top-left corner all the time ({@link AgvnEditPen}).
  */
 public final class AgvnControlsBar {
     private static final int BG_NORMAL = AgvnBarButton.BG_NORMAL, BG_HIDDEN = AgvnBarButton.BG_HIDDEN;
@@ -32,6 +34,7 @@ public final class AgvnControlsBar {
     private final TextView eye;
     private final AgvnControlsEditor editor;
     private final AgvnBarAutoHide autoHide;
+    private final AgvnEditPen pen;
     /** Profile that was on screen before the player hid it (-1: none), shown again by [👁]. */
     private int hiddenProfileId = -1;
     /** The sidebar drawer started to open and hid the bar. */
@@ -46,13 +49,17 @@ public final class AgvnControlsBar {
         bar.addView(barButton(activity.getString(R.string.agvn_bar_edit_label), 14, R.string.agvn_bar_edit, v -> edit()));
         eye = barButton(activity.getString(R.string.agvn_bar_hide_label), 14, R.string.agvn_bar_toggle, v -> toggle());
         bar.addView(eye);
+        AgvnScreenFit fit = new AgvnScreenFit(activity);
+        bar.addView(barButton("⛶", 16, R.string.agvn_bar_fit, v -> fit.toggle()));
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
         lp.topMargin = (int) (6 * dp);
         activity.addContentView(bar, lp);
         autoHide = new AgvnBarAutoHide(activity, bar);
+        pen = new AgvnEditPen(activity, this::edit);
         editor = new AgvnControlsEditor(activity, () -> {
             autoHide.reveal();
+            pen.setVisible(true);
             updateEye();
         });
         watchDrawer();
@@ -119,6 +126,7 @@ public final class AgvnControlsBar {
         hiddenProfileId = -1;
         AgvnControlsFork.setHidden(activity.agvnShortcut(), false);
         autoHide.suspend(); // the editor has its own toolbar
+        pen.setVisible(false);
     }
 
     /** The profile hidden by [👁], else the game's profile, else its AGVN layout. */
@@ -144,11 +152,13 @@ public final class AgvnControlsBar {
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 if (slideOffset <= 0f) { // back to closed; a drawer that never fully opened gets no onDrawerClosed
                     if (drawerHid) autoHide.reveal();
+                    if (drawerHid) pen.setVisible(true);
                     drawerHid = false;
                     return;
                 }
                 if (editor.isActive()) editor.finish(); // opening the menu ends editing (saved)
                 autoHide.suspend();
+                pen.setVisible(false); // it would sit on the drawer
                 drawerHid = true;
             }
 
@@ -156,6 +166,7 @@ public final class AgvnControlsBar {
             public void onDrawerClosed(View drawerView) {
                 drawerHid = false;
                 autoHide.reveal();
+                pen.setVisible(true);
                 if (isShown()) { // the sidebar showed the controls again: do not hide them at the next launch
                     hiddenProfileId = -1;
                     AgvnControlsFork.setHidden(activity.agvnShortcut(), false);

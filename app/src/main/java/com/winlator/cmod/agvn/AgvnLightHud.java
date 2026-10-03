@@ -44,7 +44,7 @@ final class AgvnLightHud {
         view.setVisibility(View.GONE);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.START);
-        lp.setMargins((int) (8 * dp), (int) (8 * dp), 0, 0);
+        lp.setMargins(Math.round(AgvnEditPen.clearX(activity)), (int) (8 * dp), 0, 0); // beside the ✎ in the corner
         activity.addContentView(view, lp);
     }
 

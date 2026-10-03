@@ -1408,6 +1408,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 classicHud = new FrameRating(this, graphicsDriverConfig);
                 classicHud.setVisibility(View.GONE);
                 rootView.addView(classicHud);
+                com.winlator.cmod.agvn.AgvnEditPen.clearOf(classicHud); // AGVN: beside the ✎ in the corner
                 renderer.setFrameRating(classicHud);
             } else if (hudMode == 2) {
 
@@ -1910,6 +1911,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 classicHud = new FrameRating(this, graphicsDriverConfig);
                 classicHud.setVisibility(View.GONE);
                 rootView.addView(classicHud);
+                com.winlator.cmod.agvn.AgvnEditPen.clearOf(classicHud); // AGVN: beside the ✎ in the corner
                 renderer.setFrameRating(classicHud);
                 if (rendererAlreadyActive) {
                     frameRatingWindowId = activeRendererWindowId;
@@ -2734,6 +2736,15 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
     public void agvnHideControls() {
         hideInputControls();
+    }
+
+    // AGVN: "Vừa màn hình" (agvn/AgvnScreenFit) maps touches as it draws, and closes the game for "Mở lại game ngay"
+    public TouchpadView agvnTouchpadView() {
+        return touchpadView;
+    }
+
+    public void agvnExit() {
+        exit();
     }
 
     // AGVN: rebuilds the sidebar profile list around the shown profile (its listener then re-applies that same profile)

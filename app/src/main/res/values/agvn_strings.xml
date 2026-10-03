@@ -94,6 +94,18 @@
     <string name="agvn_bar_keyboard">Bàn phím</string>
     <string name="agvn_bar_edit">Sửa phím</string>
     <string name="agvn_bar_toggle">Ẩn/Hiện phím</string>
+    <string name="agvn_bar_fit">Vừa màn hình: phóng khung game cho vừa</string>
+    <string name="agvn_fit_small_title">Khung game nhỏ hơn màn hình</string>
+    <string name="agvn_fit_small_detail">Game mở khung %1$s trên màn hình %2$s. App đã phóng khung game cho vừa màn hình; bấm ⛶ ở thanh trên cùng để bật hoặc tắt.</string>
+    <string name="agvn_fit_small_screen_detail">Game mở khung %1$s, nhỏ hơn màn hình %2$s.</string>
+    <string name="agvn_fit_overflow_title">Game bị tràn ra ngoài màn hình</string>
+    <string name="agvn_fit_overflow_detail">Khung game %1$s lớn hơn màn hình %2$s nên bị cắt mất một phần.</string>
+    <string name="agvn_fit_keep">Giữ như vậy</string>
+    <string name="agvn_fit_undo">Trả lại như cũ</string>
+    <string name="agvn_fit_resize">Đổi màn hình game thành %1$s</string>
+    <string name="agvn_fit_on">Đã phóng khung game cho vừa màn hình</string>
+    <string name="agvn_fit_off">Đã trả khung game về như cũ</string>
+    <string name="agvn_fit_unsupported">Game này vẽ bằng EGL hoặc DisplayX nên chưa phóng khung được. Chọn trình vẽ Vulkan trong cài đặt game để dùng ⛶.</string>
     <string name="agvn_bar_hide">Ẩn bộ phím</string>
     <string name="agvn_bar_show">Hiện bộ phím</string>
     <string name="agvn_bar_edit_label">✎ Sửa</string>
@@ -254,6 +266,8 @@
     <string name="agvn_update_latest">Đây đã là bản mới nhất (%1$s).</string>
     <string name="agvn_update_not_published">Chưa có bản cập nhật nào được đăng.</string>
     <string name="agvn_update_available_title">Có bản mới %1$s</string>
+    <string name="agvn_update_channel">Bản cập nhật AGVN Player</string>
+    <string name="agvn_update_notify_text">Chạm để xem điểm mới và cập nhật ngay trong app.</string>
     <string name="agvn_update_available">Bản mới: %1$s (%2$s)\nBản đang dùng: %3$s\n\n%4$sGame, save và cài đặt vẫn giữ nguyên. Tệp khá nặng, nên dùng Wi-Fi.</string>
     <string name="agvn_update_now">Cập nhật</string>
     <string name="agvn_update_later">Để sau</string>
