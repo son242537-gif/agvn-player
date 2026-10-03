@@ -19,6 +19,7 @@ app/src/main/assets/proton-9.0-x86_64.txz
 keystore.properties
 app/src/main/assets/imagefs.tar.zst
 app/src/main/assets/proton-*.tar.zst
+app/agvn-downloads/
 __pycache__/
 *.pyc
 # AGVN release output (APK + checksum), built locally by the maintainer

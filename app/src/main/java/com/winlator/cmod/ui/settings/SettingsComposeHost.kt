@@ -196,7 +196,8 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
             }
             item("agvn-update") {
                 val version = remember { com.winlator.cmod.agvn.AgvnUpdater.installedName(context) }
-                NavigationRow(Icons.Outlined.SystemUpdate, stringResource(R.string.agvn_update_title), stringResource(R.string.agvn_update_summary, version)) {
+                NavigationRow(Icons.Outlined.SystemUpdate, stringResource(R.string.agvn_update_title), stringResource(R.string.agvn_update_summary, version),
+                    dot = com.winlator.cmod.agvn.rememberAgvnUpdateDot()) {
                     activity?.let { com.winlator.cmod.agvn.AgvnUpdateDialogs.show(it) }
                 }
             }
@@ -392,7 +393,11 @@ private fun GroupDivider() {
 }
 
 @Composable
-private fun NavigationRow(icon: ImageVector, title: String, subtitle: String?, onClick: () -> Unit) {
+private fun NavigationRow(icon: ImageVector, title: String, subtitle: String?, onClick: () -> Unit) =
+    NavigationRow(icon, title, subtitle, false, onClick)
+
+@Composable
+private fun NavigationRow(icon: ImageVector, title: String, subtitle: String?, dot: Boolean, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
@@ -404,7 +409,10 @@ private fun NavigationRow(icon: ImageVector, title: String, subtitle: String?, o
             SmallIcon(icon)
             Spacer(Modifier.width(11.dp))
             Column(Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+                    if (dot) com.winlator.cmod.agvn.AgvnRedDot(Modifier.padding(start = 8.dp)) // AGVN: a newer AGVN Player is out
+                }
                 if (!subtitle.isNullOrBlank()) Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
             SettingHelpButton(title)

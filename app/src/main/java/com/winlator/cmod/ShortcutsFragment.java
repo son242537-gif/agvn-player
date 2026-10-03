@@ -513,6 +513,10 @@ public class ShortcutsFragment extends Fragment {
             if (artworkChecked.add(baseName)) { // AGVN: redraw artwork made by an older AGVN version
                 com.winlator.cmod.agvn.AgvnCovers.dropIfOutdated(cover);
                 com.winlator.cmod.agvn.AgvnCovers.dropIfOutdated(banner);
+                // AGVN: a Ren'Py/RPG Maker game imported earlier gets its icon from its own art instead of the engine's
+                com.winlator.cmod.agvn.AgvnGameIcons.refreshAsync(shortcut, resolveExeFile(shortcut), autoIcon, () -> {
+                    if (getActivity() != null) getActivity().runOnUiThread(() -> refreshArtworkAndLauncherShortcuts(shortcut));
+                });
             }
             String iconPath = userIcon.exists() ? userIcon.getPath() :
                     (autoIcon.exists() ? autoIcon.getPath() : null);

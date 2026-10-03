@@ -49,7 +49,7 @@ public final class AgvnProfileValidator {
         if (p.controls != null && !AgvnLayouts.isKind(p.controls))
             throw new AgvnProfileException("Bộ phím (controls) phải là một trong: " + String.join(", ", AgvnLayouts.KINDS) + ": " + p.controls);
         if (!AgvnHtmlGame.isValidRunner(p.runner))
-            throw new AgvnProfileException("Cách chạy (runner) phải là html hoặc wine: " + p.runner);
+            throw new AgvnProfileException("Cách chạy (runner) phải là html, renpy, rgss hoặc wine: " + p.runner);
         if (!AgvnLocale.isValid(p.locale))
             throw new AgvnProfileException("Ngôn ngữ (locale) phải có dạng ja_JP hoặc ja_JP.UTF-8: " + p.locale);
         for (Map.Entry<String, Map<String, String>> section : p.ueEngineIni.entrySet()) {
@@ -71,8 +71,10 @@ public final class AgvnProfileValidator {
         String suggested = GameExeResolver.resolveExe(gameDir, engine);
         String exe = p.exe != null ? p.exe.trim().replace('\\', '/') : "";
         if (exe.isEmpty()) {
-            if (suggested == null) throw new AgvnProfileException("Không tìm thấy file .exe để chạy. Hãy ghi rõ \"exe\" trong profile.");
-            return suggested;
+            if (suggested != null) return suggested;
+            // a copy made for phones without the .exe: "Chạy nhẹ" runs it, the placeholder is never started
+            if (AgvnLightGame.canRun(gameDir, engine)) return AgvnLightGame.placeholderExe(gameDir, engine);
+            throw new AgvnProfileException("Không tìm thấy file .exe để chạy. Hãy ghi rõ \"exe\" trong profile.");
         }
         if (exe.startsWith("/") || exe.matches("^[A-Za-z]:.*") || exe.contains(".."))
             throw new AgvnProfileException("Đường dẫn exe phải nằm trong thư mục game: " + exe);

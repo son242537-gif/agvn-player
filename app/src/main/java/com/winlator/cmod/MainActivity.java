@@ -99,6 +99,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        com.winlator.cmod.agvn.AgvnDoctorDialog.checkAsync(this); // AGVN: ask about the last game's problem ("Tự sửa lỗi")
+        com.winlator.cmod.agvn.AgvnUpdateBadge.refresh(this); // AGVN: a red dot on "Cài đặt" while a newer version is out
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -136,7 +143,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         boolean isBigPictureModeEnabled = sharedPreferences.getBoolean("enable_big_picture_mode", false);
 
-        if (isBigPictureModeEnabled && !com.winlator.cmod.agvn.CrashRecorder.hasPendingCrash(this)) {
+        if (isBigPictureModeEnabled && !com.winlator.cmod.agvn.CrashRecorder.hasPendingCrash(this)
+                && !com.winlator.cmod.agvn.AgvnDoctor.hasPending(this)) { // AGVN: the fix question shows first
             Intent intent = new Intent(MainActivity.this, BigPictureActivity.class);
             startActivity(intent);
         }

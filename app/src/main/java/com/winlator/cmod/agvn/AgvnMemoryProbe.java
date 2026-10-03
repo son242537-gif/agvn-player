@@ -33,6 +33,12 @@ final class AgvnMemoryProbe {
         return kb < 0 ? -1 : kb / 1024;
     }
 
+    /** Resident memory of this process (VmRSS) in MB, or -1: the game's own, for an engine in a process of its own. */
+    static long processMb() {
+        long kb = kb(read(new File("/proc/self/status")), "VmRSS:");
+        return kb < 0 ? -1 : kb / 1024;
+    }
+
     /** The phone's RAM (MemTotal) in MB, or 0 when unreadable. */
     static long totalMb() {
         long kb = kb(read(new File("/proc/meminfo")), "MemTotal:");

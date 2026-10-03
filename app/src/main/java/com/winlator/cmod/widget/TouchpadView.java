@@ -105,7 +105,19 @@ public class TouchpadView extends View {
         resolutionScale = 1000.0f / Math.min(xServer.screenInfo.width, xServer.screenInfo.height);
     }
 
+    /** AGVN: touches land on this part of the screen (a game's own window), as the renderer draws it (agvn/AgvnScreenFit). */
+    private float[] agvnFitRect;
+
+    public void setAgvnFitRect(float[] rect) {
+        agvnFitRect = rect;
+        if (getWidth() > 0 && getHeight() > 0) updateXform(getWidth(), getHeight(), xServer.screenInfo.width, xServer.screenInfo.height);
+    }
+
     private void updateXform(int outerWidth, int outerHeight, int innerWidth, int innerHeight) {
+        if (agvnFitRect != null && outerWidth > 0 && outerHeight > 0) {
+            com.winlator.cmod.agvn.AgvnFitMath.touch(xform, agvnFitRect, outerWidth, outerHeight, xServer.getXServerView().isFullscreen());
+            return;
+        }
         ViewTransformation viewTransformation = new ViewTransformation();
         viewTransformation.update(outerWidth, outerHeight, innerWidth, innerHeight);
 

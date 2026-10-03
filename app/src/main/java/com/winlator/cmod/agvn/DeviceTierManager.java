@@ -26,7 +26,8 @@ public final class DeviceTierManager {
     }
 
     public static synchronized DeviceTier detect(Context ctx) {
-        if (detected == null) detected = getRules(ctx).classify(DriverSafety.getGpuRenderer(ctx), socModel(), totalRamMb(ctx));
+        // the GPU name the app remembered: the "Chạy nhẹ" games' processes then load no Vulkan driver to tell it
+        if (detected == null) detected = getRules(ctx).classify(AgvnDeviceFacts.gpu(ctx), socModel(), totalRamMb(ctx));
         return detected;
     }
 

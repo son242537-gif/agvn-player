@@ -1,0 +1,152 @@
+AGVN Player: build mkxp-z for Android arm64.
+- libmkxp-z.so instead of an executable: Android's SDLActivity loads it and calls SDL_main. SDL is linked whole
+  to keep its JNI entry points; only those, JNI_OnLoad and SDL_main are exported (android/exports.map).
+- the GNU triplet aarch64-linux-android (Ruby then uses its arm64 coroutines; bionic has no pthread_cancel),
+  a soname for FluidSynth, and the NDK's OpenSL ES for OpenAL Soft (no pkg-config file there, so no sound before).
+
+diff --git a/android/exports.map b/android/exports.map
+new file mode 100644
+index 00000000..e9fc8f84
+--- /dev/null
++++ b/android/exports.map
+@@ -0,0 +1,9 @@
++/* The symbols Android's SDLActivity needs from libmkxp-z.so; everything else stays inside the library. */
++{
++    global:
++        JNI_OnLoad;
++        Java_*;
++        SDL_main;
++    local:
++        *;
++};
+diff --git a/meson.build b/meson.build
+index 2b3dc514..d020a42a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -182,22 +182,42 @@ libmkxp = static_library(
+     override_options: {'c_std': c_std, 'cpp_std': cpp_std},
+ )
+ 
+-executable(
+-    exe_name,
+-    sources: [
+-        git_hash_file, # Dummy source file just so that Meson doesn't complain about the executable not having any sources
+-        windows_resources,
+-    ],
+-    link_with: libmkxp,
+-    include_directories: global_include_dirs,
+-    link_args: global_link_args,
+-    win_subsystem: 'windows',
+-    build_rpath: rpath,
+-    install_rpath: rpath,
+-    install: true,
+-    install_dir: '.',
+-    install_tag: meson.project_name(),
+-)
++if host_system == 'android'
++    # Android: the app's SDLActivity loads this library and calls SDL_main. SDL is linked whole so that its JNI entry
++    # points stay; only those, JNI_OnLoad and SDL_main are exported.
++    shared_library(
++        meson.project_name(),
++        sources: [git_hash_file],
++        link_whole: [libmkxp, sdl2_lib],
++        include_directories: global_include_dirs,
++        link_args: global_link_args + [
++            '-static-libstdc++',
++            '-Wl,--gc-sections',
++            '-Wl,--version-script=' + meson.project_source_root() / 'android' / 'exports.map',
++        ],
++        link_depends: files('android' / 'exports.map'),
++        install: true,
++        install_dir: '.',
++        install_tag: meson.project_name(),
++    )
++else
++    executable(
++        exe_name,
++        sources: [
++            git_hash_file, # Dummy source file just so that Meson doesn't complain about the executable not having any sources
++            windows_resources,
++        ],
++        link_with: libmkxp,
++        include_directories: global_include_dirs,
++        link_args: global_link_args,
++        win_subsystem: 'windows',
++        build_rpath: rpath,
++        install_rpath: rpath,
++        install: true,
++        install_dir: '.',
++        install_tag: meson.project_name(),
++    )
++endif
+ 
+ global_install_tags = [meson.project_name()]
+ if host_system == 'darwin'
+diff --git a/src/meson.build b/src/meson.build
+index abe5f3c6..0e3d2908 100755
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -45,6 +45,11 @@ foreach dep_name : [
+     endif
+ endforeach
+ 
++if host_system == 'android'
++    # The NDK has OpenSL ES as a plain library, without a pkg-config file: give it to OpenAL Soft, or there is no sound
++    meson.override_dependency('opensl', meson.get_compiler('c').find_library('OpenSLES'), static: true)
++endif
++
+ cmake_base_options = {
+     'CMAKE_POLICY_VERSION_MINIMUM': '3.10',
+     'CMAKE_OSX_SYSROOT': '/nonexistent',
+@@ -318,6 +323,7 @@ if is_unix
+     ]
+ endif
+ 
++sdl2_lib = []
+ if not sdl2.found() or not sdl2main.found()
+     have_angle = get_option('angle').allowed()
+ 
+@@ -477,6 +483,7 @@ if not sdl2.found() or not sdl2main.found()
+         host_system in ['windows', 'cygwin'] ? meson.get_compiler('c').find_library('mingw32') : [],
+     ])
+     sdl2 = subproject('sdl2', default_options: sdl2_options).get_variable('sdl2_dep')
++    sdl2_lib = subproject('sdl2', default_options: sdl2_options).get_variable('sdl2')
+     sdl2_includes = ['-I' + meson.project_build_root() / 'subprojects' / ('SDL2-' + sdl2.version()) / 'include', '-I' + meson.project_source_root() / 'subprojects' / ('SDL2-' + sdl2.version()) / 'include']
+ else
+     if get_option('angle').enabled()
+diff --git a/subprojects/common/meson.build b/subprojects/common/meson.build
+index bc22d3af..8b09153c 100644
+--- a/subprojects/common/meson.build
++++ b/subprojects/common/meson.build
+@@ -36,6 +36,10 @@ host_triplet_cpu = host_machine.cpu()
+ host_triplet_vendor = 'unknown'
+ if host_machine.system() in ['windows', 'cygwin']
+     host_triplet_os = 'mingw64'
++elif host_machine.system() == 'android'
++    # Android's GNU triplet is <cpu>-linux-android (Ruby picks its arm64 coroutines from it)
++    host_triplet_vendor = 'linux'
++    host_triplet_os = 'android'
+ else
+     host_triplet_os = host_machine.system()
+ endif
+diff --git a/subprojects/common/sonametool.py b/subprojects/common/sonametool.py
+index 971cda7b..065b7efb 100644
+--- a/subprojects/common/sonametool.py
++++ b/subprojects/common/sonametool.py
+@@ -8,6 +8,7 @@ host_machine_is_darwin = host_machine_system == 'darwin'
+ host_machine_is_linux = host_machine_system == 'linux'
+ host_machine_is_unix = host_machine_is_bsd or host_machine_is_linux
+ host_machine_is_windows = host_machine_system in ('cygwin', 'windows')
++host_machine_is_android = host_machine_system == 'android'
+ 
+ def main() -> str:
+     if library == 'decor-0':
+@@ -26,6 +27,8 @@ def main() -> str:
+         if host_machine_is_windows:
+             return 'libEGL.dll'
+     if library == 'fluidsynth':
++        if host_machine_is_android:
++            return 'libfluidsynth.so'
+         if host_machine_is_darwin:
+             return 'libfluidsynth.3.dylib'
+         if host_machine_is_unix:

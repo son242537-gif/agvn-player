@@ -8,6 +8,8 @@
  *  3. A missing sound file is skipped instead of stopping the game ("Failed to load: audio/...").
  *  4. RPG Maker MV is told it runs on a PC, as JoiPlay does: on a phone it asks for .m4a sound and .mp4 video, which
  *     PC games do not ship (every sound was missing, silently because of 3), and draws with the slow canvas renderer.
+ *  5. An error that stops the game (its error screen, or a missing picture or data file) is kept in
+ *     window.__agvnFatal, so the app can say what happened when the player leaves ("Tự sửa lỗi").
  */
 (function () {
     'use strict';
@@ -138,13 +140,26 @@
                 if (!isMz && typeof this.requestUpdate === 'function') this.requestUpdate();
                 return;
             }
+            keepFatal((e && e.name ? e.name + ': ' : '') + (e && e.message ? e.message : String(e)));
             return original.apply(this, arguments);
         };
+        var G = window.Graphics;
+        if (G && typeof G.printLoadingError === 'function') { // RPG Maker MV: a picture or data file that is missing
+            var printLoadingError = G.printLoadingError;
+            G.printLoadingError = function (url) {
+                keepFatal('Failed to load: ' + url);
+                return printLoadingError.apply(this, arguments);
+            };
+        }
         if (AM) {
             if (typeof AM.checkErrors === 'function') AM.checkErrors = function () {};
             if (typeof AM.checkWebAudioError === 'function') AM.checkWebAudioError = function () {};
         }
         return true;
+    }
+
+    function keepFatal(text) {
+        if (!window.__agvnFatal) window.__agvnFatal = String(text).slice(0, 300);
     }
 
     var tries = 0;

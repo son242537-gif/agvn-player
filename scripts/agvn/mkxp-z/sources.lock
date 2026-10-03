@@ -1,0 +1,20 @@
+# AGVN Player - pinned inputs of build-mkxp-z.sh (RPG Maker XP/VX/VX Ace runner). One input per line.
+mkxp-z https://github.com/mkxp-z/mkxp-z 095b9cc39a4f17bcf68870ff663c57f8bb9be088
+ndk 29.0.14206865
+api 28
+meson 1.9.1
+# subproject <wrap name> git <repo> <ref> <commit>  -> rebuilt GitHub tarball, checked against the wrap's SHA-256
+# subproject <wrap name> url <mirror URL>            -> same file from a reachable mirror, checked against the wrap
+# subproject <wrap name> meson                        -> Meson downloads it itself (wrapdb patch still prefetched)
+subproject spirv-headers git https://github.com/KhronosGroup/SPIRV-Headers refs/tags/vulkan-sdk-1.4.350.0 ad9184e76a66b1001c29db9b0a3e87f646c64de0
+subproject openal-soft git https://github.com/kcat/openal-soft refs/tags/1.24.3 dc7d7054a5b4f3bec1dc23a42fd616a0847af948
+subproject fmt git https://github.com/fmtlib/fmt refs/tags/12.1.0 407c905e45ad75fc29bf0f9bb7c5c2fd3475976f
+subproject sdl2_ttf git https://github.com/libsdl-org/SDL_ttf refs/tags/release-2.0.18 3e702ed9bf400b0a72534f144b8bec46ee0416cb
+subproject theoraplay git https://github.com/icculus/theoraplay ec1aad1ee43592f216946cdc03b1ee4c4e1e2e59 ec1aad1ee43592f216946cdc03b1ee4c4e1e2e59
+subproject fluidsynth git https://github.com/FluidSynth/fluidsynth refs/tags/v2.5.0 df432e151dcaf463b1ecc7e873803bfa19733fd3
+subproject libyaml git https://github.com/yaml/libyaml refs/tags/0.2.5 2c891fc7a770e8ba2fec34fc6b545c672beb37e6
+subproject ruby-3.1 git https://github.com/ruby/ruby refs/tags/v3_1_3 1a6b16756e0ba6b95ab71a441357ed5484e33498
+subproject freetype git https://github.com/freetype/freetype refs/tags/VER-2-14-3 0a0221a1347e2f1e07c395263540026e9a0aa7c7
+subproject sdl2 meson
+subproject pixman url http://archive.ubuntu.com/ubuntu/pool/main/p/pixman/pixman_0.46.4.orig.tar.gz
+subproject uchardet url http://archive.ubuntu.com/ubuntu/pool/main/u/uchardet/uchardet_0.0.8.orig.tar.xz

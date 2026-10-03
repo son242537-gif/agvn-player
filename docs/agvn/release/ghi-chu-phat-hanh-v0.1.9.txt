@@ -1,0 +1,9 @@
+AGVN Player v0.1.9 - agvn.io.vn
+
+Mới:
+- Game "Chạy nhẹ" (Ren'Py, RPG Maker, game HTML) chỉnh được phím ảo như JoiPlay: bấm ✎ để đổi một nút sang phím khác, thêm nút mới, thêm cụm mũi tên hoặc xoá nút.
+- Phím chọn trên bàn phím vẽ sẵn, chỉ có những phím game đó nhận được. Đổi được chữ trên nút; cụm mũi tên đổi được sang W A S D.
+- Mỗi game giữ bộ phím riêng, giống game Windows. Bấm "Mặc định" để trả về bộ phím ban đầu.
+Sửa lỗi:
+- Game RPG Maker XP, VX, VX Ace "Chạy nhẹ": phím Z tự thêm bấm đúng Z, không còn bị đổi thành Enter.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.

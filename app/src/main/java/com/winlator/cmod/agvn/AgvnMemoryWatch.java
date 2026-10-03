@@ -21,6 +21,7 @@ public final class AgvnMemoryWatch {
     private static final String TAG = "AGVN";
     private static final long POLL_S = 5, PEAKS_EVERY_MS = 60_000;
     private static volatile long lastInputMs = SystemClock.uptimeMillis();
+    private static volatile long playerInputMs;
 
     private final Activity activity;
     private final Runnable exitGame;
@@ -37,6 +38,12 @@ public final class AgvnMemoryWatch {
     /** Called on every touch, key or controller input. */
     public static void touched() {
         lastInputMs = SystemClock.uptimeMillis();
+        playerInputMs = lastInputMs;
+    }
+
+    /** SystemClock.uptimeMillis() of the player's last touch, key or controller input; 0 before the first one. */
+    static long playerInputMs() {
+        return playerInputMs;
     }
 
     public synchronized void start() {

@@ -1,6 +1,8 @@
 /* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
+import com.winlator.cmod.core.EnvVars;
+
 import java.io.File;
 
 /**
@@ -17,6 +19,18 @@ public final class AgvnGlDriver {
     static final int ZINK_REVISION = 3;
 
     private AgvnGlDriver() {}
+
+    /**
+     * Godot asks for an OpenGL 3.3 core context and stops with "Unable to initialize video driver" when the driver
+     * offers less. On Zink (phones without Turnip) a Godot game ({@code engine} "GODOT") gets
+     * MESA_GL_VERSION_OVERRIDE=3.3 and MESA_GLSL_VERSION_OVERRIDE=330, so Zink offers 3.3; Godot's renderer needs
+     * nothing above it. Values the player set stay.
+     */
+    public static void forGodot(String engine, EnvVars env) {
+        if (!"GODOT".equals(engine)) return;
+        if (!env.has("MESA_GL_VERSION_OVERRIDE")) env.put("MESA_GL_VERSION_OVERRIDE", "3.3");
+        if (!env.has("MESA_GLSL_VERSION_OVERRIDE")) env.put("MESA_GLSL_VERSION_OVERRIDE", "330");
+    }
 
     /** Value stored in the container extra "installedOpenGLDriver" once {@code driver} is installed. */
     public static String marker(String driver) {

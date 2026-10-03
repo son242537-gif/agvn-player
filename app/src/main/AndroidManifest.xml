@@ -46,6 +46,26 @@
             android:foregroundServiceType="specialUse"
             android:exported="false" />
 
+        <!-- AGVN: the same keep-alive service in the Ren'Py process (agvn/AgvnKeepAlive) -->
+        <service
+            android:name="com.winlator.cmod.agvn.AgvnKeepAlive$Renpy"
+            android:process=":renpy"
+            android:foregroundServiceType="specialUse"
+            android:exported="false" />
+
+        <!-- AGVN: and in the RPG Maker XP/VX/VX Ace process -->
+        <service
+            android:name="com.winlator.cmod.agvn.AgvnKeepAlive$Rgss"
+            android:process=":rgss"
+            android:foregroundServiceType="specialUse"
+            android:exported="false" />
+
+        <!-- AGVN: once a day, is a newer AGVN Player published? (agvn/AgvnUpdateJob: reads agvn-update.txt, sends nothing) -->
+        <service
+            android:name="com.winlator.cmod.agvn.AgvnUpdateJob"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false" />
+
         <activity
             android:name="com.winlator.cmod.OnboardingActivity"
             android:theme="@style/AppThemeFullscreen.Dark"
@@ -99,6 +119,26 @@
             android:screenOrientation="sensorLandscape"
             android:hardwareAccelerated="true"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|density|navigation"
+            android:exported="false" />
+
+        <!-- AGVN: Ren'Py 8 games on "Chạy nhẹ" (agvn/AgvnRenpyActivity), in their own process, which Ren'Py ends on quit -->
+        <activity
+            android:name="com.winlator.cmod.agvn.AgvnRenpyActivity"
+            android:process=":renpy"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:screenOrientation="sensorLandscape"
+            android:launchMode="singleTop"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|uiMode|density|fontScale"
+            android:exported="false" />
+
+        <!-- AGVN: RPG Maker XP/VX/VX Ace games on "Chạy nhẹ" with mkxp-z (agvn/AgvnRgssActivity), in their own process -->
+        <activity
+            android:name="com.winlator.cmod.agvn.AgvnRgssActivity"
+            android:process=":rgss"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:screenOrientation="sensorLandscape"
+            android:launchMode="singleTop"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|uiMode|density|fontScale"
             android:exported="false" />
 
         <activity

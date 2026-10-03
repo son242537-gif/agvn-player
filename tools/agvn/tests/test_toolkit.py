@@ -97,6 +97,13 @@ class ProfileRulesTest(unittest.TestCase):
             with self.assertRaises(ProfileError, msg=str(extra)):
                 validate(p, self.ue)
 
+    def test_runner_values(self):
+        game = os.path.join(self.tmp.name, "RenPyGame")
+        for rel in ("MyGame.exe", "MyGame.py", "game/script.rpyc", "renpy/common/00start.rpyc"):
+            touch(game, rel)
+        for runner in ("html", "renpy", "rgss", "wine"):
+            self.assertEqual("MyGame.exe", validate({"schemaVersion": 1, "name": "g", "runner": runner}, game))
+
     def test_rejects_wine_in_path(self):
         g = os.path.join(self.tmp.name, "Red wine 2")
         touch(g, "game.exe")

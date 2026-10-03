@@ -60,11 +60,14 @@ public final class AgvnImportDialog {
         LaunchPresetResolver.Effective eff = LaunchPresetResolver.resolve(p, tier, DeviceTierManager.getRules(activity).preset(tier));
         StringBuilder msg = new StringBuilder();
         msg.append(activity.getString(R.string.agvn_import_preview_tier, tier.label)).append('\n');
-        msg.append(activity.getString(R.string.agvn_import_preview_exe, candidate.exe)).append('\n');
+        boolean hasExe = new File(gameDir, candidate.exe).isFile();
+        msg.append(hasExe ? activity.getString(R.string.agvn_import_preview_exe, candidate.exe)
+                : activity.getString(R.string.agvn_import_preview_no_exe)).append('\n');
         msg.append(activity.getString(R.string.agvn_import_preview_fps, eff.fps > 0 ? String.valueOf(eff.fps) : activity.getString(R.string.agvn_unlimited))).append('\n');
         msg.append(activity.getString(R.string.agvn_import_preview_resolution, eff.resolution != null ? eff.resolution : activity.getString(R.string.agvn_default_value))).append('\n');
         msg.append(activity.getString(R.string.agvn_import_preview_controls, activity.getString(AgvnLayouts.labelRes(AgvnLayouts.kindFor(p, candidate.engine))))).append('\n');
-        if (AgvnHtmlGame.useHtml(p, AgvnHtmlGame.indexFor(gameDir, candidate.engine)))
+        if (AgvnHtmlGame.useHtml(p, AgvnHtmlGame.indexFor(gameDir, candidate.engine)) || AgvnRenpyGame.useRenpy(p, candidate.engine, gameDir)
+                || AgvnRgssGame.useRgss(p, candidate.engine, gameDir))
             msg.append(activity.getString(R.string.agvn_import_preview_html)).append('\n');
         if (AgvnLocale.JAPANESE.equals(AgvnLocale.forGame(p, candidate.engine, gameDir.getName(), candidate.exe)))
             msg.append(activity.getString(R.string.agvn_import_preview_japanese)).append('\n');

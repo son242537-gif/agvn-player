@@ -15,7 +15,8 @@ import java.io.File;
  * <ul>
  *   <li>DXVK (DirectX 8–11): smaller memory chunks (16 MB instead of 64 MB per memory type) from Trung bình down;
  *       pipeline libraries freed once unused on Thấp and Siêu nhẹ;</li>
- *   <li>Ren'Py: image cache capped at 256 / 192 / 128 MB (the engine default is 300–400 MB, games may raise it);</li>
+ *   <li>Ren'Py: image cache capped at 256 / 192 / 128 MB (the engine default is 300–400 MB, games may raise it), in
+ *       Wine and on "Chạy nhẹ";</li>
  *   <li>Unity: the game starts at its lowest quality level on Thấp and Siêu nhẹ;</li>
  *   <li>Unreal: texture pool, already written by {@link AgvnQuality} and {@link UeIniWriter};</li>
  *   <li>OpenGL (Zink): freed-buffer cache capped at 256 MB in the bundled build, at every step.</li>
@@ -42,6 +43,19 @@ public final class AgvnMemorySaver {
             case LOW: return 192;
             case MEDIUM: return 256;
             default: return 0;
+        }
+    }
+
+    /**
+     * "Chạy nhẹ" Ren'Py, before the game starts: the image cache cap of the game's "Đồ họa" step ({@code quality}, the
+     * shortcut's {@link AgvnQuality#EXTRA_QUALITY}), as in Wine. Never throws: a failure must not block the launch.
+     */
+    static void applyRenpyLight(Context ctx, File gameDir, String quality) {
+        try {
+            AgvnQuality.Level level = AgvnQuality.Level.of(quality);
+            AgvnRenpyCache.apply(gameDir, renpyCacheMb(level == AgvnQuality.Level.AUTO ? AgvnQuality.recommended(ctx) : level));
+        } catch (Exception e) {
+            Log.w(TAG, "Ren'Py memory setting not applied", e);
         }
     }
 

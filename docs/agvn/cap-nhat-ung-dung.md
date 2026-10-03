@@ -10,6 +10,11 @@ cần bấm "Cập nhật", rồi bấm "Cập nhật" thêm một lần trên h
   - Nếu có, app hiện "Có bản mới x.y.z" kèm ghi chú và dung lượng. Người chơi chọn "Cập nhật" hoặc "Để sau".
   - Tắt được trong Cài đặt → Cập nhật ứng dụng.
 - **Kiểm tra bằng tay:** Cài đặt → **Cập nhật ứng dụng** → **Kiểm tra cập nhật**.
+- **Chấm đỏ:** khi có bản mới, nút "Cài đặt" (thanh dưới, thanh bên khi xoay ngang, biểu tượng ở thư viện) và mục
+  "Cập nhật ứng dụng" có chấm đỏ. Chấm mất khi máy đã lên bản đó.
+- **Thông báo của Android:** mỗi ngày một lần, app kiểm tra ngầm (cần mạng), kể cả khi người chơi không mở app. Có bản
+  mới thì hiện thông báo "Có bản mới x.y.z", mỗi bản một lần. Chạm vào thông báo là app mở và hỏi "Cập nhật" luôn.
+  Tắt "Tự kiểm tra" thì không kiểm tra ngầm nữa.
 - **Lần đầu cập nhật:** Android hỏi quyền "Cài ứng dụng không rõ nguồn gốc" cho AGVN Player (chỉ một lần). App mở
   sẵn đúng màn hình đó. Bật xong, quay lại bấm "Cài tiếp".
 - **Mất mạng giữa chừng hay bấm Hủy:** phần đã tải được giữ lại, lần sau tải tiếp.
@@ -89,7 +94,7 @@ Khoá ký chỉ nằm trên PC của anh Sơn. Kẻ xấu có sửa được fil
 thoại không cài.
 
 App không gửi gì về máy điện thoại, chỉ tải hai file công khai. Đây là ngoại lệ đã được anh Sơn đồng ý, ghi ở quy
-định 3 trong `CLAUDE.md`.
+định 3 trong `CLAUDE.md`. Lần kiểm tra ngầm mỗi ngày (`AgvnUpdateJob`) cũng chỉ đọc `agvn-update.txt` như vậy.
 
 ## Mã nguồn
 
@@ -97,7 +102,9 @@ App không gửi gì về máy điện thoại, chỉ tải hai file công khai.
   - `AgvnUpdateInfo`: đọc `agvn-update.txt`;
   - `AgvnUpdater`: tải, tải tiếp, kiểm tra, dọn file;
   - `AgvnUpdateDialogs`: mục Cài đặt và kiểm tra mỗi ngày;
-  - `AgvnUpdateInstall`: tải có thanh tiến độ và mở trình cài của Android.
+  - `AgvnUpdateInstall`: tải có thanh tiến độ và mở trình cài của Android;
+  - `AgvnUpdateBadge` và `AgvnUpdateDot.kt`: chấm đỏ;
+  - `AgvnUpdateJob`: kiểm tra ngầm mỗi ngày (JobScheduler) và thông báo.
 - Quyền `REQUEST_INSTALL_PACKAGES` và `cache-path` `updates/` trong `res/xml/file_paths.xml` (FileProvider có sẵn).
 - `tools/agvn/dang-ban-cap-nhat.ps1`: script đăng bản.
 
@@ -107,3 +114,14 @@ App không gửi gì về máy điện thoại, chỉ tải hai file công khai.
   adb một lần, từ đó cập nhật trong app được.
 - **"Chưa có bản cập nhật nào được đăng":** chưa có release nào có `agvn-update.txt`.
 - **HyperOS/MIUI** có thể hiện thêm màn hình quét an toàn của Xiaomi trước khi cài. Chỉ cần bấm tiếp.
+- **"App not installed as package appears to be invalid" hoặc "APK contains no signature files" khi cài từ file:**
+  - Thường do file APK trên máy hỏng hoặc chưa tải đủ: tải bằng app tăng tốc, mạng chập chờn, hoặc chép qua Zalo, Drive,
+    thẻ nhớ. Trình cài vẫn đọc được tên và biểu tượng app, nhưng khi kiểm chữ ký trên cả file thì sai.
+  - Xoá file đó, tải lại bằng Chrome từ link chính thức, chờ tải xong hẳn, rồi cài từ thông báo tải xong hoặc app Quản
+    lý tệp của máy.
+  - Muốn chắc file trên GitHub không hỏng: tải về PC, so SHA-256 với dòng `sha256=` trong `agvn-update.txt`, rồi chạy
+    `apksigner verify --min-sdk-version 21 --print-certs`. Phải ra v1 và v2 đúng, khoá `9531477b…`. Bản 0.1.10 đã kiểm
+    như vậy ngày 03/10 và không lỗi.
+  - Một số trình cài chỉ đọc chữ ký kiểu cũ (v1, các file trong `META-INF`). Bản 0.1.6 chỉ có chữ ký kiểu mới (v2),
+    nên từ bản sau 0.1.6, APK có cả hai.
+  - Người đang có app thì cập nhật ngay trong app: app tự kiểm tra SHA-256 trước khi cài.

@@ -146,7 +146,7 @@ public final class AgvnQuality {
         return vars.toString();
     }
 
-    private static AgvnProfile profileOf(Shortcut shortcut) {
+    static AgvnProfile profileOf(Shortcut shortcut) {
         String path = shortcut.getExtra(AgvnGameImporter.EXTRA_PROFILE_PATH);
         if (!path.isEmpty()) {
             try {

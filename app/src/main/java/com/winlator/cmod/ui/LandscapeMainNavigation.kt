@@ -38,6 +38,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.winlator.cmod.MainActivity
+import com.winlator.cmod.agvn.AgvnRedDot
+import com.winlator.cmod.agvn.rememberAgvnUpdateDot
 import com.winlator.cmod.R
 
 fun applyAppFullscreen(activity: Activity?) {
@@ -148,7 +150,8 @@ fun LandscapeMainNavigation(
         Destination(Icons.Outlined.SportsEsports, "Điều khiển", selected == R.id.main_menu_input_controls) {
             activity?.navigateToMainDestination(R.id.main_menu_input_controls)
         }
-        Destination(Icons.Outlined.Settings, "Cài đặt", selected == R.id.main_menu_settings) {
+        // AGVN: a red dot while a newer AGVN Player is out
+        Destination(Icons.Outlined.Settings, "Cài đặt", selected == R.id.main_menu_settings, rememberAgvnUpdateDot()) {
             activity?.navigateToMainDestination(R.id.main_menu_settings)
         }
     }
@@ -159,6 +162,15 @@ private fun Destination(
     icon: ImageVector,
     description: String,
     selected: Boolean,
+    onClick: () -> Unit
+) = Destination(icon, description, selected, false, onClick)
+
+@Composable
+private fun Destination(
+    icon: ImageVector,
+    description: String,
+    selected: Boolean,
+    dot: Boolean,
     onClick: () -> Unit
 ) {
     val whiteTheme = MaterialTheme.colorScheme.background.luminance() > .65f
@@ -179,6 +191,7 @@ private fun Destination(
     ) {
         Box(Modifier.size(44.dp), contentAlignment = Alignment.Center) {
             Icon(icon, description, modifier = Modifier.size(23.dp))
+            if (dot) AgvnRedDot(Modifier.align(Alignment.TopEnd).padding(6.dp))
         }
     }
 }
