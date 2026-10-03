@@ -3,6 +3,7 @@ package com.winlator.cmod.agvn;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.winlator.cmod.core.EnvVars;
@@ -63,6 +64,18 @@ public class AgvnSessionLogTest {
         assertTrue(copied.endsWith("E"));
         assertTrue(copied.contains("bỏ bớt 5000 byte"));
         assertTrue(out.size() < AgvnEngineLogs.MAX_BYTES + 200);
+    }
+
+    @Test
+    public void notesNameTheLogsAndAPlayersSwipe() throws Exception {
+        File roaming = tmp.newFolder("Roaming"), godot = new File(roaming, "PartyMe/logs/godot.log");
+        assertTrue(godot.getParentFile().mkdirs());
+        Files.write(godot.toPath(), "Godot Engine v4.3.stable.official".getBytes(StandardCharsets.UTF_8));
+        String notes = "start=1\ngame=Rebirth Pub\nlog=/g/Player.log\nlogscan=" + roaming.getPath() + "\n";
+        assertEquals(Arrays.asList(new File("/g/Player.log"), godot), AgvnSessionNotes.engineLogs(notes, 0));
+        assertFalse(AgvnSessionNotes.removedByPlayer(notes));
+        // swiped away from the recent apps: AGVN ends itself (SIGKILL), and nothing is asked about it
+        assertTrue(AgvnSessionNotes.removedByPlayer(notes + AgvnSessionNotes.REMOVED + "=1791035699000\n"));
     }
 
     @Test

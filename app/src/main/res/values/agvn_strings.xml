@@ -60,6 +60,7 @@
     <string name="agvn_power_save_on">Máy đang bật Tiết kiệm pin nên game sẽ chậm và giật hơn. Tắt Tiết kiệm pin để chơi mượt hơn.</string>
     <string name="agvn_startup_progress">Đang khởi động %1$s</string>
     <string name="agvn_startup_stalled">Có thể đang treo (%1$s)</string>
+    <string name="agvn_startup_last">lần trước %1$s</string>
     <string name="agvn_import_empty">Chưa tìm thấy game nào.\n\nHãy chép thư mục game vào Bộ nhớ trong (ví dụ Bộ nhớ trong/AGVN/Tên game), thư mục Download hoặc thẻ nhớ, rồi mở lại mục này. App tự tìm cả trong các thư mục con.</string>
     <string name="agvn_import_scanning">Đang tìm game trong máy…</string>
     <string name="agvn_import_no_permission">AGVN Player chưa được phép đọc bộ nhớ nên không thấy game.\n\nBấm "Cấp quyền" rồi bật "Cho phép quản lý tất cả tệp" cho AGVN Player, sau đó quay lại.</string>

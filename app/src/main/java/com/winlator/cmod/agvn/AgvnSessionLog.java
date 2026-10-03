@@ -99,6 +99,13 @@ public final class AgvnSessionLog {
         close(context, dir, error != null ? error : how);
     }
 
+    /** The player swiped AGVN away (NotificationService.onTaskRemoved then ends the process): theirs, so not asked about. */
+    public static void removedByPlayer(Context context) {
+        File dir = current;
+        if (dir != null) write(new File(dir, RUNNING), AgvnSessionNotes.REMOVED + "=" + System.currentTimeMillis() + "\n", true);
+        AgvnLightSession.removedByPlayer(context);
+    }
+
     /** At app start: finishes sessions whose app process died, with the reason Android recorded. */
     public static synchronized void finishPending(Context context) {
         File[] games = root().listFiles(File::isDirectory);
@@ -110,6 +117,10 @@ public final class AgvnSessionLog {
                 File running = new File(dir, RUNNING);
                 if (!running.isFile() || dir.equals(current)) continue;
                 String notes = read(running);
+                if (AgvnSessionNotes.removedByPlayer(notes)) {
+                    close(context, dir, AgvnSessionNotes.REMOVED_HOW); // the player's own end: nothing to ask
+                    continue;
+                }
                 close(context, dir, AgvnExitReason.after(context, value(notes, "start", 0)));
                 AgvnDoctor.afterKill(context, notes); // Android ended the game: tell the player why, if it can be helped
             }
@@ -120,7 +131,7 @@ public final class AgvnSessionLog {
         File running = new File(dir, RUNNING);
         String notes = read(running);
         long start = value(notes, "start", 0);
-        AgvnEngineLogs.Copied engine = AgvnEngineLogs.copy(engineLogs(notes, start), dir, start);
+        AgvnEngineLogs.Copied engine = AgvnEngineLogs.copy(AgvnSessionNotes.engineLogs(notes, start), dir, start);
         AgvnEngineLogs.Copied wine = AgvnEngineLogs.copy(files(notes, "wine="), dir, 0);
         for (File f : wine.copied) f.delete(); // a copy is in the session folder; the logs/ root does not grow
         write(new File(dir, SUMMARY), summary(context, dir, notes, how, engine, wine), false);
@@ -134,19 +145,12 @@ public final class AgvnSessionLog {
     static void snapshot(Context context, File dir, File into) {
         String notes = read(new File(dir, RUNNING));
         long start = value(notes, "start", 0);
-        AgvnEngineLogs.Copied engine = AgvnEngineLogs.copy(engineLogs(notes, start), into, start);
+        AgvnEngineLogs.Copied engine = AgvnEngineLogs.copy(AgvnSessionNotes.engineLogs(notes, start), into, start);
         AgvnEngineLogs.Copied wine = AgvnEngineLogs.copy(files(notes, "wine="), into, 0);
         if (dir.equals(current)) AgvnWineTail.get().save(into);
         String how = "chưa kết thúc, game vẫn đang chạy (nhật ký gom lúc "
                 + new SimpleDateFormat("HH:mm:ss", Locale.ROOT).format(new Date()) + ")";
         write(new File(into, SUMMARY), summary(context, dir, notes, how, engine, wine), false);
-    }
-
-    /** The engine logs the notes name (log=), and Godot's written since {@code start} in the folders they name (logscan=). */
-    private static List<File> engineLogs(String notes, long start) {
-        List<File> logs = files(notes, "log=");
-        for (File roaming : files(notes, "logscan=")) logs.addAll(AgvnGodotFiles.logs(roaming, start));
-        return logs;
     }
 
     private static String summary(Context context, File dir, String notes, String how, AgvnEngineLogs.Copied engine,

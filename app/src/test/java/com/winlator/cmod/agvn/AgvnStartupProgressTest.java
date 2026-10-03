@@ -47,4 +47,10 @@ public class AgvnStartupProgressTest {
         assertEquals("4:12", AgvnStartupProgress.clock(252_400));
         assertEquals("0:09", AgvnStartupProgress.clock(9_999));
     }
+
+    @Test
+    public void aSlowStartIsKeptForTheNextOne() {
+        assertEquals(98_000, AgvnStartTimes.kept(98_000)); // "lần trước 1:38"
+        assertEquals("a start that showed no line clears it", 0, AgvnStartTimes.kept(AgvnStartupProgress.QUIET_MS - 1));
+    }
 }

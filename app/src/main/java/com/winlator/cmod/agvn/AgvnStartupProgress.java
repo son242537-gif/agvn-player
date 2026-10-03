@@ -29,11 +29,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * How a slow Windows game start is going. A Ren'Py game can spend minutes in its init code on a phone (Lo Se Sb: 141 s
  * on a PC, about 520 s here) while the screen shows its presplash and the FPS reads 0. Once the game has not drawn for
- * {@link #QUIET_MS}, the status line shows the time so far every {@link #TICK_MS} ("Đang khởi động 4:12"), and with
- * "Bật debug Wine" on also the engine log's last line ("Đang khởi động 4:12 · ..."). It goes when the game draws
- * steadily, its log says the interface is up, the game draws in answer to the player (a visual novel that redraws only
- * when tapped), or after {@link #MAX_MS}. A log that has not moved for {@link #STALL_MS} while Wine used under 5% of a
- * core reads "Có thể đang treo". The static helpers are pure Java (JVM-testable).
+ * {@link #QUIET_MS}, the status line shows the time so far every {@link #TICK_MS} ("Đang khởi động 4:12"), the game's
+ * last slow start ("· lần trước 1:58", {@link AgvnStartTimes}) and, with "Bật debug Wine" on, the engine log's last
+ * line. It goes when the game draws steadily, its log says the interface is up, the game draws in answer to the player
+ * (a visual novel that redraws only when tapped), or after {@link #MAX_MS}. A log that has not moved for
+ * {@link #STALL_MS} while Wine used under 5% of a core reads "Có thể đang treo". The static helpers are pure Java.
  */
 public final class AgvnStartupProgress {
     private static final String TAG = "AGVN";
@@ -49,6 +49,8 @@ public final class AgvnStartupProgress {
     private final Activity activity;
     private final AgvnStatusLine line;
     private final List<File> logs;
+    private final String game;
+    private final long lastStartMs;
     private final long startMs = System.currentTimeMillis(), startUptimeMs = SystemClock.uptimeMillis();
     private final AtomicInteger updates = new AtomicInteger();
     private final ArrayDeque<long[]> cpu = new ArrayDeque<>(); // {time ms, Wine's CPU ticks}
@@ -62,15 +64,17 @@ public final class AgvnStartupProgress {
     private long lastChangeMs = startMs;
     private volatile boolean done, answered;
 
-    private AgvnStartupProgress(Activity activity, AgvnStatusLine line, List<File> logs) {
+    private AgvnStartupProgress(Activity activity, AgvnStatusLine line, List<File> logs, String game) {
         this.activity = activity;
         this.line = line;
         this.logs = logs;
+        this.game = game;
+        lastStartMs = AgvnStartTimes.last(activity, game);
     }
 
     /** Starts watching as Wine starts the game. */
     public static AgvnStartupProgress start(Activity activity, Shortcut shortcut, AgvnStatusLine line) {
-        AgvnStartupProgress p = new AgvnStartupProgress(activity, line, AgvnEngineLogs.of(shortcut));
+        AgvnStartupProgress p = new AgvnStartupProgress(activity, line, AgvnEngineLogs.of(shortcut), shortcut.file.getPath());
         p.timer.scheduleWithFixedDelay(p::tick, TICK_MS, TICK_MS, TimeUnit.MILLISECONDS);
         return p;
     }
@@ -99,7 +103,9 @@ public final class AgvnStartupProgress {
             long now = System.currentTimeMillis(), elapsed = now - startMs;
             drawingTicks = updates.getAndSet(0) >= DRAWING ? drawingTicks + 1 : 0;
             String tail = tail(log());
-            if (drawingTicks >= 2 || answered || elapsed >= MAX_MS || ready(tail)) {
+            boolean up = drawingTicks >= 2 || answered || ready(tail);
+            if (up || elapsed >= MAX_MS) {
+                if (up) AgvnStartTimes.remember(activity, game, elapsed);
                 stop();
                 return;
             }
@@ -117,6 +123,7 @@ public final class AgvnStartupProgress {
             // the log's last line only for "Bật debug Wine": with logs off, no log text on the game
             boolean debug = PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("enable_wine_debug", false);
             String text = activity.getString(stalled ? R.string.agvn_startup_stalled : R.string.agvn_startup_progress, clock(elapsed))
+                    + (lastStartMs > 0 ? " · " + activity.getString(R.string.agvn_startup_last, clock(lastStartMs)) : "")
                     + (last.isEmpty() || !debug ? "" : " · " + last);
             activity.runOnUiThread(() -> {
                 if (!done) line.setProgress(text);

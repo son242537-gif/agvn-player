@@ -7,10 +7,27 @@ import java.util.List;
 
 /**
  * The notes of a running session (dang-chay.txt): "key=value" lines such as start=, game=, shortcut=, container=,
- * log=, logscan= (a folder searched for Godot's log at the end) and wine=. Pure Java (JVM-testable).
+ * log=, logscan= (a folder searched for Godot's log at the end), wine= and removed= (the player swiped AGVN away).
+ * Pure Java (JVM-testable).
  */
 final class AgvnSessionNotes {
+    static final String REMOVED = "removed";
+    /** How a session ended that the player closed by swiping AGVN away from the recent apps. */
+    static final String REMOVED_HOW = "Người chơi vuốt tắt AGVN khỏi danh sách app gần đây (không phải máy tắt game)";
+
     private AgvnSessionNotes() {}
+
+    /** True when the player swiped AGVN away during the session: Android's SIGKILL then is AGVN's own. */
+    static boolean removedByPlayer(String notes) {
+        return !text(notes, REMOVED).isEmpty();
+    }
+
+    /** The engine logs the notes name (log=), and Godot's written since {@code start} in the folders they name (logscan=). */
+    static List<File> engineLogs(String notes, long start) {
+        List<File> logs = files(notes, "log=");
+        for (File roaming : files(notes, "logscan=")) logs.addAll(AgvnGodotFiles.logs(roaming, start));
+        return logs;
+    }
 
     static long value(String notes, String key, long fallback) {
         try {

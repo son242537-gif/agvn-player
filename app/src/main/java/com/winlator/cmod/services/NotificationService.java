@@ -65,6 +65,7 @@ public class NotificationService extends Service {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
+        com.winlator.cmod.agvn.AgvnSessionLog.removedByPlayer(this); // AGVN: the player's end, not Android's
         stopForeground(STOP_FOREGROUND_REMOVE);
         stopSelf();
         isRunning = false;

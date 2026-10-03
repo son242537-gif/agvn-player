@@ -53,6 +53,11 @@ public final class AgvnLightSession {
         set(ctx, ENDED, "1");
     }
 
+    /** The player swiped AGVN away while this process ran the game: it ended as they chose. */
+    static void removedByPlayer(Context ctx) {
+        if (String.valueOf(Process.myPid()).equals(read(ctx).getProperty(PID))) ended(ctx);
+    }
+
     /** The runner showed its own error, with its fixes ("Chạy bằng Windows", the RTP): nothing to ask again. */
     static void shown(Context ctx, String error) {
         Properties p = read(ctx);

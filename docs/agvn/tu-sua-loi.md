@@ -66,6 +66,10 @@ RTP), Ren'Py dừng trước màn hình đầu.
 | Game chậm, máy giấu mức bận của GPU | CPU không bận, nên nhiều khả năng là GPU | Hạ Đồ họa, thử Gmem, DXVK arm64ec, bỏ bớt khung hình |
 | Game chậm, không biết GPU hay CPU | Game HTML trên máy giấu mức bận của GPU | Như trên |
 
+Người chơi tự vuốt tắt AGVN khỏi danh sách app gần đây thì không phải lỗi. Khi đó AGVN tự tắt mình (`SIGKILL`, giống
+như máy tắt), nên trước khi tắt nó ghi lại là người chơi vuốt tắt. Lần mở sau, app không hỏi gì, và `tom-tat.txt` ghi
+"Người chơi vuốt tắt AGVN khỏi danh sách app gần đây".
+
 "Game chậm" là game chạy đều dưới mức của nó suốt 1 phút. Màn hình đứng yên (visual novel chờ bấm) và mức "Giới hạn
 FPS" người chơi tự đặt không tính.
 
@@ -177,4 +181,8 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       trong game; "Trả lại như cũ" đưa về khung nhỏ; ⛶ bật lại; mở lại game vẫn vừa.
 - [ ] Game Windows khung 1280×720 ở mức "Thấp": thanh "Game bị tràn ra ngoài màn hình", bấm "Đổi màn hình game thành
       1280×720" rồi "Mở lại game ngay": game mở lại thấy đủ khung.
+- [ ] Đang chơi một game Windows, vuốt AGVN khỏi danh sách app gần đây rồi mở lại app: không có hộp hỏi; `tom-tat.txt`
+      của phiên đó ghi "Người chơi vuốt tắt AGVN…".
+- [ ] Game mở chậm (hơn 10 giây không vẽ, ví dụ game Unity trên máy yếu): lần mở sau, dòng trên góc phải ghi "Đang khởi
+      động 0:25 · lần trước 1:40".
 - [ ] `adb logcat -s AGVN`: dòng `doctor: <lỗi> for <game>` và `fix <cách sửa> -> <giá trị>`.
