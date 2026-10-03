@@ -90,7 +90,7 @@ public class AgvnRgssActivity extends SDLActivity {
     private final class Host implements AgvnLightTools.Host {
         @Override
         public void binding(String binding, boolean down) {
-            int key = AgvnLightActions.forRgss(binding);
+            int key = AgvnLightActions.of(binding); // OK is Enter already (AgvnLightActions.defaultBinding)
             if (key <= 0) return;
             if (down) onNativeKeyDown(key);
             else onNativeKeyUp(key);

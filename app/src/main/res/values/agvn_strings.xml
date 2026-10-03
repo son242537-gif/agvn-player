@@ -105,13 +105,12 @@
     <string name="agvn_light_subtitle">Chạy nhẹ · game vẫn chạy phía sau</string>
     <string name="agvn_light_keys_section">Phím ảo</string>
     <string name="agvn_light_opacity">Độ mờ phím</string>
-    <string name="agvn_light_edit">Sửa vị trí phím</string>
+    <string name="agvn_light_edit">Sửa phím: đổi, thêm, xoá</string>
     <string name="agvn_light_other_section">Khác</string>
     <string name="agvn_light_hud">HUD: RAM, pin, nhiệt độ</string>
     <string name="agvn_light_reset">Mặc định</string>
-    <string name="agvn_light_reset_desc">Đưa mọi phím về chỗ cũ</string>
-    <string name="agvn_light_edit_hint">Kéo phím để di chuyển. Chạm một phím rồi bấm － hoặc ＋ để đổi cỡ, xong bấm Xong.</string>
-    <string name="agvn_light_saved">Đã lưu vị trí phím cho các game cùng loại</string>
+    <string name="agvn_light_reset_desc">Đưa bộ phím về như ban đầu</string>
+    <string name="agvn_light_reset_ask">Đưa bộ phím của game này về như ban đầu? Phím đã thêm hoặc đã đổi sẽ mất.</string>
     <string name="agvn_controls_auto">Tự động (AGVN)</string>
     <string name="agvn_controls_hidden">Đã ẩn bộ phím ảo. Bấm 👁 để hiện lại.</string>
     <string name="agvn_controls_shown">Đã hiện bộ phím ảo</string>

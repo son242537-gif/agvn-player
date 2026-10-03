@@ -7,27 +7,27 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 /**
- * The on-screen keys of a "Chạy nhẹ" game: the layout AGVN gives the same game type on Windows ({@link AgvnLayouts}:
- * controls-vn.icp for visual novels, controls-rpg.icp for RPG Maker), read from the .icp JSON. Each key keeps its
- * label, its keys and its place and size; places are fractions of the screen, sizes the .icp's scale. The player's own
- * places and sizes ({@link #positions()}) are kept per game type. Pure Java (JVM-testable).
+ * The on-screen keys of a "Chạy nhẹ" game. They start as the layout AGVN gives the same game type on Windows
+ * ({@link AgvnLayouts}: controls-vn.icp for visual novels, controls-rpg.icp for RPG Maker), read from the .icp JSON.
+ * The player can move, resize, re-key, add and delete keys ({@link AgvnLightEditor}); the result is the game's own key
+ * set, kept in the .icp's own form ({@link #toJson}). Places are fractions of the screen, sizes the .icp's scale.
+ * Pure Java (JVM-testable).
  */
 final class AgvnLightLayout {
     static final float MIN_SCALE = 0.5f, MAX_SCALE = 2.5f;
+    /** A key the player adds: a pill as the Windows editor's new button, an arrow pad as the RPG layout's. */
+    static final float NEW_BUTTON_SCALE = 0.7f, NEW_PAD_SCALE = 0.9f;
 
     static final class Element {
         /** A four-way pad (bindings up, right, down, left), else a button. */
         final boolean pad;
         /** A round button, else a pill. */
         final boolean round;
-        final String text;
-        final String[] bindings;
-        final float x0, y0, scale0;
+        String text;
+        String[] bindings;
         float x, y, scale;
 
         Element(boolean pad, boolean round, String text, String[] bindings, float x, float y, float scale) {
@@ -35,53 +35,85 @@ final class AgvnLightLayout {
             this.round = round;
             this.text = text;
             this.bindings = bindings;
-            this.x = x0 = x;
-            this.y = y0 = y;
-            this.scale = scale0 = scale;
+            this.x = x;
+            this.y = y;
+            this.scale = scale;
+        }
+
+        /** A new pill in the middle of the screen: {@code binding}, with {@code text} on it. */
+        static Element button(String text, String binding) {
+            return new Element(false, false, text, new String[]{binding}, 0.5f, 0.5f, NEW_BUTTON_SCALE);
+        }
+
+        /** A new arrow pad in the middle of the screen: {@code directions} up, right, down, left. */
+        static Element pad(String[] directions) {
+            return new Element(true, true, "", directions.clone(), 0.5f, 0.5f, NEW_PAD_SCALE);
         }
     }
 
     final String kind;
-    final List<Element> elements;
+    final List<Element> elements = new ArrayList<>();
+    /** The .icp, and the runner its keys go to, for {@link #reset}. */
+    private final String defaults, runner;
 
-    private AgvnLightLayout(String kind, List<Element> elements) {
+    private AgvnLightLayout(String kind, String defaults, String runner) {
         this.kind = kind;
-        this.elements = Collections.unmodifiableList(elements);
+        this.defaults = defaults;
+        this.runner = runner;
+        reset();
     }
 
-    /** Buttons and pads of an .icp profile; other controls (sticks, touch areas) have no meaning without a mouse. */
+    /** The .icp's keys as they are (the Windows names); a broken .icp has none. */
     static AgvnLightLayout parse(String kind, String json) {
-        List<Element> out = new ArrayList<>();
-        try {
-            JsonArray elements = JsonParser.parseString(json).getAsJsonObject().getAsJsonArray("elements");
-            for (JsonElement item : elements) {
-                JsonObject e = item.getAsJsonObject();
-                String type = text(e, "type");
-                if (!type.equals("BUTTON") && !type.equals("D_PAD")) continue;
-                JsonArray b = e.getAsJsonArray("bindings");
-                String[] bindings = new String[b != null ? b.size() : 0];
-                for (int i = 0; i < bindings.length; i++) bindings[i] = b.get(i).getAsString();
-                out.add(new Element(type.equals("D_PAD"), text(e, "shape").equals("CIRCLE"), text(e, "text"), bindings,
-                        clamp(number(e, "x", 0.5f), 0, 1), clamp(number(e, "y", 0.5f), 0, 1),
-                        clamp(number(e, "scale", 1f), MIN_SCALE, MAX_SCALE)));
-            }
-        } catch (RuntimeException e) {
-            // a broken layout: no keys rather than a crash
-        }
-        return new AgvnLightLayout(kind, out);
+        return parse(kind, json, null);
     }
 
-    /** "x,y,scale;x,y,scale;…" of every key, as {@link #apply} reads it back. */
-    String positions() {
-        StringBuilder sb = new StringBuilder();
+    /** The .icp's keys as {@code runner}'s game gets them ({@link AgvnLightActions#defaultBinding}). */
+    static AgvnLightLayout parse(String kind, String json, String runner) {
+        return new AgvnLightLayout(kind, json, runner);
+    }
+
+    /** Back to the .icp's keys, places and sizes ("Mặc định"). */
+    void reset() {
+        List<Element> read = read(defaults, runner);
+        elements.clear();
+        if (read != null) elements.addAll(read);
+    }
+
+    /** The game's own key set ({@link #toJson}) instead; false, the keys unchanged, when it cannot be read. */
+    boolean load(String json) {
+        List<Element> read = json == null || json.isEmpty() ? null : read(json, null);
+        if (read == null) return false;
+        elements.clear();
+        elements.addAll(read);
+        return true;
+    }
+
+    /** Every key in the .icp's form, {"elements": [...]}, as {@link #load} reads it back. */
+    String toJson() {
+        JsonArray all = new JsonArray();
         for (Element e : elements) {
-            if (sb.length() > 0) sb.append(';');
-            sb.append(String.format(Locale.ROOT, "%.4f,%.4f,%.3f", e.x, e.y, e.scale));
+            JsonObject o = new JsonObject();
+            o.addProperty("type", e.pad ? "D_PAD" : "BUTTON");
+            o.addProperty("shape", e.pad || e.round ? "CIRCLE" : "ROUND_RECT");
+            o.addProperty("text", e.text);
+            JsonArray bindings = new JsonArray();
+            for (String b : e.bindings) bindings.add(b);
+            o.add("bindings", bindings);
+            o.addProperty("x", e.x);
+            o.addProperty("y", e.y);
+            o.addProperty("scale", e.scale);
+            all.add(o);
         }
-        return sb.toString();
+        JsonObject root = new JsonObject();
+        root.add("elements", all);
+        return root.toString();
     }
 
-    /** The player's places and sizes, when they are for this layout (same number of keys); false otherwise. */
+    /**
+     * The player's places and sizes of AGVN 0.1.6 to 0.1.8, kept per game type as "x,y,scale;…", for a game without a
+     * key set of its own; false when they are not for this layout (another number of keys).
+     */
     boolean apply(String positions) {
         if (positions == null || positions.isEmpty()) return false;
         String[] keys = positions.split(";");
@@ -104,13 +136,28 @@ final class AgvnLightLayout {
         return true;
     }
 
-    /** Back to the places and sizes of the .icp ("Mặc định"). */
-    void reset() {
-        for (Element e : elements) {
-            e.x = e.x0;
-            e.y = e.y0;
-            e.scale = e.scale0;
+    /**
+     * The buttons and pads of an .icp profile, the bindings as {@code runner}'s game gets them; null when it is not
+     * one. Other controls (sticks, touch areas) have no meaning without a mouse.
+     */
+    private static List<Element> read(String json, String runner) {
+        List<Element> out = new ArrayList<>();
+        try {
+            for (JsonElement item : JsonParser.parseString(json).getAsJsonObject().getAsJsonArray("elements")) {
+                JsonObject e = item.getAsJsonObject();
+                String type = text(e, "type");
+                if (!type.equals("BUTTON") && !type.equals("D_PAD")) continue;
+                JsonArray b = e.getAsJsonArray("bindings");
+                String[] bindings = new String[b != null ? b.size() : 0];
+                for (int i = 0; i < bindings.length; i++) bindings[i] = AgvnLightActions.defaultBinding(runner, b.get(i).getAsString());
+                out.add(new Element(type.equals("D_PAD"), text(e, "shape").equals("CIRCLE"), text(e, "text"), bindings,
+                        clamp(number(e, "x", 0.5f), 0, 1), clamp(number(e, "y", 0.5f), 0, 1),
+                        clamp(number(e, "scale", 1f), MIN_SCALE, MAX_SCALE)));
+            }
+        } catch (RuntimeException e) {
+            return null; // not a key set: no keys rather than a crash
         }
+        return out;
     }
 
     static float clamp(float v, float min, float max) {

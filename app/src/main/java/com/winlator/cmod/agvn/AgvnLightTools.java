@@ -15,7 +15,8 @@ import java.io.File;
 /**
  * The toolkit of a "Chạy nhẹ" game, as Windows games have it: the on-screen keys of the game type
  * ({@link AgvnLightKeys}), the ⌨ ✎ 👁 ☰ bar at the top ({@link AgvnLightBar}), the menu Back opens
- * ({@link AgvnLightMenu}), moving and resizing the keys ({@link AgvnLightEditBar}) and the HUD ({@link AgvnLightHud}).
+ * ({@link AgvnLightMenu}), moving, changing, adding and deleting keys ({@link AgvnLightEditor}) and the HUD
+ * ({@link AgvnLightHud}). Each game can have a key set of its own ({@link AgvnLightPrefs#layout}).
  * The runner (Ren'Py, RPG Maker XP/VX/VX Ace, HTML) is the {@link Host}. All calls on the UI thread.
  */
 public final class AgvnLightTools {
@@ -46,21 +47,20 @@ public final class AgvnLightTools {
         int targetFps();
     }
 
-    private static final float RESIZE_STEP = 0.1f;
-
     final Activity activity;
     final Host host;
     private final String gameName;
     private final File gameDir;
-    private final String game;
-    private final AgvnLightPrefs prefs;
-    private final AgvnLightLayout layout;
-    private final AgvnLightKeys keys;
+    /** The game's folder (or name): its own key set and hidden keys are kept under it. */
+    final String game;
+    final AgvnLightPrefs prefs;
+    final AgvnLightLayout layout;
+    final AgvnLightKeys keys;
     private final AgvnLightHud hud;
     private final AgvnLightBar bar;
     private final AgvnLightMenu menu;
     private final AgvnLightSlow slow;
-    private AgvnLightEditBar editBar;
+    private final AgvnLightEditor editor = new AgvnLightEditor(this);
 
     private AgvnLightTools(Activity activity, String kind, String gameName, File gameDir, Host host) {
         this.activity = activity;
@@ -70,8 +70,8 @@ public final class AgvnLightTools {
         game = gameDir != null ? gameDir.getAbsolutePath() : this.gameName;
         prefs = new AgvnLightPrefs(activity.getFilesDir());
         String json = FileUtils.readString(activity, AgvnLayouts.assetFor(kind));
-        layout = AgvnLightLayout.parse(kind, json != null ? json : "{}");
-        layout.apply(prefs.positions(kind));
+        layout = AgvnLightLayout.parse(kind, json != null ? json : "{}", host.runner());
+        if (!layout.load(prefs.layout(game))) layout.apply(prefs.positions(kind)); // else the places of AGVN 0.1.6-0.1.8
         keys = new AgvnLightKeys(activity, layout, host::binding);
         keys.setAlpha(prefs.opacity());
         keys.setVisibility(prefs.keysHidden(game) ? View.GONE : View.VISIBLE);
@@ -93,7 +93,7 @@ public final class AgvnLightTools {
 
     /** Back: ends editing, else closes the menu, else opens it. Always handled. */
     boolean onBack() {
-        if (editBar != null) finishEdit();
+        if (editor.active()) editor.finish();
         else if (menu.isOpen()) menu.close();
         else openMenu();
         return true;
@@ -113,7 +113,7 @@ public final class AgvnLightTools {
     }
 
     void openMenu() {
-        if (editBar != null) finishEdit();
+        if (editor.active()) editor.finish();
         bar.suspend();
         menu.open(keysShown(), prefs.opacity(), prefs.hud());
     }
@@ -154,37 +154,18 @@ public final class AgvnLightTools {
         AgvnLogShare.share(activity, gameName, gameDir);
     }
 
-    /** Edit mode: the keys show fully, a tap selects one, a drag moves it; the edit bar resizes and saves. */
+    /** "Sửa phím": the keys can be moved, changed, added and deleted ({@link AgvnLightEditor}). */
     void edit() {
-        if (editBar != null) return;
+        if (editor.active()) return;
         if (menu.isOpen()) menu.close();
         bar.suspend();
-        keys.setVisibility(View.VISIBLE);
-        keys.setAlpha(1f);
-        keys.setEditing(true);
-        editBar = new AgvnLightEditBar(this);
-        AppUtils.showToast(activity, R.string.agvn_light_edit_hint);
+        editor.start();
     }
 
-    void resizeSelected(boolean bigger) {
-        if (!keys.resizeSelected(bigger ? RESIZE_STEP : -RESIZE_STEP)) AppUtils.showToast(activity, R.string.agvn_edit_select_first);
-    }
-
-    void resetKeys() {
-        keys.resetAll();
-    }
-
-    /** "Xong": keeps the places and sizes for every game of this type. */
-    void finishEdit() {
-        if (editBar == null) return;
-        editBar.remove();
-        editBar = null;
-        boolean changed = keys.changed();
-        keys.setEditing(false);
+    /** The editor is done: the keys show again at the player's opacity, with the bar. */
+    void editEnded() {
         keys.setAlpha(prefs.opacity());
-        if (changed) prefs.setPositions(layout.kind, layout.positions());
         prefs.setKeysHidden(game, false);
-        AppUtils.showToast(activity, changed ? R.string.agvn_light_saved : R.string.agvn_edit_unchanged);
         bar.update(true);
         bar.reveal();
     }

@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * The on-screen keys of a "Chạy nhẹ" game ({@link AgvnLightLayout}), placed and sized as the Windows controls of the
  * same game type ({@link AgvnLightGeometry}). Several fingers work at once (walk while dashing); a touch that starts
- * outside every key goes to the game. While editing, a tap selects a key and a drag moves it.
+ * outside every key goes to the game. While editing ({@link AgvnLightEditor}), a tap selects a key and a drag moves it.
  */
 @SuppressLint("ViewConstructor")
 final class AgvnLightKeys extends View {
@@ -127,7 +127,7 @@ final class AgvnLightKeys extends View {
         return NOTHING;
     }
 
-    /** Edit mode: keys only move (the game gets nothing); returns to play with {@code false}. */
+    /** Edit mode: keys only change (the game gets nothing); returns to play with {@code false}. */
     void setEditing(boolean on) {
         releaseAll();
         editing = on;
@@ -137,25 +137,25 @@ final class AgvnLightKeys extends View {
         invalidate();
     }
 
-    /** True when an edit moved or resized a key. */
+    /** True when an edit changed a key ({@link AgvnLightEditor}) or moved one. */
     boolean changed() {
         return changed;
     }
 
-    /** Resizes the selected key by {@code step}; false when no key is selected. */
-    boolean resizeSelected(float step) {
-        if (selected < 0) return false;
-        AgvnLightLayout.Element e = layout.elements.get(selected);
-        e.scale = AgvnLightLayout.clamp(e.scale + step, AgvnLightLayout.MIN_SCALE, AgvnLightLayout.MAX_SCALE);
+    /** The editor changed the keys: redraws. */
+    void markChanged() {
         changed = true;
         invalidate();
-        return true;
     }
 
-    /** Every key back to the layout's own place and size. */
-    void resetAll() {
-        layout.reset();
-        changed = true;
+    /** The key being edited, or -1. */
+    int selected() {
+        return selected;
+    }
+
+    /** Selects key {@code i} (-1: none), e.g. one just added, so the tools act on it. */
+    void select(int i) {
+        selected = i >= 0 && i < layout.elements.size() ? i : -1;
         invalidate();
     }
 

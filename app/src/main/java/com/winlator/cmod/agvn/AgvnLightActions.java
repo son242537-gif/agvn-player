@@ -78,11 +78,20 @@ final class AgvnLightActions {
     }
 
     /**
-     * RPG Maker XP/VX/VX Ace in mkxp-z: OK (Z in the Windows layout) presses Enter, RGSS's confirm key in every version
-     * (Z is A, not confirm, in XP).
+     * A key of AGVN's own layout as {@code runner}'s game gets it. RPG Maker XP/VX/VX Ace in mkxp-z: OK (Z in the
+     * Windows layout) is Enter, RGSS's confirm key in every version (Z is A, not confirm, in XP). A key the player picks
+     * is sent as it is.
      */
-    static int forRgss(String binding) {
-        return "KEY_Z".equals(binding) ? KeyEvent.KEYCODE_ENTER : of(binding);
+    static String defaultBinding(String runner, String binding) {
+        return AgvnHtmlGame.RUNNER_RGSS.equals(runner) && "KEY_Z".equals(binding) ? "KEY_ENTER" : binding;
+    }
+
+    /** True when {@code runner}'s game gets {@code binding}: mkxp-z takes no mouse, an HTML page the keys {@link #dom} knows. */
+    static boolean sendable(String runner, String binding) {
+        int action = of(binding);
+        if (action == NONE) return false;
+        if (action < 0) return !AgvnHtmlGame.RUNNER_RGSS.equals(runner);
+        return !AgvnHtmlGame.RUNNER_HTML.equals(runner) || dom(action) != null;
     }
 
     /** {key, code, keyCode} of the DOM keyboard event for an Android key code, as a browser sends it; null if unknown. */

@@ -47,28 +47,12 @@ public class AgvnLightToolsTest {
     }
 
     @Test
-    public void placesRoundTripAndResetToTheLayout() throws Exception {
-        AgvnLightLayout rpg = layout(AgvnLayouts.RPG);
-        rpg.elements.get(1).x = 0.5f;
-        rpg.elements.get(1).scale = 1.4f;
-        String saved = rpg.positions();
-        AgvnLightLayout again = layout(AgvnLayouts.RPG);
-        assertTrue(again.apply(saved));
-        assertEquals(0.5f, again.elements.get(1).x, 1e-4);
-        assertEquals(1.4f, again.elements.get(1).scale, 1e-3);
-        assertFalse(again.apply("0.1,0.1,1")); // places of another layout (other key count)
-        assertFalse(again.apply("a,b,c;" + saved.substring(saved.indexOf(';') + 1)));
-        again.reset();
-        assertEquals(0.865f, again.elements.get(1).x, 1e-6);
-        assertEquals(0.9f, again.elements.get(1).scale, 1e-6);
-    }
-
-    @Test
     public void keysSendTheWindowsBindings() {
         assertEquals(KeyEvent.KEYCODE_CTRL_LEFT, AgvnLightActions.of("KEY_CTRL_L")); // "Tua": skip while held
         assertEquals(KeyEvent.KEYCODE_ESCAPE, AgvnLightActions.of("KEY_ESC"));
         assertEquals(KeyEvent.KEYCODE_Z, AgvnLightActions.of("KEY_Z"));
-        assertEquals(KeyEvent.KEYCODE_ENTER, AgvnLightActions.forRgss("KEY_Z")); // OK confirms in every RGSS version
+        assertEquals("KEY_ENTER", AgvnLightActions.defaultBinding(AgvnHtmlGame.RUNNER_RGSS, "KEY_Z")); // OK confirms in every RGSS version
+        assertEquals("KEY_Z", AgvnLightActions.defaultBinding(AgvnHtmlGame.RUNNER_HTML, "KEY_Z")); // MV: Z is OK itself
         assertEquals(KeyEvent.KEYCODE_F5, AgvnLightActions.of("KEY_F5"));
         assertEquals(KeyEvent.KEYCODE_PAGE_UP, AgvnLightActions.of("KEY_PG_UP"));
         assertEquals(AgvnLightActions.RIGHT_CLICK, AgvnLightActions.of("MOUSE_RIGHT_BUTTON"));
@@ -110,14 +94,19 @@ public class AgvnLightToolsTest {
         prefs.setKeysHidden("/sdcard/Games/A", true);
         prefs.setOpacity(0.05f); // too faint: kept at the minimum
         prefs.setHud(true);
-        prefs.setPositions("rpg", "0.1,0.2,1.0");
+        prefs.setLayout("/sdcard/Games/A", "{\"elements\":[]}");
         AgvnLightPrefs other = new AgvnLightPrefs(dir); // another process, later
         assertTrue(other.keysHidden("/sdcard/Games/A"));
         assertFalse(other.keysHidden("/sdcard/Games/B"));
         assertEquals(AgvnLightPrefs.MIN_OPACITY, other.opacity(), 1e-6);
         assertTrue(other.hud());
-        assertEquals("0.1,0.2,1.0", other.positions("rpg"));
-        assertNull(other.positions("vn"));
+        assertEquals("{\"elements\":[]}", other.layout("/sdcard/Games/A"));
+        assertNull(other.layout("/sdcard/Games/B")); // a game with no key set of its own: its type's keys
+        assertNull(other.positions("rpg"));
+        java.util.Properties old = AgvnPropsFile.load(new File(dir, AgvnLightPrefs.FILE_NAME));
+        old.setProperty("keys.rpg", "0.1,0.2,1.0"); // as AGVN 0.1.6-0.1.8 wrote it
+        assertTrue(AgvnPropsFile.store(old, new File(dir, AgvnLightPrefs.FILE_NAME), null));
+        assertEquals("0.1,0.2,1.0", new AgvnLightPrefs(dir).positions("rpg"));
         other.setKeysHidden("/sdcard/Games/A", false);
         assertFalse(new AgvnLightPrefs(dir).keysHidden("/sdcard/Games/A"));
     }

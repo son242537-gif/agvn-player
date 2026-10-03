@@ -6,8 +6,8 @@ import java.util.Properties;
 
 /**
  * The "Chạy nhẹ" toolkit's settings, in files/agvn-light.properties: keys hidden per game, the keys' opacity, the
- * HUD, and the player's key places per game type. A file rather than SharedPreferences, because the Ren'Py and RPG
- * Maker games run in processes of their own and SharedPreferences keeps each process's first read. Pure Java.
+ * HUD, and each game's own key set. A file rather than SharedPreferences, because the Ren'Py and RPG Maker games run
+ * in processes of their own and SharedPreferences keeps each process's first read. Pure Java.
  */
 final class AgvnLightPrefs {
     /** As the Windows controls start (InputControlsView.DEFAULT_OVERLAY_OPACITY). */
@@ -54,15 +54,19 @@ final class AgvnLightPrefs {
         save();
     }
 
-    /** The player's places and sizes for game type {@code kind} ({@link AgvnLightLayout#positions()}), or null. */
-    String positions(String kind) {
-        return props.getProperty("keys." + kind);
+    /** The game's own key set ({@link AgvnLightLayout#toJson}), or null: the game type's keys then. */
+    String layout(String game) {
+        return props.getProperty("layout." + game);
     }
 
-    void setPositions(String kind, String positions) {
-        if (positions == null) props.remove("keys." + kind);
-        else props.setProperty("keys." + kind, positions);
+    void setLayout(String game, String json) {
+        props.setProperty("layout." + game, json);
         save();
+    }
+
+    /** The places and sizes AGVN 0.1.6 to 0.1.8 kept per game type ({@link AgvnLightLayout#apply}), or null. */
+    String positions(String kind) {
+        return props.getProperty("keys." + kind);
     }
 
     /** Written whole, then moved over the old file ({@link AgvnPropsFile}): a crash never leaves half a file. */

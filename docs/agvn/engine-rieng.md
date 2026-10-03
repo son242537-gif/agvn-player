@@ -41,12 +41,23 @@ Anh Sơn quyết định ngày 02/10/2026:
     - RPG Maker và MV/MZ: D-pad, OK, Hủy, Chạy, Menu, Enter, Space.
     - Ren'Py nhận "Menu" là chuột phải và "Lịch sử" là lăn chuột lên, như trên PC. RPG Maker XP/VX/VX Ace nhận OK là
       Enter.
-  - **Thanh trên cùng:** ⌨ bàn phím Android, ✎ sửa vị trí phím, 👁 ẩn/hiện phím (nhớ theo từng game), ☰ menu. Thanh
-    tự ẩn sau 3 giây như ở game Windows.
-  - **Menu bên trái** (nút Quay lại hoặc ☰): chơi tiếp, mở menu game, bàn phím, hiện phím ảo, độ mờ phím, sửa vị trí
-    phím, HUD, "Gửi nhật ký", "Chạy bằng Windows" (nếu có `.exe`), thoát game. Game vẫn chạy phía sau.
-  - **Sửa vị trí phím:** kéo để dời, － ＋ để đổi cỡ, "Mặc định" để trả về, "Xong" để lưu. Vị trí lưu cho mọi game cùng
-    loại (VN hoặc RPG), trong `files/agvn-light.properties`, vì Ren'Py và RPG Maker chạy ở tiến trình riêng.
+  - **Thanh trên cùng:** ⌨ bàn phím Android, ✎ sửa phím, 👁 ẩn/hiện phím (nhớ theo từng game), ☰ menu. Thanh tự ẩn
+    sau 3 giây như ở game Windows.
+  - **Menu bên trái** (nút Quay lại hoặc ☰): chơi tiếp, mở menu game, bàn phím, hiện phím ảo, độ mờ phím, sửa phím,
+    HUD, "Gửi nhật ký", "Chạy bằng Windows" (nếu có `.exe`), thoát game. Game vẫn chạy phía sau.
+  - **Sửa phím** (anh Sơn yêu cầu 03/10/2026: đổi, thêm, xoá phím như JoiPlay; `AgvnLightEditor`). Thanh công cụ giống
+    hệt khi sửa phím game Windows:
+    - kéo phím để dời; chạm một phím để chọn;
+    - "+ Nút": chọn phím trên bàn phím vẽ sẵn, nút mới hiện giữa màn hình; "+ Mũi tên": thêm cụm mũi tên;
+    - "Phím…": đổi phím đang chọn sang phím khác, hoặc "Đổi tên" chữ trên phím. Cụm mũi tên đổi được sang W A S D;
+    - － ＋ đổi cỡ, "Xóa" xoá phím đang chọn, "Mặc định" (hỏi trước) trả về bộ phím của AGVN, ⇅ dời thanh xuống dưới;
+    - "Xong" hoặc nút Quay lại: lưu thành bộ phím riêng của game này, như game Windows có bộ phím riêng.
+  - Bàn phím vẽ sẵn chỉ hiện phím game nhận được: RPG Maker XP/VX/VX Ace (mkxp-z) không nhận chuột; game HTML chưa
+    nhận các phím dấu câu và bàn phím số. Phím OK của AGVN là Enter ở RPG Maker XP/VX/VX Ace; phím Z người chơi tự chọn
+    vẫn là Z.
+  - Bộ phím riêng nằm trong `files/agvn-light.properties` (`layout.<thư mục game>`, dạng `.icp`), vì Ren'Py và RPG
+    Maker chạy ở tiến trình riêng. Game chưa có bộ phím riêng dùng bộ phím của loại game, với vị trí phím bản 0.1.6–0.1.8
+    đã lưu cho cả loại game (`keys.<loại>`).
   - **HUD** (góc trên bên trái): RAM của game (Ren'Py, RPG Maker), RAM trống, pin, nhiệt độ; FPS chỉ đo được ở game HTML.
   - **Bàn phím ở game HTML:** chữ gõ được gửi vào trang thành phím bấm, cho game đọc phím (plugin nhập tên của MV).
 - **Gửi nhật ký khi đang chơi:** "Gửi nhật ký" (menu ⋮ của game, menu Chạy nhẹ, hay mục dưới "Xem log" ở menu bên của
@@ -203,7 +214,10 @@ Anh Sơn chốt ngày 02/10/2026:
   11. Bộ công cụ, ở một game Ren'Py, một game RPG Maker XP/VX/VX Ace và một game MV:
       - phím ảo hiện đúng chỗ như khi chạy Windows và bấm được; Tua (giữ) tua chữ, Lịch sử lùi lại ở Ren'Py;
       - ⌨ mở bàn phím, gõ tên được; 👁 ẩn phím, mở lại game vẫn ẩn;
-      - ✎: kéo phím, － ＋, "Xong"; mở game khác cùng loại thấy đúng vị trí mới;
+      - ✎: kéo phím, － ＋, "Xong"; mở lại game thấy đúng vị trí mới;
+      - ✎ "+ Nút" chọn phím A, "Phím…" đổi "Chạy" sang phím khác, "Xóa" một phím, "Xong": các phím mới bấm được
+        trong game, mở lại game vẫn còn; game khác cùng loại vẫn giữ bộ phím của nó; "Mặc định" trả về như cũ;
+      - game RPG Maker XP: phím OK vẫn xác nhận; thêm phím Z thì Z không phải Enter; bàn phím vẽ sẵn không có cột chuột;
       - nút Quay lại mở menu bên trái; thử từng mục; HUD hiện RAM, pin, nhiệt độ (FPS ở game MV).
   12. Đang chơi, bấm "Gửi nhật ký" (menu bên của game, hoặc menu ⋮ ngoài thư viện): file zip có `app/logcat.txt` và
       log của phiên đang chạy.
