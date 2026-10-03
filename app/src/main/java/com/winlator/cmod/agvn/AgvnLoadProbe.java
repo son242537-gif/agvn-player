@@ -1,6 +1,7 @@
 /* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
+import android.os.Process;
 import android.system.Os;
 import android.system.OsConstants;
 
@@ -10,65 +11,39 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
- * How busy the GPU and the game's busiest thread are, for {@link AgvnSlowWatch}. The GPU from the kernel's load files
- * (Adreno's kgsl, Mali's utilisation, MediaTek's ged), which some phones do not let apps read (-1 then); the CPU from
- * Wine's threads in /proc (the game's main thread, DXVK's, the emulator's). The parsing is pure Java (JVM-testable).
+ * How busy the GPU ({@link AgvnGpuLoad}) and the game's busiest thread are, for the slow-game checks. The threads are
+ * Wine's processes (the game's main thread, DXVK's, the emulator's) for a Windows game, or this process for a "Chạy
+ * nhẹ" runner (Ren'Py, mkxp-z). An HTML game runs in WebView's own process, which the app cannot read: no threads.
+ * {@link #busiest} is pure Java (JVM-testable).
  */
 final class AgvnLoadProbe {
-    private static final String[] GPU_FILES = {
-            "/sys/class/kgsl/kgsl-3d0/gpu_busy_percentage",
-            "/sys/class/kgsl/kgsl-3d0/gpubusy",
-            "/sys/class/misc/mali0/device/utilization",
-            "/sys/class/misc/mali0/device/utilisation",
-            "/sys/kernel/gpu/gpu_busy",
-            "/sys/module/ged/parameters/gpu_loading"};
-    private static final Pattern NUMBER = Pattern.compile("\\d+");
+    enum Threads { WINE, SELF, NONE }
+
+    private final AgvnGpuLoad gpu = new AgvnGpuLoad();
+    private final Threads threads;
     private final Map<String, Long> lastTicks = new HashMap<>();
-    private String gpuFile;
-    private boolean gpuUnreadable;
     private long lastMs;
 
+    AgvnLoadProbe(Threads threads) {
+        this.threads = threads;
+    }
+
     /** GPU busy percent now, or -1 when this phone does not tell apps. */
-    int gpuPercent() {
-        if (gpuUnreadable) return -1;
-        if (gpuFile != null) return parseGpu(gpuFile, read(gpuFile));
-        for (String f : GPU_FILES) {
-            int value = parseGpu(f, read(f));
-            if (value >= 0) {
-                gpuFile = f;
-                return value;
-            }
-        }
-        gpuUnreadable = true;
-        return -1;
+    int gpuPercent(long nowMs) {
+        return gpu.percent(nowMs);
     }
 
-    /** "45 %" or "45" → 45; kgsl's gpubusy "busy total" → busy × 100 / total; -1 when unreadable. */
-    static int parseGpu(String path, String text) {
-        if (text == null) return -1;
-        String t = text.trim();
-        if (path.endsWith("/gpubusy")) {
-            String[] parts = t.split("\\s+");
-            try {
-                long busy = Long.parseLong(parts[0]), total = parts.length > 1 ? Long.parseLong(parts[1]) : 0;
-                return total > 0 ? (int) Math.min(100, busy * 100 / total) : -1;
-            } catch (NumberFormatException e) {
-                return -1;
-            }
-        }
-        Matcher m = NUMBER.matcher(t);
-        return m.find() ? (int) Math.min(100, Long.parseLong(m.group())) : -1;
-    }
-
-    /** The share of one core the busiest game thread used since the last call (1.0 = a whole core); -1 the first time. */
+    /** The share of one core the busiest thread used since the last call (1.0 = a whole core); -1 when unknown. */
     double busiestThread(long nowMs) {
-        Map<String, Long> ticks = threadTicks();
+        if (threads == Threads.NONE) return -1;
+        Map<String, Long> ticks = threadTicks(threads == Threads.WINE
+                ? ProcessHelper.listRunningWineProcesses() : Collections.singletonList(String.valueOf(Process.myPid())));
         double busiest = busiest(lastTicks, ticks, nowMs - lastMs, Os.sysconf(OsConstants._SC_CLK_TCK));
         lastTicks.clear();
         lastTicks.putAll(ticks);
@@ -86,30 +61,21 @@ final class AgvnLoadProbe {
         return most * 1000.0 / ticksPerSecond / ms;
     }
 
-    /** utime + stime of each thread of Wine's processes, by "pid/tid". */
-    private static Map<String, Long> threadTicks() {
+    /** utime + stime of each thread of {@code pids}, by "pid/tid". */
+    private static Map<String, Long> threadTicks(List<String> pids) {
         Map<String, Long> ticks = new HashMap<>();
-        for (String pid : ProcessHelper.listRunningWineProcesses()) {
+        for (String pid : pids) {
             File[] tasks = new File("/proc/" + pid + "/task").listFiles();
             if (tasks == null) continue;
             for (File task : tasks) {
-                String stat = read(task.getPath() + "/stat");
-                if (stat == null) continue;
                 try {
+                    String stat = new String(Files.readAllBytes(new File(task, "stat").toPath()), StandardCharsets.UTF_8);
                     ticks.put(pid + "/" + task.getName(), AgvnStartupProgress.cpuTicks(stat));
-                } catch (RuntimeException ignored) {
+                } catch (IOException | RuntimeException ignored) {
                     // the thread just ended
                 }
             }
         }
         return ticks;
-    }
-
-    private static String read(String path) {
-        try {
-            return new String(Files.readAllBytes(new File(path).toPath()), StandardCharsets.UTF_8);
-        } catch (IOException | RuntimeException e) {
-            return null;
-        }
     }
 }

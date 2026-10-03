@@ -1,22 +1,26 @@
 # Tự sửa lỗi
 
-Khi game Windows gặp lỗi hoặc chạy chậm, app tự nhận ra lỗi và hỏi người chơi theo mẫu: "Máy của bạn đang bị…
-Bạn có thể…". Mỗi cách sửa là một nút. Bấm nút là app đổi cấu hình của riêng game đó rồi mở lại game. Người chơi
-không cần vào "Cấu hình".
+Khi game gặp lỗi hoặc chạy chậm, app tự nhận ra và hỏi người chơi theo mẫu: "Máy của bạn đang bị… Bạn có thể…". Áp
+dụng cho game Windows và game "Chạy nhẹ" (Ren'Py, RPG Maker XP/VX/VX Ace, RPG Maker MV/MZ và Tyrano). Mỗi cách sửa
+là một nút. Bấm nút là app đổi cấu hình của riêng game đó rồi mở lại game. Người chơi không cần vào "Cấu hình".
 
 ## Khi nào app hỏi
 
 | Lúc | Ở đâu | Ví dụ |
 |---|---|---|
 | Trước khi vào game | Hộp hỏi | Tiết kiệm pin đang bật: "Mở cài đặt Tiết kiệm pin" hoặc "Chơi luôn". |
-| Đang chơi | Thanh trên game; game vẫn chạy bên dưới | Game chậm đều dưới 20 FPS suốt 1 phút. Cách sửa có tác dụng ở lần mở game sau. |
-| Game vừa thoát hoặc bị lỗi | Hộp hỏi ở thư viện, sau khi app khởi động lại | Game tắt ngay khi mở, crash, thiếu DirectX, thiếu file `.dll`. Bấm một cách sửa là game mở lại ngay. |
-| Android đã tắt app | Hộp hỏi ở lần mở app tiếp theo (trong 24 giờ) | Máy hết RAM; HyperOS tắt app khi chuyển sang app khác. |
+| Đang chơi | Thanh trên game; game vẫn chạy bên dưới | Game chậm đều suốt 1 phút. Sau khi bấm một cách sửa, thanh hỏi "Mở lại game ngay" (nhớ lưu game trước) hay "Để lần sau". |
+| Game vừa thoát hoặc bị lỗi | Hộp hỏi ở thư viện (hoặc Big Picture) | Game tắt ngay khi mở, crash, thiếu DirectX, thiếu file `.dll`; game "Chạy nhẹ" báo lỗi script, bị tắt đột ngột, bị treo. Bấm một cách sửa là game mở lại ngay. |
+| Android đã tắt game | Hộp hỏi khi về thư viện (trong 24 giờ) | Máy hết RAM; HyperOS tắt game khi chuyển sang app khác. |
 
 Mỗi lỗi chỉ hỏi một lần. Cách sửa đã thử mà vẫn lỗi thì lần sau không hiện lại, cho đến khi game chạy tốt một
-lần. Hộp game chậm có nút "Để vậy, không hỏi lại" cho riêng game đó.
+lần. Thanh game chậm có nút "Để vậy, không hỏi lại" cho riêng game đó.
+
+Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp hỏi chỉ hiện ở màn hình đang ở trên cùng.
 
 ## Lỗi app nhận ra (`assets/agvn/game-problems.json`)
+
+### Game Windows
 
 | Lỗi | App nhận ra nhờ | Cách sửa (theo thứ tự) |
 |---|---|---|
@@ -29,18 +33,60 @@ lần. Hộp game chậm có nút "Để vậy, không hỏi lại" cho riêng g
 | Driver đồ họa lỗi giữa chừng | `VK_ERROR_DEVICE_LOST` | Để Turnip tự chọn chế độ dựng hình, đổi driver, đổi DXVK, hạ Đồ họa |
 | Hết bộ nhớ đồ họa / hết RAM | DXVK, Unity, Unreal báo hết bộ nhớ | Hạ Đồ họa |
 | File game hỏng | Unity: `is corrupted` | Gửi nhật ký (cần chép lại game) |
-| Máy hết RAM nên Android tắt app | Lý do Android ghi lại (`LOW_MEMORY`) | Hạ Đồ họa |
-| Máy tắt app khi chạy nền | Lý do Android ghi lại (`SIGKILL` khi app chạy nền) | Mở cài đặt pin của AGVN |
 | Game không chịu độ phân giải nhỏ ("The current resolution is too low") | Game tắt trước khi hiện hình, màn hình dưới 480 dòng | Nâng Đồ họa (thường là Thấp 854×480), dùng lại cấu hình đã chạy được |
 | Game không chạy với cấu hình mới | Lần trước chạy được, đổi cấu hình xong thì tắt trước khi hiện hình | Dùng lại cấu hình đã chạy được, về cấu hình gốc |
 | Game crash | Wine in báo cáo crash | Đổi DXVK, giả lập CPU ổn định hơn, đổi driver, về cấu hình gốc |
 | Game tắt ngay, không rõ lỗi | Game tắt trước khi hiện hình | Về cấu hình gốc, đổi DXVK, đổi driver, gửi nhật ký |
-| Game chậm vì GPU | Dưới 20 FPS, GPU từ 85% trở lên | Hạ Đồ họa, thử chế độ dựng hình Gmem, để Turnip tự chọn |
-| Game chậm vì CPU | Dưới 20 FPS, một nhân CPU từ 90% trở lên | DXVK chạy thẳng trên chip ARM (bản arm64ec), giả lập CPU nhanh hơn, tắt Tiết kiệm pin |
-| Game chậm, máy không cho biết GPU | Dưới 20 FPS đều, CPU không bận | Hạ Đồ họa, thử Gmem, DXVK arm64ec |
 
-Cách sửa nào không đổi được gì thì không hiện. Ví dụ: không có nút đổi driver khi máy chỉ có một driver dùng được,
-không có nút hạ Đồ họa xuống mức game đã từ chối.
+### Game "Chạy nhẹ"
+
+| Lỗi | App nhận ra nhờ | Cách sửa |
+|---|---|---|
+| Game báo lỗi script | Ren'Py ghi `traceback.txt` trong lúc chơi; game MV/MZ hiện màn hình lỗi hoặc thiếu file ảnh, dữ liệu (`html-compat.js` giữ câu lỗi) | Chạy bằng Windows, gửi nhật ký |
+| Trang game HTML bị tắt | WebView của Android mất trang game (thường do hết RAM) | Chạy bằng Windows, gửi nhật ký |
+| Game bị tắt đột ngột | Android ghi tiến trình của Ren'Py hoặc mkxp-z bị lỗi (`CRASH`, `CRASH_NATIVE`) | Chạy bằng Windows, gửi nhật ký |
+| Game bị treo | Android ghi tiến trình không phản hồi (`ANR`) | Chạy bằng Windows, gửi nhật ký |
+
+Lỗi mà bộ chạy game đã tự giải thích kèm cách sửa thì không hỏi lại ở thư viện: lỗi của mkxp-z (kể cả hướng dẫn chép
+RTP), Ren'Py dừng trước màn hình đầu.
+
+### Cả hai loại game
+
+| Lỗi | App nhận ra nhờ | Cách sửa |
+|---|---|---|
+| Máy hết RAM nên Android tắt game | Lý do Android ghi lại (`LOW_MEMORY`) | Hạ Đồ họa (game Windows và Ren'Py), gửi nhật ký |
+| Máy tắt game khi chạy nền | Lý do Android ghi lại (`SIGKILL` khi game chạy nền) | Mở cài đặt pin của AGVN |
+| Game chậm vì GPU | GPU từ 85% trở lên | Hạ Đồ họa, thử chế độ dựng hình Gmem, để Turnip tự chọn, bỏ bớt khung hình (RPG Maker) |
+| Game chậm vì CPU | Một nhân CPU từ 90% trở lên | DXVK chạy thẳng trên chip ARM (bản arm64ec), giả lập CPU nhanh hơn, bỏ bớt khung hình (RPG Maker), tắt Tiết kiệm pin |
+| Game chậm, máy giấu mức bận của GPU | CPU không bận, nên nhiều khả năng là GPU | Hạ Đồ họa, thử Gmem, DXVK arm64ec, bỏ bớt khung hình |
+| Game chậm, không biết GPU hay CPU | Game HTML trên máy giấu mức bận của GPU | Như trên |
+
+"Game chậm" là game chạy đều dưới mức của nó suốt 1 phút. Màn hình đứng yên (visual novel chờ bấm) và mức "Giới hạn
+FPS" người chơi tự đặt không tính.
+
+- **Game Windows:** dưới 20 FPS.
+- **RPG Maker XP/VX/VX Ace:** dưới 3/4 tốc độ của game, tức dưới 30 với XP, dưới 45 với VX. FPS lấy từ
+  `agvn_fps.rb`, một script nhỏ mkxp-z nạp trước game. HUD giờ cũng hiện FPS của game RPG Maker.
+- **Game HTML:** dưới 45 FPS.
+- **Ren'Py:** chỉ vẽ khi có gì chuyển động nên không đo FPS. Chỉ tính khi một nhân CPU bận suốt.
+
+Cách sửa nào không đổi được gì thì không hiện. Ví dụ:
+- không có nút đổi driver khi máy chỉ có một driver dùng được;
+- không có nút hạ Đồ họa xuống mức game đã từ chối;
+- không có nút "Chạy bằng Windows" cho bản game không có `.exe`;
+- game "Chạy nhẹ" không có các nút chỉnh Wine.
+
+## Mức bận của GPU
+
+App đọc mọi file mà kernel các dòng GPU ghi mức bận, giống HUD của Winlator:
+- Adreno (`kgsl`);
+- Mali (`utilization`, `gpuinfo`);
+- MediaTek (`ged`, `mtk_mali`);
+- PowerVR, Exynos;
+- mọi nút `devfreq` có tên giống GPU.
+
+Máy nào giấu hết các file này thì app dựa vào CPU: CPU không bận mà game vẫn chậm thì nhiều khả năng do GPU, và app
+nói đúng như vậy.
 
 ## App biết gì về từng game (`files/agvn/doctor/`)
 
@@ -54,6 +100,17 @@ không có nút hạ Đồ họa xuống mức game đã từ chối.
 không tính. Game tắt khi chưa hiện hình nghĩa là game không mở được, kể cả khi người chơi bấm thoát sau 10 giây mà
 chỉ thấy một hộp lỗi.
 
+Game "Chạy nhẹ" chạy trong tiến trình riêng. Lúc game mở, tiến trình đó ghi `files/agvn/light-session.properties`:
+game nào, tiến trình nào, game đã hiện màn hình đầu chưa, đã kết thúc bình thường chưa, có lỗi gì. Khi về thư viện,
+app đọc file này cùng lý do Android ghi lại cho tiến trình đó. Thời điểm:
+
+- Game ghi "đã kết thúc" ngay lúc màn hình game đóng, trước khi thư viện hiện lại và đọc file.
+- Tiến trình chết mà chưa ghi "đã kết thúc": app chờ tối đa 2 giây để Android ghi xong lý do.
+- Tiến trình còn sống mà chưa kết thúc (người chơi bấm Home rồi mở thư viện): app không hỏi gì, đợi lần sau.
+- "Mở lại game ngay": app đợi tiến trình cũ tắt hẳn (tối đa 12 giây) rồi mới mở lại. Ren'Py và mkxp-z không chạy hai
+  lần trong một tiến trình. Yêu cầu mở lại chỉ có hiệu lực 2 phút: người chơi trả lời "không" khi Ren'Py hỏi thoát
+  thì lần thoát sau game không tự mở lại.
+
 ## Nhật ký Wine luôn có dòng lỗi
 
 Khi tắt "Bật debug Wine", app vẫn cho Wine in hai nhóm lỗi: `err+module` (thiếu hoặc hỏng file `.dll`) và
@@ -64,17 +121,10 @@ Khi tắt "Bật debug Wine", app vẫn cho Wine in hai nhóm lỗi: `err+module
 1. Lấy câu lỗi thật trong `wine-cuoi.txt` hoặc nhật ký engine của người chơi gửi về.
 2. Thêm một mục vào `game-problems.json`: `id`, `lines` (biểu thức chính quy), `when`, `title`, `cause` (viết cho
    người chơi), `fixes` (chọn trong các cách sửa đã có).
-3. Thêm một ca vào `AgvnDoctorTest` với đúng câu lỗi đó.
+3. Thêm một ca vào `AgvnDoctorTest` (game Windows) hoặc `AgvnLightDoctorTest` (game "Chạy nhẹ") với đúng câu lỗi đó.
 4. Nâng `AGVN_VERSION_CODE` rồi phát hành.
 
 Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `AgvnFixApply`.
-
-## Chưa làm
-
-- Game "Chạy nhẹ" (Ren'Py, RPG Maker, HTML) vẫn dùng hộp lỗi riêng đã có: thiếu RTP, "Chạy bằng Windows". Chưa có
-  hộp game chậm.
-- Khi đang bật chế độ Big Picture, app chờ hỏi xong mới mở Big Picture. Riêng lỗi "Android đã tắt app" được tìm ra
-  sau khi Big Picture đã mở, nên hộp hỏi nằm bên dưới Big Picture.
 
 ## Thử trên máy
 
@@ -83,8 +133,17 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       Mở hộp Đồ họa, kéo về Siêu nhẹ: có dòng ⚠.
 - [ ] Đổi DXVK của một game đang chạy tốt sang bản game không chạy được. Hộp hỏi có "Dùng lại cấu hình đã chạy được".
 - [ ] Game nặng trên máy yếu (GPU 100%): sau khoảng 2,5 phút, thanh "Game đang chạy chậm" hiện với nút hạ Đồ họa và
-      nút Gmem. Bấm "Để vậy, không hỏi lại": lần sau không hiện.
+      nút Gmem. Bấm một nút: thanh "Đã lưu…" hỏi "Mở lại game ngay"; bấm thì game đóng rồi tự mở lại với cấu hình mới.
+      Lần khác bấm "Để vậy, không hỏi lại": lần sau không hiện.
 - [ ] Game Godot báo "Unable to initialize video driver": hộp hỏi có "Cho game Godot chạy bằng Vulkan".
-- [ ] Bật Tiết kiệm pin rồi mở game: có hộp hỏi trước khi vào game. "Chơi luôn" vào game, không có thêm thông báo.
-- [ ] Chơi bình thường rồi thoát: không có hộp nào.
+- [ ] Bật Tiết kiệm pin rồi mở game (Windows và "Chạy nhẹ"): có hộp hỏi trước khi vào game. "Chơi luôn" vào game,
+      không có thêm thông báo.
+- [ ] Game Ren'Py "Chạy nhẹ" gặp lỗi script (màn hình lỗi của Ren'Py), thoát game: thư viện hỏi "Game báo lỗi khi
+      Chạy nhẹ" kèm câu lỗi và nút "Chạy bằng Windows".
+- [ ] Game MV "Chạy nhẹ" hiện màn hình lỗi hoặc báo thiếu file, thoát game: thư viện hỏi như trên.
+- [ ] Game RPG Maker XP "Chạy nhẹ": HUD hiện FPS (khoảng 40).
+- [ ] Game RPG Maker XP hoặc Ren'Py "Chạy nhẹ" chậm: bấm cách sửa trên thanh, rồi "Mở lại game ngay". Game đóng, về
+      thư viện vài giây rồi tự mở lại và chơi được (không tắt ngay sau khi mở).
+- [ ] Bật Big Picture rồi để một game gặp lỗi: hộp hỏi hiện trong Big Picture.
+- [ ] Chơi bình thường rồi thoát (game Windows và "Chạy nhẹ"): không có hộp nào.
 - [ ] `adb logcat -s AGVN`: dòng `doctor: <lỗi> for <game>` và `fix <cách sửa> -> <giá trị>`.

@@ -9,6 +9,7 @@ import android.util.Log;
 import com.winlator.cmod.SettingsFragment;
 import com.winlator.cmod.container.Container;
 import com.winlator.cmod.container.ContainerManager;
+import com.winlator.cmod.container.Shortcut;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,8 +27,13 @@ import java.util.Map;
  */
 final class AgvnRgssFiles {
     private static final String TAG = "AGVN";
-    /** mkxp-z's own preload scripts: Ruby 1.8/1.9 names RGSS scripts use, mkxp names, and Win32API stand-ins. */
-    static final String[] PRELOAD = {"ruby_classic_wrap.rb", "mkxp_wrap.rb", "win32_wrap.rb"};
+    /**
+     * The preload scripts: mkxp-z's own (Ruby 1.8/1.9 names RGSS scripts use, mkxp names, Win32API stand-ins), then
+     * AGVN's agvn_fps.rb, which reports the frames the game runs per second (the HUD, "Tự sửa lỗi").
+     */
+    static final String[] PRELOAD = {"ruby_classic_wrap.rb", "mkxp_wrap.rb", "win32_wrap.rb", "agvn_fps.rb"};
+    /** The game's own "skip frames when behind" ("Tự sửa lỗi" turns it on where the phone's tier did not). */
+    static final String EXTRA_FRAME_SKIP = "agvnRgssFrameSkip";
     static final String SOUND_FONT = "soundfonts/wt_210k_G.sf2";
 
     private AgvnRgssFiles() {}
@@ -43,6 +49,7 @@ final class AgvnRgssFiles {
         Intent intent = new Intent(activity, AgvnRgssActivity.class);
         if (from.getExtras() != null) intent.putExtras(from.getExtras());
         intent.putExtra(AgvnRgssActivity.EXTRA_GAME_DIR, gameDir.getPath());
+        intent.putExtra(AgvnRgssActivity.EXTRA_FRAME_SKIP, "1".equals(extras.get(EXTRA_FRAME_SKIP)));
         File driveC = driveC(activity, from);
         if (driveC != null) intent.putExtra(AgvnRgssActivity.EXTRA_DRIVE_C, driveC.getPath());
         activity.startActivity(intent);
@@ -58,8 +65,13 @@ final class AgvnRgssFiles {
         return container != null ? new File(container.getRootDir(), ".wine/drive_c") : null;
     }
 
+    /** True when mkxp-z skips drawing a frame it is behind on: weak and mid phones, or a game "Tự sửa lỗi" set. */
+    static boolean frameSkip(Context context, Shortcut shortcut) {
+        return DeviceTierManager.current(context) != DeviceTier.FLAGSHIP || "1".equals(shortcut.getExtra(EXTRA_FRAME_SKIP));
+    }
+
     /** Writes everything mkxp-z needs; returns the config, or null when the files cannot be written. */
-    static AgvnRgssConfig prepare(Context context, File gameDir, File driveC, File runDir) {
+    static AgvnRgssConfig prepare(Context context, File gameDir, File driveC, File runDir, boolean forceFrameSkip) {
         try {
             if (!runDir.isDirectory() && !runDir.mkdirs()) throw new IOException("cannot create " + runDir);
             List<File> preload = new ArrayList<>();
@@ -68,7 +80,7 @@ final class AgvnRgssFiles {
             AgvnRgssConfig config = new AgvnRgssConfig(gameDir, new File(SettingsFragment.DEFAULT_WINLATOR_PATH), driveC);
             try (OutputStream out = new FileOutputStream(new File(runDir, "mkxp.json"))) {
                 // weak and mid phones skip drawing a frame when they fall behind, rather than slowing the game down
-                boolean frameSkip = DeviceTierManager.current(context) != DeviceTier.FLAGSHIP;
+                boolean frameSkip = forceFrameSkip || DeviceTierManager.current(context) != DeviceTier.FLAGSHIP;
                 out.write(config.json(soundFont, preload, frameSkip).getBytes(StandardCharsets.UTF_8));
             }
             Log.i(TAG, "RGSS" + config.rgss + " game " + gameDir + ", RTP " + config.rtpDirs + ", missing " + config.missingRtp);

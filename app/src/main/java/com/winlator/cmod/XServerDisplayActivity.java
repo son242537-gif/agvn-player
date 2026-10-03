@@ -853,7 +853,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         agvnMemoryWatch.start();
         if (agvnHeatWatch == null) agvnHeatWatch = new com.winlator.cmod.agvn.AgvnHeatWatch(this);
         agvnHeatWatch.start();
-        if (agvnSlowWatch == null) agvnSlowWatch = new com.winlator.cmod.agvn.AgvnSlowWatch(this, shortcut); // AGVN: slow game
+        if (agvnSlowWatch == null) agvnSlowWatch = new com.winlator.cmod.agvn.AgvnSlowWatch(this, shortcut, this::exit); // AGVN
         agvnSlowWatch.start();
         if (agvnStatus != null) agvnStatus.followDebugSetting(preferences.getBoolean("enable_wine_debug", false)); // AGVN
         if (!isInPictureInPictureMode())

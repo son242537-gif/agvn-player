@@ -68,6 +68,16 @@ final class AgvnHtmlHost implements AgvnLightTools.Host {
         return -1; // the page runs in WebView's own process, which the app cannot measure
     }
 
+    @Override
+    public String runner() {
+        return AgvnHtmlGame.RUNNER_HTML;
+    }
+
+    @Override
+    public int targetFps() {
+        return 60; // RPG Maker MV/MZ and Tyrano move 60 times a second
+    }
+
     private static int parse(String value) {
         try {
             return value != null ? Integer.parseInt(value.trim()) : -1;

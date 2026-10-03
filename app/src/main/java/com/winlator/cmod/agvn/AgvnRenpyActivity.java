@@ -57,6 +57,7 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
             end();
             return;
         }
+        AgvnLightSession.begin(this, AgvnHtmlGame.RUNNER_RENPY, gameDir); // "Tự sửa lỗi" reads how it ends
         AgvnRefreshCap.apply(this); // 60 Hz: Ren'Py draws every refresh
         AgvnKeepAlive.startRenpy(this, getIntent().getStringExtra("shortcut_name")); // the game keeps running in the background
         showSplash();
@@ -105,6 +106,7 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
     @Override
     protected void onPresplashHidden() {
         started = true;
+        AgvnLightSession.started(this);
         if (splash != null) {
             mLayout.removeView(splash);
             splash = null;
@@ -170,6 +172,7 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
             return;
         }
         failed = true;
+        AgvnLightSession.shown(this, "Ren'Py stopped before its first screen"); // this dialog offers the fixes
         boolean windows = AgvnHtmlGame.hasWindowsExe(this);
         runOnUiThread(() -> {
             AlertDialog.Builder b = new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
@@ -184,6 +187,7 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
 
     /** Ends this process: SDL and Python cannot start twice in one process, and the app's screens live elsewhere. */
     private void end() {
+        AgvnLightSession.ended(this); // a choice of the player or the game, never a crash
         Process.killProcess(Process.myPid());
     }
 

@@ -99,6 +99,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        com.winlator.cmod.agvn.AgvnDoctorDialog.checkAsync(this); // AGVN: ask about the last game's problem ("Tự sửa lỗi")
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -127,12 +133,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return;
         }
 
-        // AGVN: sessions whose process Android killed get their logs and exit reason now; then the player is asked
-        // about what went wrong in the last game, with fixes ("Tự sửa lỗi")
-        new Thread(() -> {
-            com.winlator.cmod.agvn.AgvnSessionLog.finishPending(getApplicationContext());
-            runOnUiThread(() -> com.winlator.cmod.agvn.AgvnDoctorDialog.showIfPending(this));
-        }, "AgvnSessionLog").start();
+        // AGVN: sessions whose process Android killed get their logs and exit reason now
+        new Thread(() -> com.winlator.cmod.agvn.AgvnSessionLog.finishPending(getApplicationContext()), "AgvnSessionLog").start();
 
         notificationService = new Intent(this, NotificationService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && (Build.VERSION.SDK_INT < 33 || ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED))

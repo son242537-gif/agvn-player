@@ -319,4 +319,9 @@
     <string name="agvn_fix_app_settings">Mở cài đặt pin của AGVN</string>
     <string name="agvn_fix_send_logs">Gửi nhật ký cho AGVN</string>
     <string name="agvn_fix_play_anyway">Chơi luôn</string>
+    <string name="agvn_fix_rgss_frameskip">Bỏ bớt khung hình khi máy chậm (game giữ đúng tốc độ)</string>
+    <string name="agvn_doctor_restart_title">Đã lưu: %1$s</string>
+    <string name="agvn_doctor_restart_detail">Mở lại game ngay để dùng cách sửa này? Nhớ lưu game trước.</string>
+    <string name="agvn_doctor_restart_now">Mở lại game ngay</string>
+    <string name="agvn_doctor_restart_later">Để lần sau</string>
 </resources>

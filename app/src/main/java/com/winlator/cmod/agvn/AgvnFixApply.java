@@ -82,6 +82,12 @@ final class AgvnFixApply {
             case "wincomponent":
                 s.putExtra("wincomponents", AgvnFixEdits.withComponent(AgvnFixes.winComponents(s), fix.to));
                 break;
+            case "run-windows":
+                s.putExtra(AgvnHtmlGame.EXTRA_RUNNER, fix.to); // the next start is Wine's
+                break;
+            case "rgss-frameskip":
+                s.putExtra(AgvnRgssFiles.EXTRA_FRAME_SKIP, fix.to);
+                break;
             default:
                 return false;
         }

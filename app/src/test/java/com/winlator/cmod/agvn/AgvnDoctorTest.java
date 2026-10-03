@@ -26,10 +26,11 @@ public class AgvnDoctorTest {
     private static final Set<String> FIXES = new HashSet<>(Arrays.asList("restore-good", "reset", "quality-down",
             "quality-up", "dxvk-other", "dxvk-arm64ec", "driver-other", "wined3d", "godot-renderer", "godot-undo",
             "render-gmem", "render-auto", "emulator-stable", "emulator-fast", "wincomponent", "power-save-settings",
-            "app-settings", "send-logs"));
+            "app-settings", "send-logs", "run-windows", "rgss-frameskip"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
-            "changed", "small-screen", "killed-low-memory", "killed-background", "live"));
-    private static AgvnProblemCatalog catalog;
+            "changed", "small-screen", "killed-low-memory", "killed-background", "live", "light", "script-error",
+            "page-crash", "frozen"));
+    static AgvnProblemCatalog catalog;
 
     @BeforeClass
     public static void load() throws IOException {
@@ -62,7 +63,8 @@ public class AgvnDoctorTest {
             for (String fix : p.fixes) assertTrue(p.id + ": unknown fix " + fix, FIXES.contains(fix));
             if (p.when != null) for (String c : p.when) assertTrue(p.id + ": unknown condition " + c, CONDITIONS.contains(c));
         }
-        for (String live : Arrays.asList("slow-gpu", "slow-cpu", "slow", "power-save")) assertNotNull(live, catalog.byId(live));
+        for (String live : Arrays.asList("slow-gpu", "slow-cpu", "slow", "slow-unknown", "power-save"))
+            assertNotNull(live, catalog.byId(live));
     }
 
     @Test

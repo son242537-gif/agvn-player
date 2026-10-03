@@ -38,6 +38,12 @@ public final class AgvnLightTools {
 
         /** The game's own memory in MB; -1 when it cannot be measured (an HTML game runs in WebView's process). */
         long gameMb();
+
+        /** The runner: AgvnHtmlGame.RUNNER_RENPY, RUNNER_RGSS or RUNNER_HTML. */
+        String runner();
+
+        /** The frames per second the game is made for; -1 when it has none (Ren'Py draws only when something moves). */
+        int targetFps();
     }
 
     private static final float RESIZE_STEP = 0.1f;
@@ -53,6 +59,7 @@ public final class AgvnLightTools {
     private final AgvnLightHud hud;
     private final AgvnLightBar bar;
     private final AgvnLightMenu menu;
+    private final AgvnLightSlow slow;
     private AgvnLightEditBar editBar;
 
     private AgvnLightTools(Activity activity, String kind, String gameName, File gameDir, Host host) {
@@ -74,6 +81,8 @@ public final class AgvnLightTools {
         menu = new AgvnLightMenu(this, this.gameName);
         if (prefs.hud()) hud.start();
         bar.update(keysShown());
+        slow = new AgvnLightSlow(activity, host); // "Tự sửa lỗi": a game slow for a minute says why
+        slow.start();
     }
 
     /** Puts the toolkit on the game screen: {@code kind} is the game type of {@link AgvnLayouts} (VN or RPG). */
@@ -94,10 +103,13 @@ public final class AgvnLightTools {
     void onPause() {
         keys.releaseAll();
         hud.stop();
+        slow.stop();
+        if (activity.isFinishing()) AgvnLightSession.ended(activity); // before the library comes back and reads it
     }
 
     void onResume() {
         if (prefs.hud()) hud.start();
+        slow.start();
     }
 
     void openMenu() {

@@ -70,6 +70,16 @@ final class AgvnRenpyHost implements AgvnLightTools.Host {
     }
 
     @Override
+    public String runner() {
+        return AgvnHtmlGame.RUNNER_RENPY;
+    }
+
+    @Override
+    public int targetFps() {
+        return -1; // Ren'Py draws only when something on screen moves
+    }
+
+    @Override
     public long gameMb() {
         return AgvnMemoryProbe.processMb();
     }

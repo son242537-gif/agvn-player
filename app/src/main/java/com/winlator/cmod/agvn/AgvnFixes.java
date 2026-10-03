@@ -24,6 +24,10 @@ import java.util.Set;
 final class AgvnFixes {
     /** Fixes that change no game setting: offered every time. */
     private static final List<String> ALWAYS = Arrays.asList("send-logs", "power-save-settings", "app-settings");
+    /** Fixes of Wine's settings: none of them changes a "Chạy nhẹ" game. */
+    private static final List<String> WINE_ONLY = Arrays.asList("restore-good", "reset", "dxvk-other", "dxvk-arm64ec",
+            "driver-other", "wined3d", "godot-renderer", "godot-undo", "render-gmem", "render-auto", "emulator-stable",
+            "emulator-fast", "wincomponent");
     static final String SYSTEM = "System";
 
     /** A button: its fix id, its words, and what it sets ({@code to}). */
@@ -56,7 +60,15 @@ final class AgvnFixes {
     }
 
     private static Fix make(Activity a, Shortcut s, AgvnProblemCatalog.Finding finding, Properties state, String id) {
+        String runner = s.getExtra(AgvnHtmlGame.EXTRA_RUNNER);
+        boolean light = AgvnHtmlGame.isLight(runner);
+        if (light && (WINE_ONLY.contains(id) || id.startsWith("quality-") && !AgvnHtmlGame.RUNNER_RENPY.equals(runner))) return null;
         switch (id) {
+            case "run-windows":
+                return light && AgvnHtmlGame.exeExists(s.file) ? new Fix(id, a.getString(R.string.agvn_html_use_windows), AgvnHtmlGame.RUNNER_WINE) : null;
+            case "rgss-frameskip":
+                return AgvnHtmlGame.RUNNER_RGSS.equals(runner) && !AgvnRgssFiles.frameSkip(a, s)
+                        ? new Fix(id, a.getString(R.string.agvn_fix_rgss_frameskip), "1") : null;
             case "restore-good":
                 return AgvnGoodConfig.hasGood(state) && !AgvnGoodConfig.changed(AgvnGoodConfig.good(state),
                         AgvnGoodConfig.snapshot(s)).isEmpty() ? new Fix(id, a.getString(R.string.agvn_fix_restore_good), null) : null;

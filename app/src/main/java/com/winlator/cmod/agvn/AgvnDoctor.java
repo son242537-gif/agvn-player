@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
  */
 public final class AgvnDoctor {
     private static final String TAG = "AGVN";
-    static final String PENDING = "agvn/doctor-pending.properties", PARAM = "param.";
     private static final Pattern GODOT = Pattern.compile("Godot Engine v(\\d+)\\.");
     /** Settings a lower Đồ họa step changes: when only they changed and the game then refused to start, the screen did it. */
     private static final List<String> SCREEN_KEYS = Arrays.asList("screenSize", AgvnQuality.EXTRA_QUALITY, "nativeFpsLimit",
@@ -51,7 +50,20 @@ public final class AgvnDoctor {
 
     /** True when a game left a problem to ask about (MainActivity then stays in front of Big Picture). */
     public static boolean hasPending(Context ctx) {
-        return new File(ctx.getFilesDir(), PENDING).isFile();
+        return AgvnDoctorStore.hasPending(ctx);
+    }
+
+    /** "Mở lại game ngay": the library starts {@code s} again as soon as it shows (AgvnDoctorDialog). */
+    static void requestRelaunch(Context ctx, Shortcut s) {
+        AgvnDoctorStore.relaunch(ctx, s);
+    }
+
+    /** A "Chạy nhẹ" game's end ({@link AgvnLightDoctor}): its problem, if any, is asked about at the library. */
+    static void diagnoseLight(Context ctx, Shortcut s, AgvnEvidence ev) {
+        AgvnProblemCatalog.Finding f = catalog(ctx).find(ev);
+        if (f == null) return;
+        Log.i(TAG, "doctor: " + f.id() + " for " + s.name);
+        AgvnDoctorStore.ask(ctx, s, f);
     }
 
     /** The game ends (XServerDisplayActivity.exit), before its session log closes. Never throws. */
@@ -107,7 +119,8 @@ public final class AgvnDoctor {
             AgvnGoodConfig.save(ctx, s, state);
         }
         AgvnSessionLog.event("Tự sửa lỗi: " + f.id() + " – " + f.title());
-        writePending(ctx, s, f);
+        Log.i(TAG, "doctor: " + f.id() + " for " + s.name);
+        AgvnDoctorStore.ask(ctx, s, f);
     }
 
     /** True when the game refused this screen size: "low-resolution", or only the screen got smaller before it failed. */
@@ -172,19 +185,5 @@ public final class AgvnDoctor {
             }
         }
         return lines;
-    }
-
-    private static void writePending(Context ctx, Shortcut s, AgvnProblemCatalog.Finding f) {
-        Properties p = new Properties();
-        p.setProperty("container", String.valueOf(s.container.id));
-        p.setProperty("shortcut", s.file.getPath());
-        p.setProperty("problem", f.id());
-        p.setProperty("time", String.valueOf(System.currentTimeMillis()));
-        for (Map.Entry<String, String> e : f.params.entrySet()) p.setProperty(PARAM + e.getKey(), e.getValue());
-        File file = new File(ctx.getFilesDir(), PENDING);
-        File dir = file.getParentFile();
-        if (dir != null) dir.mkdirs();
-        AgvnPropsFile.store(p, file, "AGVN Player: a problem to ask the player about");
-        Log.i(TAG, "doctor: " + f.id() + " for " + s.name);
     }
 }

@@ -4,16 +4,12 @@ package com.winlator.cmod.agvn;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.webkit.ConsoleMessage;
 import android.webkit.RenderProcessGoneDetail;
-import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -57,6 +53,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         root = index.getParentFile();
         host = AgvnHtmlGame.hostFor(index);
         AgvnKeepAlive.start(this, getIntent().getStringExtra("shortcut_name")); // the game keeps running in the background
+        AgvnLightSession.begin(this, AgvnHtmlGame.RUNNER_HTML, AgvnLightGame.folderOf(index)); // "Tự sửa lỗi" reads its end
         boolean rpgMaker = AgvnHtmlFiles.resolve(root, "/js/rpg_core.js") != null || AgvnHtmlFiles.resolve(root, "/js/rmmz_core.js") != null;
         if (rpgMaker) compatJs = com.winlator.cmod.core.FileUtils.readString(this, "agvn/html-compat.js");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -86,13 +83,27 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         s.setAllowContentAccess(false);
         s.setTextZoom(100);
         webView.setWebViewClient(new GameClient());
-        webView.setWebChromeClient(new ConsoleClient(logs));
+        webView.setWebChromeClient(new AgvnHtmlConsole(logs));
         setContentView(webView);
         hideSystemUi();
         webView.loadUrl("https://" + host + "/" + Uri.encode(index.getName()));
         tools = AgvnLightTools.attach(this, rpgMaker ? AgvnLayouts.RPG : AgvnLayouts.VN, getIntent().getStringExtra("shortcut_name"),
                 AgvnLightGame.folderOf(index), new AgvnHtmlHost(this, webView));
+        webView.postDelayed(fatalPoll, AgvnHtmlConsole.FATAL_POLL_MS);
     }
+
+    /** "Tự sửa lỗi": an error that stopped the game (html-compat.js keeps it in __agvnFatal), asked about at the end. */
+    private final Runnable fatalPoll = new Runnable() {
+        @Override
+        public void run() {
+            if (webView == null || isFinishing()) return;
+            webView.evaluateJavascript(AgvnHtmlConsole.FATAL, v -> {
+                String error = AgvnHtmlConsole.unquote(v);
+                if (!error.isEmpty()) AgvnLightSession.error(AgvnHtmlActivity.this, error);
+                else if (webView != null) webView.postDelayed(fatalPoll, AgvnHtmlConsole.FATAL_POLL_MS);
+            });
+        }
+    };
 
     private final class GameClient extends WebViewClient {
         @Override
@@ -108,8 +119,14 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         }
 
         @Override
+        public void onPageFinished(WebView view, String url) {
+            AgvnLightSession.started(AgvnHtmlActivity.this);
+        }
+
+        @Override
         public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
             // the game page crashed or ran out of memory: close the game, never the whole app
+            AgvnLightSession.pageCrashed(AgvnHtmlActivity.this); // the library then says why and offers Windows
             Toast.makeText(AgvnHtmlActivity.this, R.string.agvn_html_crashed, Toast.LENGTH_LONG).show();
             if (webView != null) {
                 ((android.view.ViewGroup) webView.getParent()).removeView(webView);
@@ -118,31 +135,6 @@ public class AgvnHtmlActivity extends AppCompatActivity {
             }
             finish();
             return true;
-        }
-    }
-
-    /** Game script messages in logcat (tag AgvnHtml): warnings and errors always, everything with a log setting on. */
-    private static final class ConsoleClient extends WebChromeClient {
-        private final boolean all;
-
-        ConsoleClient(boolean all) {
-            this.all = all;
-        }
-
-        @Override
-        public boolean onConsoleMessage(ConsoleMessage m) {
-            ConsoleMessage.MessageLevel level = m.messageLevel();
-            boolean problem = level == ConsoleMessage.MessageLevel.ERROR || level == ConsoleMessage.MessageLevel.WARNING;
-            if (all || problem) {
-                Log.println(problem ? Log.WARN : Log.INFO, "AgvnHtml", m.message() + " (" + m.sourceId() + ":" + m.lineNumber() + ")");
-            }
-            return true;
-        }
-
-        /** No grey "play" picture on a game video before its first frame. */
-        @Override
-        public Bitmap getDefaultVideoPoster() {
-            return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
         }
     }
 
@@ -201,6 +193,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
             webView = null;
         }
         if (isFinishing() && !toWindows) AgvnKeepAlive.start(this, null); // back to the library's notification
+        if (isFinishing()) AgvnLightSession.ended(this);
         super.onDestroy();
     }
 }

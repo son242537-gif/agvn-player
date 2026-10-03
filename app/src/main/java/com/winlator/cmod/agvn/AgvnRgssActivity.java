@@ -10,14 +10,10 @@ import android.view.InputDevice;
 import android.view.KeyEvent;
 
 import com.winlator.cmod.R;
-import com.winlator.cmod.SettingsFragment;
 import com.winlator.cmod.agvn.sdl.SDLActivity;
 import com.winlator.cmod.core.FileUtils;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * Plays an RPG Maker XP/VX/VX Ace game on "Chạy nhẹ" ({@link AgvnRgssGame}) with mkxp-z (libmkxp-z.so, built by
@@ -29,9 +25,13 @@ public class AgvnRgssActivity extends SDLActivity {
     private static final String TAG = "AGVN";
     public static final String EXTRA_GAME_DIR = "agvn_rgss_game_dir";
     public static final String EXTRA_DRIVE_C = "agvn_rgss_drive_c";
+    /** True when the game's own settings ask mkxp-z to skip frames it is behind on (AgvnRgssFiles.EXTRA_FRAME_SKIP). */
+    public static final String EXTRA_FRAME_SKIP = "agvn_rgss_frameskip";
 
     private AgvnRgssConfig config;
     private File errorFile;
+    /** "<frames per second> <the game's frame rate>", written by agvn_fps.rb every 2 s. */
+    private File fpsFile;
     private AgvnLightTools tools;
     private boolean failed;
 
@@ -47,7 +47,10 @@ public class AgvnRgssActivity extends SDLActivity {
         File runDir = new File(getFilesDir(), "rgss");
         errorFile = new File(runDir, "error.txt");
         errorFile.delete();
-        if (dir != null) config = AgvnRgssFiles.prepare(this, new File(dir), driveC != null ? new File(driveC) : null, runDir);
+        fpsFile = new File(runDir, "fps.txt");
+        fpsFile.delete();
+        if (dir != null) config = AgvnRgssFiles.prepare(this, new File(dir), driveC != null ? new File(driveC) : null, runDir,
+                getIntent().getBooleanExtra(EXTRA_FRAME_SKIP, false));
         super.onCreate(savedInstanceState);
         if (mBrokenLibraries) return; // SDL shows its own error
         if (config == null) {
@@ -56,7 +59,10 @@ public class AgvnRgssActivity extends SDLActivity {
         }
         nativeSetenv("SRCDIR", runDir.getPath()); // mkxp-z reads mkxp.json there, then switches into the game folder
         nativeSetenv("AGVN_MKXPZ_ERROR_FILE", errorFile.getPath());
+        nativeSetenv("AGVN_RGSS_FPS_FILE", fpsFile.getPath());
+        AgvnLightSession.begin(this, AgvnHtmlGame.RUNNER_RGSS, config.gameDir); // "Tự sửa lỗi" reads how it ends
         tools = AgvnLightTools.attach(this, AgvnLayouts.RPG, getIntent().getStringExtra("shortcut_name"), config.gameDir, new Host());
+        AgvnLightSession.started(this);
         AgvnKeepAlive.startRgss(this, getIntent().getStringExtra("shortcut_name")); // keeps running in the background
     }
 
@@ -113,7 +119,17 @@ public class AgvnRgssActivity extends SDLActivity {
 
         @Override
         public int fps() {
-            return -1;
+            return Math.round(fpsReading(0));
+        }
+
+        @Override
+        public String runner() {
+            return AgvnHtmlGame.RUNNER_RGSS;
+        }
+
+        @Override
+        public int targetFps() {
+            return Math.round(fpsReading(1)); // XP 40, VX and VX Ace 60, or what the game set
         }
 
         @Override
@@ -139,12 +155,13 @@ public class AgvnRgssActivity extends SDLActivity {
         }
         failed = true;
         Log.w(TAG, "mkxp-z stopped on an error: " + error);
-        saveErrorLog(error);
+        AgvnLightSession.shown(this, error); // this dialog offers the fixes; the library does not ask again
+        AgvnRgssFailure.saveLog(getIntent().getStringExtra("shortcut_name"), error, config);
         boolean windows = AgvnHtmlGame.hasWindowsExe(this);
         runOnUiThread(() -> {
             AlertDialog.Builder b = new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
                     .setTitle(R.string.agvn_rgss_failed_title)
-                    .setMessage(failureMessage(error))
+                    .setMessage(AgvnRgssFailure.message(this, error, config))
                     .setNegativeButton(R.string.agvn_close, (d, w) -> end())
                     .setCancelable(false);
             if (windows) b.setPositiveButton(R.string.agvn_html_use_windows, (d, w) -> switchToWindows());
@@ -152,30 +169,20 @@ public class AgvnRgssActivity extends SDLActivity {
         });
     }
 
-    /** A missing file while an RTP the game asks for is not on the phone: how to add that RTP. Else the error itself. */
-    private String failureMessage(String error) {
-        String first = error.length() > 600 ? error.substring(0, 600) + "…" : error;
-        boolean missingFile = error.contains("ENOENT") || error.contains("No such file") || error.contains("Unable to find");
-        if (missingFile && config != null && !config.missingRtp.isEmpty()) {
-            String name = config.missingRtp.get(0);
-            File folder = new File(new File(SettingsFragment.DEFAULT_WINLATOR_PATH, AgvnRgssConfig.RTP_FOLDER), name);
-            return getString(R.string.agvn_rgss_missing_rtp, name, folder.getPath()) + "\n\n" + first;
+    /** Field {@code index} of agvn_fps.rb's file ("57.9 60"), -1 when there is none yet. */
+    private float fpsReading(int index) {
+        String text = fpsFile != null && fpsFile.isFile() ? FileUtils.readString(fpsFile) : null;
+        String[] parts = text != null ? text.trim().split("\\s+") : new String[0];
+        try {
+            return parts.length > index ? Float.parseFloat(parts[index]) : -1;
+        } catch (NumberFormatException e) {
+            return -1;
         }
-        return getString(R.string.agvn_rgss_failed_message) + "\n\n" + first;
-    }
-
-    /** Keeps the error where "Gửi nhật ký" in the game's ⋮ menu finds it: a session folder of AGVN-Player/logs/<game>. */
-    private void saveErrorLog(String error) {
-        File dir = new File(new File(AgvnSessionLog.root(), AgvnLogFolders.safeName(getIntent().getStringExtra("shortcut_name"))),
-                new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.ROOT).format(new Date()));
-        if (config == null || !dir.mkdirs()) return;
-        FileUtils.writeString(new File(dir, AgvnSessionLog.SUMMARY), "runner=rgss (mkxp-z)\nrgss=" + config.rgss + "\ngame="
-                + config.gameDir + "\nrtp=" + config.rtpDirs + "\nmissingRtp=" + config.missingRtp + "\nend=error\n");
-        FileUtils.writeString(new File(dir, "loi-game.txt"), error);
     }
 
     /** Ends this process: SDL cannot start twice in one process, and the app's screens live elsewhere. */
     private void end() {
+        AgvnLightSession.ended(this); // a choice of the player or the game, never a crash
         Process.killProcess(Process.myPid());
     }
 

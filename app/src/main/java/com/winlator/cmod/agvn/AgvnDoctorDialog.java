@@ -2,6 +2,7 @@
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Typeface;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -10,14 +11,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 
 import com.winlator.cmod.R;
 import com.winlator.cmod.container.Shortcut;
 
-import java.io.File;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -27,26 +27,38 @@ import java.util.Properties;
 public final class AgvnDoctorDialog {
     private AgvnDoctorDialog() {}
 
+    /**
+     * When the library (or Big Picture) comes to the front: sessions Android ended and a "Chạy nhẹ" game that ended
+     * are read off the UI thread (a runner that asked to restart is let end first), then {@link #showIfPending}.
+     */
+    public static void checkAsync(Activity a) {
+        Context app = a.getApplicationContext();
+        new Thread(() -> {
+            AgvnSessionLog.finishPending(app);
+            AgvnDoctorStore.awaitRelaunch(app);
+            AgvnLightDoctor.check(app);
+            a.runOnUiThread(() -> showIfPending(a));
+        }, "AgvnDoctor").start();
+    }
+
+    /**
+     * At the library: first a game the player asked to start again ("Mở lại game ngay"), else the problem a game left,
+     * once. Only while {@code a} is in front: Big Picture over the library asks instead. Call on the UI thread.
+     */
     public static void showIfPending(Activity a) {
         if (a == null || a.isFinishing() || a.isDestroyed()) return;
-        File file = new File(a.getFilesDir(), AgvnDoctor.PENDING);
-        if (!file.isFile()) return;
-        Properties p = AgvnPropsFile.load(file);
-        file.delete();
-        int container;
-        try {
-            container = Integer.parseInt(p.getProperty("container", "-1"));
-            long age = System.currentTimeMillis() - Long.parseLong(p.getProperty("time", "0"));
-            if (age > AgvnDoctor.KILL_RECENT_MS) return; // a day old: the player has moved on
-        } catch (NumberFormatException e) {
+        if (a instanceof LifecycleOwner && !((LifecycleOwner) a).getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) return;
+        AgvnDoctorStore.Entry again = AgvnDoctorStore.take(a, AgvnDoctorStore.RELAUNCH);
+        Shortcut restart = again == null || System.currentTimeMillis() - again.time > AgvnDoctorStore.RELAUNCH_MS
+                ? null : AgvnRelaunch.find(a, again.container, again.shortcut);
+        if (restart != null) {
+            AgvnRelaunch.start(a, restart);
             return;
         }
-        Shortcut s = AgvnRelaunch.find(a, container, p.getProperty("shortcut", ""));
-        Map<String, String> params = new LinkedHashMap<>();
-        for (String key : p.stringPropertyNames()) {
-            if (key.startsWith(AgvnDoctor.PARAM)) params.put(key.substring(AgvnDoctor.PARAM.length()), p.getProperty(key));
-        }
-        AgvnProblemCatalog.Finding f = AgvnDoctor.catalog(a).finding(p.getProperty("problem", ""), params);
+        AgvnDoctorStore.Entry e = AgvnDoctorStore.take(a, AgvnDoctorStore.PENDING);
+        if (e == null || System.currentTimeMillis() - e.time > AgvnDoctor.KILL_RECENT_MS) return; // a day old: moved on
+        Shortcut s = AgvnRelaunch.find(a, e.container, e.shortcut);
+        AgvnProblemCatalog.Finding f = AgvnDoctor.catalog(a).finding(e.problem, e.params);
         if (s != null && f != null) show(a, s, f);
     }
 

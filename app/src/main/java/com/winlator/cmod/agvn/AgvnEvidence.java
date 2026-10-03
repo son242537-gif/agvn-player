@@ -19,10 +19,14 @@ final class AgvnEvidence {
     static final long GOOD_AFTER_S = 60;
 
     final List<String> lines = new ArrayList<>();
-    /** Values the problem texts use: "crash", "screen", "fps", "gpu", "cpu", "godot". */
+    /** Values the problem texts use: "crash", "screen", "fps", "speed", "gpu", "cpu", "godot", "runner", "error". */
     final Map<String, String> params = new LinkedHashMap<>();
     String engine = "";
+    /** "" for a Windows game; renpy, rgss or html for a "Chạy nhẹ" game (AgvnLightDoctor). */
+    String runner = "";
     boolean crashed, endedByGame, playerQuit, started, bigWindowSeen, changed, smallScreen;
+    /** "Chạy nhẹ": the game reported an error, its page process died, Android found it frozen. */
+    boolean scriptError, pageCrash, frozen;
     long seconds;
     /** How Android ended the app, for a session found unfinished at the next start; -1 when it was not. */
     int killedReason = -1, killedImportance;
@@ -44,6 +48,10 @@ final class AgvnEvidence {
             case "small-screen": return smallScreen;
             case "killed-low-memory": return killedReason == REASON_LOW_MEMORY;
             case "killed-background": return killedReason == REASON_SIGNALED && killedImportance > IMPORTANCE_FOREGROUND;
+            case "light": return !runner.isEmpty();
+            case "script-error": return scriptError;
+            case "page-crash": return pageCrash;
+            case "frozen": return frozen;
             default: return false; // "live" problems are found while playing; names a newer file may add stay unmet
         }
     }

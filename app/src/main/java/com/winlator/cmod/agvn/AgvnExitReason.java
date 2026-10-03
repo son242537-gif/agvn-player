@@ -35,11 +35,16 @@ final class AgvnExitReason {
 
     /** The first end of the app process after {@code startMs} (Android 11+), or null when unknown. */
     static Exit exit(Context context, long startMs) {
+        return exit(context, startMs, 0);
+    }
+
+    /** As {@link #exit(Context, long)} for one process ({@code pid}, 0 for any): a "Chạy nhẹ" runner's own. */
+    static Exit exit(Context context, long startMs, int pid) {
         if (Build.VERSION.SDK_INT < 30 || startMs <= 0) return null;
         try {
             ActivityManager am = context.getSystemService(ActivityManager.class);
             ApplicationExitInfo first = null; // the list is newest first; the session ended with the oldest one after it began
-            for (ApplicationExitInfo info : am.getHistoricalProcessExitReasons(context.getPackageName(), 0, 16))
+            for (ApplicationExitInfo info : am.getHistoricalProcessExitReasons(context.getPackageName(), Math.max(0, pid), 16))
                 if (info.getTimestamp() >= startMs) first = info;
             return first != null ? new Exit(first.getReason(), first.getImportance(), first.getDescription()) : null;
         } catch (RuntimeException e) {
