@@ -35,7 +35,16 @@ Container đầu tiên chọn DXVK theo việc Vulkan chạy được gì, khôn
   cần Vulkan 1.3.
 - Mali: 1.10.3 như bản gốc. Máy không cho biết bản Vulkan: 2.3.1 như trước.
 
-Container đã có giữ nguyên cài đặt.
+Container đã có giữ nguyên cài đặt. Lúc mở game, nếu game đặt DXVK 2.x mà driver Vulkan của máy ("System") dưới
+1.3, lần chạy đó dùng 1.10.3 (`AgvnDxvkPick.fitLaunch`). Nếu không, DXVK 2.x không tạo được DirectX và game báo
+thiếu DirectX 11. Turnip và driver tự cài thì giữ nguyên lựa chọn.
+
+### OpenGL cho game Godot (`AgvnGlDriver.forGodot`)
+
+Game Godot 4 dùng "Compatibility" và Godot 3 dùng GLES3 đều đòi OpenGL 3.3. Nếu không có, game dừng với hộp
+"Unable to initialize video driver … OpenGL 3.3". Trên Zink (máy không có Turnip), app đặt
+`MESA_GL_VERSION_OVERRIDE=3.3` và `MESA_GLSL_VERSION_OVERRIDE=330` cho game Godot, trừ khi người chơi đã tự đặt.
+Turnip dùng freedreno, vốn đã đặt 3.3.
 
 ### Game "Chạy nhẹ"
 
@@ -68,6 +77,10 @@ lỗi" trong Cài đặt có thêm các dòng này:
 
 Tên GPU được nhớ trong `files/agvn-device.properties`. Nhờ vậy tiến trình riêng của Ren'Py và mkxp-z biết mức máy
 mà không phải nạp driver Vulkan.
+
+Mỗi phiên chơi game Windows còn có `wine-cuoi.txt`: 300 dòng cuối Wine và game in ra, kể cả khi tắt debug Wine
+và game tự thoát. Trong đó có câu lỗi của game (ví dụ Godot báo "OpenGL 3.3"), dòng DXVK báo GPU và lỗi, dòng lỗi
+của Mesa/Zink (`AgvnWineTail`).
 
 ## Khi người chơi máy khác báo game chậm
 

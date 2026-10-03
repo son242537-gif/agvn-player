@@ -1076,6 +1076,9 @@ public class XServerDisplayActivity extends AppCompatActivity {
         String dxwrapper = this.dxwrapper;
 
         if (dxwrapper.contains("dxvk")) {
+            // AGVN: DXVK 2.x needs Vulkan 1.3; on an older phone driver this start gets 1.10.3
+            com.winlator.cmod.agvn.AgvnDxvkPick.fitLaunch(this, dxwrapperConfig,
+                    com.winlator.cmod.agvn.DriverSafety.resolveUsable(this, graphicsDriverConfig.get("version")));
             String dxvkWrapper = "dxvk-" + dxwrapperConfig.get("version");
             String vkd3dWrapper = "vkd3d-" + dxwrapperConfig.get("vkd3dVersion");
             String ddrawrapper = dxwrapperConfig.get("ddrawrapper");
@@ -2516,6 +2519,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
             }
             if (!envVars.has("ZINK_DESCRIPTORS")) envVars.put("ZINK_DESCRIPTORS", "lazy");
             if (!envVars.has("ZINK_DEBUG")) envVars.put("ZINK_DEBUG", "compact");
+            if (shortcut != null) // AGVN: Godot games need OpenGL 3.3
+                com.winlator.cmod.agvn.AgvnGlDriver.forGodot(shortcut.getExtra(com.winlator.cmod.agvn.AgvnGameImporter.EXTRA_ENGINE), envVars);
         }
     }
 

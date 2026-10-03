@@ -69,4 +69,20 @@ public class AgvnLogShareTest {
         Collections.sort(out); // file order differs between Linux and Windows
         return out;
     }
+
+    /** What Wine and the game printed last is kept with the session, also after a normal end. */
+    @Test
+    public void wineTailSavedWithTheSession() throws Exception {
+        File dir = tmp.newFolder("session");
+        AgvnWineTail tail = AgvnWineTail.get();
+        tail.reset();
+        tail.save(dir);
+        assertEquals(0, dir.list().length); // nothing printed, no file
+        tail.call("info:  DXVK: v1.10.3");
+        tail.call("ERROR: Your video card drivers seem not to support the required OpenGL 3.3 version.");
+        tail.save(dir);
+        assertEquals("info:  DXVK: v1.10.3\nERROR: Your video card drivers seem not to support the required OpenGL 3.3 version.\n",
+                new String(Files.readAllBytes(new File(dir, AgvnWineTail.FILE).toPath()), StandardCharsets.UTF_8));
+        tail.reset();
+    }
 }

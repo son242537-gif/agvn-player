@@ -88,6 +88,7 @@ public final class AgvnSessionLog {
         if (dir == null) return;
         String notes = read(new File(dir, RUNNING));
         String error = AgvnCrashScan.sessionError(AgvnWineTail.get().crash(), files(notes, "log="), value(notes, "start", 0), dir);
+        AgvnWineTail.get().save(dir);
         close(context, dir, error != null ? error : how);
     }
 
@@ -126,6 +127,7 @@ public final class AgvnSessionLog {
         long start = value(notes, "start", 0);
         AgvnEngineLogs.Copied engine = AgvnEngineLogs.copy(files(notes, "log="), into, start);
         AgvnEngineLogs.Copied wine = AgvnEngineLogs.copy(files(notes, "wine="), into, 0);
+        if (dir.equals(current)) AgvnWineTail.get().save(into);
         String how = "chưa kết thúc, game vẫn đang chạy (nhật ký gom lúc "
                 + new SimpleDateFormat("HH:mm:ss", Locale.ROOT).format(new Date()) + ")";
         write(new File(into, SUMMARY), summary(context, dir, notes, how, engine, wine), false);

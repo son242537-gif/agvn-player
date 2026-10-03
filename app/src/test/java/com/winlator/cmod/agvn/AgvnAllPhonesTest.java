@@ -40,6 +40,31 @@ public class AgvnAllPhonesTest {
         assertEquals("version=2.3.1", AgvnDxvkPick.withVersion("", AgvnDxvkPick.NEW));
     }
 
+    @Test
+    public void dxvk2StepsDownAtStartOnAnOldPhoneDriver() {
+        assertEquals(AgvnDxvkPick.OLD, AgvnDxvkPick.forLaunch("2.3.1", "System", VK_1_1));
+        assertEquals("1.10.3-arm64ec-async", AgvnDxvkPick.forLaunch("2.3.1-arm64ec-gplasync", "System", VK_1_1));
+        assertEquals("2.3.1", AgvnDxvkPick.forLaunch("2.3.1", "System", VK_1_3)); // the driver runs it
+        assertEquals("2.3.1", AgvnDxvkPick.forLaunch("2.3.1", "turnip26.2.0", VK_1_1)); // Turnip brings 1.3
+        assertEquals("2.3.1", AgvnDxvkPick.forLaunch("2.3.1", "System", 0)); // the phone does not say
+        assertEquals("1.10.3", AgvnDxvkPick.forLaunch("1.10.3", "System", VK_1_1));
+        assertEquals(null, AgvnDxvkPick.forLaunch(null, "System", VK_1_1));
+    }
+
+    @Test
+    public void godotGetsOpenGl33OnZink() {
+        com.winlator.cmod.core.EnvVars env = new com.winlator.cmod.core.EnvVars("ZINK_DEBUG=compact");
+        AgvnGlDriver.forGodot("GODOT", env);
+        assertEquals("3.3", env.get("MESA_GL_VERSION_OVERRIDE"));
+        assertEquals("330", env.get("MESA_GLSL_VERSION_OVERRIDE"));
+        com.winlator.cmod.core.EnvVars own = new com.winlator.cmod.core.EnvVars("MESA_GL_VERSION_OVERRIDE=4.6");
+        AgvnGlDriver.forGodot("GODOT", own); // the player's value stays
+        assertEquals("4.6", own.get("MESA_GL_VERSION_OVERRIDE"));
+        com.winlator.cmod.core.EnvVars unity = new com.winlator.cmod.core.EnvVars("");
+        AgvnGlDriver.forGodot("UNITY", unity);
+        assertFalse(unity.has("MESA_GL_VERSION_OVERRIDE"));
+    }
+
     private static AgvnRefreshCap.Mode mode(int id, int w, int h, float hz) {
         return new AgvnRefreshCap.Mode(id, w, h, hz);
     }

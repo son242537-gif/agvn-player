@@ -167,8 +167,16 @@ android {
     // AGVN release signing: the maintainer keeps keystore.properties (storeFile, storePassword, keyAlias,
     // keyPassword) outside git; AGVN_KEYSTORE_PROPS may point to it. Without it the release APK is
     // debug-signed (cloud/test builds); -PagvnRequireReleaseSigning=true turns that into a hard error.
+    // Both signatures, old (v1, META-INF) and new (v2): with minSdk 28 the build would write only v2, and
+    // some phone installers then report "APK contains no signature files". Android itself verifies v2.
     signingConfigs {
+        debug {
+            enableV1Signing true
+            enableV2Signing true
+        }
         release {
+            enableV1Signing true
+            enableV2Signing true
             File propsFile = agvnKeystorePropsFile
             if (propsFile.isFile()) {
                 def props = new Properties()

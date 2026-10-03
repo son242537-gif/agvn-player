@@ -107,3 +107,9 @@ App không gửi gì về máy điện thoại, chỉ tải hai file công khai.
   adb một lần, từ đó cập nhật trong app được.
 - **"Chưa có bản cập nhật nào được đăng":** chưa có release nào có `agvn-update.txt`.
 - **HyperOS/MIUI** có thể hiện thêm màn hình quét an toàn của Xiaomi trước khi cài. Chỉ cần bấm tiếp.
+- **"APK contains no signature files" khi cài từ file:**
+  - Thường do file APK trên máy hỏng: tải bằng app tăng tốc, mạng chập chờn, hoặc chép qua Zalo, Drive, thẻ nhớ.
+    Tải lại bằng Chrome từ link chính thức, rồi cài từ thông báo tải xong hoặc app Quản lý tệp của máy.
+  - Một số trình cài chỉ đọc chữ ký kiểu cũ (v1, các file trong `META-INF`). Bản 0.1.6 chỉ có chữ ký kiểu mới (v2),
+    nên từ bản sau 0.1.6, APK có cả hai.
+  - Người đang có app thì cập nhật ngay trong app: app tự kiểm tra SHA-256 trước khi cài.
