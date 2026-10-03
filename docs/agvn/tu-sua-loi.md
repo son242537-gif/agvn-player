@@ -30,6 +30,7 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | File `.dll` hỏng hoặc sai 32/64-bit | Wine: lỗi `c000007b` | Gửi nhật ký |
 | Game cần .NET | Wine: `Wine Mono is not installed` | Gửi nhật ký |
 | Godot không mở được OpenGL | Câu lỗi của Godot, hoặc game Godot tắt trước khi hiện hình | Chạy Godot bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), đổi driver |
+| Game bị tắt khi vẽ hình (OpenGL qua Zink) | Zink báo `vkCreateGraphicsPipelines failed` rồi game tự tắt; hay gặp ở GPU Mali, vì Zink thiếu vài tính năng trên đó | Game Godot: chạy bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bỏ cách chạy Godot đã đổi. Mọi game: đổi driver |
 | Không tạo được DirectX / thiếu DirectX 11 | Câu lỗi của DXVK, Unity (`InitializeEngineGraphics failed`) | Đổi bản DXVK, đổi driver (Turnip ↔ System), dùng WineD3D |
 | Driver đồ họa lỗi giữa chừng | `VK_ERROR_DEVICE_LOST` | Để Turnip tự chọn chế độ dựng hình, đổi driver, đổi DXVK, hạ Đồ họa |
 | Hết bộ nhớ đồ họa / hết RAM | DXVK, Unity, Unreal báo hết bộ nhớ | Hạ Đồ họa |
@@ -38,6 +39,9 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Game không chạy với cấu hình mới | Lần trước chạy được, đổi cấu hình xong thì tắt trước khi hiện hình | Dùng lại cấu hình đã chạy được, về cấu hình gốc |
 | Game crash | Wine in báo cáo crash | Đổi DXVK, giả lập CPU ổn định hơn, đổi driver, về cấu hình gốc |
 | Game tắt ngay, không rõ lỗi | Game tắt trước khi hiện hình | Về cấu hình gốc, đổi DXVK, đổi driver, gửi nhật ký |
+
+App biết game Godot là Godot 3 hay 4 nhờ dòng đầu nhật ký của Godot (`godot.log`, app chép vào thư mục phiên chơi), hoặc
+nhờ phần đầu file `.pck` của game (file `.pck` riêng hoặc gắn trong file `.exe`).
 
 ### Game "Chạy nhẹ"
 
@@ -156,6 +160,9 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       nút Gmem. Bấm một nút: thanh "Đã lưu…" hỏi "Mở lại game ngay"; bấm thì game đóng rồi tự mở lại với cấu hình mới.
       Lần khác bấm "Để vậy, không hỏi lại": lần sau không hiện.
 - [ ] Game Godot báo "Unable to initialize video driver": hộp hỏi có "Cho game Godot chạy bằng Vulkan".
+- [ ] Máy GPU Mali, game Godot bị tắt sau dòng Zink `vkCreateGraphicsPipelines failed` trong `wine-cuoi.txt`: thư viện
+      hỏi "Game Godot bị tắt khi vẽ hình". Nút là "Cho game Godot chạy bằng Vulkan" nếu game là Godot 4, hoặc "…GLES2" nếu
+      game là Godot 3. Thư mục phiên chơi có `godot.log`.
 - [ ] Bật Tiết kiệm pin rồi mở game (Windows và "Chạy nhẹ"): có hộp hỏi trước khi vào game. "Chơi luôn" vào game,
       không có thêm thông báo.
 - [ ] Game Ren'Py "Chạy nhẹ" gặp lỗi script (màn hình lỗi của Ren'Py), thoát game: thư viện hỏi "Game báo lỗi khi

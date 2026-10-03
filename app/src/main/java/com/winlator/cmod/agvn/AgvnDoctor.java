@@ -75,6 +75,8 @@ public final class AgvnDoctor {
             String screen = ranWith.containsKey("screenSize") ? ranWith.get("screenSize") : s.container.getScreenSize();
             AgvnEvidence ev = evidence(s, screen, AgvnWineTail.get().lines(), AgvnWineTail.get().crash(), System.currentTimeMillis());
             ev.lines.addAll(engineLogTails(s, AgvnSessionTrack.startMs()));
+            String godot = godotVersion(ev, AgvnEngineLogs.exe(s), AgvnEngineLogs.gameDir(s));
+            if (godot != null) ev.params.put("godot", godot);
             diagnose(ctx, s, ev, ranWith);
         } catch (RuntimeException e) {
             Log.w(TAG, "doctor: game end not read", e);
@@ -146,8 +148,6 @@ public final class AgvnDoctor {
         ev.seconds = AgvnSessionTrack.seconds(nowMs);
         ev.smallScreen = screenLines(screen) < SMALL_SCREEN_LINES;
         ev.params.put("screen", screen.replace('x', '×'));
-        String godot = godotMajor(ev.lines);
-        if (godot != null) ev.params.put("godot", godot);
         return ev;
     }
 
@@ -161,6 +161,13 @@ public final class AgvnDoctor {
         }
     }
 
+    /** A Godot game's major version: from Godot's first line in its log or Wine's, else from its pack; null otherwise. */
+    static String godotVersion(AgvnEvidence ev, File exe, File gameDir) {
+        if (!GameExeResolver.Engine.GODOT.name().equals(ev.engine)) return null;
+        String major = godotMajor(ev.lines);
+        return major != null ? major : AgvnGodotFiles.major(exe, gameDir);
+    }
+
     /** "4" from Godot's first line ("Godot Engine v4.3.stable.official..."), or null. */
     static String godotMajor(List<String> lines) {
         for (String line : lines) {
@@ -170,10 +177,12 @@ public final class AgvnDoctor {
         return null;
     }
 
-    /** The last lines of the engine's logs (Unity's Player.log...) written during this session. */
+    /** The last lines of the engine's logs (Unity's Player.log, Godot's godot.log...) written during this session. */
     private static List<String> engineLogTails(Shortcut s, long sinceMs) {
         List<String> lines = new java.util.ArrayList<>();
-        for (File f : AgvnEngineLogs.of(s)) {
+        List<File> logs = AgvnEngineLogs.of(s);
+        for (File roaming : AgvnEngineLogs.scanned(s)) logs.addAll(AgvnGodotFiles.logs(roaming, sinceMs));
+        for (File f : logs) {
             if (!f.isFile() || (sinceMs > 0 && f.lastModified() < sinceMs - AgvnEngineLogs.OLD_SLACK_MS)) continue;
             try (RandomAccessFile in = new RandomAccessFile(f, "r")) {
                 byte[] buf = new byte[(int) Math.min(in.length(), ENGINE_LOG_BYTES)];

@@ -39,11 +39,33 @@ final class AgvnEngineLogs {
 
     /** The log files the shortcut's game engine may write. */
     static List<File> of(Shortcut shortcut) {
-        File exe = new File(shortcut.path.replace("\"", ""));
-        String gameDirPath = shortcut.getExtra(AgvnGameImporter.EXTRA_GAME_DIR);
-        File gameDir = !gameDirPath.isEmpty() ? new File(gameDirPath) : exe.getParentFile();
-        File profile = new File(shortcut.container.getRootDir(), ".wine/drive_c/users/" + ImageFs.USER);
-        return candidates(exe, gameDir, shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE), profile);
+        return candidates(exe(shortcut), gameDir(shortcut), shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE), profile(shortcut));
+    }
+
+    /** The game's exe as a file on the phone. */
+    static File exe(Shortcut shortcut) {
+        return new File(shortcut.path.replace("\"", ""));
+    }
+
+    /** The game's folder: the one it was imported from, else the exe's. */
+    static File gameDir(Shortcut shortcut) {
+        String path = shortcut.getExtra(AgvnGameImporter.EXTRA_GAME_DIR);
+        return !path.isEmpty() ? new File(path) : exe(shortcut).getParentFile();
+    }
+
+    /** Windows' users/xuser of the game's container. */
+    private static File profile(Shortcut shortcut) {
+        return new File(shortcut.container.getRootDir(), ".wine/drive_c/users/" + ImageFs.USER);
+    }
+
+    /**
+     * Folders searched for the engine's logs when the session ends, as their names are the project's, which only the
+     * game knows: a Godot game's %APPDATA% ({@link AgvnGodotFiles#logs}).
+     */
+    static List<File> scanned(Shortcut shortcut) {
+        List<File> out = new ArrayList<>();
+        if ("GODOT".equals(shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE))) out.add(new File(profile(shortcut), "AppData/Roaming"));
+        return out;
     }
 
     /** Files the engine may write; missing ones are skipped when copying. {@code profile} = Windows users/xuser. */

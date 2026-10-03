@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * The notes of a running session (dang-chay.txt): "key=value" lines such as start=, game=, shortcut=, container=,
- * log= and wine=. Pure Java (JVM-testable).
+ * log=, logscan= (a folder searched for Godot's log at the end) and wine=. Pure Java (JVM-testable).
  */
 final class AgvnSessionNotes {
     private AgvnSessionNotes() {}

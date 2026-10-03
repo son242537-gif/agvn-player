@@ -57,6 +57,7 @@ public final class AgvnSessionLog {
             StringBuilder running = new StringBuilder("start=" + System.currentTimeMillis() + "\ngame=" + shortcut.name + "\n"
                     + "shortcut=" + shortcut.file.getPath() + "\ncontainer=" + shortcut.container.id + "\n");
             for (File f : AgvnEngineLogs.of(shortcut)) running.append("log=").append(f.getPath()).append('\n');
+            for (File f : AgvnEngineLogs.scanned(shortcut)) running.append("logscan=").append(f.getPath()).append('\n');
             write(new File(dir, RUNNING), running.toString(), false);
             write(new File(dir, ENV), graphicsEnv(env), false);
             current = dir;
@@ -119,7 +120,7 @@ public final class AgvnSessionLog {
         File running = new File(dir, RUNNING);
         String notes = read(running);
         long start = value(notes, "start", 0);
-        AgvnEngineLogs.Copied engine = AgvnEngineLogs.copy(files(notes, "log="), dir, start);
+        AgvnEngineLogs.Copied engine = AgvnEngineLogs.copy(engineLogs(notes, start), dir, start);
         AgvnEngineLogs.Copied wine = AgvnEngineLogs.copy(files(notes, "wine="), dir, 0);
         for (File f : wine.copied) f.delete(); // a copy is in the session folder; the logs/ root does not grow
         write(new File(dir, SUMMARY), summary(context, dir, notes, how, engine, wine), false);
@@ -133,12 +134,19 @@ public final class AgvnSessionLog {
     static void snapshot(Context context, File dir, File into) {
         String notes = read(new File(dir, RUNNING));
         long start = value(notes, "start", 0);
-        AgvnEngineLogs.Copied engine = AgvnEngineLogs.copy(files(notes, "log="), into, start);
+        AgvnEngineLogs.Copied engine = AgvnEngineLogs.copy(engineLogs(notes, start), into, start);
         AgvnEngineLogs.Copied wine = AgvnEngineLogs.copy(files(notes, "wine="), into, 0);
         if (dir.equals(current)) AgvnWineTail.get().save(into);
         String how = "chưa kết thúc, game vẫn đang chạy (nhật ký gom lúc "
                 + new SimpleDateFormat("HH:mm:ss", Locale.ROOT).format(new Date()) + ")";
         write(new File(into, SUMMARY), summary(context, dir, notes, how, engine, wine), false);
+    }
+
+    /** The engine logs the notes name (log=), and Godot's written since {@code start} in the folders they name (logscan=). */
+    private static List<File> engineLogs(String notes, long start) {
+        List<File> logs = files(notes, "log=");
+        for (File roaming : files(notes, "logscan=")) logs.addAll(AgvnGodotFiles.logs(roaming, start));
+        return logs;
     }
 
     private static String summary(Context context, File dir, String notes, String how, AgvnEngineLogs.Copied engine,
