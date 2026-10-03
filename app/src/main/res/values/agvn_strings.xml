@@ -96,6 +96,12 @@
     <string name="agvn_bar_edit">Sửa phím</string>
     <string name="agvn_bar_toggle">Ẩn/Hiện phím</string>
     <string name="agvn_bar_fit">Vừa màn hình: phóng khung game cho vừa</string>
+    <string name="agvn_bar_exit">Thoát game</string>
+    <string name="agvn_bar_exit_label">✕ Thoát</string>
+    <string name="agvn_exit_title">Thoát game?</string>
+    <string name="agvn_exit_detail">Nhớ lưu game trước khi thoát.</string>
+    <string name="agvn_exit_cancel">Chơi tiếp</string>
+    <string name="agvn_exit_ok">Thoát game</string>
     <string name="agvn_fit_small_title">Khung game nhỏ hơn màn hình</string>
     <string name="agvn_fit_small_detail">Game mở khung %1$s trên màn hình %2$s. App đã phóng khung game cho vừa màn hình; bấm ⛶ ở thanh trên cùng để bật hoặc tắt.</string>
     <string name="agvn_fit_small_screen_detail">Game mở khung %1$s, nhỏ hơn màn hình %2$s.</string>

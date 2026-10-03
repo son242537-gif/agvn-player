@@ -20,8 +20,9 @@ import com.winlator.cmod.widget.InputControlsView;
 /**
  * Small bar at the top centre of the game screen: [⌨] opens the Android keyboard, [✎ Sửa] edits the on-screen controls
  * right on the game ({@link AgvnControlsEditor}), [👁 Ẩn / 👁 Hiện] hides or shows them for this game (remembered in the
- * shortcut, extra agvnControlsHidden), [⛶] fits the game's window to the screen ({@link AgvnScreenFit}). Hidden
- * controls are really gone (View.GONE), so touches reach the game.
+ * shortcut, extra agvnControlsHidden), [⛶] fits the game's window to the screen ({@link AgvnScreenFit}), [✕ Thoát]
+ * quits the game after asking, as the sidebar's ⏻ does (players swiped AGVN away instead, which reads like Android
+ * ending the game). Hidden controls are really gone (View.GONE), so touches reach the game.
  * Long-press a button for its full name. The bar tucks itself away after 3 s without a tap, leaving a thin line at the
  * top edge that brings it back ({@link AgvnBarAutoHide}); it hides while the sidebar drawer is open. A ✎ stays in the
  * top-left corner all the time ({@link AgvnEditPen}).
@@ -51,6 +52,7 @@ public final class AgvnControlsBar {
         bar.addView(eye);
         AgvnScreenFit fit = new AgvnScreenFit(activity);
         bar.addView(barButton("⛶", 16, R.string.agvn_bar_fit, v -> fit.toggle()));
+        bar.addView(barButton(activity.getString(R.string.agvn_bar_exit_label), 14, R.string.agvn_bar_exit, v -> askExit()));
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
         lp.topMargin = (int) (6 * dp);
@@ -127,6 +129,13 @@ public final class AgvnControlsBar {
         AgvnControlsFork.setHidden(activity.agvnShortcut(), false);
         autoHide.suspend(); // the editor has its own toolbar
         pen.setVisible(false);
+    }
+
+    /** [✕ Thoát]: asked on a bar over the running game, so a stray tap costs nothing. */
+    private void askExit() {
+        AgvnWarningBar.show(activity, activity.getString(R.string.agvn_exit_title), activity.getString(R.string.agvn_exit_detail),
+                new AgvnWarningBar.Choice(R.string.agvn_exit_cancel, null),
+                new AgvnWarningBar.Choice(R.string.agvn_exit_ok, activity::agvnExit));
     }
 
     /** The profile hidden by [👁], else the game's profile, else its AGVN layout. */
