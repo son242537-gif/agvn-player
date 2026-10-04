@@ -62,6 +62,7 @@ public final class AgvnDoctor {
         AgvnProblemCatalog.Finding f = catalog(ctx).find(ev);
         if (f == null) return;
         Log.i(TAG, "doctor: " + f.id() + " for " + s.name);
+        if (AgvnMemorySaver.ranOutOfRam(f.id())) AgvnMemorySaver.markRamShort(s);
         AgvnDoctorStore.ask(ctx, s, f);
     }
 
@@ -122,6 +123,7 @@ public final class AgvnDoctor {
         }
         AgvnSessionLog.event("Tự sửa lỗi: " + f.id() + " – " + f.title());
         Log.i(TAG, "doctor: " + f.id() + " for " + s.name);
+        if (AgvnMemorySaver.ranOutOfRam(f.id())) AgvnMemorySaver.markRamShort(s); // its next starts save the most RAM
         AgvnDoctorStore.ask(ctx, s, f);
     }
 

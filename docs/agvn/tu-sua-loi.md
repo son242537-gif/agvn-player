@@ -38,13 +38,13 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Game bị tắt khi vẽ hình (OpenGL qua Zink) | Zink báo `vkCreateGraphicsPipelines failed` rồi game tự tắt; hay gặp ở GPU Mali, vì Zink thiếu vài tính năng trên đó | Game Godot: chạy bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bằng Direct3D 11 (ANGLE), bỏ cách vẽ đã đổi. Mọi game: đổi driver |
 | Không tạo được DirectX / thiếu DirectX 11 | Câu lỗi của DXVK, Unity (`InitializeEngineGraphics failed`) | Đổi bản DXVK, đổi driver (Turnip ↔ System), dùng WineD3D |
 | Driver đồ họa lỗi giữa chừng | `VK_ERROR_DEVICE_LOST` | Để Turnip tự chọn chế độ dựng hình, đổi driver, đổi DXVK, hạ Đồ họa |
-| Hết bộ nhớ đồ họa / hết RAM | DXVK, Unity, Unreal báo hết bộ nhớ | Hạ Đồ họa |
+| Hết bộ nhớ đồ họa / hết RAM | DXVK, Unity, Unreal báo hết bộ nhớ | Hạ Đồ họa. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ (`giam-ram.md`) |
 | File game hỏng | Unity: `is corrupted` | Gửi nhật ký (cần chép lại game) |
 | Game không chịu độ phân giải nhỏ ("The current resolution is too low") | Game tắt trước khi hiện hình, màn hình dưới 480 dòng | Nâng Đồ họa (thường là Thấp 854×480), dùng lại cấu hình đã chạy được |
 | Game không chạy với cấu hình mới | Lần trước chạy được, đổi cấu hình xong thì tắt trước khi hiện hình | Dùng lại cấu hình đã chạy được, về cấu hình gốc |
 | Game crash | Wine in báo cáo crash | Đổi DXVK, giả lập CPU ổn định hơn, đổi driver, về cấu hình gốc |
 | Game tắt ngay, không rõ lỗi | Game tắt trước khi hiện hình | Về cấu hình gốc, đổi DXVK, đổi driver, gửi nhật ký |
-| Game tự tắt lúc máy gần hết RAM | Game tự đóng, không crash, không câu lỗi, trong khi 30 giây trước đó RAM trống đã xuống dưới mức của thanh cảnh báo RAM (một phần mười RAM của máy, từ 600 MB đến 1,2 GB) | Hạ Đồ họa, gửi nhật ký |
+| Game tự tắt lúc máy gần hết RAM | Game tự đóng, không crash, không câu lỗi, trong khi 30 giây trước đó RAM trống đã xuống dưới mức của thanh cảnh báo RAM (một phần mười RAM của máy, từ 600 MB đến 1,2 GB) | Hạ Đồ họa, gửi nhật ký. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ |
 
 Khi máy hết RAM, hệ thống có thể tắt riêng tiến trình game mà không tắt AGVN. Lúc đó Wine kết thúc với mã 0, còn Wine,
 DXVK và engine của game đều không kịp ghi gì. Trước đây app coi đó là game thoát bình thường và còn lưu cấu hình đó là
@@ -93,7 +93,7 @@ RTP), Ren'Py dừng trước màn hình đầu.
 
 | Lỗi | App nhận ra nhờ | Cách sửa |
 |---|---|---|
-| Máy hết RAM nên Android tắt game | Lý do Android ghi lại (`LOW_MEMORY`) | Hạ Đồ họa (game Windows và Ren'Py), gửi nhật ký |
+| Máy hết RAM nên Android tắt game | Lý do Android ghi lại (`LOW_MEMORY`) | Hạ Đồ họa (game Windows và Ren'Py), gửi nhật ký. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ |
 | Máy tắt game khi chạy nền | Lý do Android ghi lại (`SIGKILL` khi game chạy nền) | Mở cài đặt pin của AGVN |
 | Game chậm vì GPU | GPU từ 85% trở lên | Hạ Đồ họa, thử chế độ dựng hình Gmem, để Turnip tự chọn, bỏ bớt khung hình (RPG Maker) |
 | Game chậm vì CPU | Một nhân CPU từ 90% trở lên | DXVK chạy thẳng trên chip ARM (bản arm64ec), giả lập CPU nhanh hơn, bỏ bớt khung hình (RPG Maker), tắt Tiết kiệm pin |
@@ -302,5 +302,9 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
   `Tự sửa lỗi: low-ram-end`. Chơi đủ RAM rồi thoát từ menu của game: không có hộp nào.
 - [ ] Game mở cửa sổ nhỏ hơn màn hình và đen lâu lúc đang tải (như Legend Cleaner trên máy Mali): không có thanh "Màn
   hình game vẫn đen"; `su-kien.txt` có "Màn hình đen sau … giây, màn hình …, khung game …: không hỏi".
+- [ ] Máy Mali dưới 9 GB RAM, game Unity hoặc Unreal ở mức Trung bình trở lên: `su-kien.txt` có "Tiết kiệm RAM như Siêu
+  nhẹ: máy giải nén texture BCn…", `moi-truong.txt` có `dxvk.trackPipelineLifetime=True`. Trên POCO (Turnip) thì không.
+- [ ] Game vừa được hỏi "Game tự tắt lúc máy gần hết RAM": lần mở sau, `su-kien.txt` có "Tiết kiệm RAM như Siêu nhẹ: game
+  từng bị tắt vì hết RAM trên máy này".
 - [ ] `adb logcat`: dòng `Wine mode emulation: on`; `wine-cuoi.txt` của game bị đen có `display settings returned -2`.
 - [ ] `adb logcat -s AGVN`: dòng `doctor: <lỗi> for <game>` và `fix <cách sửa> -> <giá trị>`.

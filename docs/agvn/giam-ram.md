@@ -19,6 +19,31 @@ giữ lại. Tài liệu này ghi lại AGVN làm gì ở từng mức và vì s
 
 Mức "Tự động" dùng mức gợi ý cho máy: máy yếu là Thấp, máy tầm trung là Trung bình, máy flagship là Cao.
 
+## Khi máy không đủ RAM cho game
+
+Ở bất kỳ mức nào, app dùng phần tiết kiệm RAM của Siêu nhẹ cho game khi máy không đủ sức (`AgvnMemorySaver.tight`).
+Độ phân giải và FPS vẫn theo mức đã chọn. Máy không đủ sức khi:
+
+- game từng bị tắt vì hết RAM trên máy này. "Tự sửa lỗi" gặp lỗi `memory`, `gpu-memory`, `killed-low-memory` hoặc
+  `low-ram-end` thì đánh dấu game (`agvnRamShort` trong lối tắt), và hộp hỏi báo "Từ lần mở sau, app tự dùng mức tiết
+  kiệm RAM cao nhất mà game này có";
+- hoặc game DirectX chạy trên driver của máy (Mali, và Qualcomm khi không dùng Turnip) trên máy dưới 9 GB RAM. Driver
+  này không đọc được texture BCn, nên wrapper giải nén chúng ra lớn gấp 4–8 lần.
+
+| Engine | Phần giảm |
+|---|---|
+| DXVK (mọi game DirectX 8–11: Unity, Unreal, game khác) | Khối bộ nhớ 16 MB, giải phóng pipeline library không dùng |
+| Unity | Mức chất lượng thấp nhất của game |
+| Unreal | Texture pool của Siêu nhẹ (384 MB), trên driver của máy là một phần tư: 96 MB |
+| Ren'Py (Wine và "Chạy nhẹ") | Bộ đệm ảnh 128 MB, chỉ khi game từng hết RAM (ảnh Ren'Py không phải BCn) |
+| Zink (OpenGL) | Như mọi mức |
+
+Máy đủ sức thì giữ phần tiết kiệm của mức đã chọn: Turnip đọc được BCn, hoặc máy có từ 9 GB RAM, và game chưa từng hết
+RAM trên máy. `su-kien.txt` của phiên chơi ghi "Tiết kiệm RAM như Siêu nhẹ: <lý do>" khi app giảm.
+
+App chưa giảm được texture của Godot, KiriKiri, RPG Maker (XP/VX/VX Ace, MV/MZ) và game HTML: chưa có thiết lập nào
+app ghi được từ bên ngoài game cho phần này.
+
 ## Chi tiết
 
 - **Giới hạn FPS:**

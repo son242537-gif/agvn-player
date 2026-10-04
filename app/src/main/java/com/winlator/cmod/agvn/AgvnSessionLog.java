@@ -61,6 +61,8 @@ public final class AgvnSessionLog {
             write(new File(dir, RUNNING), running.toString(), false);
             write(new File(dir, ENV), graphicsEnv(env), false);
             current = dir;
+            String saving = AgvnMemorySaver.takeNote();
+            if (saving != null) event(saving);
             AgvnLogFolders.prune(gameLogs);
             AgvnLogFolders.pruneLoose(root(), System.currentTimeMillis());
         } catch (Exception e) {

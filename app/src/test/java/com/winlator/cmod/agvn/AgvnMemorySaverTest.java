@@ -17,6 +17,7 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Arrays;
 
 public class AgvnMemorySaverTest {
     @Rule public TemporaryFolder tmp = new TemporaryFolder();
@@ -33,6 +34,33 @@ public class AgvnMemorySaverTest {
         assertEquals("dxvk.maxChunkSize=16;dxvk.trackPipelineLifetime=True", AgvnMemorySaver.dxvkOptions(Level.LOWEST));
         assertEquals("dxvk.maxChunkSize=16", AgvnMemorySaver.dxvkOptions(Level.MEDIUM));
         assertEquals("", AgvnMemorySaver.dxvkOptions(Level.HIGH));
+    }
+
+    @Test
+    public void aPhoneShortOfRamSavesTheMostAtAnyStep() {
+        // the Mali-G610 phone with 7.2 GB (7374 MB) on its own driver, which gets BCn textures unpacked
+        assertTrue(AgvnMemorySaver.tight(false, true, 7374));
+        assertFalse("12 GB can spare it", AgvnMemorySaver.tight(false, true, 11_500));
+        assertFalse("Turnip reads BCn as it is", AgvnMemorySaver.tight(false, false, 7374));
+        assertFalse("RAM unknown", AgvnMemorySaver.tight(false, true, 0));
+        assertTrue("it ran out of RAM here before", AgvnMemorySaver.tight(true, false, 16_000));
+        assertEquals(Level.LOWEST, AgvnMemorySaver.memoryStep(Level.HIGH, true));
+        assertEquals(Level.MEDIUM, AgvnMemorySaver.memoryStep(Level.MEDIUM, false));
+        assertTrue(AgvnMemorySaver.unityLowestQuality(AgvnMemorySaver.memoryStep(Level.MEDIUM, true)));
+        assertEquals(128, AgvnMemorySaver.renpyCacheMb(AgvnMemorySaver.memoryStep(Level.HIGHEST, true)));
+        Level tightHigh = AgvnMemorySaver.memoryStep(Level.HIGH, true);
+        assertEquals(AgvnMemorySaver.dxvkOptions(Level.LOWEST), AgvnMemorySaver.dxvkOptions(tightHigh));
+        // Unreal: Siêu nhẹ's pool when tight, then a quarter of it where BCn is unpacked
+        assertEquals(96, AgvnMemorySaver.ueTexturePool(768, true, true)); // Trung bình on the Mali phone
+        assertEquals(384, AgvnMemorySaver.ueTexturePool(1024, true, false));
+        assertEquals("a game's own pool is capped too", 96, AgvnMemorySaver.ueTexturePool(0, true, true));
+        assertEquals(256, AgvnMemorySaver.ueTexturePool(1024, false, true));
+        assertEquals(1024, AgvnMemorySaver.ueTexturePool(1024, false, false));
+        assertEquals(0, AgvnMemorySaver.ueTexturePool(0, false, true));
+        for (String id : Arrays.asList("memory", "gpu-memory", "killed-low-memory", "low-ram-end"))
+            assertTrue(id, AgvnMemorySaver.ranOutOfRam(id));
+        assertFalse(AgvnMemorySaver.ranOutOfRam("crash"));
+        assertFalse(AgvnMemorySaver.ranOut(null));
     }
 
     @Test

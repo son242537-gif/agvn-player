@@ -51,7 +51,8 @@ public final class PreLaunchCheck {
 
     /**
      * Writes the profile's Engine.ini overrides and texture pool for imported Unreal games; safe to repeat. The pool is
-     * smaller where the game's Vulkan driver unpacks BCn textures ({@link AgvnBcn#texturePool}).
+     * smaller where the game's Vulkan driver unpacks BCn textures, and Siêu nhẹ's where the phone cannot spare the RAM
+     * ({@link AgvnMemorySaver#ueTexturePool}).
      */
     public static void applyUeConfig(Context ctx, Shortcut shortcut) {
         try {
@@ -65,8 +66,11 @@ public final class PreLaunchCheck {
             File gameDir = new File(gameDirPath);
             String exe = shortcut.path.replace("\"", "");
             String relative = exe.startsWith(gameDir.getPath() + "/") ? exe.substring(gameDir.getPath().length() + 1) : exe;
-            int pool = AgvnBcn.texturePool(parseInt(shortcut.getExtra(AgvnGameImporter.EXTRA_TEXTURE_POOL, "0")),
-                    unpacksBcn(ctx, shortcut));
+            boolean unpacked = unpacksBcn(ctx, shortcut);
+            boolean ranOut = AgvnMemorySaver.ranOut(shortcut);
+            int stepPool = parseInt(shortcut.getExtra(AgvnGameImporter.EXTRA_TEXTURE_POOL, "0"));
+            boolean tight = AgvnMemorySaver.tight(ranOut, unpacked, AgvnMemoryProbe.totalMb());
+            int pool = AgvnMemorySaver.ueTexturePool(stepPool, tight, unpacked);
             File wineUser = new File(shortcut.container.getRootDir(), ".wine/drive_c/users/" + ImageFs.USER);
             for (File ini : UeIniWriter.apply(wineUser, UeIniWriter.projectName(gameDir, relative), UeIniWriter.overrides(profile, pool)))
                 Log.i(TAG, "Engine.ini updated (texture pool " + pool + " MB): " + ini);

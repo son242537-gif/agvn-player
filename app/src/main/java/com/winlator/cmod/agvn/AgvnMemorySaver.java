@@ -8,6 +8,8 @@ import com.winlator.cmod.container.Shortcut;
 import com.winlator.cmod.core.EnvVars;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Lower "Đồ họa" steps also cut RAM, each where the game spends it. Phones share RAM with the GPU, so texture and
@@ -22,11 +24,23 @@ import java.io.File;
  *   <li>OpenGL (Zink): freed-buffer cache capped at 256 MB in the bundled build, at every step.</li>
  * </ul>
  * Cao and Rất cao leave every game at its own defaults and undo what a lower step wrote.
+ * <p>
+ * A phone that cannot spare the RAM ({@link #tight}) gets Siêu nhẹ's savings at any step, with its step's screen and
+ * FPS: when the game ran out of RAM there before, or, for DirectX games, when the phone unpacks BCn textures (4 to 8
+ * times larger, {@link AgvnBcn}) and has under {@link #SMALL_RAM_MB}. A phone that can keeps its step's savings.
  */
 public final class AgvnMemorySaver {
     private static final String TAG = "AGVN";
     static final String DXVK_SMALL_CHUNKS = "dxvk.maxChunkSize=16";
     static final String DXVK_FREE_PIPELINES = "dxvk.trackPipelineLifetime=True";
+    /** "1" once "Tự sửa lỗi" found that the game ran out of RAM on this phone ({@link #markRamShort}). */
+    static final String EXTRA_RAM_SHORT = "agvnRamShort";
+    /** A phone with less RAM than this (MemTotal) that unpacks BCn textures cannot spare RAM for a DirectX game. */
+    static final long SMALL_RAM_MB = 9 * 1024;
+    /** The problems of game-problems.json that say a game ran out of RAM. */
+    static final List<String> OUT_OF_RAM = Arrays.asList("memory", "gpu-memory", "killed-low-memory", "low-ram-end");
+    /** Why the last start saved the most RAM, for its session log ({@link #takeNote}); null when it did not. */
+    private static volatile String note;
 
     private AgvnMemorySaver() {}
 
@@ -34,6 +48,58 @@ public final class AgvnMemorySaver {
     static AgvnQuality.Level stepOf(Context ctx, Shortcut shortcut) {
         AgvnQuality.Level level = shortcut != null ? AgvnQuality.current(shortcut) : AgvnQuality.Level.AUTO;
         return level == AgvnQuality.Level.AUTO ? AgvnQuality.recommended(ctx) : level;
+    }
+
+    /**
+     * True when the phone cannot spare RAM for the game: it ran out of RAM here before ({@code ranOut}), or the phone
+     * unpacks BCn textures and has under {@link #SMALL_RAM_MB} ({@code totalRamMb}, 0 when unknown).
+     */
+    static boolean tight(boolean ranOut, boolean bcnUnpacked, long totalRamMb) {
+        return ranOut || bcnUnpacked && totalRamMb > 0 && totalRamMb < SMALL_RAM_MB;
+    }
+
+    /** {@link #tight} for a DirectX game about to start: its flag, its Vulkan driver as it starts, the phone's RAM. */
+    static boolean tight(Context ctx, Shortcut s) {
+        return tight(ranOut(s), PreLaunchCheck.unpacksBcn(ctx, s), AgvnMemoryProbe.totalMb());
+    }
+
+    static boolean ranOut(Shortcut s) {
+        return s != null && "1".equals(s.getExtra(EXTRA_RAM_SHORT));
+    }
+
+    /** The step whose memory savings apply: Siêu nhẹ's when the phone cannot spare the RAM. */
+    static AgvnQuality.Level memoryStep(AgvnQuality.Level step, boolean tight) {
+        return tight ? AgvnQuality.Level.LOWEST : step;
+    }
+
+    /** The Unreal texture pool (MB, 0: the game's own) for a step's {@code poolMb}: Siêu nhẹ's if tight, BCn's part. */
+    static int ueTexturePool(int poolMb, boolean tight, boolean bcnUnpacked) {
+        int lowest = AgvnQuality.Level.LOWEST.texturePool;
+        return AgvnBcn.texturePool(tight ? (poolMb > 0 ? Math.min(poolMb, lowest) : lowest) : poolMb, bcnUnpacked);
+    }
+
+    /** True when a game that ended with {@code problem} ran out of RAM. */
+    static boolean ranOutOfRam(String problem) {
+        return OUT_OF_RAM.contains(problem);
+    }
+
+    /** "Tự sửa lỗi" found that the game ran out of RAM: from its next start, it saves the most RAM it can. */
+    static void markRamShort(Shortcut s) {
+        if (ranOut(s)) return;
+        s.putExtra(EXTRA_RAM_SHORT, "1");
+        s.saveData();
+    }
+
+    /** Why the game about to start saves the most RAM, once, for its session log; null when it does not. */
+    static String takeNote() {
+        String n = note;
+        note = null;
+        return n;
+    }
+
+    private static void noteTight(Shortcut s) {
+        note = "Tiết kiệm RAM như Siêu nhẹ: " + (ranOut(s) ? "game từng bị tắt vì hết RAM trên máy này"
+                : "máy giải nén texture BCn, RAM " + AgvnMemoryWatch.gb(AgvnMemoryProbe.totalMb()));
     }
 
     /** Ren'Py image cache in MB for {@code level}, or 0 to keep the game's own. */
@@ -48,12 +114,14 @@ public final class AgvnMemorySaver {
 
     /**
      * "Chạy nhẹ" Ren'Py, before the game starts: the image cache cap of the game's "Đồ họa" step ({@code quality}, the
-     * shortcut's {@link AgvnQuality#EXTRA_QUALITY}), as in Wine. Never throws: a failure must not block the launch.
+     * shortcut's {@link AgvnQuality#EXTRA_QUALITY}), or Siêu nhẹ's when it ran out of RAM before ({@code ranOut}), as
+     * in Wine. Never throws: a failure must not block the launch.
      */
-    static void applyRenpyLight(Context ctx, File gameDir, String quality) {
+    static void applyRenpyLight(Context ctx, File gameDir, String quality, boolean ranOut) {
         try {
             AgvnQuality.Level level = AgvnQuality.Level.of(quality);
-            AgvnRenpyCache.apply(gameDir, renpyCacheMb(level == AgvnQuality.Level.AUTO ? AgvnQuality.recommended(ctx) : level));
+            level = level == AgvnQuality.Level.AUTO ? AgvnQuality.recommended(ctx) : level;
+            AgvnRenpyCache.apply(gameDir, renpyCacheMb(memoryStep(level, ranOut)));
         } catch (Exception e) {
             Log.w(TAG, "Ren'Py memory setting not applied", e);
         }
@@ -83,7 +151,14 @@ public final class AgvnMemorySaver {
 
     /** At launch, after the DXVK settings: adds this step's DXVK memory options to DXVK_CONFIG. */
     public static void applyDxvk(Context ctx, Shortcut shortcut, EnvVars envVars) {
-        String options = dxvkOptions(stepOf(ctx, shortcut));
+        boolean tight = false;
+        try {
+            tight = shortcut != null && tight(ctx, shortcut);
+        } catch (RuntimeException e) {
+            Log.w(TAG, "RAM need not read", e); // the step's savings, as before
+        }
+        if (tight) noteTight(shortcut);
+        String options = dxvkOptions(memoryStep(stepOf(ctx, shortcut), tight));
         if (options.isEmpty()) return;
         envVars.put("DXVK_CONFIG", mergeDxvkConfig(envVars.get("DXVK_CONFIG"), options));
     }
@@ -100,10 +175,11 @@ public final class AgvnMemorySaver {
             if (engine.isEmpty() || gameDir.isEmpty()) return;
             AgvnQuality.Level step = stepOf(ctx, shortcut);
             if (GameExeResolver.Engine.RENPY.name().equals(engine)) {
-                AgvnRenpyCache.apply(new File(gameDir), renpyCacheMb(step));
+                if (ranOut(shortcut)) noteTight(shortcut);
+                AgvnRenpyCache.apply(new File(gameDir), renpyCacheMb(memoryStep(step, ranOut(shortcut))));
             } else if (GameExeResolver.Engine.UNITY.name().equals(engine)) {
                 File userReg = new File(shortcut.container.getRootDir(), ".wine/user.reg");
-                AgvnUnityQuality.apply(shortcut, userReg, unityLowestQuality(step));
+                AgvnUnityQuality.apply(shortcut, userReg, unityLowestQuality(memoryStep(step, tight(ctx, shortcut))));
             }
         } catch (Exception e) {
             Log.w(TAG, "memory settings not applied", e);

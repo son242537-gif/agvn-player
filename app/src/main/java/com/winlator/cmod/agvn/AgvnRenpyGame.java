@@ -95,7 +95,8 @@ public final class AgvnRenpyGame {
         String dir = extras.get(AgvnGameImporter.EXTRA_GAME_DIR);
         File gameDir = dir != null && !dir.isEmpty() ? new File(dir) : null;
         if (!canRun(gameDir)) return false;
-        AgvnMemorySaver.applyRenpyLight(activity, gameDir, extras.get(AgvnQuality.EXTRA_QUALITY));
+        AgvnMemorySaver.applyRenpyLight(activity, gameDir, extras.get(AgvnQuality.EXTRA_QUALITY),
+                "1".equals(extras.get(AgvnMemorySaver.EXTRA_RAM_SHORT)));
         Intent intent = new Intent(activity, AgvnRenpyActivity.class);
         if (from.getExtras() != null) intent.putExtras(from.getExtras());
         intent.putExtra(AgvnRenpyActivity.EXTRA_GAME_DIR, gameDir.getPath());

@@ -66,6 +66,7 @@ public class AgvnDoctorTest {
         }
         for (String live : Arrays.asList("slow-gpu", "slow-cpu", "slow", "slow-unknown", "power-save"))
             assertNotNull(live, catalog.byId(live));
+        for (String ranOut : AgvnMemorySaver.OUT_OF_RAM) assertNotNull(ranOut, catalog.byId(ranOut));
     }
 
     @Test
