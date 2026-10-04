@@ -26,10 +26,16 @@ public final class AgvnWineDebug {
     private static final String[] CLASSES = {"err", "warn", "fixme"};
     private static final String[] QUIET = {"heap", "file", "font"};
     /**
-     * With the log off, Wine still prints the errors "Tự sửa lỗi" reads (AgvnDoctor): a DLL the game needs and cannot
-     * load (module) and a .NET game without Wine Mono (mscoree). Both print only when that goes wrong.
+     * The text of every message box a game shows (dlls/user32/msgbox.c traces it), whatever the log setting: a game's
+     * error box ("Unable to initialize video driver", a Vulkan driver crash Wine turned into "Assertion failed!") is
+     * often all it says. One line per box.
      */
-    static final String QUIET_SPEC = "-all,err+module,err+mscoree";
+    static final String MESSAGE_BOXES = "trace+msgbox";
+    /**
+     * With the log off, Wine still prints the errors "Tự sửa lỗi" reads (AgvnDoctor): a DLL the game needs and cannot
+     * load (module), a .NET game without Wine Mono (mscoree), and error boxes. They print only when that goes wrong.
+     */
+    static final String QUIET_SPEC = "-all,err+module,err+mscoree," + MESSAGE_BOXES;
 
     private AgvnWineDebug() {}
 
@@ -44,8 +50,10 @@ public final class AgvnWineDebug {
                 out.add(isClass(name) ? name + "+all" : "+" + name);
             }
         }
+        if (out.isEmpty()) return QUIET_SPEC;
         if (picked.contains("warn")) for (String quiet : QUIET) if (!picked.contains(quiet)) out.add("warn-" + quiet);
-        return out.isEmpty() ? QUIET_SPEC : String.join(",", out);
+        if (!picked.contains("msgbox")) out.add(MESSAGE_BOXES);
+        return String.join(",", out);
     }
 
     private static boolean isClass(String name) {

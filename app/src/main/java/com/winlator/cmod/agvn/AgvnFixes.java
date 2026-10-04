@@ -26,8 +26,8 @@ final class AgvnFixes {
     private static final List<String> ALWAYS = Arrays.asList("send-logs", "power-save-settings", "app-settings");
     /** Fixes of Wine's settings: none of them changes a "Chạy nhẹ" game. */
     private static final List<String> WINE_ONLY = Arrays.asList("restore-good", "reset", "dxvk-other", "dxvk-arm64ec",
-            "driver-other", "wined3d", "godot-renderer", "godot-undo", "render-gmem", "render-auto", "emulator-stable",
-            "emulator-fast", "wincomponent");
+            "driver-other", "wined3d", "godot-renderer", "godot-angle", "godot-undo", "render-gmem", "render-auto",
+            "emulator-stable", "emulator-fast", "wincomponent");
     static final String SYSTEM = "System";
 
     /** A button: its fix id, its words, and what it sets ({@code to}). */
@@ -90,18 +90,10 @@ final class AgvnFixes {
             }
             case "wined3d":
                 return dxvk(s) ? new Fix(id, a.getString(R.string.agvn_fix_wined3d), "wined3d") : null;
-            case "godot-renderer": {
-                String args = AgvnFixEdits.godotArgs(finding.params.get("godot"));
-                if (!GameExeResolver.Engine.GODOT.name().equals(s.getExtra(AgvnGameImporter.EXTRA_ENGINE))
-                        || s.getExtra("execArgs").contains(args)) return null;
-                boolean three = AgvnFixEdits.GODOT3_ARGS.equals(args);
-                return new Fix(id, a.getString(three ? R.string.agvn_fix_godot_gles2 : R.string.agvn_fix_godot_vulkan), args);
-            }
-            case "godot-undo": {
-                String args = s.getExtra("execArgs");
-                return args.contains(AgvnFixEdits.GODOT4_ARGS) || args.contains(AgvnFixEdits.GODOT3_ARGS)
-                        ? new Fix(id, a.getString(R.string.agvn_fix_godot_undo), null) : null;
-            }
+            case "godot-renderer":
+            case "godot-angle":
+            case "godot-undo":
+                return AgvnGodotGame.fix(a, s, finding, id);
             case "render-gmem":
                 return turnip(a, s) && !renderFlags(s).contains("gmem") ? new Fix(id, a.getString(R.string.agvn_fix_render_gmem), "gmem") : null;
             case "render-auto": {

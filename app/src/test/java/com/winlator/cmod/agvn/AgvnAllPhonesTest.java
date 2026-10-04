@@ -31,6 +31,15 @@ public class AgvnAllPhonesTest {
     }
 
     @Test
+    public void everySarekKeepsTheWrapperPassOff() {
+        // upstream's own build and one a player installed (its DXVK HUD: "DXVK-Sarek v1.11.0-async", 04/10)
+        assertTrue(AgvnDxvkPick.isSarek("1.11.1-sarek"));
+        assertTrue(AgvnDxvkPick.isSarek("Sarek-1.11.0-async-0"));
+        assertFalse(AgvnDxvkPick.isSarek(AgvnDxvkPick.OLD));
+        assertFalse(AgvnDxvkPick.isSarek(null));
+    }
+
+    @Test
     public void dxvkVersionReplacedAlone() {
         // Container.DEFAULT_DXWRAPPERCONFIG's start (the class itself needs the phone's GPU to load)
         String upstream = "version=2.3.1,framerate=0,async=0,asyncCache=0,vkd3dVersion=None,vkd3dLevel=12_1,ddrawrapper=none";

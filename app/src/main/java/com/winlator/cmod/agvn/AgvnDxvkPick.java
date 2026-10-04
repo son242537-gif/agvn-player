@@ -42,6 +42,16 @@ public final class AgvnDxvkPick {
     }
 
     /**
+     * True for any DXVK-Sarek build, also one a player installed ("Sarek-1.11.0-async"), not only upstream's
+     * "1.11.1-sarek". The wrapper rewrites each shader as the game creates it; upstream turns its OpConstantComposite pass
+     * off for Sarek's shaders (WRAPPER_NO_PATCH_OPCONSTCOMP). A Mali phone with an installed Sarek, the pass on, crashed
+     * at that very step: "Assertion failed! ... vkCreateShaderModule".
+     */
+    public static boolean isSarek(String version) {
+        return version != null && version.toLowerCase(java.util.Locale.ROOT).contains("sarek");
+    }
+
+    /**
      * At a game's start: DXVK 2.x on the phone's own driver ("System") older than Vulkan 1.3 cannot create a DirectX
      * device, and the game then says DirectX 11 is missing. That start uses 1.10.3 instead. Turnip and other drivers,
      * and every other version, stay as chosen. Games set up before {@link #apply} existed keep 2.3.1 otherwise.

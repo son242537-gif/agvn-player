@@ -42,13 +42,13 @@ public class AgvnGodotTest {
         File game = tmp.newFolder("PARTY ME GAMEHUB");
         File exe = new File(game, "PartyMe.exe");
         Files.write(exe.toPath(), "MZ, not a pack".getBytes(StandardCharsets.US_ASCII));
-        assertNull(AgvnGodotFiles.major(exe, game));
+        assertNull(AgvnGodotFiles.release(exe, game));
         Files.write(new File(game, "PartyMe.pck").toPath(), pack(2, 4, 3, 0));
-        assertEquals("4", AgvnGodotFiles.major(exe, game));
+        assertArrayEquals(new int[]{4, 3, 0}, AgvnGodotFiles.release(exe, game));
         assertArrayEquals(new int[]{4, 3, 0}, AgvnGodotFiles.version(new File(game, "PartyMe.pck")));
         File old = tmp.newFolder("old");
         Files.write(new File(old, "data.pck").toPath(), pack(1, 3, 5, 2)); // not named after the exe: still read
-        assertEquals("3", AgvnGodotFiles.major(new File(old, "Game.exe"), old));
+        assertArrayEquals(new int[]{3, 5, 2}, AgvnGodotFiles.release(new File(old, "Game.exe"), old));
         Files.write(new File(old, "Scene.pck").toPath(), "Siglus' own pack".getBytes(StandardCharsets.US_ASCII));
         assertNull(AgvnGodotFiles.version(new File(old, "Scene.pck")));
     }
@@ -62,10 +62,12 @@ public class AgvnGodotTest {
         File exe = new File(tmp.getRoot(), "Embedded.exe");
         Files.write(exe.toPath(), b.array());
         assertArrayEquals(new int[]{4, 4, 1}, AgvnGodotFiles.version(exe));
-        assertEquals("4", AgvnGodotFiles.major(exe, tmp.getRoot()));
+        assertArrayEquals(new int[]{4, 4, 1}, AgvnGodotFiles.release(exe, tmp.getRoot()));
+        assertEquals("one exe, no .pck: still Godot", GameExeResolver.Engine.GODOT, GameExeResolver.detectEngine(tmp.getRoot()));
         b.putLong(b.capacity() - 12, Long.MAX_VALUE); // a size bigger than the file
         Files.write(exe.toPath(), b.array());
         assertNull(AgvnGodotFiles.version(exe));
+        assertEquals(GameExeResolver.Engine.UNKNOWN, GameExeResolver.detectEngine(tmp.getRoot()));
     }
 
     @Test
@@ -75,11 +77,17 @@ public class AgvnGodotTest {
         Files.write(new File(game, "Game.pck").toPath(), pack(2, 4, 2, 1));
         AgvnEvidence ev = new AgvnEvidence();
         ev.engine = "GODOT";
-        assertEquals("4", AgvnDoctor.godotVersion(ev, exe, game));
+        AgvnGodotGame.version(ev, exe, game);
+        assertEquals("4", ev.params.get("godot"));
+        assertEquals("2", ev.params.get("godotMinor"));
         ev.lines.add("Godot Engine v3.5.2.stable.official.170ba337a - https://godotengine.org"); // from its godot.log
-        assertEquals("3", AgvnDoctor.godotVersion(ev, exe, game));
+        AgvnGodotGame.version(ev, exe, game);
+        assertEquals("3", ev.params.get("godot"));
+        assertEquals("5", ev.params.get("godotMinor"));
         ev.engine = "UNITY";
-        assertNull(AgvnDoctor.godotVersion(ev, exe, game));
+        ev.params.clear();
+        AgvnGodotGame.version(ev, exe, game);
+        assertTrue(ev.params.isEmpty());
     }
 
     @Test
@@ -113,10 +121,33 @@ public class AgvnGodotTest {
         ev.engine = "GODOT";
         AgvnProblemCatalog.Finding f = AgvnDoctorTest.catalog.find(ev);
         assertEquals("godot-gl-crash", f.id());
-        assertEquals("[godot-renderer, godot-undo, driver-other, send-logs]", f.fixes().toString());
+        assertEquals("[godot-renderer, godot-angle, godot-undo, driver-other, send-logs]", f.fixes().toString());
         ev.engine = "UNKNOWN";
         assertEquals("opengl-crash", AgvnDoctorTest.catalog.find(ev).id());
         ev.endedByGame = false; // the player left while it still drew: nothing to ask
+        ev.playerQuit = true;
+        assertNull(AgvnDoctorTest.catalog.find(ev));
+    }
+
+    @Test
+    public void partyMeClosingOnVulkanIsAsked() {
+        // the player's 0.1.11 log of 04/10: after "Cho game Godot chạy bằng Vulkan", Party Me (Godot 4.6) closed by
+        // itself 12 and 16 s after it started, before its first script ran, with no error; the library asked nothing
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.engine = "GODOT";
+        ev.started = ev.endedByGame = true;
+        ev.seconds = 16;
+        ev.lines.addAll(Arrays.asList("Godot Engine v4.6.stable.official.89cea1439 - https://godotengine.org",
+                "Failed to enable screen_keep_on.", "Vulkan 1.3.247 - Forward Mobile - Using Device #0: ARM - Wrapper(Mali-G615 MC2)"));
+        assertNull("its own renderer: a quick close may be the player's", AgvnDoctorTest.catalog.find(ev));
+        ev.godotSwitched = AgvnFixEdits.godotSwitched("--fullscreen " + AgvnFixEdits.GODOT4_ARGS);
+        AgvnProblemCatalog.Finding f = AgvnDoctorTest.catalog.find(ev);
+        assertEquals("godot-switch-failed", f.id());
+        assertEquals(Arrays.asList("godot-angle", "godot-undo", "driver-other", "send-logs"), f.fixes());
+        ev.seconds = 75; // it played a while
+        assertNull(AgvnDoctorTest.catalog.find(ev));
+        ev.seconds = 16;
+        ev.endedByGame = false; // the player quit it
         ev.playerQuit = true;
         assertNull(AgvnDoctorTest.catalog.find(ev));
     }

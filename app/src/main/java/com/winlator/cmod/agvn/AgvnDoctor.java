@@ -17,8 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * "Tự sửa lỗi": when a Windows game ends badly, finds what went wrong ({@link AgvnProblemCatalog}) and leaves it for
@@ -27,7 +25,6 @@ import java.util.regex.Pattern;
  */
 public final class AgvnDoctor {
     private static final String TAG = "AGVN";
-    private static final Pattern GODOT = Pattern.compile("Godot Engine v(\\d+)\\.");
     /** Settings a lower Đồ họa step changes: when only they changed and the game then refused to start, the screen did it. */
     private static final List<String> SCREEN_KEYS = Arrays.asList("screenSize", AgvnQuality.EXTRA_QUALITY, "nativeFpsLimit",
             "nativeFpsLimiterEnabled");
@@ -74,9 +71,10 @@ public final class AgvnDoctor {
             if (ranWith.isEmpty()) ranWith = AgvnGoodConfig.snapshot(s);
             String screen = ranWith.containsKey("screenSize") ? ranWith.get("screenSize") : s.container.getScreenSize();
             AgvnEvidence ev = evidence(s, screen, AgvnWineTail.get().lines(), AgvnWineTail.get().crash(), System.currentTimeMillis());
+            if (AgvnGodotGame.learn(s, ev.lines)) ev.engine = s.getExtra(AgvnGameImporter.EXTRA_ENGINE); // its error box said so
             ev.lines.addAll(engineLogTails(s, AgvnSessionTrack.startMs()));
-            String godot = godotVersion(ev, AgvnEngineLogs.exe(s), AgvnEngineLogs.gameDir(s));
-            if (godot != null) ev.params.put("godot", godot);
+            AgvnGodotGame.version(ev, AgvnEngineLogs.exe(s), AgvnEngineLogs.gameDir(s));
+            ev.godotSwitched = AgvnFixEdits.godotSwitched(ranWith.get("execArgs"));
             diagnose(ctx, s, ev, ranWith);
         } catch (RuntimeException e) {
             Log.w(TAG, "doctor: game end not read", e);
@@ -159,22 +157,6 @@ public final class AgvnDoctor {
         } catch (NumberFormatException e) {
             return Integer.MAX_VALUE;
         }
-    }
-
-    /** A Godot game's major version: from Godot's first line in its log or Wine's, else from its pack; null otherwise. */
-    static String godotVersion(AgvnEvidence ev, File exe, File gameDir) {
-        if (!GameExeResolver.Engine.GODOT.name().equals(ev.engine)) return null;
-        String major = godotMajor(ev.lines);
-        return major != null ? major : AgvnGodotFiles.major(exe, gameDir);
-    }
-
-    /** "4" from Godot's first line ("Godot Engine v4.3.stable.official..."), or null. */
-    static String godotMajor(List<String> lines) {
-        for (String line : lines) {
-            Matcher m = GODOT.matcher(line);
-            if (m.find()) return m.group(1);
-        }
-        return null;
     }
 
     /** The last lines of the engine's logs (Unity's Player.log, Godot's godot.log...) written during this session. */

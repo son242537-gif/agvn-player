@@ -29,8 +29,12 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Thiếu file `.dll` | Wine: `Library X.dll (which is needed by …) not found` | Bật thư viện Windows chứa file đó (DirectX, XAudio, VC++ 2010), gửi nhật ký |
 | File `.dll` hỏng hoặc sai 32/64-bit | Wine: lỗi `c000007b` | Gửi nhật ký |
 | Game cần .NET | Wine: `Wine Mono is not installed` | Gửi nhật ký |
-| Godot không mở được OpenGL | Câu lỗi của Godot, hoặc game Godot tắt trước khi hiện hình | Chạy Godot bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), đổi driver |
-| Game bị tắt khi vẽ hình (OpenGL qua Zink) | Zink báo `vkCreateGraphicsPipelines failed` rồi game tự tắt; hay gặp ở GPU Mali, vì Zink thiếu vài tính năng trên đó | Game Godot: chạy bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bỏ cách chạy Godot đã đổi. Mọi game: đổi driver |
+| Driver đồ họa bị lỗi khi game vẽ hình | Hộp "Assertion failed!" của Wine nhắc `winevulkan/loader_thunks.c` và một hàm Vulkan (`vkCreateShaderModule`...): driver bị lỗi ngay trong lúc game nhờ nó dựng hình | Đổi bản DXVK, đổi driver, dùng WineD3D. Game Godot: bỏ cách vẽ đã đổi, chạy bằng Direct3D 11 (ANGLE), đổi driver |
+| Godot không mở được OpenGL | Câu lỗi của Godot (nhật ký `godot.log` hoặc hộp "Unable to initialize video driver"), hoặc game Godot tắt trước khi hiện hình | Chạy Godot bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bằng Direct3D 11 (ANGLE, Godot 4.4 trở lên), bỏ cách vẽ đã đổi, đổi driver |
+| Godot không mở được OpenGL lẫn Direct3D 11 | Hộp lỗi của Godot 4.4 trở lên: "...required OpenGL 3.3 or Direct3D 11 version" | Chạy bằng Vulkan, bỏ cách vẽ đã đổi, đổi driver |
+| Godot không mở được Vulkan | Hộp lỗi của Godot: "...required Vulkan version" | Bỏ cách vẽ đã đổi, chạy bằng Direct3D 11 (ANGLE), đổi driver |
+| Game Godot tự tắt sau khi đổi cách vẽ | App đã đổi cách vẽ của game, rồi game tự tắt trong một phút đầu mà không để lại câu lỗi nào | Chạy bằng Direct3D 11 (ANGLE), bỏ cách vẽ đã đổi, đổi driver |
+| Game bị tắt khi vẽ hình (OpenGL qua Zink) | Zink báo `vkCreateGraphicsPipelines failed` rồi game tự tắt; hay gặp ở GPU Mali, vì Zink thiếu vài tính năng trên đó | Game Godot: chạy bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bằng Direct3D 11 (ANGLE), bỏ cách vẽ đã đổi. Mọi game: đổi driver |
 | Không tạo được DirectX / thiếu DirectX 11 | Câu lỗi của DXVK, Unity (`InitializeEngineGraphics failed`) | Đổi bản DXVK, đổi driver (Turnip ↔ System), dùng WineD3D |
 | Driver đồ họa lỗi giữa chừng | `VK_ERROR_DEVICE_LOST` | Để Turnip tự chọn chế độ dựng hình, đổi driver, đổi DXVK, hạ Đồ họa |
 | Hết bộ nhớ đồ họa / hết RAM | DXVK, Unity, Unreal báo hết bộ nhớ | Hạ Đồ họa |
@@ -40,8 +44,21 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Game crash | Wine in báo cáo crash | Đổi DXVK, giả lập CPU ổn định hơn, đổi driver, về cấu hình gốc |
 | Game tắt ngay, không rõ lỗi | Game tắt trước khi hiện hình | Về cấu hình gốc, đổi DXVK, đổi driver, gửi nhật ký |
 
-App biết game Godot là Godot 3 hay 4 nhờ dòng đầu nhật ký của Godot (`godot.log`, app chép vào thư mục phiên chơi), hoặc
-nhờ phần đầu file `.pck` của game (file `.pck` riêng hoặc gắn trong file `.exe`).
+App biết game Godot là bản nào (4.6, 3.5...) nhờ dòng đầu nhật ký của Godot (`godot.log`, app chép vào thư mục phiên
+chơi), hoặc nhờ phần đầu file `.pck` của game (file `.pck` riêng hoặc gắn trong file `.exe`).
+
+Game Godot đóng gói trong một file `.exe` (không có file `.pck` riêng) trước đây bị nhận là game không rõ engine, nên
+thiếu OpenGL 3.3 qua Zink và không có cách sửa nào của Godot. Giờ app nhận ra nó lúc thêm game và lúc mở game (gói của
+Godot nằm ở cuối file `.exe`), hoặc khi hộp lỗi của game là câu của Godot.
+
+"Direct3D 11 (ANGLE)": Godot 4.4 trở lên vẽ được bằng ANGLE, tức OpenGL ES dựng trên Direct3D 11. Như vậy game đi qua
+DXVK chứ không qua Zink, hợp với GPU Mali, nơi Zink thiếu tính năng. Nếu ANGLE không mở được, Godot tự quay về OpenGL
+như cũ. App chỉ đổi cách vẽ bằng tham số chạy game (`--rendering-method gl_compatibility --rendering-driver
+opengl3_angle`), và mỗi lần chỉ giữ một cách vẽ đã đổi.
+
+DXVK-Sarek người chơi tự cài (nút "Cài thêm" ở mục DXVK) giờ cũng được tắt một bước sửa shader của wrapper
+(`WRAPPER_NO_PATCH_OPCONSTCOMP`), như upstream vẫn làm với bản Sarek của họ. Bước này chạy đúng lúc game tạo shader
+(`vkCreateShaderModule`). Một máy Mali-G925 dùng Sarek tự cài đã bị lỗi driver ở đúng bước đó.
 
 ### Game "Chạy nhẹ"
 
@@ -145,6 +162,10 @@ lớn nhất, không tính màn nền của Wine (`explorer.exe`). Khi game đã
 Khi tắt "Bật debug Wine", app vẫn cho Wine in hai nhóm lỗi: `err+module` (thiếu hoặc hỏng file `.dll`) và
 `err+mscoree` (.NET). Hai nhóm này chỉ in khi có lỗi thật, nên không làm game chậm.
 
+Bật hay tắt debug, Wine cũng ghi chữ trong mọi hộp thông báo game hiện ra (`trace+msgbox`): mỗi hộp một dòng
+`trace:msgbox:MSGBOX_OnInit L"..."` trong `wine-cuoi.txt`. Wine cắt dòng này sau khoảng 290 ký tự. Nhiều game chỉ báo lỗi
+bằng hộp, ví dụ "Unable to initialize video driver" của Godot, hay "Assertion failed!" khi driver Vulkan bị lỗi.
+
 ## Thêm một lỗi mới
 
 1. Lấy câu lỗi thật trong `wine-cuoi.txt` hoặc nhật ký engine của người chơi gửi về.
@@ -164,7 +185,17 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
 - [ ] Game nặng trên máy yếu (GPU 100%): sau khoảng 2,5 phút, thanh "Game đang chạy chậm" hiện với nút hạ Đồ họa và
       nút Gmem. Bấm một nút: thanh "Đã lưu…" hỏi "Mở lại game ngay"; bấm thì game đóng rồi tự mở lại với cấu hình mới.
       Lần khác bấm "Để vậy, không hỏi lại": lần sau không hiện.
-- [ ] Game Godot báo "Unable to initialize video driver": hộp hỏi có "Cho game Godot chạy bằng Vulkan".
+- [ ] Game Godot báo "Unable to initialize video driver": hộp hỏi có "Cho game Godot chạy bằng Vulkan"; `wine-cuoi.txt` có
+  dòng `trace:msgbox:MSGBOX_OnInit` với chữ trong hộp.
+- [ ] Máy Mali, game Godot 4.4 trở lên (như Party Me) đã đổi sang Vulkan mà tự tắt trong một phút đầu: thư viện hỏi
+  "Game Godot tự tắt sau khi đổi cách vẽ" với "Cho game Godot chạy bằng Direct3D 11 (ANGLE)". Bấm vào thì game mở lại,
+  và `godot.log` của phiên đó nhắc ANGLE.
+- [ ] Game hiện hộp "Assertion failed!" nhắc `vkCreateShaderModule`, bấm OK: thư viện hỏi "Driver đồ họa bị lỗi khi game
+  vẽ hình" với nút đổi DXVK.
+- [ ] Game Godot chỉ có một file `.exe`, không có `.pck`: thêm mới thì game được nhận là Godot ngay. Game đã thêm từ
+  trước thì lần mở đầu `adb logcat -s AGVN` có dòng `... is a Godot game`. Cả hai trường hợp, `moi-truong.txt` có
+  `MESA_GL_VERSION_OVERRIDE=3.3`.
+- [ ] Game dùng DXVK-Sarek tự cài: `adb logcat` có dòng `Disabling Wrapper PATCH_OPCONSTCOMP SPIR-V pass`.
 - [ ] Máy GPU Mali, game Godot bị tắt sau dòng Zink `vkCreateGraphicsPipelines failed` trong `wine-cuoi.txt`: thư viện
       hỏi "Game Godot bị tắt khi vẽ hình". Nút là "Cho game Godot chạy bằng Vulkan" nếu game là Godot 4, hoặc "…GLES2" nếu
       game là Godot 3. Thư mục phiên chơi có `godot.log`.

@@ -13,6 +13,9 @@ final class AgvnFixEdits {
     static final String DXVK_OLD = AgvnDxvkPick.OLD, DXVK_NEW = AgvnDxvkPick.NEW;
     static final String ARM64EC_OLD = DXVK_OLD + "-arm64ec-async", ARM64EC_NEW = DXVK_NEW + "-arm64ec-gplasync";
     static final String GODOT4_ARGS = "--rendering-method mobile --rendering-driver vulkan", GODOT3_ARGS = "--video-driver GLES2";
+    /** Godot 4's Compatibility renderer on ANGLE: OpenGL ES drawn with Direct3D 11, so through DXVK instead of Zink. */
+    static final String GODOT_ANGLE_ARGS = "--rendering-method gl_compatibility --rendering-driver opengl3_angle";
+    private static final String[] GODOT_RENDERERS = {GODOT4_ARGS, GODOT_ANGLE_ARGS, GODOT3_ARGS};
 
     private AgvnFixEdits() {}
 
@@ -73,6 +76,32 @@ final class AgvnFixEdits {
     /** Godot 3 drops to GLES2 (OpenGL 2.1 is enough); Godot 4 renders with Vulkan's Mobile renderer. */
     static String godotArgs(String major) {
         return "3".equals(major) ? GODOT3_ARGS : GODOT4_ARGS;
+    }
+
+    /** True when the game starts with a Godot renderer a fix picked. */
+    static boolean godotSwitched(String args) {
+        for (String renderer : GODOT_RENDERERS) if (args != null && args.contains(renderer)) return true;
+        return false;
+    }
+
+    /** Exec arguments with {@code renderer} in place of a Godot renderer a fix picked before; null: back to the game's own. */
+    static String withGodotRenderer(String args, String renderer) {
+        String out = args == null ? "" : args;
+        for (String old : GODOT_RENDERERS) out = withoutArgs(out, old);
+        return renderer == null ? out : withArgs(out, renderer);
+    }
+
+    /**
+     * True from Godot 4.4: it knows ANGLE, and when ANGLE cannot start it goes back to native OpenGL by itself
+     * (rendering/gl_compatibility/fallback_to_native), so trying ANGLE costs nothing where it fails.
+     */
+    static boolean godotAngle(String major, String minor) {
+        try {
+            int ma = Integer.parseInt(major), mi = Integer.parseInt(minor);
+            return ma > 4 || ma == 4 && mi >= 4;
+        } catch (NumberFormatException e) {
+            return false; // a version the game did not tell
+        }
     }
 
     /**

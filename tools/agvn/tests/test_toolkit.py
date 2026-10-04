@@ -148,6 +148,17 @@ class EngineDetectionTest(unittest.TestCase):
         self.check("GODOT", "godot", "Game.exe", "Game.pck")
         self.assertEqual("SiglusEngine.exe", resolve_exe(siglus, "SIGLUS"))
 
+    def test_godot_in_one_exe(self):
+        # "Embed PCK": the exe, the pack ("GDPC", format, major, minor, patch...), the pack's size, "GDPC"
+        pck = struct.pack("<4s4I", b"GDPC", 3, 4, 5, 1) + bytes(76)
+        root = self.game("embedded", "readme.txt")
+        with open(os.path.join(root, "Game.exe"), "wb") as f:
+            f.write(b"MZ... the engine ..." + pck + struct.pack("<Q", len(pck)) + b"GDPC")
+        self.assertEqual("GODOT", detect_engine(root))
+        with open(os.path.join(root, "Game.exe"), "wb") as f:  # a size bigger than the file: not a pack
+            f.write(b"MZ... the engine ..." + pck + struct.pack("<Q", 1 << 40) + b"GDPC")
+        self.assertEqual("UNKNOWN", detect_engine(root))
+
     def test_rpgmaker_families(self):
         mv = self.check("RPGMAKER_MV", "mv", "Game.exe", "notification_helper.exe", "nw.dll", "www/js/rpg_core.js")
         self.assertEqual("Game.exe", resolve_exe(mv, "RPGMAKER_MV"))

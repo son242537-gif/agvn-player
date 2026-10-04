@@ -25,6 +25,8 @@ final class AgvnEvidence {
     /** "" for a Windows game; renpy, rgss or html for a "Chạy nhẹ" game (AgvnLightDoctor). */
     String runner = "";
     boolean crashed, endedByGame, playerQuit, started, bigWindowSeen, changed, smallScreen;
+    /** A Godot game started with the renderer a fix picked (AgvnFixEdits.godotSwitched). */
+    boolean godotSwitched;
     /** "Chạy nhẹ": the game reported an error, its page process died, Android found it frozen. */
     boolean scriptError, pageCrash, frozen;
     long seconds;
@@ -38,12 +40,19 @@ final class AgvnEvidence {
         return playerQuit && !bigWindowSeen && seconds >= QUIT_AFTER_S;
     }
 
+    /** The game failed within a minute: it crashed or closed by itself, or never showed its window. */
+    boolean endedEarly() {
+        return seconds < GOOD_AFTER_S && (crashed || endedByGame || noStart());
+    }
+
     boolean holds(String condition) {
         switch (condition) {
             case "failed": return crashed || noStart();
             case "no-start": return noStart();
             case "crash": return crashed;
             case "ended": return crashed || endedByGame;
+            case "ended-early": return endedEarly();
+            case "godot-switched": return godotSwitched;
             case "changed": return changed;
             case "small-screen": return smallScreen;
             case "killed-low-memory": return killedReason == REASON_LOW_MEMORY;

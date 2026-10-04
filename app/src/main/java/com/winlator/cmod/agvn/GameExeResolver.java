@@ -57,9 +57,20 @@ public final class GameExeResolver {
         if (isDir(top.get("tyrano")) || isFile(path(top, "data", "system", "config.tjs"))) return Engine.TYRANO;
         File[] renpyGame = listOrEmpty(path(top, "game"));
         if (isDir(top.get("renpy")) || anyFile(renpyGame, "", ".rpa", ".rpyc")) return Engine.RENPY;
-        if (anyFile(children, "", ".pck")) return Engine.GODOT;
+        if (anyFile(children, "", ".pck") || embedsGodot(children)) return Engine.GODOT;
         if (isFile(top.get("data.win"))) return Engine.GAMEMAKER;
         return Engine.UNKNOWN;
+    }
+
+    /** A Godot game exported as one exe ("Embed PCK"): no .pck beside it, its pack ends the exe (AgvnGodotFiles). */
+    private static boolean embedsGodot(File[] children) {
+        int read = 0;
+        for (File f : children) {
+            if (!f.isFile() || !f.getName().toLowerCase(Locale.ROOT).endsWith(".exe")) continue;
+            if (read++ == MAX_GAMES) return false; // a folder of tools, not one game
+            if (AgvnGodotFiles.version(f) != null) return true;
+        }
+        return false;
     }
 
     /** RPG Maker 2000/2003 (RPG_RT.*) or XP/VX/VX Ace (Game.ini with an RGSS dll, encrypted archive or Data/ files). */

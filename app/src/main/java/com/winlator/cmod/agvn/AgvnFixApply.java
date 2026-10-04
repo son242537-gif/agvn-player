@@ -64,11 +64,9 @@ final class AgvnFixApply {
                 s.putExtra("dxwrapper", fix.to);
                 break;
             case "godot-renderer":
-                s.putExtra("execArgs", AgvnFixEdits.withArgs(s.getExtra("execArgs"), fix.to));
-                break;
+            case "godot-angle":
             case "godot-undo":
-                s.putExtra("execArgs", AgvnFixEdits.withoutArgs(AgvnFixEdits.withoutArgs(s.getExtra("execArgs"),
-                        AgvnFixEdits.GODOT4_ARGS), AgvnFixEdits.GODOT3_ARGS));
+                AgvnGodotGame.apply(s, fix);
                 break;
             case "render-gmem":
             case "render-auto":

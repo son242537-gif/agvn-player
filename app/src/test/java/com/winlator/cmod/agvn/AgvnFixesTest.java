@@ -62,6 +62,23 @@ public class AgvnFixesTest {
     }
 
     @Test
+    public void oneGodotRendererAtATime() {
+        String vulkan = AgvnFixEdits.withGodotRenderer("--fullscreen", AgvnFixEdits.GODOT4_ARGS);
+        assertTrue(AgvnFixEdits.godotSwitched(vulkan));
+        String angle = AgvnFixEdits.withGodotRenderer(vulkan, AgvnFixEdits.GODOT_ANGLE_ARGS);
+        assertEquals("--fullscreen --rendering-method gl_compatibility --rendering-driver opengl3_angle", angle);
+        assertEquals("--fullscreen", AgvnFixEdits.withGodotRenderer(angle, null));
+        assertFalse(AgvnFixEdits.godotSwitched("--fullscreen"));
+        assertFalse(AgvnFixEdits.godotSwitched(null));
+        // ANGLE from Godot 4.4: it then falls back to native OpenGL by itself when ANGLE cannot start
+        assertTrue(AgvnFixEdits.godotAngle("4", "6"));
+        assertTrue(AgvnFixEdits.godotAngle("4", "4"));
+        assertFalse(AgvnFixEdits.godotAngle("4", "3"));
+        assertFalse(AgvnFixEdits.godotAngle("3", "5"));
+        assertFalse(AgvnFixEdits.godotAngle("4", null));
+    }
+
+    @Test
     public void turnipRenderingMode() {
         // the container's Winlator default forces sysmem: the game's own TU_DEBUG replaces it, noconform stays
         assertEquals("TU_DEBUG=noconform,gmem", AgvnFixEdits.withRenderMode("", "noconform,sysmem", "gmem"));

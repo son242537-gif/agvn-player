@@ -73,12 +73,12 @@ public class AgvnMediaFoundationTest {
     @Test
     public void wineDebugClassesCoverEveryChannel() {
         // the default pick must log warnings, e.g. "Transform failed to process output"
-        assertEquals("warn+all,err+all,fixme+all,warn-heap,warn-file,warn-font",
+        assertEquals("warn+all,err+all,fixme+all,warn-heap,warn-file,warn-font,trace+msgbox",
                 AgvnWineDebug.spec(true, SettingsFragment.DEFAULT_WINE_DEBUG_CHANNELS));
-        assertEquals("warn+all,+mfplat,+d3d11,warn-heap,warn-file,warn-font", AgvnWineDebug.spec(true, "warn, mfplat,d3d11"));
-        assertEquals("-all,err+module,err+mscoree", AgvnWineDebug.spec(false, "warn,err,fixme"));
-        assertEquals("-all,err+module,err+mscoree", AgvnWineDebug.spec(true, ""));
-        assertEquals("-all,err+module,err+mscoree", AgvnWineDebug.spec(true, " , "));
-        assertEquals("-all,err+module,err+mscoree", AgvnWineDebug.spec(true, null));
+        assertEquals("warn+all,+mfplat,+d3d11,warn-heap,warn-file,warn-font,trace+msgbox", AgvnWineDebug.spec(true, "warn, mfplat,d3d11"));
+        assertEquals("-all,err+module,err+mscoree,trace+msgbox", AgvnWineDebug.spec(false, "warn,err,fixme"));
+        assertEquals("-all,err+module,err+mscoree,trace+msgbox", AgvnWineDebug.spec(true, ""));
+        assertEquals("-all,err+module,err+mscoree,trace+msgbox", AgvnWineDebug.spec(true, " , "));
+        assertEquals("-all,err+module,err+mscoree,trace+msgbox", AgvnWineDebug.spec(true, null));
     }
 }

@@ -329,6 +329,7 @@
     <string name="agvn_fix_wined3d">Dùng WineD3D thay DXVK (chậm hơn, dễ chạy hơn)</string>
     <string name="agvn_fix_godot_vulkan">Cho game Godot chạy bằng Vulkan</string>
     <string name="agvn_fix_godot_gles2">Cho game Godot chạy bằng OpenGL đời cũ (GLES2)</string>
+    <string name="agvn_fix_godot_angle">Cho game Godot chạy bằng Direct3D 11 (ANGLE)</string>
     <string name="agvn_fix_godot_undo">Bỏ cách chạy Godot đã đổi</string>
     <string name="agvn_fix_render_gmem">Thử chế độ dựng hình Gmem</string>
     <string name="agvn_fix_render_auto">Để Turnip tự chọn chế độ dựng hình</string>

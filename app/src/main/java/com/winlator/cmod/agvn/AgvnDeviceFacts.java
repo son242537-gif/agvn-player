@@ -75,7 +75,7 @@ final class AgvnDeviceFacts {
             String value = String.valueOf(e.getValue());
             if (e.getKey().endsWith(suffix))
                 tried.put(e.getKey().substring(0, e.getKey().length() - suffix.length()),
-                        "ok".equals(value) ? "ok" : "bad".equals(value) ? "lỗi" : "đang thử");
+                        "ok".equals(value) ? "ok" : value.startsWith("bad") ? "lỗi" : "đang thử"); // bad1: failed once
         }
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> e : tried.entrySet()) sb.append(sb.length() > 0 ? " · " : "").append(e.getKey()).append(' ').append(e.getValue());

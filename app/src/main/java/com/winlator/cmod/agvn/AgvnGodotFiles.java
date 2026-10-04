@@ -26,8 +26,8 @@ final class AgvnGodotFiles {
 
     private AgvnGodotFiles() {}
 
-    /** "3" or "4" for the game of {@code exe}, its packs looked for beside it and in {@code gameDir}; null when none says. */
-    static String major(File exe, File gameDir) {
+    /** {major, minor, patch} of the game of {@code exe}, from a pack beside it, in {@code gameDir} or in it; null when none. */
+    static int[] release(File exe, File gameDir) {
         Set<File> packs = new LinkedHashSet<>();
         File exeDir = exe.getParentFile();
         if (exeDir != null) packs.add(new File(exeDir, exe.getName().replaceFirst("(?i)\\.exe$", "") + ".pck")); // Godot's first try
@@ -40,7 +40,7 @@ final class AgvnGodotFiles {
         packs.add(exe);
         for (File pack : packs) {
             int[] version = version(pack);
-            if (version != null) return String.valueOf(version[0]);
+            if (version != null) return version;
         }
         return null;
     }

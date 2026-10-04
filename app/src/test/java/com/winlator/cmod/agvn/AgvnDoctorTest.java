@@ -1,6 +1,7 @@
 /* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -24,12 +25,12 @@ import java.util.Set;
 /** "Tự sửa lỗi": game-problems.json read with the lines Wine, DXVK, Godot and Unity really print. */
 public class AgvnDoctorTest {
     private static final Set<String> FIXES = new HashSet<>(Arrays.asList("restore-good", "reset", "quality-down",
-            "quality-up", "dxvk-other", "dxvk-arm64ec", "driver-other", "wined3d", "godot-renderer", "godot-undo",
+            "quality-up", "dxvk-other", "dxvk-arm64ec", "driver-other", "wined3d", "godot-renderer", "godot-angle", "godot-undo",
             "render-gmem", "render-auto", "emulator-stable", "emulator-fast", "wincomponent", "power-save-settings",
             "app-settings", "send-logs", "run-windows", "rgss-frameskip"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
-            "changed", "small-screen", "killed-low-memory", "killed-background", "live", "light", "script-error",
-            "page-crash", "frozen"));
+            "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "live",
+            "light", "script-error", "page-crash", "frozen"));
     static AgvnProblemCatalog catalog;
 
     @BeforeClass
@@ -106,10 +107,10 @@ public class AgvnDoctorTest {
         AgvnEvidence ev = noStart("Godot Engine v4.3.stable.official.77dcf97d8 - https://godotengine.org");
         ev.engine = "GODOT";
         assertEquals("godot-no-start", found(ev));
-        assertEquals("4", AgvnDoctor.godotMajor(ev.lines));
+        assertArrayEquals(new int[]{4, 3}, AgvnGodotGame.fromLines(ev.lines));
         ev.lines.add("WARNING: Your video card drivers seem not to support the required OpenGL 3.3 version, switching to ANGLE.");
         assertEquals("godot-opengl", found(ev));
-        assertEquals("3", AgvnDoctor.godotMajor(Collections.singletonList("Godot Engine v3.5.2.stable.official.170ba337a")));
+        assertArrayEquals(new int[]{3, 5}, AgvnGodotGame.fromLines(Collections.singletonList("Godot Engine v3.5.2.stable.official.170ba337a")));
         assertEquals(AgvnFixEdits.GODOT3_ARGS, AgvnFixEdits.godotArgs("3"));
         assertEquals(AgvnFixEdits.GODOT4_ARGS, AgvnFixEdits.godotArgs(null));
     }
