@@ -1,0 +1,9 @@
+AGVN Player v0.1.13 - agvn.io.vn
+
+Mới:
+- Game KiriKiri mới thêm: app đọc khổ màn hình của game và chọn màn hình không nhỏ hơn khổ đó, để game hiện đủ hình. Kéo "Đồ họa" xuống thấp chỉ giảm FPS, không làm màn hình nhỏ hơn khổ game.
+- Game mở xong mà vẫn đen màn hình khoảng 20 giây: app đề nghị đổi sang màn hình lớn hơn rồi mở lại game. Bạn cũng có thể chọn "Chờ thêm" hoặc "Để vậy, không hỏi lại".
+Sửa lỗi:
+- Nút ⛶ "Vừa màn hình" nhận ra khung game trong nhiều trường hợp hơn.
+- Nhật ký lỗi ghi lại khi game xin độ phân giải lớn hơn màn hình, giúp tìm ra lỗi màn hình đen.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.
