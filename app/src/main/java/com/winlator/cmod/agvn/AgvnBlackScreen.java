@@ -111,11 +111,14 @@ public final class AgvnBlackScreen {
         XServer xServer = activity.getXServer();
         if (s == null || xServer == null) return;
         String screen = String.valueOf(xServer.screenInfo);
-        String bigger = AgvnBlackScreenRules.bigger(screen, s.getExtra(AgvnKirikiri.EXTRA_GAME_SIZE), window);
+        String bigger = AgvnBlackScreenRules.bigger(screen, s.getExtra(AgvnKirikiri.EXTRA_GAME_SIZE), window, refused);
         long seconds = elapsedMs / 1000;
-        AgvnSessionLog.event("Màn hình đen sau " + seconds + " giây, màn hình " + screen
-                + (refused ? ", Wine từ chối độ phân giải game xin" : "") + (bigger != null ? ": hỏi đổi sang " + bigger : ""));
-        Log.i(TAG, "black screen after " + seconds + " s on " + screen + (refused ? ", mode refused" : "") + ", offer " + bigger);
+        String frame = window != null ? window[2] + "x" + window[3] : "?";
+        AgvnSessionLog.event("Màn hình đen sau " + seconds + " giây, màn hình " + screen + ", khung game " + frame
+                + (refused ? ", Wine từ chối độ phân giải game xin" : "")
+                + (bigger != null ? ": hỏi đổi sang " + bigger : ": không hỏi"));
+        Log.i(TAG, "black screen after " + seconds + " s on " + screen + ", window " + frame
+                + (refused ? ", mode refused" : "") + ", offer " + bigger);
         if (bigger == null) return;
         String label = activity.getString(R.string.agvn_fit_resize, bigger.replace('x', '×'));
         String detail = activity.getString(R.string.agvn_black_detail, seconds, screen.replace('x', '×'))

@@ -14,7 +14,7 @@ giữ lại. Tài liệu này ghi lại AGVN làm gì ở từng mức và vì s
 | DXVK: giải phóng pipeline library không dùng (`dxvk.trackPipelineLifetime=True`) | có | có | không | không |
 | Ren'Py: bộ đệm ảnh (`config.image_cache_size_mb`), trong Wine và "Chạy nhẹ" | 128 MB | 192 MB | 256 MB | để game tự chọn |
 | Unity: mức chất lượng thấp nhất của game | có | có | không | không |
-| Unreal: texture pool (`r.Streaming.PoolSize`) | 384 MB | 512 MB | 768 MB | Cao: 1024 MB. Rất cao: 1536 MB |
+| Unreal: texture pool (`r.Streaming.PoolSize`); với driver của máy (Mali, Qualcomm) là một phần tư, ít nhất 64 MB | 384 MB | 512 MB | 768 MB | Cao: 1024 MB. Rất cao: 1536 MB |
 | Zink (OpenGL): vùng đệm bộ đệm GPU đã dùng xong | 256 MB | 256 MB | 256 MB | 256 MB |
 
 Mức "Tự động" dùng mức gợi ý cho máy: máy yếu là Thấp, máy tầm trung là Trung bình, máy flagship là Cao.
@@ -53,6 +53,13 @@ Mức "Tự động" dùng mức gợi ý cho máy: máy yếu là Thấp, máy 
     container. Công ty và tên game lấy từ hai dòng đầu của `<exe>_Data/app.info`.
   - Ở mức cao hơn, AGVN xoá giá trị này, nhưng chỉ khi chính AGVN đã ghi nó.
   - Mức thấp nhất của Unity thường giảm độ phân giải texture và tắt bóng. Game có menu cài đặt riêng có thể ghi đè.
+- **Unreal trên driver của máy:**
+  - Unreal tính texture theo cỡ nén BCn. Driver của máy (Mali, và Qualcomm khi không dùng Turnip) không đọc được BCn,
+    nên wrapper giải nén texture ra lớn gấp 4–8 lần. Texture pool vì vậy chiếm RAM gấp ít nhất 4 lần con số đặt.
+  - AGVN đặt pool bằng một phần tư mức của thanh, ít nhất 64 MB và không lớn hơn mức gốc (`AgvnBcn.texturePool`).
+    Turnip đọc BCn trực tiếp nên giữ nguyên mức.
+  - Ví dụ ngày 05/10: Legend Cleaner (Unreal) trên máy Mali-G610 7,2 GB lên 4,1 GB khi đang tải rồi bị tắt vì hết RAM.
+  - Đổi lại, texture của game Unreal trên các máy này mờ hơn. Mức mới chưa được đo trên máy thật.
 - **Zink:** bản vá `scripts/agvn/zink/patches/0007-agvn-cap-buffer-cache.patch`. Trên POCO F8 Pro, bộ nhớ GPU của một
   game OpenGL giảm từ 2,78 GB xuống 2,52 GB.
 
@@ -60,7 +67,8 @@ Mức "Tự động" dùng mức gợi ý cho máy: máy yếu là Thấp, máy 
 
 Thanh "Đồ họa" chỉ bớt được những phần trong bảng trên. Nếu game cần nhiều RAM hơn máy còn trống, hệ thống tắt tiến
 trình game, thường không để lại dòng lỗi nào. App nhận ra trường hợp này và hỏi "Game tự tắt lúc máy gần hết RAM"
-(`tu-sua-loi.md`).
+(`tu-sua-loi.md`). Khi RAM trống dưới hai lần mức cảnh báo, app đọc RAM mỗi giây thay vì 5 giây, để không bỏ sót game
+dùng hết RAM giữa hai lần đo (`AgvnMemoryWatch`).
 
 Ví dụ ngày 04/10: With The Devilish Her (Unity 2021.3, bản Việt hoá GameHub) trên Xiaomi 23090RA98G (Mali-G610, RAM
 7,2 GB, còn trống 3,0 GB trước khi chơi). App và game lên 4,0–4,2 GB RSS, RAM trống xuống 0,4–0,7 GB. Cả bốn lần chơi,
