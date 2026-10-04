@@ -44,6 +44,13 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Game không chạy với cấu hình mới | Lần trước chạy được, đổi cấu hình xong thì tắt trước khi hiện hình | Dùng lại cấu hình đã chạy được, về cấu hình gốc |
 | Game crash | Wine in báo cáo crash | Đổi DXVK, giả lập CPU ổn định hơn, đổi driver, về cấu hình gốc |
 | Game tắt ngay, không rõ lỗi | Game tắt trước khi hiện hình | Về cấu hình gốc, đổi DXVK, đổi driver, gửi nhật ký |
+| Game tự tắt lúc máy gần hết RAM | Game tự đóng, không crash, không câu lỗi, trong khi 30 giây trước đó RAM trống đã xuống dưới mức của thanh cảnh báo RAM (một phần mười RAM của máy, từ 600 MB đến 1,2 GB) | Hạ Đồ họa, gửi nhật ký |
+
+Khi máy hết RAM, hệ thống có thể tắt riêng tiến trình game mà không tắt AGVN. Lúc đó Wine kết thúc với mã 0, còn Wine,
+DXVK và engine của game đều không kịp ghi gì. Trước đây app coi đó là game thoát bình thường và còn lưu cấu hình đó là
+cấu hình chạy tốt. Ví dụ ngày 04/10: game Unity trên máy Mali-G610 7,2 GB bị tắt ở cùng một cảnh trong cả bốn lần
+chơi, 7–17 giây sau thanh cảnh báo RAM, khi RAM trống chỉ còn 0,4–0,7 GB. Người chơi tự thoát từ menu của game lúc RAM
+đang thấp cũng gặp thông báo này, nên trong thông báo có câu "Nếu chính bạn vừa thoát game thì bỏ qua thông báo này".
 
 App biết game Godot là bản nào (4.6, 3.5...) nhờ dòng đầu nhật ký của Godot (`godot.log`, app chép vào thư mục phiên
 chơi), hoặc nhờ phần đầu file `.pck` của game (file `.pck` riêng hoặc gắn trong file `.exe`).
@@ -284,5 +291,8 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
 - [ ] Game có cảnh tối hoặc mờ dần sau khi đã hiện hình: không có thanh "Màn hình game vẫn đen".
 - [ ] Máy Mali, game bị hộp "Assertion failed!" ngay khi mở (như Support Pregnancy School): để hộp đó hơn 30 giây,
   không có thanh "Màn hình game vẫn đen". Bấm OK thì thư viện hỏi "Driver đồ họa bị lỗi khi game vẽ hình".
+- [ ] Game nặng trên máy RAM ít bị tắt giữa chừng ngay sau thanh "Game đang dùng quá nhiều RAM" (hoặc giả lập: mở
+  nhiều app nặng rồi vào game): thư viện hỏi "Game tự tắt lúc máy gần hết RAM" với số MB còn trống; `su-kien.txt` có
+  `Tự sửa lỗi: low-ram-end`. Chơi đủ RAM rồi thoát từ menu của game: không có hộp nào.
 - [ ] `adb logcat`: dòng `Wine mode emulation: on`; `wine-cuoi.txt` của game bị đen có `display settings returned -2`.
 - [ ] `adb logcat -s AGVN`: dòng `doctor: <lỗi> for <game>` và `fix <cách sửa> -> <giá trị>`.

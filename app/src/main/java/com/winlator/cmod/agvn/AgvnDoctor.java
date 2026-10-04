@@ -30,6 +30,8 @@ public final class AgvnDoctor {
             "nativeFpsLimiterEnabled");
     static final int ENGINE_LOG_BYTES = 16 * 1024, SMALL_SCREEN_LINES = 480;
     static final long KILL_RECENT_MS = 24 * 3600_000L;
+    /** Free RAM under the RAM bar's level this shortly before a game ended by itself: memory most likely ended it. */
+    static final long LOW_RAM_RECENT_MS = 30_000;
     private static AgvnProblemCatalog catalog;
 
     private AgvnDoctor() {}
@@ -146,6 +148,8 @@ public final class AgvnDoctor {
         ev.seconds = AgvnSessionTrack.seconds(nowMs);
         ev.smallScreen = screenLines(screen) < SMALL_SCREEN_LINES;
         ev.params.put("screen", screen.replace('x', '×'));
+        ev.lowRamFreeMb = AgvnSessionTrack.lowRamFreeMb(nowMs, LOW_RAM_RECENT_MS);
+        if (ev.lowRamFreeMb >= 0) ev.params.put("free", String.valueOf(ev.lowRamFreeMb));
         return ev;
     }
 

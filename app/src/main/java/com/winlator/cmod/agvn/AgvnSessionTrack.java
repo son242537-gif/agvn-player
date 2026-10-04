@@ -12,7 +12,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  *   times. An error box ("The current resolution is too low...") is smaller, so a game that only showed one never
  *   started;</li>
  *   <li>who ended it: Wine by itself (the game closed, crashed or showed its error and quit), or the player;</li>
- *   <li>how many frames its window drew.</li>
+ *   <li>how many frames its window drew;</li>
+ *   <li>when free RAM last fell under the RAM bar's level ({@link AgvnMemoryWatch}): a game that ends just after it
+ *   most likely ran out of memory, since Android or the kernel ends it without a word in any log.</li>
  * </ul>
  * One game at a time, as XServerDisplayActivity runs one. Pure Java (JVM-testable).
  */
@@ -24,6 +26,7 @@ public final class AgvnSessionTrack {
     private static volatile long startMs;
     private static volatile Map<String, String> settings = Collections.emptyMap();
     private static volatile boolean bigSeen, wineEnded, playerQuit, exiting;
+    private static long lowRamAtMs, lowRamFreeMb = -1;
 
     private AgvnSessionTrack() {}
 
@@ -39,6 +42,8 @@ public final class AgvnSessionTrack {
         frames.set(0);
         bigUpdates.set(0);
         bigSeen = wineEnded = playerQuit = exiting = false;
+        lowRamAtMs = 0;
+        lowRamFreeMb = -1;
     }
 
     /** A window's content changed: X server thread, every frame, so kept cheap. */
@@ -63,6 +68,18 @@ public final class AgvnSessionTrack {
         if (exiting) return;
         exiting = true;
         playerQuit = !wineEnded;
+    }
+
+    /** A memory sample while the game plays: {@code freeMb} under {@code lowFreeMb}, the RAM bar's level, is kept. */
+    static synchronized void memory(long nowMs, long freeMb, long lowFreeMb) {
+        if (freeMb < 0 || freeMb >= lowFreeMb) return;
+        lowRamAtMs = nowMs;
+        lowRamFreeMb = freeMb;
+    }
+
+    /** The free RAM (MB) of the last sample under the RAM bar's level, if within {@code withinMs}; else -1. */
+    static synchronized long lowRamFreeMb(long nowMs, long withinMs) {
+        return lowRamFreeMb >= 0 && nowMs - lowRamAtMs <= withinMs ? lowRamFreeMb : -1;
     }
 
     static boolean started() {

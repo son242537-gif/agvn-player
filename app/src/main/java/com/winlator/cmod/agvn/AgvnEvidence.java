@@ -19,7 +19,7 @@ final class AgvnEvidence {
     static final long GOOD_AFTER_S = 60;
 
     final List<String> lines = new ArrayList<>();
-    /** Values the problem texts use: "crash", "screen", "fps", "speed", "gpu", "cpu", "godot", "runner", "error". */
+    /** Values the problem texts use: "crash", "screen", "free", "fps", "speed", "gpu", "cpu", "godot", "runner", "error". */
     final Map<String, String> params = new LinkedHashMap<>();
     String engine = "";
     /** "" for a Windows game; renpy, rgss or html for a "Chạy nhẹ" game (AgvnLightDoctor). */
@@ -32,6 +32,8 @@ final class AgvnEvidence {
     long seconds;
     /** How Android ended the app, for a session found unfinished at the next start; -1 when it was not. */
     int killedReason = -1, killedImportance;
+    /** Free RAM (MB) when it last fell under the RAM bar's level, shortly before the game ended; -1 when it did not. */
+    long lowRamFreeMb = -1;
 
     /** The game never drew its window and then closed, or the player gave up on it. */
     boolean noStart() {
@@ -57,6 +59,7 @@ final class AgvnEvidence {
             case "small-screen": return smallScreen;
             case "killed-low-memory": return killedReason == REASON_LOW_MEMORY;
             case "killed-background": return killedReason == REASON_SIGNALED && killedImportance > IMPORTANCE_FOREGROUND;
+            case "low-ram": return lowRamFreeMb >= 0;
             case "light": return !runner.isEmpty();
             case "script-error": return scriptError;
             case "page-crash": return pageCrash;

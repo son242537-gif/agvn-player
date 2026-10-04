@@ -56,6 +56,33 @@ Mức "Tự động" dùng mức gợi ý cho máy: máy yếu là Thấp, máy 
 - **Zink:** bản vá `scripts/agvn/zink/patches/0007-agvn-cap-buffer-cache.patch`. Trên POCO F8 Pro, bộ nhớ GPU của một
   game OpenGL giảm từ 2,78 GB xuống 2,52 GB.
 
+## Khi game vẫn bị tắt vì hết RAM
+
+Thanh "Đồ họa" chỉ bớt được những phần trong bảng trên. Nếu game cần nhiều RAM hơn máy còn trống, hệ thống tắt tiến
+trình game, thường không để lại dòng lỗi nào. App nhận ra trường hợp này và hỏi "Game tự tắt lúc máy gần hết RAM"
+(`tu-sua-loi.md`).
+
+Ví dụ ngày 04/10: With The Devilish Her (Unity 2021.3, bản Việt hoá GameHub) trên Xiaomi 23090RA98G (Mali-G610, RAM
+7,2 GB, còn trống 3,0 GB trước khi chơi). App và game lên 4,0–4,2 GB RSS, RAM trống xuống 0,4–0,7 GB. Cả bốn lần chơi,
+game đều bị tắt ở cùng một cảnh, khoảng 2,5 phút sau khi mở.
+
+- **Người chơi:**
+  - Đóng các app khác hoặc khởi động lại máy trước khi chơi.
+  - Lưu game trước đoạn hay bị tắt.
+  - Khi thanh "Game đang dùng quá nhiều RAM" hiện, lưu game rồi thoát.
+- **Người làm bản vá game Unity:**
+  - GPU Mali không đọc được texture BCn (DXT1, DXT5, BC7), nên wrapper giải nén chúng ra RGBA8, lớn gấp 4–8 lần.
+    Driver Qualcomm cũng vậy. Turnip thì đọc được BCn, nên game vừa RAM trên POCO F8 Pro vẫn có thể hết RAM trên máy
+    Mali có cùng dung lượng RAM.
+  - Trong game, GPU Mali có `SystemInfo.graphicsDeviceVendor` là `ARM` (Player.log ghi `Vendor: ARM`). RAM của máy là
+    `SystemInfo.systemMemorySize`.
+  - `QualitySettings.masterTextureLimit` chỉ thu nhỏ texture có mipmap. Ảnh CG và sprite thường không có mipmap nên vẫn
+    được nạp đủ cỡ.
+  - Chỉ nạp thứ gì khi cần. Bản vá ở ví dụ trên nạp sẵn 3 gói DLC lúc mở game, và Player.log có hai lần dòng
+    `Warmed 38 gallery thumbnail(s)`.
+  - `tools/agvn/do-bo-nho-anh.py` đo bộ nhớ texture của game trên PC. Số đo là cỡ texture khi GPU đọc được BCn, chưa
+    tính phần lớn thêm trên Mali.
+
 ## Những cách không giúp hoặc chưa làm
 
 - **Giới hạn VRAM báo cho game:** `WRAPPER_VMEM_MAX_SIZE`, `dxgi.maxDeviceMemory`, `VideoMemorySize` của WineD3D.

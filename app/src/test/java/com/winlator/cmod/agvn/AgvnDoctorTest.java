@@ -29,8 +29,8 @@ public class AgvnDoctorTest {
             "render-gmem", "render-auto", "emulator-stable", "emulator-fast", "wincomponent", "power-save-settings",
             "app-settings", "send-logs", "run-windows", "rgss-frameskip", "wrapper-constants", "wrapper-clip"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
-            "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "live",
-            "light", "script-error", "page-crash", "frozen"));
+            "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
+            "live", "light", "script-error", "page-crash", "frozen"));
     static AgvnProblemCatalog catalog;
 
     @BeforeClass
@@ -170,6 +170,41 @@ public class AgvnDoctorTest {
         assertNull(found(ev));
         ev.killedReason = 10; // the player swiped AGVN away
         assertNull(found(ev));
+    }
+
+    @Test
+    public void aGameThatClosedAsRamRanOut() {
+        // With The Devilish Her (Unity) on a Mali-G610 with 7.2 GB: Wine ended (code 0) at the same scene in every run,
+        // without a crash or an out-of-memory line, 7-17 s after the RAM bar (641 and 525 MB free)
+        long start = 1_000_000;
+        AgvnSessionTrack.start(start);
+        AgvnSessionTrack.memory(start + 160_000, 900, 737); // above the level of a 7.2 GB phone: not kept
+        assertEquals(-1, AgvnSessionTrack.lowRamFreeMb(start + 165_000, AgvnDoctor.LOW_RAM_RECENT_MS));
+        AgvnSessionTrack.memory(start + 165_000, 641, 737);
+        assertEquals(641, AgvnSessionTrack.lowRamFreeMb(start + 172_000, AgvnDoctor.LOW_RAM_RECENT_MS));
+        assertEquals("long before the end", -1, AgvnSessionTrack.lowRamFreeMb(start + 200_000, AgvnDoctor.LOW_RAM_RECENT_MS));
+        AgvnSessionTrack.start(start + 300_000);
+        assertEquals("a new game", -1, AgvnSessionTrack.lowRamFreeMb(start + 301_000, AgvnDoctor.LOW_RAM_RECENT_MS));
+
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.started = ev.endedByGame = true;
+        ev.seconds = 169;
+        ev.lowRamFreeMb = 641;
+        ev.params.put("free", "641");
+        AgvnProblemCatalog.Finding f = catalog.find(ev);
+        assertEquals("low-ram-end", f.id());
+        assertTrue(f.cause(), f.cause().contains("chỉ còn trống 641 MB RAM"));
+        assertEquals(Arrays.asList("quality-down", "send-logs"), f.fixes());
+        ev.endedByGame = false;
+        ev.playerQuit = true;
+        assertNull("the player quit with AGVN's own button", found(ev));
+        ev.playerQuit = false;
+        ev.endedByGame = true;
+        ev.lowRamFreeMb = -1;
+        assertNull("RAM to spare: the game closed itself, from its menu", found(ev));
+        ev.lowRamFreeMb = 641;
+        ev.crashed = true;
+        assertEquals("a crash names its own cause", "crash", found(ev));
     }
 
     @Test
