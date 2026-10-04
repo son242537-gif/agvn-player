@@ -1,0 +1,10 @@
+AGVN Player v0.1.12 - agvn.io.vn
+
+Mới:
+- Game Godot (bản 4.4 trở lên) có thêm cách chạy bằng Direct3D 11 (ANGLE). Đây là một cách khác để thử trên máy GPU Mali khi OpenGL và Vulkan đều lỗi. App tự đề nghị khi cần.
+- App đọc được chữ trong hộp báo lỗi của game, nên nhận ra thêm lỗi và đưa cách sửa: driver đồ họa bị lỗi khi game vẽ hình ("Assertion failed!"), game Godot không mở được OpenGL, Direct3D 11 hoặc Vulkan.
+Sửa lỗi:
+- Game Godot tự tắt ngay sau khi đổi cách chạy: app hỏi lại, đề nghị cách chạy khác hoặc trả về như cũ.
+- Game Godot đóng gói trong một file .exe giờ được nhận đúng là game Godot, nên có OpenGL 3.3 và các cách sửa của Godot.
+- DXVK-Sarek tự cài: app tắt một bước sửa shader như bản Sarek gốc, để tránh lỗi "Assertion failed!".
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.
