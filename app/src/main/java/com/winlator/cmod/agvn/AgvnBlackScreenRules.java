@@ -67,15 +67,16 @@ final class AgvnBlackScreenRules {
 
     /**
      * A screen larger than {@code screen} to offer: the game's own size when the screen is smaller ({@link AgvnKirikiri}),
-     * else the window's when it is larger than the screen, else the next of {@link #SCREENS}; null when there is none.
+     * else the window's ({x, y, width, height}, or null) when the screen cuts it off ({@link AgvnFitMath#cutOff}), else
+     * the next of {@link #SCREENS}; null when there is none.
      */
-    static String bigger(String screen, String gameSize, int windowW, int windowH) {
+    static String bigger(String screen, String gameSize, int[] window) {
         int[] now = size(screen);
         if (now == null) return null;
         String forGame = AgvnKirikiri.notSmaller(screen, gameSize);
         if (forGame != null && !forGame.equals(screen)) return forGame;
-        if (windowW > now[0] + AgvnFitMath.SLACK || windowH > now[1] + AgvnFitMath.SLACK)
-            return AgvnFitMath.screenFor(Math.max(windowW, now[0]), Math.max(windowH, now[1]));
+        if (window != null && AgvnFitMath.cutOff(window[0], window[1], window[2], window[3], now[0], now[1]))
+            return AgvnFitMath.screenFor(Math.max(window[2], now[0]), Math.max(window[3], now[1]));
         for (String s : SCREENS) {
             int[] wh = size(s);
             if (wh[0] >= now[0] && wh[1] >= now[1] && (wh[0] > now[0] || wh[1] > now[1])) return s;

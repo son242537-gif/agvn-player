@@ -14,17 +14,31 @@ public final class AgvnFitMath {
     static final float SMALL_SHARE = 0.85f;
     /** A window this many pixels bigger than the screen is cut off. */
     static final int SLACK = 2;
+    /**
+     * A maximized window's frame hangs past every edge of the screen, the game inside it whole: Wine put Party Me's
+     * 1068x652 window at -6,-6 on a 1056x640 screen. Up to this many pixels past an edge is a frame, not a cut.
+     */
+    static final int FRAME = 16;
     /** The largest screen a game can get (some drivers allocate the whole screen at once). */
     static final int MAX_SIZE = 4096;
 
     private AgvnFitMath() {}
 
-    /** {@link #SMALL}, {@link #OVERFLOW}, or null when a w x h window suits an sw x sh screen. */
-    static String verdict(int w, int h, int sw, int sh) {
+    /** {@link #SMALL}, {@link #OVERFLOW}, or null when a w x h window at x, y suits an sw x sh screen. */
+    static String verdict(int x, int y, int w, int h, int sw, int sh) {
         if (w <= 0 || h <= 0 || sw <= 0 || sh <= 0) return null;
-        if (w > sw + SLACK || h > sh + SLACK) return OVERFLOW;
+        if (cutOff(x, y, w, h, sw, sh)) return OVERFLOW;
         if (w <= sw * SMALL_SHARE && h <= sh * SMALL_SHARE) return SMALL;
         return null;
+    }
+
+    /**
+     * True when a w x h window at x, y is bigger than an sw x sh screen and part of the game is off it: more than a
+     * {@link #FRAME} past an edge. A screen the window's size would not help a maximized window, which grows with it.
+     */
+    static boolean cutOff(int x, int y, int w, int h, int sw, int sh) {
+        if (w <= sw + SLACK && h <= sh + SLACK) return false;
+        return x < -FRAME || y < -FRAME || x + w > sw + FRAME || y + h > sh + FRAME;
     }
 
     /**

@@ -92,14 +92,17 @@ public class AgvnBlackScreenTest {
 
     @Test
     public void theLargerScreenOffered() {
-        assertEquals("1280x720", AgvnBlackScreenRules.bigger("854x480", "1280x720", 854, 480)); // a KiriKiri game's size
-        assertEquals("800x600", AgvnBlackScreenRules.bigger("960x544", "800x600", 960, 544)); // taller than the screen
-        assertEquals("1024x768", AgvnBlackScreenRules.bigger("854x480", null, 1024, 768)); // its window is larger
-        assertEquals("1280x720", AgvnBlackScreenRules.bigger("854x480", "-", 854, 480)); // the next screen
-        assertEquals("1600x900", AgvnBlackScreenRules.bigger("1280x720", "1280x720", 1280, 720));
-        assertEquals("1600x900", AgvnBlackScreenRules.bigger("1280x800", null, 0, 0));
-        assertEquals("1920x1080", AgvnBlackScreenRules.bigger("1600x900", null, 0, 0));
-        assertNull(AgvnBlackScreenRules.bigger("1920x1080", null, 1920, 1080)); // nothing larger to offer
-        assertNull(AgvnBlackScreenRules.bigger("bad", null, 0, 0));
+        int[] full = {0, 0, 854, 480};
+        assertEquals("1280x720", AgvnBlackScreenRules.bigger("854x480", "1280x720", full)); // a KiriKiri game's size
+        assertEquals("800x600", AgvnBlackScreenRules.bigger("960x544", "800x600", new int[]{0, 0, 960, 544})); // taller
+        assertEquals("1024x768", AgvnBlackScreenRules.bigger("854x480", null, new int[]{0, 0, 1024, 768})); // cut off
+        assertEquals("1280x720", AgvnBlackScreenRules.bigger("854x480", "-", full)); // the next screen
+        // a maximized window's frame past the edges is no reason for a screen its size: the next one
+        assertEquals("1280x720", AgvnBlackScreenRules.bigger("960x544", null, new int[]{-6, -6, 972, 556}));
+        assertEquals("1600x900", AgvnBlackScreenRules.bigger("1280x720", "1280x720", new int[]{0, 0, 1280, 720}));
+        assertEquals("1600x900", AgvnBlackScreenRules.bigger("1280x800", null, null));
+        assertEquals("1920x1080", AgvnBlackScreenRules.bigger("1600x900", null, null));
+        assertNull(AgvnBlackScreenRules.bigger("1920x1080", null, new int[]{0, 0, 1920, 1080})); // nothing larger
+        assertNull(AgvnBlackScreenRules.bigger("bad", null, null));
     }
 }

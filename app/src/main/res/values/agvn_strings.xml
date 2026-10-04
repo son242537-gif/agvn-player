@@ -337,6 +337,8 @@
     <string name="agvn_fix_godot_angle">Cho game Godot chạy bằng Direct3D 11 (ANGLE)</string>
     <string name="agvn_fix_godot_undo">Bỏ cách chạy Godot đã đổi</string>
     <string name="agvn_fix_render_gmem">Thử chế độ dựng hình Gmem</string>
+    <string name="agvn_fix_wrapper_constants">Tắt bước sửa shader \"hằng số\" của GPU Mali</string>
+    <string name="agvn_fix_wrapper_clip">Tắt bước sửa shader \"cắt hình\" của GPU Mali</string>
     <string name="agvn_fix_render_auto">Để Turnip tự chọn chế độ dựng hình</string>
     <string name="agvn_fix_emulator_stable">Dùng giả lập CPU ổn định hơn</string>
     <string name="agvn_fix_emulator_fast">Dùng giả lập CPU nhanh hơn (có thể kém ổn định)</string>

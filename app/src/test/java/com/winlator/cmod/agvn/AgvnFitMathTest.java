@@ -16,14 +16,28 @@ public class AgvnFitMathTest {
 
     @Test
     public void smallFramesAndCutOffWindows() {
-        assertEquals(AgvnFitMath.SMALL, AgvnFitMath.verdict(640, 480, 1280, 720)); // an old game on "Cao"
-        assertEquals(AgvnFitMath.OVERFLOW, AgvnFitMath.verdict(1280, 720, 854, 480)); // a fixed 720p window on "Thấp"
-        assertEquals(AgvnFitMath.OVERFLOW, AgvnFitMath.verdict(800, 600, 854, 480)); // only the height is cut
-        assertNull(AgvnFitMath.verdict(1280, 720, 1280, 720));
-        assertNull("4:3 at full height: already as big as it gets", AgvnFitMath.verdict(960, 720, 1280, 720));
-        assertNull("within the slack", AgvnFitMath.verdict(1282, 720, 1280, 720));
-        assertEquals(AgvnFitMath.OVERFLOW, AgvnFitMath.verdict(1283, 720, 1280, 720));
-        assertNull(AgvnFitMath.verdict(0, 0, 1280, 720));
+        assertEquals(AgvnFitMath.SMALL, AgvnFitMath.verdict(0, 0, 640, 480, 1280, 720)); // an old game on "Cao"
+        assertEquals(AgvnFitMath.OVERFLOW, AgvnFitMath.verdict(0, 0, 1280, 720, 854, 480)); // a fixed 720p window on "Thấp"
+        assertEquals(AgvnFitMath.OVERFLOW, AgvnFitMath.verdict(0, 0, 800, 600, 854, 480)); // only the height is cut
+        assertEquals(AgvnFitMath.OVERFLOW, AgvnFitMath.verdict(-213, -120, 1280, 720, 854, 480)); // centred, cut all round
+        assertNull(AgvnFitMath.verdict(0, 0, 1280, 720, 1280, 720));
+        assertNull("4:3 at full height: already as big as it gets", AgvnFitMath.verdict(160, 0, 960, 720, 1280, 720));
+        assertNull("within the slack", AgvnFitMath.verdict(0, 0, 1282, 720, 1280, 720));
+        assertEquals(AgvnFitMath.OVERFLOW, AgvnFitMath.verdict(0, 0, 1300, 720, 1280, 720));
+        assertNull(AgvnFitMath.verdict(0, 0, 0, 0, 1280, 720));
+    }
+
+    @Test
+    public void aMaximizedWindowsFrameIsNotACut() {
+        // Party Me on a Mali-G615: Wine's maximized window hangs 6 px past each edge, the game inside it whole. Each
+        // "Đổi màn hình" made the screen 12 px larger and the window with it: 960x544 became 1056x640 in 8 starts.
+        for (int grown = 0; grown <= 8; grown++) {
+            int sw = 960 + 12 * grown, sh = 544 + 12 * grown;
+            assertNull(sw + "x" + sh, AgvnFitMath.verdict(-6, -6, sw + 12, sh + 12, sw, sh));
+        }
+        assertNull("its frame on one side only", AgvnFitMath.verdict(0, 0, 1068, 652, 1056, 640));
+        assertEquals("more than a frame", AgvnFitMath.OVERFLOW, AgvnFitMath.verdict(-6, -6, 1100, 652, 1056, 640));
+        assertEquals("a frame plus a cut", AgvnFitMath.OVERFLOW, AgvnFitMath.verdict(-20, -6, 1096, 652, 1056, 640));
     }
 
     @Test

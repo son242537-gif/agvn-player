@@ -68,6 +68,10 @@ final class AgvnFixApply {
             case "godot-undo":
                 AgvnGodotGame.apply(s, fix);
                 break;
+            case "wrapper-constants":
+            case "wrapper-clip":
+                s.putExtra("envVars", AgvnWrapperPasses.off(s.getExtra("envVars"), fix.to));
+                break;
             case "render-gmem":
             case "render-auto":
                 s.putExtra("envVars", AgvnFixEdits.withRenderMode(s.getExtra("envVars"), AgvnFixes.inheritedTuDebug(s), fix.to));

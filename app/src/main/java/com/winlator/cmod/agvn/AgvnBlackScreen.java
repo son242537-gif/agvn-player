@@ -38,7 +38,8 @@ public final class AgvnBlackScreen {
     private final Runnable poll = this::poll;
     private final AgvnBlackScreenRules rules;
     private final long startMs = SystemClock.uptimeMillis();
-    private int windowW, windowH;
+    /** The game's window as last looked at, {x, y, width, height}, or null. */
+    private int[] window;
 
     /** A Vulkan or OpenGL frame presented into {@code window} (X server thread, every frame: kept cheap). */
     public static void onDirectFrame(Window window, Drawable frame) {
@@ -76,16 +77,18 @@ public final class AgvnBlackScreen {
             Drawable frame = directFrame;
             Window game = into != null && frame != null ? AgvnGameWindow.topLevel(into) : null;
             if (game != null) { // it draws with Vulkan or OpenGL: its window holds nothing, its last frame shows
-                windowW = game.getWidth();
-                windowH = game.getHeight();
+                window = rect(game);
                 return xServer.drawableManager.getDrawable(frame.id) == frame ? look(frame) : AgvnBlackScreenRules.Look.UNKNOWN;
             }
             game = AgvnGameWindow.find(xServer.windowManager.rootWindow);
             if (game == null) return AgvnBlackScreenRules.Look.NO_WINDOW;
-            windowW = game.getWidth();
-            windowH = game.getHeight();
+            window = rect(game);
             return look(game.getContent()); // GDI: what the window holds
         }
+    }
+
+    private static int[] rect(Window w) {
+        return new int[]{w.getRootX(), w.getRootY(), w.getWidth(), w.getHeight()};
     }
 
     /**
@@ -107,7 +110,7 @@ public final class AgvnBlackScreen {
         XServer xServer = activity.getXServer();
         if (s == null || xServer == null) return;
         String screen = String.valueOf(xServer.screenInfo);
-        String bigger = AgvnBlackScreenRules.bigger(screen, s.getExtra(AgvnKirikiri.EXTRA_GAME_SIZE), windowW, windowH);
+        String bigger = AgvnBlackScreenRules.bigger(screen, s.getExtra(AgvnKirikiri.EXTRA_GAME_SIZE), window);
         long seconds = elapsedMs / 1000;
         AgvnSessionLog.event("Màn hình đen sau " + seconds + " giây, màn hình " + screen
                 + (refused ? ", Wine từ chối độ phân giải game xin" : "") + (bigger != null ? ": hỏi đổi sang " + bigger : ""));

@@ -60,7 +60,7 @@ public final class AgvnScreenFit {
             return;
         }
         float[] rect = mainWindow();
-        String verdict = rect != null ? AgvnFitMath.verdict((int) rect[2], (int) rect[3], screenW(), screenH()) : null;
+        String verdict = rect != null ? verdict(rect) : null;
         if (AgvnFitMath.OVERFLOW.equals(verdict) || verdict != null && !canDraw()) {
             offerScreen(rect, verdict);
         } else if (!canDraw()) {
@@ -88,7 +88,7 @@ public final class AgvnScreenFit {
         stable = rect != null && Arrays.equals(rect, last) ? stable + 1 : 0;
         last = rect;
         if (stable < STABLE_POLLS) return;
-        String verdict = AgvnFitMath.verdict((int) rect[2], (int) rect[3], screenW(), screenH());
+        String verdict = verdict(rect);
         if (verdict == null) return; // suits the screen; a window that changes later is checked again
         asked = true;
         AgvnSessionLog.event("Khung game " + size(rect) + " trên màn hình " + screenW() + "x" + screenH() + ": " + verdict);
@@ -157,6 +157,10 @@ public final class AgvnScreenFit {
             Window best = AgvnGameWindow.find(xServer.windowManager.rootWindow);
             return best == null ? null : new float[]{best.getRootX(), best.getRootY(), best.getWidth(), best.getHeight()};
         }
+    }
+
+    private String verdict(float[] rect) {
+        return AgvnFitMath.verdict((int) rect[0], (int) rect[1], (int) rect[2], (int) rect[3], screenW(), screenH());
     }
 
     private boolean canDraw() {

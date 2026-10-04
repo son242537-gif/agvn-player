@@ -30,7 +30,7 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Thiếu file `.dll` | Wine: `Library X.dll (which is needed by …) not found` | Bật thư viện Windows chứa file đó (DirectX, XAudio, VC++ 2010), gửi nhật ký |
 | File `.dll` hỏng hoặc sai 32/64-bit | Wine: lỗi `c000007b` | Gửi nhật ký |
 | Game cần .NET | Wine: `Wine Mono is not installed` | Gửi nhật ký |
-| Driver đồ họa bị lỗi khi game vẽ hình | Hộp "Assertion failed!" của Wine nhắc `winevulkan/loader_thunks.c` và một hàm Vulkan (`vkCreateShaderModule`...): driver bị lỗi ngay trong lúc game nhờ nó dựng hình | Đổi bản DXVK, đổi driver, dùng WineD3D. Game Godot: bỏ cách vẽ đã đổi, chạy bằng Direct3D 11 (ANGLE), đổi driver |
+| Driver đồ họa bị lỗi khi game vẽ hình | Hộp "Assertion failed!" của Wine nhắc `winevulkan/loader_thunks.c` và một hàm Vulkan (`vkCreateShaderModule`...): driver bị lỗi ngay trong lúc game nhờ nó dựng hình | GPU Mali, lỗi lúc tạo shader: tắt bước sửa shader "hằng số", rồi bước "cắt hình". Đổi bản DXVK, đổi driver, dùng WineD3D. Game Godot: bỏ cách vẽ đã đổi, chạy bằng Direct3D 11 (ANGLE), hai bước sửa shader, đổi driver |
 | Godot không mở được OpenGL | Câu lỗi của Godot (nhật ký `godot.log` hoặc hộp "Unable to initialize video driver"), hoặc game Godot tắt trước khi hiện hình | Chạy Godot bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bằng Direct3D 11 (ANGLE, Godot 4.4 trở lên), bỏ cách vẽ đã đổi, đổi driver |
 | Godot không mở được OpenGL lẫn Direct3D 11 | Hộp lỗi của Godot 4.4 trở lên: "...required OpenGL 3.3 or Direct3D 11 version" | Chạy bằng Vulkan, bỏ cách vẽ đã đổi, đổi driver |
 | Godot không mở được Vulkan | Hộp lỗi của Godot: "...required Vulkan version" | Bỏ cách vẽ đã đổi, chạy bằng Direct3D 11 (ANGLE), đổi driver |
@@ -60,6 +60,13 @@ opengl3_angle`), và mỗi lần chỉ giữ một cách vẽ đã đổi.
 DXVK-Sarek người chơi tự cài (nút "Cài thêm" ở mục DXVK) giờ cũng được tắt một bước sửa shader của wrapper
 (`WRAPPER_NO_PATCH_OPCONSTCOMP`), như upstream vẫn làm với bản Sarek của họ. Bước này chạy đúng lúc game tạo shader
 (`vkCreateShaderModule`). Một máy Mali-G925 dùng Sarek tự cài đã bị lỗi driver ở đúng bước đó.
+
+Wrapper Vulkan đi kèm app (`libvulkan_wrapper.so`, hàm `wrapper_CreateShaderModule`) chỉ sửa shader khi GPU là Mali
+(driver ARM). Nó chép shader ra rồi chạy hai bước: đổi `OpConstantComposite` thành `OpSpecConstantComposite`, và bỏ
+`ClipDistance`/`CullDistance`. Mỗi bước có một công tắc (`WRAPPER_NO_PATCH_OPCONSTCOMP`,
+`WRAPPER_NO_REMOVE_CLIP_DISTANCE`; số khác 0 là tắt). Khi game Mali bị "Assertion failed!" lúc tạo shader, hộp hỏi có
+“Tắt bước sửa shader "hằng số" của GPU Mali” và “Tắt bước sửa shader "cắt hình" của GPU Mali” (`AgvnWrapperPasses`). Mỗi nút ghi công tắc vào
+biến môi trường của riêng game đó. Nút đã thử mà vẫn lỗi thì lần sau hộp hỏi nút còn lại, nên hai bước được thử lần lượt.
 
 ### Game "Chạy nhẹ"
 
@@ -150,7 +157,7 @@ nằm bên trong cửa sổ màn nền; app tìm ở mọi tầng. Khi game đã
 | Khung game | App làm gì |
 |---|---|
 | Nhỏ hơn 85% màn hình cả chiều ngang lẫn chiều dọc | Phóng khung game ra cả màn hình ngay, giữ đúng tỉ lệ (hoặc kéo giãn nếu game đang bật "Kéo giãn"). Chạm vào đâu trên khung là trúng chỗ đó trong game. Thanh báo có "Giữ như vậy" và "Trả lại như cũ". |
-| Lớn hơn màn hình | Phần thừa bị cắt, chuột cũng không tới được, nên không phóng nhỏ được. Thanh báo đề nghị "Đổi màn hình game thành <cỡ khung>", rồi "Mở lại game ngay". |
+| Lớn hơn màn hình | Phần thừa bị cắt, chuột cũng không tới được, nên không phóng nhỏ được. Thanh báo đề nghị "Đổi màn hình game thành <cỡ khung>", rồi "Mở lại game ngay". Cửa sổ phóng to thì viền của nó thò ra ngoài mỗi cạnh vài điểm ảnh (Wine: 6), hình game bên trong vẫn đủ: thò ra không quá 16 điểm ảnh mỗi cạnh thì không tính là bị cắt (`AgvnFitMath.cutOff`). Trước 0.1.14, Party Me (1068×652 ở -6,-6 trên màn hình 1056×640) bị báo nhầm, và mỗi lần đổi, màn hình lớn thêm 12 điểm ảnh. |
 | Vừa | Không làm gì. Khung đổi cỡ sau đó thì app xét lại. |
 
 - Nút ⛶ trên thanh ⌨ ✎ 👁 bật hoặc tắt "Vừa màn hình" bất cứ lúc nào. Khung lớn hơn màn hình thì ⛶ mở thanh đổi màn
@@ -234,7 +241,8 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
   "Game Godot tự tắt sau khi đổi cách vẽ" với "Cho game Godot chạy bằng Direct3D 11 (ANGLE)". Bấm vào thì game mở lại,
   và `godot.log` của phiên đó nhắc ANGLE.
 - [ ] Game hiện hộp "Assertion failed!" nhắc `vkCreateShaderModule`, bấm OK: thư viện hỏi "Driver đồ họa bị lỗi khi game
-  vẽ hình" với nút đổi DXVK.
+  vẽ hình" với nút đổi DXVK. Trên GPU Mali, hai nút đầu là “Tắt bước sửa shader "hằng số"…” và “…"cắt hình"…”;
+  bấm một nút thì `moi-truong.txt` của lần chạy sau có công tắc đó bằng 1.
 - [ ] Game Godot chỉ có một file `.exe`, không có `.pck`: thêm mới thì game được nhận là Godot ngay. Game đã thêm từ
   trước thì lần mở đầu `adb logcat -s AGVN` có dòng `... is a Godot game`. Cả hai trường hợp, `moi-truong.txt` có
   `MESA_GL_VERSION_OVERRIDE=3.3`.
@@ -256,6 +264,8 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       trong game; "Trả lại như cũ" đưa về khung nhỏ; ⛶ bật lại; mở lại game vẫn vừa.
 - [ ] Game Windows khung 1280×720 ở mức "Thấp": thanh "Game bị tràn ra ngoài màn hình", bấm "Đổi màn hình game thành
       1280×720" rồi "Mở lại game ngay": game mở lại thấy đủ khung.
+- [ ] Game mở cửa sổ phóng to (như Party Me): không có thanh "Game bị tràn ra ngoài màn hình". Game đã bị đổi màn hình
+      nhiều lần (như 1056×640): chọn lại mức "Đồ họa" để về cỡ của mức đó.
 - [ ] Đang chơi một game Windows, vuốt AGVN khỏi danh sách app gần đây rồi mở lại app: không có hộp hỏi; `tom-tat.txt`
       của phiên đó ghi "Người chơi vuốt tắt AGVN…".
 - [ ] Game Windows: "✕ Thoát" trên thanh ⌨ ✎ 👁 ⛶ hiện thanh "Thoát game?"; "Chơi tiếp" để game chạy tiếp, "Thoát game"

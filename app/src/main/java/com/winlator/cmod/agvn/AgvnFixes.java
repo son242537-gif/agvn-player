@@ -27,7 +27,7 @@ final class AgvnFixes {
     /** Fixes of Wine's settings: none of them changes a "Chạy nhẹ" game. */
     private static final List<String> WINE_ONLY = Arrays.asList("restore-good", "reset", "dxvk-other", "dxvk-arm64ec",
             "driver-other", "wined3d", "godot-renderer", "godot-angle", "godot-undo", "render-gmem", "render-auto",
-            "emulator-stable", "emulator-fast", "wincomponent");
+            "emulator-stable", "emulator-fast", "wincomponent", "wrapper-constants", "wrapper-clip");
     static final String SYSTEM = "System";
 
     /** A button: its fix id, its words, and what it sets ({@code to}). */
@@ -94,6 +94,9 @@ final class AgvnFixes {
             case "godot-angle":
             case "godot-undo":
                 return AgvnGodotGame.fix(a, s, finding, id);
+            case "wrapper-constants":
+            case "wrapper-clip":
+                return wrapperPass(a, s, finding, id);
             case "render-gmem":
                 return turnip(a, s) && !renderFlags(s).contains("gmem") ? new Fix(id, a.getString(R.string.agvn_fix_render_gmem), "gmem") : null;
             case "render-auto": {
@@ -141,6 +144,17 @@ final class AgvnFixes {
         if (id.equals("quality-down") && AgvnGoodConfig.refused(state, screen)) return null;
         return new Fix(id, a.getString(R.string.agvn_fix_quality, AgvnQualityDialog.name(a, level),
                 screen.replace('x', '×')), level.name());
+    }
+
+    /** One of the wrapper's shader rewrites off ({@link AgvnWrapperPasses}): on Mali, for a crash creating a shader. */
+    private static Fix wrapperPass(Activity a, Shortcut s, AgvnProblemCatalog.Finding f, String id) {
+        String call = f.params.get("1"); // null when the box's text was cut before the call's name
+        if (call != null && !call.equals("vkCreateShaderModule") || !AgvnWrapperPasses.mali(AgvnDeviceFacts.gpu(a))) return null;
+        boolean constants = id.equals("wrapper-constants");
+        String name = constants ? AgvnWrapperPasses.CONSTANTS : AgvnWrapperPasses.CLIP;
+        boolean sarek = dxvk(s) && AgvnDxvkPick.isSarek(dxvkVersion(s));
+        if (!AgvnWrapperPasses.runs(s.container.getEnvVars(), s.getExtra("envVars"), name, sarek)) return null;
+        return new Fix(id, a.getString(constants ? R.string.agvn_fix_wrapper_constants : R.string.agvn_fix_wrapper_clip), name);
     }
 
     static boolean dxvk(Shortcut s) {
