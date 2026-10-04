@@ -3,5 +3,6 @@ AGVN Player v0.1.14 - agvn.io.vn
 Mới:
 - Máy GPU Mali: game bị lỗi "Assertion failed!" khi tạo shader thì app đề nghị tắt từng bước sửa shader cho Mali, chỉ cho riêng game đó. Bước thứ nhất vẫn lỗi thì lần sau app đề nghị bước còn lại.
 Sửa lỗi:
+- Game hiện hộp lỗi ngay khi mở (như "Assertion failed!") không còn bị hỏi nhầm "Màn hình game vẫn đen".
 - Game mở cửa sổ phóng to (như Party Me) không còn bị báo nhầm "Game bị tràn ra ngoài màn hình". Trước đây mỗi lần bấm "Đổi màn hình", màn hình game lại lớn thêm một chút. Game đã bị đổi như vậy: chọn lại mức "Đồ họa" để về cỡ cũ.
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.
