@@ -1,0 +1,10 @@
+AGVN Player v0.1.17 - agvn.io.vn
+
+Mới:
+- Máy không đủ RAM cho game: app tự tiết kiệm RAM như mức "Siêu nhẹ" cho riêng game đó, dù bạn chọn mức "Đồ họa" nào. Độ phân giải và FPS vẫn theo mức bạn chọn. Máy đủ RAM thì vẫn như cũ.
+- App coi là không đủ RAM khi game đã bị tắt vì hết RAM trên máy (kể từ bản này), hoặc khi máy dưới 9 GB RAM có GPU Mali (hay dùng driver của máy, System) chạy game Unreal, Unity hoặc DirectX 9 đến 11. Game Ren'Py chỉ được tiết kiệm sau khi từng bị tắt vì hết RAM.
+Sửa lỗi:
+- Màn hình đen lúc game đang tải, khi khung game còn nhỏ hơn màn hình: app không còn đề nghị nhầm đổi sang màn hình lớn hơn. Màn hình lớn hơn chỉ làm game tốn RAM hơn.
+- Game Unreal trên GPU Mali (hay driver của máy, System) dùng ít RAM cho texture hơn, nên ít bị tắt giữa chừng vì hết RAM.
+- App nhận ra cả những lần game tắt vì hết RAM ngay lúc đang tải.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.
