@@ -26,6 +26,16 @@ public class AgvnWrapperPassesTest {
     }
 
     @Test
+    public void aCrashCreatingAShaderAlsoWhenWineCutItsName() {
+        assertTrue(AgvnWrapperPasses.creatingShader("vkCreateShaderModule"));
+        assertTrue("cut before the name", AgvnWrapperPasses.creatingShader(null));
+        assertTrue("cut inside it", AgvnWrapperPasses.creatingShader("vkCreateShaderMo"));
+        assertFalse(AgvnWrapperPasses.creatingShader("vkCreateGraphicsPipelines"));
+        assertFalse(AgvnWrapperPasses.creatingShader("vkCreateShadersEXT"));
+        assertFalse(AgvnWrapperPasses.creatingShader("vkAllocateMemory"));
+    }
+
+    @Test
     public void bothPassesRunUntilASwitchSaysOtherwise() {
         assertTrue(AgvnWrapperPasses.runs("", "", CONSTANTS, false));
         assertTrue(AgvnWrapperPasses.runs(null, null, CLIP, false));

@@ -148,8 +148,7 @@ final class AgvnFixes {
 
     /** One of the wrapper's shader rewrites off ({@link AgvnWrapperPasses}): on Mali, for a crash creating a shader. */
     private static Fix wrapperPass(Activity a, Shortcut s, AgvnProblemCatalog.Finding f, String id) {
-        String call = f.params.get("1"); // null when the box's text was cut before the call's name
-        if (call != null && !call.equals("vkCreateShaderModule") || !AgvnWrapperPasses.mali(AgvnDeviceFacts.gpu(a))) return null;
+        if (!AgvnWrapperPasses.creatingShader(f.params.get("1")) || !AgvnWrapperPasses.mali(AgvnDeviceFacts.gpu(a))) return null;
         boolean constants = id.equals("wrapper-constants");
         String name = constants ? AgvnWrapperPasses.CONSTANTS : AgvnWrapperPasses.CLIP;
         boolean sarek = dxvk(s) && AgvnDxvkPick.isSarek(dxvkVersion(s));

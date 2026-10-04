@@ -83,6 +83,15 @@ public class AgvnErrorBoxTest {
     }
 
     @Test
+    public void aLongerPathCutsTheCallsName() {
+        String deeper = VULKAN_ASSERT.replace("blabla", "blabla\\Game hay nhất\\Unreal Engine 4");
+        AgvnProblemCatalog.Finding f = AgvnDoctorTest.catalog.find(box("UNREAL", deeper));
+        assertEquals("vulkan-crash", f.id());
+        assertEquals("vkCreateShaderModu", f.params.get("1"));
+        assertTrue("the Mali shader steps are still offered", AgvnWrapperPasses.creatingShader(f.params.get("1")));
+    }
+
+    @Test
     public void godotSaysWhichRenderersFailed() {
         AgvnEvidence ev = box("GODOT", GODOT_GL);
         ev.started = false; // it never drew

@@ -8,7 +8,8 @@ import java.util.List;
  * When {@link AgvnBlackScreen} asks, and what it offers. A game's window that stays black from its start, or a game
  * whose resolution Wine refused, past {@link #MIN_WAIT_MS} (or its last start plus {@link #AFTER_LAST_START_MS}, for a
  * game known to start slowly): the screen may be smaller than the game. A game that has shown a picture and goes black
- * later is a scene (a fade, a dark room), unless Wine refused its resolution. Pure Java (JVM-testable).
+ * later is a scene (a fade, a dark room), and one that showed a message box waits on it or crashed into it ("Assertion
+ * failed!", read by "Tự sửa lỗi" when the game ends), unless Wine refused its resolution. Pure Java (JVM-testable).
  */
 final class AgvnBlackScreenRules {
     /** What a look at the game's window found. */
@@ -27,6 +28,8 @@ final class AgvnBlackScreenRules {
     static final String[] SCREENS = {"1280x720", "1600x900", "1920x1080"};
     /** win32u's error for a display mode the game asked for and Wine does not list (DISP_CHANGE_BADMODE). */
     static final String REFUSED = "display settings returned -2";
+    /** Wine's line for each message box a game shows ({@link AgvnWineDebug#MESSAGE_BOXES}). */
+    static final String BOX = "trace:msgbox:";
 
     private final long waitMs;
     private boolean shown;
@@ -41,11 +44,12 @@ final class AgvnBlackScreenRules {
         return waitMs;
     }
 
-    Step next(Look look, long elapsedMs, boolean refused) {
+    /** {@code refused}: Wine refused the game's resolution ({@link #refused}); {@code box}: it showed a message box. */
+    Step next(Look look, long elapsedMs, boolean refused, boolean box) {
         if (look == Look.PICTURE) shown = true;
         black = look == Look.BLACK || look == Look.NO_WINDOW && refused ? black + 1 : 0;
         if (elapsedMs < waitMs) return Step.WAIT;
-        if (black >= BLACK_LOOKS && (!shown || refused)) return Step.OFFER;
+        if (black >= BLACK_LOOKS && (refused || !shown && !box)) return Step.OFFER;
         return elapsedMs >= waitMs + WATCH_MS ? Step.STOP : Step.WAIT;
     }
 
@@ -62,6 +66,12 @@ final class AgvnBlackScreenRules {
     /** True when Wine refused a resolution the game asked for. */
     static boolean refused(List<String> wineLines) {
         for (String line : wineLines) if (line.contains(REFUSED)) return true;
+        return false;
+    }
+
+    /** True when the game showed a message box. */
+    static boolean boxShown(List<String> wineLines) {
+        for (String line : wineLines) if (line.contains(BOX)) return true;
         return false;
     }
 

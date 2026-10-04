@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
  */
 final class AgvnWrapperPasses {
     static final String CONSTANTS = "WRAPPER_NO_PATCH_OPCONSTCOMP", CLIP = "WRAPPER_NO_REMOVE_CLIP_DISTANCE";
+    static final String SHADER_CALL = "vkCreateShaderModule";
     private static final Pattern LEADING_NUMBER = Pattern.compile("^\\s*[+-]?(\\d+)");
 
     private AgvnWrapperPasses() {}
@@ -25,6 +26,14 @@ final class AgvnWrapperPasses {
     static boolean mali(String gpu) {
         String g = gpu == null ? "" : gpu.toLowerCase(Locale.ROOT);
         return g.contains("mali") || g.contains("immortalis");
+    }
+
+    /**
+     * True when Wine's box may name {@link #SHADER_CALL}: Wine traces the box's text cut after about 290 characters,
+     * so a long game folder cuts the call's name ("vkCreateShaderMo", read as its start) or leaves none (null).
+     */
+    static boolean creatingShader(String call) {
+        return call == null || SHADER_CALL.startsWith(call);
     }
 
     /**

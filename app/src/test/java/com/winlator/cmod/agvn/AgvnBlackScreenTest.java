@@ -24,7 +24,8 @@ public class AgvnBlackScreenTest {
     private static AgvnBlackScreenRules.Step run(AgvnBlackScreenRules rules, AgvnBlackScreenRules.Look look, long fromMs,
                                                  long untilMs, boolean refused) {
         AgvnBlackScreenRules.Step step = WAIT;
-        for (long t = fromMs; t <= untilMs && step == WAIT; t += AgvnBlackScreenRules.POLL_MS) step = rules.next(look, t, refused);
+        for (long t = fromMs; t <= untilMs && step == WAIT; t += AgvnBlackScreenRules.POLL_MS)
+            step = rules.next(look, t, refused, false);
         return step;
     }
 
@@ -33,7 +34,7 @@ public class AgvnBlackScreenTest {
         AgvnBlackScreenRules rules = new AgvnBlackScreenRules(0);
         assertEquals(20_000, rules.waitMs());
         assertEquals(WAIT, run(rules, BLACK, 2000, 18_000, false));
-        assertEquals(OFFER, rules.next(BLACK, 20_000, false));
+        assertEquals(OFFER, rules.next(BLACK, 20_000, false, false));
     }
 
     @Test
@@ -41,27 +42,43 @@ public class AgvnBlackScreenTest {
         AgvnBlackScreenRules rules = new AgvnBlackScreenRules(60_000); // its last start took a minute
         assertEquals(70_000, rules.waitMs());
         assertEquals(WAIT, run(rules, BLACK, 2000, 68_000, false));
-        assertEquals(OFFER, rules.next(BLACK, 70_000, false));
+        assertEquals(OFFER, rules.next(BLACK, 70_000, false, false));
     }
 
     @Test
     public void aGameThatShowedAPictureIsInAScene() {
         AgvnBlackScreenRules rules = new AgvnBlackScreenRules(0);
-        assertEquals(WAIT, rules.next(PICTURE, 10_000, false)); // its logo
+        assertEquals(WAIT, rules.next(PICTURE, 10_000, false, false)); // its logo
         assertEquals(STOP, run(rules, BLACK, 12_000, 200_000, false)); // a fade to black: not asked
         AgvnBlackScreenRules refused = new AgvnBlackScreenRules(0);
-        refused.next(PICTURE, 10_000, false);
+        refused.next(PICTURE, 10_000, false, false);
         assertEquals(OFFER, run(refused, BLACK, 12_000, 30_000, true)); // then its full screen was refused
+    }
+
+    @Test
+    public void aGameBehindItsMessageBoxIsNotAsked() {
+        AgvnBlackScreenRules rules = new AgvnBlackScreenRules(0);
+        // "Assertion failed!" over a game that never drew: "Tự sửa lỗi" reads the box when the game ends
+        AgvnBlackScreenRules.Step step = WAIT;
+        for (long t = 2000; t <= 200_000 && step == WAIT; t += 2000) step = rules.next(BLACK, t, false, true);
+        assertEquals(STOP, step);
+        AgvnBlackScreenRules refused = new AgvnBlackScreenRules(0); // a box about full screen, then a refused mode
+        for (long t = 2000; t < 20_000; t += 2000) assertEquals(WAIT, refused.next(BLACK, t, true, true));
+        assertEquals(OFFER, refused.next(BLACK, 20_000, true, true));
+        assertTrue(AgvnBlackScreenRules.boxShown(Arrays.asList("wine: setpriority 6 for pid -1 failed: 3",
+                AgvnErrorBoxTest.traced(AgvnErrorBoxTest.VULKAN_ASSERT))));
+        assertFalse(AgvnBlackScreenRules.boxShown(Collections.singletonList("0024:err:module:import_dll X.dll")));
     }
 
     @Test
     public void blackMustLastThreeLooks() {
         AgvnBlackScreenRules rules = new AgvnBlackScreenRules(0);
         // a look it cannot read (every third one here) starts the count again
-        for (long t = 2000; t <= 24_000; t += 2000) assertEquals(WAIT, rules.next(t % 6000 == 0 ? UNKNOWN : BLACK, t, false));
-        assertEquals(WAIT, rules.next(BLACK, 26_000, false));
-        assertEquals(WAIT, rules.next(BLACK, 28_000, false));
-        assertEquals(OFFER, rules.next(BLACK, 30_000, false));
+        for (long t = 2000; t <= 24_000; t += 2000)
+            assertEquals(WAIT, rules.next(t % 6000 == 0 ? UNKNOWN : BLACK, t, false, false));
+        assertEquals(WAIT, rules.next(BLACK, 26_000, false, false));
+        assertEquals(WAIT, rules.next(BLACK, 28_000, false, false));
+        assertEquals(OFFER, rules.next(BLACK, 30_000, false, false));
     }
 
     @Test

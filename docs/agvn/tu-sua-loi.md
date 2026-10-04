@@ -67,6 +67,8 @@ Wrapper Vulkan đi kèm app (`libvulkan_wrapper.so`, hàm `wrapper_CreateShaderM
 `WRAPPER_NO_REMOVE_CLIP_DISTANCE`; số khác 0 là tắt). Khi game Mali bị "Assertion failed!" lúc tạo shader, hộp hỏi có
 “Tắt bước sửa shader "hằng số" của GPU Mali” và “Tắt bước sửa shader "cắt hình" của GPU Mali” (`AgvnWrapperPasses`). Mỗi nút ghi công tắc vào
 biến môi trường của riêng game đó. Nút đã thử mà vẫn lỗi thì lần sau hộp hỏi nút còn lại, nên hai bước được thử lần lượt.
+Thư mục game dài thì dòng Wine ghi chữ trong hộp bị cắt giữa tên hàm (`vkCreateShaderMo`) hoặc trước tên hàm; hai
+nút vẫn được hỏi (`AgvnWrapperPasses.creatingShader`).
 
 ### Game "Chạy nhẹ"
 
@@ -178,8 +180,10 @@ gì nữa. `AgvnBlackScreen` canh chuyện này cho mọi game Windows:
 - Hàng nào cũng chỉ có điểm ảnh tối (đỏ, xanh lá, xanh dương đều ≤ 24) thì là màn hình đen.
 - App hỏi khi màn hình đen 3 lần đọc liền nhau (6 giây), sau 20 giây kể từ lúc mở game. Game thường mở chậm thì thời
   gian chờ là lần mở trước cộng 10 giây (`AgvnStartTimes`). App chỉ canh trong 1 phút sau thời gian chờ.
-- Game đã hiện hình rồi mới đen (cảnh mờ dần, cảnh tối) thì app không hỏi. Trừ khi Wine đã từ chối độ phân giải game
-  xin: nhật ký Wine có dòng `display settings returned -2`. Khi đó app hỏi cả khi chưa thấy khung game.
+- Game đã hiện hình rồi mới đen (cảnh mờ dần, cảnh tối) thì app không hỏi. Game đã hiện một hộp thông báo
+  (`trace:msgbox`) cũng vậy: game đang chờ người chơi bấm, hoặc đã lỗi ("Assertion failed!", "Tự sửa lỗi" đọc hộp này
+  khi game tắt). Trừ khi Wine đã từ chối độ phân giải game xin: nhật ký Wine có dòng `display settings returned -2`. Khi
+  đó app hỏi cả khi chưa thấy khung game.
 - Màn hình đề nghị (`AgvnBlackScreenRules.bigger`): khổ game KiriKiri nếu biết; khung game nếu khung lớn hơn màn hình;
   nếu không thì cỡ kế tiếp trong 1280×720, 1600×900, 1920×1080. Màn hình đã là 1920×1080 thì app chỉ ghi vào nhật ký.
 
@@ -278,5 +282,7 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
 - [ ] Game KiriKiri đã thêm từ trước, màn hình nhỏ hơn khổ game, đứng ở màn hình đen: khoảng 20 giây sau có thanh "Màn
       hình game vẫn đen" với "Đổi màn hình game thành <khổ game>". Bấm rồi "Mở lại game ngay": game hiện hình.
 - [ ] Game có cảnh tối hoặc mờ dần sau khi đã hiện hình: không có thanh "Màn hình game vẫn đen".
+- [ ] Máy Mali, game bị hộp "Assertion failed!" ngay khi mở (như Support Pregnancy School): để hộp đó hơn 30 giây,
+  không có thanh "Màn hình game vẫn đen". Bấm OK thì thư viện hỏi "Driver đồ họa bị lỗi khi game vẽ hình".
 - [ ] `adb logcat`: dòng `Wine mode emulation: on`; `wine-cuoi.txt` của game bị đen có `display settings returned -2`.
 - [ ] `adb logcat -s AGVN`: dòng `doctor: <lỗi> for <game>` và `fix <cách sửa> -> <giá trị>`.

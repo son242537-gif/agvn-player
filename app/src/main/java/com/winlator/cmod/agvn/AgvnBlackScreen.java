@@ -60,8 +60,9 @@ public final class AgvnBlackScreen {
         if (activity.isFinishing() || activity.isDestroyed()) return;
         try {
             long elapsed = SystemClock.uptimeMillis() - startMs;
-            boolean refused = AgvnBlackScreenRules.refused(AgvnWineTail.get().lines());
-            AgvnBlackScreenRules.Step step = rules.next(look(), elapsed, refused);
+            List<String> lines = AgvnWineTail.get().lines();
+            boolean refused = AgvnBlackScreenRules.refused(lines);
+            AgvnBlackScreenRules.Step step = rules.next(look(), elapsed, refused, AgvnBlackScreenRules.boxShown(lines));
             if (step == AgvnBlackScreenRules.Step.OFFER) offer(elapsed, refused);
             else if (step == AgvnBlackScreenRules.Step.WAIT) handler.postDelayed(poll, AgvnBlackScreenRules.POLL_MS);
         } catch (RuntimeException e) {
