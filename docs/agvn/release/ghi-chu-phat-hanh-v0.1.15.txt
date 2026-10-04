@@ -1,0 +1,5 @@
+AGVN Player v0.1.15 - agvn.io.vn
+
+Sửa lỗi:
+- Không còn bị văng app lúc thoát game vẽ bằng EGL hoặc DisplayX (chọn trong cài đặt game). Trước đây app có thể văng trước khi kịp lưu nhật ký lần chơi và tự sao lưu save.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.
