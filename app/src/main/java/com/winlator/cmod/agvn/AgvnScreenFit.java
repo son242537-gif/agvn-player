@@ -19,8 +19,8 @@ import java.util.Arrays;
 
 /**
  * "Vừa màn hình" for a Windows game whose own window does not suit the screen. Every second it finds the game's window
- * (the largest application window, the Wine desktop explorer.exe left out) and, once the game runs and the window
- * stays put for 3 s ({@link AgvnFitMath#verdict}):
+ * ({@link AgvnGameWindow}: the largest application window, Wine's explorer.exe left out, at any depth) and, once the
+ * game runs and the window stays put for 3 s ({@link AgvnFitMath#verdict}):
  * <ul>
  *   <li>a small frame (a 640×480 game on a 1280×720 screen): the view draws that window over the whole screen at once
  *   (VulkanXServerView, TouchpadView), also at the next starts, and the bar can undo it;</li>
@@ -111,11 +111,12 @@ public final class AgvnScreenFit {
         String screen = AgvnFitMath.screenFor((int) rect[2], (int) rect[3]);
         String label = activity.getString(R.string.agvn_fit_resize, screen.replace('x', '×'));
         AgvnWarningBar.show(activity, activity.getString(big ? R.string.agvn_fit_overflow_title : R.string.agvn_fit_small_title),
-                detail, new AgvnWarningBar.Choice(label, () -> resize(screen, label)),
+                detail, new AgvnWarningBar.Choice(label, () -> resize(activity, screen, label)),
                 new AgvnWarningBar.Choice(R.string.agvn_doctor_keep, () -> keep("0")));
     }
 
-    private void resize(String screen, String label) {
+    /** The game gets {@code screen} at its next start, now or later ({@link AgvnSlowBar#offerRestart}). */
+    static void resize(XServerDisplayActivity activity, String screen, String label) {
         Shortcut s = activity.agvnShortcut();
         if (s == null) return;
         s.putExtra("screenSize", screen);
@@ -148,21 +149,12 @@ public final class AgvnScreenFit {
         if (touch != null) touch.setAgvnFitRect(rect);
     }
 
-    /** The game's own window, {x, y, width, height}, or null while it has none. */
+    /** The game's own window ({@link AgvnGameWindow}), {x, y, width, height}, or null while it has none. */
     private float[] mainWindow() {
         XServer xServer = activity.getXServer();
         if (xServer == null) return null;
-        Window best = null;
-        long bestArea = 0;
         try (XLock lock = xServer.lock(XServer.Lockable.WINDOW_MANAGER)) {
-            for (Window w : xServer.windowManager.rootWindow.getChildren()) {
-                if (!w.isApplicationWindow() || w.getClassName().contains("explorer.exe")) continue;
-                long area = (long) w.getWidth() * w.getHeight();
-                if (area > bestArea) {
-                    best = w;
-                    bestArea = area;
-                }
-            }
+            Window best = AgvnGameWindow.find(xServer.windowManager.rootWindow);
             return best == null ? null : new float[]{best.getRootX(), best.getRootY(), best.getWidth(), best.getHeight()};
         }
     }

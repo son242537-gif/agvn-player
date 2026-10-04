@@ -637,6 +637,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onUpdateWindowContentDirect(Window window, Drawable drawable) {
+                com.winlator.cmod.agvn.AgvnBlackScreen.onDirectFrame(window, drawable); // AGVN: the game's Vulkan/OpenGL frame
+            }
+
+            @Override
             public void onMapWindow(Window window) {
                 assignTaskAffinity(window);
             }
@@ -717,6 +722,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             Executors.newSingleThreadExecutor().execute(() -> {
                 if (shortcut != null) agvnEffectiveExePath = com.winlator.cmod.agvn.AgvnExeRedirect.effectivePath(shortcut.path, container); // AGVN
                 com.winlator.cmod.agvn.AgvnGodotGame.recognize(shortcut); // AGVN: a Godot game in one exe gets Godot's settings
+                com.winlator.cmod.agvn.AgvnKirikiri.recognize(shortcut); // AGVN: a KiriKiri game's size, for the black-screen bar
                 com.winlator.cmod.agvn.AgvnMemorySaver.applyGameSettings(this, shortcut); // AGVN: Ren'Py/Unity RAM per step
                 setupWineSystemFiles();
                 extractGraphicsDriverFiles();
@@ -3065,18 +3071,15 @@ public class XServerDisplayActivity extends AppCompatActivity {
         final boolean xrandrCapable = isSelectedWineXrandrCapable();
         File userRegFile = new File(imageFs.getRootDir(), ImageFs.WINEPREFIX + "/user.reg");
 
+        // AGVN: a game picks its resolution from Wine's mode list, so every Wine gets the emulated list and mode
+        // changes, XRandR or not; a Wine that does not know these keys ignores them.
         try (WineRegistryEditor registryEditor = new WineRegistryEditor(userRegFile)) {
-            if (xrandrCapable) {
-                registryEditor.setStringValue(x11DriverKey, "EmulateModelist", "Y");
-                registryEditor.setStringValue(x11DriverKey, "EmulateModeset", "Y");
-            } else {
-                registryEditor.removeValue(x11DriverKey, "EmulateModelist");
-                registryEditor.removeValue(x11DriverKey, "EmulateModeset");
-            }
+            registryEditor.setStringValue(x11DriverKey, "EmulateModelist", "Y");
+            registryEditor.setStringValue(x11DriverKey, "EmulateModeset", "Y");
         }
 
-        Log.d("XServerDisplayActivity", "RandR Wine mode emulation: "
-                + (xrandrCapable ? "disabled" : "unchanged (layer has no XRandR)"));
+        Log.d("XServerDisplayActivity", "Wine mode emulation: on"
+                + (xrandrCapable ? "" : " (layer has no XRandR)"));
     }
 
     private boolean isSelectedWineXrandrCapable() {

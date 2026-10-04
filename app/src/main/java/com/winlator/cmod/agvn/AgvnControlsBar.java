@@ -51,6 +51,7 @@ public final class AgvnControlsBar {
         eye = barButton(activity.getString(R.string.agvn_bar_hide_label), 14, R.string.agvn_bar_toggle, v -> toggle());
         bar.addView(eye);
         AgvnScreenFit fit = new AgvnScreenFit(activity);
+        new AgvnBlackScreen(activity); // a game that stays black: a larger screen
         bar.addView(barButton("⛶", 16, R.string.agvn_bar_fit, v -> fit.toggle()));
         bar.addView(barButton(activity.getString(R.string.agvn_bar_exit_label), 14, R.string.agvn_bar_exit, v -> askExit()));
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,

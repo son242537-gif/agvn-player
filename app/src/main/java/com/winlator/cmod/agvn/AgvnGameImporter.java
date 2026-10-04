@@ -36,6 +36,8 @@ public final class AgvnGameImporter {
         public final GameExeResolver.Engine engine;
         /** The exe of one game of a folder that holds several, or of an exe picked by hand; null for the folder's game. */
         public final String variant;
+        /** A KiriKiri game's own size ("1280x720"), or null when unknown. */
+        public final String gameSize;
 
         Candidate(File gameDir, AgvnProfile profile, String exe, GameExeResolver.Engine engine, String variant) {
             this.gameDir = gameDir;
@@ -43,6 +45,7 @@ public final class AgvnGameImporter {
             this.exe = exe;
             this.engine = engine;
             this.variant = variant;
+            this.gameSize = engine == GameExeResolver.Engine.KIRIKIRI ? AgvnKirikiri.gameSize(gameDir) : null;
         }
     }
 
@@ -187,7 +190,9 @@ public final class AgvnGameImporter {
         shortcut.putExtra("envVars", buildEnvVars(p.env, dlls));
         AgvnQuality.setStartFps(shortcut, eff.fps);
         AgvnLayouts.applyImport(shortcut, AgvnLayouts.kindFor(p, c.engine));
-        if (eff.resolution != null) shortcut.putExtra("screenSize", eff.resolution);
+        String screen = AgvnKirikiri.notSmaller(eff.resolution, c.gameSize); // a KiriKiri game shows whole
+        if (screen != null) shortcut.putExtra("screenSize", screen);
+        shortcut.putExtra(AgvnKirikiri.EXTRA_GAME_SIZE, c.gameSize);
         shortcut.putExtra("simTouchScreen", p.isSimulatedTouchscreen() ? "1" : "0");
         shortcut.putExtra(EXTRA_PROFILE_PATH, profileCopy.getAbsolutePath());
         shortcut.putExtra(EXTRA_GAME_DIR, c.gameDir.getAbsolutePath());

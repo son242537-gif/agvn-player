@@ -33,9 +33,11 @@ public final class AgvnWineDebug {
     static final String MESSAGE_BOXES = "trace+msgbox";
     /**
      * With the log off, Wine still prints the errors "Tự sửa lỗi" reads (AgvnDoctor): a DLL the game needs and cannot
-     * load (module), a .NET game without Wine Mono (mscoree), and error boxes. They print only when that goes wrong.
+     * load (module), a .NET game without Wine Mono (mscoree), a resolution Wine refused the game (system, "Changing ...
+     * display settings returned -2", read by {@link AgvnBlackScreen}), and error boxes. They print only when that goes
+     * wrong.
      */
-    static final String QUIET_SPEC = "-all,err+module,err+mscoree," + MESSAGE_BOXES;
+    static final String QUIET_SPEC = "-all,err+module,err+mscoree,err+system," + MESSAGE_BOXES;
 
     private AgvnWineDebug() {}
 

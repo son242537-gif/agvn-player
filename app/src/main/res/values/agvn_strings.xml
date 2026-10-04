@@ -21,6 +21,7 @@
     <string name="agvn_import_preview_no_exe">File chạy: không có file .exe (bản cho điện thoại), game chỉ chạy bằng Chạy nhẹ</string>
     <string name="agvn_import_preview_fps">Giới hạn FPS: %1$s</string>
     <string name="agvn_import_preview_resolution">Độ phân giải: %1$s</string>
+    <string name="agvn_import_preview_game_size">Độ phân giải: %1$s (bằng khổ của game, để game hiện đủ)</string>
     <string name="agvn_import_preview_pool">Texture pool: %1$d MB</string>
     <string name="agvn_import_pool_warning">Lưu ý: RAM trống hiện tại ít hơn texture pool của game, game có thể bị tắt giữa chừng.</string>
     <string name="agvn_unlimited">không giới hạn</string>
@@ -110,6 +111,10 @@
     <string name="agvn_fit_keep">Giữ như vậy</string>
     <string name="agvn_fit_undo">Trả lại như cũ</string>
     <string name="agvn_fit_resize">Đổi màn hình game thành %1$s</string>
+    <string name="agvn_black_title">Màn hình game vẫn đen</string>
+    <string name="agvn_black_detail">Game đã chạy %1$d giây mà chưa hiện hình trên màn hình %2$s. Có thể màn hình này nhỏ hơn khổ game.</string>
+    <string name="agvn_black_refused">Game đã xin một độ phân giải lớn hơn màn hình này nhưng không được.</string>
+    <string name="agvn_black_wait">Chờ thêm</string>
     <string name="agvn_fit_on">Đã phóng khung game cho vừa màn hình</string>
     <string name="agvn_fit_off">Đã trả khung game về như cũ</string>
     <string name="agvn_fit_unsupported">Game này vẽ bằng EGL hoặc DisplayX nên chưa phóng khung được. Chọn trình vẽ Vulkan trong cài đặt game để dùng ⛶.</string>
