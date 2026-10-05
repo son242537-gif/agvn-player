@@ -142,7 +142,8 @@ public class AgvnGodotLightTest {
         write("Two/Renamed.exe.pck", pck);
         assertEquals("Renamed.exe.pck", AgvnGodotLight.mainPack(exe2).file.getName());
         write("Two/renamed.pck", pck); // any letter case, as on Windows
-        assertEquals("renamed.pck", AgvnGodotLight.mainPack(exe2).file.getName());
+        // a file system that ignores case (Windows, Android's shared storage) gives the name as asked: Renamed.pck
+        assertTrue("renamed.pck".equalsIgnoreCase(AgvnGodotLight.mainPack(exe2).file.getName()));
         File exe3 = write("Three/Game.exe", "MZ".getBytes());
         write("Three/a.pck", pck);
         write("Three/b.pck", pck);
