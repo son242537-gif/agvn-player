@@ -1,4 +1,4 @@
-// Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE).
+// Copyright (c) 2026 agvn.io — MIT License (see LICENSE).
 //
 // AGVN: Ren'Py 8 runner ("Chạy nhẹ" for Ren'Py games, docs/agvn/engine-rieng.md). Fetches Ren'Py's own Android build
 // (RAPT) and SDK from renpy.org, checked against scripts/agvn/pins.txt, and makes from them in build/generated/agvn/renpy:

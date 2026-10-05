@@ -9,7 +9,7 @@ Ví dụ:
 
 Exe được tự tìm giống hệt app (Unreal: <Game>-Win64-Shipping.exe). Profile được kiểm tra bằng đúng luật của app
 trước khi ghi; sai luật thì báo lỗi tiếng Việt và không ghi file. Không truy cập mạng.
-Copyright (c) 2026 agvn.io.vn - MIT License.
+Copyright (c) 2026 agvn.io - MIT License.
 """
 import argparse
 import json

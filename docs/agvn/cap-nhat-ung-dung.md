@@ -76,7 +76,7 @@ https://github.com/son242537-gif/agvn-player/releases/latest/download/AGVN-Playe
 
 Link chạy được vì mọi release đều có file tên đúng `AGVN-Player.apk` (script tự đặt). Không bao giờ đổi tên file này.
 
-- Dùng làm nút "Tải AGVN Player" trên agvn.io.vn, hoặc cho một địa chỉ ngắn như `agvn.io.vn/tai` chuyển hướng về đây.
+- Dùng làm nút "Tải AGVN Player" trên agvn.io, hoặc cho một địa chỉ ngắn như `agvn.io/tai` chuyển hướng về đây.
   Ra bản mới không phải đổi link.
 - Chrome hỏi "Tệp này có thể gây hại": chọn "Vẫn tải xuống". Mọi file APK tải từ web đều bị hỏi như vậy.
 - Mở link trong Facebook, Messenger hay Zalo mà không tải: bấm ⋮ → "Mở bằng trình duyệt", rồi bấm lại link.

@@ -10,7 +10,7 @@ Anh Sơn quyết định ngày 02/10/2026: app phát hành theo **GNU GPL phiên
 - **Mã gốc của Winlator/Ludashi và mã AGVN viết thêm:** giấy phép MIT ([`LICENSE`](../../LICENSE)). MIT cho phép đưa vào
   app GPL.
   - Giữ nguyên dòng bản quyền của BrunoSX và StevenMXZ.
-  - File AGVN mới ghi `Copyright (c) 2026 agvn.io.vn — MIT License`.
+  - File AGVN mới ghi `Copyright (c) 2026 agvn.io — MIT License`.
 - **Thành phần bên thứ ba** giữ giấy phép riêng, danh sách ở `app/src/main/assets/agvn/licenses.html`. Ví dụ:
   - Wine, Proton, VKD3D, PulseAudio: LGPL 2.1.
   - Wine Mono 9.3.1 (bộ chạy .NET cho Wine, chỉ giải nén cho game cần .NET): nhiều giấy phép, theo `COPYING` của nó.

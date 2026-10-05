@@ -1,4 +1,4 @@
-/* Simulates an RPG Maker MV engine around assets/agvn/html-compat.js. Copyright (c) 2026 agvn.io.vn - MIT License. */
+/* Simulates an RPG Maker MV engine around assets/agvn/html-compat.js. Copyright (c) 2026 agvn.io - MIT License. */
 const fs = require('fs'), vm = require('vm');
 const src = fs.readFileSync(require('path').join(__dirname, '..', '..', '..', 'app', 'src', 'main', 'assets', 'agvn', 'html-compat.js'), 'utf8');
 const store = {};

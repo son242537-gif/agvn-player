@@ -3,7 +3,7 @@
 Each reader returns (width, height, format, mip_count, gpu_bytes) or None.
 gpu_bytes is what the texture occupies once uploaded: compressed block formats stay compressed,
 PNG/JPG/TGA/BMP are expanded to RGBA8 (4 bytes/pixel) with a full mip chain (x4/3).
-Copyright (c) 2026 agvn.io.vn - MIT License.
+Copyright (c) 2026 agvn.io - MIT License.
 """
 import struct
 

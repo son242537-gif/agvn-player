@@ -27,7 +27,7 @@ Rename the app to "AGVN Player", replace the icon with AGVN branding, add a 1.2-
 | Manifest label | Winlator Ludashi | AGVN Player |
 | Launcher icon | Generic | AGVN logo (adaptive) |
 | Splash screen | (none) | AGVN logo 1.2 s, tappable |
-| About | Winlator credits + winlator.org | AGVN Player, agvn.io.vn |
+| About | Winlator credits + winlator.org | AGVN Player, agvn.io |
 | Licenses | (none) | MIT + third-party list |
 
 ## Requirements
@@ -36,7 +36,7 @@ Rename the app to "AGVN Player", replace the icon with AGVN branding, add a 1.2-
 1. App labeled "AGVN Player"; `applicationId` from P2
 2. Adaptive launcher icon: AGVN logo (1024×1024, provided) scaled to mdpi–xxxhdpi
 3. SplashActivity: shows AGVN logo, counts 1.2 s (or user taps to skip), then launches MainActivity
-4. About dialog: only agvn.io.vn credit; button "Giấy phép mã nguồn mở" → separate screen
+4. About dialog: only agvn.io credit; button "Giấy phép mã nguồn mở" → separate screen
 5. Licenses screen: MIT text ("Copyright (c) 2023 BrunoSX"), Wine/proot/patchelf source links
 6. Vietnamese text on all 8 scoped screens; no English except app/product names (Wine, DXVK, FPS, etc.)
 7. No layout overflow at 360 dp width
@@ -104,7 +104,7 @@ Rename the app to "AGVN Player", replace the icon with AGVN branding, add a 1.2-
 1. `aapt2 dump badging` → `application-label:'AGVN Player'`; launchable activity = SplashActivity
 2. Cold start shows splash 1.2 s then transitions to library
 3. Splash taps to skip
-4. About screen shows only agvn.io.vn; licenses button shows MIT notice with BrunoSX copyright
+4. About screen shows only agvn.io; licenses button shows MIT notice with BrunoSX copyright
 5. 8 scoped screens contain no English words except product/technical names (Wine, FPS, etc.)
 6. Grep gate passes (no leakage of Winlator/Ludashi/StevenMXZ in customer UI)
 7. Maintainer device visual review: 10-screen walkthrough confirms Vietnamese on each screen
@@ -118,7 +118,7 @@ Rename the app to "AGVN Player", replace the icon with AGVN branding, add a 1.2-
 - [ ] Launch countdown + pre-load screen: Vietnamese
 - [ ] In-game sidebar: Vietnamese menu, FPS/RAM display readable
 - [ ] Settings basic options: Vietnamese labels
-- [ ] About: only agvn.io.vn; licenses button works
+- [ ] About: only agvn.io; licenses button works
 - [ ] Export diagnostic: checks crash export (P3) includes Vietnamese strings without corruption
 
 ## Next Steps

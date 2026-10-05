@@ -58,7 +58,7 @@ index 00000000..5698bf56
 +/*
 +** agvn-error.h
 +**
-+** AGVN Player (agvn.io.vn): on Android, the app sets AGVN_MKXPZ_ERROR_FILE before the game starts and reads that file
++** AGVN Player (agvn.io): on Android, the app sets AGVN_MKXPZ_ERROR_FILE before the game starts and reads that file
 +** after the game ends, so it can tell a game that stopped on an error from one the player quit. Elsewhere: no-op.
 +*/
 +

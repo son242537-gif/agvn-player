@@ -9,7 +9,7 @@
 - Unity: nếu máy có UnityPy (pip install UnityPy) thì đọc Texture2D trong .assets/bundle; nếu không thì chỉ
   liệt kê dung lượng file.
 Chỉ đọc phần đầu file, không tải cả gói vào RAM, không dùng mạng.
-Copyright (c) 2026 agvn.io.vn - MIT License.
+Copyright (c) 2026 agvn.io - MIT License.
 """
 import argparse
 import csv

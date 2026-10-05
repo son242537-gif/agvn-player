@@ -2,7 +2,7 @@
 
 Mirrors app/src/main/java/com/winlator/cmod/agvn/GameExeResolver.java and AgvnProfileValidator.java.
 Keep both sides in sync; tests/test_toolkit.py and the Java unit tests validate the same example profile.
-Copyright (c) 2026 agvn.io.vn - MIT License.
+Copyright (c) 2026 agvn.io - MIT License.
 """
 import os
 import re

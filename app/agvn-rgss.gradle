@@ -1,4 +1,4 @@
-// Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE).
+// Copyright (c) 2026 agvn.io — MIT License (see LICENSE).
 //
 // AGVN: RPG Maker XP/VX/VX Ace runner ("Chạy nhẹ" with mkxp-z, docs/agvn/engine-rieng.md). libmkxp-z.so is built by
 // scripts/agvn/mkxp-z/build-mkxp-z.sh and kept in src/main/jniLibs, checked here against scripts/agvn/pins.txt. Its

@@ -1,4 +1,4 @@
-# AGVN Player (agvn.io.vn) - MIT License (see LICENSE). Loaded by mkxp-z before the game's own scripts.
+# AGVN Player (agvn.io) - MIT License (see LICENSE). Loaded by mkxp-z before the game's own scripts.
 # How many frames the game runs per second, for the "Chạy nhẹ" HUD and the slow-game check ("Tự sửa lỗi"):
 # every 2 s, "<frames per second> <the game's frame rate>" goes to the file AGVN_RGSS_FPS_FILE names.
 # A game that later redefines Graphics.update without calling the old one only stops the reports.

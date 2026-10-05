@@ -1,5 +1,5 @@
 # Pinned inputs of scripts/agvn/zink/build-zink.sh (checked before use; any mismatch stops the build).
-# Copyright (c) 2026 agvn.io.vn - MIT License. How these were verified: scripts/agvn/zink/README.md.
+# Copyright (c) 2026 agvn.io - MIT License. How these were verified: scripts/agvn/zink/README.md.
 #
 # mesa <tag> <tag-object-sha> <commit-sha> <git-url>  (tag signed by Mesa release manager Eric Engestrom,
 #       key 57551DE15B968F6341C248F68D8E31AFC32428A6; the same tag object is on two independent mirrors)

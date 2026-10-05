@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
@@ -9,7 +9,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.winlator.cmod.R;
 
-/** About dialog: AGVN Player, version, agvn.io.vn, and a button to the open-source licenses. */
+/** About dialog: AGVN Player, version, agvn.io, and a button to the open-source licenses. */
 public final class AgvnAbout {
     private AgvnAbout() {}
 

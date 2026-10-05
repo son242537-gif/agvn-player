@@ -6,7 +6,7 @@
 #   url <url>                  the same file from a mirror
 # Every file must match the SHA-256 that mkxp-z pins in its .wrap, or the build stops. Wrapdb patch archives come from
 # wrapdb's GitHub releases. Usage: fetch-subprojects.py <sources.lock> <mkxp-z source dir>
-# Copyright (c) 2026 agvn.io.vn - MIT License.
+# Copyright (c) 2026 agvn.io - MIT License.
 import configparser
 import hashlib
 import os

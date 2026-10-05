@@ -1,4 +1,4 @@
-/* AGVN Player - compatibility layer for RPG Maker MV/MZ games run without NW.js. Copyright (c) 2026 agvn.io.vn - MIT License.
+/* AGVN Player - compatibility layer for RPG Maker MV/MZ games run without NW.js. Copyright (c) 2026 agvn.io - MIT License.
  * Loaded before the game's own scripts. It fixes what breaks when a PC game runs in a phone browser:
  *  1. Plugins that call require('fs'/'path'/'nw.gui') get small stand-ins (files are read from the game folder,
  *     written files go to localStorage). `process` stays undefined so the engine keeps using browser saves.

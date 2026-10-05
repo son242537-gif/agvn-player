@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # AGVN Player - the licenses of mkxp-z and of every library linked into libmkxp-z.so, in one text file for the app's
 # "Giấy phép mã nguồn mở" screen. Usage: licenses.sh <mkxp-z source dir after the build> <output file>
-# Copyright (c) 2026 agvn.io.vn - MIT License.
+# Copyright (c) 2026 agvn.io - MIT License.
 set -euo pipefail
 SRC="$1"
 OUT="$2"

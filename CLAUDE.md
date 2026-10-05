@@ -11,7 +11,8 @@ A Vietnamese-first emulation environment for PC games on weak Android phones (Ad
 - Device-tiered presets (weak-phone optimization: 24 FPS cap, scaled resolution, RAM guards)
 - Thermal & memory safeguards (prevents thermal throttle & "Out of Memory" force-close)
 - Vietnamese UI for non-technical players
-- AGVN branding + credit (agvn.io.vn only; no ads, telemetry, or third-party accounts)
+- AGVN branding + credit (agvn.io only; no ads, telemetry, or third-party accounts)
+  - The site is agvn.io since 2026-10-05 (maintainer's decision). It was agvn.io.vn, which the published release notes keep.
 
 **Goal:** Every AGVN game runs smoothly at 24–30 FPS on Snapdragon 6xx (2.8 GHz, Adreno 650) or equiv. with 6 GB RAM, measured on real devices by the maintainer before release.
 
@@ -47,7 +48,7 @@ A Vietnamese-first emulation environment for PC games on weak Android phones (Ad
 
 2. **No features requiring root or in-app ADB self-pairing** (security risk for non-technical users).
 
-3. **No in-app telemetry, ads, or external links** (except agvn.io.vn in About screen and diagnostic exports).
+3. **No in-app telemetry, ads, or external links** (except agvn.io in About screen and diagnostic exports).
    - Exception, approved by the maintainer: the in-app updater (`agvn/AgvnUpdater`).
      - It reads `agvn-update.txt` and the APK named there, only from this repository's GitHub Releases.
      - It sends nothing about the device.
@@ -139,7 +140,7 @@ See [`docs/agvn/ROADMAP.md`](./docs/agvn/ROADMAP.md) for the full 10-phase plan,
 - **Original:** BrunoSX (Winlator), StevenMXZ (Ludashi fork)
 - **AGVN additions:** Licensed MIT (same as upstream), distributed as part of the GPL-3.0-or-later app; source code must remain public, and every release tag is the source of that APK
 - **Third-party notices:** Wine, proot, patchelf, Mesa, DXVK, FEX, Box64, Turnip — see bundled licenses in app
-- **Copyright year:** Keep BrunoSX/StevenMXZ notices in all derivative files; add "Copyright (c) 2026 agvn.io.vn" to new AGVN modules
+- **Copyright year:** Keep BrunoSX/StevenMXZ notices in all derivative files; add "Copyright (c) 2026 agvn.io" to new AGVN modules
 
 ## Further Reading
 

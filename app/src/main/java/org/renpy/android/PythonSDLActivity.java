@@ -2,7 +2,7 @@
  * Ren'Py's Android activity, adapted for AGVN Player from Ren'Py 8.5.3 (rapt/prototype/renpyandroid,
  * org/renpy/android/PythonSDLActivity.java). Ren'Py: MIT License, Copyright 2004-2026 Tom Rothamel and contributors.
  * AGVN changes (no Play asset packs or in-app store, no web pages, no files unpacked here, a window flag in place of a
- * wake lock, quitting closes only this activity): Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE).
+ * wake lock, quitting closes only this activity): Copyright (c) 2026 agvn.io — MIT License (see LICENSE).
  *
  * The class keeps Ren'Py's name and members: librenpython.so calls nativeSetEnv and preparePython, and Ren'Py's Python
  * code (renpy/, lib/python3.12/android) reaches mActivity, hidePresplash, armOnStop, finishOnStop, vibrate, getDPI,

@@ -1,4 +1,4 @@
-# Copyright (c) 2026 agvn.io.vn - MIT License (see LICENSE).
+# Copyright (c) 2026 agvn.io - MIT License (see LICENSE).
 #
 # AGVN Player's start file for Ren'Py games. librenpython.so runs ANDROID_PRIVATE/main.py; Ren'Py's own Android
 # build puts its renpy.py there, with the game inside the APK. Here the game stays in its folder on the phone:

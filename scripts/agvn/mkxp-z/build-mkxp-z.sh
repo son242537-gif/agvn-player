@@ -5,7 +5,7 @@
 # Inputs are pinned in scripts/agvn/mkxp-z/sources.lock: mkxp-z by commit, every library by the SHA-256 that mkxp-z
 # pins in its .wrap files (fetch-subprojects.py checks them). AGVN's changes are scripts/agvn/mkxp-z/patches.
 # Linux x86_64 only (the cloud container or WSL). See scripts/agvn/mkxp-z/README.md.
-# Copyright (c) 2026 agvn.io.vn - MIT License.
+# Copyright (c) 2026 agvn.io - MIT License.
 set -euo pipefail
 
 ROOT=$(git -C "$(dirname "$0")" rev-parse --show-toplevel)
