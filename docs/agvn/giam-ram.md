@@ -37,9 +37,20 @@ Mức "Tự động" dùng mức gợi ý cho máy: máy yếu là Thấp, máy 
 | Unreal | Texture pool của Siêu nhẹ (384 MB), trên driver của máy là một phần tư: 96 MB |
 | Ren'Py (Wine và "Chạy nhẹ") | Bộ đệm ảnh 128 MB, chỉ khi game từng hết RAM (ảnh Ren'Py không phải BCn) |
 | Zink (OpenGL) | Như mọi mức |
+| Game DirectX, driver không phải Turnip | Bật "Đồng bộ khung hình" và "Tắt Present Wait" cho lần chạy đó |
+
+Hai mục ở dòng cuối là cách một người chơi Mali-G615 (7,2 GB) mở được Support Pregnancy School (Unreal): với mặc định,
+game đen màn hình rồi không vào được (`AgvnPresentSync`).
+- "Đồng bộ khung hình" (`MESA_VK_WSI_DEBUG=forcesync`): mỗi khung lên màn xong mới tới khung sau.
+- "Tắt Present Wait" (`WRAPPER_DISABLE_PRESENT_WAIT=1`): wrapper giấu `VK_KHR_present_wait` khỏi DXVK 2.x. DXVK 1.10.3
+  không dùng nó.
+
+App chỉ đổi biến môi trường của lần chạy đó, cài đặt của game giữ nguyên, và biến người chơi tự đặt trong "Biến môi
+trường" vẫn được ưu tiên. Chưa đo trên máy xem game chạy chậm đi bao nhiêu.
 
 Máy đủ sức thì giữ phần tiết kiệm của mức đã chọn: Turnip đọc được BCn, hoặc máy có từ 9 GB RAM, và game chưa từng hết
-RAM trên máy. `su-kien.txt` của phiên chơi ghi "Tiết kiệm RAM như Siêu nhẹ: <lý do>" khi app giảm.
+RAM trên máy. `su-kien.txt` của phiên chơi ghi "Tiết kiệm RAM như Siêu nhẹ: <lý do>" khi app giảm, kèm "; đồng bộ khung
+hình, tắt Present Wait" khi app bật hai mục đó.
 
 App chưa giảm được texture của Godot, KiriKiri, RPG Maker (XP/VX/VX Ace, MV/MZ) và game HTML: chưa có thiết lập nào
 app ghi được từ bên ngoài game cho phần này.

@@ -105,6 +105,7 @@ public final class AgvnSessionLog {
     public static void removedByPlayer(Context context) {
         File dir = current;
         if (dir != null) write(new File(dir, RUNNING), AgvnSessionNotes.REMOVED + "=" + System.currentTimeMillis() + "\n", true);
+        if (dir != null) AgvnWineTail.get().save(dir); // Wine's last lines: nothing of this process is left after it
         AgvnLightSession.removedByPlayer(context);
     }
 

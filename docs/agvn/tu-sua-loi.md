@@ -13,7 +13,7 @@ là một nút. Bấm nút là app đổi cấu hình của riêng game đó r�
 | Game vừa thoát hoặc bị lỗi | Hộp hỏi ở thư viện (hoặc Big Picture) | Game tắt ngay khi mở, crash, thiếu DirectX, thiếu file `.dll`; game "Chạy nhẹ" báo lỗi script, bị tắt đột ngột, bị treo. Bấm một cách sửa là game mở lại ngay. |
 | Android đã tắt game | Hộp hỏi khi về thư viện (trong 24 giờ) | Máy hết RAM; HyperOS tắt game khi chuyển sang app khác. |
 | Game Windows vừa hiện khung | Thanh trên game | Khung game nhỏ hơn màn hình: app phóng cho vừa luôn. Khung game lớn hơn màn hình: app đề nghị đổi màn hình game. Xem "Vừa màn hình" bên dưới. |
-| Game Windows vẫn đen màn hình | Thanh trên game | Khoảng 20 giây sau khi mở (lâu hơn nếu game thường mở chậm), game vẫn chưa hiện hình, và màn hình nhỏ có thể là lý do: app đề nghị màn hình lớn hơn. Xem "Màn hình đen" bên dưới. |
+| Game Windows vẫn đen màn hình | Thanh trên game | Khoảng 20 giây sau khi mở (lâu hơn nếu game thường mở chậm), game vẫn chưa hiện hình, và có dấu hiệu màn hình nhỏ hơn game (khổ game KiriKiri, khung game bị cắt, Wine từ chối độ phân giải game xin): app đề nghị màn hình lớn hơn. Xem "Màn hình đen" bên dưới. |
 
 Mỗi lỗi chỉ hỏi một lần. Cách sửa đã thử mà vẫn lỗi thì lần sau không hiện lại, cho đến khi game chạy tốt một
 lần. Thanh game chậm có nút "Để vậy, không hỏi lại" cho riêng game đó.
@@ -193,12 +193,15 @@ gì nữa. `AgvnBlackScreen` canh chuyện này cho mọi game Windows:
   đó app hỏi cả khi chưa thấy khung game.
 - Màn hình đề nghị (`AgvnBlackScreenRules.bigger`): khổ game KiriKiri nếu biết; khung game nếu khung lớn hơn màn hình;
   nếu không thì cỡ kế tiếp trong 1280×720, 1600×900, 1920×1080. Màn hình đã là 1920×1080 thì app chỉ ghi vào nhật ký.
-- Cỡ kế tiếp chỉ được đề nghị khi Wine đã từ chối độ phân giải game xin, hoặc khung game chiếm cả màn hình (từ 95% mỗi
-  chiều: toàn màn hình hoặc phóng to). Khung game nhỏ hơn hẳn màn hình là game tự chọn cỡ đó, nên màn hình lớn hơn không
-  làm game hiện hình. Khi đó app không hỏi, chỉ ghi vào nhật ký "… khung game <cỡ>: không hỏi".
+- Cỡ kế tiếp chỉ được đề nghị khi Wine đã từ chối độ phân giải game xin. Game đen mà không có dấu hiệu nào ở trên là
+  game đang tải, hoặc khung hình của game không lên được màn hình. Màn hình lớn hơn không chữa được cả hai, nên app
+  không hỏi, chỉ ghi vào nhật ký "… khung game <cỡ>: không hỏi".
   - Ví dụ ngày 05/10: Legend Cleaner (Unreal) trên máy Mali-G610 đen màn hình vì đang tải, rồi bị tắt vì hết RAM. Khung
     game là 711×400 trên màn hình 854×480, 1066×600 trên 1280×720 và 1440×720 trên 1600×900. Người chơi bấm đổi màn
     hình hai lần mà game vẫn đen.
+  - Cũng ngày 05/10: Support Pregnancy School (Unreal) trên máy Mali-G615 (bản 0.1.17) đen cả màn hình 1280×720 sau 32
+    giây, và thanh này đề nghị 1600×900. Game vào được khi người chơi bật "Đồng bộ khung hình" và "Tắt Present Wait",
+    không nhờ màn hình lớn hơn. Nay máy không đủ RAM tự bật hai mục này cho game DirectX (xem `giam-ram.md`).
 
 Thanh "Màn hình game vẫn đen" có ba nút: "Đổi màn hình game thành <cỡ>" (rồi "Mở lại game ngay"), "Chờ thêm" (không hỏi
 lại trong lần chơi này), và "Để vậy, không hỏi lại" (`agvnBlackScreen`: 0 trong lối tắt). `tom-tat.txt` của phiên chơi
@@ -302,6 +305,12 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
   `Tự sửa lỗi: low-ram-end`. Chơi đủ RAM rồi thoát từ menu của game: không có hộp nào.
 - [ ] Game mở cửa sổ nhỏ hơn màn hình và đen lâu lúc đang tải (như Legend Cleaner trên máy Mali): không có thanh "Màn
   hình game vẫn đen"; `su-kien.txt` có "Màn hình đen sau … giây, màn hình …, khung game …: không hỏi".
+- [ ] Máy Mali dưới 9 GB RAM, game DirectX (như Support Pregnancy School): `moi-truong.txt` có
+  `MESA_VK_WSI_DEBUG=forcesync` và `WRAPPER_DISABLE_PRESENT_WAIT=1`, `su-kien.txt` có "…; đồng bộ khung hình, tắt
+  Present Wait", và game vào được như khi người chơi tự bật hai mục đó. Trên POCO (Turnip) thì không có hai biến này.
+- [ ] Game đen cả màn hình mà Wine không từ chối độ phân giải: không có thanh đề nghị màn hình lớn hơn.
+- [ ] Vuốt tắt AGVN khỏi danh sách app gần đây khi game Windows đang chạy, mở lại rồi "Gửi nhật ký": phiên đó có
+  `wine-cuoi.txt`.
 - [ ] Máy Mali dưới 9 GB RAM, game Unity hoặc Unreal ở mức Trung bình trở lên: `su-kien.txt` có "Tiết kiệm RAM như Siêu
   nhẹ: máy giải nén texture BCn…", `moi-truong.txt` có `dxvk.trackPipelineLifetime=True`. Trên POCO (Turnip) thì không.
 - [ ] Game vừa được hỏi "Game tự tắt lúc máy gần hết RAM": lần mở sau, `su-kien.txt` có "Tiết kiệm RAM như Siêu nhẹ: game

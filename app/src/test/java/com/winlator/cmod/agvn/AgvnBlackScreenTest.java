@@ -108,16 +108,21 @@ public class AgvnBlackScreenTest {
     }
 
     @Test
-    public void aWindowWithRoomAroundItGetsNoScreen() {
+    public void aLargerScreenOnlyWhenWineRefusedTheGamesResolution() {
         // Legend Cleaner (Unreal) on a Mali-G610, black while it loads and then out of RAM: 711x400 in a 719x426 frame
         // on 854x480, 1066x600 on 1280x720, 1440x720 on 1600x900. Each larger screen only made a larger window.
         assertNull(AgvnBlackScreenRules.bigger("854x480", null, new int[]{67, 27, 719, 426}, false));
         assertNull(AgvnBlackScreenRules.bigger("1600x900", "-", new int[]{76, 73, 1448, 754}, false));
-        assertEquals("Wine refused its mode", "1280x720",
-                AgvnBlackScreenRules.bigger("854x480", null, new int[]{67, 27, 719, 426}, true));
-        assertTrue(AgvnBlackScreenRules.fills(new int[]{0, 0, 854, 480}, new int[]{854, 480}));
-        assertTrue(AgvnBlackScreenRules.fills(new int[]{0, 0, 820, 460}, new int[]{854, 480}));
-        assertFalse(AgvnBlackScreenRules.fills(new int[]{0, 0, 854, 440}, new int[]{854, 480}));
+        // Support Pregnancy School (Unreal) on a Mali-G615 (0.1.17): black full screen at 1280x720 after 32 s; it
+        // started with "Đồng bộ khung hình" and "Tắt Present Wait" on, not with a larger screen
+        int[] hd = {0, 0, 1280, 720};
+        assertNull(AgvnBlackScreenRules.bigger("1280x720", "-", hd, false));
+        int[] maximized = {-6, -6, 972, 556};
+        assertNull("a maximized window", AgvnBlackScreenRules.bigger("960x544", null, maximized, false));
+        assertNull("no window seen", AgvnBlackScreenRules.bigger("1280x800", null, null, false));
+        // Wine refused the game's mode: the screen is too small for it
+        assertEquals("1280x720", AgvnBlackScreenRules.bigger("854x480", null, new int[]{67, 27, 719, 426}, true));
+        assertEquals("1600x900", AgvnBlackScreenRules.bigger("1280x720", "-", hd, true));
     }
 
     @Test
@@ -128,15 +133,15 @@ public class AgvnBlackScreenTest {
         assertEquals("800x600", AgvnBlackScreenRules.bigger("960x544", "800x600", new int[]{0, 0, 960, 544}, false));
         // a window the screen cuts off: its own size
         assertEquals("1024x768", AgvnBlackScreenRules.bigger("854x480", null, new int[]{0, 0, 1024, 768}, false));
-        assertEquals("1280x720", AgvnBlackScreenRules.bigger("854x480", "-", full, false)); // the next screen
+        assertEquals("1280x720", AgvnBlackScreenRules.bigger("854x480", "-", full, true)); // refused: the next screen
         // a maximized window's frame past the edges is no reason for a screen its size: the next one
-        assertEquals("1280x720", AgvnBlackScreenRules.bigger("960x544", null, new int[]{-6, -6, 972, 556}, false));
+        assertEquals("1280x720", AgvnBlackScreenRules.bigger("960x544", null, new int[]{-6, -6, 972, 556}, true));
         int[] hd = {0, 0, 1280, 720};
-        assertEquals("1600x900", AgvnBlackScreenRules.bigger("1280x720", "1280x720", hd, false));
-        assertEquals("1600x900", AgvnBlackScreenRules.bigger("1280x800", null, null, false));
-        assertEquals("1920x1080", AgvnBlackScreenRules.bigger("1600x900", null, null, false));
+        assertEquals("1600x900", AgvnBlackScreenRules.bigger("1280x720", "1280x720", hd, true));
+        assertEquals("1600x900", AgvnBlackScreenRules.bigger("1280x800", null, null, true));
+        assertEquals("1920x1080", AgvnBlackScreenRules.bigger("1600x900", null, null, true));
         int[] fullHd = {0, 0, 1920, 1080};
-        assertNull("nothing larger", AgvnBlackScreenRules.bigger("1920x1080", null, fullHd, false));
-        assertNull(AgvnBlackScreenRules.bigger("bad", null, null, false));
+        assertNull("nothing larger", AgvnBlackScreenRules.bigger("1920x1080", null, fullHd, true));
+        assertNull(AgvnBlackScreenRules.bigger("bad", null, null, true));
     }
 }

@@ -26,8 +26,6 @@ final class AgvnBlackScreenRules {
     static final int ROW_SAMPLES = 64;
     /** Screens offered when the game's own size is not known, smallest first. */
     static final String[] SCREENS = {"1280x720", "1600x900", "1920x1080"};
-    /** A window at least this share of the screen's width and height takes the whole screen. */
-    static final double FILL = 0.95;
     /** win32u's error for a display mode the game asked for and Wine does not list (DISP_CHANGE_BADMODE). */
     static final String REFUSED = "display settings returned -2";
     /** Wine's line for each message box a game shows ({@link AgvnWineDebug#MESSAGE_BOXES}). */
@@ -80,9 +78,11 @@ final class AgvnBlackScreenRules {
     /**
      * A screen larger than {@code screen} to offer: the game's own size when the screen is smaller ({@link AgvnKirikiri}),
      * else the window's ({x, y, width, height}, or null) when the screen cuts it off ({@link AgvnFitMath#cutOff}), else
-     * the next of {@link #SCREENS} when Wine refused the game's resolution or the window takes the whole screen. A window
-     * with room around it picked its own size, so a larger screen would not light it: Legend Cleaner, black while it
-     * loads on a Mali phone, opens 711x400 on 854x480 and 1440x720 on 1600x900. Null when there is none.
+     * the next of {@link #SCREENS} when Wine refused the game's resolution. Black without one of these is a game still
+     * loading, or one whose frames do not reach the screen, and a larger screen lights neither: Legend Cleaner opened
+     * 711x400 on 854x480 while it loaded, and Support Pregnancy School stayed black full screen (1280x720) on a
+     * Mali-G615 until "Đồng bộ khung hình" and "Tắt Present Wait" were on ({@link AgvnPresentSync}). Null when there is
+     * none.
      */
     static String bigger(String screen, String gameSize, int[] window, boolean refused) {
         int[] now = size(screen);
@@ -91,17 +91,12 @@ final class AgvnBlackScreenRules {
         if (forGame != null && !forGame.equals(screen)) return forGame;
         if (window != null && AgvnFitMath.cutOff(window[0], window[1], window[2], window[3], now[0], now[1]))
             return AgvnFitMath.screenFor(Math.max(window[2], now[0]), Math.max(window[3], now[1]));
-        if (!refused && window != null && !fills(window, now)) return null;
+        if (!refused) return null;
         for (String s : SCREENS) {
             int[] wh = size(s);
             if (wh[0] >= now[0] && wh[1] >= now[1] && (wh[0] > now[0] || wh[1] > now[1])) return s;
         }
         return null;
-    }
-
-    /** The window ({x, y, width, height}) takes the whole screen ({width, height}): fullscreen or maximized. */
-    static boolean fills(int[] window, int[] screen) {
-        return window[2] >= screen[0] * FILL && window[3] >= screen[1] * FILL;
     }
 
     static int[] size(String s) {

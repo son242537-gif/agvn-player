@@ -97,9 +97,10 @@ public final class AgvnMemorySaver {
         return n;
     }
 
-    private static void noteTight(Shortcut s) {
+    private static void noteTight(Shortcut s, boolean frameSync) {
         note = "Tiết kiệm RAM như Siêu nhẹ: " + (ranOut(s) ? "game từng bị tắt vì hết RAM trên máy này"
-                : "máy giải nén texture BCn, RAM " + AgvnMemoryWatch.gb(AgvnMemoryProbe.totalMb()));
+                : "máy giải nén texture BCn, RAM " + AgvnMemoryWatch.gb(AgvnMemoryProbe.totalMb()))
+                + (frameSync ? "; đồng bộ khung hình, tắt Present Wait" : "");
     }
 
     /** Ren'Py image cache in MB for {@code level}, or 0 to keep the game's own. */
@@ -157,7 +158,7 @@ public final class AgvnMemorySaver {
         } catch (RuntimeException e) {
             Log.w(TAG, "RAM need not read", e); // the step's savings, as before
         }
-        if (tight) noteTight(shortcut);
+        if (tight) noteTight(shortcut, AgvnPresentSync.appliedThisStart());
         String options = dxvkOptions(memoryStep(stepOf(ctx, shortcut), tight));
         if (options.isEmpty()) return;
         envVars.put("DXVK_CONFIG", mergeDxvkConfig(envVars.get("DXVK_CONFIG"), options));
@@ -175,7 +176,7 @@ public final class AgvnMemorySaver {
             if (engine.isEmpty() || gameDir.isEmpty()) return;
             AgvnQuality.Level step = stepOf(ctx, shortcut);
             if (GameExeResolver.Engine.RENPY.name().equals(engine)) {
-                if (ranOut(shortcut)) noteTight(shortcut);
+                if (ranOut(shortcut)) noteTight(shortcut, false);
                 AgvnRenpyCache.apply(new File(gameDir), renpyCacheMb(memoryStep(step, ranOut(shortcut))));
             } else if (GameExeResolver.Engine.UNITY.name().equals(engine)) {
                 File userReg = new File(shortcut.container.getRootDir(), ".wine/user.reg");

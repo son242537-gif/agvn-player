@@ -2657,6 +2657,9 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
         String bcnEmulationCache = graphicsDriverConfig.get("bcnEmulationCache");
         envVars.put("WRAPPER_USE_BCN_CACHE", bcnEmulationCache);
+        // AGVN: a phone that cannot cope shows a DirectX game's frames one at a time
+        if (dxwrapper.contains("dxvk"))
+            com.winlator.cmod.agvn.AgvnPresentSync.apply(shortcut, envVars, bcnEmulation, adrenoToolsDriverId);
 
         if (xServer.getSurfaceFormat() == Drawable.HAL_PIXEL_FORMAT_RGBA_8888) {
             envVars.put("WRAPPER_SURFACE_FORMAT", "rgba8");
