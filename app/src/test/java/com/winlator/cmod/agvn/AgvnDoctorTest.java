@@ -210,8 +210,9 @@ public class AgvnDoctorTest {
 
     @Test
     public void aFileWineCannotRun() {
-        // Yarisutemesubuta Cheat02 on an Adreno 610: its exe, a .NET program, with no Wine Mono yet: the first fix
-        // installs it
+        // Yarisutemesubuta Cheat02 on an Adreno 610: Wine's box at the first start, which 0.1.19 read as "no-start";
+        // then its exe, a .NET program, with no Wine Mono yet: the first fix installs it
+        assertEquals("bad-exe", found(noStart("00d0:trace:msgbox:MSGBOX_OnInit L\"Bad EXE format for \"")));
         assertEquals("dotnet", found(noStart("00e4:err:mscoree:CLRRuntimeInfo_GetRuntimeHost Wine Mono is not installed")));
         assertEquals("wine-mono", catalog.byId("dotnet").fixes.get(0));
         // Wine Mono there, but Wine could not load it or mscoree.dll: installing it again would not help
