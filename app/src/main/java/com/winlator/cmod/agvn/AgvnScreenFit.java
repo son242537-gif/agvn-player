@@ -32,7 +32,8 @@ import java.util.Arrays;
  * small frame gets the screen change too. UI thread.
  */
 public final class AgvnScreenFit {
-    private static final String TAG = "AGVN", EXTRA_FIT = "agvnFit";
+    static final String EXTRA_FIT = "agvnFit";
+    private static final String TAG = "AGVN";
     private static final long POLL_MS = 1000;
     private static final int STABLE_POLLS = 3;
 
@@ -61,6 +62,7 @@ public final class AgvnScreenFit {
         }
         float[] rect = mainWindow();
         String verdict = rect != null ? verdict(rect) : null;
+        if (AgvnFitMath.OVERFLOW.equals(verdict) && AgvnScreenGrowth.undoIfFollowed(activity, rect)) return;
         if (AgvnFitMath.OVERFLOW.equals(verdict) || verdict != null && !canDraw()) {
             offerScreen(rect, verdict);
         } else if (!canDraw()) {
@@ -91,6 +93,7 @@ public final class AgvnScreenFit {
         String verdict = verdict(rect);
         if (verdict == null) return; // suits the screen; a window that changes later is checked again
         asked = true;
+        if (AgvnFitMath.OVERFLOW.equals(verdict) && AgvnScreenGrowth.undoIfFollowed(activity, rect)) return;
         AgvnSessionLog.event("Khung game " + size(rect) + " trên màn hình " + screenW() + "x" + screenH() + ": " + verdict);
         if (AgvnFitMath.SMALL.equals(verdict) && canDraw()) {
             set(true);
@@ -110,15 +113,20 @@ public final class AgvnScreenFit {
                 size(rect), size(screenW(), screenH())) + "\n" + activity.getString(R.string.agvn_doctor_lead);
         String screen = AgvnFitMath.screenFor((int) rect[2], (int) rect[3]);
         String label = activity.getString(R.string.agvn_fit_resize, screen.replace('x', '×'));
+        int[] window = AgvnScreenGrowth.ints(rect);
         AgvnWarningBar.show(activity, activity.getString(big ? R.string.agvn_fit_overflow_title : R.string.agvn_fit_small_title),
-                detail, new AgvnWarningBar.Choice(label, () -> resize(activity, screen, label)),
+                detail, new AgvnWarningBar.Choice(label, () -> resize(activity, screen, label, window)),
                 new AgvnWarningBar.Choice(R.string.agvn_doctor_keep, () -> keep("0")));
     }
 
-    /** The game gets {@code screen} at its next start, now or later ({@link AgvnSlowBar#offerRestart}). */
-    static void resize(XServerDisplayActivity activity, String screen, String label) {
+    /**
+     * The game gets {@code screen} at its next start, now or later ({@link AgvnSlowBar#offerRestart}), for its window
+     * ({x, y, width, height}, null when unknown): {@link AgvnScreenGrowth} notes how far past the screen it reached.
+     */
+    static void resize(XServerDisplayActivity activity, String screen, String label, int[] window) {
         Shortcut s = activity.agvnShortcut();
         if (s == null) return;
+        AgvnScreenGrowth.remember(activity, s, window, screen);
         s.putExtra("screenSize", screen);
         s.putExtra(EXTRA_FIT, null); // checked again on the new screen
         s.saveData();

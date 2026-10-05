@@ -111,21 +111,46 @@ public final class AgvnBlackScreen {
         XServer xServer = activity.getXServer();
         if (s == null || xServer == null) return;
         String screen = String.valueOf(xServer.screenInfo);
-        String bigger = AgvnBlackScreenRules.bigger(screen, s.getExtra(AgvnKirikiri.EXTRA_GAME_SIZE), window, refused);
+        int sw = xServer.screenInfo.width, sh = xServer.screenInfo.height;
+        // a window that followed the screen made larger for it gets no larger one (AgvnScreenGrowth)
+        boolean follows = window != null && AgvnScreenGrowth.followed(s, window[2], window[3], sw, sh);
+        String bigger = AgvnBlackScreenRules.bigger(screen, s.getExtra(AgvnKirikiri.EXTRA_GAME_SIZE),
+                follows ? null : window, refused);
+        boolean sync = bigger == null && AgvnPresentSync.offerable(s);
         long seconds = elapsedMs / 1000;
         String frame = window != null ? window[2] + "x" + window[3] : "?";
         AgvnSessionLog.event("Màn hình đen sau " + seconds + " giây, màn hình " + screen + ", khung game " + frame
                 + (refused ? ", Wine từ chối độ phân giải game xin" : "")
-                + (bigger != null ? ": hỏi đổi sang " + bigger : ": không hỏi"));
+                + (bigger != null ? ": hỏi đổi sang " + bigger
+                : sync ? ": hỏi bật đồng bộ khung hình" : ": không hỏi"));
         Log.i(TAG, "black screen after " + seconds + " s on " + screen + ", window " + frame
-                + (refused ? ", mode refused" : "") + ", offer " + bigger);
-        if (bigger == null) return;
+                + (refused ? ", mode refused" : "") + ", offer " + (sync ? "frame sync" : bigger));
+        if (bigger != null) offerScreen(s, bigger, screen, seconds, refused);
+        else if (sync) offerSync(s, seconds);
+    }
+
+    private void offerScreen(Shortcut s, String bigger, String screen, long seconds, boolean refused) {
         String label = activity.getString(R.string.agvn_fit_resize, bigger.replace('x', '×'));
         String detail = activity.getString(R.string.agvn_black_detail, seconds, screen.replace('x', '×'))
                 + (refused ? "\n" + activity.getString(R.string.agvn_black_refused) : "")
                 + "\n" + activity.getString(R.string.agvn_doctor_lead);
-        AgvnWarningBar.show(activity, activity.getString(R.string.agvn_black_title), detail,
-                new AgvnWarningBar.Choice(label, () -> AgvnScreenFit.resize(activity, bigger, label)),
+        int[] seen = window;
+        show(s, detail, new AgvnWarningBar.Choice(label, () -> AgvnScreenFit.resize(activity, bigger, label, seen)));
+    }
+
+    /** A DirectX game black with nothing to offer for its screen: what got Support Pregnancy School to show. */
+    private void offerSync(Shortcut s, long seconds) {
+        String label = activity.getString(R.string.agvn_black_sync);
+        String detail = activity.getString(R.string.agvn_black_sync_detail, seconds)
+                + "\n" + activity.getString(R.string.agvn_doctor_lead);
+        show(s, detail, new AgvnWarningBar.Choice(label, () -> {
+            AgvnPresentSync.turnOn(s);
+            AgvnSlowBar.offerRestart(activity, s, label, activity::agvnExit);
+        }));
+    }
+
+    private void show(Shortcut s, String detail, AgvnWarningBar.Choice fix) {
+        AgvnWarningBar.show(activity, activity.getString(R.string.agvn_black_title), detail, fix,
                 new AgvnWarningBar.Choice(R.string.agvn_black_wait, null),
                 new AgvnWarningBar.Choice(R.string.agvn_doctor_keep, () -> {
                     s.putExtra(EXTRA_ASK, "0");

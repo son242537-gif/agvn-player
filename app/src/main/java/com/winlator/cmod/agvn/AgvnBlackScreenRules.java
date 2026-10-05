@@ -81,8 +81,9 @@ final class AgvnBlackScreenRules {
      * the next of {@link #SCREENS} when Wine refused the game's resolution. Black without one of these is a game still
      * loading, or one whose frames do not reach the screen, and a larger screen lights neither: Legend Cleaner opened
      * 711x400 on 854x480 while it loaded, and Support Pregnancy School stayed black full screen (1280x720) on a
-     * Mali-G615 until "Đồng bộ khung hình" and "Tắt Present Wait" were on ({@link AgvnPresentSync}). Null when there is
-     * none.
+     * Mali-G615 until "Đồng bộ khung hình" and "Tắt Present Wait" were on ({@link AgvnPresentSync}, which the bar then
+     * offers a DirectX game). {@code window} is null for one that followed its screen ({@link AgvnScreenGrowth}). Null
+     * when there is none.
      */
     static String bigger(String screen, String gameSize, int[] window, boolean refused) {
         int[] now = size(screen);

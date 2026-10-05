@@ -19,16 +19,18 @@ giữ lại. Tài liệu này ghi lại AGVN làm gì ở từng mức và vì s
 
 Mức "Tự động" dùng mức gợi ý cho máy: máy yếu là Thấp, máy tầm trung là Trung bình, máy flagship là Cao.
 
-## Khi máy không đủ RAM cho game
+## Khi game từng hết RAM trên máy
 
-Ở bất kỳ mức nào, app dùng phần tiết kiệm RAM của Siêu nhẹ cho game khi máy không đủ sức (`AgvnMemorySaver.tight`).
-Độ phân giải và FPS vẫn theo mức đã chọn. Máy không đủ sức khi:
+Ở bất kỳ mức nào, app dùng phần tiết kiệm RAM của Siêu nhẹ cho một game đã từng bị tắt vì hết RAM trên máy này
+(`AgvnMemorySaver.ranOut`). Độ phân giải và FPS vẫn theo mức đã chọn. "Tự sửa lỗi" gặp lỗi `memory`, `gpu-memory`,
+`killed-low-memory` hoặc `low-ram-end` thì đánh dấu game (`agvnRamShort` trong lối tắt), và hộp hỏi báo "Từ lần mở sau,
+app tự dùng mức tiết kiệm RAM cao nhất mà game này có".
 
-- game từng bị tắt vì hết RAM trên máy này. "Tự sửa lỗi" gặp lỗi `memory`, `gpu-memory`, `killed-low-memory` hoặc
-  `low-ram-end` thì đánh dấu game (`agvnRamShort` trong lối tắt), và hộp hỏi báo "Từ lần mở sau, app tự dùng mức tiết
-  kiệm RAM cao nhất mà game này có";
-- hoặc game DirectX chạy trên driver của máy (Mali, và Qualcomm khi không dùng Turnip) trên máy dưới 9 GB RAM. Driver
-  này không đọc được texture BCn, nên wrapper giải nén chúng ra lớn gấp 4–8 lần.
+Chỉ lỗi thật của chính game đó mới làm app giảm thêm, trên mọi máy. RAM hay GPU của máy thì không. Bản 0.1.17 còn giảm
+như Siêu nhẹ cho mọi game DirectX trên máy dưới 9 GB RAM chạy driver của máy (Mali, và Qualcomm khi không dùng Turnip),
+dù người chơi chọn mức nào. Kết quả là cả những game vẫn chạy tốt cũng bị giảm chất lượng (máy Mali-G615 chọn mức
+FLAGSHIP vẫn bị giảm). Bản sau bỏ cách đó, theo nguyên tắc của người bảo trì (05/10): sửa lỗi phải áp dụng chung, không
+hy sinh game khác để sửa lỗi riêng của một máy.
 
 | Engine | Phần giảm |
 |---|---|
@@ -37,20 +39,15 @@ Mức "Tự động" dùng mức gợi ý cho máy: máy yếu là Thấp, máy 
 | Unreal | Texture pool của Siêu nhẹ (384 MB), trên driver của máy là một phần tư: 96 MB |
 | Ren'Py (Wine và "Chạy nhẹ") | Bộ đệm ảnh 128 MB, chỉ khi game từng hết RAM (ảnh Ren'Py không phải BCn) |
 | Zink (OpenGL) | Như mọi mức |
-| Game DirectX, driver không phải Turnip | Bật "Đồng bộ khung hình" và "Tắt Present Wait" cho lần chạy đó |
 
-Hai mục ở dòng cuối là cách một người chơi Mali-G615 (7,2 GB) mở được Support Pregnancy School (Unreal): với mặc định,
-game đen màn hình rồi không vào được (`AgvnPresentSync`).
-- "Đồng bộ khung hình" (`MESA_VK_WSI_DEBUG=forcesync`): mỗi khung lên màn xong mới tới khung sau.
-- "Tắt Present Wait" (`WRAPPER_DISABLE_PRESENT_WAIT=1`): wrapper giấu `VK_KHR_present_wait` khỏi DXVK 2.x. DXVK 1.10.3
-  không dùng nó.
+Game chưa từng hết RAM thì giữ phần tiết kiệm của mức đã chọn. Trên driver của máy, texture pool của Unreal vẫn là một
+phần tư (xem bảng trên), vì đó là cách tính đúng RAM chứ không phải giảm thêm. `su-kien.txt` của phiên chơi ghi "Tiết
+kiệm RAM như Siêu nhẹ: game từng bị tắt vì hết RAM trên máy này" khi app giảm.
 
-App chỉ đổi biến môi trường của lần chạy đó, cài đặt của game giữ nguyên, và biến người chơi tự đặt trong "Biến môi
-trường" vẫn được ưu tiên. Chưa đo trên máy xem game chạy chậm đi bao nhiêu.
-
-Máy đủ sức thì giữ phần tiết kiệm của mức đã chọn: Turnip đọc được BCn, hoặc máy có từ 9 GB RAM, và game chưa từng hết
-RAM trên máy. `su-kien.txt` của phiên chơi ghi "Tiết kiệm RAM như Siêu nhẹ: <lý do>" khi app giảm, kèm "; đồng bộ khung
-hình, tắt Present Wait" khi app bật hai mục đó.
+"Đồng bộ khung hình" và "Tắt Present Wait" là cách một người chơi Mali-G615 (7,2 GB) mở được Support Pregnancy School
+(Unreal): với mặc định, game đen màn hình rồi không vào được. Bản 0.1.18 tự bật hai mục này cho mọi game DirectX trên
+máy như vậy. Bản sau chỉ đề nghị chúng trên thanh "Màn hình game vẫn đen" của game DirectX, trên mọi máy (xem
+`tu-sua-loi.md`).
 
 App chưa giảm được texture của Godot, KiriKiri, RPG Maker (XP/VX/VX Ace, MV/MZ) và game HTML: chưa có thiết lập nào
 app ghi được từ bên ngoài game cho phần này.

@@ -14,7 +14,7 @@ là một nút. Bấm nút là app đổi cấu hình của riêng game đó r�
 | Game vừa thoát hoặc bị lỗi | Hộp hỏi ở thư viện (hoặc Big Picture) | Game tắt ngay khi mở, crash, thiếu DirectX, thiếu file `.dll`; game "Chạy nhẹ" báo lỗi script, bị tắt đột ngột, bị treo. Bấm một cách sửa là game mở lại ngay. |
 | Android đã tắt game | Hộp hỏi khi về thư viện (trong 24 giờ) | Máy hết RAM; HyperOS tắt game khi chuyển sang app khác. |
 | Game Windows vừa hiện khung | Thanh trên game | Khung game nhỏ hơn màn hình: app phóng cho vừa luôn. Khung game lớn hơn màn hình: app đề nghị đổi màn hình game. Xem "Vừa màn hình" bên dưới. |
-| Game Windows vẫn đen màn hình | Thanh trên game | Khoảng 20 giây sau khi mở (lâu hơn nếu game thường mở chậm), game vẫn chưa hiện hình, và có dấu hiệu màn hình nhỏ hơn game (khổ game KiriKiri, khung game bị cắt, Wine từ chối độ phân giải game xin): app đề nghị màn hình lớn hơn. Xem "Màn hình đen" bên dưới. |
+| Game Windows vẫn đen màn hình | Thanh trên game | Khoảng 20 giây sau khi mở (lâu hơn nếu game thường mở chậm), game vẫn chưa hiện hình, và có dấu hiệu màn hình nhỏ hơn game (khổ game KiriKiri, khung game bị cắt, Wine từ chối độ phân giải game xin): app đề nghị màn hình lớn hơn. Game DirectX đen mà không có dấu hiệu đó: app đề nghị "Bật Đồng bộ khung hình". Xem "Màn hình đen" bên dưới. |
 
 Mỗi lỗi chỉ hỏi một lần. Cách sửa đã thử mà vẫn lỗi thì lần sau không hiện lại, cho đến khi game chạy tốt một
 lần. Thanh game chậm có nút "Để vậy, không hỏi lại" cho riêng game đó.
@@ -167,7 +167,7 @@ nằm bên trong cửa sổ màn nền; app tìm ở mọi tầng. Khi game đã
 | Khung game | App làm gì |
 |---|---|
 | Nhỏ hơn 85% màn hình cả chiều ngang lẫn chiều dọc | Phóng khung game ra cả màn hình ngay, giữ đúng tỉ lệ (hoặc kéo giãn nếu game đang bật "Kéo giãn"). Chạm vào đâu trên khung là trúng chỗ đó trong game. Thanh báo có "Giữ như vậy" và "Trả lại như cũ". |
-| Lớn hơn màn hình | Phần thừa bị cắt, chuột cũng không tới được, nên không phóng nhỏ được. Thanh báo đề nghị "Đổi màn hình game thành <cỡ khung>", rồi "Mở lại game ngay". Cửa sổ phóng to thì viền của nó thò ra ngoài mỗi cạnh vài điểm ảnh (Wine: 6), hình game bên trong vẫn đủ: thò ra không quá 16 điểm ảnh mỗi cạnh thì không tính là bị cắt (`AgvnFitMath.cutOff`). Trước 0.1.14, Party Me (1068×652 ở -6,-6 trên màn hình 1056×640) bị báo nhầm, và mỗi lần đổi, màn hình lớn thêm 12 điểm ảnh. |
+| Lớn hơn màn hình | Phần thừa bị cắt, chuột cũng không tới được, nên không phóng nhỏ được. Thanh báo đề nghị "Đổi màn hình game thành <cỡ khung>", rồi "Mở lại game ngay". Cửa sổ phóng to thì viền của nó thò ra ngoài mỗi cạnh vài điểm ảnh (Wine: 6), hình game bên trong vẫn đủ: thò ra không quá 16 điểm ảnh mỗi cạnh thì không tính là bị cắt (`AgvnFitMath.cutOff`). Khung game lớn theo màn hình thì đổi màn hình không giúp được: xem "Khung game lớn theo màn hình" bên dưới. |
 | Vừa | Không làm gì. Khung đổi cỡ sau đó thì app xét lại. |
 
 - Nút ⛶ trên thanh ⌨ ✎ 👁 bật hoặc tắt "Vừa màn hình" bất cứ lúc nào. Khung lớn hơn màn hình thì ⛶ mở thanh đổi màn
@@ -175,6 +175,23 @@ nằm bên trong cửa sổ màn nền; app tìm ở mọi tầng. Khi game đã
 - Lựa chọn lưu theo game (`agvnFit` trong lối tắt: 1 bật, 0 tắt và không hỏi lại), nên lần sau game mở là vừa luôn.
 - Chỉ trình vẽ Vulkan (mặc định của AGVN) phóng được khung. Game chọn EGL hoặc DisplayX thì khung nhỏ cũng được đề nghị
   đổi màn hình.
+- Khung game không bao giờ là cửa sổ của chương trình mở game: `explorer.exe`, `winhandler.exe`, `start.exe`. Ngày 05/10,
+  hộp "File not found." 144×106 của `winhandler.exe` (file chạy của Monster Black Market không còn ở chỗ cũ) bị phóng ra
+  cả màn hình như khung game.
+
+### Khung game lớn theo màn hình
+
+Có game mà khung luôn lớn hơn màn hình một chút, dù màn hình là bao nhiêu. Party Me trên máy Mali-G615 (05/10, bản
+0.1.17): khung thò ra 12 điểm ảnh mỗi chiều, nên mỗi lần người chơi bấm "Đổi màn hình game thành …", màn hình lớn thêm
+12 điểm ảnh (1080×664, 1092×676, 1104×688 chỉ trong một buổi). Bản 0.1.14 đoán chỗ đặt khung (-6, -6) để bỏ qua, nhưng
+đoán sai, nên vòng lặp vẫn còn.
+
+Nay khi đổi màn hình cho khung game (`AgvnScreenGrowth`), app ghi lại màn hình trước lần đổi đầu tiên (`agvnFitFrom`),
+màn hình app đặt (`agvnFitTo`) và khung thò ra bao nhiêu (`agvnFitPast`). Lần mở sau, nếu khung lại thò ra đúng chừng đó
+(chênh không quá 2 điểm ảnh) trên màn hình app đặt, thì khung lớn theo màn hình. Khi đó app không đề nghị nữa, trả game
+về màn hình cũ từ lần mở sau (`agvnFit`: 0), và báo một lần "Khung game lớn theo màn hình". Cách này đúng với mọi game,
+mọi máy, khung đặt ở đâu cũng được. Game có khung cỡ riêng (như Monster Black Market, 1288×746 trên 1280×720) thì vừa
+màn hình mới, nên không bị trả về.
 
 ## Màn hình đen (game Windows)
 
@@ -202,11 +219,16 @@ gì nữa. `AgvnBlackScreen` canh chuyện này cho mọi game Windows:
     hình hai lần mà game vẫn đen.
   - Cũng ngày 05/10: Support Pregnancy School (Unreal) trên máy Mali-G615 (bản 0.1.17) đen cả màn hình 1280×720 sau 32
     giây, và thanh này đề nghị 1600×900. Game vào được khi người chơi bật "Đồng bộ khung hình" và "Tắt Present Wait",
-    không nhờ màn hình lớn hơn. Nay máy không đủ RAM tự bật hai mục này cho game DirectX (xem `giam-ram.md`).
+    không nhờ màn hình lớn hơn.
+- Game DirectX (DXVK) đen mà không có màn hình nào để đề nghị, và chưa bật cả hai mục trên: thanh đề nghị "Bật Đồng bộ
+  khung hình" (`AgvnPresentSync`). Bấm thì cài đặt đồ họa của game có `syncFrame=1` và `disablePresentWait=1`, rồi "Mở
+  lại game ngay". Người chơi tắt lại được trong cài đặt game. Bản 0.1.18 tự bật hai mục này cho mọi game DirectX trên
+  máy dưới 9 GB RAM không dùng Turnip, nên cả game vẫn chạy tốt cũng mất khung hình. Bản sau chỉ đề nghị khi game đen.
+- Khung game lớn theo màn hình (xem trên) thì không được đề nghị màn hình cỡ khung nữa.
 
-Thanh "Màn hình game vẫn đen" có ba nút: "Đổi màn hình game thành <cỡ>" (rồi "Mở lại game ngay"), "Chờ thêm" (không hỏi
-lại trong lần chơi này), và "Để vậy, không hỏi lại" (`agvnBlackScreen`: 0 trong lối tắt). `tom-tat.txt` của phiên chơi
-ghi "Màn hình đen sau … giây".
+Thanh "Màn hình game vẫn đen" có ba nút: "Đổi màn hình game thành <cỡ>" hoặc "Bật Đồng bộ khung hình" (rồi "Mở lại game
+ngay"), "Chờ thêm" (không hỏi lại trong lần chơi này), và "Để vậy, không hỏi lại" (`agvnBlackScreen`: 0 trong lối tắt).
+`tom-tat.txt` của phiên chơi ghi "Màn hình đen sau … giây".
 
 ## Game KiriKiri: màn hình không nhỏ hơn khổ game
 
@@ -288,8 +310,10 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       trong game; "Trả lại như cũ" đưa về khung nhỏ; ⛶ bật lại; mở lại game vẫn vừa.
 - [ ] Game Windows khung 1280×720 ở mức "Thấp": thanh "Game bị tràn ra ngoài màn hình", bấm "Đổi màn hình game thành
       1280×720" rồi "Mở lại game ngay": game mở lại thấy đủ khung.
-- [ ] Game mở cửa sổ phóng to (như Party Me): không có thanh "Game bị tràn ra ngoài màn hình". Game đã bị đổi màn hình
-      nhiều lần (như 1056×640): chọn lại mức "Đồ họa" để về cỡ của mức đó.
+- [ ] Game có khung lớn theo màn hình (như Party Me trên máy Mali-G615): bấm "Đổi màn hình game thành …" một lần rồi
+      "Mở lại game ngay". Lần mở sau có thanh "Khung game lớn theo màn hình", không có thanh đổi màn hình nữa, và lần mở
+      sau nữa game về lại màn hình cũ. Game đã bị đổi màn hình nhiều lần (như 1116×700): chọn lại mức "Đồ họa" để về cỡ
+      của mức đó.
 - [ ] Đang chơi một game Windows, vuốt AGVN khỏi danh sách app gần đây rồi mở lại app: không có hộp hỏi; `tom-tat.txt`
       của phiên đó ghi "Người chơi vuốt tắt AGVN…".
 - [ ] Game Windows: "✕ Thoát" trên thanh ⌨ ✎ 👁 ⛶ hiện thanh "Thoát game?"; "Chơi tiếp" để game chạy tiếp, "Thoát game"
@@ -309,14 +333,15 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
   `Tự sửa lỗi: low-ram-end`. Chơi đủ RAM rồi thoát từ menu của game: không có hộp nào.
 - [ ] Game mở cửa sổ nhỏ hơn màn hình và đen lâu lúc đang tải (như Legend Cleaner trên máy Mali): không có thanh "Màn
   hình game vẫn đen"; `su-kien.txt` có "Màn hình đen sau … giây, màn hình …, khung game …: không hỏi".
-- [ ] Máy Mali dưới 9 GB RAM, game DirectX (như Support Pregnancy School): `moi-truong.txt` có
-  `MESA_VK_WSI_DEBUG=forcesync` và `WRAPPER_DISABLE_PRESENT_WAIT=1`, `su-kien.txt` có "…; đồng bộ khung hình, tắt
-  Present Wait", và game vào được như khi người chơi tự bật hai mục đó. Trên POCO (Turnip) thì không có hai biến này.
+- [ ] Game DirectX đen cả màn hình (như Support Pregnancy School trên máy Mali-G615, cài đặt mặc định): khoảng 20 giây
+  sau có thanh "Màn hình game vẫn đen" với "Bật Đồng bộ khung hình". Bấm rồi "Mở lại game ngay": `moi-truong.txt` có
+  `MESA_VK_WSI_DEBUG=forcesync` và `WRAPPER_DISABLE_PRESENT_WAIT=1`, và game vào được như khi người chơi tự bật hai mục
+  đó. Game DirectX hiện hình bình thường: không có hai biến này, trên mọi máy.
 - [ ] Game đen cả màn hình mà Wine không từ chối độ phân giải: không có thanh đề nghị màn hình lớn hơn.
 - [ ] Vuốt tắt AGVN khỏi danh sách app gần đây khi game Windows đang chạy, mở lại rồi "Gửi nhật ký": phiên đó có
   `wine-cuoi.txt`.
-- [ ] Máy Mali dưới 9 GB RAM, game Unity hoặc Unreal ở mức Trung bình trở lên: `su-kien.txt` có "Tiết kiệm RAM như Siêu
-  nhẹ: máy giải nén texture BCn…", `moi-truong.txt` có `dxvk.trackPipelineLifetime=True`. Trên POCO (Turnip) thì không.
+- [ ] Máy Mali dưới 9 GB RAM, game Unity hoặc Unreal chưa từng hết RAM, ở mức Cao: `su-kien.txt` không có "Tiết kiệm RAM
+  như Siêu nhẹ", `moi-truong.txt` không có `dxvk.trackPipelineLifetime=True` (giống POCO).
 - [ ] Game vừa được hỏi "Game tự tắt lúc máy gần hết RAM": lần mở sau, `su-kien.txt` có "Tiết kiệm RAM như Siêu nhẹ: game
   từng bị tắt vì hết RAM trên máy này".
 - [ ] `adb logcat`: dòng `Wine mode emulation: on`; `wine-cuoi.txt` của game bị đen có `display settings returned -2`.
