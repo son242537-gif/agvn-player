@@ -75,7 +75,8 @@ export AGVN_VERSION_CODE=2
 ./gradlew assembleRelease --no-daemon
 # Output: app/build/outputs/apk/release/app-release.apk
 ```
-The first build downloads large archives and checks each against `scripts/agvn/pins.txt`: imagefs, Proton and Wine
+The first build downloads large archives and checks each against `scripts/agvn/pins.txt`: imagefs, Proton 9, Proton
+10.0-4 (the second Wine for new games and WMV movies, a `.wcp` in `assets/agvn/`, see `app/agvn-wine.gradle`) and Wine
 Mono 9.3.1 (the .NET runtime, unpacked on the phone only for .NET games) from GitHub, and Ren'Py 8.5.3 (RAPT and SDK,
 for the Ren'Py runner) from renpy.org into `app/agvn-downloads/` (see `app/agvn-renpy.gradle`), and Godot's Android
 library 4.7.2 from Maven Central (for the Godot runner; its engine is AGVN's own build, `app/agvn-godot/`, made by

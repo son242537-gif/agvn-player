@@ -11,6 +11,8 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.winlator.cmod.container.Container;
+import com.winlator.cmod.container.ContainerManager;
 import com.winlator.cmod.container.Shortcut;
 
 import java.io.File;
@@ -87,6 +89,13 @@ final class AgvnFixApply {
             case "wine-mono":
                 s.putExtra(AgvnWineMono.EXTRA, fix.to); // the next start unpacks it (AgvnWineMono.prepare)
                 break;
+            case "wine-old": {
+                Container old = new ContainerManager(a).getContainerById(Integer.parseInt(fix.to));
+                if (old == null) return false;
+                AgvnGameMove.request(s, old); // the next start moves it back to Proton 9
+                s.putExtra(AgvnGameMove.EXTRA_NOT_TEN, "1"); // and Proton 10 is not offered to it again
+                break;
+            }
             case "run-windows":
                 s.putExtra(AgvnHtmlGame.EXTRA_RUNNER, fix.to); // the next start is Wine's
                 break;

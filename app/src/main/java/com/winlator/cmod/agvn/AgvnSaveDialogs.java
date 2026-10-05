@@ -126,7 +126,7 @@ public final class AgvnSaveDialogs {
         return new File(dir, dir.getName() + "_" + kind + "_" + stamp + ".zip");
     }
 
-    private static String prefsKey(Shortcut shortcut) {
+    static String prefsKey(Shortcut shortcut) {
         if (!GameExeResolver.Engine.UNITY.name().equals(shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE))) return null;
         String[] names = AgvnSaveLocations.unityNames(new File(shortcut.path.replace("\"", "")));
         return names != null ? "Software\\" + names[0] + "\\" + names[1] : null;

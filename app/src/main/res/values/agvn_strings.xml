@@ -132,6 +132,12 @@
     <string name="agvn_movie_no_skip">Lần trước bỏ qua phim này không được. Bấm \"Gửi nhật ký\" để báo lỗi cho AGVN.</string>
     <string name="agvn_movie_skip_failed">Không bỏ qua được phim này. Bấm \"Gửi nhật ký\" để báo lỗi cho AGVN.</string>
     <string name="agvn_movie_progress">Phim trong game không phát được (%1$s)</string>
+    <string name="agvn_movie_wine10">Wine mới của app (Proton 10) phát được loại phim này. Chọn \"Chạy lại bằng Wine mới\": game mở lại trên Wine mới, save đi theo (lần đầu app cài Wine mới, khoảng 1 phút).</string>
+    <string name="agvn_wine10_move">Chạy lại bằng Wine mới</string>
+    <string name="agvn_wine10_installing">Đang cài Wine mới (Proton 10), chỉ lần đầu: %1$d%%</string>
+    <string name="agvn_wine10_failed">Không cài được Wine mới (Proton 10): máy cần còn trống khoảng 900 MB.</string>
+    <string name="agvn_import_wine10">Đang chuẩn bị Wine mới (Proton 10) cho game, chỉ lần đầu: %1$d%%</string>
+    <string name="agvn_fix_wine_old">Chạy bằng Wine cũ (Proton 9)</string>
     <string name="agvn_fit_on">Đã phóng khung game cho vừa màn hình</string>
     <string name="agvn_fit_off">Đã trả khung game về như cũ</string>
     <string name="agvn_fit_unsupported">Game này vẽ bằng EGL hoặc DisplayX nên chưa phóng khung được. Chọn trình vẽ Vulkan trong cài đặt game để dùng ⛶.</string>

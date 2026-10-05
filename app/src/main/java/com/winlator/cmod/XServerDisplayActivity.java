@@ -451,6 +451,17 @@ public class XServerDisplayActivity extends AppCompatActivity {
             return;
         }
 
+        // AGVN: a game moved to the other Wine (agvn/AgvnGameMove) moves now, before anything reads it
+        if (shortcutPath != null && !shortcutPath.isEmpty()) {
+            Shortcut moved = com.winlator.cmod.agvn.AgvnGameMove.pending(this, new Shortcut(container, new File(shortcutPath)));
+            if (moved != null) {
+                container = moved.container;
+                shortcutPath = moved.file.getPath();
+                getIntent().putExtra("shortcut_path", shortcutPath);
+                getIntent().putExtra("container_id", container.id);
+            }
+        }
+
         containerManager.activateContainer(container);
 
         if (shortcutPath != null && !shortcutPath.isEmpty()) {
@@ -2733,6 +2744,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
     public InputControlsView getInputControlsView() {
         return inputControlsView;
+    }
+
+    /** AGVN: the status line in the corner (a slow start, Wine's debug notice). */
+    public com.winlator.cmod.agvn.AgvnStatusLine agvnStatus() {
+        return agvnStatus;
     }
 
     // AGVN: hooks for the in-game controls editor (agvn/AgvnControlsBar, AgvnControlsEditor); UI thread only

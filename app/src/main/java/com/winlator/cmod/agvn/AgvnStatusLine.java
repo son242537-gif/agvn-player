@@ -12,12 +12,13 @@ import android.widget.TextView;
 import com.winlator.cmod.R;
 
 /**
- * A small line of text at the top right of the game: that "Bật debug Wine" is on, and how a slow start is going
- * ({@link AgvnStartupProgress}). It takes no touches, so the game under it works as before. Call on the UI thread.
+ * A small line of text at the top right of the game: that "Bật debug Wine" is on, how a slow start is going
+ * ({@link AgvnStartupProgress}), and work the app does for the game meanwhile ({@link #setWork}: installing Proton 10).
+ * It takes no touches, so the game under it works as before. Call on the UI thread.
  */
 public final class AgvnStatusLine {
     private final Activity activity;
-    private String debug = "", progress = "";
+    private String debug = "", progress = "", work = "";
     private TextView view;
 
     public AgvnStatusLine(Activity activity) {
@@ -44,9 +45,15 @@ public final class AgvnStatusLine {
         render();
     }
 
+    /** Work the app does for the game ("Đang cài Wine mới… 42%"), above the rest; null when done. */
+    public void setWork(String text) {
+        work = text != null ? text : "";
+        render();
+    }
+
     private void render() {
         if (activity.isFinishing() || activity.isDestroyed()) return;
-        String text = progress.isEmpty() ? debug : debug.isEmpty() ? progress : progress + "\n" + debug;
+        String text = join(work, join(progress, debug));
         if (text.isEmpty()) {
             if (view != null && view.getParent() instanceof ViewGroup) ((ViewGroup) view.getParent()).removeView(view);
             view = null;
@@ -77,5 +84,9 @@ public final class AgvnStatusLine {
 
     private int dp(int value) {
         return Math.round(value * activity.getResources().getDisplayMetrics().density);
+    }
+
+    private static String join(String first, String second) {
+        return first.isEmpty() ? second : second.isEmpty() ? first : first + "\n" + second;
     }
 }

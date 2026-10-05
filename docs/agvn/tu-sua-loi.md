@@ -301,10 +301,14 @@ Ngày 06/10 (bản 0.1.20), một game KiriKiri đứng chờ phim mở đầu (
 ASF) 4 phút 30 giây. Wine của app (`proton-9.0-arm64ec`) đưa phim cho bộ giải mã của GStreamer (`avdec_wmv3`) mà thiếu
 phần đầu chuỗi (`codec_data`, nằm sau `VIDEOINFOHEADER` hoặc trong `MF_MT_USER_DATA`). Bộ giải mã từ chối mọi khung:
 `Subclass refused caps` và `Failed to push transform input, error -4` lặp hàng trăm lần mỗi giây. Wine không báo lỗi
-cho game (không có `EC_ERRORABORT` hay `EC_COMPLETE`), nên game chờ mãi. Lỗi nằm trong winegstreamer của bản Wine này
-(bản dựng trên Termux, có `wg_media_type.c`); sửa tận gốc cần dựng lại Wine hoặc đổi sang bản Wine có bản sửa.
+cho game (không có `EC_ERRORABORT` hay `EC_COMPLETE`), nên game chờ mãi.
 
-Trong lúc chờ, app canh lỗi này cho mọi game (`AgvnMovieWatch`, `AgvnMovieRules`):
+Gốc lỗi nằm ở `mfplat` của Proton 9: `MFInitMediaTypeFromVideoInfoHeader` (`dlls/mfplat/mediatype.c`) chuyển kiểu phim
+của DirectShow sang Media Foundation mà bỏ phần sau `VIDEOINFOHEADER`, nên `MF_MT_USER_DATA` trống. Proton 10 và 11
+chép phần đó sang, nên phát được (GameHub dùng Proton 11). Vì vậy app có Wine thứ hai, Proton 10 (xem "Hai bản Wine"
+bên dưới).
+
+App canh lỗi này cho mọi game (`AgvnMovieWatch`, `AgvnMovieRules`):
 
 - Tắt "Bật debug Wine" thì GStreamer không in gì (winegstreamer chỉ đặt `GST_DEBUG` khi kênh gstreamer của Wine bật).
   App đặt `GST_DEBUG=WINE:2,videodecoder:2`: chỉ cảnh báo của bộ giải mã phim và của winegstreamer. Người chơi tự đặt
@@ -312,6 +316,10 @@ Trong lúc chờ, app canh lỗi này cho mọi game (`AgvnMovieWatch`, `AgvnMov
 - Từ 100 dòng từ chối trở lên trong 5 giây, kéo dài ít nhất 1 giây: phim không phát được. `su-kien.txt` ghi "Phim
   trong game không phát được: WMV3 1280x720 …" (định dạng đọc từ dòng caps Wine in ra), và dòng trên góc phải đổi
   thành "Phim trong game không phát được (0:12)".
+- Game đang chạy Proton 9: thanh có thêm "Chạy lại bằng Wine mới" (đứng đầu). Bấm thì app cài Proton 10 (chỉ lần đầu,
+  dòng góc phải ghi "Đang cài Wine mới (Proton 10), chỉ lần đầu: …%"), rồi game tắt và tự mở lại trên Proton 10, save
+  trong thư mục Windows đi theo (xem "Hai bản Wine"). Game đã từng hỏng trên Proton 10 và được đưa về thì không có nút
+  này nữa.
 - Thanh "Phim trong game không phát được" có "Bỏ qua phim" và "Chờ thêm". "Bỏ qua phim" nhấp chuột giữa khung game;
   2,5 giây sau phim vẫn kẹt thì gửi phím Esc. `su-kien.txt` ghi "Bỏ qua phim: được, bằng nhấp chuột" (hoặc "phím Esc"),
   hoặc "Bỏ qua phim: không được". Không được thì lối tắt nhớ (`agvnMovieSkip`: 0), lần sau thanh chỉ báo lỗi, không
@@ -322,6 +330,33 @@ Nhật ký Wine không còn phình vì dòng lặp (`AgvnLogRepeats`): dòng nà
 địa chỉ `0x…`) thì không ghi lại, mỗi giây ghi một dòng "[AGVN] ×N nữa: …". Quá 64 MB thì ngừng ghi, kèm một dòng báo.
 300 dòng cuối của Wine (`wine-cuoi.txt`, và chỗ "Tự sửa lỗi" đọc) cũng gộp dòng lặp ("[AGVN] ×N dòng lặp lại"), nên
 phim lỗi không đẩy các dòng khác ra ngoài.
+
+## Hai bản Wine: Proton 9 và Proton 10
+
+App có hai bản Wine. Mỗi bản có môi trường chạy (container) riêng, vì Wine gắn với container:
+
+- **Proton 9** (`proton-9.0-arm64ec`, có sẵn từ trước): container đầu tiên. Game đã thêm từ trước ở yên đây, và game
+  .NET mới thêm cũng vào đây (Proton 10 cần Wine Mono 10.4.1, app chỉ có 9.3.1).
+- **Proton 10** (`Proton-10.0-4-arm64ec-9`, `AgvnWine10`): container "AGVN Proton 10". **Game mới thêm vào đây theo mặc
+  định** (`AgvnImportDialog`, `AgvnWine10.forImport`), vì nó phát được phim WMV3 mà Proton 9 không phát được.
+  - Gói `proton-10.0-4-arm64ec.wcp` nằm trong APK (thêm khoảng 114 MB). Lần đầu cần (thêm game đầu tiên, hoặc bấm "Chạy
+    lại bằng Wine mới"), app giải nén vào `files/contents/Proton/10.0-4-arm64ec-9` như một gói `.wcp` người chơi tự cài,
+    rồi tạo container "AGVN Proton 10". Mất khoảng 1 phút, cần trống khoảng 900 MB. Hộp "Đang chuẩn bị Wine mới…" hoặc
+    dòng góc phải báo tiến độ.
+  - App bỏ các file không dùng tới: thư viện tĩnh `.a` (không thì mỗi container chép thêm vào `system32`), và các thư
+    viện Wayland/Mesa trong `lib/` cùng `share/vulkan` (app vẽ qua X11, `lib/` không nằm trong đường dẫn thư viện). Còn
+    khoảng 394 MB thay vì 553 MB.
+  - Không cài được (thiếu chỗ) thì game mới vào Proton 9 như trước.
+- **Chuyển game giữa hai bản** (`AgvnGameMove`): app ghi `agvnMoveTo` vào lối tắt, và lần mở sau, trước khi đọc game,
+  app chuyển lối tắt sang container kia: file lối tắt, biểu tượng, save trong thư mục Windows (`AgvnSaveLocations`,
+  phần `profile/`) và PlayerPrefs của Unity (`AgvnSavePrefs`). Thư mục game không đổi, save nằm trong đó giữ nguyên. Chuyển
+  lúc mở chứ không lúc đang chơi, vì game đang chạy ghi lại cài đặt vào file của nó khi tắt.
+- **Đường lui:** game chạy Proton 10 mà "Game bị lỗi và tự tắt" hoặc "Game tắt ngay sau khi mở": "Tự sửa lỗi" có "Chạy
+  bằng Wine cũ (Proton 9)". Bấm thì game về Proton 9 ở lần mở sau, và Proton 10 không được đề nghị cho game đó nữa
+  (`agvnNotWine10`).
+- Chưa thử trên máy: Proton 10 cần FFmpeg 8 cho `winedmo` (bộ đọc AVI, WAV, MP3 mới qua Media Foundation), imagefs chỉ
+  có FFmpeg 7.1. `winedmo` không nạp được thì chỉ báo `Failed to init unixlib`, game không sập. Phim MP4 vẫn qua
+  winegstreamer như Proton 9.
 
 ## Game .NET (Wine Mono)
 
@@ -446,6 +481,21 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       "Màn hình đen sau … giây …: hỏi đổi sang 1280x1024". Bấm rồi "Mở lại game ngay": game hiện hình.
 - [ ] Game đã chọn "Để vậy, không hỏi lại" ở thanh màn hình đen mà vẫn đen: không có thanh, nhưng `su-kien.txt` vẫn có
       dòng "Màn hình đen sau … giây".
+- [ ] Thêm game mới (không phải .NET) lần đầu: hộp "Đang chuẩn bị Wine mới (Proton 10) cho game, chỉ lần đầu: …%" chạy
+      khoảng 1 phút, rồi game nằm trong thư viện; Cấu hình → Môi trường chạy ghi "AGVN Proton 10". Thêm game thứ hai:
+      không có hộp đó nữa. `adb logcat -s AGVN` có `Proton 10 installed` và `Proton 10 container …`.
+- [ ] Game KiriKiri ở phiếu 06/10 (phim WMV3) thêm mới vào Proton 10: phim mở đầu phát có hình có tiếng, hết phim vào
+      màn tiêu đề; nhật ký Wine không có `Subclass refused caps`.
+- [ ] Cùng game đó nhưng đã thêm từ trước (Proton 9): thanh phim lỗi có "Chạy lại bằng Wine mới". Bấm: dòng góc phải báo
+      tiến độ cài, game tắt rồi tự mở lại; `su-kien.txt` phiên đầu có "Game chuyển sang Wine mới (Proton 10) khi mở
+      lại"; lần này phim phát. Save trong thư mục game vẫn còn.
+- [ ] Một game Unity có phim MP4, một game Ren'Py và một game DXVK thêm mới vào Proton 10: vào menu, phim phát, FPS như
+      trên Proton 9 (so với bản cũ của chính game đó).
+- [ ] Thêm một game .NET: vào Proton 9 (container đầu tiên), không có hộp chuẩn bị Wine mới.
+- [ ] Game trên Proton 10 tự tắt ngay khi mở: "Tự sửa lỗi" có "Chạy bằng Wine cũ (Proton 9)". Bấm, "Mở lại game ngay":
+      game về container đầu tiên; lần sau phim lỗi thì thanh không còn "Chạy lại bằng Wine mới".
+- [ ] Máy còn trống dưới 900 MB, thêm game mới: game vào Proton 9 như trước, `adb logcat` có `Proton 10 not installed: …
+      MB free`.
 - [ ] Game KiriKiri phát phim WMV3 (như game ở phiếu 06/10, màn hình 1280×1024), "Bật debug Wine" tắt: trong 10 giây có
       thanh "Phim trong game không phát được" với "Bỏ qua phim"; dòng góc phải ghi "Phim trong game không phát được
       (…)"; `su-kien.txt` có "Phim trong game không phát được: WMV3 1280x720". Bấm "Bỏ qua phim": `su-kien.txt` có "Bỏ

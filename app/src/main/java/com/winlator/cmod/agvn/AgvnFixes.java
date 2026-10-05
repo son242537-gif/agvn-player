@@ -5,6 +5,8 @@ import android.app.Activity;
 
 import com.winlator.cmod.R;
 import com.winlator.cmod.box64.Box64Preset;
+import com.winlator.cmod.container.Container;
+import com.winlator.cmod.container.ContainerManager;
 import com.winlator.cmod.container.Shortcut;
 import com.winlator.cmod.core.DefaultVersion;
 import com.winlator.cmod.core.EnvVars;
@@ -27,7 +29,8 @@ final class AgvnFixes {
     /** Fixes of Wine's settings: none of them changes a "Chạy nhẹ" game. */
     private static final List<String> WINE_ONLY = Arrays.asList("restore-good", "reset", "dxvk-other", "dxvk-arm64ec",
             "driver-other", "wined3d", "godot-renderer", "godot-angle", "godot-undo", "render-gmem", "render-auto",
-            "emulator-stable", "emulator-fast", "wincomponent", "wrapper-constants", "wrapper-clip", "wine-mono");
+            "emulator-stable", "emulator-fast", "wincomponent", "wrapper-constants", "wrapper-clip", "wine-mono",
+            "wine-old");
     static final String SYSTEM = "System";
 
     /** A button: its fix id, its words, and what it sets ({@code to}). */
@@ -116,6 +119,10 @@ final class AgvnFixes {
             }
             case "wine-mono":
                 return AgvnWineMono.offered(a, s) ? new Fix(id, a.getString(R.string.agvn_fix_wine_mono), "1") : null;
+            case "wine-old": { // a game that fails on Proton 10 goes back to Proton 9's container (AgvnWine10)
+                Container old = AgvnWine10.runs(s.container) ? AgvnWine10.find(new ContainerManager(a).getContainers(), false) : null;
+                return old != null ? new Fix(id, a.getString(R.string.agvn_fix_wine_old), String.valueOf(old.id)) : null;
+            }
             case "power-save-settings":
                 return AgvnPowerSave.on(a) ? new Fix(id, a.getString(R.string.agvn_fix_power_save), null) : null;
             case "app-settings":
