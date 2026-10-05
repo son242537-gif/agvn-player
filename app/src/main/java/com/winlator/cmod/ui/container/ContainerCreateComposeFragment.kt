@@ -30,10 +30,27 @@ class ContainerCreateComposeFragment : Fragment() {
             WinZTheme {
                 ContainerEditorV2(
                     editId = editId,
-                    onBack = { parentFragmentManager.popBackStack() },
-                    onCreated = { parentFragmentManager.popBackStack() }
+                    onBack = { close() },
+                    onCreated = { close() }
                 )
             }
+        }
+    }
+
+    // AGVN: a container made while the app was in the background ended it at popBackStack
+    // ("Can not perform this action after onSaveInstanceState"); the screen now closes when the app is back
+    private var closeOnResume = false
+
+    private fun close() {
+        if (!isAdded) return
+        if (parentFragmentManager.isStateSaved) closeOnResume = true else parentFragmentManager.popBackStack()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (closeOnResume) {
+            closeOnResume = false
+            parentFragmentManager.popBackStack()
         }
     }
 }
