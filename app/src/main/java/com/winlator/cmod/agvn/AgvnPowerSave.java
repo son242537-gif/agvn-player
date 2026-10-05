@@ -17,11 +17,11 @@ import java.util.Collections;
 /**
  * Battery saver ("Tiết kiệm pin") lowers the CPU's clocks on most phones, which an emulated game feels first. Before a
  * game starts from the library, the player is asked: open battery saver's settings, or play anyway (game-problems.json
- * "power-save"). A game started another way says so once with a toast. Nothing is changed on the phone.
+ * "power-save"). A game started another way says so once with a toast. Nothing is changed on the phone. After "Chơi
+ * luôn" neither comes back for {@link #QUIET_MS}: a player who keeps battery saver on was asked before every start.
  */
 public final class AgvnPowerSave {
-    /** A toast this soon after the question would say it twice ("Chạy nhẹ" games start in their own process). */
-    private static final long ASKED_MS = 60_000;
+    static final long QUIET_MS = 24 * 60 * 60 * 1000L;
     private static final String PREFS = "agvn_power_save", ASKED_AT = "askedAt";
 
     private AgvnPowerSave() {}
@@ -35,29 +35,39 @@ public final class AgvnPowerSave {
         }
     }
 
+    /** Within {@link #QUIET_MS} after the player's "Chơi luôn" at {@code askedAtMs}; a clock set back counts as not. */
+    static boolean playedAnyway(long askedAtMs, long nowMs) {
+        return askedAtMs > 0 && nowMs >= askedAtMs && nowMs - askedAtMs < QUIET_MS;
+    }
+
+    private static boolean playedAnyway(Context context) {
+        long askedAt = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getLong(ASKED_AT, 0);
+        return playedAnyway(askedAt, System.currentTimeMillis());
+    }
+
     /** Runs {@code play} at once with battery saver off; with it on, after the player chose to play anyway. */
     static void ask(Activity activity, Runnable play) {
-        AgvnProblemCatalog.Finding f = on(activity) ? AgvnDoctor.catalog(activity).finding("power-save", Collections.emptyMap()) : null;
+        AgvnProblemCatalog.Finding f = on(activity) && !playedAnyway(activity)
+                ? AgvnDoctor.catalog(activity).finding("power-save", Collections.emptyMap()) : null;
         if (f == null) {
             play.run();
             return;
         }
         new AlertDialog.Builder(activity)
                 .setTitle(f.title())
-                .setMessage(f.cause())
+                .setMessage(f.cause() + "\n\n" + activity.getString(R.string.agvn_power_save_quiet))
                 .setPositiveButton(R.string.agvn_fix_power_save,
                         (d, w) -> AgvnFixApply.open(activity, new Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS)))
                 .setNegativeButton(R.string.agvn_fix_play_anyway, (d, w) -> {
                     activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
-                            .putLong(ASKED_AT, System.currentTimeMillis()).commit(); // the game's own notice would repeat it
+                            .putLong(ASKED_AT, System.currentTimeMillis()).commit(); // no question or toast for a day
                     play.run();
                 })
                 .show();
     }
 
     public static void warn(Activity activity) {
-        long askedAt = activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getLong(ASKED_AT, 0);
-        if (Math.abs(System.currentTimeMillis() - askedAt) < ASKED_MS) return; // the player was just asked
+        if (playedAnyway(activity)) return; // the player chose to play with it on
         if (on(activity)) Toast.makeText(activity, R.string.agvn_power_save_on, Toast.LENGTH_LONG).show();
     }
 }

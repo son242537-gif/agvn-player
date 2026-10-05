@@ -41,6 +41,8 @@
     <string name="agvn_guard_low_ram_title">Sắp hết RAM</string>
     <string name="agvn_guard_low_ram">RAM trống còn rất ít, game có thể bị Android tắt. Hãy lưu game ngay và đóng bớt ứng dụng khác.</string>
     <string name="agvn_guard_countdown">Tự đóng thông báo sau %1$d giây</string>
+    <string name="agvn_guard_heat_ack">Máy bố, bố biết</string>
+    <string name="agvn_guard_heat_ack_note">Chọn \"Máy bố, bố biết\" thì 24 giờ tới app không báo nóng nữa.</string>
     <!-- before a game starts: its exe or a DLL is cut short (AgvnGameFilesCheck) -->
     <string name="agvn_broken_files_title">File game bị hỏng</string>
     <string name="agvn_broken_files_message">Các file sau của game bị thiếu dữ liệu, thường do chép hoặc giải nén chưa xong. Game sẽ không mở được:\n\n%1$s\n\nHãy xoá thư mục game rồi chép hoặc giải nén lại. Khi giải nén, để đủ chỗ trống, giữ màn hình sáng và chờ tới khi xong 100%%.</string>
@@ -59,6 +61,7 @@
     <string name="agvn_debug_on_notice">Đang ghi log Wine chi tiết – game chạy chậm hơn</string>
     <string name="agvn_debug_off_next_start">Đã tắt debug Wine. Thoát hẳn game rồi mở lại để Wine thôi ghi log.</string>
     <string name="agvn_power_save_on">Máy đang bật Tiết kiệm pin nên game sẽ chậm và giật hơn. Tắt Tiết kiệm pin để chơi mượt hơn.</string>
+    <string name="agvn_power_save_quiet">Chọn \"Chơi luôn\" thì 24 giờ tới app không hỏi lại.</string>
     <string name="agvn_startup_progress">Đang khởi động %1$s</string>
     <string name="agvn_startup_stalled">Có thể đang treo (%1$s)</string>
     <string name="agvn_startup_last">lần trước %1$s</string>

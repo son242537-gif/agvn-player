@@ -78,7 +78,8 @@ public final class AgvnHeatWatch {
             if (reason == AgvnHeatRules.Reason.NONE) return;
             AgvnSessionLog.event("Cảnh báo nóng (" + reason + "): CPU mạnh nhất tối đa " + percent(cap) + " tốc độ, headroom "
                     + headroom + ", pin " + battery + " °C, " + (charging ? "đang sạc" : "không sạc"));
-            if (firstHeatWarning(activity)) activity.runOnUiThread(() -> showBar(reason, cap, charging));
+            if (!AgvnHeatAck.quiet(activity) && firstHeatWarning(activity))
+                activity.runOnUiThread(() -> showBar(reason, cap, charging));
         } catch (RuntimeException e) {
             Log.w(TAG, "heat watch sample failed", e);
         }

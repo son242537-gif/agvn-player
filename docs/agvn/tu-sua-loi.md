@@ -8,7 +8,8 @@ là một nút. Bấm nút là app đổi cấu hình của riêng game đó r�
 
 | Lúc | Ở đâu | Ví dụ |
 |---|---|---|
-| Trước khi vào game | Hộp hỏi | Tiết kiệm pin đang bật: "Mở cài đặt Tiết kiệm pin" hoặc "Chơi luôn". |
+| Trước khi vào game | Hộp hỏi | Tiết kiệm pin đang bật: "Mở cài đặt Tiết kiệm pin" hoặc "Chơi luôn". Sau "Chơi luôn", 24 giờ tới app không hỏi lại. |
+| Đang chơi, máy nóng | Hộp báo, tự đóng sau 30 giây | "Máy đang nóng". Nút "Máy bố, bố biết" tắt mọi báo nóng (hộp này và thanh "Máy đang nóng lên") trong 24 giờ (`AgvnHeatAck`). |
 | Đang chơi | Thanh trên game; game vẫn chạy bên dưới | Game chậm đều suốt 1 phút. Sau khi bấm một cách sửa, thanh hỏi "Mở lại game ngay" (nhớ lưu game trước) hay "Để lần sau". |
 | Game vừa thoát hoặc bị lỗi | Hộp hỏi ở thư viện (hoặc Big Picture) | Game tắt ngay khi mở, crash, thiếu DirectX, thiếu file `.dll`; game "Chạy nhẹ" báo lỗi script, bị tắt đột ngột, bị treo. Bấm một cách sửa là game mở lại ngay. |
 | Android đã tắt game | Hộp hỏi khi về thư viện (trong 24 giờ) | Máy hết RAM; HyperOS tắt game khi chuyển sang app khác. |
@@ -271,7 +272,10 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       hỏi "Game Godot bị tắt khi vẽ hình". Nút là "Cho game Godot chạy bằng Vulkan" nếu game là Godot 4, hoặc "…GLES2" nếu
       game là Godot 3. Thư mục phiên chơi có `godot.log`.
 - [ ] Bật Tiết kiệm pin rồi mở game (Windows và "Chạy nhẹ"): có hộp hỏi trước khi vào game. "Chơi luôn" vào game,
-      không có thêm thông báo.
+      không có thêm thông báo. Thoát rồi mở lại game trong 24 giờ: không hỏi nữa.
+- [ ] Máy báo nóng ngay khi mở game (như Xiaomi 2306EPN60G của một người chơi: Android báo trạng thái nhiệt "nóng" khi
+      pin mới 37 °C): hộp "Máy đang nóng" có nút "Máy bố, bố biết". Bấm nút, thoát rồi mở lại game: 24 giờ tới
+      không còn hộp hay thanh báo nóng; `su-kien.txt` có "Người chơi chọn "Máy bố, bố biết"…".
 - [ ] Game Ren'Py "Chạy nhẹ" gặp lỗi script (màn hình lỗi của Ren'Py), thoát game: thư viện hỏi "Game báo lỗi khi
       Chạy nhẹ" kèm câu lỗi và nút "Chạy bằng Windows".
 - [ ] Game MV "Chạy nhẹ" hiện màn hình lỗi hoặc báo thiếu file, thoát game: thư viện hỏi như trên.
