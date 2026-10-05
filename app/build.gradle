@@ -289,3 +289,5 @@ apply from: "agvn-renpy.gradle"
 apply from: "agvn-rgss.gradle"
 // AGVN: the Godot runner's engine, Godot's Java library with AGVN's build of Godot (see the file)
 apply from: "agvn-godot.gradle"
+// AGVN: Proton 10, a second Wine for games Proton 9 cannot play (WMV3 movies), see agvn-wine.gradle
+apply from: "agvn-wine.gradle"

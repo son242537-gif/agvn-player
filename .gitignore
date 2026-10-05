@@ -20,6 +20,7 @@ keystore.properties
 app/src/main/assets/imagefs.tar.zst
 app/src/main/assets/proton-*.tar.zst
 app/src/main/assets/wine-mono-*.tar.xz
+app/src/main/assets/agvn/proton-*.wcp
 app/agvn-downloads/
 __pycache__/
 *.pyc
