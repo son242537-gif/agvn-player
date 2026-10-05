@@ -79,6 +79,7 @@ public final class AgvnMemoryWatch {
                 maxDmabufMb = Math.max(maxDmabufMb, use.dmabufMb);
             }
             AgvnSessionTrack.memory(System.currentTimeMillis(), free, rules.lowFreeMb); // for AgvnDoctor at the end
+            AgvnSessionTrack.used(System.currentTimeMillis(), use.rssMb + use.dmabufMb); // for AgvnBlackScreen
             nearLow = free >= 0 && free < 2 * rules.lowFreeMb;
             if (now - peaksWrittenMs >= PEAKS_EVERY_MS) writePeaks();
             AgvnMemoryRules.Reason reason = rules.feed(now, startedMs, free, use.rssMb + use.dmabufMb, lastInputMs);

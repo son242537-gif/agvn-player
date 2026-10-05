@@ -222,6 +222,10 @@ gì nữa. `AgvnBlackScreen` canh chuyện này cho mọi game Windows:
 - Hàng nào cũng chỉ có điểm ảnh tối (đỏ, xanh lá, xanh dương đều ≤ 24) thì là màn hình đen.
 - App hỏi khi màn hình đen 3 lần đọc liền nhau (6 giây), sau 20 giây kể từ lúc mở game. Game thường mở chậm thì thời
   gian chờ là lần mở trước cộng 10 giây (`AgvnStartTimes`). App chỉ canh trong 1 phút sau thời gian chờ.
+- RAM của app và game còn tăng nhanh (từ 64 MB trở lên giữa hai lần đo RAM, 5 giây một lần) thì game đang tải: lần đọc
+  đen lúc đó không tính, và 1 phút canh tính từ lúc game tải xong (`AgvnSessionTrack.grewMb`). Ví dụ ngày 05/10: Lg Light
+  (Unity) trên máy Mali-G925 đen trong lúc RAM tăng 150–300 MB mỗi 10 giây, rồi bị tắt vì hết RAM. Bản 0.1.17 đề nghị
+  nó màn hình 1920×1080 lúc 22 giây, mà màn hình lớn hơn chỉ tốn RAM hơn.
 - Game đã hiện hình rồi mới đen (cảnh mờ dần, cảnh tối) thì app không hỏi. Game đã hiện một hộp thông báo
   (`trace:msgbox`) cũng vậy: game đang chờ người chơi bấm, hoặc đã lỗi ("Assertion failed!", "Tự sửa lỗi" đọc hộp này
   khi game tắt). Trừ khi Wine đã từ chối độ phân giải game xin: nhật ký Wine có dòng `display settings returned -2`. Khi
@@ -370,5 +374,7 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
   …", kể cả ở Siêu nhẹ (640×360).
 - [ ] Mở lại game đó (giờ đã "Tiết kiệm RAM như Siêu nhẹ") để nó hết RAM lần nữa: hộp hỏi ghi "…dù game đã chạy với mức
   tiết kiệm RAM cao nhất…" và không có nút hạ Đồ họa; `su-kien.txt` có `Tự sửa lỗi: low-ram-saved`.
+- [ ] Game đen lâu lúc đang tải mà RAM còn tăng (như Lg Light): không có thanh "Màn hình game vẫn đen" khi RAM còn tăng;
+  game tải xong mà vẫn đen thì thanh hiện sau khoảng 6 giây.
 - [ ] `adb logcat`: dòng `Wine mode emulation: on`; `wine-cuoi.txt` của game bị đen có `display settings returned -2`.
 - [ ] `adb logcat -s AGVN`: dòng `doctor: <lỗi> for <game>` và `fix <cách sửa> -> <giá trị>`.

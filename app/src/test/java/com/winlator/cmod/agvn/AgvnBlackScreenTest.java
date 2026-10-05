@@ -25,7 +25,7 @@ public class AgvnBlackScreenTest {
                                                  long untilMs, boolean refused) {
         AgvnBlackScreenRules.Step step = WAIT;
         for (long t = fromMs; t <= untilMs && step == WAIT; t += AgvnBlackScreenRules.POLL_MS)
-            step = rules.next(look, t, refused, false);
+            step = rules.next(look, t, refused, false, false);
         return step;
     }
 
@@ -34,7 +34,7 @@ public class AgvnBlackScreenTest {
         AgvnBlackScreenRules rules = new AgvnBlackScreenRules(0);
         assertEquals(20_000, rules.waitMs());
         assertEquals(WAIT, run(rules, BLACK, 2000, 18_000, false));
-        assertEquals(OFFER, rules.next(BLACK, 20_000, false, false));
+        assertEquals(OFFER, rules.next(BLACK, 20_000, false, false, false));
     }
 
     @Test
@@ -42,16 +42,16 @@ public class AgvnBlackScreenTest {
         AgvnBlackScreenRules rules = new AgvnBlackScreenRules(60_000); // its last start took a minute
         assertEquals(70_000, rules.waitMs());
         assertEquals(WAIT, run(rules, BLACK, 2000, 68_000, false));
-        assertEquals(OFFER, rules.next(BLACK, 70_000, false, false));
+        assertEquals(OFFER, rules.next(BLACK, 70_000, false, false, false));
     }
 
     @Test
     public void aGameThatShowedAPictureIsInAScene() {
         AgvnBlackScreenRules rules = new AgvnBlackScreenRules(0);
-        assertEquals(WAIT, rules.next(PICTURE, 10_000, false, false)); // its logo
+        assertEquals(WAIT, rules.next(PICTURE, 10_000, false, false, false)); // its logo
         assertEquals(STOP, run(rules, BLACK, 12_000, 200_000, false)); // a fade to black: not asked
         AgvnBlackScreenRules refused = new AgvnBlackScreenRules(0);
-        refused.next(PICTURE, 10_000, false, false);
+        refused.next(PICTURE, 10_000, false, false, false);
         assertEquals(OFFER, run(refused, BLACK, 12_000, 30_000, true)); // then its full screen was refused
     }
 
@@ -60,11 +60,11 @@ public class AgvnBlackScreenTest {
         AgvnBlackScreenRules rules = new AgvnBlackScreenRules(0);
         // "Assertion failed!" over a game that never drew: "Tự sửa lỗi" reads the box when the game ends
         AgvnBlackScreenRules.Step step = WAIT;
-        for (long t = 2000; t <= 200_000 && step == WAIT; t += 2000) step = rules.next(BLACK, t, false, true);
+        for (long t = 2000; t <= 200_000 && step == WAIT; t += 2000) step = rules.next(BLACK, t, false, true, false);
         assertEquals(STOP, step);
         AgvnBlackScreenRules refused = new AgvnBlackScreenRules(0); // a box about full screen, then a refused mode
-        for (long t = 2000; t < 20_000; t += 2000) assertEquals(WAIT, refused.next(BLACK, t, true, true));
-        assertEquals(OFFER, refused.next(BLACK, 20_000, true, true));
+        for (long t = 2000; t < 20_000; t += 2000) assertEquals(WAIT, refused.next(BLACK, t, true, true, false));
+        assertEquals(OFFER, refused.next(BLACK, 20_000, true, true, false));
         assertTrue(AgvnBlackScreenRules.boxShown(Arrays.asList("wine: setpriority 6 for pid -1 failed: 3",
                 AgvnErrorBoxTest.traced(AgvnErrorBoxTest.VULKAN_ASSERT))));
         assertFalse(AgvnBlackScreenRules.boxShown(Collections.singletonList("0024:err:module:import_dll X.dll")));
@@ -75,10 +75,40 @@ public class AgvnBlackScreenTest {
         AgvnBlackScreenRules rules = new AgvnBlackScreenRules(0);
         // a look it cannot read (every third one here) starts the count again
         for (long t = 2000; t <= 24_000; t += 2000)
-            assertEquals(WAIT, rules.next(t % 6000 == 0 ? UNKNOWN : BLACK, t, false, false));
-        assertEquals(WAIT, rules.next(BLACK, 26_000, false, false));
-        assertEquals(WAIT, rules.next(BLACK, 28_000, false, false));
-        assertEquals(OFFER, rules.next(BLACK, 30_000, false, false));
+            assertEquals(WAIT, rules.next(t % 6000 == 0 ? UNKNOWN : BLACK, t, false, false, false));
+        assertEquals(WAIT, rules.next(BLACK, 26_000, false, false, false));
+        assertEquals(WAIT, rules.next(BLACK, 28_000, false, false, false));
+        assertEquals(OFFER, rules.next(BLACK, 30_000, false, false, false));
+    }
+
+    @Test
+    public void aGameStillLoadingIsNotAsked() {
+        // Lg Light (Unity, its resolution refused) stayed black while its memory rose 150-300 MB every 10 s, until it
+        // ran out of RAM 50-90 s in: the bar offered it a larger screen at 22 s, which only takes more RAM
+        AgvnBlackScreenRules rules = new AgvnBlackScreenRules(0);
+        for (long t = 2000; t <= 90_000; t += 2000) assertEquals(WAIT, rules.next(BLACK, t, true, false, true));
+        // black once the memory stops growing counts, and the watch runs from the end of the loading
+        AgvnBlackScreenRules loaded = new AgvnBlackScreenRules(0);
+        for (long t = 2000; t <= 70_000; t += 2000) loaded.next(BLACK, t, false, false, true);
+        assertEquals(WAIT, loaded.next(BLACK, 72_000, false, false, false));
+        assertEquals(WAIT, loaded.next(BLACK, 74_000, false, false, false));
+        assertEquals(OFFER, loaded.next(BLACK, 76_000, false, false, false));
+        AgvnBlackScreenRules scene = new AgvnBlackScreenRules(0);
+        for (long t = 2000; t <= 70_000; t += 2000) scene.next(BLACK, t, false, false, true);
+        assertEquals(WAIT, scene.next(PICTURE, 72_000, false, false, false));
+        assertEquals(WAIT, run(scene, BLACK, 74_000, 128_000, false));
+        assertEquals(STOP, scene.next(BLACK, 130_000, false, false, false));
+
+        long within = AgvnBlackScreenRules.LOADING_SAMPLE_MS; // the memory watch samples every 5 s
+        AgvnSessionTrack.start(1_000);
+        assertEquals("no sample yet", 0, AgvnSessionTrack.grewMb(6_000, within));
+        AgvnSessionTrack.used(6_000, 900);
+        assertEquals("one sample", 0, AgvnSessionTrack.grewMb(7_000, within));
+        AgvnSessionTrack.used(11_000, 1_050);
+        assertEquals(150, AgvnSessionTrack.grewMb(12_000, within));
+        assertEquals("an old sample", 0, AgvnSessionTrack.grewMb(19_000, within));
+        AgvnSessionTrack.start(30_000);
+        assertEquals("a new game", 0, AgvnSessionTrack.grewMb(30_500, within));
     }
 
     @Test

@@ -16,7 +16,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  *   and how often the player pressed something since: a game that shows nothing while the player keeps pressing has
  *   frozen;</li>
  *   <li>when free RAM last fell under the RAM bar's level ({@link AgvnMemoryWatch}): a game that ends just after it
- *   most likely ran out of memory, since Android or the kernel ends it without a word in any log.</li>
+ *   most likely ran out of memory, since Android or the kernel ends it without a word in any log;</li>
+ *   <li>how much memory the app and the game took at the memory watch's last two samples: a game whose memory still
+ *   grows fast is still loading ({@link AgvnBlackScreen}).</li>
  * </ul>
  * One game at a time, as XServerDisplayActivity runs one. Pure Java (JVM-testable).
  */
@@ -31,6 +33,7 @@ public final class AgvnSessionTrack {
     private static volatile long lastFrameMs, endMs;
     private static final AtomicInteger pressesSinceFrame = new AtomicInteger(), framesSeen = new AtomicInteger();
     private static long lowRamAtMs, lowRamFreeMb = -1;
+    private static long usedAtMs, usedMb = -1, usedBeforeMb = -1;
 
     private AgvnSessionTrack() {}
 
@@ -51,6 +54,8 @@ public final class AgvnSessionTrack {
         framesSeen.set(0);
         lowRamAtMs = 0;
         lowRamFreeMb = -1;
+        usedAtMs = 0;
+        usedMb = usedBeforeMb = -1;
     }
 
     /** A window's content changed: X server thread, every frame, so kept cheap. */
@@ -125,6 +130,18 @@ public final class AgvnSessionTrack {
     /** The free RAM (MB) of the last sample under the RAM bar's level, if within {@code withinMs}; else -1. */
     static synchronized long lowRamFreeMb(long nowMs, long withinMs) {
         return lowRamFreeMb >= 0 && nowMs - lowRamAtMs <= withinMs ? lowRamFreeMb : -1;
+    }
+
+    /** A memory watch sample: {@code mb} is what the app and the game take (RSS and DMA-BUF). */
+    static synchronized void used(long nowMs, long mb) {
+        usedBeforeMb = usedMb;
+        usedMb = mb;
+        usedAtMs = nowMs;
+    }
+
+    /** MB the app and the game grew by between the last two samples, if the last is within {@code withinMs}; else 0. */
+    static synchronized long grewMb(long nowMs, long withinMs) {
+        return usedBeforeMb >= 0 && nowMs - usedAtMs <= withinMs ? usedMb - usedBeforeMb : 0;
     }
 
     static boolean started() {

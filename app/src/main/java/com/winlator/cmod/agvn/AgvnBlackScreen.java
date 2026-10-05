@@ -22,9 +22,10 @@ import java.util.List;
  * A Windows game that stays black, as a KiriKiri game does on a screen smaller than itself: Wine lists display modes
  * only up to the screen's size, so its switch to full screen fails. Every {@link AgvnBlackScreenRules#POLL_MS} it
  * looks at {@link #ROWS} rows of the game's window ({@link AgvnGameWindow}): the last Vulkan or OpenGL frame presented
- * into a game window, else what the largest game window holds (GDI). A frame the CPU cannot read tells nothing. When
- * the rules say so ({@link AgvnBlackScreenRules}), a bar offers a larger screen, then a new start. The game keeps "Để
- * vậy, không hỏi lại" (extra agvnBlackScreen: 0). UI thread.
+ * into a game window, else what the largest game window holds (GDI). A frame the CPU cannot read tells nothing, and
+ * black while the game's memory still grows fast is its loading. When the rules say so ({@link AgvnBlackScreenRules}),
+ * a bar offers a larger screen, then a new start. The game keeps "Để vậy, không hỏi lại" (extra agvnBlackScreen: 0).
+ * UI thread.
  */
 public final class AgvnBlackScreen {
     private static final String TAG = "AGVN", EXTRA_ASK = "agvnBlackScreen";
@@ -62,7 +63,9 @@ public final class AgvnBlackScreen {
             long elapsed = SystemClock.uptimeMillis() - startMs;
             List<String> lines = AgvnWineTail.get().lines();
             boolean refused = AgvnBlackScreenRules.refused(lines);
-            AgvnBlackScreenRules.Step step = rules.next(look(), elapsed, refused, AgvnBlackScreenRules.boxShown(lines));
+            long grewMb = AgvnSessionTrack.grewMb(System.currentTimeMillis(), AgvnBlackScreenRules.LOADING_SAMPLE_MS);
+            boolean box = AgvnBlackScreenRules.boxShown(lines), loading = grewMb >= AgvnBlackScreenRules.LOADING_MB;
+            AgvnBlackScreenRules.Step step = rules.next(look(), elapsed, refused, box, loading);
             if (step == AgvnBlackScreenRules.Step.OFFER) offer(elapsed, refused);
             else if (step == AgvnBlackScreenRules.Step.WAIT) handler.postDelayed(poll, AgvnBlackScreenRules.POLL_MS);
         } catch (RuntimeException e) {

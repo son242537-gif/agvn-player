@@ -9,7 +9,10 @@ import java.util.List;
  * whose resolution Wine refused, past {@link #MIN_WAIT_MS} (or its last start plus {@link #AFTER_LAST_START_MS}, for a
  * game known to start slowly): the screen may be smaller than the game. A game that has shown a picture and goes black
  * later is a scene (a fade, a dark room), and one that showed a message box waits on it or crashed into it ("Assertion
- * failed!", read by "Tự sửa lỗi" when the game ends), unless Wine refused its resolution. Pure Java (JVM-testable).
+ * failed!", read by "Tự sửa lỗi" when the game ends), unless Wine refused its resolution. Black while the game's
+ * memory still grows fast ({@link #LOADING_MB}) is a loading screen and does not count: Lg Light (Unity) took
+ * 150-300 MB every 10 s, black, until it ran out of RAM, and was offered a larger screen at 22 s, which only takes
+ * more. Pure Java (JVM-testable).
  */
 final class AgvnBlackScreenRules {
     /** What a look at the game's window found. */
@@ -26,6 +29,11 @@ final class AgvnBlackScreenRules {
     static final int ROW_SAMPLES = 64;
     /** Screens offered when the game's own size is not known, smallest first. */
     static final String[] SCREENS = {"1280x720", "1600x900", "1920x1080"};
+    /**
+     * MB the app and the game take between two memory samples (5 s apart) while the game loads
+     * ({@link AgvnSessionTrack#grewMb}); a sample older than {@link #LOADING_SAMPLE_MS} tells nothing.
+     */
+    static final long LOADING_MB = 64, LOADING_SAMPLE_MS = 7_000;
     /** win32u's error for a display mode the game asked for and Wine does not list (DISP_CHANGE_BADMODE). */
     static final String REFUSED = "display settings returned -2";
     /** Wine's line for each message box a game shows ({@link AgvnWineDebug#MESSAGE_BOXES}). */
@@ -34,6 +42,8 @@ final class AgvnBlackScreenRules {
     private final long waitMs;
     private boolean shown;
     private int black;
+    /** When the game was last seen loading, from its start. */
+    private long loadingMs;
 
     /** {@code lastStartMs}: how long the game's last slow start took, 0 for none ({@link AgvnStartTimes}). */
     AgvnBlackScreenRules(long lastStartMs) {
@@ -44,13 +54,18 @@ final class AgvnBlackScreenRules {
         return waitMs;
     }
 
-    /** {@code refused}: Wine refused the game's resolution ({@link #refused}); {@code box}: it showed a message box. */
-    Step next(Look look, long elapsedMs, boolean refused, boolean box) {
+    /**
+     * {@code refused}: Wine refused the game's resolution ({@link #refused}); {@code box}: it showed a message box;
+     * {@code loading}: its memory grew by {@link #LOADING_MB} or more at the last sample. The watch lasts
+     * {@link #WATCH_MS} past the wait, or past the game's loading when that ends later.
+     */
+    Step next(Look look, long elapsedMs, boolean refused, boolean box, boolean loading) {
         if (look == Look.PICTURE) shown = true;
-        black = look == Look.BLACK || look == Look.NO_WINDOW && refused ? black + 1 : 0;
+        if (loading) loadingMs = elapsedMs;
+        black = !loading && (look == Look.BLACK || look == Look.NO_WINDOW && refused) ? black + 1 : 0;
         if (elapsedMs < waitMs) return Step.WAIT;
         if (black >= BLACK_LOOKS && (refused || !shown && !box)) return Step.OFFER;
-        return elapsedMs >= waitMs + WATCH_MS ? Step.STOP : Step.WAIT;
+        return elapsedMs >= Math.max(waitMs, loadingMs) + WATCH_MS ? Step.STOP : Step.WAIT;
     }
 
     /** True when every looked-at pixel of {@code row} (4 bytes a pixel, any 8-bit order) is dark. */
