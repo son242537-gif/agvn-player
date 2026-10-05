@@ -18,7 +18,7 @@ import java.io.File;
  * ({@link AgvnLightMenu}), moving, changing, adding and deleting keys ({@link AgvnLightEditor}) and the HUD
  * ({@link AgvnLightHud}). Each game can have a key set of its own ({@link AgvnLightPrefs#layout}); a ✎ stays in the
  * top-left corner to edit it ({@link AgvnEditPen}).
- * The runner (Ren'Py, RPG Maker XP/VX/VX Ace, HTML) is the {@link Host}. All calls on the UI thread.
+ * The runner (Ren'Py, RPG Maker XP/VX/VX Ace, Godot, HTML) is the {@link Host}. All calls on the UI thread.
  */
 public final class AgvnLightTools {
     /** What the toolkit asks of the game's runner. */
@@ -41,7 +41,7 @@ public final class AgvnLightTools {
         /** The game's own memory in MB; -1 when it cannot be measured (an HTML game runs in WebView's process). */
         long gameMb();
 
-        /** The runner: AgvnHtmlGame.RUNNER_RENPY, RUNNER_RGSS or RUNNER_HTML. */
+        /** The runner: AgvnHtmlGame.RUNNER_RENPY, RUNNER_RGSS, RUNNER_GODOT or RUNNER_HTML. */
         String runner();
 
         /** The frames per second the game is made for; -1 when it has none (Ren'Py draws only when something moves). */

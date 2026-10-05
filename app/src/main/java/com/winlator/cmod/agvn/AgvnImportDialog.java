@@ -69,7 +69,7 @@ public final class AgvnImportDialog {
                 : activity.getString(R.string.agvn_import_preview_resolution, screen != null ? screen : activity.getString(R.string.agvn_default_value))).append('\n');
         msg.append(activity.getString(R.string.agvn_import_preview_controls, activity.getString(AgvnLayouts.labelRes(AgvnLayouts.kindFor(p, candidate.engine))))).append('\n');
         if (AgvnHtmlGame.useHtml(p, AgvnHtmlGame.indexFor(gameDir, candidate.engine)) || AgvnRenpyGame.useRenpy(p, candidate.engine, gameDir)
-                || AgvnRgssGame.useRgss(p, candidate.engine, gameDir))
+                || AgvnRgssGame.useRgss(p, candidate.engine, gameDir) || AgvnGodotLight.useGodot(p, candidate.engine, new File(gameDir, candidate.exe)))
             msg.append(activity.getString(R.string.agvn_import_preview_html)).append('\n');
         if (AgvnLocale.JAPANESE.equals(AgvnLocale.forGame(p, candidate.engine, gameDir.getName(), candidate.exe)))
             msg.append(activity.getString(R.string.agvn_import_preview_japanese)).append('\n');

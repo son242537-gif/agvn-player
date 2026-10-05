@@ -1,4 +1,4 @@
-# Engine riêng: Ren'Py và RPG Maker XP/VX/VX Ace
+# Engine riêng: Ren'Py, RPG Maker XP/VX/VX Ace và Godot
 
 Anh Sơn quyết định ngày 02/10/2026:
 - làm lại kế hoạch engine riêng, mỗi engine một đợt;
@@ -22,6 +22,7 @@ Anh Sơn quyết định ngày 02/10/2026:
 | 1 | Ren'Py 8: game Python 3 (Ren'Py 8.x, phần lớn game mới) | `agvn/p50-renpy8` |
 | 2 | Ren'Py 7: game Python 2 (Ren'Py 6.x và 7.x) | `agvn/p51-renpy7` |
 | 3 | RPG Maker XP/VX/VX Ace bằng mkxp-z | `claude/great-goodall-qjemo1` |
+| 4 | Godot 4 bằng Godot cho Android | `agvn/p54-godot-native` |
 
 - **Ren'Py làm trước** vì Ren'Py có bản Android chính thức (RAPT), kèm thư viện dựng sẵn. Đợt này nhanh và ít rủi ro.
 - **mkxp-z làm sau** vì chưa có bản Android chính thức: phải tự dựng Ruby, SDL2 và mkxp-z cho Android. Đây là việc lớn
@@ -224,3 +225,63 @@ Anh Sơn chốt ngày 02/10/2026:
       - nút Quay lại mở menu bên trái; thử từng mục; HUD hiện RAM, pin, nhiệt độ (FPS ở game MV).
   12. Đang chơi, bấm "Gửi nhật ký" (menu bên của game, hoặc menu ⋮ ngoài thư viện): file zip có `app/logcat.txt` và
       log của phiên đang chạy.
+
+## Đợt 4: Godot 4
+
+Anh Sơn quyết định ngày 05/10/2026, sau khi Party Me (Godot 4.6) đứng hình trên máy Mali-G615 còn app MinHub chạy được:
+- làm "Chạy nhẹ" cho game Godot; APK nặng thêm khoảng 24 MB là chấp nhận được;
+- cho dựng Godot từ mã nguồn trên máy cloud.
+
+- **Vì sao:** khi chạy bằng Windows, game Godot đi qua Wine và giả lập x86, rồi vẽ qua ANGLE (OpenGL ES trên Direct3D
+  11), DXVK (Direct3D 11 trên Vulkan) và wrapper Vulkan. Mỗi hình mới phải dịch shader qua ba lớp. Party Me đứng hình
+  10–17 giây lúc vào, rồi 1–5 giây liên tục. Zink và Vulkan đều tắt game trên Mali. "Chạy nhẹ" chạy chính gói game
+  (`.pck`) bằng Godot cho Android, vẽ thẳng bằng OpenGL ES hoặc Vulkan của máy.
+- **Nguồn:** phần Java là thư viện Android chính thức của Godot 4.7.2 (`org.godotengine:godot`, Maven Central, ghim
+  `godot_aar_sha256`). Engine (`libgodot_android.so`) dựng lại từ mã nguồn phát hành của Godot bằng
+  `scripts/agvn/godot/build-godot.sh`, vì bản chính thức từ 4.6 không mở gói game ngoài APK. Cách dựng, 2 bản vá và
+  cách kiểm chứng ở [`scripts/agvn/godot/README.md`](../../scripts/agvn/godot/README.md).
+- **Giấy phép:** Godot là MIT. Giấy phép đủ của Godot và các thư viện bên trong nằm ở cuối màn "Giấy phép mã nguồn mở".
+- **Game nào chạy được** (`AgvnGodotLight.fit`, đọc thư mục của gói như Godot đọc):
+  - Godot 4.5–4.7, ví dụ Party Me. Script dạng mã nhị phân của 4.5 trở lên đọc được.
+  - Godot 4.0–4.4 có script dạng chữ (`.gd`). Godot 4.3–4.4 thường xuất script dạng mã nhị phân bản cũ, mà Godot 4.5
+    trở lên không đọc được. Những game đó vẫn chạy bằng Windows. Muốn chạy được thì phải kèm thêm engine Godot 4.4: việc
+    này để đợt sau.
+  - Gói nằm trong `.exe` ("Embed PCK") hay file `.pck` cạnh `.exe`, theo đúng thứ tự Godot cho Windows tìm.
+- **Vẫn chạy bằng Windows:**
+  - game Godot 3;
+  - game Godot viết bằng C# (.NET), tức có thư mục `data_*` chứa `GodotSharp.dll`, hoặc gói có file `.cs`;
+  - gói hay file bị mã hoá: chỉ engine riêng của game có khoá;
+  - game dùng thư viện native (GDExtension, ví dụ GodotSteam): thư viện đó dựng cho Windows, Android không nạp được;
+  - Godot bản mới hơn 4.7.
+- **Đã làm** (nhánh `agvn/p54-godot-native`, xếp trên bản 0.1.20, chờ anh Sơn thử máy):
+  - **Trong app:** `AgvnGodotActivity` (lớp con `GodotActivity` của Godot) chạy game trong tiến trình riêng `:godot`.
+    Dòng lệnh: `--main-pack <gói> --log-file AGVN-Player/godot/<thư mục game>/godot.log --fullscreen`. Có thêm
+    `--max-fps` theo giới hạn FPS của mức đồ hoạ.
+  - **Nhận diện:** game Godot được đặt "Chạy nhẹ" khi nhập, nếu Godot 4.7 chạy được nó. Game Godot đã nhập từ trước
+    (chưa chọn cách chạy) tự chuyển ở lần mở tiếp theo; lối tắt nhớ lựa chọn này.
+  - **Save và thiết lập:** cùng chỗ với "Chạy bằng Windows" (`AppData/Roaming/Godot/app_userdata/<project>` trong
+    container Wine của game), nhờ bản vá 0001. Đổi cách chạy vẫn còn save.
+  - **File cạnh `.exe`:** game nạp gói vá, DLC hay bản dịch đặt cạnh `.exe` vẫn tìm thấy (bản vá 0002).
+  - **Cách vẽ:** dùng cách vẽ của chính game (Godot đổi Forward+ thành Mobile trên Android, tức Vulkan). Vulkan không mở
+    được thì Godot tự quay về OpenGL ES.
+  - **Phím ảo:** bộ phím chọn lúc nhập (mặc định là bộ 2D cho game Godot). Chạm vào màn hình là chuột trái. Phím ảo
+    chuột phải và cuộn chuột bấm ở chỗ vừa chạm.
+  - **Nút Quay lại:** cùng menu với Ren'Py và RPG Maker: mở menu game (Esc), ẩn/hiện phím, bàn phím, thoát, "Chạy bằng
+    Windows". Godot không tự thoát khi bấm Quay lại.
+  - **Game dừng trước khi hiện hình:** app hiện lỗi đầu tiên trong `godot.log` và gợi ý "Chạy bằng Windows".
+  - **Không mở trang web:** link game mở (`OS.shell_open`, ví dụ trang Steam) bị chặn.
+  - **Nhật ký:** `adb logcat -s godot AGVN`; `AGVN-Player/godot/<thư mục game>/godot.log`. "Gửi nhật ký" kèm file này.
+- **Thử máy:** Party Me trên máy Mali-G615, thêm một game Godot 4.5–4.7 khác nếu có.
+  1. Cài đè bản đang dùng. Mở Party Me đã nhập từ trước: game chạy "Chạy nhẹ". Có dòng `Godot 4.6.x game ... on Chạy
+     nhẹ` trong `adb logcat -s AGVN`.
+  2. Thời gian vào game và các lần đứng hình: so với `su-kien.txt` của bản 0.1.20 (đứng 10–17 giây lúc vào).
+  3. Chơi 10 phút: chạm để bấm, kéo, chuyển cảnh, nghe nhạc. Lưu, thoát, mở lại, tải save.
+  4. Save cũ khi chạy bằng Windows có trong game. Lưu khi "Chạy nhẹ", rồi "Chạy bằng Windows": vẫn thấy save đó.
+  5. Nút Quay lại: thử từng mục. Esc mở menu game. Thoát game xong thì thư viện hiện lại.
+  6. Bấm Home rồi quay lại game: game chạy tiếp, có tiếng.
+  7. RAM và nhiệt: `adb shell dumpsys meminfo com.agvn.player:godot`; so với khi chạy bằng Windows.
+  8. Chữ tiếng Việt của bản dịch AGVN hiện đúng; `godot.log` có `AGVN font` và `AGVN splash`.
+  9. Hồi quy: Ren'Py 8, RPG Maker XP/VX/VX Ace, MV/MZ "Chạy nhẹ" và game Windows vẫn chạy như cũ.
+  10. Màn "Giấy phép mã nguồn mở" có phần Godot.
+  11. Các màn của app vẫn như cũ: thư viện, "Thêm game", menu ⋮ của game, cấu hình lối tắt, tạo container, Cài đặt.
+      Thư viện Godot cần AndroidX Fragment 1.8.6 (trước là 1.4.0) và Kotlin stdlib 2.1.21, nên cả app dùng bản mới này.

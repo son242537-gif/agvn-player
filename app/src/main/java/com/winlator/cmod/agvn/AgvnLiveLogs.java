@@ -12,26 +12,27 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
  * What "Gửi nhật ký" adds so the player need not quit a game first: each session still running as it is now
  * ({@link AgvnSessionLog#snapshot}), the app's own logcat, where the "Chạy nhẹ" engines write (mkxp-z, SDL, Ren'Py,
- * the HTML games' messages), the phone's facts ({@link AgvnDeviceReport}) and the "Chạy nhẹ" Ren'Py logs
- * (AGVN-Player/renpy/&lt;game&gt;). Off the UI thread.
+ * the HTML games' messages), the phone's facts ({@link AgvnDeviceReport}), the "Chạy nhẹ" Ren'Py logs
+ * (AGVN-Player/renpy/&lt;game&gt;) and Godot's log (AGVN-Player/godot/&lt;game&gt;). Off the UI thread.
  */
 final class AgvnLiveLogs {
     private static final String TAG = "AGVN";
-    static final String APP = "app", RENPY = "renpy", LOGCAT = "logcat.txt", DEVICE = "thiet-bi.txt";
+    static final String APP = "app", RENPY = "renpy", GODOT = "godot", LOGCAT = "logcat.txt", DEVICE = "thiet-bi.txt";
     private static final int LOGCAT_LINES = 20000;
     private static final long LOGCAT_MAX_BYTES = 4L << 20;
 
     private AgvnLiveLogs() {}
 
     /**
-     * Fills {@code into}: "&lt;session&gt;/" for each running session, "app/logcat.txt", "app/thiet-bi.txt" and "renpy/"
-     * for {@code gameDir}.
+     * Fills {@code into}: "&lt;session&gt;/" for each running session, "app/logcat.txt", "app/thiet-bi.txt", and "renpy/"
+     * and "godot/" for {@code gameDir}.
      */
     static void collect(Context context, File[] sessions, File gameDir, File into) {
         if (sessions != null) {
@@ -52,6 +53,9 @@ final class AgvnLiveLogs {
         for (String name : new String[]{"log.txt", "traceback.txt", "errors.txt"}) files.add(new File(renpyLogs, name));
         File renpy = new File(into, RENPY);
         if (renpy.mkdirs()) AgvnEngineLogs.copy(files, renpy, 0);
+        File godotLog = new File(AgvnGodotLight.publicDir(AgvnSessionLog.root().getParentFile(), gameDir), "godot.log");
+        File godot = new File(into, GODOT);
+        if (godotLog.isFile() && godot.mkdirs()) AgvnEngineLogs.copy(Collections.singletonList(godotLog), godot, 0);
     }
 
     /**

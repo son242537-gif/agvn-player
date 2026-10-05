@@ -91,6 +91,7 @@ public final class AgvnLightDoctor {
         switch (runner) {
             case AgvnHtmlGame.RUNNER_RENPY: return "Ren'Py";
             case AgvnHtmlGame.RUNNER_RGSS: return "mkxp-z (RPG Maker)";
+            case AgvnHtmlGame.RUNNER_GODOT: return "Godot";
             case AgvnHtmlGame.RUNNER_HTML: return "WebView (HTML)";
             default: return runner;
         }

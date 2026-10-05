@@ -18,8 +18,8 @@ import java.util.Map;
 /**
  * "Chạy nhẹ": RPG Maker MV/MZ and TyranoBuilder games are web pages (index.html + JavaScript), so they run in an
  * Android WebView ({@link AgvnHtmlActivity}) without Wine or Box64: far lighter, cooler and kinder to the battery.
- * Ren'Py 8 games ({@link AgvnRenpyGame}) and RPG Maker XP/VX/VX Ace games ({@link AgvnRgssGame}) have their own
- * "Chạy nhẹ". The shortcut keeps its Wine Exec line; the extra
+ * Ren'Py 8 games ({@link AgvnRenpyGame}), RPG Maker XP/VX/VX Ace games ({@link AgvnRgssGame}) and Godot 4 games
+ * ({@link AgvnGodotLight}) have their own "Chạy nhẹ". The shortcut keeps its Wine Exec line; the extra
  * {@link #EXTRA_RUNNER} decides which one starts.
  */
 public final class AgvnHtmlGame {
@@ -28,6 +28,7 @@ public final class AgvnHtmlGame {
     public static final String RUNNER_HTML = "html";
     public static final String RUNNER_RENPY = "renpy";
     public static final String RUNNER_RGSS = "rgss";
+    public static final String RUNNER_GODOT = "godot";
     public static final String RUNNER_WINE = "wine";
 
     private AgvnHtmlGame() {}
@@ -53,17 +54,19 @@ public final class AgvnHtmlGame {
 
     public static boolean isValidRunner(String runner) {
         return runner == null || RUNNER_HTML.equals(runner) || RUNNER_RENPY.equals(runner) || RUNNER_RGSS.equals(runner)
-                || RUNNER_WINE.equals(runner);
+                || RUNNER_GODOT.equals(runner) || RUNNER_WINE.equals(runner);
     }
 
-    /** True for "Chạy nhẹ" (HTML, Ren'Py or RGSS): the game runs on Android itself, without Wine. */
+    /** True for "Chạy nhẹ" (HTML, Ren'Py, RGSS or Godot): the game runs on Android itself, without Wine. */
     public static boolean isLight(String runner) {
-        return RUNNER_HTML.equals(runner) || RUNNER_RENPY.equals(runner) || RUNNER_RGSS.equals(runner);
+        return RUNNER_HTML.equals(runner) || RUNNER_RENPY.equals(runner) || RUNNER_RGSS.equals(runner)
+                || RUNNER_GODOT.equals(runner);
     }
 
     /**
      * Called first thing by XServerDisplayActivity: opens "Chạy nhẹ" instead of Wine when the shortcut asks for it.
      * Returns true when the caller must finish(). A game that moved (no index.html, no Ren'Py 8 or RGSS game) runs in Wine.
+     * A Godot game imported before Godot had "Chạy nhẹ" (no runner yet) gets it as soon as Godot 4.7 runs it.
      */
     public static boolean redirect(Activity activity) {
         Intent from = activity.getIntent();
@@ -72,6 +75,10 @@ public final class AgvnHtmlGame {
         Map<String, String> extras = readExtras(new File(path));
         if (RUNNER_RENPY.equals(extras.get(EXTRA_RUNNER))) return AgvnRenpyGame.start(activity, from, extras);
         if (RUNNER_RGSS.equals(extras.get(EXTRA_RUNNER))) return AgvnRgssFiles.start(activity, from, extras);
+        String runner = extras.get(EXTRA_RUNNER);
+        boolean godot = RUNNER_GODOT.equals(runner) || ((runner == null || runner.isEmpty())
+                && GameExeResolver.Engine.GODOT.name().equals(extras.get(AgvnGameImporter.EXTRA_ENGINE)));
+        if (godot) return AgvnGodotLight.start(activity, from, extras);
         if (!RUNNER_HTML.equals(extras.get(EXTRA_RUNNER))) return false;
         String index = extras.get(EXTRA_INDEX);
         if (index == null || !new File(index).isFile()) return false;

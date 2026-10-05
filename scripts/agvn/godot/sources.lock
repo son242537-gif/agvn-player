@@ -1,0 +1,9 @@
+# AGVN Player - pinned inputs of build-godot.sh (the Godot runner's engine). One input per line; each download is
+# checked against its SHA-256 before use.
+# godot <version> <release source tarball> <sha256> (the same file as on github.com/godotengine/godot/releases)
+godot 4.7.2 https://github.com/godotengine/godot/releases/download/4.7.2-stable/godot-4.7.2-stable.tar.xz a18ce0ccec3ecc40b0dd6c4f5132ca934e9fb7c2979717940ff32aee1eb35481
+# swappy <archive> <sha256>: the frame pacing library official Android builds link (misc/scripts/install_swappy_android.py)
+swappy https://github.com/godotengine/godot-swappy/releases/download/from-source-2025-01-31/godot-swappy.zip 2dd05484de29a3040106658d6f95915778fd71abc3261130eada6090ed1c153d
+# scons <version> <sha256 of the wheel on PyPI>
+scons 4.11.1 454cef364348053422696e3d2ecb4fa593c96a624f955842eaaea64f95c8d11d
+ndk 29.0.14206865

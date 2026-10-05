@@ -60,6 +60,13 @@
             android:foregroundServiceType="specialUse"
             android:exported="false" />
 
+        <!-- AGVN: and in the Godot process -->
+        <service
+            android:name="com.winlator.cmod.agvn.AgvnKeepAlive$Godot"
+            android:process=":godot"
+            android:foregroundServiceType="specialUse"
+            android:exported="false" />
+
         <!-- AGVN: once a day, is a newer AGVN Player published? (agvn/AgvnUpdateJob: reads agvn-update.txt, sends nothing) -->
         <service
             android:name="com.winlator.cmod.agvn.AgvnUpdateJob"
@@ -141,6 +148,17 @@
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|uiMode|density|fontScale"
             android:exported="false" />
 
+        <!-- AGVN: Godot 4 games on "Chạy nhẹ" (agvn/AgvnGodotActivity), in their own process; not exported, so only
+             AGVN gives Godot its command line -->
+        <activity
+            android:name="com.winlator.cmod.agvn.AgvnGodotActivity"
+            android:process=":godot"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:screenOrientation="sensorLandscape"
+            android:launchMode="singleTop"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|uiMode|density|fontScale"
+            android:exported="false" />
+
         <activity
             android:name="com.winlator.cmod.agvn.LicensesActivity"
             android:label="@string/agvn_licenses"
@@ -192,12 +210,15 @@
             </intent-filter>
         </receiver>
 
+        <!-- AGVN: Godot's library brings the same provider as ${applicationId}.fileprovider; the app keeps its own -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.tileprovider"
             android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
+            android:grantUriPermissions="true"
+            tools:replace="android:authorities">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths"
+                tools:replace="android:resource" />
         </provider>
 
         <provider

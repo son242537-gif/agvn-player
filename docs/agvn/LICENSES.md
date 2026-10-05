@@ -28,6 +28,12 @@ Anh Sơn quyết định ngày 02/10/2026: app phát hành theo **GNU GPL phiên
     pyjnius (MIT), FFmpeg và FriBiDi (LGPL 2.1), OpenSSL (Apache 2.0) cùng các thư viện khác. Danh sách đủ nằm trong
     `LICENSE.txt` của Ren'Py; app hiện nguyên văn file này ở cuối màn giấy phép. Mã nguồn:
     https://github.com/renpy/renpy và https://github.com/renpy/renpy-build.
+  - Godot Engine 4.7.2 ("Chạy nhẹ" cho game Godot 4): MIT. Phần Java là thư viện Android của chính Godot
+    (`org.godotengine:godot`); `libgodot_android.so` được AGVN dựng lại từ mã nguồn chính thức (`disable_path_overrides=no`,
+    thêm các bản vá trong `scripts/agvn/godot/patches`) và chứa thêm FreeType, HarfBuzz, ICU, mbedTLS, Swappy (Apache 2.0)
+    cùng các thư viện khác. Giấy phép đầy đủ: `app/src/main/assets/agvn/godot-license.txt` (LICENSE.txt và COPYRIGHT.txt của
+    Godot, giấy phép của Swappy), tạo bởi `scripts/agvn/godot/build-godot.sh`. Mã nguồn: https://github.com/godotengine/godot;
+    bản vá và script dựng: `scripts/agvn/godot`.
   - mkxp-z ("Chạy nhẹ" cho game RPG Maker XP/VX/VX Ace): GPL 3 hoặc mới hơn (dựng kèm shader GPLv3). `libmkxp-z.so`
     chứa thêm Ruby (Ruby License / BSD-2-Clause), SDL2, SDL_image, SDL_sound, SDL_ttf, PhysFS (zlib), OpenAL Soft và
     FluidSynth (LGPL 2.1), FreeType (FTL), pixman, fmt, libffi, libyaml (MIT), libogg/vorbis/theora, libjxl (BSD) cùng

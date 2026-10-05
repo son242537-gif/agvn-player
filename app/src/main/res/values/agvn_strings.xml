@@ -86,6 +86,9 @@
     <string name="agvn_renpy_failed_title">Game chưa mở được</string>
     <string name="agvn_renpy_failed_message">Game này chưa chạy được bằng Chạy nhẹ. Bạn có thể chạy bằng Windows.\n\nNhật ký lỗi (gửi cho AGVN nếu cần): %1$s</string>
     <string name="agvn_rgss_show_keys">Hiện phím ảo</string>
+    <string name="agvn_godot_failed_title">Game chưa mở được</string>
+    <string name="agvn_godot_failed_message">Godot dừng trước khi game hiện hình: %1$s\n\nBản Windows của game thường vẫn chạy được: bấm \"Chạy bằng Windows\". Nhật ký nằm ở AGVN-Player/godot.</string>
+    <string name="agvn_godot_failed_unknown">không rõ lý do</string>
     <string name="agvn_rgss_failed_title">Game bị dừng vì lỗi</string>
     <string name="agvn_rgss_failed_message">Game này gặp lỗi khi chạy bằng Chạy nhẹ. Bạn có thể chạy bằng Windows. Lỗi gốc của game:</string>
     <string name="agvn_rgss_missing_rtp">Game cần gói RTP \"%1$s\" của RPG Maker mà máy chưa có.\n\nCách sửa: chép thư mục RTP %1$s (lấy từ máy tính đã cài RTP) vào %2$s rồi mở lại game. Hoặc bấm \"Chạy bằng Windows\" và cài RTP trong Windows: Chạy nhẹ cũng dùng được RTP đó.\n\nLỗi gốc của game:</string>

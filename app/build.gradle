@@ -287,3 +287,5 @@ dependencies {
 apply from: "agvn-renpy.gradle"
 // AGVN: RPG Maker XP/VX/VX Ace runner (libmkxp-z.so is checked, SDL's Java classes are generated), see agvn-rgss.gradle
 apply from: "agvn-rgss.gradle"
+// AGVN: the Godot runner's engine, Godot's Java library with AGVN's build of Godot (see the file)
+apply from: "agvn-godot.gradle"

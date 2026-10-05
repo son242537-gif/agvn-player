@@ -77,8 +77,10 @@ export AGVN_VERSION_CODE=2
 ```
 The first build downloads large archives and checks each against `scripts/agvn/pins.txt`: imagefs, Proton and Wine
 Mono 9.3.1 (the .NET runtime, unpacked on the phone only for .NET games) from GitHub, and Ren'Py 8.5.3 (RAPT and SDK,
-for the Ren'Py runner) from renpy.org into `app/agvn-downloads/` (see `app/agvn-renpy.gradle`). In a fresh cloud
-checkout, run `scripts/agvn/prepare-native-deps.sh` first.
+for the Ren'Py runner) from renpy.org into `app/agvn-downloads/` (see `app/agvn-renpy.gradle`), and Godot's Android
+library 4.7.2 from Maven Central (for the Godot runner; its engine is AGVN's own build, `app/agvn-godot/`, made by
+`scripts/agvn/godot/build-godot.sh`, see `app/agvn-godot.gradle`). In a fresh cloud checkout, run
+`scripts/agvn/prepare-native-deps.sh` first.
 
 ### Publish an Update (maintainer's PC only)
 Phones update themselves from GitHub Releases (Cài đặt → Cập nhật ứng dụng). There is one channel: every phone gets the
