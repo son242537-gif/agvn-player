@@ -125,14 +125,22 @@ public class AgvnKirikiriTest {
     }
 
     @Test
-    public void theScreenIsNeverSmallerThanTheGame() {
-        assertEquals("1280x720", AgvnKirikiri.notSmaller("854x480", "1280x720"));
-        assertEquals("1280x720", AgvnKirikiri.notSmaller("1280x720", "800x600")); // a small frame: "Vừa màn hình"
-        assertEquals("800x600", AgvnKirikiri.notSmaller("960x544", "800x600")); // too low
-        assertEquals("1600x900", AgvnKirikiri.notSmaller("1600x900", "1280x720")); // the player's larger screen stays
-        assertEquals("1024x768", AgvnKirikiri.notSmaller(null, "1023x767")); // even sizes
-        assertEquals("854x480", AgvnKirikiri.notSmaller("854x480", null));
-        assertEquals("854x480", AgvnKirikiri.notSmaller("854x480", "-")); // not readable
-        assertNull(AgvnKirikiri.notSmaller(null, ""));
+    public void theScreenIsLargerThanTheGame() {
+        // KAG3 goes full screen, and hangs black in Wine, when the screen is not larger than the game: an equal one too
+        assertEquals("1280x1024", AgvnKirikiriScreen.larger("1280x720", "1280x720")); // 0.1.20 hung on 1280x720
+        assertEquals("1280x1024", AgvnKirikiriScreen.larger("854x480", "1280x720"));
+        assertEquals("1280x1024", AgvnKirikiriScreen.larger("960x544", "1280x960"));
+        assertEquals("1024x768", AgvnKirikiriScreen.larger("960x544", "800x600")); // too low
+        assertEquals("1280x1024", AgvnKirikiriScreen.larger("1024x768", "1024x768"));
+        assertEquals("1600x1200", AgvnKirikiriScreen.larger("1600x900", "1600x900"));
+        assertEquals("1920x1440", AgvnKirikiriScreen.larger("1280x720", "1920x1080"));
+        assertEquals("1024x2564", AgvnKirikiriScreen.larger(null, "1023x2500")); // none listed: even, with room for the bars
+        // a screen larger in one direction and not smaller in the other stays: the game keeps its window
+        assertEquals("1280x720", AgvnKirikiriScreen.larger("1280x720", "800x600")); // a small frame: "Vừa màn hình"
+        assertEquals("1600x900", AgvnKirikiriScreen.larger("1600x900", "1280x720")); // the player's larger screen
+        assertEquals("1280x800", AgvnKirikiriScreen.larger("1280x800", "1280x720"));
+        assertEquals("854x480", AgvnKirikiriScreen.larger("854x480", null));
+        assertEquals("854x480", AgvnKirikiriScreen.larger("854x480", "-")); // not readable
+        assertNull(AgvnKirikiriScreen.larger(null, ""));
     }
 }

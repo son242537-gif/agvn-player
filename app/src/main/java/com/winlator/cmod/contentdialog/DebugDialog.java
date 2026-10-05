@@ -27,6 +27,8 @@ public class DebugDialog extends ContentDialog implements Callback<String> {
     private static boolean paused = false;
     private BufferedWriter writer;
     private File logFile;
+    /** AGVN: a line written again and again (a movie Wine cannot decode) goes in once, then "×N" once a second. */
+    private final com.winlator.cmod.agvn.AgvnLogRepeats repeats = new com.winlator.cmod.agvn.AgvnLogRepeats();
     /** AGVN: the log goes to /sdcard once a second, not after every line (a game can write thousands a minute). */
     private final ScheduledExecutorService flusher = Executors.newSingleThreadScheduledExecutor(r -> {
         Thread t = new Thread(r, "DebugDialogFlush");
@@ -66,6 +68,12 @@ public class DebugDialog extends ContentDialog implements Callback<String> {
 
     @Override
     public void call(final String line) {
+        synchronized (repeats) {
+            for (String out : repeats.add(line, System.currentTimeMillis())) write(out);
+        }
+    }
+
+    private void write(String line) {
         if (!getPaused()) logView.append(line+"\n");
         try {
             writer.write(line + "\n");
@@ -78,9 +86,12 @@ public class DebugDialog extends ContentDialog implements Callback<String> {
     /** AGVN: writes out the lines still buffered, e.g. before the log is copied into the play session. */
     public void flush() {
         try {
+            synchronized (repeats) {
+                for (String out : repeats.tick(System.currentTimeMillis())) write(out);
+            }
             writer.flush();
         }
-        catch (IOException ignored) {
+        catch (IOException | RuntimeException ignored) {
             // the next flush tries again
         }
     }

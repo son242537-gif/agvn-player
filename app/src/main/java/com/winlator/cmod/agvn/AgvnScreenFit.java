@@ -11,6 +11,7 @@ import com.winlator.cmod.container.Shortcut;
 import com.winlator.cmod.core.AppUtils;
 import com.winlator.cmod.widget.TouchpadView;
 import com.winlator.cmod.widget.VulkanXServerView;
+import com.winlator.cmod.widget.XServerRendererView;
 import com.winlator.cmod.xserver.Window;
 import com.winlator.cmod.xserver.XLock;
 import com.winlator.cmod.xserver.XServer;
@@ -168,7 +169,9 @@ public final class AgvnScreenFit {
     }
 
     private String verdict(float[] rect) {
-        return AgvnFitMath.verdict((int) rect[0], (int) rect[1], (int) rect[2], (int) rect[3], screenW(), screenH());
+        XServerRendererView view = activity.getXServerView();
+        return AgvnFitMath.verdict((int) rect[0], (int) rect[1], (int) rect[2], (int) rect[3], screenW(), screenH(),
+                view != null ? view.getWidth() : 0, view != null ? view.getHeight() : 0);
     }
 
     private boolean canDraw() {

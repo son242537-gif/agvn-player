@@ -24,8 +24,9 @@ import java.util.List;
  * looks at {@link #ROWS} rows of the game's window ({@link AgvnGameWindow}): the last Vulkan or OpenGL frame presented
  * into a game window, else what the largest game window holds (GDI). A frame the CPU cannot read tells nothing, and
  * black while the game's memory still grows fast is its loading. When the rules say so ({@link AgvnBlackScreenRules}),
- * a bar offers a larger screen, then a new start. The game keeps "Để vậy, không hỏi lại" (extra agvnBlackScreen: 0).
- * UI thread.
+ * a bar offers a larger screen, then a new start. The game keeps "Để vậy, không hỏi lại" (extra agvnBlackScreen: 0):
+ * then it is still watched, and su-kien.txt says what was seen, but not asked. A black window not asked about is
+ * written there too when the watch ends. UI thread.
  */
 public final class AgvnBlackScreen {
     private static final String TAG = "AGVN", EXTRA_ASK = "agvnBlackScreen";
@@ -39,8 +40,11 @@ public final class AgvnBlackScreen {
     private final Runnable poll = this::poll;
     private final AgvnBlackScreenRules rules;
     private final long startMs = SystemClock.uptimeMillis();
+    private final boolean ask;
     /** The game's window as last looked at, {x, y, width, height}, or null. */
     private int[] window;
+    /** Wine refused the game's resolution, or it showed a message box, since the start (the tail keeps 300 lines). */
+    private boolean refused, box;
 
     /** A Vulkan or OpenGL frame presented into {@code window} (X server thread, every frame: kept cheap). */
     public static void onDirectFrame(Window window, Drawable frame) {
@@ -54,7 +58,8 @@ public final class AgvnBlackScreen {
         directFrame = null;
         Shortcut s = activity.agvnShortcut();
         rules = new AgvnBlackScreenRules(s != null ? AgvnStartTimes.last(activity, s.file.getPath()) : 0);
-        if (s != null && !"0".equals(s.getExtra(EXTRA_ASK))) handler.postDelayed(poll, AgvnBlackScreenRules.POLL_MS);
+        ask = s != null && !"0".equals(s.getExtra(EXTRA_ASK));
+        if (s != null) handler.postDelayed(poll, AgvnBlackScreenRules.POLL_MS);
     }
 
     private void poll() {
@@ -62,12 +67,14 @@ public final class AgvnBlackScreen {
         try {
             long elapsed = SystemClock.uptimeMillis() - startMs;
             List<String> lines = AgvnWineTail.get().lines();
-            boolean refused = AgvnBlackScreenRules.refused(lines);
+            refused |= AgvnBlackScreenRules.refused(lines);
+            box |= AgvnBlackScreenRules.boxShown(lines);
             long grewMb = AgvnSessionTrack.grewMb(System.currentTimeMillis(), AgvnBlackScreenRules.LOADING_SAMPLE_MS);
-            boolean box = AgvnBlackScreenRules.boxShown(lines), loading = grewMb >= AgvnBlackScreenRules.LOADING_MB;
+            boolean loading = grewMb >= AgvnBlackScreenRules.LOADING_MB;
             AgvnBlackScreenRules.Step step = rules.next(look(), elapsed, refused, box, loading);
             if (step == AgvnBlackScreenRules.Step.OFFER) offer(elapsed, refused);
             else if (step == AgvnBlackScreenRules.Step.WAIT) handler.postDelayed(poll, AgvnBlackScreenRules.POLL_MS);
+            else if (rules.blackNow()) notAsked(elapsed);
         } catch (RuntimeException e) {
             Log.w(TAG, "black screen check failed", e); // never in the game's way: no more checks
         }
@@ -96,17 +103,17 @@ public final class AgvnBlackScreen {
     }
 
     /**
-     * {@link #ROWS} rows across the image: black when all are dark, unknown when one cannot be read or its pixels are
-     * not 4 bytes (RGBA, RGBX, BGRA, RGBA 10:10:10:2).
+     * {@link #ROWS} rows across the image ({@link AgvnBlackScreenRules#look}): unknown when one cannot be read or its
+     * pixels are not 4 bytes (RGBA, RGBX, BGRA, RGBA 10:10:10:2).
      */
     private static AgvnBlackScreenRules.Look look(Drawable image) {
         if (image == null || !FOUR_BYTES.contains(image.format)) return AgvnBlackScreenRules.Look.UNKNOWN;
+        ByteBuffer[] rows = new ByteBuffer[ROWS];
         for (int i = 1; i <= ROWS; i++) {
-            ByteBuffer row = image.agvnReadRow(image.height * i / (ROWS + 1));
-            if (row == null) return AgvnBlackScreenRules.Look.UNKNOWN;
-            if (!AgvnBlackScreenRules.dark(row, image.width)) return AgvnBlackScreenRules.Look.PICTURE;
+            rows[i - 1] = image.agvnReadRow(image.height * i / (ROWS + 1));
+            if (rows[i - 1] == null) return AgvnBlackScreenRules.Look.UNKNOWN;
         }
-        return AgvnBlackScreenRules.Look.BLACK;
+        return AgvnBlackScreenRules.look(rows, image.width);
     }
 
     private void offer(long elapsedMs, boolean refused) {
@@ -125,11 +132,21 @@ public final class AgvnBlackScreen {
         AgvnSessionLog.event("Màn hình đen sau " + seconds + " giây, màn hình " + screen + ", khung game " + frame
                 + (refused ? ", Wine từ chối độ phân giải game xin" : "")
                 + (bigger != null ? ": hỏi đổi sang " + bigger
-                : sync ? ": hỏi bật đồng bộ khung hình" : ": không hỏi"));
+                : sync ? ": hỏi bật đồng bộ khung hình" : ": không hỏi")
+                + (ask || bigger == null && !sync ? "" : " (không hiện thanh: game đã chọn \"Để vậy, không hỏi lại\")"));
         Log.i(TAG, "black screen after " + seconds + " s on " + screen + ", window " + frame
-                + (refused ? ", mode refused" : "") + ", offer " + (sync ? "frame sync" : bigger));
+                + (refused ? ", mode refused" : "") + ", offer " + (sync ? "frame sync" : bigger) + (ask ? "" : ", not asked"));
+        if (!ask) return; // "Để vậy, không hỏi lại"
         if (bigger != null) offerScreen(s, bigger, screen, seconds, refused);
         else if (sync) offerSync(s, seconds);
+    }
+
+    /** The watch ended on a black window it did not ask about: why, in su-kien.txt, for "Gửi nhật ký". */
+    private void notAsked(long elapsedMs) {
+        String frame = window != null ? window[2] + "x" + window[3] : "?";
+        String why = box ? "game đã hiện hộp thoại" : rules.shown() ? "game đã hiện hình trước đó" : "game còn đang tải";
+        AgvnSessionLog.event("Màn hình đen tới giây " + elapsedMs / 1000 + ", khung game " + frame + ": không hỏi, " + why);
+        Log.i(TAG, "black screen at " + elapsedMs / 1000 + " s, window " + frame + ", not asked: " + why);
     }
 
     private void offerScreen(Shortcut s, String bigger, String screen, long seconds, boolean refused) {

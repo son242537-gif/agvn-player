@@ -493,6 +493,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
         ProcessHelper.removeAllDebugCallbacks();
         ProcessHelper.addDebugCallback(com.winlator.cmod.agvn.AgvnWineTail.get()); // AGVN: a crash shows in the session summary, logs on or off
+        com.winlator.cmod.agvn.AgvnMovieWatch.attach(this); // AGVN: a movie Wine cannot decode, which the game waits on
         if (enableLogs || enableWinlatorLogs) LogView.setFilename(getExecutable());
         if (enableLogs) {
             ProcessHelper.addDebugCallback(debugDialog = new DebugDialog(this));
@@ -528,6 +529,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             dxwrapper = shortcut.getExtra("dxwrapper", container.getDXWrapper());
             dxwrapperConfig = shortcut.getExtra("dxwrapperConfig", container.getDXWrapperConfig());
             screenSize = shortcut.getExtra("screenSize", container.getScreenSize());
+            screenSize = com.winlator.cmod.agvn.AgvnKirikiriScreen.atLaunch(shortcut, screenSize); // AGVN: KAG3 hangs full screen on a screen not larger than it
             lc_all = shortcut.getExtra("lc_all", container.getLC_ALL());
             midiSoundFont = shortcut.getExtra("midiSoundFont", container.getMIDISoundFont()); // AGVN: the game's own choice, "" = off
             String inputType = shortcut.getExtra("inputType");
@@ -1179,6 +1181,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         String wineDebugChannels = preferences.getString("wine_debug_channels",
                 SettingsFragment.DEFAULT_WINE_DEBUG_CHANNELS);
         envVars.put("WINEDEBUG", com.winlator.cmod.agvn.AgvnWineDebug.spec(enableWineDebug, wineDebugChannels)); // AGVN: "warn+all", not "+warn"
+        if (!enableWineDebug) envVars.put("GST_DEBUG", com.winlator.cmod.agvn.AgvnWineDebug.QUIET_GST); // AGVN: a movie's decoder warnings only
 
         String rootPath = imageFs.getRootDir().getPath();
         FileUtils.clear(imageFs.getTmpDir());
@@ -3076,14 +3079,16 @@ public class XServerDisplayActivity extends AppCompatActivity {
         File userRegFile = new File(imageFs.getRootDir(), ImageFs.WINEPREFIX + "/user.reg");
 
         // AGVN: a game picks its resolution from Wine's mode list, so every Wine gets the emulated list and mode
-        // changes, XRandR or not; a Wine that does not know these keys ignores them.
+        // changes, XRandR or not; a Wine that does not know these keys ignores them. proton-9.0-arm64ec reads neither:
+        // in the virtual desktop every game starts in, its win32u lists the usual sizes up to the screen's, the
+        // screen's own included (desktop_update_display_devices), whatever the keys say.
         try (WineRegistryEditor registryEditor = new WineRegistryEditor(userRegFile)) {
             registryEditor.setStringValue(x11DriverKey, "EmulateModelist", "Y");
             registryEditor.setStringValue(x11DriverKey, "EmulateModeset", "Y");
         }
 
-        Log.d("XServerDisplayActivity", "Wine mode emulation: on"
-                + (xrandrCapable ? "" : " (layer has no XRandR)"));
+        Log.d("XServerDisplayActivity", "Wine mode emulation keys written (a Wine may ignore them)"
+                + (xrandrCapable ? "" : ", layer has no XRandR"));
     }
 
     private boolean isSelectedWineXrandrCapable() {

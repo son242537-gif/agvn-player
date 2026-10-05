@@ -14,7 +14,7 @@ là một nút. Bấm nút là app đổi cấu hình của riêng game đó r�
 | Game vừa thoát hoặc bị lỗi | Hộp hỏi ở thư viện (hoặc Big Picture) | Game tắt ngay khi mở, crash, thiếu DirectX, thiếu file `.dll`; game "Chạy nhẹ" báo lỗi script, bị tắt đột ngột, bị treo. Bấm một cách sửa là game mở lại ngay. |
 | Android đã tắt game | Hộp hỏi khi về thư viện (trong 24 giờ) | Máy hết RAM; HyperOS tắt game khi chuyển sang app khác. |
 | Game Windows vừa hiện khung | Thanh trên game | Khung game nhỏ hơn màn hình: app phóng cho vừa luôn. Khung game lớn hơn màn hình: app đề nghị đổi màn hình game. Xem "Vừa màn hình" bên dưới. |
-| Game Windows vẫn đen màn hình | Thanh trên game | Khoảng 20 giây sau khi mở (lâu hơn nếu game thường mở chậm), game vẫn chưa hiện hình, và có dấu hiệu màn hình nhỏ hơn game (khổ game KiriKiri, khung game bị cắt, Wine từ chối độ phân giải game xin): app đề nghị màn hình lớn hơn. Game DirectX đen mà không có dấu hiệu đó: app đề nghị "Bật Đồng bộ khung hình". Xem "Màn hình đen" bên dưới. |
+| Game Windows vẫn đen màn hình | Thanh trên game | Khoảng 20 giây sau khi mở (lâu hơn nếu game thường mở chậm), game vẫn chưa hiện hình, và có dấu hiệu màn hình chưa đủ lớn cho game (khổ game KiriKiri, game KiriKiri chưa đọc được khổ, khung game bị cắt, Wine từ chối độ phân giải game xin): app đề nghị màn hình lớn hơn. Game DirectX đen mà không có dấu hiệu đó: app đề nghị "Bật Đồng bộ khung hình". Xem "Màn hình đen" bên dưới. |
 
 Mỗi lỗi chỉ hỏi một lần. Cách sửa đã thử mà vẫn lỗi thì lần sau không hiện lại, cho đến khi game chạy tốt một
 lần. Lần chơi mà game đứng hình ít nhất 10 giây trước khi tắt, dù người chơi bấm ít nhất 5 lần, không tính là chạy tốt
@@ -185,7 +185,7 @@ nằm bên trong cửa sổ màn nền; app tìm ở mọi tầng. Khi game đã
 
 | Khung game | App làm gì |
 |---|---|
-| Nhỏ hơn 85% màn hình cả chiều ngang lẫn chiều dọc | Phóng khung game ra cả màn hình ngay, giữ đúng tỉ lệ (hoặc kéo giãn nếu game đang bật "Kéo giãn"). Chạm vào đâu trên khung là trúng chỗ đó trong game. Thanh báo có "Giữ như vậy" và "Trả lại như cũ". |
+| Nhỏ hơn 85% màn hình cả chiều ngang lẫn chiều dọc, hoặc khung phóng lên lấp màn hình điện thoại thì to ra ít nhất 1/0,85 lần (khoảng 18%), như khung 1288×769 của game KiriKiri 1280×720 trên màn hình 1280×1024 (ngang đã kín, dọc chỉ ba phần tư) | Phóng khung game ra cả màn hình ngay, giữ đúng tỉ lệ (hoặc kéo giãn nếu game đang bật "Kéo giãn"). Chạm vào đâu trên khung là trúng chỗ đó trong game. Thanh báo có "Giữ như vậy" và "Trả lại như cũ". |
 | Lớn hơn màn hình | Phần thừa bị cắt, chuột cũng không tới được, nên không phóng nhỏ được. Thanh báo đề nghị "Đổi màn hình game thành <cỡ khung>", rồi "Mở lại game ngay". Cửa sổ phóng to thì viền của nó thò ra ngoài mỗi cạnh vài điểm ảnh (Wine: 6), hình game bên trong vẫn đủ: thò ra không quá 16 điểm ảnh mỗi cạnh thì không tính là bị cắt (`AgvnFitMath.cutOff`). Khung game lớn theo màn hình thì đổi màn hình không giúp được: xem "Khung game lớn theo màn hình" bên dưới. |
 | Vừa | Không làm gì. Khung đổi cỡ sau đó thì app xét lại. |
 
@@ -214,14 +214,17 @@ màn hình mới, nên không bị trả về.
 
 ## Màn hình đen (game Windows)
 
-Game KiriKiri trên màn hình nhỏ hơn khổ game có thể đứng ở màn hình đen. Game xin chuyển sang toàn màn hình với
-độ phân giải của nó, nhưng Wine chỉ có các độ phân giải không lớn hơn màn hình game. Wine trả lỗi -2, và game không vẽ
-gì nữa. `AgvnBlackScreen` canh chuyện này cho mọi game Windows:
+Game KiriKiri trên màn hình không lớn hơn khổ game (bằng cũng tính) đứng ở màn hình đen: KAG3 chuyển sang toàn màn
+hình, và toàn màn hình DirectDraw treo đen trong Wine (xem phần KiriKiri bên dưới). Game khác xin độ phân giải lớn hơn
+màn hình thì Wine trả lỗi -2, và game không vẽ gì nữa. `AgvnBlackScreen` canh chuyện này cho mọi game Windows:
 
 - Mỗi 2 giây, app đọc 5 hàng điểm ảnh của khung game (`AgvnGameWindow`). Game vẽ bằng Vulkan hoặc OpenGL (DXVK, Zink)
   thì app đọc hình cuối cùng game gửi lên. Game vẽ bằng GDI thì app đọc hình trong khung. Hình nào máy không cho đọc thì
   không tính, nên không báo nhầm.
 - Hàng nào cũng chỉ có điểm ảnh tối (đỏ, xanh lá, xanh dương đều ≤ 24) thì là màn hình đen.
+- Khung toàn một màu sáng (mọi điểm đọc cùng một màu, chênh không quá 12) chưa phải hình của game: đó là nền của cửa
+  sổ lúc game chưa vẽ. Ngày 06/10 (bản 0.1.20), cửa sổ xám của một game KiriKiri bị tính là "đã hiện hình", nên khi
+  game treo đen lúc vào toàn màn hình, 5 phút liền app không hỏi.
 - App hỏi khi màn hình đen 3 lần đọc liền nhau (6 giây), sau 20 giây kể từ lúc mở game. Game thường mở chậm thì thời
   gian chờ là lần mở trước cộng 10 giây (`AgvnStartTimes`). App chỉ canh trong 1 phút sau thời gian chờ.
 - RAM của app và game còn tăng nhanh (từ 64 MB trở lên giữa hai lần đo RAM, 5 giây một lần) thì game đang tải: lần đọc
@@ -231,9 +234,16 @@ gì nữa. `AgvnBlackScreen` canh chuyện này cho mọi game Windows:
 - Game đã hiện hình rồi mới đen (cảnh mờ dần, cảnh tối) thì app không hỏi. Game đã hiện một hộp thông báo
   (`trace:msgbox`) cũng vậy: game đang chờ người chơi bấm, hoặc đã lỗi ("Assertion failed!", "Tự sửa lỗi" đọc hộp này
   khi game tắt). Trừ khi Wine đã từ chối độ phân giải game xin: nhật ký Wine có dòng `display settings returned -2`. Khi
-  đó app hỏi cả khi chưa thấy khung game.
-- Màn hình đề nghị (`AgvnBlackScreenRules.bigger`): khổ game KiriKiri nếu biết; khung game nếu khung lớn hơn màn hình;
-  nếu không thì cỡ kế tiếp trong 1280×720, 1600×900, 1920×1080. Màn hình đã là 1920×1080 thì app chỉ ghi vào nhật ký.
+  đó app hỏi cả khi chưa thấy khung game. Dòng này và dòng hộp thông báo được nhớ suốt lần chơi, dù đã trôi khỏi 300
+  dòng cuối của Wine.
+- Không dùng `display mode not found` hay `NtUserEnumDisplaySettings Failed to query` làm dấu hiệu: hai dòng này (cùng
+  `wined3d_output_get_mode Invalid mode_idx N`) là lúc game đọc hết danh sách độ phân giải, game DirectDraw/Direct3D nào
+  cũng có. Số `index 0` trong dòng là phần còn lại sau khi đếm, không phải "chế độ đầu tiên".
+- Màn hình đề nghị (`AgvnBlackScreenRules.bigger`): màn hình lớn hơn khổ game KiriKiri nếu biết khổ
+  (`AgvnKirikiriScreen.larger`); khung game nếu khung lớn hơn màn hình; game KiriKiri chưa đọc được khổ (`-`): game đã
+  vào toàn màn hình nên không nhỏ hơn màn hình, app đề nghị màn hình lớn hơn chính màn hình đang dùng (1280×720 thành
+  1280×1024); nếu không thì cỡ kế tiếp trong 1280×720, 1600×900, 1920×1080. Màn hình đã là 1920×1080 thì app chỉ ghi
+  vào nhật ký.
 - Cỡ kế tiếp chỉ được đề nghị khi Wine đã từ chối độ phân giải game xin. Game đen mà không có dấu hiệu nào ở trên là
   game đang tải, hoặc khung hình của game không lên được màn hình. Màn hình lớn hơn không chữa được cả hai, nên app
   không hỏi, chỉ ghi vào nhật ký "… khung game <cỡ>: không hỏi".
@@ -251,9 +261,12 @@ gì nữa. `AgvnBlackScreen` canh chuyện này cho mọi game Windows:
 
 Thanh "Màn hình game vẫn đen" có ba nút: "Đổi màn hình game thành <cỡ>" hoặc "Bật Đồng bộ khung hình" (rồi "Mở lại game
 ngay"), "Chờ thêm" (không hỏi lại trong lần chơi này), và "Để vậy, không hỏi lại" (`agvnBlackScreen`: 0 trong lối tắt).
-`tom-tat.txt` của phiên chơi ghi "Màn hình đen sau … giây".
+Game đã chọn "Để vậy, không hỏi lại" vẫn được canh: `su-kien.txt` vẫn ghi "Màn hình đen sau … giây …", chỉ không hiện
+thanh. Hết thời gian canh mà khung vẫn đen và app không hỏi (game đã hiện hình trước đó, hoặc đã hiện hộp thông báo),
+`su-kien.txt` ghi "Màn hình đen tới giây …, khung game …: không hỏi, <lý do>". `tom-tat.txt` của phiên chơi ghi "Màn hình
+đen sau … giây".
 
-## Game KiriKiri: màn hình không nhỏ hơn khổ game
+## Game KiriKiri: màn hình lớn hơn khổ game
 
 Khổ game KiriKiri nằm trong `system/Config.tjs` (`;scWidth = 1280;`, `;scHeight = 720;`). `AgvnKirikiri` đọc file này ở
 đúng chỗ game đọc: gói vá mới nhất (`patch3.xp3`, `patch2.xp3`, `patch.xp3`), `data.xp3`, thư mục `data` chưa đóng gói,
@@ -261,11 +274,54 @@ rồi các gói `.xp3` khác (gói nhỏ trước, tối đa 6 gói). `AgvnXp3` 
 nén zlib, bản 2 có "cushion", file nén hoặc không. `AgvnTjsText` đọc chữ: UTF-16, UTF-8, Shift-JIS, và dạng riêng của
 KiriKiri (`FE FE 0/1/2 FF FE`). Game mã hóa gói thì app không đọc được khổ game, và mọi thứ giữ như cũ.
 
-- Khi thêm game: màn hình game không nhỏ hơn khổ game. Ví dụ máy yếu (854×480) và game 1280×720 thì màn hình là 1280×720.
-  Hộp xem trước ghi "Độ phân giải: 1280x720 (bằng khổ của game, để game hiện đủ)".
-- Mức "Đồ họa" (và cách sửa "Đổi Đồ họa sang …") không làm màn hình nhỏ hơn khổ game. Mức thấp chỉ còn hạ FPS.
+KAG3 vào toàn màn hình ngay khi mở nếu màn hình **không lớn hơn** khổ game, kể cả khi bằng (`system/MainWindow.tjs`:
+`if(System.screenWidth <= scWidth && System.screenHeight <= scHeight)`). Toàn màn hình DirectDraw (chế độ độc quyền)
+treo đen trong Wine: ngày 06/10 (bản 0.1.20), game 1280×720 trên màn hình 1280×720 treo ở `ddraw_set_cooperative_level`
+(`DDSCL_ALLOWREBOOT`), tiến trình game ngủ, CPU không chạy. Cùng game trên màn hình 1280×1024 chạy trong cửa sổ, vẽ
+bình thường. Wine không thiếu độ phân giải: trong màn nền ảo, Proton 9 liệt kê 9 cỡ cho mỗi độ màu, có cả cỡ màn hình
+(`desktop_update_display_devices`); game vẫn treo khi vào toàn màn hình. Chỗ treo nằm trong Wine, cần nhật ký
+`+ddraw,+d3d,+win,+x11drv` để tìm. Trong lúc chờ, game KiriKiri luôn được màn hình lớn hơn nó (`AgvnKirikiriScreen`):
+
+- Màn hình đang dùng không nhỏ hơn khổ game ở chiều nào và lớn hơn ở ít nhất một chiều: giữ nguyên.
+- Nếu không: cỡ đầu tiên trong 640×480, 800×600, 1024×768, 1280×1024, 1600×1200, 1920×1440, 2560×1920 có chiều ngang
+  không nhỏ hơn game và chiều dọc hơn game ít nhất 64 điểm ảnh (chỗ cho thanh tiêu đề, thanh menu và viền cửa sổ). Ví
+  dụ: game 1280×720 hoặc 1280×960 → 1280×1024; 800×600 → 1024×768; 1024×768 → 1280×1024; 1600×900 → 1600×1200.
+- Áp dụng khi thêm game (hộp xem trước ghi "Độ phân giải: 1280x1024 (lớn hơn khổ game, để game chạy trong cửa sổ,
+  không treo màn đen)"), khi đổi mức "Đồ họa" (và cách sửa "Đổi Đồ họa sang …"), và mỗi lần mở game: lối tắt cũ đang để
+  màn hình bằng khổ game được nâng lên và lưu lại (`adb logcat -s AGVN`: `KiriKiri game 1280x720: screen 1280x720 ->
+  1280x1024`).
+- Game chạy trong cửa sổ nên khung nhỏ hơn màn hình: "Vừa màn hình" phóng khung lên cả màn hình điện thoại (xem trên).
 - Khổ game lưu trong lối tắt (`agvnGameSize`; `-` nếu không đọc được). Game KiriKiri đã thêm từ trước thì app đọc khổ ở
-  lần mở đầu tiên. Thanh "Màn hình đen" dùng khổ này để đề nghị.
+  lần mở đầu tiên (màn hình được nâng từ lần mở sau). Thanh "Màn hình đen" dùng khổ này để đề nghị.
+- Trong game, bấm F4 hoặc mục "Toàn màn hình" thì game vẫn treo như trên, cho tới khi Wine được sửa.
+
+## Phim trong game không phát được (game Windows)
+
+Ngày 06/10 (bản 0.1.20), một game KiriKiri đứng chờ phim mở đầu (WMV3, tức Windows Media Video 9, 1280×720 trong
+ASF) 4 phút 30 giây. Wine của app (`proton-9.0-arm64ec`) đưa phim cho bộ giải mã của GStreamer (`avdec_wmv3`) mà thiếu
+phần đầu chuỗi (`codec_data`, nằm sau `VIDEOINFOHEADER` hoặc trong `MF_MT_USER_DATA`). Bộ giải mã từ chối mọi khung:
+`Subclass refused caps` và `Failed to push transform input, error -4` lặp hàng trăm lần mỗi giây. Wine không báo lỗi
+cho game (không có `EC_ERRORABORT` hay `EC_COMPLETE`), nên game chờ mãi. Lỗi nằm trong winegstreamer của bản Wine này
+(bản dựng trên Termux, có `wg_media_type.c`); sửa tận gốc cần dựng lại Wine hoặc đổi sang bản Wine có bản sửa.
+
+Trong lúc chờ, app canh lỗi này cho mọi game (`AgvnMovieWatch`, `AgvnMovieRules`):
+
+- Tắt "Bật debug Wine" thì GStreamer không in gì (winegstreamer chỉ đặt `GST_DEBUG` khi kênh gstreamer của Wine bật).
+  App đặt `GST_DEBUG=WINE:2,videodecoder:2`: chỉ cảnh báo của bộ giải mã phim và của winegstreamer. Người chơi tự đặt
+  `GST_DEBUG` trong biến môi trường thì app giữ của người chơi.
+- Từ 100 dòng từ chối trở lên trong 5 giây, kéo dài ít nhất 1 giây: phim không phát được. `su-kien.txt` ghi "Phim
+  trong game không phát được: WMV3 1280x720 …" (định dạng đọc từ dòng caps Wine in ra), và dòng trên góc phải đổi
+  thành "Phim trong game không phát được (0:12)".
+- Thanh "Phim trong game không phát được" có "Bỏ qua phim" và "Chờ thêm". "Bỏ qua phim" nhấp chuột giữa khung game;
+  2,5 giây sau phim vẫn kẹt thì gửi phím Esc. `su-kien.txt` ghi "Bỏ qua phim: được, bằng nhấp chuột" (hoặc "phím Esc"),
+  hoặc "Bỏ qua phim: không được". Không được thì lối tắt nhớ (`agvnMovieSkip`: 0), lần sau thanh chỉ báo lỗi, không
+  đề nghị bỏ qua nữa.
+- Phim ngừng lỗi 10 giây rồi một phim khác lỗi: app báo lại.
+
+Nhật ký Wine không còn phình vì dòng lặp (`AgvnLogRepeats`): dòng nào đã ghi trong 5 giây qua (bỏ qua giờ, luồng và
+địa chỉ `0x…`) thì không ghi lại, mỗi giây ghi một dòng "[AGVN] ×N nữa: …". Quá 64 MB thì ngừng ghi, kèm một dòng báo.
+300 dòng cuối của Wine (`wine-cuoi.txt`, và chỗ "Tự sửa lỗi" đọc) cũng gộp dòng lặp ("[AGVN] ×N dòng lặp lại"), nên
+phim lỗi không đẩy các dòng khác ra ngoài.
 
 ## Game .NET (Wine Mono)
 
@@ -306,9 +362,10 @@ Khi tắt "Bật debug Wine", app vẫn cho Wine in ba nhóm lỗi: `err+module`
 chỉ in khi có lỗi thật, nên không làm game chậm.
 
 App luôn đặt `EmulateModelist` và `EmulateModeset` = `Y` (khóa `Software\Wine\X11 Driver`), dù bản Wine có XRandR hay
-không. Lưu ý: Proton 9 đi kèm app không đọc hai khóa này. Trong màn nền ảo, danh sách độ phân giải của nó chỉ có các cỡ
-không lớn hơn màn hình game (`win32u`, `desktop_update_display_devices`). Game xin cỡ lớn hơn thì nhận lỗi -2. Vì vậy
-màn hình game phải đủ lớn ngay từ đầu (phần KiriKiri và "Màn hình đen" ở trên).
+không. Lưu ý: Proton 9 đi kèm app không đọc hai khóa này (trong `winex11.so` không có tên khóa nào). Trong màn nền ảo,
+danh sách độ phân giải của nó có các cỡ chuẩn không lớn hơn màn hình game, cộng cỡ màn hình (`win32u`,
+`desktop_update_display_devices`). Game xin cỡ lớn hơn thì nhận lỗi -2. Vì vậy màn hình game phải đủ lớn ngay từ đầu
+(phần KiriKiri và "Màn hình đen" ở trên). `adb logcat` ghi `Wine mode emulation keys written (a Wine may ignore them)`.
 
 Bật hay tắt debug, Wine cũng ghi chữ trong mọi hộp thông báo game hiện ra (`trace+msgbox`): mỗi hộp một dòng
 `trace:msgbox:MSGBOX_OnInit L"..."` trong `wine-cuoi.txt`. Wine cắt dòng này sau khoảng 290 ký tự. Nhiều game chỉ báo lỗi
@@ -377,11 +434,27 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       đưa về thư viện và không có hộp hỏi.
 - [ ] Game mở chậm (hơn 10 giây không vẽ, ví dụ game Unity trên máy yếu): lần mở sau, dòng trên góc phải ghi "Đang khởi
       động 0:25 · lần trước 1:40".
-- [ ] Thêm một game KiriKiri 1280×720 trên máy yếu (Thấp, 854×480): hộp xem trước ghi "Độ phân giải: 1280x720 (bằng khổ
-      của game, để game hiện đủ)"; `adb logcat -s AGVN` có `KiriKiri game size 1280x720 (data.xp3>system/Config.tjs)`.
-      Vào game: thấy đủ hình. Mở hộp Đồ họa: các mức đều ghi 1280×720.
-- [ ] Game KiriKiri đã thêm từ trước, màn hình nhỏ hơn khổ game, đứng ở màn hình đen: khoảng 20 giây sau có thanh "Màn
-      hình game vẫn đen" với "Đổi màn hình game thành <khổ game>". Bấm rồi "Mở lại game ngay": game hiện hình.
+- [ ] Thêm một game KiriKiri 1280×720 (máy nào cũng vậy): hộp xem trước ghi "Độ phân giải: 1280x1024 (lớn hơn khổ game,
+      …)"; `adb logcat -s AGVN` có `KiriKiri game size 1280x720 (data.xp3>system/Config.tjs)`. Vào game: không có dòng
+      `DDSCL_ALLOWREBOOT` trong nhật ký Wine, plugin nạp ở `first.ks` có trong nhật ký, game vẽ hình trong cửa sổ, và
+      vài giây sau khung game được phóng vừa màn hình điện thoại (thanh "Khung game nhỏ hơn màn hình"), không còn viền
+      đen lớn trên dưới. Mở hộp Đồ họa: các mức đều ghi 1280×1024.
+- [ ] Game KiriKiri đã thêm từ trước, lối tắt đang để màn hình bằng khổ game (1280×720): lần mở sau `adb logcat -s AGVN`
+      có `KiriKiri game 1280x720: screen 1280x720 -> 1280x1024`, cài đặt game ghi 1280x1024, game vào được.
+- [ ] Game KiriKiri chưa đọc được khổ (gói mã hóa, `agvnGameSize` = `-`) mà treo đen lúc mở: khoảng 20–30 giây sau có
+      thanh "Màn hình game vẫn đen" với "Đổi màn hình game thành 1280×1024" (màn hình đang 1280×720); `su-kien.txt` có
+      "Màn hình đen sau … giây …: hỏi đổi sang 1280x1024". Bấm rồi "Mở lại game ngay": game hiện hình.
+- [ ] Game đã chọn "Để vậy, không hỏi lại" ở thanh màn hình đen mà vẫn đen: không có thanh, nhưng `su-kien.txt` vẫn có
+      dòng "Màn hình đen sau … giây".
+- [ ] Game KiriKiri phát phim WMV3 (như game ở phiếu 06/10, màn hình 1280×1024), "Bật debug Wine" tắt: trong 10 giây có
+      thanh "Phim trong game không phát được" với "Bỏ qua phim"; dòng góc phải ghi "Phim trong game không phát được
+      (…)"; `su-kien.txt` có "Phim trong game không phát được: WMV3 1280x720". Bấm "Bỏ qua phim": `su-kien.txt` có "Bỏ
+      qua phim: được, …" và game đi tiếp, hoặc "Bỏ qua phim: không được"; khi đó lần mở sau thanh không còn nút bỏ qua.
+- [ ] Bật "Bật debug Wine", để phim lỗi chạy 5 phút: file nhật ký Wine dưới vài MB, có các dòng "[AGVN] ×… nữa: …"
+      thay cho hàng trăm nghìn dòng lặp; `wine-cuoi.txt` có "[AGVN] ×… dòng lặp lại" và vẫn còn các dòng khác.
+- [ ] Game Unity phát phim H.264/MP4 qua Media Foundation: phim vẫn phát như trước, không có thanh phim lỗi;
+      `moi-truong.txt` có `GST_DEBUG=WINE:2,videodecoder:2` khi tắt debug.
+- [ ] Một game Unity/DXVK và một game Ren'Py vẫn vào menu như trước, không có thanh mới.
 - [ ] Game có cảnh tối hoặc mờ dần sau khi đã hiện hình: không có thanh "Màn hình game vẫn đen".
 - [ ] Máy Mali, game bị hộp "Assertion failed!" ngay khi mở (như Support Pregnancy School): để hộp đó hơn 30 giây,
   không có thanh "Màn hình game vẫn đen". Bấm OK thì thư viện hỏi "Driver đồ họa bị lỗi khi game vẽ hình".
@@ -417,5 +490,6 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
 - [ ] Mở một game không phải .NET: không cài gì, `su-kien.txt` không nhắc Wine Mono.
 - [ ] Game có hộp "Bad EXE format" của Wine (ví dụ chọn nhầm một file không phải chương trình Windows, đổi đuôi
       thành `.exe`): thư viện hỏi "File chạy của game không đúng định dạng", không còn "Game tắt ngay sau khi mở".
-- [ ] `adb logcat`: dòng `Wine mode emulation: on`; `wine-cuoi.txt` của game bị đen có `display settings returned -2`.
+- [ ] `adb logcat`: dòng `Wine mode emulation keys written`; `wine-cuoi.txt` của game bị đen vì Wine từ chối độ phân
+      giải có `display settings returned -2`.
 - [ ] `adb logcat -s AGVN`: dòng `doctor: <lỗi> for <game>` và `fix <cách sửa> -> <giá trị>`.

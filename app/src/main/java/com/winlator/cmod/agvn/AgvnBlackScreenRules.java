@@ -9,14 +9,15 @@ import java.util.List;
  * whose resolution Wine refused, past {@link #MIN_WAIT_MS} (or its last start plus {@link #AFTER_LAST_START_MS}, for a
  * game known to start slowly): the screen may be smaller than the game. A game that has shown a picture and goes black
  * later is a scene (a fade, a dark room), and one that showed a message box waits on it or crashed into it ("Assertion
- * failed!", read by "Tự sửa lỗi" when the game ends), unless Wine refused its resolution. Black while the game's
- * memory still grows fast ({@link #LOADING_MB}) is a loading screen and does not count: Lg Light (Unity) took
- * 150-300 MB every 10 s, black, until it ran out of RAM, and was offered a larger screen at 22 s, which only takes
- * more. Pure Java (JVM-testable).
+ * failed!", read by "Tự sửa lỗi" when the game ends), unless Wine refused its resolution. A window all of one lit
+ * colour is not a picture: it is the window's own background before the game draws (a KiriKiri game's grey window
+ * then hung black going full screen, 0.1.20, and was never asked). Black while the game's memory still grows fast
+ * ({@link #LOADING_MB}) is a loading screen and does not count: Lg Light (Unity) took 150-300 MB every 10 s, black,
+ * until it ran out of RAM, and was offered a larger screen at 22 s, which only takes more. Pure Java (JVM-testable).
  */
 final class AgvnBlackScreenRules {
-    /** What a look at the game's window found. */
-    enum Look { BLACK, PICTURE, UNKNOWN, NO_WINDOW }
+    /** What a look at the game's window found: PLAIN is one lit colour all over, the window's own background. */
+    enum Look { BLACK, PLAIN, PICTURE, UNKNOWN, NO_WINDOW }
 
     enum Step { WAIT, OFFER, STOP }
 
@@ -27,6 +28,8 @@ final class AgvnBlackScreenRules {
     static final int DARK = 24;
     /** Pixels looked at across a row. */
     static final int ROW_SAMPLES = 64;
+    /** How far a pixel's red, green or blue may be from the first one's in a window of one colour. */
+    static final int PLAIN_SPREAD = 12;
     /** Screens offered when the game's own size is not known, smallest first. */
     static final String[] SCREENS = {"1280x720", "1600x900", "1920x1080"};
     /**
@@ -68,14 +71,36 @@ final class AgvnBlackScreenRules {
         return elapsedMs >= Math.max(waitMs, loadingMs) + WATCH_MS ? Step.STOP : Step.WAIT;
     }
 
+    /** True when the last {@link #BLACK_LOOKS} looks or more found black. */
+    boolean blackNow() {
+        return black >= BLACK_LOOKS;
+    }
+
+    /** True when the game has shown a picture. */
+    boolean shown() {
+        return shown;
+    }
+
     /** True when every looked-at pixel of {@code row} (4 bytes a pixel, any 8-bit order) is dark. */
     static boolean dark(ByteBuffer row, int width) {
+        return look(new ByteBuffer[]{row}, width) == Look.BLACK;
+    }
+
+    /** BLACK when every looked-at pixel of {@code rows} is dark, PLAIN when they are all one lit colour, else PICTURE. */
+    static Look look(ByteBuffer[] rows, int width) {
         int step = Math.max(1, width / ROW_SAMPLES);
-        for (int x = 0; x < width; x += step) {
-            int at = x * 4;
-            for (int c = 0; c < 3; c++) if ((row.get(at + c) & 0xff) > DARK) return false;
+        boolean lit = false, plain = true;
+        int[] first = null;
+        for (ByteBuffer row : rows) {
+            for (int x = 0; x < width; x += step) {
+                int at = x * 4;
+                int[] rgb = {row.get(at) & 0xff, row.get(at + 1) & 0xff, row.get(at + 2) & 0xff};
+                if (rgb[0] > DARK || rgb[1] > DARK || rgb[2] > DARK) lit = true;
+                if (first == null) first = rgb;
+                for (int c = 0; c < 3 && plain; c++) if (Math.abs(rgb[c] - first[c]) > PLAIN_SPREAD) plain = false;
+            }
         }
-        return true;
+        return !lit ? Look.BLACK : plain ? Look.PLAIN : Look.PICTURE;
     }
 
     /** True when Wine refused a resolution the game asked for. */
@@ -97,16 +122,22 @@ final class AgvnBlackScreenRules {
      * loading, or one whose frames do not reach the screen, and a larger screen lights neither: Legend Cleaner opened
      * 711x400 on 854x480 while it loaded, and Support Pregnancy School stayed black full screen (1280x720) on a
      * Mali-G615 until "Đồng bộ khung hình" and "Tắt Present Wait" were on ({@link AgvnPresentSync}, which the bar then
-     * offers a DirectX game). {@code window} is null for one that followed its screen ({@link AgvnScreenGrowth}). Null
-     * when there is none.
+     * offers a DirectX game). {@code window} is null for one that followed its screen ({@link AgvnScreenGrowth}). A
+     * KiriKiri game whose size could not be read ({@link AgvnKirikiri#UNKNOWN}) and stays black has gone full screen,
+     * so it is no smaller than the screen: it gets one larger ({@link AgvnKirikiriScreen#larger}). Null when there is
+     * none.
      */
     static String bigger(String screen, String gameSize, int[] window, boolean refused) {
         int[] now = size(screen);
         if (now == null) return null;
-        String forGame = AgvnKirikiri.notSmaller(screen, gameSize);
+        String forGame = AgvnKirikiriScreen.larger(screen, gameSize);
         if (forGame != null && !forGame.equals(screen)) return forGame;
         if (window != null && AgvnFitMath.cutOff(window[0], window[1], window[2], window[3], now[0], now[1]))
             return AgvnFitMath.screenFor(Math.max(window[2], now[0]), Math.max(window[3], now[1]));
+        if (AgvnKirikiri.UNKNOWN.equals(gameSize)) {
+            String kirikiri = AgvnKirikiriScreen.larger(screen, screen);
+            if (!screen.equals(kirikiri)) return kirikiri;
+        }
         if (!refused) return null;
         for (String s : SCREENS) {
             int[] wh = size(s);

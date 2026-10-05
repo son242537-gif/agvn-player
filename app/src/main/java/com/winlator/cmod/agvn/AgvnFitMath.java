@@ -26,10 +26,22 @@ public final class AgvnFitMath {
 
     /** {@link #SMALL}, {@link #OVERFLOW}, or null when a w x h window at x, y suits an sw x sh screen. */
     static String verdict(int x, int y, int w, int h, int sw, int sh) {
+        return verdict(x, y, w, h, sw, sh, 0, 0);
+    }
+
+    /**
+     * As above, for the screen drawn on a vw x vh view (0 x 0: not known). A small frame is under {@link #SMALL_SHARE}
+     * of the screen both ways, or one that drawn over the whole view shows at least 1 / {@link #SMALL_SHARE} times
+     * larger: a KiriKiri game's 1288x769 window, on the 1280x1024 screen it gets
+     * ({@link AgvnKirikiriScreen#larger}), takes three quarters of a 2400x1080 view's height, and all of it alone.
+     */
+    static String verdict(int x, int y, int w, int h, int sw, int sh, int vw, int vh) {
         if (w <= 0 || h <= 0 || sw <= 0 || sh <= 0) return null;
         if (cutOff(x, y, w, h, sw, sh)) return OVERFLOW;
         if (w <= sw * SMALL_SHARE && h <= sh * SMALL_SHARE) return SMALL;
-        return null;
+        if (vw <= 0 || vh <= 0) return null;
+        float whole = Math.min((float) vw / sw, (float) vh / sh), alone = Math.min((float) vw / w, (float) vh / h);
+        return alone * SMALL_SHARE >= whole ? SMALL : null;
     }
 
     /**

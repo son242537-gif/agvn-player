@@ -190,7 +190,7 @@ public final class AgvnGameImporter {
         shortcut.putExtra("envVars", buildEnvVars(p.env, dlls));
         AgvnQuality.setStartFps(shortcut, eff.fps);
         AgvnLayouts.applyImport(shortcut, AgvnLayouts.kindFor(p, c.engine));
-        String screen = AgvnKirikiri.notSmaller(eff.resolution, c.gameSize); // a KiriKiri game shows whole
+        String screen = AgvnKirikiriScreen.larger(eff.resolution, c.gameSize); // a KiriKiri game plays in its window
         if (screen != null) shortcut.putExtra("screenSize", screen);
         shortcut.putExtra(AgvnKirikiri.EXTRA_GAME_SIZE, c.gameSize);
         shortcut.putExtra("simTouchScreen", p.isSimulatedTouchscreen() ? "1" : "0");

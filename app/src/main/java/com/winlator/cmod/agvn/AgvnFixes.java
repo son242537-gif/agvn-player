@@ -142,7 +142,7 @@ final class AgvnFixes {
         int to = id.equals("quality-down") ? step - 1 : auto ? step : step + 1;
         if (to < 0 || to > 4) return null;
         AgvnQuality.Level level = AgvnQuality.Level.atStep(to);
-        String screen = AgvnKirikiri.screenFor(s, level.resolution);
+        String screen = AgvnKirikiriScreen.screenFor(s, level.resolution);
         if (id.equals("quality-down") && AgvnGoodConfig.refused(state, screen)) return null;
         return new Fix(id, a.getString(R.string.agvn_fix_quality, AgvnQualityDialog.name(a, level),
                 screen.replace('x', '×')), level.name());

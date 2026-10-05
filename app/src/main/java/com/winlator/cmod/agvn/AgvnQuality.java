@@ -82,7 +82,7 @@ public final class AgvnQuality {
 
     /**
      * Effective values for {@code level}: AUTO follows the phone tier and game profile, a slider step is fixed. The
-     * screen is never smaller than a KiriKiri game ({@link AgvnKirikiri#screenFor}).
+     * screen is larger than a KiriKiri game ({@link AgvnKirikiriScreen#screenFor}).
      */
     public static LaunchPresetResolver.Effective effective(Context ctx, Shortcut shortcut, Level level) {
         LaunchPresetResolver.Effective eff;
@@ -91,7 +91,7 @@ public final class AgvnQuality {
             DeviceTier tier = DeviceTierManager.current(ctx);
             eff = LaunchPresetResolver.resolve(profileOf(shortcut), tier, DeviceTierManager.getRules(ctx).preset(tier));
         }
-        return new LaunchPresetResolver.Effective(AgvnKirikiri.screenFor(shortcut, eff.resolution), eff.fps, eff.texturePool);
+        return new LaunchPresetResolver.Effective(AgvnKirikiriScreen.screenFor(shortcut, eff.resolution), eff.fps, eff.texturePool);
     }
 
     public static void apply(Context ctx, Shortcut shortcut, Level level) {

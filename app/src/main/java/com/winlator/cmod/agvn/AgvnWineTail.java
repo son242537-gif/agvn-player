@@ -15,17 +15,21 @@ import java.util.List;
  * What Wine and the programs it starts print, kept in memory for the play session summary, with "Bật debug Wine" off
  * too. Wine prints "Unhandled page fault ..." and winedbg its crash report whatever WINEDEBUG says, but nothing read
  * them, and winedbg exits with 0, so a crashed game read as a normal end. Keeps the last {@link #LINES} lines and the
- * first crash report (it can be longer than the tail: modules and threads follow the backtrace). The tail goes into the
- * session folder as {@value #FILE}.
+ * first crash report (it can be longer than the tail: modules and threads follow the backtrace). A line that came in
+ * the last {@link #RECENT} kept ones (its thread and addresses aside) is counted, not kept: a movie Wine cannot decode
+ * prints two lines hundreds of times a second ({@link AgvnMovieRules}), which pushed everything else out. The tail goes
+ * into the session folder as {@value #FILE}.
  */
 public final class AgvnWineTail implements Callback<String> {
-    static final int LINES = 300, CRASH_LINES = 200, LINE_CHARS = 1000;
+    static final int LINES = 300, CRASH_LINES = 200, LINE_CHARS = 1000, RECENT = 4;
     static final String FILE = "wine-cuoi.txt";
     private static final AgvnWineTail INSTANCE = new AgvnWineTail();
 
     private final ArrayDeque<String> tail = new ArrayDeque<>();
     private final List<String> crash = new ArrayList<>();
+    private final ArrayDeque<String> recentKeys = new ArrayDeque<>();
     private boolean inCrash;
+    private int again;
 
     public static AgvnWineTail get() {
         return INSTANCE;
@@ -35,20 +39,35 @@ public final class AgvnWineTail implements Callback<String> {
     public synchronized void reset() {
         tail.clear();
         crash.clear();
+        recentKeys.clear();
         inCrash = false;
+        again = 0;
     }
 
     @Override
     public synchronized void call(String line) {
         if (line == null) return;
         if (line.length() > LINE_CHARS) line = line.substring(0, LINE_CHARS);
-        if (tail.size() == LINES) tail.removeFirst();
-        tail.addLast(line);
         if (!inCrash && crash.isEmpty() && AgvnCrashScan.startsCrash(line)) inCrash = true;
         if (inCrash) {
             crash.add(line);
             if (crash.size() >= CRASH_LINES) inCrash = false;
         }
+        String key = AgvnLogRepeats.key(line);
+        if (recentKeys.contains(key)) {
+            again++;
+            return;
+        }
+        if (again > 0) keep("[AGVN] ×" + again + " dòng lặp lại");
+        again = 0;
+        keep(line);
+        recentKeys.addLast(key);
+        if (recentKeys.size() > RECENT) recentKeys.removeFirst();
+    }
+
+    private void keep(String line) {
+        if (tail.size() == LINES) tail.removeFirst();
+        tail.addLast(line);
     }
 
     /** The first crash report of the game, or an empty list. */

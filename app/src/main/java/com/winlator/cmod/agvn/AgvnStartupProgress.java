@@ -45,6 +45,8 @@ public final class AgvnStartupProgress {
     static final long ANSWER_MS = 1500;
     /** Ren'Py's log once its first screen is up (Ren'Py 6 to 8). */
     private static final String[] READY = {"Interface start took", "Total time until interface ready"};
+    /** Why the game does not go on, said instead of "Đang khởi động" (a string with the time so far), or 0. */
+    private static volatile int problem;
 
     private final Activity activity;
     private final AgvnStatusLine line;
@@ -74,6 +76,7 @@ public final class AgvnStartupProgress {
 
     /** Starts watching as Wine starts the game. */
     public static AgvnStartupProgress start(Activity activity, Shortcut shortcut, AgvnStatusLine line) {
+        problem = 0;
         AgvnStartupProgress p = new AgvnStartupProgress(activity, line, AgvnEngineLogs.of(shortcut), shortcut.file.getPath());
         p.timer.scheduleWithFixedDelay(p::tick, TICK_MS, TICK_MS, TimeUnit.MILLISECONDS);
         return p;
@@ -89,6 +92,11 @@ public final class AgvnStartupProgress {
     /** True when a window update at {@code nowMs} answers the player's input at {@code inputMs} (uptime clock). */
     static boolean answers(long inputMs, long nowMs, long startMs) {
         return inputMs > startMs && nowMs - inputMs >= 0 && nowMs - inputMs <= ANSWER_MS;
+    }
+
+    /** Why the game does not go on: {@code stringRes} ("Phim trong game không phát được (%1$s)"), 0 for none. */
+    public static void problem(int stringRes) {
+        problem = stringRes;
     }
 
     public void stop() {
@@ -122,7 +130,8 @@ public final class AgvnStartupProgress {
                     && share(latest[1] - first[1], latest[0] - first[0], Os.sysconf(OsConstants._SC_CLK_TCK)) < 0.05;
             // the log's last line only for "Bật debug Wine": with logs off, no log text on the game
             boolean debug = PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("enable_wine_debug", false);
-            String text = activity.getString(stalled ? R.string.agvn_startup_stalled : R.string.agvn_startup_progress, clock(elapsed))
+            int lead = problem != 0 ? problem : stalled ? R.string.agvn_startup_stalled : R.string.agvn_startup_progress;
+            String text = activity.getString(lead, clock(elapsed))
                     + (lastStartMs > 0 ? " · " + activity.getString(R.string.agvn_startup_last, clock(lastStartMs)) : "")
                     + (last.isEmpty() || !debug ? "" : " · " + last);
             activity.runOnUiThread(() -> {

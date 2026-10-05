@@ -16,7 +16,7 @@ import java.util.Collections;
 public class AgvnBlackScreenTest {
     private static final AgvnBlackScreenRules.Look BLACK = AgvnBlackScreenRules.Look.BLACK,
             PICTURE = AgvnBlackScreenRules.Look.PICTURE, UNKNOWN = AgvnBlackScreenRules.Look.UNKNOWN,
-            NO_WINDOW = AgvnBlackScreenRules.Look.NO_WINDOW;
+            NO_WINDOW = AgvnBlackScreenRules.Look.NO_WINDOW, PLAIN = AgvnBlackScreenRules.Look.PLAIN;
     private static final AgvnBlackScreenRules.Step WAIT = AgvnBlackScreenRules.Step.WAIT,
             OFFER = AgvnBlackScreenRules.Step.OFFER, STOP = AgvnBlackScreenRules.Step.STOP;
 
@@ -53,6 +53,37 @@ public class AgvnBlackScreenTest {
         AgvnBlackScreenRules refused = new AgvnBlackScreenRules(0);
         refused.next(PICTURE, 10_000, false, false, false);
         assertEquals(OFFER, run(refused, BLACK, 12_000, 30_000, true)); // then its full screen was refused
+    }
+
+    @Test
+    public void aWindowOfOneColourIsNotAPicture() {
+        // a KiriKiri game's window, grey before the game drew, then black going full screen (0.1.20): never asked
+        AgvnBlackScreenRules rules = new AgvnBlackScreenRules(0);
+        assertEquals(WAIT, rules.next(PLAIN, 4000, false, false, false));
+        assertFalse(rules.shown());
+        assertEquals(OFFER, run(rules, BLACK, 6000, 30_000, false));
+        assertTrue(rules.blackNow());
+        AgvnBlackScreenRules scene = new AgvnBlackScreenRules(0);
+        scene.next(PICTURE, 4000, false, false, false);
+        assertEquals(STOP, run(scene, BLACK, 6000, 200_000, false)); // a scene: not asked, but blackNow says so
+        assertTrue(scene.shown());
+        assertTrue(scene.blackNow());
+    }
+
+    @Test
+    public void blackPlainAndPictureRows() {
+        int width = 1280;
+        ByteBuffer black = ByteBuffer.allocate(width * 4), grey = ByteBuffer.allocate(width * 4);
+        for (int i = 0; i < width; i++) for (int c = 0; c < 3; c++) grey.put(i * 4 + c, (byte) 0xf0);
+        ByteBuffer[] dark = {black, black};
+        assertEquals(BLACK, AgvnBlackScreenRules.look(dark, width));
+        assertEquals(PLAIN, AgvnBlackScreenRules.look(new ByteBuffer[]{grey, grey}, width));
+        grey.put(640 * 4, (byte) (0xf0 - AgvnBlackScreenRules.PLAIN_SPREAD)); // a shade off is still the same grey
+        assertEquals(PLAIN, AgvnBlackScreenRules.look(new ByteBuffer[]{grey, grey}, width));
+        assertEquals(PICTURE, AgvnBlackScreenRules.look(new ByteBuffer[]{grey, black}, width)); // lit and black
+        ByteBuffer logo = ByteBuffer.allocate(width * 4);
+        logo.put(640 * 4 + 2, (byte) 0x80);
+        assertEquals(PICTURE, AgvnBlackScreenRules.look(new ByteBuffer[]{black, logo}, width)); // a lit pixel on black
     }
 
     @Test
@@ -142,32 +173,38 @@ public class AgvnBlackScreenTest {
         // Legend Cleaner (Unreal) on a Mali-G610, black while it loads and then out of RAM: 711x400 in a 719x426 frame
         // on 854x480, 1066x600 on 1280x720, 1440x720 on 1600x900. Each larger screen only made a larger window.
         assertNull(AgvnBlackScreenRules.bigger("854x480", null, new int[]{67, 27, 719, 426}, false));
-        assertNull(AgvnBlackScreenRules.bigger("1600x900", "-", new int[]{76, 73, 1448, 754}, false));
+        assertNull(AgvnBlackScreenRules.bigger("1600x900", "", new int[]{76, 73, 1448, 754}, false));
         // Support Pregnancy School (Unreal) on a Mali-G615 (0.1.17): black full screen at 1280x720 after 32 s; it
         // started with "Đồng bộ khung hình" and "Tắt Present Wait" on, not with a larger screen
         int[] hd = {0, 0, 1280, 720};
-        assertNull(AgvnBlackScreenRules.bigger("1280x720", "-", hd, false));
+        assertNull(AgvnBlackScreenRules.bigger("1280x720", "", hd, false));
         int[] maximized = {-6, -6, 972, 556};
         assertNull("a maximized window", AgvnBlackScreenRules.bigger("960x544", null, maximized, false));
         assertNull("no window seen", AgvnBlackScreenRules.bigger("1280x800", null, null, false));
         // Wine refused the game's mode: the screen is too small for it
         assertEquals("1280x720", AgvnBlackScreenRules.bigger("854x480", null, new int[]{67, 27, 719, 426}, true));
-        assertEquals("1600x900", AgvnBlackScreenRules.bigger("1280x720", "-", hd, true));
+        assertEquals("1600x900", AgvnBlackScreenRules.bigger("1280x720", "", hd, true));
     }
 
     @Test
     public void theLargerScreenOffered() {
         int[] full = {0, 0, 854, 480};
-        // a KiriKiri game's size, also when it is taller
-        assertEquals("1280x720", AgvnBlackScreenRules.bigger("854x480", "1280x720", full, false));
-        assertEquals("800x600", AgvnBlackScreenRules.bigger("960x544", "800x600", new int[]{0, 0, 960, 544}, false));
+        // a KiriKiri game: a screen larger than it (AgvnKirikiriScreen), also when it is taller or of its size
+        assertEquals("1280x1024", AgvnBlackScreenRules.bigger("854x480", "1280x720", full, false));
+        assertEquals("1024x768", AgvnBlackScreenRules.bigger("960x544", "800x600", new int[]{0, 0, 960, 544}, false));
+        int[] hd720 = {0, 0, 1280, 720};
+        assertEquals("1280x1024", AgvnBlackScreenRules.bigger("1280x720", "1280x720", hd720, false));
+        // its size not read: KAG3 went full screen, so it is no smaller than the screen
+        assertEquals("1280x1024", AgvnBlackScreenRules.bigger("1280x720", "-", hd720, false));
+        assertEquals("1288x770", AgvnBlackScreenRules.bigger("1280x720", "-", new int[]{-4, -24, 1288, 769}, false));
+        assertNull("a larger screen already", AgvnBlackScreenRules.bigger("1280x1024", "1280x720", hd720, false));
         // a window the screen cuts off: its own size
         assertEquals("1024x768", AgvnBlackScreenRules.bigger("854x480", null, new int[]{0, 0, 1024, 768}, false));
-        assertEquals("1280x720", AgvnBlackScreenRules.bigger("854x480", "-", full, true)); // refused: the next screen
+        assertEquals("1280x720", AgvnBlackScreenRules.bigger("854x480", "", full, true)); // refused: the next screen
         // a maximized window's frame past the edges is no reason for a screen its size: the next one
         assertEquals("1280x720", AgvnBlackScreenRules.bigger("960x544", null, new int[]{-6, -6, 972, 556}, true));
         int[] hd = {0, 0, 1280, 720};
-        assertEquals("1600x900", AgvnBlackScreenRules.bigger("1280x720", "1280x720", hd, true));
+        assertEquals("1280x1024", AgvnBlackScreenRules.bigger("1280x720", "1280x720", hd, true));
         assertEquals("1600x900", AgvnBlackScreenRules.bigger("1280x800", null, null, true));
         assertEquals("1920x1080", AgvnBlackScreenRules.bigger("1600x900", null, null, true));
         int[] fullHd = {0, 0, 1920, 1080};

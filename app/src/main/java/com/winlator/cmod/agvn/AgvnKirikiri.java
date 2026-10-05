@@ -16,17 +16,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A KiriKiri game's own size, from the ";scWidth = 1280;" and ";scHeight = 720;" lines of its system/Config.tjs (KAG).
- * A screen smaller than the game cuts it off, and in full screen it stays black: Wine offers the game only modes up
- * to the screen's size. So the game gets a screen not smaller than itself ({@link #notSmaller}), at import and from
- * "Đồ họa". Config.tjs is read where the game reads it: the last patch archive (patch3.xp3, patch2.xp3, patch.xp3),
- * data.xp3, the unpacked data folder, then the other archives, smallest first.
+ * A KiriKiri game's own size, from the ";scWidth = 1280;" and ";scHeight = 720;" lines of its system/Config.tjs (KAG),
+ * for the screen it gets ({@link AgvnKirikiriScreen}). Config.tjs is read where the game reads it: the last patch
+ * archive (patch3.xp3, patch2.xp3, patch.xp3), data.xp3, the unpacked data folder, then the other archives, smallest
+ * first.
  */
 public final class AgvnKirikiri {
     private static final String TAG = "AGVN";
     /** The game's own size, "1280x720", read at import or at its first start; "-" when it cannot be read. */
     public static final String EXTRA_GAME_SIZE = "agvnGameSize";
-    private static final String UNKNOWN = "-", CONFIG = "config.tjs";
+    /** {@link #EXTRA_GAME_SIZE} of a KiriKiri game whose size could not be read. */
+    static final String UNKNOWN = "-";
+    private static final String CONFIG = "config.tjs";
     static final int MAX_CONFIG = 1 << 20, MAX_ARCHIVES = 6;
     private static final Pattern SIZE = Pattern.compile("(?m)^[ \\t]*;?[ \\t]*sc(Width|Height)[ \\t]*=[ \\t]*(\\d{3,4})\\b");
     private static final Pattern PATCH = Pattern.compile("patch(\\d*)\\.xp3", Pattern.CASE_INSENSITIVE);
@@ -44,20 +45,6 @@ public final class AgvnKirikiri {
         } catch (RuntimeException e) {
             Log.w(TAG, "KiriKiri size not kept", e);
         }
-    }
-
-    /** {@code screen}, or the game's own size when the screen is narrower or lower than the game. */
-    public static String notSmaller(String screen, String gameSize) {
-        int[] game = parse(gameSize);
-        if (game == null) return screen;
-        int[] now = parse(screen);
-        if (now != null && now[0] >= game[0] && now[1] >= game[1]) return screen;
-        return AgvnFitMath.screenFor(game[0], game[1]);
-    }
-
-    /** The screen {@code s} gets for {@code screen}: not smaller than its game. */
-    static String screenFor(Shortcut s, String screen) {
-        return notSmaller(screen, s.getExtra(EXTRA_GAME_SIZE));
     }
 
     /** "1280x720" from the game folder's Config.tjs, or null. Never throws. */
@@ -166,7 +153,7 @@ public final class AgvnKirikiri {
         return size;
     }
 
-    private static int[] parse(String size) {
+    static int[] parse(String size) {
         String s = AgvnScreenSize.normalize(size);
         if (s == null) return null;
         String[] wh = s.split("x");

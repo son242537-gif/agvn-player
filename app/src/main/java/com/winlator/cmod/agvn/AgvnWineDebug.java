@@ -38,6 +38,12 @@ public final class AgvnWineDebug {
      * wrong.
      */
     static final String QUIET_SPEC = "-all,err+module,err+mscoree,err+system," + MESSAGE_BOXES;
+    /**
+     * GST_DEBUG with the log off: GStreamer's warnings of a movie's decoder and of winegstreamer only, which
+     * {@link AgvnMovieWatch} reads (winegstreamer sets its own GST_DEBUG when Wine's gstreamer channel is on, and none
+     * when it is off, so a movie Wine could not decode printed nothing).
+     */
+    public static final String QUIET_GST = "WINE:2,videodecoder:2";
 
     private AgvnWineDebug() {}
 

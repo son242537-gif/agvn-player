@@ -28,6 +28,19 @@ public class AgvnFitMathTest {
     }
 
     @Test
+    public void aFrameThatShowsSmallOnThePhone() {
+        // a 1280x720 KiriKiri game in its window (title and menu bars) on the 1280x1024 screen it gets: 3/4 of the
+        // view's height, all of it drawn alone
+        assertEquals(AgvnFitMath.SMALL, AgvnFitMath.verdict(-4, 127, 1288, 769, 1280, 1024, W, H));
+        assertNull("view not known", AgvnFitMath.verdict(-4, 127, 1288, 769, 1280, 1024, 0, 0));
+        assertNull("4:3 at full height", AgvnFitMath.verdict(160, 0, 960, 720, 1280, 720, W, H));
+        assertNull("a 16:9 window on 16:10: little to gain", AgvnFitMath.verdict(0, 20, 1288, 749, 1280, 800, W, H));
+        assertNull("a maximized window", AgvnFitMath.verdict(-6, -6, 1292, 1036, 1280, 1024, W, H));
+        assertEquals(AgvnFitMath.SMALL, AgvnFitMath.verdict(0, 0, 640, 480, 1280, 720, W, H)); // as before
+        assertEquals(AgvnFitMath.OVERFLOW, AgvnFitMath.verdict(0, 0, 1280, 720, 854, 480, W, H));
+    }
+
+    @Test
     public void aMaximizedWindowsFrameIsNotACut() {
         // Party Me on a Mali-G615: Wine's maximized window hangs 6 px past each edge, the game inside it whole. Each
         // "Đổi màn hình" made the screen 12 px larger and the window with it: 960x544 became 1056x640 in 8 starts.
