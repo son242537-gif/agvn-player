@@ -37,8 +37,9 @@ Record the release certificate SHA-256 (from `apksigner verify --print-certs`) a
 Never commit `.jks`, `.keystore` or `keystore.properties` files.
 
 ## Pinned downloads
-`imagefs.tar.zst` and `proton-9.0-arm64ec.tar.zst` are downloaded at build time and checked against the
-SHA-256 values in `scripts/agvn/pins.txt`; a mismatch fails the build.
+`imagefs.tar.zst`, `proton-9.0-arm64ec.tar.zst` and `wine-mono-9.3.1-x86.tar.xz` (Wine Mono's own release file,
+see `docs/agvn/tu-sua-loi.md`) are downloaded at build time and checked against the SHA-256 values in
+`scripts/agvn/pins.txt`; a mismatch fails the build.
 For offline rebuilds pass a cache folder: `./gradlew assembleRelease -PagvnAssetCache=/path/to/cache`.
 Verified files are copied into the cache after the first download and reused from it afterwards.
 

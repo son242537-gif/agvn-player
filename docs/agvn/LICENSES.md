@@ -13,6 +13,12 @@ Anh Sơn quyết định ngày 02/10/2026: app phát hành theo **GNU GPL phiên
   - File AGVN mới ghi `Copyright (c) 2026 agvn.io.vn — MIT License`.
 - **Thành phần bên thứ ba** giữ giấy phép riêng, danh sách ở `app/src/main/assets/agvn/licenses.html`. Ví dụ:
   - Wine, Proton, VKD3D, PulseAudio: LGPL 2.1.
+  - Wine Mono 9.3.1 (bộ chạy .NET cho Wine, chỉ giải nén cho game cần .NET): nhiều giấy phép, theo `COPYING` của nó.
+    Phần Mono là MIT X11 hoặc LGPL; FNA là MS-PL và MIT; FAudio, SDL2 và các thư viện đi kèm FNA là zlib; WinForms và
+    WPF là MIT; SharpZipLib là GPL có ngoại lệ. Wine Mono chạy riêng trong Wine, không liên kết vào app. App giữ
+    nguyên file phát hành gốc `wine-mono-9.3.1-x86.tar.xz`. Mã nguồn đúng bản này là `wine-mono-9.3.1-src.tar.xz`
+    trên trang phát hành https://github.com/wine-mono/wine-mono/releases/tag/wine-mono-9.3.1; kho mã:
+    https://gitlab.winehq.org/mono/wine-mono.
   - Termux:X11, termux-packages, patchelf: GPL 3.
   - proot: GPL 2.
   - DXVK, D8VK, dxwrapper: zlib.

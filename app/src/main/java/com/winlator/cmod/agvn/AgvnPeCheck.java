@@ -108,7 +108,7 @@ public final class AgvnPeCheck {
     }
 
     /** {@code length} bytes at {@code offset}, or null when the file ends first. */
-    private static byte[] read(RandomAccessFile raf, long offset, int length) throws IOException {
+    static byte[] read(RandomAccessFile raf, long offset, int length) throws IOException {
         if (offset < 0 || offset + length > raf.length()) return null;
         byte[] out = new byte[length];
         raf.seek(offset);
@@ -116,11 +116,11 @@ public final class AgvnPeCheck {
         return out;
     }
 
-    private static int u16(byte[] b, int at) {
+    static int u16(byte[] b, int at) {
         return (b[at] & 0xff) | (b[at + 1] & 0xff) << 8;
     }
 
-    private static long u32(byte[] b, int at) {
+    static long u32(byte[] b, int at) {
         return ((long) u16(b, at + 2) << 16) | u16(b, at);
     }
 }

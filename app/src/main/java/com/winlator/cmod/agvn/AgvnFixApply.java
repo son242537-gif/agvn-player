@@ -84,6 +84,9 @@ final class AgvnFixApply {
             case "wincomponent":
                 s.putExtra("wincomponents", AgvnFixEdits.withComponent(AgvnFixes.winComponents(s), fix.to));
                 break;
+            case "wine-mono":
+                s.putExtra(AgvnWineMono.EXTRA, fix.to); // the next start unpacks it (AgvnWineMono.prepare)
+                break;
             case "run-windows":
                 s.putExtra(AgvnHtmlGame.EXTRA_RUNNER, fix.to); // the next start is Wine's
                 break;

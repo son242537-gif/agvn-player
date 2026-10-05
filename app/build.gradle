@@ -101,9 +101,26 @@ tasks.register("downloadProton") {
     }
 }
 
+// AGVN: Wine Mono, the .NET runtime that the bundled Proton's mscoree.dll asks for. The app unpacks it only for a game
+// that needs .NET (agvn/AgvnWineMono.java).
+tasks.register("downloadWineMono") {
+    def assetDir = new File(project.rootDir, ["app","src","main","assets"].join(File.separator))
+    File wineMono = new File(assetDir, "wine-mono-9.3.1-x86.tar.xz")
+    String wineMonoURL = "https://github.com/wine-mono/wine-mono/releases/download/wine-mono-9.3.1/wine-mono-9.3.1-x86.tar.xz"
+
+    doLast {
+        pinnedAsset(wineMono, "wine_mono_sha256") { File target ->
+            new URL(wineMonoURL).withInputStream { input ->
+                target.withOutputStream { output -> output << input }
+            }
+        }
+    }
+}
+
 tasks.register("prepareKotlinBuildScriptModel"){}
 downloadProton.dependsOn(downloadImageFS)
-preBuild.dependsOn(downloadProton)
+downloadWineMono.dependsOn(downloadProton)
+preBuild.dependsOn(downloadWineMono)
 
 File agvnKeystorePropsFile = System.getenv("AGVN_KEYSTORE_PROPS") ?
         new File(System.getenv("AGVN_KEYSTORE_PROPS")) : rootProject.file("keystore.properties")

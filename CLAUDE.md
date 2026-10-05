@@ -74,9 +74,10 @@ export AGVN_VERSION_CODE=2
 ./gradlew assembleRelease --no-daemon
 # Output: app/build/outputs/apk/release/app-release.apk
 ```
-The first build downloads large archives and checks each against `scripts/agvn/pins.txt`: imagefs and Proton from
-GitHub, and Ren'Py 8.5.3 (RAPT and SDK, for the Ren'Py runner) from renpy.org into `app/agvn-downloads/`
-(see `app/agvn-renpy.gradle`). In a fresh cloud checkout, run `scripts/agvn/prepare-native-deps.sh` first.
+The first build downloads large archives and checks each against `scripts/agvn/pins.txt`: imagefs, Proton and Wine
+Mono 9.3.1 (the .NET runtime, unpacked on the phone only for .NET games) from GitHub, and Ren'Py 8.5.3 (RAPT and SDK,
+for the Ren'Py runner) from renpy.org into `app/agvn-downloads/` (see `app/agvn-renpy.gradle`). In a fresh cloud
+checkout, run `scripts/agvn/prepare-native-deps.sh` first.
 
 ### Publish an Update (maintainer's PC only)
 Phones update themselves from GitHub Releases (Cài đặt → Cập nhật ứng dụng). There is one channel: every phone gets the

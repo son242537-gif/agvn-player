@@ -33,7 +33,8 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Game cần Steam | Wine báo thiếu `steam_api.dll` | Gửi nhật ký |
 | Thiếu file `.dll` | Wine: `Library X.dll (which is needed by …) not found` | Bật thư viện Windows chứa file đó (DirectX, XAudio, VC++ 2010), gửi nhật ký |
 | File `.dll` hỏng hoặc sai 32/64-bit | Wine: lỗi `c000007b` | Gửi nhật ký |
-| Game cần .NET | Wine: `Wine Mono is not installed` | Gửi nhật ký |
+| Game cần .NET | Wine: `Wine Mono is not installed`: file chạy của game, hoặc chương trình nó mở, viết bằng .NET (C#) mà Wine chưa có Wine Mono. Xem "Game .NET (Wine Mono)" bên dưới | Cài .NET cho game (Wine Mono), gửi nhật ký. Hộp hỏi cũng gợi ý thêm lại game bằng file chạy chính nếu thư mục còn file `.exe` khác |
+| Wine chưa chạy được phần .NET của game | Wine: `Could not load Mono into this process` hoặc `mscoree.dll not found, IL-only binary`: có Wine Mono rồi mà Wine không nạp được | Gửi nhật ký, kèm gợi ý file chạy như trên |
 | Driver đồ họa bị lỗi khi game vẽ hình | Hộp "Assertion failed!" của Wine nhắc `winevulkan/loader_thunks.c` và một hàm Vulkan (`vkCreateShaderModule`...): driver bị lỗi ngay trong lúc game nhờ nó dựng hình | GPU Mali, lỗi lúc tạo shader: tắt bước sửa shader "hằng số", rồi bước "cắt hình". Đổi bản DXVK, đổi driver, dùng WineD3D. Game Godot: bỏ cách vẽ đã đổi, chạy bằng Direct3D 11 (ANGLE), hai bước sửa shader, đổi driver |
 | Godot không mở được OpenGL | Câu lỗi của Godot (nhật ký `godot.log` hoặc hộp "Unable to initialize video driver"), hoặc game Godot tắt trước khi hiện hình | Chạy Godot bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bằng Direct3D 11 (ANGLE, Godot 4.4 trở lên), bỏ cách vẽ đã đổi, đổi driver |
 | Godot không mở được OpenGL lẫn Direct3D 11 | Hộp lỗi của Godot 4.4 trở lên: "...required OpenGL 3.3 or Direct3D 11 version" | Chạy bằng Vulkan, bỏ cách vẽ đã đổi, đổi driver |
@@ -265,6 +266,38 @@ KiriKiri (`FE FE 0/1/2 FF FE`). Game mã hóa gói thì app không đọc đư�
 - Khổ game lưu trong lối tắt (`agvnGameSize`; `-` nếu không đọc được). Game KiriKiri đã thêm từ trước thì app đọc khổ ở
   lần mở đầu tiên. Thanh "Màn hình đen" dùng khổ này để đề nghị.
 
+## Game .NET (Wine Mono)
+
+Game hay trình mở game viết bằng .NET (C#) cần Wine Mono, bộ chạy .NET của Wine. Proton 9 đi kèm app không có sẵn bộ
+này, nên trước đây Wine đóng các chương trình đó ngay khi mở (`Wine Mono is not installed`). Ví dụ ngày 05/10:
+"Yarisutemesubuta Cheat02" trên máy Adreno 610 mở `YARISUTEMESUBUTA + AGVN.exe`, một chương trình .NET, và tắt ngay
+cả ba lần.
+
+- App kèm sẵn Wine Mono 9.3.1 (`AgvnWineMono`), đúng bản `mscoree.dll` của Proton 9 tìm. Đó là file gốc của Wine
+  Mono, `wine-mono-9.3.1-x86.tar.xz` (44 MB): bản dựng app tải nó từ GitHub và kiểm SHA-256 theo
+  `scripts/agvn/pins.txt`.
+- App chỉ giải nén (235 MB) cho game cần nó:
+  - lúc mở game, nếu file chạy là chương trình .NET (đầu file `.exe` có phần CLR);
+  - hoặc khi người chơi bấm "Cài .NET cho game (Wine Mono…)" trong hộp "Game cần .NET", dành cho trình mở game
+    (không phải .NET) mở tiếp một chương trình .NET. Nút này lưu `agvnWineMono` = 1 trong lối tắt, và lần mở sau app
+    giải nén.
+
+  Game khác không tốn chỗ hay thời gian. Lúc giải nén, màn hình khởi động ghi tiến độ, ví dụ "Đang cài .NET cho game,
+  chỉ lần đầu: 40%".
+- Wine Mono nằm trong thư mục của Wine: `imagefs/opt/proton-9.0-arm64ec/share/wine/mono/wine-mono-9.3.1`. Đây đúng là
+  chỗ bản dựng Proton của Valve đặt nó, và `mscoree.dll` tìm ở đó qua `WINEDATADIR`. Mọi game dùng Wine đó đều thấy,
+  nên chỉ giải nén một lần. Nếu app cài lại phần hệ thống (thư mục `opt` bị xoá), lần mở game .NET sau giải nén lại.
+- App chỉ cài khi `mscoree.dll` của Wine game đang dùng tìm đúng bản 9.3.1. Wine khác (tự cài thêm) cần bản khác thì
+  app không cài, và `su-kien.txt` ghi bản Wine đó cần.
+- App giải nén vào một thư mục tạm rồi mới đổi tên, nên lần giải nén dở (máy hết chỗ) không bị coi là đã cài. Máy còn
+  dưới 288 MB trống thì app không giải nén, và báo cần bao nhiêu chỗ.
+- `su-kien.txt` của phiên chơi ghi "Đã cài Wine Mono 9.3.1 cho game cần .NET (… s)" hoặc "Game cần .NET: đã có Wine
+  Mono 9.3.1".
+- Chương trình .NET 32-bit (thường gặp nhất, kể cả "AnyCPU" ưu tiên 32-bit) chạy qua FEX bằng `libmono-2.0-x86.dll`.
+  Chương trình .NET 64-bit, hoặc "AnyCPU" không ưu tiên 32-bit, chạy dạng 64-bit và cần `libmono-2.0-x86_64.dll`
+  (mã x86-64, chạy giả lập). Cả hai chưa thử trên máy thật. Wine không nạp được thì hộp hỏi là "Wine chưa chạy được
+  phần .NET của game".
+
 ## Nhật ký Wine luôn có dòng lỗi
 
 Khi tắt "Bật debug Wine", app vẫn cho Wine in ba nhóm lỗi: `err+module` (thiếu hoặc hỏng file `.dll`), `err+mscoree`
@@ -376,5 +409,10 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
   tiết kiệm RAM cao nhất…" và không có nút hạ Đồ họa; `su-kien.txt` có `Tự sửa lỗi: low-ram-saved`.
 - [ ] Game đen lâu lúc đang tải mà RAM còn tăng (như Lg Light): không có thanh "Màn hình game vẫn đen" khi RAM còn tăng;
   game tải xong mà vẫn đen thì thanh hiện sau khoảng 6 giây.
+- [ ] Game .NET (như Yarisutemesubuta Cheat02): lần mở đầu, màn hình khởi động ghi "Đang cài .NET cho game, chỉ lần
+      đầu: …%", rồi game mở. `su-kien.txt` có "Đã cài Wine Mono 9.3.1 cho game cần .NET". Lần mở sau không cài lại và
+      ghi "đã có Wine Mono 9.3.1". `imagefs/opt/proton-9.0-arm64ec/share/wine/mono/wine-mono-9.3.1/bin` có hai file
+      `libmono-2.0-x86.dll` và `libmono-2.0-x86_64.dll`.
+- [ ] Mở một game không phải .NET: không cài gì, `su-kien.txt` không nhắc Wine Mono.
 - [ ] `adb logcat`: dòng `Wine mode emulation: on`; `wine-cuoi.txt` của game bị đen có `display settings returned -2`.
 - [ ] `adb logcat -s AGVN`: dòng `doctor: <lỗi> for <game>` và `fix <cách sửa> -> <giá trị>`.

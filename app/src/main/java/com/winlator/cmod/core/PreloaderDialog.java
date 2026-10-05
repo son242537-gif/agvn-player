@@ -414,6 +414,16 @@ public class PreloaderDialog {
         activity.runOnUiThread(() -> show(textResId));
     }
 
+    // AGVN: what a long step of the start does (installing .NET for a game); null puts the usual text back
+    public void setStatusOnUiThread(final String text) {
+        activity.runOnUiThread(() -> {
+            TextView status = isShowing() ? dialog.findViewById(R.id.LaunchStatus) : null;
+            if (status == null) return;
+            if (text != null) status.setText(text);
+            else status.setText(R.string.starting_up);
+        });
+    }
+
     public synchronized void close() {
         try {
             if (dialog != null) {

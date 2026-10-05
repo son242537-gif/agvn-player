@@ -724,6 +724,10 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 com.winlator.cmod.agvn.AgvnGodotGame.recognize(shortcut); // AGVN: a Godot game in one exe gets Godot's settings
                 com.winlator.cmod.agvn.AgvnKirikiri.recognize(shortcut); // AGVN: a KiriKiri game's size, for the black-screen bar
                 com.winlator.cmod.agvn.AgvnMemorySaver.applyGameSettings(this, shortcut); // AGVN: Ren'Py/Unity RAM per step
+                if (shortcut != null) com.winlator.cmod.agvn.AgvnWineMono.prepare(this, shortcut, wineInfo.path, agvnExePath(), text -> {
+                    preloaderDialog.setStatusOnUiThread(text); // AGVN: .NET for a .NET game, unpacked once
+                    runOnUiThread(() -> agvnStatus.setProgress(text));
+                });
                 setupWineSystemFiles();
                 extractGraphicsDriverFiles();
                 changeWineAudioDriver();

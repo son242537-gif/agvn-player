@@ -27,7 +27,7 @@ public class AgvnDoctorTest {
     private static final Set<String> FIXES = new HashSet<>(Arrays.asList("restore-good", "reset", "quality-down",
             "quality-up", "dxvk-other", "dxvk-arm64ec", "driver-other", "wined3d", "godot-renderer", "godot-angle", "godot-undo",
             "render-gmem", "render-auto", "emulator-stable", "emulator-fast", "wincomponent", "power-save-settings",
-            "app-settings", "send-logs", "run-windows", "rgss-frameskip", "wrapper-constants", "wrapper-clip"));
+            "app-settings", "send-logs", "run-windows", "rgss-frameskip", "wrapper-constants", "wrapper-clip", "wine-mono"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
             "ram-saved", "live", "light", "script-error", "page-crash", "frozen"));
@@ -206,6 +206,19 @@ public class AgvnDoctorTest {
         ev.changed = true;
         assertEquals("file-not-found", found(ev));
         assertEquals("only Wine's box", "no-start", found(noStart("File not found: save1.dat")));
+    }
+
+    @Test
+    public void aFileWineCannotRun() {
+        // Yarisutemesubuta Cheat02 on an Adreno 610: its exe, a .NET program, with no Wine Mono yet: the first fix
+        // installs it
+        assertEquals("dotnet", found(noStart("00e4:err:mscoree:CLRRuntimeInfo_GetRuntimeHost Wine Mono is not installed")));
+        assertEquals("wine-mono", catalog.byId("dotnet").fixes.get(0));
+        // Wine Mono there, but Wine could not load it or mscoree.dll: installing it again would not help
+        assertEquals("dotnet-load", found(noStart("0110:err:mscoree:load_mono Could not load Mono into this process")));
+        assertEquals("dotnet-load", found(noStart("0024:err:module:fixup_imports_ilonly mscoree.dll not found, "
+                + "IL-only binary L\"Launcher.exe\" cannot be loaded")));
+        assertFalse(catalog.byId("dotnet-load").fixes.contains("wine-mono"));
     }
 
     @Test

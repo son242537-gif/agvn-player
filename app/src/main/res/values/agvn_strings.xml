@@ -350,6 +350,7 @@
     <string name="agvn_fix_emulator_stable">Dùng giả lập CPU ổn định hơn</string>
     <string name="agvn_fix_emulator_fast">Dùng giả lập CPU nhanh hơn (có thể kém ổn định)</string>
     <string name="agvn_fix_wincomponent">Bật thư viện Windows \"%1$s\"</string>
+    <string name="agvn_fix_wine_mono">Cài .NET cho game (Wine Mono, khoảng 240 MB)</string>
     <string name="agvn_fix_power_save">Mở cài đặt Tiết kiệm pin</string>
     <string name="agvn_fix_app_settings">Mở cài đặt pin của AGVN</string>
     <string name="agvn_fix_send_logs">Gửi nhật ký cho AGVN</string>
@@ -359,4 +360,8 @@
     <string name="agvn_doctor_restart_detail">Mở lại game ngay để dùng cách sửa này? Nhớ lưu game trước.</string>
     <string name="agvn_doctor_restart_now">Mở lại game ngay</string>
     <string name="agvn_doctor_restart_later">Để lần sau</string>
+    <!-- Wine Mono, the .NET runtime, unpacked before a .NET game's first start (AgvnWineMono) -->
+    <string name="agvn_wine_mono_installing">Đang cài .NET cho game, chỉ lần đầu: %1$d%%</string>
+    <string name="agvn_wine_mono_no_space">Chưa cài được .NET cho game: cần %1$d MB trống, máy chỉ còn %2$d MB. Hãy xoá bớt file rồi mở lại game.</string>
+    <string name="agvn_wine_mono_failed">Chưa cài được .NET cho game. Hãy mở lại game, nếu vẫn lỗi thì gửi nhật ký cho AGVN.</string>
 </resources>

@@ -27,7 +27,7 @@ final class AgvnFixes {
     /** Fixes of Wine's settings: none of them changes a "Chạy nhẹ" game. */
     private static final List<String> WINE_ONLY = Arrays.asList("restore-good", "reset", "dxvk-other", "dxvk-arm64ec",
             "driver-other", "wined3d", "godot-renderer", "godot-angle", "godot-undo", "render-gmem", "render-auto",
-            "emulator-stable", "emulator-fast", "wincomponent", "wrapper-constants", "wrapper-clip");
+            "emulator-stable", "emulator-fast", "wincomponent", "wrapper-constants", "wrapper-clip", "wine-mono");
     static final String SYSTEM = "System";
 
     /** A button: its fix id, its words, and what it sets ({@code to}). */
@@ -114,6 +114,8 @@ final class AgvnFixes {
                 if (component == null || AgvnFixEdits.withComponent(winComponents(s), component) == null) return null;
                 return fix(a, id, R.string.agvn_fix_wincomponent, component);
             }
+            case "wine-mono":
+                return AgvnWineMono.offered(a, s) ? new Fix(id, a.getString(R.string.agvn_fix_wine_mono), "1") : null;
             case "power-save-settings":
                 return AgvnPowerSave.on(a) ? new Fix(id, a.getString(R.string.agvn_fix_power_save), null) : null;
             case "app-settings":
