@@ -1,0 +1,8 @@
+AGVN Player v0.1.20 - agvn.io.vn
+
+Sửa lỗi:
+- Game bị tắt vì máy hết RAM, kể cả lúc đang tải: app báo đúng "Game tự tắt lúc máy gần hết RAM", không còn báo nhầm "Game tắt ngay sau khi mở" hay "Game không chạy ở độ phân giải 640×360" rồi đề nghị đổi DXVK, đổi driver hay nâng "Đồ họa".
+- Game đã tiết kiệm RAM như "Siêu nhẹ" mà vẫn hết RAM: app nói rõ điều đó và không đề nghị hạ "Đồ họa" nữa, vì hạ cũng không bớt được RAM. Hãy đóng các app khác hoặc khởi động lại máy trước khi chơi.
+- Game hết RAM sau khi bạn đổi cấu hình: app đề nghị dùng lại cấu hình đã chạy được.
+- Game còn đang tải nên màn hình còn đen: thanh "Màn hình game vẫn đen" chờ game tải xong mới hỏi, không còn đề nghị màn hình lớn hơn lúc đó. Màn hình lớn hơn chỉ làm game tốn RAM hơn.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.
