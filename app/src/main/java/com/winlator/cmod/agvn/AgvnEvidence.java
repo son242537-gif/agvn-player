@@ -41,6 +41,8 @@ final class AgvnEvidence {
     int killedReason = -1, killedImportance;
     /** Free RAM (MB) when it last fell under the RAM bar's level, shortly before the game ended; -1 when it did not. */
     long lowRamFreeMb = -1;
+    /** The game started with the most RAM savings, having run out of RAM before ({@link AgvnMemorySaver#ranOut}). */
+    boolean ramSaved;
     /** Seconds from the game's last frame to its end (-1: none), and the player's presses in them. */
     long frozenS = -1;
     int frozenPresses;
@@ -70,6 +72,7 @@ final class AgvnEvidence {
             case "killed-low-memory": return killedReason == REASON_LOW_MEMORY;
             case "killed-background": return killedReason == REASON_SIGNALED && killedImportance > IMPORTANCE_FOREGROUND;
             case "low-ram": return lowRamFreeMb >= 0;
+            case "ram-saved": return ramSaved;
             case "light": return !runner.isEmpty();
             case "script-error": return scriptError;
             case "page-crash": return pageCrash;

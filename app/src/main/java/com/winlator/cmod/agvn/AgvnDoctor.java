@@ -97,6 +97,7 @@ public final class AgvnDoctor {
             if (s == null) return;
             AgvnEvidence ev = new AgvnEvidence();
             ev.engine = s.getExtra(AgvnGameImporter.EXTRA_ENGINE);
+            ev.ramSaved = AgvnMemorySaver.ranOut(s);
             ev.killedReason = exit.reason;
             ev.killedImportance = exit.importance;
             diagnose(ctx, s, ev, AgvnGoodConfig.snapshot(s));
@@ -153,6 +154,7 @@ public final class AgvnDoctor {
         ev.smallScreen = screenLines(screen) < SMALL_SCREEN_LINES;
         ev.params.put("screen", screen.replace('x', '×'));
         ev.lowRamFreeMb = AgvnSessionTrack.lowRamFreeMb(nowMs, LOW_RAM_RECENT_MS);
+        ev.ramSaved = AgvnMemorySaver.ranOut(s);
         ev.frozenS = AgvnSessionTrack.frozenSecondsAtEnd();
         ev.frozenPresses = AgvnSessionTrack.pressesWithoutFrame();
         if (ev.lowRamFreeMb >= 0) ev.params.put("free", String.valueOf(ev.lowRamFreeMb));

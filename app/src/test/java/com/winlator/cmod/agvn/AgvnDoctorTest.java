@@ -30,7 +30,7 @@ public class AgvnDoctorTest {
             "app-settings", "send-logs", "run-windows", "rgss-frameskip", "wrapper-constants", "wrapper-clip"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
-            "live", "light", "script-error", "page-crash", "frozen"));
+            "ram-saved", "live", "light", "script-error", "page-crash", "frozen"));
     static AgvnProblemCatalog catalog;
 
     @BeforeClass
@@ -213,6 +213,10 @@ public class AgvnDoctorTest {
         AgvnEvidence ev = new AgvnEvidence();
         ev.killedReason = AgvnEvidence.REASON_LOW_MEMORY;
         assertEquals("killed-low-memory", found(ev));
+        ev.ramSaved = true; // it already started with the most RAM savings: Lg Light's last run
+        assertEquals("killed-low-memory-saved", found(ev));
+        assertFalse(catalog.find(ev).fixes().contains("quality-down"));
+        ev.ramSaved = false;
         ev.killedReason = AgvnEvidence.REASON_SIGNALED;
         ev.killedImportance = 125; // in the background, kept by AGVN's notification
         assertEquals("killed-background", found(ev));
@@ -244,7 +248,7 @@ public class AgvnDoctorTest {
         AgvnProblemCatalog.Finding f = catalog.find(ev);
         assertEquals("low-ram-end", f.id());
         assertTrue(f.cause(), f.cause().contains("chỉ còn trống 641 MB RAM"));
-        assertEquals(Arrays.asList("quality-down", "send-logs"), f.fixes());
+        assertEquals(Arrays.asList("restore-good", "quality-down", "send-logs"), f.fixes());
         ev.endedByGame = false;
         ev.playerQuit = true;
         assertNull("the player quit with AGVN's own button", found(ev));
@@ -255,6 +259,42 @@ public class AgvnDoctorTest {
         ev.lowRamFreeMb = 641;
         ev.crashed = true;
         assertEquals("a crash names its own cause", "crash", found(ev));
+    }
+
+    @Test
+    public void aGameThatRanOutOfRamWhileLoadingRanOutOfRam() {
+        // Lg Light (Lifeguard Holic, Unity 6) on a Mali-G925 with 11.1 GB: it never showed its first scene, reached
+        // 5.6-7.1 GB and closed 10-19 s after free RAM fell to 242 and 367 MB. 0.1.17 read two of those runs as
+        // "no-start" and "low-resolution", whose fixes (another DXVK, a higher Đồ họa step) cannot help.
+        AgvnEvidence ev = noStart();
+        ev.seconds = 87;
+        ev.lowRamFreeMb = 242;
+        ev.params.put("free", "242");
+        ev.params.put("screen", "854×480");
+        assertEquals("low-ram-end", found(ev));
+        ev.smallScreen = true; // 640x360, the screen it ran out of RAM on, was not refused
+        ev.params.put("screen", "640×360");
+        assertEquals("low-ram-end", found(ev));
+        assertFalse(AgvnDoctor.refusedScreen("low-ram-end", false, Collections.emptyList(), "640x360", null));
+        ev.engine = "GODOT";
+        assertEquals("not \"godot-no-start\"", "low-ram-end", found(ev));
+        ev.engine = "";
+        ev.lines.add("err:   DxvkAdapter: Failed to create device");
+        assertEquals("what a line names comes first", "directx", found(ev));
+        ev.lines.clear();
+        ev.crashed = true;
+        assertEquals("a crash Wine printed names its own cause", "crash", found(ev));
+        ev.crashed = false;
+
+        ev.ramSaved = true; // every one of those runs had Siêu nhẹ's savings: 1600x900 to 640x360 changed nothing
+        AgvnProblemCatalog.Finding f = catalog.find(ev);
+        assertEquals("low-ram-saved", f.id());
+        assertTrue(f.cause(), f.cause().contains("chỉ còn trống 242 MB RAM"));
+        assertTrue(f.cause(), f.cause().contains("đã chạy với mức tiết kiệm RAM cao nhất"));
+        assertEquals(Arrays.asList("restore-good", "send-logs"), f.fixes());
+        assertTrue(AgvnMemorySaver.ranOutOfRam(f.id()));
+        ev.lowRamFreeMb = -1;
+        assertEquals("RAM to spare", "low-resolution", found(ev));
     }
 
     @Test

@@ -49,6 +49,7 @@ public final class AgvnLightDoctor {
             if (s == null) return;
             AgvnEvidence ev = evidence(p, ended ? null : exitOf(ctx, start, pid), renpyError(p, start));
             ev.engine = s.getExtra(AgvnGameImporter.EXTRA_ENGINE);
+            ev.ramSaved = AgvnMemorySaver.ranOut(s);
             AgvnDoctor.diagnoseLight(ctx, s, ev);
         } catch (RuntimeException e) {
             Log.w(TAG, "doctor: light game end not read", e);

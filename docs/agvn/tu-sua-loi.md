@@ -45,17 +45,30 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Hết bộ nhớ đồ họa / hết RAM | DXVK, Unity, Unreal báo hết bộ nhớ | Hạ Đồ họa. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ (`giam-ram.md`) |
 | File game hỏng | Unity: `is corrupted` | Gửi nhật ký (cần chép lại game) |
 | Không tìm thấy file của game | Hộp "File not found." của Wine: file chạy của game, hoặc file game cần, không còn ở chỗ cũ (thư mục game bị đổi tên, chuyển hay xoá) | Gửi nhật ký (cần chép lại thư mục game, thêm lại game) |
+| Game crash | Wine in báo cáo crash | Đổi DXVK, giả lập CPU ổn định hơn, đổi driver, về cấu hình gốc |
+| Game tự tắt lúc máy gần hết RAM | Game tự đóng, không crash, không câu lỗi, trong khi 30 giây trước đó RAM trống đã xuống dưới mức của thanh cảnh báo RAM (một phần mười RAM của máy, từ 600 MB đến 1,2 GB), kể cả khi game chưa kịp hiện hình | Dùng lại cấu hình đã chạy được, hạ Đồ họa, gửi nhật ký. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ. Game đã tiết kiệm như vậy mà vẫn hết RAM: không đề nghị hạ Đồ họa nữa |
 | Game không chịu độ phân giải nhỏ ("The current resolution is too low") | Game tắt trước khi hiện hình, màn hình dưới 480 dòng | Nâng Đồ họa (thường là Thấp 854×480), dùng lại cấu hình đã chạy được |
 | Game không chạy với cấu hình mới | Lần trước chạy được, đổi cấu hình xong thì tắt trước khi hiện hình | Dùng lại cấu hình đã chạy được, về cấu hình gốc |
-| Game crash | Wine in báo cáo crash | Đổi DXVK, giả lập CPU ổn định hơn, đổi driver, về cấu hình gốc |
 | Game tắt ngay, không rõ lỗi | Game tắt trước khi hiện hình | Về cấu hình gốc, đổi DXVK, đổi driver, gửi nhật ký |
-| Game tự tắt lúc máy gần hết RAM | Game tự đóng, không crash, không câu lỗi, trong khi 30 giây trước đó RAM trống đã xuống dưới mức của thanh cảnh báo RAM (một phần mười RAM của máy, từ 600 MB đến 1,2 GB) | Hạ Đồ họa, gửi nhật ký. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ |
 
 Khi máy hết RAM, hệ thống có thể tắt riêng tiến trình game mà không tắt AGVN. Lúc đó Wine kết thúc với mã 0, còn Wine,
 DXVK và engine của game đều không kịp ghi gì. Trước đây app coi đó là game thoát bình thường và còn lưu cấu hình đó là
 cấu hình chạy tốt. Ví dụ ngày 04/10: game Unity trên máy Mali-G610 7,2 GB bị tắt ở cùng một cảnh trong cả bốn lần
 chơi, 7–17 giây sau thanh cảnh báo RAM, khi RAM trống chỉ còn 0,4–0,7 GB. Người chơi tự thoát từ menu của game lúc RAM
 đang thấp cũng gặp thông báo này, nên trong thông báo có câu "Nếu chính bạn vừa thoát game thì bỏ qua thông báo này".
+
+App xét lỗi theo thứ tự: lỗi có câu lỗi hay báo cáo crash của Wine trước, rồi tới hết RAM, rồi mới tới các lỗi chỉ đoán
+từ cách game tắt (tắt trước khi hiện hình, màn hình nhỏ). Ngày 05/10, Lg Light (Lifeguard Holic, Unity 6) trên máy
+Mali-G925 11,1 GB không qua được màn tải trong cả năm lần chơi: game lên tới 5,6–7,1 GB rồi bị tắt khi RAM trống chỉ
+còn 170–370 MB. Bản 0.1.17 đọc hai lần trong đó thành "Game tắt ngay sau khi mở" (đề nghị về cấu hình gốc, đổi DXVK,
+đổi driver) và "Game không chạy ở độ phân giải 640×360" (đề nghị nâng Đồ họa, và nhớ 640×360 là màn hình game không
+chịu). Không cách nào trong đó bớt được RAM.
+
+Game đã tiết kiệm RAM như Siêu nhẹ (vì từng hết RAM) mà vẫn hết RAM thì hộp hỏi nói rõ điều đó ("…dù game đã chạy với
+mức tiết kiệm RAM cao nhất…", `low-ram-saved`, `killed-low-memory-saved`) và không đề nghị hạ Đồ họa. Lúc đó hạ Đồ họa
+chỉ đổi màn hình và FPS, gần như không bớt RAM: Lg Light lên 5,8 GB ở 1600×900 và 6,8 GB ở 640×360. Còn lại là đóng
+app khác, khởi động lại máy, dùng lại cấu hình đã chạy được (nếu có) và gửi nhật ký. Nếu vẫn vậy, game cần nhiều RAM
+hơn máy còn trống.
 
 App biết game Godot là bản nào (4.6, 3.5...) nhờ dòng đầu nhật ký của Godot (`godot.log`, app chép vào thư mục phiên
 chơi), hoặc nhờ phần đầu file `.pck` của game (file `.pck` riêng hoặc gắn trong file `.exe`).
@@ -98,7 +111,7 @@ RTP), Ren'Py dừng trước màn hình đầu.
 
 | Lỗi | App nhận ra nhờ | Cách sửa |
 |---|---|---|
-| Máy hết RAM nên Android tắt game | Lý do Android ghi lại (`LOW_MEMORY`) | Hạ Đồ họa (game Windows và Ren'Py), gửi nhật ký. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ |
+| Máy hết RAM nên Android tắt game | Lý do Android ghi lại (`LOW_MEMORY`) | Hạ Đồ họa (game Windows và Ren'Py), gửi nhật ký. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ. Game đã tiết kiệm như vậy mà vẫn bị tắt: dùng lại cấu hình đã chạy được, gửi nhật ký, không đề nghị hạ Đồ họa nữa |
 | Máy tắt game khi chạy nền | Lý do Android ghi lại (`SIGKILL` khi game chạy nền) | Mở cài đặt pin của AGVN |
 | Game chậm vì GPU | GPU từ 85% trở lên | Hạ Đồ họa, thử chế độ dựng hình Gmem, để Turnip tự chọn, bỏ bớt khung hình (RPG Maker) |
 | Game chậm vì CPU | Một nhân CPU từ 90% trở lên | DXVK chạy thẳng trên chip ARM (bản arm64ec), giả lập CPU nhanh hơn, bỏ bớt khung hình (RPG Maker), tắt Tiết kiệm pin |
@@ -352,5 +365,10 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
   game Godot đã đổi cách vẽ thì lần sau không bị đổi qua đổi lại giữa các cách đã thử.
 - [ ] Game vừa được hỏi "Game tự tắt lúc máy gần hết RAM": lần mở sau, `su-kien.txt` có "Tiết kiệm RAM như Siêu nhẹ: game
   từng bị tắt vì hết RAM trên máy này".
+- [ ] Game hết RAM ngay lúc đang tải (màn hình đen, RAM tăng tới khi game bị tắt, như Lg Light trên máy Mali-G925): thư
+  viện hỏi "Game tự tắt lúc máy gần hết RAM", không hỏi "Game tắt ngay sau khi mở" hay "Game không chạy ở độ phân giải
+  …", kể cả ở Siêu nhẹ (640×360).
+- [ ] Mở lại game đó (giờ đã "Tiết kiệm RAM như Siêu nhẹ") để nó hết RAM lần nữa: hộp hỏi ghi "…dù game đã chạy với mức
+  tiết kiệm RAM cao nhất…" và không có nút hạ Đồ họa; `su-kien.txt` có `Tự sửa lỗi: low-ram-saved`.
 - [ ] `adb logcat`: dòng `Wine mode emulation: on`; `wine-cuoi.txt` của game bị đen có `display settings returned -2`.
 - [ ] `adb logcat -s AGVN`: dòng `doctor: <lỗi> for <game>` và `fix <cách sửa> -> <giá trị>`.

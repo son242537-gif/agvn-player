@@ -36,8 +36,9 @@ public final class AgvnMemorySaver {
     static final String DXVK_FREE_PIPELINES = "dxvk.trackPipelineLifetime=True";
     /** "1" once "Tự sửa lỗi" found that the game ran out of RAM on this phone ({@link #markRamShort}). */
     static final String EXTRA_RAM_SHORT = "agvnRamShort";
-    /** The problems of game-problems.json that say a game ran out of RAM. */
-    static final List<String> OUT_OF_RAM = Arrays.asList("memory", "gpu-memory", "killed-low-memory", "low-ram-end");
+    /** The problems of game-problems.json that say a game ran out of RAM (the -saved ones: with these savings on). */
+    static final List<String> OUT_OF_RAM = Arrays.asList("memory", "gpu-memory", "killed-low-memory", "low-ram-end",
+            "killed-low-memory-saved", "low-ram-saved");
     /** Why the last start saved the most RAM, for its session log ({@link #takeNote}); null when it did not. */
     private static volatile String note;
 
