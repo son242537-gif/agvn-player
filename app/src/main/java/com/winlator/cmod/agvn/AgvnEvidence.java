@@ -15,8 +15,15 @@ final class AgvnEvidence {
     static final int REASON_SIGNALED = 2, REASON_LOW_MEMORY = 3, IMPORTANCE_FOREGROUND = 100;
     /** A player who quits a game that showed nothing for this long, besides maybe an error box, saw it fail. */
     static final long QUIT_AFTER_S = 10;
-    /** A session that ran this long without a crash ran well, however it ended. */
+    /** A session that ran this long without a crash ran well, however it ended, unless it froze. */
     static final long GOOD_AFTER_S = 60;
+    /**
+     * A game that showed no frame for this long before it ended, while the player pressed at least
+     * {@link #FROZEN_PRESSES} times, froze. Party Me (Godot on ANGLE, Mali-G615) stopped showing frames 17-24 s
+     * before it closed itself, three times, the player tapping on: 0.1.17 kept the one that lasted 88 s as a good run.
+     */
+    static final long FROZEN_S = 10;
+    static final int FROZEN_PRESSES = 5;
 
     final List<String> lines = new ArrayList<>();
     /** Values the problem texts use: "crash", "screen", "free", "fps", "speed", "gpu", "cpu", "godot", "runner", "error". */
@@ -34,6 +41,9 @@ final class AgvnEvidence {
     int killedReason = -1, killedImportance;
     /** Free RAM (MB) when it last fell under the RAM bar's level, shortly before the game ended; -1 when it did not. */
     long lowRamFreeMb = -1;
+    /** Seconds from the game's last frame to its end (-1: none), and the player's presses in them. */
+    long frozenS = -1;
+    int frozenPresses;
 
     /** The game never drew its window and then closed, or the player gave up on it. */
     boolean noStart() {
@@ -73,8 +83,13 @@ final class AgvnEvidence {
         return true;
     }
 
-    /** The game drew its window and ran without a crash: its settings work and are kept (AgvnGoodConfig). */
+    /** The game stopped showing frames before it ended, though the player kept pressing ({@link #FROZEN_S}). */
+    boolean frozeAtEnd() {
+        return frozenS >= FROZEN_S && frozenPresses >= FROZEN_PRESSES;
+    }
+
+    /** The game drew its window and ran without a crash or freeze: its settings work and are kept (AgvnGoodConfig). */
     boolean good() {
-        return started && !crashed && killedReason < 0 && (playerQuit || seconds >= GOOD_AFTER_S);
+        return started && !crashed && killedReason < 0 && !frozeAtEnd() && (playerQuit || seconds >= GOOD_AFTER_S);
     }
 }

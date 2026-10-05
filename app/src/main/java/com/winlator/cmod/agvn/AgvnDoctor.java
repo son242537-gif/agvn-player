@@ -78,6 +78,8 @@ public final class AgvnDoctor {
             ev.lines.addAll(engineLogTails(s, AgvnSessionTrack.startMs()));
             AgvnGodotGame.version(ev, AgvnEngineLogs.exe(s), AgvnEngineLogs.gameDir(s));
             ev.godotSwitched = AgvnFixEdits.godotSwitched(ranWith.get("execArgs"));
+            if (ev.frozeAtEnd()) AgvnSessionLog.event("Game đứng hình " + ev.frozenS + " giây trước khi tắt (người chơi "
+                    + "bấm " + ev.frozenPresses + " lần mà hình không đổi): không tính là lần chạy tốt");
             diagnose(ctx, s, ev, ranWith);
         } catch (RuntimeException e) {
             Log.w(TAG, "doctor: game end not read", e);
@@ -151,6 +153,8 @@ public final class AgvnDoctor {
         ev.smallScreen = screenLines(screen) < SMALL_SCREEN_LINES;
         ev.params.put("screen", screen.replace('x', '×'));
         ev.lowRamFreeMb = AgvnSessionTrack.lowRamFreeMb(nowMs, LOW_RAM_RECENT_MS);
+        ev.frozenS = AgvnSessionTrack.frozenSecondsAtEnd();
+        ev.frozenPresses = AgvnSessionTrack.pressesWithoutFrame();
         if (ev.lowRamFreeMb >= 0) ev.params.put("free", String.valueOf(ev.lowRamFreeMb));
         return ev;
     }

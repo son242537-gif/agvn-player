@@ -160,6 +160,55 @@ public class AgvnDoctorTest {
     }
 
     @Test
+    public void aGameThatFrozeBeforeItClosedDidNotRunWell() {
+        // Party Me (Godot on ANGLE) on a Mali-G615: no frame for 22 s while the player tapped on, then it closed itself
+        // 88 s in. 0.1.17 kept that run as good, which forgot the renderers tried, so the app went round them again.
+        long start = 5_000_000;
+        AgvnSessionTrack.start(start);
+        assertEquals("not ended yet", -1, AgvnSessionTrack.frozenSecondsAtEnd());
+        for (int i = 0; i < AgvnSessionTrack.STARTED_UPDATES; i++) AgvnSessionTrack.onFrame(start + 30_000 + i * 33);
+        AgvnSessionTrack.onFrame(start + 60_000);
+        for (int i = 0; i < 3; i++) AgvnSessionTrack.onPress();
+        AgvnSessionTrack.onFrame(start + 66_000); // it answered
+        assertEquals(0, AgvnSessionTrack.pressesWithoutFrame());
+        for (int i = 0; i < 18; i++) AgvnSessionTrack.onPress();
+        AgvnSessionTrack.noteEnd(start + 88_000);
+        AgvnSessionTrack.noteEnd(start + 90_000); // the player's exit after Wine's: the first end counts
+        assertEquals(22, AgvnSessionTrack.frozenSecondsAtEnd());
+        assertEquals(18, AgvnSessionTrack.pressesWithoutFrame());
+
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.started = ev.endedByGame = true;
+        ev.seconds = 88;
+        ev.frozenS = AgvnSessionTrack.frozenSecondsAtEnd();
+        ev.frozenPresses = AgvnSessionTrack.pressesWithoutFrame();
+        assertTrue(ev.frozeAtEnd());
+        assertFalse(ev.good());
+        assertNull("nothing new to ask", found(ev));
+        ev.frozenPresses = 2; // a static screen the player hardly touched
+        assertTrue(ev.good());
+        ev.frozenPresses = 18;
+        ev.frozenS = 3; // its last frame just before a menu's "Thoát"
+        assertTrue(ev.good());
+        AgvnSessionTrack.start(start + 100_000);
+        AgvnSessionTrack.onFrame(start + 101_000); // one frame through Present, then EGL or DisplayX
+        for (int i = 0; i < 30; i++) AgvnSessionTrack.onPress();
+        AgvnSessionTrack.noteEnd(start + 400_000);
+        assertEquals("too few frames to judge", -1, AgvnSessionTrack.frozenSecondsAtEnd());
+    }
+
+    @Test
+    public void aGameWhoseFileIsGone() {
+        // Monster Black Market on a Mali-G615: Wine's box from winhandler.exe, then the game closed 7 s in;
+        // 0.1.17 said "Game không chạy với cấu hình mới"
+        AgvnEvidence ev = noStart("00cc:trace:msgbox:MSGBOX_OnInit L\"File not found.\\r\\n\"");
+        assertEquals("file-not-found", found(ev));
+        ev.changed = true;
+        assertEquals("file-not-found", found(ev));
+        assertEquals("only Wine's box", "no-start", found(noStart("File not found: save1.dat")));
+    }
+
+    @Test
     public void androidEndingTheApp() {
         AgvnEvidence ev = new AgvnEvidence();
         ev.killedReason = AgvnEvidence.REASON_LOW_MEMORY;

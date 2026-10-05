@@ -12,7 +12,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  *   times. An error box ("The current resolution is too low...") is smaller, so a game that only showed one never
  *   started;</li>
  *   <li>who ended it: Wine by itself (the game closed, crashed or showed its error and quit), or the player;</li>
- *   <li>how many frames its window drew;</li>
+ *   <li>how many frames its window drew, when it last showed one (drawn or presented, Vulkan and OpenGL included),
+ *   and how often the player pressed something since: a game that shows nothing while the player keeps pressing has
+ *   frozen;</li>
  *   <li>when free RAM last fell under the RAM bar's level ({@link AgvnMemoryWatch}): a game that ends just after it
  *   most likely ran out of memory, since Android or the kernel ends it without a word in any log.</li>
  * </ul>
@@ -26,6 +28,8 @@ public final class AgvnSessionTrack {
     private static volatile long startMs;
     private static volatile Map<String, String> settings = Collections.emptyMap();
     private static volatile boolean bigSeen, wineEnded, playerQuit, exiting;
+    private static volatile long lastFrameMs, endMs;
+    private static final AtomicInteger pressesSinceFrame = new AtomicInteger(), framesSeen = new AtomicInteger();
     private static long lowRamAtMs, lowRamFreeMb = -1;
 
     private AgvnSessionTrack() {}
@@ -42,6 +46,9 @@ public final class AgvnSessionTrack {
         frames.set(0);
         bigUpdates.set(0);
         bigSeen = wineEnded = playerQuit = exiting = false;
+        lastFrameMs = endMs = 0;
+        pressesSinceFrame.set(0);
+        framesSeen.set(0);
         lowRamAtMs = 0;
         lowRamFreeMb = -1;
     }
@@ -52,6 +59,23 @@ public final class AgvnSessionTrack {
         bigSeen = true;
         if (bigUpdates.get() < STARTED_UPDATES) bigUpdates.incrementAndGet();
         frames.incrementAndGet();
+        onFrame();
+    }
+
+    /** The game showed a frame: drawn into its window, or presented (AgvnInputHold.onGameFrame). Kept cheap. */
+    static void onFrame() {
+        onFrame(System.currentTimeMillis());
+    }
+
+    static void onFrame(long nowMs) {
+        lastFrameMs = nowMs;
+        if (pressesSinceFrame.get() != 0) pressesSinceFrame.set(0);
+        if (framesSeen.get() < STARTED_UPDATES) framesSeen.incrementAndGet();
+    }
+
+    /** The player pressed a key, a mouse button or the screen (AgvnInputHold.pressing). */
+    static void onPress() {
+        pressesSinceFrame.incrementAndGet();
     }
 
     static boolean big(int width, int height, int screenWidth, int screenHeight) {
@@ -61,6 +85,7 @@ public final class AgvnSessionTrack {
     /** Wine's process ended (its termination callback). Before the player's exit, the game ended by itself. */
     public static void wineEnded() {
         if (!exiting) wineEnded = true;
+        noteEnd(System.currentTimeMillis());
     }
 
     /** The game is being closed: by the player when Wine had not ended first. */
@@ -68,6 +93,26 @@ public final class AgvnSessionTrack {
         if (exiting) return;
         exiting = true;
         playerQuit = !wineEnded;
+        noteEnd(System.currentTimeMillis());
+    }
+
+    /** The game's end: Wine's, or the player's exit, whichever came first. */
+    static void noteEnd(long nowMs) {
+        if (endMs == 0) endMs = nowMs;
+    }
+
+    /**
+     * Seconds from the game's last frame to its end; -1 before the end, or when it showed fewer than
+     * {@link #STARTED_UPDATES} frames this way (a game drawn through EGL or DisplayX is not judged).
+     */
+    static long frozenSecondsAtEnd() {
+        long last = lastFrameMs, end = endMs;
+        return framesSeen.get() >= STARTED_UPDATES && end >= last ? (end - last) / 1000 : -1;
+    }
+
+    /** Presses since the game's last frame. */
+    static int pressesWithoutFrame() {
+        return pressesSinceFrame.get();
     }
 
     /** A memory sample while the game plays: {@code freeMb} under {@code lowFreeMb}, the RAM bar's level, is kept. */

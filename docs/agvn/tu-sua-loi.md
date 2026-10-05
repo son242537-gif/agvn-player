@@ -17,7 +17,10 @@ là một nút. Bấm nút là app đổi cấu hình của riêng game đó r�
 | Game Windows vẫn đen màn hình | Thanh trên game | Khoảng 20 giây sau khi mở (lâu hơn nếu game thường mở chậm), game vẫn chưa hiện hình, và có dấu hiệu màn hình nhỏ hơn game (khổ game KiriKiri, khung game bị cắt, Wine từ chối độ phân giải game xin): app đề nghị màn hình lớn hơn. Game DirectX đen mà không có dấu hiệu đó: app đề nghị "Bật Đồng bộ khung hình". Xem "Màn hình đen" bên dưới. |
 
 Mỗi lỗi chỉ hỏi một lần. Cách sửa đã thử mà vẫn lỗi thì lần sau không hiện lại, cho đến khi game chạy tốt một
-lần. Thanh game chậm có nút "Để vậy, không hỏi lại" cho riêng game đó.
+lần. Lần chơi mà game đứng hình ít nhất 10 giây trước khi tắt, dù người chơi bấm ít nhất 5 lần, không tính là chạy tốt
+(`AgvnEvidence.frozeAtEnd`): ngày 05/10, Party Me (Godot) trên máy Mali-G615 ba lần đứng hình 17–24 giây rồi tự tắt, và
+bản 0.1.17 tính lần dài 88 giây là chạy tốt, nên quên các cách vẽ đã thử và đổi qua đổi lại. `su-kien.txt` ghi "Game
+đứng hình … giây trước khi tắt". Thanh game chậm có nút "Để vậy, không hỏi lại" cho riêng game đó.
 
 Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp hỏi chỉ hiện ở màn hình đang ở trên cùng.
 
@@ -41,6 +44,7 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Driver đồ họa lỗi giữa chừng | `VK_ERROR_DEVICE_LOST` | Để Turnip tự chọn chế độ dựng hình, đổi driver, đổi DXVK, hạ Đồ họa |
 | Hết bộ nhớ đồ họa / hết RAM | DXVK, Unity, Unreal báo hết bộ nhớ | Hạ Đồ họa. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ (`giam-ram.md`) |
 | File game hỏng | Unity: `is corrupted` | Gửi nhật ký (cần chép lại game) |
+| Không tìm thấy file của game | Hộp "File not found." của Wine: file chạy của game, hoặc file game cần, không còn ở chỗ cũ (thư mục game bị đổi tên, chuyển hay xoá) | Gửi nhật ký (cần chép lại thư mục game, thêm lại game) |
 | Game không chịu độ phân giải nhỏ ("The current resolution is too low") | Game tắt trước khi hiện hình, màn hình dưới 480 dòng | Nâng Đồ họa (thường là Thấp 854×480), dùng lại cấu hình đã chạy được |
 | Game không chạy với cấu hình mới | Lần trước chạy được, đổi cấu hình xong thì tắt trước khi hiện hình | Dùng lại cấu hình đã chạy được, về cấu hình gốc |
 | Game crash | Wine in báo cáo crash | Đổi DXVK, giả lập CPU ổn định hơn, đổi driver, về cấu hình gốc |
@@ -314,6 +318,8 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       "Mở lại game ngay". Lần mở sau có thanh "Khung game lớn theo màn hình", không có thanh đổi màn hình nữa, và lần mở
       sau nữa game về lại màn hình cũ. Game đã bị đổi màn hình nhiều lần (như 1116×700): chọn lại mức "Đồ họa" để về cỡ
       của mức đó.
+- [ ] Đổi tên thư mục của một game Windows rồi mở game: thư viện hỏi "Không tìm thấy file của game"; không có khung nhỏ
+      nào bị phóng ra cả màn hình.
 - [ ] Đang chơi một game Windows, vuốt AGVN khỏi danh sách app gần đây rồi mở lại app: không có hộp hỏi; `tom-tat.txt`
       của phiên đó ghi "Người chơi vuốt tắt AGVN…".
 - [ ] Game Windows: "✕ Thoát" trên thanh ⌨ ✎ 👁 ⛶ hiện thanh "Thoát game?"; "Chơi tiếp" để game chạy tiếp, "Thoát game"
@@ -342,6 +348,8 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
   `wine-cuoi.txt`.
 - [ ] Máy Mali dưới 9 GB RAM, game Unity hoặc Unreal chưa từng hết RAM, ở mức Cao: `su-kien.txt` không có "Tiết kiệm RAM
   như Siêu nhẹ", `moi-truong.txt` không có `dxvk.trackPipelineLifetime=True` (giống POCO).
+- [ ] Game đứng hình rồi tự tắt (bấm mãi mà hình không đổi): `su-kien.txt` có "Game đứng hình … giây trước khi tắt";
+  game Godot đã đổi cách vẽ thì lần sau không bị đổi qua đổi lại giữa các cách đã thử.
 - [ ] Game vừa được hỏi "Game tự tắt lúc máy gần hết RAM": lần mở sau, `su-kien.txt` có "Tiết kiệm RAM như Siêu nhẹ: game
   từng bị tắt vì hết RAM trên máy này".
 - [ ] `adb logcat`: dòng `Wine mode emulation: on`; `wine-cuoi.txt` của game bị đen có `display settings returned -2`.
