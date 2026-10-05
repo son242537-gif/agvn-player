@@ -22,6 +22,11 @@ A Vietnamese-first emulation environment for PC games on weak Android phones (Ad
 - **File size:** Keep newly created files ≤ 200 lines; split if larger.
 - **Naming:** Kebab-case files/directories (already enforced by upstream); class names in PascalCase; constants in SCREAMING_SNAKE_CASE.
 
+### Fixes Apply to Every Phone (maintainer's rule, 2026-10-05)
+- A fix is general: it works from what a game did on the phone (its log: an error box, a crash, a black screen, running out of RAM), on any phone. It is never switched on by the phone's model, GPU or RAM alone.
+- Never sacrifice games that already run well to fix one game on one phone: no lower quality, fewer frames or extra prompts for them. A fix with a cost is offered when its problem shows, not turned on for every phone of a kind.
+- An offer that did not help is not made again, and a run that froze or failed never counts as one that ran well.
+
 ### Commits & Branches
 - **Conventional format** (no AI/assistant references):
   ```
