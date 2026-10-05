@@ -107,6 +107,12 @@ Ví dụ ngày 04/10: With The Devilish Her (Unity 2021.3, bản Việt hoá Gam
 7,2 GB, còn trống 3,0 GB trước khi chơi). App và game lên 4,0–4,2 GB RSS, RAM trống xuống 0,4–0,7 GB. Cả bốn lần chơi,
 game đều bị tắt ở cùng một cảnh, khoảng 2,5 phút sau khi mở.
 
+Ví dụ ngày 05/10: Lg Light (Lifeguard Holic 1.2, Unity 6, bản Việt hoá GameHub "Siêu nhẹ") trên OPPO PKC110 (Mali-G925,
+RAM 11,1 GB, còn trống 5,3 GB). Game chưa qua được màn tải lần nào: app và game lên 5,6–7,1 GB trong khoảng một phút,
+rồi game bị tắt (lần cuối Android tắt luôn cả AGVN). Game đã tiết kiệm RAM như Siêu nhẹ từ trước, và người chơi hạ màn
+hình từ 1600×900 xuống 640×360, mà RAM vẫn lên 5,8 rồi 6,8 GB: phần lớn RAM là texture, không phải màn hình. Hết RAM
+khi đã tiết kiệm như vậy thì "Tự sửa lỗi" không đề nghị hạ Đồ họa nữa (`tu-sua-loi.md`).
+
 - **Người chơi:**
   - Đóng các app khác hoặc khởi động lại máy trước khi chơi.
   - Lưu game trước đoạn hay bị tắt.
@@ -115,6 +121,11 @@ game đều bị tắt ở cùng một cảnh, khoảng 2,5 phút sau khi mở.
   - GPU Mali không đọc được texture BCn (DXT1, DXT5, BC7), nên wrapper giải nén chúng ra RGBA8, lớn gấp 4–8 lần.
     Driver Qualcomm cũng vậy. Turnip thì đọc được BCn, nên game vừa RAM trên POCO F8 Pro vẫn có thể hết RAM trên máy
     Mali có cùng dung lượng RAM.
+  - Cụ thể, app có hai bộ giải BCn, cả hai giải lúc game chép texture lên GPU (`vkCmdCopyBufferToImage`): wrapper
+    (`libvulkan_wrapper.so`, bằng CPU) và lớp `libbcn_layer.so` (bằng compute shader, bật khi `ENABLE_BCN_COMPUTE=1`).
+    BC1 lớn gấp 8, BC2, BC3, BC7 gấp 4 ở cả hai. BC4, BC5 gấp 2 ở wrapper (ra R8, RG8), nhưng lớp compute giải mọi
+    loại ra 4 kênh (RGBA8, BC6H ra RGBA16F). Phần này chỉ bớt khi game nạp ít texture hơn, hoặc texture nhỏ hơn (nửa
+    cỡ là một phần tư số điểm ảnh). Texture không nén (RGBA32) trên Mali tốn bằng BCn đã giải nén.
   - Trong game, GPU Mali có `SystemInfo.graphicsDeviceVendor` là `ARM` (Player.log ghi `Vendor: ARM`). RAM của máy là
     `SystemInfo.systemMemorySize`.
   - `QualitySettings.masterTextureLimit` chỉ thu nhỏ texture có mipmap. Ảnh CG và sprite thường không có mipmap nên vẫn
@@ -138,6 +149,8 @@ game đều bị tắt ở cùng một cảnh, khoảng 2,5 phút sau khi mở.
   - Wrapper của GameNative đổi BCn sang ASTC thay vì giải nén ra RGBA8 (lớn gấp 4–8 lần). Cách này chỉ có ích với
     driver không hỗ trợ BCn, như driver Qualcomm và Mali. Turnip hỗ trợ BCn sẵn.
   - Trên Mali, bộ giải BCn bằng compute và bộ giải BCn của wrapper đang cùng bật (`ENABLE_BCN_COMPUTE` và
-    `WRAPPER_EMULATE_BCN=3`).
+    `WRAPPER_EMULATE_BCN=3`). Lớp compute giải BC4, BC5 ra RGBA8, tốn gấp đôi hoặc gấp bốn bộ giải của wrapper. Cần đo
+    trên máy Mali xem game nào nhiều BC4, BC5 (thường là normal map của game 3D) có bớt RAM khi chỉ dùng bộ giải của
+    wrapper ("Kiểu giả lập BCN: software") không, và tải chậm hơn bao nhiêu.
   - Cờ V8 `--optimize-for-size` cho game NW.js (RPG Maker MV/MZ, Tyrano).
   - Giảm số luồng dịch shader của DXVK.
