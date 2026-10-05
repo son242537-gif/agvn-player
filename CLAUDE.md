@@ -17,6 +17,21 @@ A Vietnamese-first emulation environment for PC games on weak Android phones (Ad
 
 ## Coding Standards
 
+### Fix the App for Every Game (maintainer's rule)
+> "Sửa **app** để tương thích mọi game, **không** sửa game cho vừa app." — "Các sửa đổi là cho toàn game, không hy sinh chỉ để phục vụ một game duy nhất."
+
+- **Fix the app, never the game:** do not change a game's files to make it run.
+- **Every game, every supported phone:** a change must help all games, or at least not hurt any. Never make other games worse so that one game works.
+- **No per-game code:** no game name, exe name or Steam ID in code paths. Key a fix on something general:
+  - the engine or API (Unity, Unreal, Media Foundation, DXVK);
+  - the driver or GPU;
+  - a measured behavior.
+
+  What only one game needs goes into that game's own profile or settings, where it cannot affect other games.
+- **General thresholds and defaults:** derive them from how the system works, not from one game's numbers. A device report on one game shows a class of bugs; it is not the tuning target. Scale limits to the phone where it matters (for example free RAM as a share of total RAM, not a fixed number of MB).
+- **Test beyond the reported game:** a behavior change found on one game is tested on 2–3 other games, other engines too where they apply, before merging. List them in the PR's Device Test Checklist.
+- **If a fix helps one game but breaks another,** find a different general fix. A per-game exception is the last resort and needs the maintainer's approval.
+
 ### File & Naming
 - **Repository structure:** Minimize diffs against upstream (`agvn/base` at b8048ac). New AGVN code lives in `app/src/main/java/com/winlator/cmod/agvn/` (package `com.winlator.cmod.agvn`); keep `namespace 'com.winlator.cmod'` in `app/build.gradle` (unchanged from Ludashi).
 - **File size:** Keep newly created files ≤ 200 lines; split if larger.
@@ -109,6 +124,7 @@ The local build includes vulkan-validation-layers (for debug). Cloud builds omit
   - Build test (compilation successful, APK signature verified)
   - Install test (safe to install beside existing Ludashi)
   - Functional tests (phase-specific, e.g., driver fallback, crash export, game import)
+  - Other games: for a behavior change, 2–3 games besides the one that showed the bug (see "Fix the App for Every Game")
   - Regression test (previous phase features still work)
 
 ## Roadmap & Phase Dependencies
