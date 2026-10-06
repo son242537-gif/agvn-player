@@ -30,7 +30,7 @@ final class AgvnFixes {
     private static final List<String> WINE_ONLY = Arrays.asList("restore-good", "reset", "dxvk-other", "dxvk-arm64ec",
             "driver-other", "wined3d", "godot-renderer", "godot-angle", "godot-undo", "render-gmem", "render-auto",
             "emulator-stable", "emulator-fast", "wincomponent", "wrapper-constants", "wrapper-clip", "wine-mono",
-            "wine-old");
+            "wine-old", "dxvk-back");
     static final String SYSTEM = "System";
 
     /** A button: its fix id, its words, and what it sets ({@code to}). */
@@ -91,8 +91,12 @@ final class AgvnFixes {
                 if (!DriverSafety.isUsable(a, to)) return null;
                 return new Fix(id, a.getString(R.string.agvn_fix_driver, SYSTEM.equals(to) ? a.getString(R.string.agvn_fix_driver_system) : "Turnip"), to);
             }
-            case "wined3d":
-                return dxvk(s) ? new Fix(id, a.getString(R.string.agvn_fix_wined3d), "wined3d") : null;
+            case "wined3d": // WineD3D draws with OpenGL: not once OpenGL did not start with this driver
+                return dxvk(s) && !AgvnOpenGlCheck.failedBefore(a, s)
+                        ? new Fix(id, a.getString(R.string.agvn_fix_wined3d), "wined3d") : null;
+            case "dxvk-back":
+                return AgvnOpenGlCheck.wined3d(s)
+                        ? new Fix(id, a.getString(R.string.agvn_fix_dxvk_back), AgvnOpenGlCheck.dxvkBack(s)) : null;
             case "godot-renderer":
             case "godot-angle":
             case "godot-undo":

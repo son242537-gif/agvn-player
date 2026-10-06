@@ -127,6 +127,7 @@ public final class AgvnDoctor {
         AgvnSessionLog.event("Tự sửa lỗi: " + f.id() + " – " + f.title());
         Log.i(TAG, "doctor: " + f.id() + " for " + s.name);
         if (AgvnMemorySaver.ranOutOfRam(f.id())) AgvnMemorySaver.markRamShort(s); // its next starts save the most RAM
+        if (AgvnOpenGlCheck.PROBLEM.equals(f.id())) AgvnOpenGlCheck.failed(ctx, s); // no more WineD3D with this driver
         AgvnDoctorStore.ask(ctx, s, f);
     }
 

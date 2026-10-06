@@ -41,6 +41,8 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Godot không mở được Vulkan | Hộp lỗi của Godot: "...required Vulkan version" | Bỏ cách vẽ đã đổi, chạy bằng Direct3D 11 (ANGLE), đổi driver |
 | Game Godot tự tắt sau khi đổi cách vẽ | App đã đổi cách vẽ của game, rồi game tự tắt trong một phút đầu mà không để lại câu lỗi nào | Chạy bằng Direct3D 11 (ANGLE), bỏ cách vẽ đã đổi, đổi driver |
 | Game bị tắt khi vẽ hình (OpenGL qua Zink) | Zink báo `vkCreateGraphicsPipelines failed` rồi game tự tắt; hay gặp ở GPU Mali, vì Zink thiếu vài tính năng trên đó | Game Godot: chạy bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bằng Direct3D 11 (ANGLE), bỏ cách vẽ đã đổi. Mọi game: đổi driver |
+| Driver đồ họa thiếu tính năng DirectX 11 | DXVK: `D3D11CoreCreateDevice: Requested feature level not supported`: driver không đủ tính năng cho mức DirectX nào game xin (vẽ khung dây, geometry shader, transform feedback...) | Đổi driver, dùng WineD3D (trừ khi OpenGL đã không chạy với driver này), gửi nhật ký. Không đổi bản DXVK: bản nào cũng cần các tính năng đó |
+| Máy không chạy được OpenGL với driver này | Mesa: `failed to load driver: zink`: Zink không khởi động được trên driver Vulkan của game, nên game OpenGL và WineD3D không vẽ được | Dùng lại DXVK (game đang dùng WineD3D), đổi driver, gửi nhật ký. Từ đó app không đề nghị WineD3D với driver này nữa (`AgvnOpenGlCheck`, nhớ theo driver và bản app) |
 | Không tạo được DirectX / thiếu DirectX 11 | Câu lỗi của DXVK, Unity (`InitializeEngineGraphics failed`) | Đổi bản DXVK, đổi driver (Turnip ↔ System), dùng WineD3D |
 | Driver đồ họa lỗi giữa chừng | `VK_ERROR_DEVICE_LOST` | Để Turnip tự chọn chế độ dựng hình, đổi driver, đổi DXVK, hạ Đồ họa |
 | Hết bộ nhớ đồ họa / hết RAM | DXVK, Unity, Unreal báo hết bộ nhớ | Hạ Đồ họa. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ (`giam-ram.md`) |
@@ -52,6 +54,15 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Game không chịu độ phân giải nhỏ ("The current resolution is too low") | Game tắt trước khi hiện hình, màn hình dưới 480 dòng | Nâng Đồ họa (thường là Thấp 854×480), dùng lại cấu hình đã chạy được |
 | Game không chạy với cấu hình mới | Lần trước chạy được, đổi cấu hình xong thì tắt trước khi hiện hình | Dùng lại cấu hình đã chạy được, về cấu hình gốc |
 | Game tắt ngay, không rõ lỗi | Game tắt trước khi hiện hình | Về cấu hình gốc, đổi DXVK, đổi driver, gửi nhật ký |
+
+Ví dụ ngày 06/10 (bản 0.1.20): Thorn Sin (Unity 2020.3, DirectX 11) trên Xiaomi 24094RAD4G, GPU PowerVR BXM-8-256,
+driver Vulkan 1.1. Cả năm lần chơi, game chạy bằng WineD3D và tắt ở "Failed to initialize graphics": WineD3D vẽ bằng
+OpenGL, mà Zink không khởi động được trên driver đó (`failed to load driver: zink`). DXVK cũng không giúp được: theo mã
+nguồn DXVK 1.10.3 (`D3D11Device::GetDeviceFeatures`), DirectX 11 cần geometry shader ở mọi mức, vẽ khung dây
+(`fillModeNonSolid`) từ mức 9.1 và transform feedback từ mức 10.0; driver PowerVR này thiếu ít nhất hai thứ sau. "Tự
+sửa lỗi" chỉ biết "Game báo thiếu DirectX", và vì game đang dùng WineD3D nên hộp hỏi chỉ còn "Gửi nhật ký". Giờ app nói
+đúng lý do, đề nghị đưa game về DXVK, và không đề nghị WineD3D với driver đó nữa. Máy chỉ có driver như vậy thì không
+chạy được game DirectX 10/11. Game "Chạy nhẹ" (Ren'Py, RPG Maker, Godot) không cần DirectX nên vẫn chạy.
 
 Khi máy hết RAM, hệ thống có thể tắt riêng tiến trình game mà không tắt AGVN. Lúc đó Wine kết thúc với mã 0, còn Wine,
 DXVK và engine của game đều không kịp ghi gì. Trước đây app coi đó là game thoát bình thường và còn lưu cấu hình đó là
@@ -556,3 +567,9 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       lại.
 - [ ] Game DXVK: `wine-cuoi.txt` có đủ danh sách extension Vulkan (dưới mỗi extension có dòng "extension supported"),
       không có "[AGVN] ×1 dòng lặp lại".
+- [ ] Máy GPU PowerVR (driver thiếu tính năng DirectX 11), game Unity DirectX 11: hộp hỏi "Driver đồ họa thiếu tính năng
+      DirectX 11 mà game cần", không có nút đổi bản DXVK. Bấm "Dùng WineD3D…" mà game vẫn hỏng: lần sau hộp hỏi "Máy
+      không chạy được OpenGL với driver đồ họa này" với "Dùng lại DXVK (bỏ WineD3D)". Game DirectX khác trên máy đó không
+      còn được đề nghị WineD3D; `adb logcat -s AGVN` có `OpenGL (Zink) does not start with the System driver`.
+- [ ] Máy Adreno hoặc Mali: game DirectX và game OpenGL vẫn chạy như trước, `wine-cuoi.txt` không có `failed to load
+      driver: zink`.

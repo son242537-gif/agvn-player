@@ -28,7 +28,7 @@ public class AgvnDoctorTest {
             "quality-up", "dxvk-other", "dxvk-arm64ec", "driver-other", "wined3d", "godot-renderer", "godot-angle", "godot-undo",
             "render-gmem", "render-auto", "emulator-stable", "emulator-fast", "wincomponent", "power-save-settings",
             "app-settings", "send-logs", "run-windows", "rgss-frameskip", "wrapper-constants", "wrapper-clip", "wine-mono",
-            "wine-old"));
+            "wine-old", "dxvk-back"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
             "ram-saved", "live", "light", "script-error", "page-crash", "frozen"));
@@ -102,6 +102,33 @@ public class AgvnDoctorTest {
         assertEquals("gpu-lost", found(lost));
         lost.lines.set(0, "Could not allocate memory: System out of memory!");
         assertEquals("memory", found(lost));
+    }
+
+    @Test
+    public void aGpuWithoutWhatDirectX11AndOpenGlNeed() {
+        // Thorn Sin (Unity 2020.3) on a PowerVR BXM-8-256, Vulkan 1.1 (06/10): DXVK 1.10.3 had no feature level to
+        // give, then WineD3D, the next fix, had no OpenGL, as Zink did not start on that driver
+        AgvnProblemCatalog.Finding dxvk = catalog.find(noStart(
+                "info:  D3D11CoreCreateDevice: Probing D3D_FEATURE_LEVEL_11_0",
+                "err:   D3D11CoreCreateDevice: Requested feature level not supported",
+                "InitializeEngineGraphics failed"));
+        assertEquals("dx11-features", dxvk.id());
+        assertEquals("another DXVK needs the same", Arrays.asList("driver-other", "wined3d", "send-logs"),
+                dxvk.fixes());
+        AgvnProblemCatalog.Finding gl = catalog.find(noStart(
+                "WARNING: Some incorrect rendering might occur because the selected Vulkan device (Wrapper(PowerVR "
+                        + "BXM-8-256)) doesn't support base Zink requirements: feats.features.fillModeNonSolid ",
+                "glx: failed to create drisw screen",
+                "failed to load driver: zink",
+                "d3d11: failed to create factory (887a0004).",
+                "InitializeEngineGraphics failed"));
+        assertEquals(AgvnOpenGlCheck.PROBLEM, gl.id());
+        assertEquals(Arrays.asList("dxvk-back", "driver-other", "send-logs"), gl.fixes());
+        assertEquals("a Zink that only warns still starts", "directx", found(noStart(
+                "WARNING: Some incorrect rendering might occur because the selected Vulkan device (Wrapper(Mali-G57)) "
+                        + "doesn't support base Zink requirements: feats.features.fillModeNonSolid",
+                "InitializeEngineGraphics failed")));
+        assertEquals("System@24", AgvnOpenGlCheck.key("System", 24));
     }
 
     @Test

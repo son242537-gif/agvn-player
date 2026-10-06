@@ -63,6 +63,7 @@ final class AgvnFixApply {
                 s.putExtra("graphicsDriverConfig", AgvnFixEdits.withConfigValue(AgvnFixes.driverConfig(s), "version", fix.to, ';'));
                 break;
             case "wined3d":
+            case "dxvk-back":
                 s.putExtra("dxwrapper", fix.to);
                 break;
             case "godot-renderer":
