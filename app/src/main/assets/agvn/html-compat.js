@@ -14,6 +14,8 @@
  *  6. Saves are files in the game's save folder, as on a PC (MV save/file1.rpgsave, MZ save/file1.rmmzsave), through
  *     the app (window.AgvnSaves): "Nhập save" / "Xuất save" and the Windows version reach them. Saves the browser kept
  *     before are carried over while the folder holds none.
+ *  7. The page counts as the picked window while it shows (document.hasFocus): RPG Maker MZ moves its scenes only
+ *     then, and WebView can leave the page without the focus, so every MZ game stood still on its first scene.
  */
 (function () {
     'use strict';
@@ -104,6 +106,13 @@
             return {};
         };
     }
+
+    // --- 7: picked while shown. RPG Maker MZ updates its scene only while window.top.document.hasFocus()
+    // (SceneManager.isGameActive), as a PC game waits while another window is picked. A phone shows one app, but
+    // WebView can leave the page without the focus (a tap does not give it; the ⌨ field holds it while it types): the
+    // game drew on and stood still on its first scene, with no error. Plugins that ask the same follow. The game still
+    // stops when the player leaves the app, since the page hides.
+    document.hasFocus = function () { return document.visibilityState !== 'hidden'; };
 
     // --- 2 and 3: keep the game running through small errors ---
     var MINOR = /opacity|length|undefined|null|not a function|not an object|Cannot read|Cannot set/i;

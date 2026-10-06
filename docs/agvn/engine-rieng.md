@@ -317,3 +317,32 @@ Chỗ để save của từng loại game: xem "Save, Nhập save và Xuất sav
      .zip đó trên máy khác: save hiện trong game.
   7. Ren'Py, RPG Maker XP/VX/VX Ace "Chạy nhẹ": "Xuất save" rồi "Nhập save" trên máy khác: save hiện trong game.
   8. Game Tyrano: "Nhập save" / "Xuất save" báo chưa làm được, như trước.
+
+## Game RPG Maker MZ đứng ở cảnh đầu (bản 0.1.25)
+
+Anh Sơn báo 07/10/2026 (POCO F8 Pro, bản 0.1.24): mọi game MZ "Chạy nhẹ" đứng ở cảnh đầu (màn đen, logo), chạm không
+đi tiếp, và không có lỗi nào nên "Tự sửa lỗi" không biết.
+
+- **Vì sao:** MZ chỉ cập nhật cảnh khi cửa sổ đang được chọn (`SceneManager.isGameActive` hỏi
+  `window.top.document.hasFocus()`), như game trên PC đứng chờ khi người chơi chọn cửa sổ khác. Từ Android 9, ở chế độ
+  chạm không view nào tự có focus, và chạm vào WebView cũng không cho focus, nên trang luôn trả lời "không được chọn":
+  game vẫn vẽ nhưng cảnh không chạy tiếp. MV không hỏi điều này nên không bị.
+- **Sửa:**
+  - `html-compat.js` (mục 7): trang được coi là "đang được chọn" khi đang hiện (`document.hasFocus()` theo
+    `document.visibilityState`). Hàm của MZ, cả khi plugin bọc lại, và plugin nào hỏi `hasFocus` đều theo đó, từ trước
+    khi script đầu tiên của game chạy. Rời app thì trang ẩn và game vẫn dừng như trước.
+  - `AgvnHtmlTyping`: WebView nhận focus khi game mở và mỗi lần cửa sổ có lại focus (đóng hộp thoại, kéo thanh thông
+    báo, quay lại từ app khác), trừ lúc ô gõ chữ đang giữ để mở bàn phím ảo. Phím của bàn phím rời và tay cầm nhờ vậy
+    tới được trang.
+  - Không thêm bộ dò "cảnh đứng" cho "Tự sửa lỗi": sau khi sửa, `isGameActive()` chỉ còn sai khi plugin của game cố ý
+    dừng cảnh (ví dụ lúc chiếu phim), nên bộ dò sẽ báo nhầm cho game đang chạy tốt.
+  - Test: `tools/agvn/tests/html_focus_sim.js` chạy vòng cảnh của MZ trên trang không có focus (trước khi sửa: cảnh
+    không chạy).
+- **Thử máy:**
+  1. Một game MZ bất kỳ: tự qua màn giới thiệu tới màn tiêu đề mà không cần chạm; vào chơi, lưu, tải được.
+  2. Có bật nhật ký (DevTools): `SceneManager.isGameActive()` là `true` khi game đang hiện. Về màn hình chính thì game
+     dừng (tiếng tắt, cảnh không chạy), quay lại thì chạy tiếp.
+  3. Game MZ có ô nhập tên: bấm ⌨ rồi gõ: chữ vào ô, game vẫn chạy trong lúc gõ. Đóng bàn phím rồi bấm phím rời hay tay
+     cầm: game nhận phím.
+  4. Mở menu Chạy nhẹ (nút Quay lại) rồi đóng: game chạy tiếp, phím rời vẫn tới game.
+  5. Hồi quy: game MV (tiếng, khung hình, save) và game Tyrano vẫn như cũ.

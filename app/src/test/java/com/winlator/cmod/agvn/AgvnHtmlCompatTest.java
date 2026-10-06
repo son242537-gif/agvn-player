@@ -57,6 +57,14 @@ public class AgvnHtmlCompatTest {
     }
 
     @Test
+    public void bundledCompatScriptLetsRpgMakerMzMoveWhileItShows() throws Exception {
+        // MZ updates its scene only while document.hasFocus(), and WebView can leave the page without the focus:
+        // every MZ game stood still on its first scene (tools/agvn/tests/html_focus_sim.js plays it through)
+        String js = compatJs();
+        assertTrue(js.contains("document.hasFocus = function () { return document.visibilityState !== 'hidden'; };"));
+    }
+
+    @Test
     public void bundledCompatScriptTellsRpgMakerMvItRunsOnAPc() throws Exception {
         String js = compatJs();
         // a PC game ships .ogg sound and .webm video: on a phone MV asks for .m4a/.mp4 and every sound is missing

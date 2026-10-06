@@ -20,8 +20,9 @@ import androidx.core.view.WindowInsetsCompat;
  * [⌨] on an HTML game: the Android keyboard, whose letters reach the page as key events, for games that read keys
  * (an RPG Maker MV/MZ name input plugin, Tyrano's key settings). A hidden 1x1 field holds the keyboard; what it gets
  * is compared with what it had, so the keyboard's own corrections become Backspace and new letters. The field takes
- * focus only while the keyboard is up, so a real keyboard or controller always reaches the page. A text field of the
- * page itself gets the keyboard from WebView as usual.
+ * focus only while the keyboard is up; the rest of the time the page has it, from the start and whenever the window
+ * gets it back (Android 9+ gives no view the focus in touch mode, and a tap on WebView does not), so a real keyboard
+ * or controller always reaches the page. A text field of the page itself gets the keyboard from WebView as usual.
  */
 final class AgvnHtmlTyping {
     private final Activity activity;
@@ -70,6 +71,17 @@ final class AgvnHtmlTyping {
             return false;
         });
         activity.addContentView(field, new FrameLayout.LayoutParams(1, 1));
+        web.setFocusable(true);
+        web.setFocusableInTouchMode(true);
+        focusPage();
+        web.getViewTreeObserver().addOnWindowFocusChangeListener(focused -> {
+            if (focused) focusPage(); // back from a dialog, the notification shade or another app
+        });
+    }
+
+    /** The page has the focus, as a browser's tab has it, unless the field holds it for the keyboard. */
+    private void focusPage() {
+        if (!field.hasFocus()) web.requestFocus();
     }
 
     void show() {
