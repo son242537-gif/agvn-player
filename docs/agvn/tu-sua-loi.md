@@ -332,7 +332,9 @@ App canh lỗi này cho mọi game (`AgvnMovieWatch`, `AgvnMovieRules`):
 Nhật ký Wine không còn phình vì dòng lặp (`AgvnLogRepeats`): dòng nào đã ghi trong 5 giây qua (bỏ qua giờ, luồng và
 địa chỉ `0x…`) thì không ghi lại, mỗi giây ghi một dòng "[AGVN] ×N nữa: …". Quá 64 MB thì ngừng ghi, kèm một dòng báo.
 300 dòng cuối của Wine (`wine-cuoi.txt`, và chỗ "Tự sửa lỗi" đọc) cũng gộp dòng lặp ("[AGVN] ×N dòng lặp lại"), nên
-phim lỗi không đẩy các dòng khác ra ngoài.
+phim lỗi không đẩy các dòng khác ra ngoài. Chỉ gộp khi giữa hai dòng được ghi có hơn 4 dòng lặp; từ 4 dòng trở xuống thì
+ghi đủ. Bản 0.1.21 gộp cả một dòng: danh sách extension Vulkan của DXVK (mỗi extension kèm dòng "extension supported :
+1") thành ra "VK_EXT_hdr_metadata", "[AGVN] ×1 dòng lặp lại". Dòng lặp ở cuối lần chơi cũng được ghi.
 
 ## Hai bản Wine: Proton 9 và Proton 10
 
@@ -552,3 +554,5 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       thanh bên: game dừng" và "Game chạy tiếp sau … giây dừng".
 - [ ] Mở game còn đen lúc tải, sang app khác 1 phút rồi quay lại: không có thanh "Màn hình game vẫn đen" ngay khi quay
       lại.
+- [ ] Game DXVK: `wine-cuoi.txt` có đủ danh sách extension Vulkan (dưới mỗi extension có dòng "extension supported"),
+      không có "[AGVN] ×1 dòng lặp lại".

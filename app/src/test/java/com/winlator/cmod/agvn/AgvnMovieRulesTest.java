@@ -108,4 +108,24 @@ public class AgvnMovieRulesTest {
                 "[AGVN] ×4998 dòng lặp lại", "wine: Unhandled page fault on read access to 0x00000000"), lines);
         tail.reset();
     }
+
+    @Test
+    public void aFewLinesSeenAgainAreKept() {
+        // DXVK's extension list (Kaiju Princess, 0.1.21) read "VK_EXT_hdr_metadata", "[AGVN] ×1 dòng lặp lại"
+        String yes = "info:    extension supported                    : 1";
+        AgvnWineTail tail = AgvnWineTail.get();
+        tail.reset();
+        tail.call("info:  VK_EXT_full_screen_exclusive");
+        tail.call(yes);
+        tail.call("info:  VK_EXT_hdr_metadata");
+        tail.call(yes);
+        tail.call("info:  VK_EXT_transform_feedback");
+        assertEquals(Arrays.asList("info:  VK_EXT_full_screen_exclusive", yes, "info:  VK_EXT_hdr_metadata", yes,
+                "info:  VK_EXT_transform_feedback"), tail.lines());
+        for (int i = 0; i < 10; i++) tail.call(REFUSED);
+        List<String> lines = tail.lines();
+        assertEquals("a flood at the end is told too", "[AGVN] ×9 dòng lặp lại", lines.get(lines.size() - 1));
+        assertEquals(REFUSED, lines.get(lines.size() - 2));
+        tail.reset();
+    }
 }
