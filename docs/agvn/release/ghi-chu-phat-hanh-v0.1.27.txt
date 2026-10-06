@@ -1,0 +1,7 @@
+AGVN Player v0.1.27 - agvn.io
+
+Bản nhỏ: chỉ sửa "Tự sửa lỗi" và nhật ký. Game chạy như bản 0.1.26.
+Sửa lỗi:
+- "Tự sửa lỗi" chỉ hỏi "Lỗi còn không?" sau khi game đã mở lại với cách sửa đang thử. Trước đó, bấm "Tự sửa lỗi" sẽ thấy nút "Mở lại game ngay" (trong game) hoặc "Chơi thử với cách này" (ở thư viện), để không cách nào bị bỏ qua khi chưa được thử.
+- Nhật ký gửi về ghi rõ game đang chạy: file exe, engine, các file DLL cạnh exe và mod (BepInEx, MelonLoader, UE4SS), kèm nhật ký của các mod đó, giúp AGVN tìm lỗi nhanh hơn.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
