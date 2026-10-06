@@ -1,0 +1,7 @@
+AGVN Player v0.1.23 - agvn.io
+
+Bản nhỏ: chỉ sửa "Tự sửa lỗi" cho game DirectX. Game chạy như bản 0.1.22.
+Sửa lỗi:
+- Máy có driver đồ họa thiếu tính năng DirectX 11 (như máy GPU PowerVR BXM-8-256): "Tự sửa lỗi" nói rõ "Driver đồ họa thiếu tính năng DirectX 11 mà game cần" và không còn đề nghị đổi bản DXVK, vì bản nào cũng cần các tính năng đó. Nếu chỉ còn nút "Gửi nhật ký" thì máy này không chạy được game DirectX 11 đó; game Ren'Py, RPG Maker, Godot "Chạy nhẹ" vẫn chạy.
+- Máy không chạy được OpenGL với driver đồ họa đang dùng: app báo rõ điều đó, có nút "Dùng lại DXVK (bỏ WineD3D)" cho game đã chuyển sang WineD3D, và không đề nghị WineD3D trên máy đó nữa. Trước đây game có thể bị kẹt ở WineD3D, mỗi lần mở chỉ còn nút "Gửi nhật ký".
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
