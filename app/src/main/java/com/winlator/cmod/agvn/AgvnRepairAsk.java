@@ -50,7 +50,8 @@ public final class AgvnRepairAsk {
             return;
         }
         Properties state = AgvnGoodConfig.load(activity, shortcut);
-        if (AgvnRepair.trying(state).isEmpty()) return; // answered in the meantime
+        // answered in the meantime, or another fix was put on during this run: asked about after the next start
+        if (AgvnRepair.trying(state).isEmpty() || !AgvnRepair.ran(state, shortcut.getExtra("lastRunAt"))) return;
         AgvnProblemCatalog.Finding f =
                 AgvnDoctor.catalog(activity).finding(AgvnRepair.symptom(state), Collections.emptyMap());
         String title = f != null ? f.title() : activity.getString(R.string.agvn_repair_title);

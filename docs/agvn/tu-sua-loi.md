@@ -196,6 +196,12 @@ app không nhìn ra chắc chắn từ hình. Với những lỗi đó, người
      game ngay". Hết cách: cấu hình về như cũ, app mời "Gửi nhật ký".
    - **Hỏi lần sau:** lần mở game sau app hỏi lại.
 
+App chỉ hỏi về một cách khi game đã chạy lại với cách đó (bản 0.1.27; `AgvnRepair.ran`: giờ đặt cách, `report.at`, so
+với lần mở game gần nhất, `lastRunAt` của lối tắt). Trước đó, bấm lại "Tự sửa lỗi" hay "🩺 Tự sửa" thì hộp nói "game
+chưa chạy lại với cách này" và chỉ có "Mở lại game ngay" (trong game) hoặc "Chơi thử với cách này" (ở thư viện), cùng
+"Chọn lỗi khác". Nhật ký Isekai NTR Inn (07/10/2026) cho thấy vì sao: người chơi bấm "Vẫn còn lỗi" cho "Về cấu hình gốc"
+11 giây sau khi app đặt cách đó, lúc game vẫn chạy với cấu hình cũ, nên app bỏ một cách chưa ai thử và báo "đã thử hết".
+
 Chỉ game được báo lỗi bị đổi, và chỉ sau khi người chơi báo. Cách không giúp được không ở lại trên game, nên game không
 phải trả giá (chậm hơn, nóng hơn) cho một cách sửa vô ích. App ghi mọi bước vào `su-kien.txt` của phiên chơi ("Tự sửa
 lỗi: người chơi báo …, thử: …"). Trạng thái nằm cùng file của "Tự sửa lỗi" (`files/agvn/doctor/`, các khóa
@@ -474,6 +480,18 @@ cả ba lần.
   (mã x86-64, chạy giả lập). Cả hai chưa thử trên máy thật. Wine không nạp được thì hộp hỏi là "Wine chưa chạy được
   phần .NET của game".
 
+## Nhật ký: game gì, có mod không
+
+Từ bản 0.1.27, dòng đầu của `su-kien.txt` nói game nào đang chạy (`AgvnGameFacts`): file exe, engine app nhận ra, các
+file `.dll` cạnh exe và thư mục mod (`BepInEx`, `MelonLoader`, `ue4ss`). Ví dụ: `Game: Rina.exe · engine UNITY · DLL
+cạnh exe: GameAssembly.dll, UnityPlayer.dll, winhttp.dll · mod: BepInEx`. App cũng chép nhật ký của các bộ nạp mod:
+`BepInEx/LogOutput.log`, `MelonLoader/Latest.log`, `ue4ss/UE4SS.log` (cạnh exe), như nhật ký engine.
+
+Lý do: hai nhật ký gửi về ngày 07/10/2026 (máy HONOR AAK-AN00) không đủ để biết game bị gì. Rina có `Player.log` của
+Unity trống cả 5 lần chạy; chỉ biến `WINEDLLOVERRIDES` trong `moi-truong.txt` cho thấy cạnh exe có `winhttp.dll` (bộ
+nạp BepInEx), mà nhật ký của BepInEx thì app chưa chép. Isekai NTR Inn không có nhật ký engine nào và không biết là
+engine gì. Máy HONOR cũng không cho app đọc logcat (`logcat.txt` chỉ có một dòng mã hoá).
+
 ## Nhật ký Wine luôn có dòng lỗi
 
 Khi tắt "Bật debug Wine", app vẫn cho Wine in ba nhóm lỗi: `err+module` (thiếu hoặc hỏng file `.dll`), `err+mscoree`
@@ -667,6 +685,11 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       nhật ký".
 - [ ] Đang thử một cách, ở thư viện bấm "Tự sửa lỗi": hộp hỏi "App đang thử cách sửa: … Lỗi còn không?" với "Hết lỗi
       rồi", "Vẫn còn lỗi", "Chọn lỗi khác". "Chọn lỗi khác" trả cấu hình về như trước rồi mới hỏi lỗi mới.
+- [ ] Trong game, "Vẫn còn lỗi" rồi đừng bấm "Mở lại game ngay"; bấm "🩺 Tự sửa": hộp nói game chưa chạy lại với cách
+      mới, chỉ có "Mở lại game ngay" và "Chọn lỗi khác". Bấm "Mở lại game ngay": game mở lại, 45 giây sau mới hỏi.
+      Ở thư viện cũng vậy, với nút "Chơi thử với cách này".
+- [ ] `su-kien.txt` của mọi phiên chơi game Windows bắt đầu bằng dòng "Game: <exe> · engine … · DLL cạnh exe: …". Game
+      có BepInEx: dòng đó có "mod: BepInEx" và thư mục phiên có `LogOutput.log`.
 - [ ] Game Unity ở Đồ họa Siêu nhẹ, chọn "Game tự tắt, văng ra" (hoặc Unity tự bắt crash): có "Để game Unity tự chọn
       chất lượng hình". Thử: lần mở sau `adb logcat -s AGVN` có `Unity quality back to the game's own`.
 - [ ] Game Nhật bị chữ ô vuông, chọn "Chữ lỗi, ô vuông, ký tự lạ": "Chạy game bằng tiếng Nhật" sửa được; game đã chạy

@@ -9,6 +9,8 @@
     <string name="agvn_repair_start">Thử cách 1: %1$s</string>
     <string name="agvn_repair_trying">Đang thử: %1$s. Game đang mở lại…</string>
     <string name="agvn_repair_status">App đang thử cách sửa: %1$s. Lỗi còn không?</string>
+    <string name="agvn_repair_not_run">App đã đặt cách sửa: %1$s, nhưng game chưa chạy lại với cách này. Mở game để thử; chơi một lúc, app sẽ hỏi lỗi còn không.</string>
+    <string name="agvn_repair_play">Chơi thử với cách này</string>
     <string name="agvn_repair_ask_title">Còn lỗi \"%1$s\" không?</string>
     <string name="agvn_repair_ask_detail">App đang thử cách sửa: %1$s. Chơi thử một lúc rồi trả lời giúp app.</string>
     <string name="agvn_repair_gone">Hết lỗi rồi</string>

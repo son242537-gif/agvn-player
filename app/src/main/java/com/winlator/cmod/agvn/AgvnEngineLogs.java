@@ -100,6 +100,9 @@ final class AgvnEngineLogs {
                 break;
         }
         out.add(new File(exeDir, "Log.txt")); // DxLib (WOLF RPG and many doujin engines) logs next to the exe
+        out.add(new File(exeDir, "BepInEx/LogOutput.log")); // mod loaders next to the exe: BepInEx (winhttp.dll),
+        out.add(new File(exeDir, "MelonLoader/Latest.log")); // MelonLoader (version.dll)
+        out.add(new File(exeDir, "ue4ss/UE4SS.log")); // and UE4SS (dwmapi.dll) of Unreal games
         return out;
     }
 

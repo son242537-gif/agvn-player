@@ -26,7 +26,7 @@ import java.util.Set;
  */
 final class AgvnRepair {
     static final String PREFIX = "report", SYMPTOM = "report", TRYING = "report.trying", LABEL = "report.label",
-            TRIED = "report.tried", HAS_BEFORE = "report.before", BEFORE = "report.before.";
+            TRIED = "report.tried", HAS_BEFORE = "report.before", BEFORE = "report.before.", AT = "report.at";
     /**
      * Settings the fixes change besides AgvnGoodConfig.KEYS: Đồ họa's texture pool, tier and FPS preset, Unity's own
      * quality, the runner of a "Chạy nhẹ" game and RPG Maker's frame skip. They go back too.
@@ -77,6 +77,24 @@ final class AgvnRepair {
         return tried;
     }
 
+    /**
+     * The game has started since the fix on trial was put on ({@code lastRunAt}: the shortcut's, stamped at each
+     * start), so the player can tell whether it helped. Before that, "Vẫn còn lỗi" would drop a fix nobody tried. A
+     * trial begun before 0.1.27 has no time: asked as before.
+     */
+    static boolean ran(Properties state, String lastRunAt) {
+        long at = number(state.getProperty(AT));
+        return at <= 0 || number(lastRunAt) >= at;
+    }
+
+    private static long number(String value) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
     static Map<String, String> before(Properties state) {
         Map<String, String> before = new LinkedHashMap<>();
         for (String key : keys()) {
@@ -98,10 +116,11 @@ final class AgvnRepair {
         for (Map.Entry<String, String> e : now.entrySet()) state.setProperty(BEFORE + e.getKey(), e.getValue());
     }
 
-    /** {@code fix} is on the game now, to be asked about. */
+    /** {@code fix} is on the game now, to be asked about once the game has run with it ({@link #ran}). */
     static void trying(Properties state, AgvnFixes.Fix fix) {
         state.setProperty(TRYING, fix.id);
         state.setProperty(LABEL, fix.label);
+        state.setProperty(AT, String.valueOf(System.currentTimeMillis()));
         Set<String> tried = tried(state);
         tried.add(fix.id);
         state.setProperty(TRIED, String.join(",", tried));

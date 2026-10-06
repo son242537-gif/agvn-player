@@ -73,39 +73,35 @@ public final class AgvnRepairDialog {
         AlertDialog dialog = dialog(a, f.title(), box);
         if (!left.isEmpty()) {
             AgvnFixes.Fix first = left.get(0);
-            box.addView(button(a, a.getString(R.string.agvn_repair_start, first.label), () -> {
-                dialog.dismiss();
+            box.addView(button(a, a.getString(R.string.agvn_repair_start, first.label), dialog, () -> {
                 if (AgvnRepair.start(a, s, f, first)) restart(a, s, first, restartGame);
             }));
         }
         for (AgvnFixes.Fix other : AgvnFixes.applicable(a, s, f, Collections.emptySet(), state)) {
             if (other.changesGame()) continue; // "Gửi nhật ký", Android's settings: right away, no new start
-            box.addView(button(a, other.label, () -> {
-                dialog.dismiss();
-                AgvnFixApply.apply(a, s, other, state);
-            }));
+            box.addView(button(a, other.label, dialog, () -> AgvnFixApply.apply(a, s, other, state)));
         }
         dialog.show();
     }
 
-    /** A fix is being tried: is the problem gone? */
+    /** A fix on trial: gone? Asked once the game has run with it, else the game starts ({@link AgvnRepair#ran}). */
     private static void status(Activity a, Shortcut s, Properties state, Runnable restartGame) {
         AgvnProblemCatalog.Finding f = AgvnDoctor.catalog(a).finding(AgvnRepair.symptom(state), Collections.emptyMap());
         String title = f != null ? f.title() : a.getString(R.string.agvn_repair_title);
+        boolean ran = AgvnRepair.ran(state, s.getExtra("lastRunAt"));
         LinearLayout box = box(a);
         box.addView(text(a, a.getString(R.string.agvn_doctor_game, s.name), 13, false));
-        box.addView(text(a, a.getString(R.string.agvn_repair_status, AgvnRepair.label(state)), 15, false));
+        box.addView(text(a, a.getString(ran ? R.string.agvn_repair_status : R.string.agvn_repair_not_run,
+                AgvnRepair.label(state)), 15, false));
         AlertDialog dialog = dialog(a, title, box);
-        box.addView(button(a, a.getString(R.string.agvn_repair_gone), () -> {
-            dialog.dismiss();
-            gone(a, s);
-        }));
-        box.addView(button(a, a.getString(R.string.agvn_repair_still), () -> {
-            dialog.dismiss();
-            still(a, s, restartGame);
-        }));
-        box.addView(button(a, a.getString(R.string.agvn_repair_other), () -> {
-            dialog.dismiss();
+        if (ran) {
+            box.addView(button(a, a.getString(R.string.agvn_repair_gone), dialog, () -> gone(a, s)));
+            box.addView(button(a, a.getString(R.string.agvn_repair_still), dialog, () -> still(a, s, restartGame)));
+        } else {
+            int play = restartGame != null ? R.string.agvn_doctor_restart_now : R.string.agvn_repair_play;
+            box.addView(button(a, a.getString(play), dialog, () -> startNow(a, s, restartGame)));
+        }
+        box.addView(button(a, a.getString(R.string.agvn_repair_other), dialog, () -> {
             AgvnRepair.abandon(a, s); // the fix on trial goes, the settings are as before
             symptoms(a, s, restartGame);
         }));
@@ -140,6 +136,16 @@ public final class AgvnRepairDialog {
                 .show();
     }
 
+    /** The game starts with the fix on trial: at once over the game ("Mở lại game ngay"), else from the library. */
+    private static void startNow(Activity a, Shortcut s, Runnable restartGame) {
+        if (restartGame == null) {
+            AgvnRelaunch.start(a, s);
+            return;
+        }
+        AgvnDoctor.requestRelaunch(a, s);
+        restartGame.run();
+    }
+
     /** The game starts again with {@code fix}: now from the library, or after "Mở lại game ngay" over the game. */
     private static void restart(Activity a, Shortcut s, AgvnFixes.Fix fix, Runnable restartGame) {
         if (restartGame != null) {
@@ -165,11 +171,15 @@ public final class AgvnRepairDialog {
         return box;
     }
 
-    private static Button button(Activity a, String label, Runnable action) {
+    /** A button that closes {@code dialog}, then does {@code action}. */
+    private static Button button(Activity a, String label, AlertDialog dialog, Runnable action) {
         Button b = new Button(a);
         b.setAllCaps(false);
         b.setText(label);
-        b.setOnClickListener(v -> action.run());
+        b.setOnClickListener(v -> {
+            dialog.dismiss();
+            action.run();
+        });
         return b;
     }
 

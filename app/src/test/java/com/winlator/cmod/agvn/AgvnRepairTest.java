@@ -98,6 +98,20 @@ public class AgvnRepairTest {
     }
 
     @Test
+    public void aFixIsAskedAboutOnceTheGameRanWithIt() {
+        Properties state = new Properties();
+        assertTrue("a trial begun before 0.1.27 has no time: asked as before", AgvnRepair.ran(state, ""));
+        String oldRun = String.valueOf(System.currentTimeMillis() - 1);
+        AgvnRepair.trying(state, new AgvnFixes.Fix("reset", "Về cấu hình gốc", "1"));
+        // Isekai NTR Inn, 07/10/2026: "Vẫn còn lỗi" 11 s after the fix was put on, the game still on its old run
+        assertFalse(AgvnRepair.ran(state, oldRun));
+        assertFalse("never started", AgvnRepair.ran(state, ""));
+        assertTrue(AgvnRepair.ran(state, String.valueOf(System.currentTimeMillis() + 1000)));
+        AgvnRepair.clear(state);
+        assertTrue(state.isEmpty());
+    }
+
+    @Test
     public void turnipFlagsAndOtherSettings() {
         assertEquals("TU_DEBUG=noconform,nolrz", AgvnRepairFixes.withTuFlag("", "noconform", "nolrz"));
         assertEquals("TU_DEBUG=gmem,noubwc", AgvnRepairFixes.withTuFlag("TU_DEBUG=gmem", "noconform", "noubwc"));
