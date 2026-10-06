@@ -1,0 +1,7 @@
+AGVN Player v0.1.26 - agvn.io
+
+Bản nhỏ: chỉ sửa game RPG Maker MV/MZ "Chạy nhẹ". Game khác chạy như bản 0.1.25.
+Sửa lỗi:
+- Game RPG Maker có plugin viết riêng cho bản PC (ví dụ plugin tự sao lưu dữ liệu game) không còn dừng ở màn đen với chữ "ReferenceError" và "process is not defined".
+- Game RPG Maker MZ dừng ở màn lỗi ngay khi mở: "Tự sửa lỗi" cho biết lỗi nằm ở file nào, dòng nào của game, để AGVN tìm lỗi nhanh hơn khi bạn gửi nhật ký.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
