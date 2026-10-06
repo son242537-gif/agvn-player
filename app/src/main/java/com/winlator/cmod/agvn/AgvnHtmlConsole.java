@@ -35,7 +35,8 @@ public final class AgvnHtmlConsole extends WebChromeClient {
 
     /** The error that stopped the game, kept by html-compat.js; "" while there is none. */
     static final String FATAL = "window.__agvnFatal||''";
-    static final long FATAL_POLL_MS = 5000;
+    /** Often enough for a player who quits as soon as an error screen shows (a plugin that fails as it loads). */
+    static final long FATAL_POLL_MS = 2000;
 
     /** A value evaluateJavascript returned (a JSON string) as plain text; "" for none. */
     static String unquote(String json) {

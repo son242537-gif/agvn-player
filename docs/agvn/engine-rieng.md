@@ -346,3 +346,41 @@ Anh Sơn báo 07/10/2026 (POCO F8 Pro, bản 0.1.24): mọi game MZ "Chạy nh�
      cầm: game nhận phím.
   4. Mở menu Chạy nhẹ (nút Quay lại) rồi đóng: game chạy tiếp, phím rời vẫn tới game.
   5. Hồi quy: game MV (tiếng, khung hình, save) và game Tyrano vẫn như cũ.
+
+## Plugin dùng `process` của NW.js (bản 0.1.26)
+
+Anh Sơn báo 07/10/2026 (POCO F8 Pro, bản 0.1.25): game RPG Maker có plugin đọc `process` ngay lúc nạp file (ví dụ
+plugin sao lưu thư mục `data`: `path.dirname(process.mainModule.filename)`) dừng ở màn đen với chữ "ReferenceError /
+process is not defined", và "Tự sửa lỗi" không biết game dừng vì đâu.
+
+- **Vì sao:** `html-compat.js` có `require('fs'/'path'/'nw.gui'/'os')` nhưng không có `process`, để engine không tưởng
+  mình chạy trên NW.js (`Utils.isNwjs()` hỏi `typeof process === "object"`) mà bỏ đường save của trình duyệt. Plugin
+  viết cho NW.js thấy `require` nên dùng tiếp `process` và lỗi. Lỗi lúc nạp không qua `SceneManager.catchException`:
+  MZ (`main.js`) giữ lỗi đầu tiên, nạp xong thì chỉ hiện màn lỗi và không chạy cảnh đầu. MV chạy tiếp, với plugin đó
+  chạy dở.
+- **Sửa (`html-compat.js`):**
+  - `process` là một hàm, không phải object: `Utils.isNwjs()`, `main.js` và plugin nào thử `typeof process === "object"`
+    vẫn thấy trình duyệt, nên save vẫn qua `AgvnSaves`. Có `mainModule.filename` (`/index.html`: thư mục `/` là thư mục
+    game, như với `fs` và `path`), `platform` (`android`), `cwd()` (`/`), `env` (rỗng), `argv`, `versions` (không có
+    `node` hay `nw`), `execPath`, `on`/`once`/`off`... (không làm gì, trả lại `process`), `exit` (không làm gì, như
+    `nw.App.quit`), `nextTick`, `memoryUsage`, `stdout`/`stderr.write`.
+  - `fs` có thêm `copyFileSync`, `renameSync`, `appendFileSync`, `rmSync`, `rmdirSync`, `lstatSync`, `accessSync` và
+    bản bất đồng bộ. Bản chép được ghi vào localStorage như mọi file plugin ghi; `readdirSync` vẫn trả rỗng nên plugin
+    sao lưu cả thư mục không chép gì.
+  - Lỗi đầu tiên lúc nạp script được giữ kèm tên file và dòng. Khi MZ hiện màn lỗi mà chưa có cảnh nào chạy, lỗi đó vào
+    `__agvnFatal` để "Tự sửa lỗi" nói được game dừng vì plugin nào. Game MV chạy tiếp sau lỗi đó nên không bị coi là
+    dừng. App đọc `__agvnFatal` mỗi 2 giây (trước là 5), để người chơi thoát ngay khi thấy màn lỗi vẫn được hỏi.
+  - Cần để ý: plugin chỉ thử `typeof process !== "undefined"` để biết có phải NW.js không giờ sẽ đi đường PC, dùng
+    `fs`/`path` của app. Cách thử phổ biến (`Utils.isNwjs()`, `typeof process === "object"`, `process.versions.nw`)
+    vẫn đi đường trình duyệt.
+  - Test: `tools/agvn/tests/html_compat_sim.js` (plugin thử của báo cáo, các hàm `fs` mới), `html_load_error_sim.js`
+    (lỗi lúc nạp ở MZ và MV). Cả hai không qua với `html-compat.js` của bản 0.1.25.
+- **Thử máy:**
+  1. Plugin thử (trong báo cáo) bật trong `plugins.js` của một game MZ và một game MV: game vào màn tiêu đề, không có
+     màn lỗi; logcat có `[THU] base=/ platform=android cwd=/`.
+  2. DevTools: `typeof process` là `"function"`, `Utils.isNwjs()` là `false`; MZ: `StorageManager.isLocalMode()` là
+     `false`.
+  3. Lưu ván: có `save/file1.rmmzsave` (MZ) hay `save/file1.rpgsave` (MV); save cũ trên máy tải được.
+  4. Plugin cố tình lỗi khi nạp (`khongCo.x = 1;` ở đầu file) trong game MZ: vẫn hiện màn lỗi như cũ; thoát game sau
+     vài giây, "Tự sửa lỗi" hiện `ReferenceError: khongCo is not defined (<tên file>.js:1)`.
+  5. Hồi quy: game không dùng `process` không đổi gì (tiếng, khung hình, save, "Thoát game").

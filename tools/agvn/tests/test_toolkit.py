@@ -332,6 +332,12 @@ class HtmlCompatTest(unittest.TestCase):
         out = subprocess.run(["node", sim], capture_output=True, text=True)
         self.assertEqual(0, out.returncode, out.stdout + out.stderr)
 
+    @unittest.skipIf(shutil.which("node") is None, "node is not installed")
+    def test_a_plugin_that_fails_as_it_loads_is_named(self):
+        sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_load_error_sim.js")
+        out = subprocess.run(["node", sim], capture_output=True, text=True)
+        self.assertEqual(0, out.returncode, out.stdout + out.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

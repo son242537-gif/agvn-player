@@ -1,8 +1,9 @@
 /* AGVN Player - compatibility layer for RPG Maker MV/MZ games run without NW.js. Copyright (c) 2026 agvn.io - MIT License.
  * Loaded before the game's own scripts. It fixes what breaks when a PC game runs in a phone browser:
- *  1. Plugins that call require('fs'/'path'/'nw.gui') get small stand-ins (files are read from the game folder,
- *     written files go to localStorage). `process` stays undefined so the engine keeps its browser save functions,
- *     which 6 sends to real files.
+ *  1. Plugins that call require('fs'/'path'/'nw.gui'/'os') get small stand-ins (files are read from the game folder,
+ *     written files go to localStorage), and `process` is there for plugins that read it as they load (mainModule,
+ *     platform, cwd(), env, on()). It is a function, not an object: RPG Maker takes typeof process === 'object' for
+ *     NW.js (Utils.isNwjs), so the engine keeps its browser save functions, which 6 sends to real files.
  *  2. Small script errors ("Cannot read property 'opacity' of undefined", "...'length'...", "x is not a function")
  *     are logged and skipped instead of stopping the game with an error screen. If they keep coming (a truly broken
  *     scene), the normal error screen is shown so the player is not stuck on a frozen picture.
@@ -10,7 +11,8 @@
  *  4. RPG Maker MV is told it runs on a PC, as JoiPlay does: on a phone it asks for .m4a sound and .mp4 video, which
  *     PC games do not ship (every sound was missing, silently because of 3), and draws with the slow canvas renderer.
  *  5. An error that stops the game (its error screen, or a missing picture or data file) is kept in
- *     window.__agvnFatal, so the app can say what happened when the player leaves ("Tự sửa lỗi").
+ *     window.__agvnFatal, so the app can say what happened when the player leaves ("Tự sửa lỗi"). So is an error
+ *     in a script as it loads (a plugin's first lines) that keeps RPG Maker MZ from starting, with its file and line.
  *  6. Saves are files in the game's save folder, as on a PC (MV save/file1.rpgsave, MZ save/file1.rmmzsave), through
  *     the app (window.AgvnSaves): "Nhập save" / "Xuất save" and the Windows version reach them. Saves the browser kept
  *     before are carried over while the folder holds none.
@@ -80,9 +82,23 @@
         statSync: function (p) {
             if (!fs.existsSync(p)) { var e = new Error('ENOENT: ' + p); e.code = 'ENOENT'; throw e; }
             return { isFile: function () { return true; }, isDirectory: function () { return false; }, size: 0, mtime: new Date() };
-        }
+        },
+        lstatSync: function (p) { return fs.statSync(p); },
+        accessSync: function (p) { fs.statSync(p); },
+        // a copy, a move or an addition is written as any file is (localStorage); readdirSync stays empty, so a plugin
+        // that backs up a whole folder copies nothing
+        copyFileSync: function (from, to) { fs.writeFileSync(to, fs.readFileSync(from)); },
+        renameSync: function (from, to) { fs.writeFileSync(to, fs.readFileSync(from)); fs.unlinkSync(from); },
+        appendFileSync: function (p, data) {
+            var now = '';
+            try { now = fs.readFileSync(p); } catch (e) { /* a new file */ }
+            fs.writeFileSync(p, now + String(data));
+        },
+        rmSync: function (p) { fs.unlinkSync(p); },
+        rmdirSync: function () {}
     };
-    ['readFile', 'writeFile', 'unlink', 'mkdir', 'readdir', 'stat'].forEach(function (name) {
+    ['readFile', 'writeFile', 'unlink', 'mkdir', 'readdir', 'stat', 'lstat', 'access', 'copyFile', 'rename', 'appendFile',
+        'rm', 'rmdir'].forEach(function (name) {
         fs[name] = function () {
             var args = Array.prototype.slice.call(arguments), cb = args.pop();
             try { var r = fs[name + 'Sync'].apply(fs, args); if (typeof cb === 'function') cb(null, r); } catch (e) { if (typeof cb === 'function') cb(e); }
@@ -98,6 +114,33 @@
         Shell: { openExternal: noop, openItem: noop }, Menu: function () { return { append: noop, createMacBuiltin: noop }; },
         MenuItem: function () { return {}; } };
     var modules = { fs: fs, path: path, 'nw.gui': gui, os: { platform: function () { return 'android'; }, EOL: '\n' } };
+
+    // `process` for plugins written for NW.js that read it as they load (path.dirname(process.mainModule.filename),
+    // process.platform, process.cwd(), process.env.LOCALAPPDATA, process.on('exit', ...)): without it they stopped the
+    // game with "process is not defined". A function, not an object, so RPG Maker (Utils.isNwjs, main.js) and plugins
+    // that check typeof process === 'object' still see a browser; versions names neither node nor nw, for the same.
+    if (typeof window.process === 'undefined') {
+        var proc = function process() {};
+        var chain = function () { return proc; };
+        proc.platform = 'android';
+        proc.env = {};
+        proc.argv = [];
+        proc.execArgv = [];
+        proc.versions = {};
+        proc.version = '';
+        proc.execPath = '/Game.exe';
+        proc.mainModule = { filename: '/index.html' }; // its folder, '/', is the game folder for fs and path above
+        proc.cwd = function () { return '/'; };
+        proc.on = proc.once = proc.off = proc.addListener = proc.removeListener = proc.removeAllListeners = chain;
+        proc.emit = proc.exit = noop;
+        proc.nextTick = function (f) {
+            var args = Array.prototype.slice.call(arguments, 1);
+            Promise.resolve().then(function () { f.apply(null, args); });
+        };
+        proc.memoryUsage = function () { return { rss: 0, heapTotal: 0, heapUsed: 0, external: 0 }; };
+        proc.stdout = proc.stderr = { write: function (s) { console.log(String(s)); return true; } };
+        window.process = proc;
+    }
 
     if (typeof window.require !== 'function') {
         window.require = function (name) {
@@ -263,6 +306,24 @@
     function keepFatal(text) {
         if (!window.__agvnFatal) window.__agvnFatal = String(text).slice(0, 300);
     }
+
+    // --- 5, as the scripts load: an error in a plugin's first lines keeps RPG Maker MZ from starting (main.js shows it
+    // on its error screen, and the first scene never comes). The first one is kept with its file and line once that
+    // screen shows. MV goes on after such an error, so there it is no stop.
+    var loadError = '';
+    window.addEventListener('error', function (ev) {
+        if (loadError || !ev || !(ev.error || ev.message)) return;
+        var e = ev.error;
+        loadError = (e && e.name ? e.name + ': ' : '') + (e && e.message ? e.message : ev.message)
+            + ' (' + String(ev.filename || '').split('/').pop() + ':' + (ev.lineno || '') + ')';
+    });
+    window.addEventListener('load', function () {
+        setTimeout(function () { // main.js has had the load event by then
+            var printer = document.getElementById('errorPrinter');
+            var shown = printer ? String(printer.innerText || printer.textContent || '').replace(/\s+/g, ' ').trim() : '';
+            if (shown && !(window.SceneManager && SceneManager._scene)) keepFatal(loadError || shown);
+        }, 0);
+    });
 
     var tries = 0;
     var timer = setInterval(function () { if (patch() || ++tries > 2000) clearInterval(timer); }, 30);

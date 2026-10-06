@@ -7,7 +7,7 @@ const ctx = {
   console: { warn: () => {}, error: () => {}, log: console.log },
   document: { title: 't' }, setInterval, clearInterval, setTimeout, Date, Error, TypeError, ReferenceError, String, Array, encodeURI,
   localStorage: { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = v; }, removeItem: k => { delete store[k]; } },
-  XMLHttpRequest: function () { this.open = (m, u) => { this.u = u; }; this.overrideMimeType = () => {}; this.send = () => { this.status = this.u === '/data/Items.json' ? 200 : 404; this.responseText = '[1]'; }; },
+  XMLHttpRequest: function () { this.open = (m, u) => { this.u = u; }; this.overrideMimeType = () => {}; this.send = () => { this.status = /^\/data\/(Items|System)\.json$/.test(this.u) ? 200 : 404; this.responseText = '[1]'; }; },
 };
 ctx.window = ctx;
 ctx.addEventListener = (n, f) => { listeners[n] = f; };
@@ -19,7 +19,21 @@ ctx.SceneManager = { catchException(e) { stopped++; }, requestUpdate() { updates
 ctx.AudioManager = { checkErrors() { throw 'Failed to load: audio/bgm/x.ogg'; }, checkWebAudioError() { throw 'x'; } };
 listeners.load();
 const assert = require('assert');
-assert.strictEqual(typeof ctx.process, 'undefined');
+// `process` for plugins written for NW.js, while RPG Maker still sees a browser (Utils.isNwjs) and keeps its saves
+assert.strictEqual(typeof ctx.process, 'function');
+assert.strictEqual(vm.runInContext("typeof require === 'function' && typeof process === 'object'", ctx), false);
+let printed = '';
+ctx.console.log = s => { printed += s; };
+vm.runInContext(`
+  var path = require('path'), fs = require('fs');
+  var base = path.dirname(process.mainModule.filename);
+  console.log('[THU] base=' + base + ' platform=' + process.platform + ' cwd=' + process.cwd());
+  fs.copyFileSync(path.join(base, 'data/System.json'), path.join(base, 'data/_thu.json'));
+  process.on('exit', function () {}).on('close', function () {});
+`, ctx);
+assert.strictEqual(printed, '[THU] base=/ platform=android cwd=/');
+assert.strictEqual(store['agvn_fs:/data/_thu.json'], '[1]', 'the copy is written as any file is');
+assert.strictEqual(ctx.process.versions.nw, undefined);
 const p = ctx.require('path');
 assert.strictEqual(p.join('/www', 'save', '../data', 'a.json'), '/www/data/a.json');
 assert.strictEqual(p.basename('/a/b.rpgsave', '.rpgsave'), 'b');
@@ -29,6 +43,16 @@ assert.strictEqual(f.readFileSync('/data/Items.json'), '[1]');
 f.writeFileSync('/save/file1.rpgsave', 'abc');
 assert.strictEqual(f.readFileSync('save/file1.rpgsave'), 'abc');
 assert.throws(() => f.readFileSync('/nope.json'));
+f.appendFileSync('/save/file1.rpgsave', 'def');
+assert.strictEqual(f.readFileSync('/save/file1.rpgsave'), 'abcdef');
+f.renameSync('/save/file1.rpgsave', '/save/file2.rpgsave');
+assert.strictEqual(f.existsSync('/save/file1.rpgsave'), false);
+assert.strictEqual(f.readFileSync('/save/file2.rpgsave'), 'abcdef');
+assert.throws(() => f.accessSync('/nope.json'));
+let copied = null;
+f.copyFile('/data/Items.json', '/data/copy.json', e => { copied = e; });
+assert.strictEqual(copied, null);
+assert.strictEqual(f.readFileSync('/data/copy.json'), '[1]');
 ctx.AudioManager.checkErrors(); // no throw
 // minor errors are skipped and the loop continues
 ctx.SceneManager.catchException(new TypeError("Cannot read property 'opacity' of undefined"));
