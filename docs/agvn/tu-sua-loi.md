@@ -258,6 +258,9 @@ màn hình thì Wine trả lỗi -2, và game không vẽ gì nữa. `AgvnBlackS
   lại game ngay". Người chơi tắt lại được trong cài đặt game. Bản 0.1.18 tự bật hai mục này cho mọi game DirectX trên
   máy dưới 9 GB RAM không dùng Turnip, nên cả game vẫn chạy tốt cũng mất khung hình. Bản sau chỉ đề nghị khi game đen.
 - Khung game lớn theo màn hình (xem trên) thì không được đề nghị màn hình cỡ khung nữa.
+- Lúc app dừng game (người chơi rời app hoặc tắt màn hình, hay bấm nút tạm dừng ⏸ ở thanh bên), app không đọc hình,
+  và khoảng đó không tính vào thời gian chờ và thời gian canh (`AgvnGamePause`). Trước đây, game đang đen lúc tải mà
+  người chơi sang app khác thì quay lại có thể gặp ngay thanh "Màn hình game vẫn đen".
 
 Thanh "Màn hình game vẫn đen" có ba nút: "Đổi màn hình game thành <cỡ>" hoặc "Bật Đồng bộ khung hình" (rồi "Mở lại game
 ngay"), "Chờ thêm" (không hỏi lại trong lần chơi này), và "Để vậy, không hỏi lại" (`agvnBlackScreen`: 0 trong lối tắt).
@@ -543,3 +546,9 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
 - [ ] `adb logcat`: dòng `Wine mode emulation keys written`; `wine-cuoi.txt` của game bị đen vì Wine từ chối độ phân
       giải có `display settings returned -2`.
 - [ ] `adb logcat -s AGVN`: dòng `doctor: <lỗi> for <game>` và `fix <cách sửa> -> <giá trị>`.
+- [ ] Đang chơi game Windows, sang app khác (hoặc tắt màn hình) khoảng 1 phút rồi quay lại: `su-kien.txt` có "Rời app
+      (…): game dừng tới khi quay lại" rồi "Game chạy tiếp sau 60 giây dừng (không tính là đứng hình)", không có dòng
+      "Đứng hình" cỡ 60000 ms. Bấm nút tạm dừng ⏸ ở thanh bên rồi bấm lại: `su-kien.txt` có "Bấm nút tạm dừng (⏸) ở
+      thanh bên: game dừng" và "Game chạy tiếp sau … giây dừng".
+- [ ] Mở game còn đen lúc tải, sang app khác 1 phút rồi quay lại: không có thanh "Màn hình game vẫn đen" ngay khi quay
+      lại.

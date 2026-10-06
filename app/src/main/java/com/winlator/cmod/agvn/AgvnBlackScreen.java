@@ -40,6 +40,7 @@ public final class AgvnBlackScreen {
     private final Runnable poll = this::poll;
     private final AgvnBlackScreenRules rules;
     private final long startMs = SystemClock.uptimeMillis();
+    private final long stoppedAtStartNs = AgvnGamePause.pausedNs(System.nanoTime());
     private final boolean ask;
     /** The game's window as last looked at, {x, y, width, height}, or null. */
     private int[] window;
@@ -65,7 +66,12 @@ public final class AgvnBlackScreen {
     private void poll() {
         if (activity.isFinishing() || activity.isDestroyed()) return;
         try {
-            long elapsed = SystemClock.uptimeMillis() - startMs;
+            if (AgvnGamePause.isPaused()) { // the app stopped the game: its frozen picture and this time do not count
+                handler.postDelayed(poll, AgvnBlackScreenRules.POLL_MS);
+                return;
+            }
+            long elapsed = SystemClock.uptimeMillis() - startMs
+                    - (AgvnGamePause.pausedNs(System.nanoTime()) - stoppedAtStartNs) / 1_000_000L;
             List<String> lines = AgvnWineTail.get().lines();
             refused |= AgvnBlackScreenRules.refused(lines);
             box |= AgvnBlackScreenRules.boxShown(lines);

@@ -3,7 +3,8 @@ package com.winlator.cmod.agvn;
 
 /**
  * Pauses of a second or more between game frames, and what the FPS limit did meanwhile, so the logs tell whether the
- * limit kept the game waiting or the game stopped for another reason. Pure logic: {@link AgvnVsyncLimiter} feeds it.
+ * limit kept the game waiting or the game stopped for another reason. Time the app kept the game stopped, as when the
+ * player left the app, is no pause of the game ({@link AgvnGamePause}). Pure logic: {@link AgvnVsyncLimiter} feeds it.
  *
  * <p>Without a limit, and under upstream's timer, every buffer goes back at once or within a frame, so the limit cannot
  * hold a game for a second. Under the vsync limit the held buffers go back one per few vsyncs: once frames stop, all
@@ -77,17 +78,22 @@ final class AgvnFrameStalls {
         }
     }
 
-    private long lastFrameNs, lastTickNs, lastBackNs, longestPauseNs;
+    private long lastFrameNs, lastStoppedNs, lastTickNs, lastBackNs, longestPauseNs;
     private int drained = -1;
 
-    /** A game frame came; {@code held} = buffers the vsync limiter holds before it. Returns the pause before it, or null. */
-    synchronized Stall onFrame(long nowNs, Mode mode, int limit, int held) {
+    /**
+     * A game frame came: the pause before it, or null. {@code stoppedNs} = all the time the app kept the game stopped
+     * so far ({@link AgvnGamePause}), left out of the pause; {@code held} = buffers the vsync limiter holds before it.
+     */
+    synchronized Stall onFrame(long nowNs, long stoppedNs, Mode mode, int limit, int held) {
         Stall stall = null;
-        if (lastFrameNs != 0 && nowNs - lastFrameNs >= STALL_NS) {
-            stall = new Stall(ms(nowNs - lastFrameNs), mode, limit, held, drained,
+        long pauseNs = nowNs - lastFrameNs - (stoppedNs - lastStoppedNs);
+        if (lastFrameNs != 0 && pauseNs >= STALL_NS) {
+            stall = new Stall(ms(pauseNs), mode, limit, held, drained,
                     lastBackNs > lastFrameNs ? ms(lastBackNs - lastFrameNs) : -1, ms(longestPauseNs));
         }
         lastFrameNs = nowNs;
+        lastStoppedNs = stoppedNs;
         lastBackNs = 0;
         longestPauseNs = 0;
         drained = -1;

@@ -880,8 +880,10 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (agvnSlowWatch == null) agvnSlowWatch = new com.winlator.cmod.agvn.AgvnSlowWatch(this, shortcut, this::exit); // AGVN
         agvnSlowWatch.start();
         if (agvnStatus != null) agvnStatus.followDebugSetting(preferences.getBoolean("enable_wine_debug", false)); // AGVN
-        if (!isInPictureInPictureMode())
+        if (!isInPictureInPictureMode()) {
+            com.winlator.cmod.agvn.AgvnGamePause.resumed(); // AGVN: the time away is not the game's
             ProcessHelper.resumeAllWineProcesses();
+        }
     }
 
     @Override
@@ -899,6 +901,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 xServerView.onPause();
             }
 
+            if (!isFinishing() && !exiting.get()) com.winlator.cmod.agvn.AgvnGamePause.paused(true); // AGVN
             ProcessHelper.pauseAllWineProcesses();
         }
 
@@ -1549,9 +1552,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
             ImageView pauseIcon = (ImageView) btItemPause.getChildAt(0);
             btItemPause.setOnClickListener(v -> {
                 if (isPaused) {
+                    com.winlator.cmod.agvn.AgvnGamePause.resumed(); // AGVN
                     ProcessHelper.resumeAllWineProcesses();
                     if (pauseIcon != null) pauseIcon.setImageResource(R.drawable.icon_pause);
                 } else {
+                    com.winlator.cmod.agvn.AgvnGamePause.paused(false); // AGVN
                     ProcessHelper.pauseAllWineProcesses();
                     if (pauseIcon != null) pauseIcon.setImageResource(R.drawable.icon_play);
                 }

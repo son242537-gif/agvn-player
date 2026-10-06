@@ -56,6 +56,7 @@ public final class AgvnSessionTrack {
         lowRamFreeMb = -1;
         usedAtMs = 0;
         usedMb = usedBeforeMb = -1;
+        AgvnGamePause.reset(System.nanoTime());
     }
 
     /** A window's content changed: X server thread, every frame, so kept cheap. */

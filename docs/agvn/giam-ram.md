@@ -65,7 +65,9 @@ app ghi được từ bên ngoài game cho phần này.
   - Ô này còn thử nghiệm: ngày 01/10 một game đứng hình 5–9 giây, hai lần trong 30 giây, khi bật. Mỗi lần game ngừng gửi
     khung hình từ 1 giây trở lên, nhật ký của lần chơi (và logcat, thẻ `AGVN`) có một dòng "Đứng hình …" ghi giới hạn FPS
     đang chạy theo cách nào. Với khớp nhịp, dòng đó còn cho biết app có giữ bộ đệm nào của game không, tức đứng hình do
-    app hay do game (`AgvnFrameStalls`).
+    app hay do game (`AgvnFrameStalls`). Lúc app dừng game (người chơi rời app hoặc tắt màn hình, hay bấm nút tạm dừng
+    ⏸) không tính là đứng hình: nhật ký ghi "Rời app…" và "Game chạy tiếp sau N giây dừng…" (`AgvnGamePause`). Bản
+    0.1.21 trở về trước tính cả lúc đó vào "Đứng hình".
   - Trong game, người chơi nâng, hạ hoặc tắt được. Khi tắt, game và menu cheat tự chỉnh FPS.
   - AGVN không còn ghi `DXVK_FRAME_RATE`: DXVK khoá cứng mức này, trong game không nâng lên được. Game cũ có biến này
     được chuyển sang "Giới hạn FPS" khi mở (`AgvnQuality.upgrade`).
