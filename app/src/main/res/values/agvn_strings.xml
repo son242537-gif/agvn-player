@@ -125,6 +125,9 @@
     <string name="agvn_black_wait">Chờ thêm</string>
     <string name="agvn_black_sync_detail">Game đã chạy %1$d giây mà chưa hiện hình. Với game DirectX, bật \"Đồng bộ khung hình\" và \"Tắt Present Wait\" có thể giúp game hiện hình. Bạn tắt lại được trong cài đặt game.</string>
     <string name="agvn_black_sync">Bật Đồng bộ khung hình</string>
+    <string name="agvn_unity_crash_title">Game bị lỗi và đã dừng</string>
+    <string name="agvn_unity_crash_detail">Unity, engine của game, báo game bị crash (%1$s). Game không chạy tiếp được dù hình vẫn còn trên màn hình. App sẽ đóng game sau %2$d giây, rồi \"Tự sửa lỗi\" gợi ý cách chạy khác.</string>
+    <string name="agvn_unity_crash_close">Đóng game ngay</string>
     <string name="agvn_movie_title">Phim trong game không phát được</string>
     <string name="agvn_movie_detail">Wine của app chưa giải mã được phim %1$s của game, nên game đứng chờ phim chạy xong. Lỗi nằm ở app, không phải ở game.</string>
     <string name="agvn_movie_skip">Bỏ qua phim</string>

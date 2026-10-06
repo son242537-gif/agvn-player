@@ -18,7 +18,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  *   <li>when free RAM last fell under the RAM bar's level ({@link AgvnMemoryWatch}): a game that ends just after it
  *   most likely ran out of memory, since Android or the kernel ends it without a word in any log;</li>
  *   <li>how much memory the app and the game took at the memory watch's last two samples: a game whose memory still
- *   grows fast is still loading ({@link AgvnBlackScreen}).</li>
+ *   grows fast is still loading ({@link AgvnBlackScreen});</li>
+ *   <li>a crash the game's engine caught itself, as Unity does ({@link AgvnUnityCrashWatch}): Wine goes on, the game
+ *   does not.</li>
  * </ul>
  * One game at a time, as XServerDisplayActivity runs one. Pure Java (JVM-testable).
  */
@@ -29,6 +31,7 @@ public final class AgvnSessionTrack {
     private static final AtomicInteger bigUpdates = new AtomicInteger();
     private static volatile long startMs;
     private static volatile Map<String, String> settings = Collections.emptyMap();
+    private static volatile String engineCrash;
     private static volatile boolean bigSeen, wineEnded, playerQuit, exiting;
     private static volatile long lastFrameMs, endMs;
     private static final AtomicInteger pressesSinceFrame = new AtomicInteger(), framesSeen = new AtomicInteger();
@@ -56,6 +59,7 @@ public final class AgvnSessionTrack {
         lowRamFreeMb = -1;
         usedAtMs = 0;
         usedMb = usedBeforeMb = -1;
+        engineCrash = null;
         AgvnGamePause.reset(System.nanoTime());
     }
 
@@ -143,6 +147,16 @@ public final class AgvnSessionTrack {
     /** MB the app and the game grew by between the last two samples, if the last is within {@code withinMs}; else 0. */
     static synchronized long grewMb(long nowMs, long withinMs) {
         return usedBeforeMb >= 0 && nowMs - usedAtMs <= withinMs ? usedMb - usedBeforeMb : 0;
+    }
+
+    /** The game's engine caught a crash and said so in its log ({@link AgvnUnityCrash#describe}'s words). */
+    static void engineCrashed(String crash) {
+        engineCrash = crash;
+    }
+
+    /** The crash the game's engine caught this session, or null. */
+    static String engineCrash() {
+        return engineCrash;
     }
 
     static boolean started() {

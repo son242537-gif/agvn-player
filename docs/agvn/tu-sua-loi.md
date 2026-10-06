@@ -49,6 +49,7 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | File game hỏng | Unity: `is corrupted` | Gửi nhật ký (cần chép lại game) |
 | Không tìm thấy file của game | Hộp "File not found." của Wine: file chạy của game, hoặc file game cần, không còn ở chỗ cũ (thư mục game bị đổi tên, chuyển hay xoá) | Gửi nhật ký (cần chép lại thư mục game, thêm lại game) |
 | File chạy của game không đúng định dạng | Hộp "Bad EXE format" của Wine: file được mở không phải chương trình Windows mà Wine chạy được (file hỏng hoặc chép chưa xong, chương trình 16-bit hay DOS, không phải file chạy của game). Trước đây app chỉ báo "Game tắt ngay sau khi mở" | Gửi nhật ký (cần chép lại game, hoặc thêm lại game bằng đúng file chạy) |
+| Game Unity crash rồi đứng hình | Unity tự bắt crash nên Wine không thấy gì: nhật ký Unity (`Player.log`) có `Crash!!!` và "A crash has been intercepted by the crash handler". App đọc nhật ký này cả lúc game đang chạy (xem ví dụ Become A Vtuber bên dưới) | Giả lập CPU ổn định hơn, Wine cũ (Proton 9), đổi DXVK, đổi driver, về cấu hình gốc, gửi nhật ký |
 | Game crash | Wine in báo cáo crash | Đổi DXVK, giả lập CPU ổn định hơn, đổi driver, về cấu hình gốc |
 | Game tự tắt lúc máy gần hết RAM | Game tự đóng, không crash, không câu lỗi, trong khi 30 giây trước đó RAM trống đã xuống dưới mức của thanh cảnh báo RAM (một phần mười RAM của máy, từ 600 MB đến 1,2 GB), kể cả khi game chưa kịp hiện hình | Dùng lại cấu hình đã chạy được, hạ Đồ họa, gửi nhật ký. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ. Game đã tiết kiệm như vậy mà vẫn hết RAM: không đề nghị hạ Đồ họa nữa |
 | Game không chịu độ phân giải nhỏ ("The current resolution is too low") | Game tắt trước khi hiện hình, màn hình dưới 480 dòng | Nâng Đồ họa (thường là Thấp 854×480), dùng lại cấu hình đã chạy được |
@@ -63,6 +64,20 @@ nguồn DXVK 1.10.3 (`D3D11Device::GetDeviceFeatures`), DirectX 11 cần geometr
 sửa lỗi" chỉ biết "Game báo thiếu DirectX", và vì game đang dùng WineD3D nên hộp hỏi chỉ còn "Gửi nhật ký". Giờ app nói
 đúng lý do, đề nghị đưa game về DXVK, và không đề nghị WineD3D với driver đó nữa. Máy chỉ có driver như vậy thì không
 chạy được game DirectX 10/11. Game "Chạy nhẹ" (Ren'Py, RPG Maker, Godot) không cần DirectX nên vẫn chạy.
+
+Ví dụ ngày 06/10 (bản 0.1.23): Become A Vtuber (Unity 6, DirectX 11) trên Redmi K30 5G, GPU Adreno 620, chạy bằng
+Proton 10. Cả năm lần chơi, game crash ở cùng một chỗ (`UnityPlayer.dll+0x8d8b1a`) lúc tải cảnh đầu; dòng cuối trước
+crash là cảnh báo về ảnh `mini game1_great`. Người chơi đã đổi bản Turnip và bật DXVK async mà chỗ crash không đổi.
+Unity tự bắt crash này (`Player.log` có `Crash!!!`, danh sách module, ngăn xếp và "A crash has been intercepted by the
+crash handler"), nên Wine không báo gì và game đứng hình mãi. Người chơi rời app rồi vuốt tắt AGVN, nên "Tự sửa lỗi"
+không hỏi gì. Giờ app đọc nhật ký Unity mỗi 3 giây trong lúc game chạy (`AgvnUnityCrashWatch`). Thấy crash thì app ghi
+vào `su-kien.txt`, hiện thanh "Game bị lỗi và đã dừng" và đóng game sau 10 giây. 10 giây này chỉ tính lúc người chơi ở
+trong app. Về thư viện, app hỏi `unity-crash`, nút đầu là giả lập CPU ổn định hơn: chỗ crash nằm trong mã của Unity,
+phần app chạy qua giả lập CPU (FEX), còn đổi driver hay DXVK async thì chỗ crash vẫn vậy. Phiên đã bị vuốt tắt sau
+crash cũng được hỏi ở lần mở app sau, và `tom-tat.txt` ghi "Game bị lỗi (crash) – Unity báo crash trong …; sau đó: …".
+Nếu Unity kịp ghi báo cáo (`error.log` trong thư mục `Crashes` mà nhật ký nhắc), app chép nó vào phiên chơi thành
+`unity-crash.txt`, và tóm tắt ghi thêm tên lỗi, như "Access Violation 0xc0000005, đọc 0x0". Unity cũng bắt cả crash lúc
+game đang thoát, nên hộp hỏi có câu "Nếu chính bạn vừa thoát game thì bỏ qua thông báo này", như thông báo hết RAM.
 
 Khi máy hết RAM, hệ thống có thể tắt riêng tiến trình game mà không tắt AGVN. Lúc đó Wine kết thúc với mã 0, còn Wine,
 DXVK và engine của game đều không kịp ghi gì. Trước đây app coi đó là game thoát bình thường và còn lưu cấu hình đó là
@@ -479,8 +494,8 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       của mức đó.
 - [ ] Đổi tên thư mục của một game Windows rồi mở game: thư viện hỏi "Không tìm thấy file của game"; không có khung nhỏ
       nào bị phóng ra cả màn hình.
-- [ ] Đang chơi một game Windows, vuốt AGVN khỏi danh sách app gần đây rồi mở lại app: không có hộp hỏi; `tom-tat.txt`
-      của phiên đó ghi "Người chơi vuốt tắt AGVN…".
+- [ ] Đang chơi một game Windows (game không crash), vuốt AGVN khỏi danh sách app gần đây rồi mở lại app: không có hộp
+      hỏi; `tom-tat.txt` của phiên đó ghi "Người chơi vuốt tắt AGVN…".
 - [ ] Game Windows: "✕ Thoát" trên thanh ⌨ ✎ 👁 ⛶ hiện thanh "Thoát game?"; "Chơi tiếp" để game chạy tiếp, "Thoát game"
       đưa về thư viện và không có hộp hỏi.
 - [ ] Game mở chậm (hơn 10 giây không vẽ, ví dụ game Unity trên máy yếu): lần mở sau, dòng trên góc phải ghi "Đang khởi
@@ -573,3 +588,17 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       còn được đề nghị WineD3D; `adb logcat -s AGVN` có `OpenGL (Zink) does not start with the System driver`.
 - [ ] Máy Adreno hoặc Mali: game DirectX và game OpenGL vẫn chạy như trước, `wine-cuoi.txt` không có `failed to load
       driver: zink`.
+- [ ] Game Unity crash mà đứng hình (như Become A Vtuber trên Proton 10, máy Adreno 620): vài giây sau crash có thanh
+      "Game bị lỗi và đã dừng" ghi chỗ crash (`UnityPlayer.dll+0x8d8b1a`). 10 giây sau game tự đóng; bấm "Đóng game
+      ngay" thì đóng luôn. Về thư viện có hộp "Game bị lỗi và đứng hình", nút đầu "Giả lập CPU ổn định". `su-kien.txt`
+      có "Unity báo crash trong …"; `tom-tat.txt` ghi "Game bị lỗi (crash) – Unity báo crash trong …"; có
+      `unity-crash.txt` nếu Unity kịp ghi báo cáo.
+- [ ] Cùng game đó, rời app ngay lúc crash: game không bị đóng khi bạn đang ở ngoài app. Quay lại thì thanh vẫn đó và
+      10 giây được đếm từ lúc quay lại.
+- [ ] Cùng game đó, vuốt tắt AGVN khi game đang đứng hình rồi mở lại app: có hộp "Game bị lỗi và đứng hình";
+      `tom-tat.txt` ghi "Game bị lỗi (crash) – Unity báo crash trong …; sau đó: …".
+- [ ] Bấm "Giả lập CPU ổn định" rồi "Mở lại game ngay": game vào được thì báo AGVN cách đó. Vẫn crash thì lần sau hộp
+      hỏi có "Chạy bằng Wine cũ (Proton 9)", không hỏi lại giả lập CPU.
+- [ ] Game Unity chạy bình thường vài phút rồi thoát: không có thanh "Game bị lỗi và đã dừng", không có hộp hỏi.
+- [ ] Nếu gặp game Unity chỉ crash lúc thoát từ menu (hộp "Game bị lỗi và đứng hình" sau khi thoát): gửi nhật ký phiên
+      đó (`Player.log` cho biết Unity ghi gì ngay trước `Crash!!!`), để app nhận ra crash lúc thoát và thôi hỏi.

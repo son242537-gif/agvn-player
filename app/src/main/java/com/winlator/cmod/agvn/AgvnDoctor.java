@@ -76,6 +76,9 @@ public final class AgvnDoctor {
             AgvnEvidence ev = evidence(s, screen, AgvnWineTail.get().lines(), AgvnWineTail.get().crash(), System.currentTimeMillis());
             if (AgvnGodotGame.learn(s, ev.lines)) ev.engine = s.getExtra(AgvnGameImporter.EXTRA_ENGINE); // its error box said so
             ev.lines.addAll(engineLogTails(s, AgvnSessionTrack.startMs()));
+            String unity = AgvnSessionTrack.engineCrash(); // seen while the game played, else in its log now
+            if (unity == null) unity = AgvnUnityCrashFiles.inLogs(AgvnEngineLogs.of(s), AgvnSessionTrack.startMs());
+            AgvnUnityCrash.into(ev, unity);
             AgvnGodotGame.version(ev, AgvnEngineLogs.exe(s), AgvnEngineLogs.gameDir(s));
             ev.godotSwitched = AgvnFixEdits.godotSwitched(ranWith.get("execArgs"));
             if (ev.frozeAtEnd()) AgvnSessionLog.event("Game đứng hình " + ev.frozenS + " giây trước khi tắt (người chơi "
@@ -86,20 +89,26 @@ public final class AgvnDoctor {
         }
     }
 
-    /** A session Android ended, found at the next start (AgvnSessionLog.finishPending); its notes name the game. */
+    /**
+     * A session found unfinished at the next start (AgvnSessionLog.finishPending); its notes name the game. A game that
+     * had crashed (its Unity log says so) is asked about as a crash, however the app ended then; else Android's end is.
+     */
     static void afterKill(Context ctx, String notes) {
         try {
             long start = AgvnSessionNotes.value(notes, "start", 0);
             if (System.currentTimeMillis() - start > KILL_RECENT_MS) return; // too long ago to ask about
-            AgvnExitReason.Exit exit = AgvnExitReason.exit(ctx, start);
-            Shortcut s = exit == null ? null : AgvnRelaunch.find(ctx, (int) AgvnSessionNotes.value(notes, "container", -1),
-                    AgvnSessionNotes.text(notes, "shortcut"));
+            String crash = AgvnUnityCrashFiles.inLogs(AgvnSessionNotes.engineLogs(notes, start), start);
+            AgvnExitReason.Exit exit = AgvnSessionNotes.removedByPlayer(notes) ? null : AgvnExitReason.exit(ctx, start);
+            Shortcut s = exit == null && crash == null ? null : AgvnRelaunch.find(ctx,
+                    (int) AgvnSessionNotes.value(notes, "container", -1), AgvnSessionNotes.text(notes, "shortcut"));
             if (s == null) return;
             AgvnEvidence ev = new AgvnEvidence();
             ev.engine = s.getExtra(AgvnGameImporter.EXTRA_ENGINE);
             ev.ramSaved = AgvnMemorySaver.ranOut(s);
-            ev.killedReason = exit.reason;
-            ev.killedImportance = exit.importance;
+            ev.lines.addAll(engineLogTails(s, start));
+            AgvnUnityCrash.into(ev, crash);
+            ev.killedReason = crash == null ? exit.reason : -1; // a game dead already: its crash, not Android's end
+            ev.killedImportance = crash == null ? exit.importance : 0;
             diagnose(ctx, s, ev, AgvnGoodConfig.snapshot(s));
         } catch (RuntimeException e) {
             Log.w(TAG, "doctor: app end not read", e);

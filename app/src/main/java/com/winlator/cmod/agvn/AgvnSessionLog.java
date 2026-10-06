@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -108,7 +109,7 @@ public final class AgvnSessionLog {
         AgvnLightSession.removedByPlayer(context);
     }
 
-    /** At app start: finishes sessions whose app process died, with the reason Android recorded. */
+    /** At app start: finishes sessions whose app process died, with the reason Android recorded or the game's crash. */
     public static synchronized void finishPending(Context context) {
         File[] games = root().listFiles(File::isDirectory);
         if (games == null) return;
@@ -119,12 +120,12 @@ public final class AgvnSessionLog {
                 File running = new File(dir, RUNNING);
                 if (!running.isFile() || dir.equals(current)) continue;
                 String notes = read(running);
-                if (AgvnSessionNotes.removedByPlayer(notes)) {
-                    close(context, dir, AgvnSessionNotes.REMOVED_HOW); // the player's own end: nothing to ask
-                    continue;
-                }
-                close(context, dir, AgvnExitReason.after(context, value(notes, "start", 0)));
-                AgvnDoctor.afterKill(context, notes); // Android ended the game: tell the player why, if it can be helped
+                long start = value(notes, "start", 0);
+                String how = AgvnSessionNotes.removedByPlayer(notes) ? AgvnSessionNotes.REMOVED_HOW // the player's end
+                        : AgvnExitReason.after(context, start);
+                String error = AgvnCrashScan.sessionError(Collections.emptyList(), files(notes, "log="), start, dir);
+                close(context, dir, error != null ? error + "; sau đó: " + how : how); // the game's crash comes first
+                AgvnDoctor.afterKill(context, notes); // the crash, else Android's end: why, if it can be helped
             }
         }
     }

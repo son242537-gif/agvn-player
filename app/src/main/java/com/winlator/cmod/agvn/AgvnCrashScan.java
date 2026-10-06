@@ -12,7 +12,8 @@ import java.util.regex.Pattern;
 
 /**
  * How a game ended, read from what it left: Wine's crash report ("Unhandled exception: page fault on read access to
- * 0xfeeefeee ..." and the backtrace's first frame) or Ren'Py's traceback.txt. Pure Java (JVM-testable).
+ * 0xfeeefeee ..." and the backtrace's first frame), a crash Unity caught ({@link AgvnUnityCrashFiles#summary}) or
+ * Ren'Py's traceback.txt. Pure Java (JVM-testable).
  */
 final class AgvnCrashScan {
     private static final Pattern EXCEPTION = Pattern.compile("Unhandled exception: (.+?)(?: in (?:\\w+ )?\\d+-bit code)?(?: \\(0x[0-9a-fA-F]+\\))?\\.?$");
@@ -25,8 +26,8 @@ final class AgvnCrashScan {
     private AgvnCrashScan() {}
 
     /**
-     * How a game whose Wine exited by itself really ended: a crash Wine printed (its report goes to crash.txt in
-     * {@code dir}), else a Ren'Py traceback.txt written during the session; null when neither.
+     * How a game really ended: a crash Wine printed (its report goes to crash.txt in {@code dir}), else a crash Unity
+     * caught (its report, if any, to unity-crash.txt), else a Ren'Py traceback.txt written in the session; else null.
      */
     static String sessionError(List<String> crash, List<File> logs, long startMs, File dir) {
         String crashed = describe(crash);
@@ -38,6 +39,8 @@ final class AgvnCrashScan {
             }
             return "Game bị lỗi (crash) – " + crashed + " (chi tiết: " + CRASH_FILE + ")";
         }
+        String unity = AgvnUnityCrashFiles.summary(logs, startMs, dir);
+        if (unity != null) return "Game bị lỗi (crash) – " + unity;
         for (File log : logs) {
             if (!log.getName().equalsIgnoreCase("traceback.txt") || !log.isFile()) continue;
             if (startMs > 0 && log.lastModified() < startMs - AgvnEngineLogs.OLD_SLACK_MS) continue;

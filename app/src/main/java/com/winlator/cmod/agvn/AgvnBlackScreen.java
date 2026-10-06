@@ -66,6 +66,7 @@ public final class AgvnBlackScreen {
     private void poll() {
         if (activity.isFinishing() || activity.isDestroyed()) return;
         try {
+            if (AgvnSessionTrack.engineCrash() != null) return; // the game crashed (AgvnUnityCrashWatch): not a screen
             if (AgvnGamePause.isPaused()) { // the app stopped the game: its frozen picture and this time do not count
                 handler.postDelayed(poll, AgvnBlackScreenRules.POLL_MS);
                 return;
