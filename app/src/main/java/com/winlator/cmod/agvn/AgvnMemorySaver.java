@@ -161,7 +161,9 @@ public final class AgvnMemorySaver {
                 AgvnRenpyCache.apply(new File(gameDir), renpyCacheMb(memoryStep(step, ranOut(shortcut))));
             } else if (GameExeResolver.Engine.UNITY.name().equals(engine)) {
                 File userReg = new File(shortcut.container.getRootDir(), ".wine/user.reg");
-                AgvnUnityQuality.apply(shortcut, userReg, unityLowestQuality(memoryStep(step, ranOut(shortcut))));
+                boolean lowest = unityLowestQuality(memoryStep(step, ranOut(shortcut)))
+                        && !AgvnUnityQuality.own(shortcut); // "Để game Unity tự chọn chất lượng"
+                AgvnUnityQuality.apply(shortcut, userReg, lowest);
             }
         } catch (Exception e) {
             Log.w(TAG, "memory settings not applied", e);

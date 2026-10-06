@@ -748,6 +748,9 @@ public class ShortcutsFragment extends Fragment {
         else if (LibraryComposeHost.ACTION_SEND_LOGS.equals(action)) {
             com.winlator.cmod.agvn.AgvnLogShare.share(requireActivity(), shortcut);
         }
+        else if (LibraryComposeHost.ACTION_REPAIR.equals(action)) {
+            com.winlator.cmod.agvn.AgvnRepairDialog.pick(requireActivity(), shortcut, null); // AGVN: "Tự sửa lỗi"
+        }
         else if (LibraryComposeHost.ACTION_SAVE_IMPORT.equals(action)) {
             com.winlator.cmod.agvn.AgvnSaveDialogs.askImport(requireActivity(), shortcut, () -> {
                 shortcutForSaveImport = shortcut;

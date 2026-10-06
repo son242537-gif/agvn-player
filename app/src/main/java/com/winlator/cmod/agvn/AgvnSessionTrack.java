@@ -163,6 +163,11 @@ public final class AgvnSessionTrack {
         return bigUpdates.get() >= STARTED_UPDATES;
     }
 
+    /** The game showed {@link #STARTED_UPDATES} frames, drawn into its window or presented (Vulkan, OpenGL). */
+    static boolean showedFrames() {
+        return started() || framesSeen.get() >= STARTED_UPDATES;
+    }
+
     static boolean bigWindowSeen() {
         return bigSeen;
     }

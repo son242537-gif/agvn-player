@@ -2,6 +2,7 @@
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
+import android.content.Context;
 
 import com.winlator.cmod.R;
 import com.winlator.cmod.box64.Box64Preset;
@@ -30,7 +31,8 @@ final class AgvnFixes {
     private static final List<String> WINE_ONLY = Arrays.asList("restore-good", "reset", "dxvk-other", "dxvk-arm64ec",
             "driver-other", "wined3d", "godot-renderer", "godot-angle", "godot-undo", "render-gmem", "render-auto",
             "emulator-stable", "emulator-fast", "wincomponent", "wrapper-constants", "wrapper-clip", "wine-mono",
-            "wine-old", "dxvk-back");
+            "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
+            "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh");
     static final String SYSTEM = "System";
 
     /** A button: its fix id, its words, and what it sets ({@code to}). */
@@ -52,7 +54,12 @@ final class AgvnFixes {
     private AgvnFixes() {}
 
     static List<Fix> applicable(Activity a, Shortcut s, AgvnProblemCatalog.Finding finding, Properties state) {
-        Set<String> tried = AgvnGoodConfig.tried(state);
+        return applicable(a, s, finding, AgvnGoodConfig.tried(state), state);
+    }
+
+    /** The buttons of {@code finding} but those in {@code tried}; the ones that change no setting are always there. */
+    static List<Fix> applicable(Activity a, Shortcut s, AgvnProblemCatalog.Finding finding, Set<String> tried,
+            Properties state) {
         List<Fix> fixes = new ArrayList<>();
         for (String id : finding.fixes()) {
             if (tried.contains(id) && !ALWAYS.contains(id)) continue;
@@ -134,7 +141,7 @@ final class AgvnFixes {
             case "send-logs":
                 return new Fix(id, a.getString(R.string.agvn_fix_send_logs), null);
             default:
-                return null; // a fix a newer catalog names
+                return AgvnRepairFixes.make(a, s, id); // one "Tự sửa lỗi" tries, else a fix a newer catalog names
         }
     }
 
@@ -186,7 +193,7 @@ final class AgvnFixes {
     }
 
     /** True when the game's Vulkan driver, as it will really start, is Turnip. */
-    static boolean turnip(Activity a, Shortcut s) {
+    static boolean turnip(Context a, Shortcut s) {
         String chosen = AgvnFixEdits.configValue(driverConfig(s), "version", ';');
         return OpenGLDriverDefaults.isTurnipDriver(DriverSafety.resolveUsable(a, chosen.isEmpty() ? SYSTEM : chosen));
     }

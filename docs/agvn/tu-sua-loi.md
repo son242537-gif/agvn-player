@@ -14,6 +14,7 @@ là một nút. Bấm nút là app đổi cấu hình của riêng game đó r�
 | Game vừa thoát hoặc bị lỗi | Hộp hỏi ở thư viện (hoặc Big Picture) | Game tắt ngay khi mở, crash, thiếu DirectX, thiếu file `.dll`; game "Chạy nhẹ" báo lỗi script, bị tắt đột ngột, bị treo. Bấm một cách sửa là game mở lại ngay. |
 | Android đã tắt game | Hộp hỏi khi về thư viện (trong 24 giờ) | Máy hết RAM; HyperOS tắt game khi chuyển sang app khác. |
 | Game Windows vừa hiện khung | Thanh trên game | Khung game nhỏ hơn màn hình: app phóng cho vừa luôn. Khung game lớn hơn màn hình: app đề nghị đổi màn hình game. Xem "Vừa màn hình" bên dưới. |
+| Bất cứ lúc nào, người chơi thấy lỗi | Nút "Tự sửa lỗi" trong menu ⋮ của game ở thư viện, nút "🩺 Tự sửa" trên thanh trong game | Hình chập chờn, đốm đen, chữ lỗi, không có tiếng: những lỗi app không tự thấy được. Người chơi chọn lỗi, app thử lần lượt từng cách. Xem "Người chơi báo lỗi" bên dưới. |
 | Game Windows vẫn đen màn hình | Thanh trên game | Khoảng 20 giây sau khi mở (lâu hơn nếu game thường mở chậm), game vẫn chưa hiện hình, và có dấu hiệu màn hình chưa đủ lớn cho game (khổ game KiriKiri, game KiriKiri chưa đọc được khổ, khung game bị cắt, Wine từ chối độ phân giải game xin): app đề nghị màn hình lớn hơn. Game DirectX đen mà không có dấu hiệu đó: app đề nghị "Bật Đồng bộ khung hình". Xem "Màn hình đen" bên dưới. |
 
 Mỗi lỗi chỉ hỏi một lần. Cách sửa đã thử mà vẫn lỗi thì lần sau không hiện lại, cho đến khi game chạy tốt một
@@ -177,6 +178,58 @@ App đọc mọi file mà kernel các dòng GPU ghi mức bận, giống HUD c�
 
 Máy nào giấu hết các file này thì app dựa vào CPU: CPU không bận mà game vẫn chậm thì nhiều khả năng do GPU, và app
 nói đúng như vậy.
+
+## Người chơi báo lỗi (thử lần lượt, giữ cách hết lỗi)
+
+App tự thấy các lỗi để lại dấu vết: crash, game tắt ngay, màn hình đen lúc mở, game chậm, hết RAM, phim không
+chạy, Unity tự bắt crash. Còn hình chập chờn, đốm đen, chữ lỗi hay mất tiếng thì không để lại gì trong nhật ký, và
+app không nhìn ra chắc chắn từ hình. Với những lỗi đó, người chơi nói app biết game đang bị gì, rồi app tự chữa:
+
+1. Chọn "Tự sửa lỗi" trong menu ⋮ của game ở thư viện, hoặc bấm "🩺 Tự sửa" trên thanh trong game. App hỏi "Game
+   đang bị gì?" (các lỗi `report-*` trong `game-problems.json`).
+2. App nói lỗi đó thường do đâu và liệt kê các cách nó sẽ thử, theo thứ tự (chỉ những cách đổi được gì đó cho game
+   này). Bấm "Thử cách 1": app đổi cấu hình của riêng game đó rồi mở lại game.
+3. Sau khi game hiện hình và chạy được 45 giây (thời gian người chơi rời app không tính), thanh trên game hỏi "Còn lỗi
+   … không?" (`AgvnRepairAsk`). Game "Chạy nhẹ" thì người chơi trả lời ở thư viện: bấm lại "Tự sửa lỗi".
+   - **Hết lỗi rồi:** app giữ cách đó, và cấu hình này thành cấu hình đã chạy được của game.
+   - **Vẫn còn lỗi:** app trả mọi cấu hình về như trước khi thử cách đầu tiên, rồi đặt cách tiếp theo và hỏi "Mở lại
+     game ngay". Hết cách: cấu hình về như cũ, app mời "Gửi nhật ký".
+   - **Hỏi lần sau:** lần mở game sau app hỏi lại.
+
+Chỉ game được báo lỗi bị đổi, và chỉ sau khi người chơi báo. Cách không giúp được không ở lại trên game, nên game không
+phải trả giá (chậm hơn, nóng hơn) cho một cách sửa vô ích. App ghi mọi bước vào `su-kien.txt` của phiên chơi ("Tự sửa
+lỗi: người chơi báo …, thử: …"). Trạng thái nằm cùng file của "Tự sửa lỗi" (`files/agvn/doctor/`, các khóa
+`report.*`): lỗi đang sửa, cách đang thử, các cách đã thử và cấu hình trước khi thử (`AgvnRepair`).
+
+| Người chơi chọn | App thử, theo thứ tự |
+|---|---|
+| Hình chập chờn, nhấp nháy | Tắt DXVK async; bật Đồng bộ khung hình; Turnip vẽ cả khung hình trong bộ nhớ (sysmem); tắt LRZ của Turnip; đổi DXVK; đổi driver; về cấu hình gốc |
+| Hình có đốm đen, mảng đen, sọc hoặc sai màu | Tắt LRZ của Turnip; tắt nén hình UBWC; sysmem; giải nén mọi texture BCn (GPU không phải Turnip); đổi DXVK; đổi driver; để game Unity tự chọn chất lượng; WineD3D; về cấu hình gốc |
+| Màn hình đen dù game vẫn chạy | Đồng bộ khung hình; sysmem; nâng Đồ họa; đổi DXVK; đổi driver; WineD3D; về cấu hình gốc |
+| Game chậm, giật, lag | Hạ Đồ họa; DXVK chạy thẳng trên chip ARM; chế độ Gmem; để Turnip tự chọn; giả lập CPU nhanh hơn; bỏ bớt khung hình (RPG Maker); mở cài đặt Tiết kiệm pin |
+| Game đứng hình, treo | Giả lập CPU ổn định hơn; tắt DXVK async; đổi DXVK; đổi driver; về cấu hình gốc |
+| Game tự tắt, văng ra | Giả lập CPU ổn định hơn; để game Unity tự chọn chất lượng; đổi DXVK; đổi driver; về cấu hình gốc |
+| Không có tiếng, tiếng rè hoặc lắp | Đổi giữa PulseAudio và ALSA; về cấu hình gốc |
+| Chữ lỗi, ô vuông, ký tự lạ | Chạy game bằng tiếng Nhật; bằng tiếng Trung; về cấu hình gốc |
+| Hình mờ, vỡ hoặc quá nhỏ | Nâng Đồ họa; để game Unity tự chọn chất lượng |
+| Lỗi khác | Dùng lại cấu hình đã chạy được; về cấu hình gốc; giả lập CPU ổn định hơn; đổi DXVK; đổi driver |
+
+Mọi lỗi đều kết thúc bằng "Gửi nhật ký". Game "Chạy nhẹ" có thêm "Chạy bằng bản Windows" khi thư mục có file `.exe`.
+Không có "Wine cũ (Proton 9)" trong danh sách: chuyển game sang Wine khác thì không trả về như cũ được, nên cách này
+chỉ có ở hộp hỏi tự động (crash, game tắt ngay).
+
+Các cách sửa mới (`AgvnRepairFixes`), mỗi cách đổi một cấu hình của riêng game:
+
+- **Turnip: sysmem, tắt LRZ, tắt UBWC** (`TU_DEBUG`, cờ cũ của game giữ nguyên). Đây là các nguyên nhân hay gặp của
+  hình chập chờn, đốm đen, sai màu trên Adreno. Chỉ có khi game chạy driver Turnip.
+- **Tắt DXVK async** (`async=0`): DXVK dựng xong pipeline rồi mới vẽ, nên không có vật thể nhấp nháy hay hiện thiếu.
+  Lúc đầu game có thể giật hơn. Chỉ có khi async đang bật.
+- **Giải nén mọi texture BCn** (`bcnEmulation=full`): cho driver không đọc được texture nén (không phải Turnip).
+- **Để game Unity tự chọn chất lượng** (`agvnUnityOwnQuality=1`): ở Đồ họa Thấp và Siêu nhẹ, app ép Unity mở game ở
+  mức chất lượng thấp nhất (`AgvnUnityQuality`); cách này bỏ việc đó cho riêng game, Đồ họa vẫn giữ màn hình và FPS
+  của mức đã chọn. Hộp hỏi "Game bị lỗi và đứng hình" (Unity tự bắt crash) cũng đề nghị cách này đầu tiên.
+- **Đổi cách phát tiếng:** PulseAudio ↔ ALSA.
+- **Tiếng Nhật, tiếng Trung** (`LC_ALL` = `ja_JP.UTF-8`, `zh_CN.UTF-8`).
 
 ## App biết gì về từng game (`files/agvn/doctor/`)
 
@@ -600,5 +653,24 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
 - [ ] Bấm "Giả lập CPU ổn định" rồi "Mở lại game ngay": game vào được thì báo AGVN cách đó. Vẫn crash thì lần sau hộp
       hỏi có "Chạy bằng Wine cũ (Proton 9)", không hỏi lại giả lập CPU.
 - [ ] Game Unity chạy bình thường vài phút rồi thoát: không có thanh "Game bị lỗi và đã dừng", không có hộp hỏi.
+- [ ] Menu ⋮ của game ở thư viện có "Tự sửa lỗi" cạnh "Gửi nhật ký"; thanh trong game có "🩺 Tự sửa". Bấm: hộp "Game
+      đang bị gì?" có 10 lỗi.
+- [ ] Game DXVK trên máy Turnip, chọn "Hình chập chờn, nhấp nháy": danh sách chỉ có các cách đổi được gì đó (game
+      không bật async thì không có "Tắt DXVK async"). Bấm "Thử cách 1": game mở lại; `su-kien.txt` có "Tự sửa lỗi:
+      người chơi báo …, thử: …".
+- [ ] Chơi khoảng 45 giây: thanh "Còn lỗi … không?". "Vẫn còn lỗi": cấu hình về như trước (xem trong "Cấu hình" của
+      game), app đặt cách tiếp và hỏi "Mở lại game ngay". "Hết lỗi rồi": thông báo "Đã giữ cách sửa: …", lần mở sau
+      không hỏi nữa.
+- [ ] Sang app khác ngay sau khi game mở rồi quay lại: thanh hỏi chỉ hiện sau 45 giây chơi thật (không tính lúc ở
+      ngoài app).
+- [ ] Thử đến hết cách: thanh "Đã thử hết cách trong app", cấu hình của game đúng như trước lần thử đầu, có nút "Gửi
+      nhật ký".
+- [ ] Đang thử một cách, ở thư viện bấm "Tự sửa lỗi": hộp hỏi "App đang thử cách sửa: … Lỗi còn không?" với "Hết lỗi
+      rồi", "Vẫn còn lỗi", "Chọn lỗi khác". "Chọn lỗi khác" trả cấu hình về như trước rồi mới hỏi lỗi mới.
+- [ ] Game Unity ở Đồ họa Siêu nhẹ, chọn "Game tự tắt, văng ra" (hoặc Unity tự bắt crash): có "Để game Unity tự chọn
+      chất lượng hình". Thử: lần mở sau `adb logcat -s AGVN` có `Unity quality back to the game's own`.
+- [ ] Game Nhật bị chữ ô vuông, chọn "Chữ lỗi, ô vuông, ký tự lạ": "Chạy game bằng tiếng Nhật" sửa được; game đã chạy
+      tiếng Nhật thì không có cách đó.
+- [ ] Một game khác không bị báo lỗi: cấu hình không đổi gì.
 - [ ] Nếu gặp game Unity chỉ crash lúc thoát từ menu (hộp "Game bị lỗi và đứng hình" sau khi thoát): gửi nhật ký phiên
       đó (`Player.log` cho biết Unity ghi gì ngay trước `Crash!!!`), để app nhận ra crash lúc thoát và thôi hỏi.

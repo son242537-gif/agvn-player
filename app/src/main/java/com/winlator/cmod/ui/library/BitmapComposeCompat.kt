@@ -44,6 +44,7 @@ import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.BugReport
+import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material3.DropdownMenu
@@ -532,14 +533,18 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_EXPORT)
                 }
             }
-            LibraryActionTileCompat(
-                Icons.Outlined.BugReport,
-                "Gửi nhật ký",
-                Modifier.fillMaxWidth().padding(top = 8.dp),
-                horizontal = landscape
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                close()
-                cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SEND_LOGS)
+                LibraryActionTileCompat(Icons.Outlined.Build, "Tự sửa lỗi", Modifier.weight(1f), horizontal = true) {
+                    close()
+                    cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_REPAIR)
+                }
+                LibraryActionTileCompat(Icons.Outlined.BugReport, "Gửi nhật ký", Modifier.weight(1f), horizontal = true) {
+                    close()
+                    cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SEND_LOGS)
+                }
             }
             LibraryActionTileCompat(
                 Icons.Outlined.DeleteOutline,

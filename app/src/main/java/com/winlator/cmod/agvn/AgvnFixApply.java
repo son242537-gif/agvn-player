@@ -104,7 +104,8 @@ final class AgvnFixApply {
                 s.putExtra(AgvnRgssFiles.EXTRA_FRAME_SKIP, fix.to);
                 break;
             default:
-                return false;
+                if (!AgvnRepairFixes.apply(s, fix)) return false; // one "Tự sửa lỗi" tries for what the player reports
+                break;
         }
         s.saveData();
         if (fix.id.equals("restore-good") || fix.id.equals("reset")) state.remove(AgvnGoodConfig.TRIED);

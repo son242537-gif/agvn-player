@@ -53,7 +53,10 @@ public final class AgvnControlsBar {
         AgvnScreenFit fit = new AgvnScreenFit(activity);
         new AgvnBlackScreen(activity); // a game that stays black: a larger screen
         AgvnUnityCrashWatch.start(activity); // a crash Unity caught: the frozen game is closed, "Tự sửa lỗi" asks
+        AgvnRepairAsk.start(activity); // a fix "Tự sửa lỗi" tries: did it help?
         bar.addView(barButton("⛶", 16, R.string.agvn_bar_fit, v -> fit.toggle()));
+        bar.addView(barButton(activity.getString(R.string.agvn_bar_repair_label), 14, R.string.agvn_bar_repair,
+                v -> AgvnRepairDialog.pick(activity, activity.agvnShortcut(), activity::agvnExit)));
         bar.addView(barButton(activity.getString(R.string.agvn_bar_exit_label), 14, R.string.agvn_bar_exit, v -> askExit()));
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
