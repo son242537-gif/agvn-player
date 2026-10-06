@@ -47,10 +47,13 @@ public class AgvnHtmlCompatTest {
     @Test
     public void bundledCompatScriptKeepsProcessUndefined() throws Exception {
         String js = compatJs();
-        // RPG Maker treats require + process as NW.js and would then save to real files, which the phone cannot do
+        // RPG Maker treats require + process as NW.js and would then save through require('fs'), whose stand-in keeps
+        // files in the browser; its browser save functions go to real files instead (window.AgvnSaves)
         assertTrue(js.contains("window.require = function"));
         assertTrue(!js.contains("window.process ="));
         assertTrue(js.contains("SM.catchException = function"));
+        assertTrue(js.contains("filesForSaves(window.StorageManager);"));
+        assertTrue(js.contains("window.AgvnSaves") && AgvnHtmlSaves.NAME.equals("AgvnSaves"));
     }
 
     @Test

@@ -84,6 +84,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         s.setTextZoom(100);
         webView.setWebViewClient(new GameClient());
         webView.setWebChromeClient(new AgvnHtmlConsole(logs));
+        if (rpgMaker) webView.addJavascriptInterface(new AgvnHtmlSaves(root), AgvnHtmlSaves.NAME); // saves as on a PC
         setContentView(webView);
         hideSystemUi();
         webView.loadUrl("https://" + host + "/" + Uri.encode(index.getName()));

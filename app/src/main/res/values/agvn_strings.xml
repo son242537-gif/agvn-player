@@ -288,7 +288,8 @@
     <string name="agvn_save_imported_backup">\n\nSave cũ đã được sao lưu ở:\n%1$s</string>
     <string name="agvn_save_exported">Đã xuất %1$d file save vào:\n%2$s\n\nChép file .zip này sang máy khác rồi dùng \"Nhập save\" để chơi tiếp.</string>
     <string name="agvn_save_export_empty">Chưa có save nào để xuất. Hãy chơi và lưu game trước.</string>
-    <string name="agvn_save_html_note">Game này chạy bằng trình duyệt có sẵn trong app, save nằm trong bộ nhớ của trình duyệt đó. AGVN chưa nhập/xuất được save cho loại game này.</string>
+    <string name="agvn_save_export_empty_html">Chưa có file save nào trong thư mục game. Save chơi bằng bản AGVN trước 0.1.24 còn nằm trong trình duyệt của app: mở game một lần để app chép chúng vào thư mục save của game, rồi xuất lại.</string>
+    <string name="agvn_save_html_note">Game này chạy bằng trình duyệt có sẵn trong app, save nằm trong bộ nhớ của trình duyệt đó. AGVN mới nhập/xuất được save của game RPG Maker MV/MZ, chưa được với loại game này.</string>
     <string name="agvn_save_error">Không xử lý được save: %1$s</string>
     <!-- In-app update (AgvnUpdateDialogs, AgvnUpdateInstall) -->
     <string name="agvn_update_title">Cập nhật ứng dụng</string>

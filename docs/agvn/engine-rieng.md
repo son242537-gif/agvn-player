@@ -66,6 +66,19 @@ Anh Sơn quyết định ngày 02/10/2026:
 - **Gửi nhật ký khi đang chơi:** "Gửi nhật ký" (menu ⋮ của game, menu Chạy nhẹ, hay mục dưới "Xem log" ở menu bên của
   game Windows) gom luôn phiên đang chạy: log engine và log Wine tới lúc đó, logcat của app (mkxp-z, SDL, Ren'Py,
   game HTML) và log của Ren'Py Chạy nhẹ. Không cần thoát game trước.
+- **Save, "Nhập save" và "Xuất save"** (menu ⋮ của game; anh Sơn yêu cầu 06/10/2026, bản 0.1.24): save của game
+  Chạy nhẹ nằm đúng chỗ bản PC để, nên hai nút này dùng được như ở game Windows (`AgvnSaveLocations`), và đổi qua lại
+  "Chạy bằng Windows" vẫn còn save.
+  - Ren'Py: `game/saves`. RPG Maker XP/VX/VX Ace: file `Save*.rxdata/.rvdata/.rvdata2` trong thư mục game.
+  - Godot: `AppData/Roaming/Godot/app_userdata/<tên dự án>` (hoặc thư mục riêng dự án chọn) trong container Wine. Tên dự
+    án đọc trong `project.binary` của gói game (`AgvnGodotUserDir`), như Godot cho Windows tự đặt.
+  - RPG Maker MV/MZ: thư mục `save` cạnh `index.html` (MV bản PC: `www/save`), file `file1.rpgsave`, `global.rpgsave`
+    (MZ: `file1.rmmzsave`...). Chạy trong trình duyệt, engine vốn để save trong bộ nhớ trình duyệt, nơi không nút nào
+    lấy ra được (bản 0.1.23 trở về trước báo "AGVN chưa nhập/xuất được save cho loại game này"). Giờ `html-compat.js`
+    chuyển save qua app (`AgvnHtmlSaves`) thành file, đúng chữ bản PC ghi (UTF-8 như NW.js). Save trong trình duyệt từ
+    trước được chép ra file ở lần mở đầu, khi thư mục `save` chưa có file nào. Thư mục đã có save (chép từ PC, hay vừa
+    "Nhập save") thì lấy save trong thư mục, bỏ qua save cũ trong trình duyệt.
+  - Game HTML khác (Tyrano) vẫn để save trong trình duyệt: hai nút báo chưa làm được.
 - **Nhận diện:** `GameExeResolver` đã nhận ra engine (`RENPY`, `RPGMAKER`). Cần thêm phần đọc phiên bản:
   - Ren'Py: `renpy/__init__.py` hoặc thư mục `lib/py3-*` / `lib/py2-*`.
   - RPG Maker: RGSS1, 2 hay 3, theo `Game.ini` và `RGSS*.dll`.
@@ -285,3 +298,22 @@ Anh Sơn quyết định ngày 05/10/2026, sau khi Party Me (Godot 4.6) đứng 
   10. Màn "Giấy phép mã nguồn mở" có phần Godot.
   11. Các màn của app vẫn như cũ: thư viện, "Thêm game", menu ⋮ của game, cấu hình lối tắt, tạo container, Cài đặt.
       Thư viện Godot cần AndroidX Fragment 1.8.6 (trước là 1.4.0) và Kotlin stdlib 2.1.21, nên cả app dùng bản mới này.
+
+## Save của game Chạy nhẹ (bản 0.1.24)
+
+Chỗ để save của từng loại game: xem "Save, Nhập save và Xuất save" ở phần chung bên trên.
+
+- **Thử máy:**
+  1. Game MV "Chạy nhẹ" đã chơi và lưu bằng bản 0.1.23 (save còn trong trình duyệt): cài đè bản mới, mở game một lần,
+     vào màn "Tải": save cũ vẫn còn. Thư mục `www/save` (game MV bản PC) hoặc `save` của game có `file1.rpgsave`,
+     `global.rpgsave`, `config.rpgsave`.
+  2. Lưu vào một ô mới, thoát. Menu ⋮ của game → "Xuất save": file .zip trong `AGVN-Player/Saves/<game>/` có
+     `game/www/save/...` (hoặc `game/save/...`).
+  3. Chép save của game đó từ PC (`www/save/*.rpgsave`, cả `global.rpgsave`: MV chỉ hiện những ô có trong file này)
+     vào máy, rồi "Nhập save" chọn các file đó. Mở game: màn "Tải" có các save của PC.
+  4. Game MZ: như các bước 1–3, với `save/*.rmmzsave`.
+  5. Lưu khi "Chạy nhẹ", rồi "Chạy bằng Windows": thấy save đó, ở MV/MZ, Ren'Py, RPG Maker XP/VX/VX Ace và Godot.
+  6. Godot (Party Me): "Xuất save" có `profile/AppData/Roaming/Godot/app_userdata/<tên dự án>/...`. "Nhập save" file
+     .zip đó trên máy khác: save hiện trong game.
+  7. Ren'Py, RPG Maker XP/VX/VX Ace "Chạy nhẹ": "Xuất save" rồi "Nhập save" trên máy khác: save hiện trong game.
+  8. Game Tyrano: "Nhập save" / "Xuất save" báo chưa làm được, như trước.
