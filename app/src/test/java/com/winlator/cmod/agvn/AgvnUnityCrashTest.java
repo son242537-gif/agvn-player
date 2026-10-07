@@ -168,6 +168,21 @@ public class AgvnUnityCrashTest {
         assertEquals("crash", catalog.find(wine).id());
     }
 
+    @Test
+    public void aTextureTheDriverCouldNotPlaceIsGpuMemory() {
+        // Boxman, Galaxy SM-S947B (Xclipse 960), 06/10/2026: DXVK could not bind memory to a texture, Unity could not
+        // create it and crashed. CPU emulation or Wine (the fixes of a crash Unity caught) cannot help there.
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.lines.add("err:   DxvkImage::DxvkImage: Failed to bind device memory");
+        ev.lines.add("d3d11: failed to create 2D texture id=59 width=4096 height=8192 mips=14 dxgifmt=77 [D3D error was 80070057]");
+        ev.lines.addAll(log(true));
+        AgvnUnityCrash.into(ev, AgvnUnityCrash.describe(ev.lines));
+        AgvnProblemCatalog.Finding f = catalog.find(ev);
+        assertEquals("gpu-memory", f.id());
+        assertEquals(Arrays.asList("quality-down", "send-logs"), f.fixes());
+        assertTrue("the next start saves memory: Unity at its lowest quality", AgvnMemorySaver.ranOutOfRam(f.id()));
+    }
+
     private static AgvnEvidence withStart(AgvnEvidence ev) {
         ev.started = ev.bigWindowSeen = ev.playerQuit = true;
         ev.seconds = 30;

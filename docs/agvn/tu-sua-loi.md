@@ -46,7 +46,7 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Máy không chạy được OpenGL với driver này | Mesa: `failed to load driver: zink`: Zink không khởi động được trên driver Vulkan của game, nên game OpenGL và WineD3D không vẽ được | Dùng lại DXVK (game đang dùng WineD3D), đổi driver, gửi nhật ký. Từ đó app không đề nghị WineD3D với driver này nữa (`AgvnOpenGlCheck`, nhớ theo driver và bản app) |
 | Không tạo được DirectX / thiếu DirectX 11 | Câu lỗi của DXVK, Unity (`InitializeEngineGraphics failed`) | Đổi bản DXVK, đổi driver (Turnip ↔ System), dùng WineD3D |
 | Driver đồ họa lỗi giữa chừng | `VK_ERROR_DEVICE_LOST` | Để Turnip tự chọn chế độ dựng hình, đổi driver, đổi DXVK, hạ Đồ họa |
-| Hết bộ nhớ đồ họa / hết RAM | DXVK, Unity, Unreal báo hết bộ nhớ | Hạ Đồ họa. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ (`giam-ram.md`) |
+| Hết bộ nhớ đồ họa / hết RAM | DXVK, Unity, Unreal báo hết bộ nhớ; DXVK không gắn được bộ nhớ cho texture (`Failed to bind device memory`, xem ví dụ Boxman bên dưới) | Hạ Đồ họa. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ (`giam-ram.md`) |
 | File game hỏng | Unity: `is corrupted` | Gửi nhật ký (cần chép lại game) |
 | Không tìm thấy file của game | Hộp "File not found." của Wine: file chạy của game, hoặc file game cần, không còn ở chỗ cũ (thư mục game bị đổi tên, chuyển hay xoá) | Gửi nhật ký (cần chép lại thư mục game, thêm lại game) |
 | File chạy của game không đúng định dạng | Hộp "Bad EXE format" của Wine: file được mở không phải chương trình Windows mà Wine chạy được (file hỏng hoặc chép chưa xong, chương trình 16-bit hay DOS, không phải file chạy của game). Trước đây app chỉ báo "Game tắt ngay sau khi mở" | Gửi nhật ký (cần chép lại game, hoặc thêm lại game bằng đúng file chạy) |
@@ -79,6 +79,14 @@ crash cũng được hỏi ở lần mở app sau, và `tom-tat.txt` ghi "Game b
 Nếu Unity kịp ghi báo cáo (`error.log` trong thư mục `Crashes` mà nhật ký nhắc), app chép nó vào phiên chơi thành
 `unity-crash.txt`, và tóm tắt ghi thêm tên lỗi, như "Access Violation 0xc0000005, đọc 0x0". Unity cũng bắt cả crash lúc
 game đang thoát, nên hộp hỏi có câu "Nếu chính bạn vừa thoát game thì bỏ qua thông báo này", như thông báo hết RAM.
+
+Ví dụ ngày 06/10 (bản 0.1.23): Boxman (Unity 2019.4, DirectX 11) trên Galaxy SM-S947B, GPU Samsung Xclipse 960, driver
+của máy, Proton 10. Cả năm lần chơi, DXVK không gắn được bộ nhớ cho một texture (`DxvkImage::DxvkImage: Failed to bind
+device memory`); Unity không tạo được texture đó (`d3d11: failed to create 2D texture … [D3D error was 80070057]`, lần
+đầu là ảnh 4096×8192), rồi Unity tự bắt crash và game đứng hình (bốn lần), hoặc đứng 20 giây rồi người chơi thoát. Lúc
+đó DMA-BUF (bộ nhớ đồ họa) của game lên tới khoảng 1 GB. Đổi giả lập CPU hay Wine không giúp được lỗi này, nên từ bản
+0.1.28 dòng đó thuộc lỗi `gpu-memory` (xét trước `unity-crash`): app đề nghị hạ Đồ họa, và từ lần mở sau dùng mức tiết
+kiệm RAM cao nhất của game (Unity ở chất lượng thấp nhất: texture nhỏ hơn, ít bộ nhớ đồ họa hơn).
 
 Khi máy hết RAM, hệ thống có thể tắt riêng tiến trình game mà không tắt AGVN. Lúc đó Wine kết thúc với mã 0, còn Wine,
 DXVK và engine của game đều không kịp ghi gì. Trước đây app coi đó là game thoát bình thường và còn lưu cấu hình đó là
