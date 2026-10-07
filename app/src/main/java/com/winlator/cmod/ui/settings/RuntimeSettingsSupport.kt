@@ -320,13 +320,13 @@ internal suspend fun installRuntimeComponent(
 
     val result = suspendCoroutine<String?> { continuation ->
         manager.extraContentFile(Uri.fromFile(archive), object : ContentsManager.OnInstallFinishedCallback {
-            override fun onFailed(reason: ContentsManager.InstallFailedReason, error: Exception) {
+            override fun onFailed(reason: ContentsManager.InstallFailedReason, error: Exception?) { // AGVN: ContentsManager passes null
                 continuation.resume(null)
             }
 
             override fun onSucceed(extracted: ContentProfile) {
                 manager.finishInstallContent(extracted, object : ContentsManager.OnInstallFinishedCallback {
-                    override fun onFailed(reason: ContentsManager.InstallFailedReason, error: Exception) {
+                    override fun onFailed(reason: ContentsManager.InstallFailedReason, error: Exception?) { // AGVN: ContentsManager passes null
                         continuation.resume(
                             if (reason == ContentsManager.InstallFailedReason.ERROR_EXIST) profile.verName else null
                         )
