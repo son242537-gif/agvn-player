@@ -52,7 +52,7 @@ public final class AgvnRepairDialog {
                 .setTitle(R.string.agvn_repair_pick)
                 .setItems(titles, (d, which) -> {
                     String id = problems.get(which).id;
-                    AgvnProblemCatalog.Finding f = AgvnDoctor.catalog(a).finding(id, Collections.emptyMap());
+                    AgvnProblemCatalog.Finding f = AgvnDoctor.catalog(a).finding(id, AgvnGodotGame.params(s));
                     if (f != null) plan(a, s, f, restartGame);
                 })
                 .setNegativeButton(R.string.agvn_doctor_later, null)
@@ -86,7 +86,8 @@ public final class AgvnRepairDialog {
 
     /** A fix on trial: gone? Asked once the game has run with it, else the game starts ({@link AgvnRepair#ran}). */
     private static void status(Activity a, Shortcut s, Properties state, Runnable restartGame) {
-        AgvnProblemCatalog.Finding f = AgvnDoctor.catalog(a).finding(AgvnRepair.symptom(state), Collections.emptyMap());
+        AgvnProblemCatalog.Finding f =
+                AgvnDoctor.catalog(a).finding(AgvnRepair.symptom(state), AgvnGodotGame.params(s));
         String title = f != null ? f.title() : a.getString(R.string.agvn_repair_title);
         boolean ran = AgvnRepair.ran(state, s.getExtra("lastRunAt"));
         LinearLayout box = box(a);

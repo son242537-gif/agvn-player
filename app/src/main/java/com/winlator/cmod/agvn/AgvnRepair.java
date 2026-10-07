@@ -29,11 +29,13 @@ final class AgvnRepair {
             TRIED = "report.tried", HAS_BEFORE = "report.before", BEFORE = "report.before.", AT = "report.at";
     /**
      * Settings the fixes change besides AgvnGoodConfig.KEYS: Đồ họa's texture pool, tier and FPS preset, Unity's own
-     * quality, the runner of a "Chạy nhẹ" game and RPG Maker's frame skip. They go back too.
+     * quality, the runner of a "Chạy nhẹ" game, RPG Maker's frame skip and Godot for Android's renderer. They go back
+     * too.
      */
     static final List<String> MORE_KEYS = Collections.unmodifiableList(Arrays.asList(
             AgvnGameImporter.EXTRA_TEXTURE_POOL, AgvnGameImporter.EXTRA_TIER, "graphicsFpsPreset",
-            AgvnUnityQuality.EXTRA_OWN, AgvnHtmlGame.EXTRA_RUNNER, AgvnRgssFiles.EXTRA_FRAME_SKIP));
+            AgvnUnityQuality.EXTRA_OWN, AgvnHtmlGame.EXTRA_RUNNER, AgvnRgssFiles.EXTRA_FRAME_SKIP,
+            AgvnGodotLight.EXTRA_RENDERER));
 
     private AgvnRepair() {}
 
@@ -181,7 +183,7 @@ final class AgvnRepair {
         AgvnSessionLog.event("Tự sửa lỗi: vẫn còn lỗi với " + label(state) + ", trả cấu hình về như trước");
         restore(s, before(state));
         s.saveData();
-        AgvnProblemCatalog.Finding f = AgvnDoctor.catalog(a).finding(symptom(state), Collections.emptyMap());
+        AgvnProblemCatalog.Finding f = AgvnDoctor.catalog(a).finding(symptom(state), AgvnGodotGame.params(s));
         for (AgvnFixes.Fix fix : f != null ? left(a, s, f, state) : Collections.<AgvnFixes.Fix>emptyList()) {
             if (!AgvnFixApply.apply(a, s, fix, state)) continue;
             trying(state, fix);

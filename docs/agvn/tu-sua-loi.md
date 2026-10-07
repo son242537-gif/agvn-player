@@ -217,16 +217,17 @@ lỗi: người chơi báo …, thử: …"). Trạng thái nằm cùng file c�
 
 | Người chơi chọn | App thử, theo thứ tự |
 |---|---|
-| Hình chập chờn, nhấp nháy | Tắt DXVK async; bật Đồng bộ khung hình; Turnip vẽ cả khung hình trong bộ nhớ (sysmem); tắt LRZ của Turnip; đổi DXVK; đổi driver; về cấu hình gốc |
-| Hình có đốm đen, mảng đen, sọc hoặc sai màu | Tắt LRZ của Turnip; tắt nén hình UBWC; sysmem; giải nén mọi texture BCn (GPU không phải Turnip); đổi DXVK; đổi driver; để game Unity tự chọn chất lượng; WineD3D; về cấu hình gốc |
-| Màn hình đen dù game vẫn chạy | Đồng bộ khung hình; sysmem; nâng Đồ họa; đổi DXVK; đổi driver; WineD3D; về cấu hình gốc |
-| Game chậm, giật, lag | Hạ Đồ họa; DXVK chạy thẳng trên chip ARM; chế độ Gmem; để Turnip tự chọn; giả lập CPU nhanh hơn; bỏ bớt khung hình (RPG Maker); mở cài đặt Tiết kiệm pin |
-| Game đứng hình, treo | Giả lập CPU ổn định hơn; tắt DXVK async; đổi DXVK; đổi driver; về cấu hình gốc |
-| Game tự tắt, văng ra | Giả lập CPU ổn định hơn; để game Unity tự chọn chất lượng; đổi DXVK; đổi driver; về cấu hình gốc |
+| Hình chập chờn, nhấp nháy | Tắt DXVK async; bật Đồng bộ khung hình; Godot: Chạy nhẹ, cách vẽ khác; Turnip vẽ cả khung hình trong bộ nhớ (sysmem); tắt LRZ của Turnip; đổi DXVK; đổi driver; về cấu hình gốc |
+| Hình có đốm đen, mảng đen, sọc hoặc sai màu | Godot: Chạy nhẹ, cách vẽ khác; tắt LRZ của Turnip; tắt nén hình UBWC; sysmem; giải nén mọi texture BCn (GPU không phải Turnip); đổi DXVK; đổi driver; để game Unity tự chọn chất lượng; WineD3D; về cấu hình gốc |
+| Màn hình đen dù game vẫn chạy | Đồng bộ khung hình; Godot: Chạy nhẹ, cách vẽ khác; sysmem; nâng Đồ họa; đổi DXVK; đổi driver; WineD3D; về cấu hình gốc |
+| Game chậm, giật, lag | Godot: Chạy nhẹ; hạ Đồ họa; DXVK chạy thẳng trên chip ARM; chế độ Gmem; để Turnip tự chọn; giả lập CPU nhanh hơn; bỏ bớt khung hình (RPG Maker); mở cài đặt Tiết kiệm pin |
+| Game đứng hình, treo | Giả lập CPU ổn định hơn; Godot: Chạy nhẹ; tắt DXVK async; Godot: cách vẽ khác; đổi DXVK; đổi driver; về cấu hình gốc |
+| Game tự tắt, văng ra | Giả lập CPU ổn định hơn; để game Unity tự chọn chất lượng; Godot: Chạy nhẹ, cách vẽ khác; đổi DXVK; đổi driver; về cấu hình gốc |
 | Không có tiếng, tiếng rè hoặc lắp | Đổi giữa PulseAudio và ALSA; về cấu hình gốc |
 | Chữ lỗi, ô vuông, ký tự lạ | Chạy game bằng tiếng Nhật; bằng tiếng Trung; về cấu hình gốc |
-| Hình mờ, vỡ hoặc quá nhỏ | Nâng Đồ họa; để game Unity tự chọn chất lượng |
-| Lỗi khác | Dùng lại cấu hình đã chạy được; về cấu hình gốc; giả lập CPU ổn định hơn; đổi DXVK; đổi driver |
+| Hình mờ, vỡ hoặc quá nhỏ | Nâng Đồ họa; Godot: Chạy nhẹ; để game Unity tự chọn chất lượng |
+| Hoạt ảnh, video hoặc hiệu ứng không chạy (bản 0.1.28) | Godot: Chạy nhẹ, cách vẽ khác; tắt DXVK async; nâng Đồ họa; để game Unity tự chọn chất lượng; đổi DXVK; đổi driver; WineD3D; về cấu hình gốc |
+| Lỗi khác | Dùng lại cấu hình đã chạy được; về cấu hình gốc; giả lập CPU ổn định hơn; Godot: Chạy nhẹ, cách vẽ khác; đổi DXVK; đổi driver |
 
 Mọi lỗi đều kết thúc bằng "Gửi nhật ký". Game "Chạy nhẹ" có thêm "Chạy bằng bản Windows" khi thư mục có file `.exe`.
 Không có "Wine cũ (Proton 9)" trong danh sách: chuyển game sang Wine khác thì không trả về như cũ được, nên cách này
@@ -244,6 +245,18 @@ Các cách sửa mới (`AgvnRepairFixes`), mỗi cách đổi một cấu hình
   của mức đã chọn. Hộp hỏi "Game bị lỗi và đứng hình" (Unity tự bắt crash) cũng đề nghị cách này đầu tiên.
 - **Đổi cách phát tiếng:** PulseAudio ↔ ALSA.
 - **Tiếng Nhật, tiếng Trung** (`LC_ALL` = `ja_JP.UTF-8`, `zh_CN.UTF-8`).
+- **Game Godot** (bản 0.1.28, sau nhật ký Train45 ngày 07/10/2026: game Godot 4.5 chạy qua Wine, khựng 1–10 giây,
+  người chơi báo cảnh có hoạt ảnh bị đứng):
+  - **Chạy nhẹ** (`godot-light`): game người chơi đã chuyển sang "Chạy bằng Windows" được chạy lại bằng Godot cho
+    Android, khi Godot 4.7 đọc được cả gói game (`AgvnGodotLight.fit`). Không qua Wine và giả lập CPU nên mượt hơn
+    nhiều. Có cả ở hộp hỏi tự động khi game chậm và khi game Godot không chạy được qua Wine.
+  - **Cách vẽ khi Chạy nhẹ** (`godot-light-renderer`): đổi sang cách còn lại của Godot cho Android, OpenGL
+    (Compatibility) hoặc Vulkan (Mobile). App đọc cách game tự chọn cho điện thoại trong `project.binary`
+    (`rendering/renderer/rendering_method.mobile`); game không ghi gì là Vulkan. Cách đã chọn nằm ở
+    `agvnGodotRenderer` và được trả về như cũ nếu không giúp được.
+  - **Cách vẽ khi chạy qua Wine:** Vulkan (`godot-renderer`, GLES2 với Godot 3) và Direct3D 11 qua ANGLE
+    (`godot-angle`, từ Godot 4.4). Lỗi người chơi báo giờ mang theo bản Godot của game (`AgvnGodotGame.params`),
+    nên app chọn đúng cách cho Godot 3 hay 4.
 
 ## App biết gì về từng game (`files/agvn/doctor/`)
 
@@ -685,7 +698,12 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       hỏi có "Chạy bằng Wine cũ (Proton 9)", không hỏi lại giả lập CPU.
 - [ ] Game Unity chạy bình thường vài phút rồi thoát: không có thanh "Game bị lỗi và đã dừng", không có hộp hỏi.
 - [ ] Menu ⋮ của game ở thư viện có "Tự sửa lỗi" cạnh "Gửi nhật ký"; thanh trong game có "🩺 Tự sửa". Bấm: hộp "Game
-      đang bị gì?" có 10 lỗi.
+      đang bị gì?" có 11 lỗi (từ bản 0.1.28 có "Hoạt ảnh, video hoặc hiệu ứng không chạy").
+- [ ] Game Godot đã chuyển sang "Chạy bằng Windows" mà Godot 4.7 đọc được: chọn "Game chậm, giật, lag" hoặc "Hoạt ảnh,
+      video hoặc hiệu ứng không chạy": cách đầu là "Chạy nhẹ: chạy game Godot thẳng trên Android". Thử: game mở bằng
+      Godot cho Android, save vẫn còn. "Vẫn còn lỗi": game về lại Windows.
+- [ ] Game Godot đang Chạy nhẹ, chọn "Hình có đốm đen…": cách đầu là "vẽ bằng OpenGL" (game dùng Vulkan) hoặc "vẽ bằng
+      Vulkan" (game dùng Compatibility). `adb logcat -s AGVN` có `--rendering-driver` đúng cách đó.
 - [ ] Game DXVK trên máy Turnip, chọn "Hình chập chờn, nhấp nháy": danh sách chỉ có các cách đổi được gì đó (game
       không bật async thì không có "Tắt DXVK async"). Bấm "Thử cách 1": game mở lại; `su-kien.txt` có "Tự sửa lỗi:
       người chơi báo …, thử: …".

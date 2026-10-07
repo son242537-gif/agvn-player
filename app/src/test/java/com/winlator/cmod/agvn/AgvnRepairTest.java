@@ -43,7 +43,7 @@ public class AgvnRepairTest {
             assertTrue(p.id + " ends with Gửi nhật ký", p.fixes.get(p.fixes.size() - 1).equals("send-logs"));
             assertFalse(p.id + ": a move to another Wine cannot be put back", p.fixes.contains("wine-old"));
         }
-        assertEquals(10, reported);
+        assertEquals(11, reported);
         // a game that crashed, never started, or ran well: never one of these, whatever it printed
         AgvnEvidence ev = new AgvnEvidence();
         ev.crashed = ev.endedByGame = true;
@@ -57,6 +57,10 @@ public class AgvnRepairTest {
         assertEquals("cheapest first: async off, then frame sync", Arrays.asList("async-off", "present-sync"),
                 flicker.subList(0, 2));
         assertEquals("unity-quality-own", catalog.byId("unity-crash").fixes.get(0));
+        // a Godot game: Godot for Android first where it reads the game, then its renderers (Train45, 07/10/2026)
+        assertEquals(Arrays.asList("godot-light", "godot-light-renderer", "godot-renderer", "godot-angle"),
+                catalog.byId("report-animation").fixes.subList(0, 4));
+        assertEquals("godot-light", catalog.byId("report-slow").fixes.get(0));
     }
 
     @Test

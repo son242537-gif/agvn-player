@@ -107,6 +107,8 @@ final class AgvnFixes {
             case "godot-renderer":
             case "godot-angle":
             case "godot-undo":
+            case "godot-light":
+            case "godot-light-renderer":
                 return AgvnGodotGame.fix(a, s, finding, id);
             case "wrapper-constants":
             case "wrapper-clip":

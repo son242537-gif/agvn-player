@@ -25,6 +25,8 @@ import java.util.Map;
 final class AgvnGodotUserDir {
     static final String NAME = "application/config/name", OWN = "application/config/use_custom_user_dir",
             OWN_NAME = "application/config/custom_user_dir_name";
+    /** The renderer on Android ("gl_compatibility", "mobile"); a project without it uses "mobile" (Vulkan). */
+    static final String METHOD_MOBILE = "rendering/renderer/rendering_method.mobile";
     static final String ROAMING = "AppData/Roaming/", APP_USERDATA = ROAMING + "Godot/app_userdata/";
     private static final int ECFG = 0x47464345, BOOL = 1, STRING = 4, MAX_SETTINGS = 4 << 20, MAX_TEXT = 4096;
 
@@ -32,6 +34,12 @@ final class AgvnGodotUserDir {
 
     /** user:// of the game {@code exe} opens, relative to the Windows user folder ("AppData/Roaming/..."), or null. */
     static String of(File exe) {
+        Map<String, Object> settings = settingsOf(exe);
+        return settings != null ? folder(settings) : null;
+    }
+
+    /** The settings {@link #settings} reads from project.binary of the pack {@code exe} opens; null if unreadable. */
+    static Map<String, Object> settingsOf(File exe) {
         AgvnGodotPack pack = AgvnGodotLight.mainPack(exe);
         AgvnGodotPack.Entry e = pack != null ? pack.find("project.binary") : null;
         if (e == null || e.size < 8 || e.size > MAX_SETTINGS || (e.flags & AgvnGodotPack.FILE_ENCRYPTED) != 0) return null;
@@ -39,13 +47,16 @@ final class AgvnGodotUserDir {
             byte[] bytes = new byte[(int) e.size];
             in.seek(e.offset);
             in.readFully(bytes);
-            return folder(settings(bytes));
+            return settings(bytes);
         } catch (IOException | RuntimeException ex) {
             return null;
         }
     }
 
-    /** The settings of project.binary's {@code bytes} that name user://: {@link #NAME}, {@link #OWN}, {@link #OWN_NAME}. */
+    /**
+     * The settings of project.binary's {@code bytes} that name user:// ({@link #NAME}, {@link #OWN}, {@link #OWN_NAME})
+     * and the renderer on Android ({@link #METHOD_MOBILE}).
+     */
     static Map<String, Object> settings(byte[] bytes) {
         Map<String, Object> out = new HashMap<>();
         ByteBuffer b = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
@@ -56,7 +67,9 @@ final class AgvnGodotUserDir {
                 int length = b.getInt();
                 if (length < 0 || length > b.remaining()) break;
                 int next = b.position() + length;
-                if (length >= 8 && (key.equals(NAME) || key.equals(OWN) || key.equals(OWN_NAME))) {
+                boolean wanted = key.equals(NAME) || key.equals(OWN) || key.equals(OWN_NAME)
+                        || key.equals(METHOD_MOBILE);
+                if (length >= 8 && wanted) {
                     int type = b.getInt() & 0xff;
                     if (type == STRING) out.put(key, text(b, b.getInt()));
                     else if (type == BOOL) out.put(key, b.getInt() != 0);

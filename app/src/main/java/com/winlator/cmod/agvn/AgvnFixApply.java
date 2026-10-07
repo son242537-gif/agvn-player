@@ -104,7 +104,8 @@ final class AgvnFixApply {
                 s.putExtra(AgvnRgssFiles.EXTRA_FRAME_SKIP, fix.to);
                 break;
             default:
-                if (!AgvnRepairFixes.apply(s, fix)) return false; // one "Tự sửa lỗi" tries for what the player reports
+                // one "Tự sửa lỗi" tries for what the player reports, or a Godot game's "Chạy nhẹ"
+                if (!AgvnRepairFixes.apply(s, fix) && !AgvnGodotGame.applyLight(s, fix)) return false;
                 break;
         }
         s.saveData();

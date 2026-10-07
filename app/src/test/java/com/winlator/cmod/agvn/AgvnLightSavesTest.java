@@ -141,4 +141,18 @@ public class AgvnLightSavesTest {
     private static void put(ByteArrayOutputStream out, ByteBuffer b) {
         out.write(b.array(), 0, b.capacity());
     }
+
+    @Test
+    public void godotForAndroidDrawsAsTheProjectSaysForPhones() {
+        // "Tự sửa lỗi" offers the other renderer of a "Chạy nhẹ" Godot game: Compatibility is OpenGL, Mobile is Vulkan
+        Map<String, Object> compat = new HashMap<>();
+        compat.put(AgvnGodotUserDir.METHOD_MOBILE, "gl_compatibility");
+        Map<String, Object> read = AgvnGodotUserDir.settings(settings(compat));
+        assertEquals("gl_compatibility", read.get(AgvnGodotUserDir.METHOD_MOBILE));
+        assertEquals("gl", AgvnGodotGame.lightRenderer("", read));
+        assertEquals("a project that names none draws with Mobile", "vulkan",
+                AgvnGodotGame.lightRenderer(null, AgvnGodotUserDir.settings(settings(Collections.emptyMap()))));
+        assertEquals("vulkan", AgvnGodotGame.lightRenderer(null, null));
+        assertEquals("the one picked before", "vulkan", AgvnGodotGame.lightRenderer("vulkan", read));
+    }
 }

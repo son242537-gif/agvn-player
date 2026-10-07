@@ -121,7 +121,8 @@ public class AgvnGodotTest {
         ev.engine = "GODOT";
         AgvnProblemCatalog.Finding f = AgvnDoctorTest.catalog.find(ev);
         assertEquals("godot-gl-crash", f.id());
-        assertEquals("[godot-renderer, godot-angle, godot-undo, driver-other, send-logs]", f.fixes().toString());
+        assertEquals("[godot-renderer, godot-angle, godot-undo, godot-light, driver-other, send-logs]",
+                f.fixes().toString());
         ev.engine = "UNKNOWN";
         assertEquals("opengl-crash", AgvnDoctorTest.catalog.find(ev).id());
         ev.endedByGame = false; // the player left while it still drew: nothing to ask
@@ -143,7 +144,7 @@ public class AgvnGodotTest {
         ev.godotSwitched = AgvnFixEdits.godotSwitched("--fullscreen " + AgvnFixEdits.GODOT4_ARGS);
         AgvnProblemCatalog.Finding f = AgvnDoctorTest.catalog.find(ev);
         assertEquals("godot-switch-failed", f.id());
-        assertEquals(Arrays.asList("godot-angle", "godot-undo", "driver-other", "send-logs"), f.fixes());
+        assertEquals(Arrays.asList("godot-angle", "godot-undo", "godot-light", "driver-other", "send-logs"), f.fixes());
         ev.seconds = 75; // it played a while
         assertNull(AgvnDoctorTest.catalog.find(ev));
         ev.seconds = 16;
