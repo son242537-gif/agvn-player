@@ -6,7 +6,8 @@ import java.util.Properties;
 
 /**
  * The "Chạy nhẹ" toolkit's settings, in files/agvn-light.properties: keys hidden per game, the keys' opacity, the
- * HUD, and each game's own key set. A file rather than SharedPreferences, because the Ren'Py and RPG Maker games run
+ * HUD, each game's own key set and the key profile it was made from, and the profile picked for each game when it
+ * last ran ({@link AgvnLightPick}). A file rather than SharedPreferences, because the Ren'Py and RPG Maker games run
  * in processes of their own and SharedPreferences keeps each process's first read. Pure Java.
  */
 final class AgvnLightPrefs {
@@ -59,14 +60,41 @@ final class AgvnLightPrefs {
         return props.getProperty("layout." + game);
     }
 
-    void setLayout(String game, String json) {
+    /** Keeps {@code json} as the game's own key set, made from the key profile {@code base} (0: AGVN's keys). */
+    void setLayout(String game, String json, int base) {
         props.setProperty("layout." + game, json);
+        props.setProperty("layoutBase." + game, String.valueOf(base));
+        save();
+    }
+
+    /** The key profile the game's own key set was made from; 0 for AGVN's keys, as every set before 0.1.29. */
+    int layoutBase(String game) {
+        return number(props.getProperty("layoutBase." + game));
+    }
+
+    /** The key profile picked for the game when it last ran ({@link AgvnLightPick#id}). */
+    int lastPick(String game) {
+        return number(props.getProperty("pick." + game));
+    }
+
+    /** The game now runs with {@code pick}, newly picked: its keys show even if hidden, unless "Tắt" was picked. */
+    void picked(String game, int pick) {
+        props.setProperty("pick." + game, String.valueOf(pick));
+        if (pick != AgvnLightPick.OFF) props.remove("hidden." + game);
         save();
     }
 
     /** The places and sizes AGVN 0.1.6 to 0.1.8 kept per game type ({@link AgvnLightLayout#apply}), or null. */
     String positions(String kind) {
         return props.getProperty("keys." + kind);
+    }
+
+    private static int number(String value) {
+        try {
+            return value != null ? Integer.parseInt(value.trim()) : 0;
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     /** Written whole, then moved over the old file ({@link AgvnPropsFile}): a crash never leaves half a file. */

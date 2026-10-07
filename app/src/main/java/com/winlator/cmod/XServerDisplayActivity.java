@@ -160,6 +160,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     protected Container container;
     private XServer xServer;
     private InputControlsManager inputControlsManager;
+    private int agvnEditedProfileId; // AGVN: the controls profile to show again after the controls screen
     private ImageFs imageFs;
     private FrameRating classicHud = null;
     private WinlatorHUD modernHud = null;
@@ -1491,6 +1492,9 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> controlsEditorActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
+                Intent agvnResult = result.getData(); // AGVN: the profile the controls screen ended on
+                if (agvnResult != null && agvnResult.getIntExtra("profile_id", 0) > 0)
+                    agvnEditedProfileId = agvnResult.getIntExtra("profile_id", 0);
                 if (editInputControlsCallback != null) {
                     editInputControlsCallback.run();
                     editInputControlsCallback = null;
@@ -2278,9 +2282,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 intent.putExtra("edit_input_controls", true);
                 intent.putExtra("selected_profile_id",
                         position > 0 ? inputControlsManager.getProfiles().get(position - 1).id : 0);
+                agvnEditedProfileId = intent.getIntExtra("selected_profile_id", 0); // AGVN
                 editInputControlsCallback = () -> {
                     hideInputControls();
                     inputControlsManager.loadProfiles(true);
+                    agvnShowEditedControls(); // AGVN: the controls just edited come back
                     loadProfileSpinner.run();
                     applySidebarInputControls.run();
                 };
@@ -2345,9 +2351,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
             intent.putExtra("edit_input_controls", true);
             intent.putExtra("selected_profile_id",
                     position > 0 ? inputControlsManager.getProfiles().get(position - 1).id : 0);
+            agvnEditedProfileId = intent.getIntExtra("selected_profile_id", 0); // AGVN
             editInputControlsCallback = () -> {
                 hideInputControls();
                 inputControlsManager.loadProfiles(true);
+                agvnShowEditedControls(); // AGVN: the controls just edited come back
                 loadProfileSpinner.run();
                 updateProfile.run();
             };
@@ -2380,6 +2388,18 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
+    }
+
+    /**
+     * AGVN: back from the controls screen opened in the game, the profile it ended on (else the one it opened) is shown
+     * again, edits included, and kept as this game's. Upstream rebuilt the profile list from the controls it had just
+     * hidden, so the list fell to "Disabled" and the game went on without controls.
+     */
+    private void agvnShowEditedControls() {
+        ControlsProfile profile = agvnEditedProfileId > 0 ? inputControlsManager.getProfile(agvnEditedProfileId) : null;
+        if (profile == null) return;
+        showInputControls(profile);
+        com.winlator.cmod.agvn.AgvnControlsFork.rememberShown(shortcut, profile);
     }
 
     private void simulateConfirmInputControlsDialog() {

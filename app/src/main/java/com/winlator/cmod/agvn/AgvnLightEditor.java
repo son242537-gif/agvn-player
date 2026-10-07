@@ -44,7 +44,7 @@ final class AgvnLightEditor {
         active = false;
         toolbar.setVisible(false);
         boolean changed = tools.keys.changed();
-        if (changed) tools.prefs.setLayout(tools.game, tools.layout.toJson());
+        if (changed) tools.prefs.setLayout(tools.game, tools.layout.toJson(), tools.pick.id);
         tools.keys.setEditing(false);
         tools.editEnded();
         AppUtils.showToast(tools.activity, changed ? R.string.agvn_edit_saved : R.string.agvn_edit_unchanged);

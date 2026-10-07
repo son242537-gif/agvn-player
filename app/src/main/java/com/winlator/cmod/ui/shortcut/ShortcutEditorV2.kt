@@ -1129,7 +1129,12 @@ private fun ShortcutCategoryV2(
 
         "Điều khiển" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
-                SettingMappedChoice("Cấu hình phím ảo", s.controlsProfile, profiles) { s.controlsProfile = it; s.shortcut.putExtra(com.winlator.cmod.agvn.AgvnLayouts.EXTRA_AUTO, null); s.extra("controlsProfile", it.ifEmpty { null }) } // AGVN: player's choice; "0" = controls off, "" = automatic
+                SettingMappedChoice("Cấu hình phím ảo", s.controlsProfile, profiles) {
+                    s.controlsProfile = it
+                    s.shortcut.putExtra(com.winlator.cmod.agvn.AgvnLayouts.EXTRA_AUTO, null)
+                    if (it != "0") s.shortcut.putExtra(com.winlator.cmod.agvn.AgvnControlsFork.EXTRA_HIDDEN, null) // AGVN: picked keys show
+                    s.extra("controlsProfile", it.ifEmpty { null })
+                } // AGVN: player's choice; "0" = controls off, "" = automatic; Chạy nhẹ games too (AgvnLightPick)
                 SettingsDivider()
                 SettingToggle("Nhập độc quyền", s.exclusive) {
                     s.exclusive = it

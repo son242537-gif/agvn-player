@@ -281,10 +281,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return;
         }
         if (editInputControls) {
+            agvnReturnProfile(); // AGVN: the game that opened this screen shows the profile it ends on
             super.onBackPressed();
             return;
         }
         finish();
+    }
+
+    /** AGVN: opened from a game (edit_input_controls), this screen gives back the profile the player ended on. */
+    private void agvnReturnProfile() {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.FLFragmentContainer);
+        if (fragment instanceof InputControlsFragment)
+            setResult(RESULT_OK, new Intent().putExtra("profile_id", ((InputControlsFragment) fragment).agvnProfileId()));
     }
 
     private void requestAppPermissions() {

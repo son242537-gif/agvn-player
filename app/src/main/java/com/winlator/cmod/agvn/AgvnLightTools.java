@@ -55,6 +55,8 @@ public final class AgvnLightTools {
     /** The game's folder (or name): its own key set and hidden keys are kept under it. */
     final String game;
     final AgvnLightPrefs prefs;
+    /** The key profile picked for the game in its settings, which its keys start from. */
+    final AgvnLightPick pick;
     final AgvnLightLayout layout;
     final AgvnLightKeys keys;
     private final AgvnLightHud hud;
@@ -71,12 +73,15 @@ public final class AgvnLightTools {
         this.gameDir = gameDir;
         game = gameDir != null ? gameDir.getAbsolutePath() : this.gameName;
         prefs = new AgvnLightPrefs(activity.getFilesDir());
-        String json = FileUtils.readString(activity, AgvnLayouts.assetFor(kind));
+        pick = AgvnLightPick.of(activity);
+        String json = pick.json != null ? pick.json : FileUtils.readString(activity, AgvnLayouts.assetFor(kind));
         layout = AgvnLightLayout.parse(kind, json != null ? json : "{}", host.runner());
-        if (!layout.load(prefs.layout(game))) layout.apply(prefs.positions(kind)); // else the places of AGVN 0.1.6-0.1.8
+        boolean own = prefs.layoutBase(game) == pick.id && layout.load(prefs.layout(game)); // made from this pick
+        if (!own && pick.json == null) layout.apply(prefs.positions(kind)); // else the places of AGVN 0.1.6-0.1.8
+        if (pick.id != prefs.lastPick(game)) prefs.picked(game, pick.id);
         keys = new AgvnLightKeys(activity, layout, host::binding);
         keys.setAlpha(prefs.opacity());
-        keys.setVisibility(prefs.keysHidden(game) ? View.GONE : View.VISIBLE);
+        keys.setVisibility(pick.id == AgvnLightPick.OFF || prefs.keysHidden(game) ? View.GONE : View.VISIBLE);
         activity.addContentView(keys, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         hud = new AgvnLightHud(activity, host);
         bar = new AgvnLightBar(this);

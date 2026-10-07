@@ -94,7 +94,7 @@ public class AgvnLightToolsTest {
         prefs.setKeysHidden("/sdcard/Games/A", true);
         prefs.setOpacity(0.05f); // too faint: kept at the minimum
         prefs.setHud(true);
-        prefs.setLayout("/sdcard/Games/A", "{\"elements\":[]}");
+        prefs.setLayout("/sdcard/Games/A", "{\"elements\":[]}", 0);
         AgvnLightPrefs other = new AgvnLightPrefs(dir); // another process, later
         assertTrue(other.keysHidden("/sdcard/Games/A"));
         assertFalse(other.keysHidden("/sdcard/Games/B"));

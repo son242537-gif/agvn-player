@@ -426,3 +426,34 @@ nhất. Game Godot 4.3 và 4.4 trước đây luôn chạy bằng Windows, chậ
   4. So với khi chạy bằng Windows: thời gian vào game, các lần khựng, RAM (`dumpsys meminfo com.agvn.player:godot`).
   5. Save khi chạy bằng Windows vẫn thấy khi Chạy nhẹ, và ngược lại.
   6. Hồi quy: Party Me (Godot 4.6) vẫn Chạy nhẹ như cũ. Game Godot 3 và game Godot C# vẫn chạy bằng Windows.
+
+## Bộ phím chỉnh sẵn tới được game (bản 0.1.29)
+
+Anh Sơn báo ngày 07/10/2026: chỉnh bộ phím "Nym" ở màn chỉnh phím của Winlator rồi vào game thì game không có phím.
+
+Có hai chỗ app làm mất bộ phím đã chỉnh, và một trạng thái giữ phím ẩn:
+- **Chỉnh từ trong game Windows** (menu bên trái → Điều khiển → ⚙, hay hộp "Điều khiển"): khi quay lại game, phím
+  biến mất. Lỗi có từ Winlator gốc. Lúc quay lại, Winlator ẩn bộ phím rồi dựng lại danh sách hồ sơ, chọn theo bộ phím
+  đang hiện. Lúc đó không còn bộ nào hiện, nên danh sách chọn "Tắt" và game chạy tiếp không có phím. Giờ màn chỉnh
+  phím báo lại hồ sơ đang mở lúc đóng (`MainActivity.agvnReturnProfile`). Game hiện lại hồ sơ đó, kèm phần vừa chỉnh,
+  và nhớ nó cho game (`XServerDisplayActivity.agvnShowEditedControls`).
+- **Game "Chạy nhẹ"** (Ren'Py, RPG Maker, Godot, HTML) bỏ qua mục "Cấu hình phím ảo" trong cài đặt game. Game luôn
+  dùng bộ phím AGVN theo loại game, nên bộ phím làm ở màn "Điều khiển" không bao giờ tới game.
+  - Giờ bộ phím của game bắt đầu từ hồ sơ được chọn (`AgvnLightPick`). Chỉ nút và D-pad dùng được; cần analog và
+    vùng chạm thì không, vì game "Chạy nhẹ" không có chuột ảo.
+  - Bộ phím riêng sửa trong game (✎) vẫn được dùng nếu nó được làm từ hồ sơ đang chọn (`layoutBase.<game>` trong
+    `agvn-light.properties`). Chọn hồ sơ khác thì game dùng hồ sơ mới.
+  - "Mặc định" trong lúc sửa đưa phím về hồ sơ đang chọn.
+  - "Tắt" mở game với phím ẩn. Để "Tự động" thì như trước: bộ phím AGVN theo loại game.
+- **Phím đã ẩn** (👁 Ẩn) giữ ẩn ở mọi lần mở sau. Giờ chọn một bộ phím cho game trong cài đặt (trừ "Tắt") thì bộ phím
+  hiện lại, ở cả game Windows lẫn "Chạy nhẹ".
+
+- **Thử máy:**
+  1. Game Windows: menu bên trái → Điều khiển → ⚙ → sửa một hồ sơ (thêm một nút) → quay lại game. Bộ phím vừa sửa hiện
+     ngay, có nút mới. Thoát rồi mở lại game: vẫn bộ phím đó.
+  2. Ở màn "Điều khiển" ngoài thư viện, tạo một hồ sơ có vài nút và D-pad. Vào cài đặt một game "Chạy nhẹ" (RPG Maker
+     hoặc Ren'Py) → Điều khiển → "Cấu hình phím ảo" chọn hồ sơ đó. Mở game: thấy đúng các nút và D-pad đó, bấm được.
+  3. Ở game đó, ✎ sửa một phím rồi "Xong". Mở lại game: thấy phím đã sửa. Đổi "Cấu hình phím ảo" sang hồ sơ khác:
+     game dùng hồ sơ mới. Đổi về "Tự động": game dùng bộ phím AGVN như trước.
+  4. Ẩn phím bằng 👁 trong một game, thoát. Chọn một bộ phím cho game đó trong cài đặt rồi mở game: phím hiện.
+  5. Hồi quy: game "Chạy nhẹ" không chọn gì (Tự động) vẫn dùng bộ phím AGVN và bộ phím riêng đã sửa trước đây.
