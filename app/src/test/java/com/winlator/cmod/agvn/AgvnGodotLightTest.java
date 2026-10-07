@@ -109,6 +109,11 @@ public class AgvnGodotLightTest {
         File ext = write("d.pck", pack(3, 6, new String[]{".godot/extension_list.cfg", "main.gdc"},
                 new byte[][]{"res://addons/godotsteam/godotsteam.gdextension".getBytes(), tokens(101)}, new int[]{0, 0}));
         assertEquals(AgvnGodotLight.Fit.EXTENSIONS, AgvnGodotLight.fit(AgvnGodotPack.open(ext)));
+        // Mii Chan: Godot 4.5.1 with spine-godot built in, whose atlases Godot 4.7 for Android has no loader for
+        File spine = write("i.pck", pack(3, 5, new String[]{".godot/imported/chicken.atlas-629e.spatlas", "main.gdc"},
+                new byte[][]{"atlas".getBytes(), tokens(101)}, new int[]{0, 0}));
+        assertEquals(AgvnGodotLight.Fit.MODULES, AgvnGodotLight.fit(AgvnGodotPack.open(spine)));
+        assertEquals("Spine", AgvnGodotModules.missing(AgvnGodotPack.open(spine)));
         File enc = write("e.pck", pack(3, 6, new String[]{"main.gdc"}, new byte[][]{tokens(101)}, new int[]{AgvnGodotPack.FILE_ENCRYPTED}));
         assertEquals(AgvnGodotLight.Fit.ENCRYPTED, AgvnGodotLight.fit(AgvnGodotPack.open(enc)));
         File cs = write("f.pck", pack(3, 6, new String[]{"Main.cs"}, new byte[][]{"class".getBytes()}, new int[]{0}));

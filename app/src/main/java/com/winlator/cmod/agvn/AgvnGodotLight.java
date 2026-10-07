@@ -37,7 +37,7 @@ public final class AgvnGodotLight {
     static final String EXTRA_RENDERER = "agvnGodotRenderer";
 
     /** Whether Godot 4.7 for Android runs a game, or why not. */
-    enum Fit { OK, NO_PACK, NOT_GODOT_4, NEWER, ENCRYPTED, UNKNOWN_SCRIPTS, EXTENSIONS, CSHARP }
+    enum Fit { OK, NO_PACK, NOT_GODOT_4, NEWER, ENCRYPTED, UNKNOWN_SCRIPTS, EXTENSIONS, MODULES, CSHARP }
 
     private AgvnGodotLight() {}
 
@@ -49,6 +49,7 @@ public final class AgvnGodotLight {
         int tokens = pack.scriptTokens();
         if (tokens > 0 && tokens != ENGINE_TOKENS && tokens != OLD_TOKENS) return Fit.UNKNOWN_SCRIPTS;
         if (pack.extensions()) return Fit.EXTENSIONS; // their libraries are built for Windows
+        if (AgvnGodotModules.missing(pack) != null) return Fit.MODULES; // built into the game's own engine only
         if (pack.csharp() || dotnetData(pack.file.getParentFile())) return Fit.CSHARP;
         return Fit.OK;
     }

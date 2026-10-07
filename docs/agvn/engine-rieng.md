@@ -264,6 +264,11 @@ Anh Sơn quyết định ngày 05/10/2026, sau khi Party Me (Godot 4.6) đứng 
   - game Godot viết bằng C# (.NET), tức có thư mục `data_*` chứa `GodotSharp.dll`, hoặc gói có file `.cs`;
   - gói hay file bị mã hoá: chỉ engine riêng của game có khoá;
   - game dùng thư viện native (GDExtension, ví dụ GodotSteam): thư viện đó dựng cho Windows, Android không nạp được;
+  - game có module dựng sẵn trong engine riêng của nó mà engine của app không có (bản 0.1.31, `AgvnGodotModules`).
+    Hiện app nhận ra Spine: gói có file `.spatlas`, `.spskel` hay `.spjson` trong `.godot/imported/`. Mii Chan (Godot
+    4.5.1 có spine-godot, 08/10/2026) Chạy nhẹ thì vào được menu, nhưng mọi cảnh Spine lỗi ("Cannot get class
+    'SpineSkeletonDataResource'") và phần quản lý game không nạp được. Spine Runtimes dùng giấy phép riêng của Esoteric
+    Software, không phải mã nguồn mở, nên app không tự thêm Spine vào engine; việc này cần anh Sơn quyết;
   - Godot bản mới hơn 4.7.
 - **Đã làm** (nhánh `agvn/p54-godot-native`, xếp trên bản 0.1.20, chờ anh Sơn thử máy):
   - **Trong app:** `AgvnGodotActivity` (lớp con `GodotActivity` của Godot) chạy game trong tiến trình riêng `:godot`.
