@@ -249,7 +249,8 @@ Các cách sửa mới (`AgvnRepairFixes`), mỗi cách đổi một cấu hình
   người chơi báo cảnh có hoạt ảnh bị đứng):
   - **Chạy nhẹ** (`godot-light`): game người chơi đã chuyển sang "Chạy bằng Windows" được chạy lại bằng Godot cho
     Android, khi Godot 4.7 đọc được cả gói game (`AgvnGodotLight.fit`). Không qua Wine và giả lập CPU nên mượt hơn
-    nhiều. Có cả ở hộp hỏi tự động khi game chậm và khi game Godot không chạy được qua Wine.
+    nhiều. Có cả ở hộp hỏi tự động khi game chậm và khi game Godot không chạy được qua Wine. Từ bản 0.1.28, engine
+    của app đọc được cả game Godot 4.3 và 4.4 (bản vá 0003, 0004; xem `engine-rieng.md`).
   - **Cách vẽ khi Chạy nhẹ** (`godot-light-renderer`): đổi sang cách còn lại của Godot cho Android, OpenGL
     (Compatibility) hoặc Vulkan (Mobile). App đọc cách game tự chọn cho điện thoại trong `project.binary`
     (`rendering/renderer/rendering_method.mobile`); game không ghi gì là Vulkan. Cách đã chọn nằm ở

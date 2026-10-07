@@ -31,13 +31,13 @@ public final class AgvnGodotLight {
     private static final String TAG = "AGVN";
     /** Godot 4.7: it refuses packs of a later Godot. */
     static final int ENGINE_MINOR = 7;
-    /** Its GDScript binary tokens (gdscript_tokenizer_buffer.h): those of Godot 4.3 and 4.4 (100) it refuses. */
-    static final int ENGINE_TOKENS = 101;
+    /** GDScript binary tokens it reads: Godot 4.5's on (101), and 4.3's and 4.4's (100) with patches/0003. */
+    static final int ENGINE_TOKENS = 101, OLD_TOKENS = 100;
     /** "gl" or "vulkan": a renderer "Tự sửa lỗi" picked for the game; none means the game's own. */
     static final String EXTRA_RENDERER = "agvnGodotRenderer";
 
     /** Whether Godot 4.7 for Android runs a game, or why not. */
-    enum Fit { OK, NO_PACK, NOT_GODOT_4, NEWER, ENCRYPTED, OLD_SCRIPTS, EXTENSIONS, CSHARP }
+    enum Fit { OK, NO_PACK, NOT_GODOT_4, NEWER, ENCRYPTED, UNKNOWN_SCRIPTS, EXTENSIONS, CSHARP }
 
     private AgvnGodotLight() {}
 
@@ -47,7 +47,7 @@ public final class AgvnGodotLight {
         if (pack.minor > ENGINE_MINOR || pack.format > 4) return Fit.NEWER;
         if (pack.encrypted()) return Fit.ENCRYPTED; // only the game's own engine has the key
         int tokens = pack.scriptTokens();
-        if (tokens > 0 && tokens != ENGINE_TOKENS) return Fit.OLD_SCRIPTS;
+        if (tokens > 0 && tokens != ENGINE_TOKENS && tokens != OLD_TOKENS) return Fit.UNKNOWN_SCRIPTS;
         if (pack.extensions()) return Fit.EXTENSIONS; // their libraries are built for Windows
         if (pack.csharp() || dotnetData(pack.file.getParentFile())) return Fit.CSHARP;
         return Fit.OK;

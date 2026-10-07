@@ -97,6 +97,8 @@ done
 ! grep -q 'attempting to load from outside of the executable' <<< "$texts" || fail "engine vẫn chặn gói game ngoài APK (disable_path_overrides)"
 grep -q 'AGVN_GODOT_APPDATA' <<< "$texts" || fail "engine thiếu bản vá user:// (patches/0001)"
 grep -q 'AGVN_GODOT_EXECUTABLE' <<< "$texts" || fail "engine thiếu bản vá đường dẫn .exe (patches/0002)"
+grep -q 'AGVN Player: binary GDScript is cut short' <<< "$texts" || fail "engine thiếu bản vá đọc script Godot 4.3, 4.4 (patches/0003)"
+# patches/0004 adds no text of its own: step 2 stops when it does not apply
 grep -q "Godot Engine v$GODOT_VERSION" <<< "$texts" || grep -q "$GODOT_VERSION.stable" <<< "$texts" || fail "không phải Godot $GODOT_VERSION"
 log "libgodot_android.so: Godot $GODOT_VERSION, mở được gói game ngoài APK, có các bản vá của AGVN"
 

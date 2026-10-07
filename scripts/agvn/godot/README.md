@@ -32,7 +32,8 @@ kiểm tra:
 - thư viện chỉ cần các thư viện có sẵn trên Android, giống bản chính thức;
 - có các hàm JNI mà phần Java gọi;
 - không còn câu chặn gói game ngoài APK;
-- có hai bản vá bên dưới.
+- có các bản vá 0001–0003 (tìm chữ riêng của từng bản trong thư viện). Bản 0004 không thêm chữ nào, nhưng script dừng
+  ngay nếu một bản vá không áp được.
 
 Đã so với bản chính thức 4.7.2: hai thư viện xuất đúng 1022 hàm như nhau.
 
@@ -46,6 +47,18 @@ kiểm tra:
 2. `0002-executable-path-of-the-windows-game`: `OS.get_executable_path()` trả về file `.exe` của game
    (`AGVN_GODOT_EXECUTABLE`). Game nào tìm gói vá, DLC, bản dịch hay mod đặt cạnh file `.exe` thì vẫn thấy. Gọi lại
    đường dẫn đó (game tự khởi động lại) vẫn là khởi động Godot, như với `"apk"` của bản gốc.
+3. `0003-scripts-of-godot-4.3-and-4.4`: đọc được script dạng mã nhị phân của Godot 4.3 và 4.4 (`.gdc`, phiên bản
+   token 100), kiểu Godot 4.3 và 4.4 xuất mặc định. Godot 4.5 trở lên chỉ đọc phiên bản 101 và báo "Binary GDScript is
+   not compatible with this engine version". Đã so mã đọc của 4.3, 4.4.1 và 4.7.2. Bản 100 chỉ khác ở hai chỗ:
+   - đầu file có thêm một số không dùng trước số token;
+   - từ `:` trở đi, mã loại token nhỏ hơn 1, vì Godot 4.5 chèn `...` vào trước `:`.
+
+   Phần còn lại vẫn như cũ: tên, hằng số (`decode_variant`), dòng và cột.
+4. `0004-script-classes-of-godot-4.3-and-older`: nhận các class (`class_name`) mà game Godot 4.0–4.3 ghi trong
+   `.godot/global_script_class_cache.cfg`. Godot 4.4 thêm hai mục `is_abstract` và `is_tool` vào file này. Từ đó
+   Godot bỏ qua class nào thiếu hai mục đó, nên script dùng class của game bị lỗi. Bản vá coi hai mục thiếu là
+   `false`, giống Godot 4.3. Lý do: class GDScript chỉ trừu tượng được từ Godot 4.5 (`@abstract`), còn `is_tool` chỉ
+   dùng trong editor.
 
 ## Cách chạy (Linux x86_64: máy cloud hoặc WSL)
 

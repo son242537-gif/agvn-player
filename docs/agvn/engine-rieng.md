@@ -251,14 +251,13 @@ Anh Sơn quyết định ngày 05/10/2026, sau khi Party Me (Godot 4.6) đứng 
   (`.pck`) bằng Godot cho Android, vẽ thẳng bằng OpenGL ES hoặc Vulkan của máy.
 - **Nguồn:** phần Java là thư viện Android chính thức của Godot 4.7.2 (`org.godotengine:godot`, Maven Central, ghim
   `godot_aar_sha256`). Engine (`libgodot_android.so`) dựng lại từ mã nguồn phát hành của Godot bằng
-  `scripts/agvn/godot/build-godot.sh`, vì bản chính thức từ 4.6 không mở gói game ngoài APK. Cách dựng, 2 bản vá và
+  `scripts/agvn/godot/build-godot.sh`, vì bản chính thức từ 4.6 không mở gói game ngoài APK. Cách dựng, các bản vá và
   cách kiểm chứng ở [`scripts/agvn/godot/README.md`](../../scripts/agvn/godot/README.md).
 - **Giấy phép:** Godot là MIT. Giấy phép đủ của Godot và các thư viện bên trong nằm ở cuối màn "Giấy phép mã nguồn mở".
 - **Game nào chạy được** (`AgvnGodotLight.fit`, đọc thư mục của gói như Godot đọc):
-  - Godot 4.5–4.7, ví dụ Party Me. Script dạng mã nhị phân của 4.5 trở lên đọc được.
-  - Godot 4.0–4.4 có script dạng chữ (`.gd`). Godot 4.3–4.4 thường xuất script dạng mã nhị phân bản cũ, mà Godot 4.5
-    trở lên không đọc được. Những game đó vẫn chạy bằng Windows. Muốn chạy được thì phải kèm thêm engine Godot 4.4: việc
-    này để đợt sau.
+  - Godot 4.0–4.7, ví dụ Party Me (4.6). Script dạng chữ (`.gd`) hay dạng mã nhị phân (`.gdc`) đều đọc được. Mã nhị
+    phân của Godot 4.3 và 4.4 là bản cũ, mà Godot 4.5 trở lên không đọc được. Engine của app đọc được nhờ bản vá 0003
+    (bản 0.1.28; trước đó những game này chạy bằng Windows). Xem "Game Godot 4.0–4.4 Chạy nhẹ" bên dưới.
   - Gói nằm trong `.exe` ("Embed PCK") hay file `.pck` cạnh `.exe`, theo đúng thứ tự Godot cho Windows tìm.
 - **Vẫn chạy bằng Windows:**
   - game Godot 3;
@@ -384,3 +383,46 @@ process is not defined", và "Tự sửa lỗi" không biết game dừng vì đ
   4. Plugin cố tình lỗi khi nạp (`khongCo.x = 1;` ở đầu file) trong game MZ: vẫn hiện màn lỗi như cũ; thoát game sau
      vài giây, "Tự sửa lỗi" hiện `ReferenceError: khongCo is not defined (<tên file>.js:1)`.
   5. Hồi quy: game không dùng `process` không đổi gì (tiếng, khung hình, save, "Thoát game").
+
+## Game Godot 4.0–4.4 Chạy nhẹ (bản 0.1.28)
+
+Sau nhật ký Train45 ngày 07/10/2026 (game Godot qua Wine khựng 1–10 giây), anh Sơn bảo làm mọi cách để game chạy mượt
+nhất. Game Godot 4.3 và 4.4 trước đây luôn chạy bằng Windows, chậm như vậy.
+
+- **Vì sao chưa chạy được:**
+  - Godot 4.3 và 4.4 mặc định xuất script dạng mã nhị phân phiên bản 100. Godot 4.5 đổi sang phiên bản 101 và chỉ
+    đọc bản đó ("Binary GDScript is not compatible with this engine version").
+  - Godot 4.0–4.3 ghi danh sách class của game (`class_name`, trong `.godot/global_script_class_cache.cfg`) thiếu
+    hai mục mà Godot 4.4 trở lên đòi. Godot 4.7 bỏ qua mọi class trong danh sách đó, nên script dùng class của game
+    bị lỗi. Lỗi này có cả ở game Godot 4.0–4.2 vốn đã Chạy nhẹ được.
+- **Sửa (engine, `scripts/agvn/godot/patches`):**
+  - `0003`: đọc cả script phiên bản 100. Đã so mã đọc của Godot 4.3, 4.4.1 và 4.7.2. Hai bản chỉ khác ở đầu file
+    (thêm một số không dùng) và mã loại token: Godot 4.5 chèn `...` vào trước `:`, nên từ `:` trở đi mã của bản cũ
+    nhỏ hơn 1. Mọi loại token của 4.4 đã được đối chiếu đúng với loại cùng tên ở 4.7. Phần đọc tên, hằng số
+    (`decode_variant`), dòng và cột vẫn như 4.4.
+  - `0004`: class thiếu hai mục `is_abstract` và `is_tool` vẫn được nhận, hai mục đó coi là `false`, giống Godot 4.3.
+  - Đã kiểm thêm trong mã của Godot 4.7: gói `.pck` kiểu cũ (format 2, của Godot 4.0–4.4) và cache UID vẫn đọc như
+    trước; scene và resource dạng nhị phân chỉ bị từ chối khi mới hơn engine.
+  - Thư viện mới xuất đúng 1022 hàm như bản trước. Chỉ 6 file của Godot được biên dịch lại.
+- **Trong app:** `AgvnGodotLight.fit` nhận script phiên bản 100 (`OLD_TOKENS`), cùng 101.
+  - Game Godot 4.3, 4.4 thêm mới được đặt Chạy nhẹ lúc nhập.
+  - Game đã nhập mà chưa chọn cách chạy tự chuyển ở lần mở tiếp theo.
+  - Game đã đặt "Chạy bằng Windows" giữ nguyên. "Tự sửa lỗi" và hộp hỏi khi game chậm đề nghị "Chạy nhẹ" cho game đó.
+  - Phiên bản script lạ (không phải 100, 101) vẫn chạy bằng Windows (`UNKNOWN_SCRIPTS`).
+- **Không chắc chắn:** game Godot 4.0–4.4 chạy trên engine 4.7, không phải engine của chính game. Godot giữ tương thích
+  giữa các bản 4.x nên phần lớn game chạy được, nhưng game dựa vào hành vi đã đổi có thể lỗi riêng.
+  - Game dừng trước khi hiện hình: app hiện lỗi đầu tiên trong `godot.log`, kèm nút "Chạy bằng Windows".
+  - Game vẫn chạy nhưng lỗi: "Tự sửa lỗi" có cách "Chạy bằng Windows".
+- **Thử máy:** một game Godot 4.3 hoặc 4.4 (game xuất mặc định có file `.gdc`), thêm một game 4.0–4.2 dùng
+  `class_name` nếu có.
+  1. Thêm game: game được đặt Chạy nhẹ. `adb logcat -s AGVN` có `Godot 4.x.y game ... on Chạy nhẹ`, không có
+     `goes to Wine`.
+  2. Game vào màn tiêu đề và chơi được 10 phút. `godot.log` không có "Binary GDScript is not compatible", không có
+     "Identifier ... not declared" hay "Could not find type".
+  3. Game 4.3/4.4 đã nhập trước khi cập nhật:
+     - chưa chọn cách chạy: lần mở tiếp theo tự Chạy nhẹ;
+     - đã đặt "Chạy bằng Windows": "Tự sửa lỗi" → "Game chậm, giật, lag" có cách "Chạy nhẹ" đầu tiên. Thử cách đó:
+       game mở bằng Godot cho Android.
+  4. So với khi chạy bằng Windows: thời gian vào game, các lần khựng, RAM (`dumpsys meminfo com.agvn.player:godot`).
+  5. Save khi chạy bằng Windows vẫn thấy khi Chạy nhẹ, và ngược lại.
+  6. Hồi quy: Party Me (Godot 4.6) vẫn Chạy nhẹ như cũ. Game Godot 3 và game Godot C# vẫn chạy bằng Windows.

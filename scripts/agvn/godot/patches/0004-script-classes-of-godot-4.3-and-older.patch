@@ -1,0 +1,46 @@
+--- a/core/config/project_settings.cpp
++++ b/core/config/project_settings.cpp
+@@ -1436,10 +1436,11 @@
+ 	Array script_classes = get_global_class_list();
+ 	for (int i = 0; i < script_classes.size(); i++) {
+ 		Dictionary c = script_classes[i];
+-		if (!c.has("class") || !c.has("language") || !c.has("path") || !c.has("base") || !c.has("is_abstract") || !c.has("is_tool")) {
++		if (!c.has("class") || !c.has("language") || !c.has("path") || !c.has("base")) {
+ 			continue;
+ 		}
+-		ScriptServer::add_global_class(c["class"], c["base"], c["language"], c["path"], c["is_abstract"], c["is_tool"]);
++		// AGVN Player: a class of Godot 4.0 to 4.3 has no "is_abstract" (none was abstract then) or "is_tool" (for the editor only).
++		ScriptServer::add_global_class(c["class"], c["base"], c["language"], c["path"], c.get("is_abstract", false), c.get("is_tool", false));
+ 	}
+ }
+ 
+--- a/core/object/script_language.cpp
++++ b/core/object/script_language.cpp
+@@ -281,10 +281,11 @@
+ 
+ 			for (const Variant &script_class : script_classes) {
+ 				Dictionary c = script_class;
+-				if (!c.has("class") || !c.has("language") || !c.has("path") || !c.has("base") || !c.has("is_abstract") || !c.has("is_tool")) {
++				if (!c.has("class") || !c.has("language") || !c.has("path") || !c.has("base")) {
+ 					continue;
+ 				}
+-				add_global_class(c["class"], c["base"], c["language"], c["path"], c["is_abstract"], c["is_tool"]);
++				// AGVN Player: a class of Godot 4.0 to 4.3 has no "is_abstract" (none was abstract then) or "is_tool" (for the editor only).
++				add_global_class(c["class"], c["base"], c["language"], c["path"], c.get("is_abstract", false), c.get("is_tool", false));
+ 			}
+ 			ProjectSettings::get_singleton()->clear("_global_script_classes");
+ 		}
+@@ -293,10 +294,11 @@
+ 		Array script_classes = ProjectSettings::get_singleton()->get_global_class_list();
+ 		for (const Variant &script_class : script_classes) {
+ 			Dictionary c = script_class;
+-			if (!c.has("class") || !c.has("language") || !c.has("path") || !c.has("base") || !c.has("is_abstract") || !c.has("is_tool")) {
++			if (!c.has("class") || !c.has("language") || !c.has("path") || !c.has("base")) {
+ 				continue;
+ 			}
+-			add_global_class(c["class"], c["base"], c["language"], c["path"], c["is_abstract"], c["is_tool"]);
++			// AGVN Player: a class of Godot 4.0 to 4.3 has no "is_abstract" (none was abstract then) or "is_tool" (for the editor only).
++			add_global_class(c["class"], c["base"], c["language"], c["path"], c.get("is_abstract", false), c.get("is_tool", false));
+ 		}
+ 	}
+ 

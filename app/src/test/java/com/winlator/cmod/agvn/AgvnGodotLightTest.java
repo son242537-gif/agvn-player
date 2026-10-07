@@ -101,8 +101,9 @@ public class AgvnGodotLightTest {
 
     @Test
     public void whatGodot47CannotRun() throws IOException {
-        // 4.3 and 4.4 kept binary tokens 100, which 4.5+ refuse; as text (.gd) they run
-        assertEquals(AgvnGodotLight.Fit.OLD_SCRIPTS, AgvnGodotLight.fit(AgvnGodotPack.open(write("a.pck", game(2, 4, "main.gdc", tokens(100))))));
+        // 4.3 and 4.4 kept binary tokens 100, which Godot 4.5+ refuse and AGVN's build reads (patches/0003)
+        assertEquals(AgvnGodotLight.Fit.OK, AgvnGodotLight.fit(AgvnGodotPack.open(write("a.pck", game(2, 4, "main.gdc", tokens(100))))));
+        assertEquals(AgvnGodotLight.Fit.UNKNOWN_SCRIPTS, AgvnGodotLight.fit(AgvnGodotPack.open(write("a2.pck", game(2, 4, "main.gdc", tokens(99))))));
         assertEquals(AgvnGodotLight.Fit.OK, AgvnGodotLight.fit(AgvnGodotPack.open(write("b.pck", game(2, 2, "main.gd", "extends Node".getBytes())))));
         assertEquals(AgvnGodotLight.Fit.NEWER, AgvnGodotLight.fit(AgvnGodotPack.open(write("c.pck", game(3, 8, "main.gdc", tokens(101))))));
         File ext = write("d.pck", pack(3, 6, new String[]{".godot/extension_list.cfg", "main.gdc"},
