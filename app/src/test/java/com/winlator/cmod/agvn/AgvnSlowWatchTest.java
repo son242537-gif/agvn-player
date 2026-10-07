@@ -119,4 +119,19 @@ public class AgvnSlowWatchTest {
         assertTrue(AgvnSessionTrack.playerQuit());
         assertFalse(AgvnSessionTrack.endedByGame());
     }
+
+    @Test
+    public void theLastMinuteTellsWhatTheGameDid() {
+        List<AgvnSlowWatch.Sample> window = new ArrayList<>();
+        window.add(new AgvnSlowWatch.Sample(30.4f, -1, 0.42));
+        window.add(new AgvnSlowWatch.Sample(0, -1, 1.0));
+        window.add(new AgvnSlowWatch.Sample(0, -1, 0.99));
+        assertEquals("Phút cuối của game (mỗi 5 giây): FPS 30 0 0; luồng bận nhất (% một nhân) 42 100 99;"
+                + " không vẽ khung nào trong 10 giây cuối", AgvnSlowWatch.lastMinute(window));
+        window.add(new AgvnSlowWatch.Sample(24, 35, 0.5));
+        assertEquals("drawing again at the end; the GPU where the phone tells",
+                "Phút cuối của game (mỗi 5 giây): FPS 30 0 0 24; luồng bận nhất (% một nhân) 42 100 99 50; GPU (%) ? ? ? 35",
+                AgvnSlowWatch.lastMinute(window));
+        assertNull(AgvnSlowWatch.lastMinute(new ArrayList<>()));
+    }
 }

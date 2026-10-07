@@ -153,8 +153,8 @@ public class AgvnUnityCrashTest {
         AgvnUnityCrash.into(ev, AgvnUnityCrash.describe(ev.lines));
         AgvnProblemCatalog.Finding f = catalog.find(ev);
         assertEquals("unity-crash", f.id());
-        assertEquals(Arrays.asList("unity-quality-own", "emulator-stable", "wine-old", "dxvk-other", "driver-other",
-                "reset", "send-logs"), f.fixes());
+        assertEquals(Arrays.asList("unity-quality-own", "emulator-stable", "mods-off", "wine-old", "dxvk-other",
+                "driver-other", "reset", "send-logs"), f.fixes());
         assertTrue(f.cause().contains("Unity báo crash trong UnityPlayer.dll+0x8d8b1a"));
         assertFalse("a crash is never a good run", ev.good());
         ev.changed = true;

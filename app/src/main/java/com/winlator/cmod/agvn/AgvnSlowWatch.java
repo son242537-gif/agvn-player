@@ -23,7 +23,8 @@ import java.util.concurrent.TimeUnit;
  * (steadily under 20 FPS, not a still screen, not the player's own FPS cap), a bar over the game says what is busy and
  * offers that problem's fixes ({@link AgvnSlowBar}; game-problems.json: slow-gpu, slow-cpu, slow, slow-unknown). Once
  * per game session; "Để vậy" stops asking for this game. {@link #verdict} also serves the "Chạy nhẹ" games
- * ({@link AgvnLightSlow}).
+ * ({@link AgvnLightSlow}). The polls go on after that: when the game ends, the session events get its last minute
+ * ({@link #lastMinute}).
  */
 public final class AgvnSlowWatch {
     private static final String TAG = "AGVN";
@@ -50,7 +51,7 @@ public final class AgvnSlowWatch {
     private final AgvnLoadProbe probe = new AgvnLoadProbe(AgvnLoadProbe.Threads.WINE);
     private final ArrayDeque<Sample> samples = new ArrayDeque<>();
     private ScheduledExecutorService poller;
-    private long lastMs;
+    private volatile long lastMs;
     private volatile boolean asked;
 
     /** {@code exitGame}: closes the game, for "Mở lại game ngay" after a fix. */
@@ -61,7 +62,7 @@ public final class AgvnSlowWatch {
     }
 
     public synchronized void start() {
-        if (poller != null || shortcut == null || asked) return;
+        if (poller != null || shortcut == null) return;
         AgvnSessionTrack.takeFrames(); // frames drawn while paused are not this minute's
         samples.clear();
         lastMs = SystemClock.uptimeMillis();
@@ -72,6 +73,15 @@ public final class AgvnSlowWatch {
     public synchronized void stop() {
         if (poller != null) poller.shutdownNow();
         poller = null;
+    }
+
+    /** The game ends: no more polls, and its last minute goes to the session events, unless it was paused since. */
+    public synchronized void finish() {
+        boolean polling = poller != null;
+        stop();
+        if (!polling || SystemClock.uptimeMillis() - lastMs > 3 * POLL_S * 1000) return;
+        String last = lastMinute(new ArrayList<>(samples));
+        if (last != null) AgvnSessionLog.event(last);
     }
 
     private void poll() {
@@ -90,7 +100,6 @@ public final class AgvnSlowWatch {
             String id = verdict(window, view != null ? view.getFpsLimit() : 0, SLOW_FPS);
             if (id == null) return;
             asked = true;
-            stop();
             Map<String, String> params = params(window);
             AgvnSessionLog.event("Game chậm (" + id + "): " + params);
             AgvnSlowBar.ask(activity, shortcut, id, params, exitGame);
@@ -126,6 +135,33 @@ public final class AgvnSlowWatch {
         if (values.isEmpty()) return -1;
         Collections.sort(values);
         return values.get(values.size() / 2);
+    }
+
+    /**
+     * The polls of {@code window} for the session events, oldest first: frames per second, the busiest thread (percent
+     * of a core) and the GPU (percent, where the phone tells), and how long the game drew nothing at the end. A game
+     * the player called frozen then shows whether it still drew (a scene that does not go on, input it waits for),
+     * worked without drawing (loading, a loop) or did nothing (waiting). Isekai NTR Inn and Rina "froze" with no line in
+     * any log (07/10/2026). Null for no poll.
+     */
+    static String lastMinute(List<Sample> window) {
+        if (window.isEmpty()) return null;
+        StringBuilder fps = new StringBuilder(), cpu = new StringBuilder(), gpu = new StringBuilder();
+        boolean cpuKnown = false, gpuKnown = false;
+        int still = 0;
+        for (Sample s : window) {
+            fps.append(' ').append(s.fps < 0 ? "?" : String.valueOf(Math.round(s.fps)));
+            cpu.append(' ').append(s.cpu < 0 ? "?" : String.valueOf(Math.round(s.cpu * 100)));
+            gpu.append(' ').append(s.gpu < 0 ? "?" : String.valueOf(s.gpu));
+            cpuKnown |= s.cpu >= 0;
+            gpuKnown |= s.gpu >= 0;
+            still = s.fps >= 0 && s.fps < 1 ? still + 1 : 0;
+        }
+        StringBuilder line = new StringBuilder("Phút cuối của game (mỗi " + POLL_S + " giây): FPS").append(fps);
+        if (cpuKnown) line.append("; luồng bận nhất (% một nhân)").append(cpu);
+        if (gpuKnown) line.append("; GPU (%)").append(gpu);
+        if (still > 0) line.append("; không vẽ khung nào trong ").append(still * POLL_S).append(" giây cuối");
+        return line.toString();
     }
 
     /** The texts' values: fps, speed (" (14 FPS)", empty without one: Ren'Py), gpu (percent), cpu (percent of a core). */

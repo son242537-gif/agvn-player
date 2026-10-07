@@ -30,7 +30,7 @@ public class AgvnDoctorTest {
             "app-settings", "send-logs", "run-windows", "rgss-frameskip", "wrapper-constants", "wrapper-clip", "wine-mono",
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "godot-light",
-            "godot-light-renderer"));
+            "godot-light-renderer", "mods-off"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
             "ram-saved", "live", "light", "script-error", "page-crash", "frozen", "reported"));

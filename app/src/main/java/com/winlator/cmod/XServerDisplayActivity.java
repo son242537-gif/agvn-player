@@ -973,7 +973,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (agvnSessionGuard != null) agvnSessionGuard.destroy();
         if (agvnMemoryWatch != null) agvnMemoryWatch.finish();
         if (agvnHeatWatch != null) agvnHeatWatch.finish();
-        if (agvnSlowWatch != null) agvnSlowWatch.stop();
+        if (agvnSlowWatch != null) agvnSlowWatch.finish(); // AGVN: the game's last minute, for the session log
         if (agvnStartup != null) agvnStartup.stop();
         NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID);
         boolean removeLoadingBar = PreferenceManager.getDefaultSharedPreferences(this)

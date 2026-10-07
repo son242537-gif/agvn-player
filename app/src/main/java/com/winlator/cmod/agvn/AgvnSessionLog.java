@@ -62,7 +62,7 @@ public final class AgvnSessionLog {
             write(new File(dir, RUNNING), running.toString(), false);
             write(new File(dir, ENV), graphicsEnv(env), false);
             current = dir;
-            event(AgvnGameFacts.of(shortcut)); // what runs: exe, engine, the DLLs next to it, mod folders
+            for (String fact : AgvnGameFacts.of(shortcut)) event(fact); // what runs: exe, engine, DLLs, folders, mods
             for (String note : new String[]{AgvnMemorySaver.takeNote(), AgvnWineMono.takeNote()}) if (note != null) event(note);
             AgvnLogFolders.prune(gameLogs);
             AgvnLogFolders.pruneLoose(root(), System.currentTimeMillis());

@@ -9,6 +9,7 @@ import com.winlator.cmod.core.EnvVars;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The fixes "Tự sửa lỗi" tries for what the player reports ({@link AgvnRepair}), besides those of {@link AgvnFixes}.
@@ -23,13 +24,14 @@ import java.util.List;
  *   <li>unity-quality-own: a Unity game keeps its own quality where Đồ họa Thấp or Siêu nhẹ set its lowest
  *   ({@link AgvnUnityQuality});</li>
  *   <li>audio-other: PulseAudio or ALSA;</li>
- *   <li>locale-ja, locale-zh: the language Windows runs the game in, which its text needs (LC_ALL).</li>
+ *   <li>locale-ja, locale-zh: the language Windows runs the game in, which its text needs (LC_ALL);</li>
+ *   <li>mods-off: the game without its mod loader, through Wine's own copy of the loader's DLL ({@link AgvnMods}).</li>
  * </ul>
  * Pure Java except {@link #make}.
  */
 final class AgvnRepairFixes {
     static final List<String> IDS = Arrays.asList("render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off",
-            "present-sync", "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh");
+            "present-sync", "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "mods-off");
     static final String CHINESE = "zh_CN.UTF-8", PULSE = "pulse-audio-gn", ALSA = "alsa";
 
     private AgvnRepairFixes() {}
@@ -65,6 +67,12 @@ final class AgvnRepairFixes {
             case "locale-zh": {
                 String to = id.equals("locale-ja") ? AgvnLocale.JAPANESE : CHINESE;
                 return to.equals(s.getExtra("lc_all")) ? null : fix(a, id, label(id), to);
+            }
+            case "mods-off": {
+                Map<String, List<String>> mods = AgvnMods.found(AgvnEngineLogs.exe(s).getParentFile());
+                if (mods.isEmpty() || AgvnMods.off(s.getExtra("envVars"), AgvnMods.proxies(mods))) return null;
+                String names = String.join(", ", mods.keySet());
+                return new AgvnFixes.Fix(id, a.getString(R.string.agvn_fix_mods_off, names), names);
             }
             default:
                 return null;
@@ -102,6 +110,10 @@ final class AgvnRepairFixes {
             case "locale-ja":
             case "locale-zh":
                 s.putExtra("lc_all", fix.to);
+                return true;
+            case "mods-off":
+                s.putExtra("envVars", AgvnMods.withBuiltin(s.getExtra("envVars"),
+                        AgvnMods.proxies(AgvnMods.found(AgvnEngineLogs.exe(s).getParentFile()))));
                 return true;
             default:
                 return false;

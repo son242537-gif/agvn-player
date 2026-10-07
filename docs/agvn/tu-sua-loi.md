@@ -219,15 +219,15 @@ lỗi: người chơi báo …, thử: …"). Trạng thái nằm cùng file c�
 |---|---|
 | Hình chập chờn, nhấp nháy | Tắt DXVK async; bật Đồng bộ khung hình; Godot: Chạy nhẹ, cách vẽ khác; Turnip vẽ cả khung hình trong bộ nhớ (sysmem); tắt LRZ của Turnip; đổi DXVK; đổi driver; về cấu hình gốc |
 | Hình có đốm đen, mảng đen, sọc hoặc sai màu | Godot: Chạy nhẹ, cách vẽ khác; tắt LRZ của Turnip; tắt nén hình UBWC; sysmem; giải nén mọi texture BCn (GPU không phải Turnip); đổi DXVK; đổi driver; để game Unity tự chọn chất lượng; WineD3D; về cấu hình gốc |
-| Màn hình đen dù game vẫn chạy | Đồng bộ khung hình; Godot: Chạy nhẹ, cách vẽ khác; sysmem; nâng Đồ họa; đổi DXVK; đổi driver; WineD3D; về cấu hình gốc |
+| Màn hình đen dù game vẫn chạy | Đồng bộ khung hình; Godot: Chạy nhẹ, cách vẽ khác; sysmem; nâng Đồ họa; đổi DXVK; đổi driver; WineD3D; chạy không có mod; về cấu hình gốc |
 | Game chậm, giật, lag | Godot: Chạy nhẹ; hạ Đồ họa; DXVK chạy thẳng trên chip ARM; chế độ Gmem; để Turnip tự chọn; giả lập CPU nhanh hơn; bỏ bớt khung hình (RPG Maker); mở cài đặt Tiết kiệm pin |
-| Game đứng hình, treo | Giả lập CPU ổn định hơn; Godot: Chạy nhẹ; tắt DXVK async; Godot: cách vẽ khác; đổi DXVK; đổi driver; về cấu hình gốc |
-| Game tự tắt, văng ra | Giả lập CPU ổn định hơn; để game Unity tự chọn chất lượng; Godot: Chạy nhẹ, cách vẽ khác; đổi DXVK; đổi driver; về cấu hình gốc |
+| Game đứng hình, treo | Giả lập CPU ổn định hơn; chạy không có mod; Godot: Chạy nhẹ; tắt DXVK async; Godot: cách vẽ khác; đổi DXVK; đổi driver; về cấu hình gốc |
+| Game tự tắt, văng ra | Giả lập CPU ổn định hơn; để game Unity tự chọn chất lượng; chạy không có mod; Godot: Chạy nhẹ, cách vẽ khác; đổi DXVK; đổi driver; về cấu hình gốc |
 | Không có tiếng, tiếng rè hoặc lắp | Đổi giữa PulseAudio và ALSA; về cấu hình gốc |
 | Chữ lỗi, ô vuông, ký tự lạ | Chạy game bằng tiếng Nhật; bằng tiếng Trung; về cấu hình gốc |
 | Hình mờ, vỡ hoặc quá nhỏ | Nâng Đồ họa; Godot: Chạy nhẹ; để game Unity tự chọn chất lượng |
 | Hoạt ảnh, video hoặc hiệu ứng không chạy (bản 0.1.28) | Godot: Chạy nhẹ, cách vẽ khác; tắt DXVK async; nâng Đồ họa; để game Unity tự chọn chất lượng; đổi DXVK; đổi driver; WineD3D; về cấu hình gốc |
-| Lỗi khác | Dùng lại cấu hình đã chạy được; về cấu hình gốc; giả lập CPU ổn định hơn; Godot: Chạy nhẹ, cách vẽ khác; đổi DXVK; đổi driver |
+| Lỗi khác | Dùng lại cấu hình đã chạy được; về cấu hình gốc; giả lập CPU ổn định hơn; Godot: Chạy nhẹ, cách vẽ khác; đổi DXVK; đổi driver; chạy không có mod |
 
 Mọi lỗi đều kết thúc bằng "Gửi nhật ký". Game "Chạy nhẹ" có thêm "Chạy bằng bản Windows" khi thư mục có file `.exe`.
 Không có "Wine cũ (Proton 9)" trong danh sách: chuyển game sang Wine khác thì không trả về như cũ được, nên cách này
@@ -258,6 +258,12 @@ Các cách sửa mới (`AgvnRepairFixes`), mỗi cách đổi một cấu hình
   - **Cách vẽ khi chạy qua Wine:** Vulkan (`godot-renderer`, GLES2 với Godot 3) và Direct3D 11 qua ANGLE
     (`godot-angle`, từ Godot 4.4). Lỗi người chơi báo giờ mang theo bản Godot của game (`AgvnGodotGame.params`),
     nên app chọn đúng cách cho Godot 3 hay 4.
+- **Chạy không có mod** (`mods-off`, bản 0.1.29): game có bộ nạp mod (thư mục `BepInEx`, `MelonLoader` hay `ue4ss` và
+  file DLL của bộ nạp cạnh exe: `winhttp.dll`, `version.dll`...) chạy với bản DLL của chính Wine
+  (`WINEDLLOVERRIDES=winhttp=b`, `AgvnMods`). Bộ nạp không chạy nên mọi mod cũng không chạy; file của game giữ nguyên.
+  Có ở "Game đứng hình, treo", "Game tự tắt", "Màn hình đen", "Lỗi khác" và ở hộp hỏi tự động khi game crash hay tắt
+  ngay. Không giúp được thì cấu hình về như cũ (mod chạy lại). Giúp được thì người chơi biết lỗi do mod: game chạy như
+  bản gốc, không có mod. "Về cấu hình gốc" bật lại mod.
 
 ## App biết gì về từng game (`files/agvn/doctor/`)
 
@@ -514,6 +520,33 @@ Unity trống cả 5 lần chạy; chỉ biến `WINEDLLOVERRIDES` trong `moi-tr
 nạp BepInEx), mà nhật ký của BepInEx thì app chưa chép. Isekai NTR Inn không có nhật ký engine nào và không biết là
 engine gì. Máy HONOR cũng không cho app đọc logcat (`logcat.txt` chỉ có một dòng mã hoá).
 
+Từ bản 0.1.29, game app chưa biết engine, hay game có mod, có thêm các dòng sau dòng đầu:
+- `Thư mục game: …`: mọi file và thư mục ở thư mục game, trừ `.dll` (đã có ở dòng đầu); file từ 1 MB có kèm cỡ;
+- `Thư mục BepInEx: …` (hay `MelonLoader`, `ue4ss`): những gì thư mục mod có, kèm cỡ mọi file (`LogOutput.log
+  trống`: BepInEx chưa ghi được gì);
+- `File exe: …` (chỉ game chưa biết engine, `AgvnPeFacts`): 32 hay 64 bit; các DLL Windows file exe nạp (Direct3D 9
+  hay 11, OpenGL, `quartz`/`mfplat` cho phim, `dsound`...); đóng gói (Enigma Virtual Box giữ cả game trong exe;
+  SteamStub `.bind` cần Steam); dữ liệu nối sau exe (zip của LÖVE hay NW.js, PyInstaller, bộ cài NSIS...).
+
+Khi game Windows kết thúc, `su-kien.txt` có thêm dòng `Phút cuối của game (mỗi 5 giây): FPS …; luồng bận nhất (% một
+nhân) …; GPU (%) …` (`AgvnSlowWatch.lastMinute`). App vốn đo các số này mỗi 5 giây để biết game chậm; giờ app đo suốt
+cả phiên (trước đây dừng sau lần hỏi "Game chậm") và ghi phút cuối. Nếu cuối phút đó game không vẽ khung nào, dòng
+có thêm "không vẽ khung nào trong N giây cuối". Đọc dòng này:
+- FPS vẫn đều: game vẫn vẽ; cảnh không đi tiếp (đợi phím, đợi chạm, kẹt logic);
+- FPS 0, một luồng bận gần 100%: game đang làm việc mà không vẽ (đang tải, tạo file lần đầu, hay vòng lặp);
+- FPS 0, không luồng nào bận: game đang đợi một thứ không đến (đứng hẳn).
+
+Lý do (bản 0.1.29): nhật ký thứ hai của Isekai NTR Inn và Rina (bản 0.1.28, cùng máy HONOR AAK-AN00, 07/10/2026) vẫn
+không cho biết game bị gì. Cả hai đều thử đủ 3 cách, mỗi cách chạy thật 1–2 phút (sửa lỗi của bản 0.1.27 đã có tác
+dụng), rồi người chơi vẫn báo đứng hình.
+- **Isekai NTR Inn:** vẫn `engine UNKNOWN`, không có DLL cạnh exe, không có nhật ký engine; Wine không báo lỗi nào.
+- **Rina:** `Player.log` của Unity trống cả 4 lần, và BepInEx chưa hề tạo `LogOutput.log`. Nhưng Wine báo
+  `find_forwarded_export module not found for forward 'icuuc68.u_charsToUChars_68' used by …\icu.dll` ngay lúc mở game.
+  Đó là .NET đang nạp ICU, nên runtime .NET mà BepInEx bản IL2CPP kèm theo đã chạy. Lỗi này không làm game dừng: .NET
+  không có ICU thì dùng cách khác. Vậy game kẹt khi BepInEx đang khởi động, trước khi BepInEx và Unity ghi được dòng
+  nhật ký nào. Vì thế mới có cách "Chạy không có mod".
+- Cả hai: từ giây thứ 10, máy giới hạn nhân CPU mạnh nhất còn 45–66% (headroom 0,80–0,86).
+
 Game HTML (RPG Maker MV/MZ, Tyrano): một thông báo của trang lặp lại chỉ được ghi vào logcat lần đầu, rồi lần thứ 10,
 100, 1000… kèm số lần (`AgvnHtmlConsole.repeat`, bản 0.1.28). Lý do: nhật ký Train45 gửi ngày 07/10/2026 có `logcat.txt`
 toàn một dòng của một game RPG Maker khác chạy trước đó ("The provided value 'undefined' is not a valid enum value of
@@ -722,6 +755,13 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       Ở thư viện cũng vậy, với nút "Chơi thử với cách này".
 - [ ] `su-kien.txt` của mọi phiên chơi game Windows bắt đầu bằng dòng "Game: <exe> · engine … · DLL cạnh exe: …". Game
       có BepInEx: dòng đó có "mod: BepInEx" và thư mục phiên có `LogOutput.log`.
+- [ ] Bản 0.1.29, game có BepInEx (Rina): `su-kien.txt` có `Thư mục game: …` và `Thư mục BepInEx: …`. Chọn "Game đứng
+      hình, treo": cách thứ hai là "Chạy game không có mod (BepInEx)…". Thử: `moi-truong.txt` của lần chạy đó có
+      `winhttp=b`; game chạy không có mod. "Vẫn còn lỗi": lần sau lại `winhttp=n,b` (mod chạy lại).
+- [ ] Bản 0.1.29, game chưa biết engine (Isekai NTR Inn): `su-kien.txt` có `Thư mục game: …` và `File exe: …`.
+- [ ] Bản 0.1.29, thoát một game Windows bất kỳ (từ menu, hoặc "Mở lại game ngay" của "Tự sửa lỗi"): gần cuối
+      `su-kien.txt` có dòng `Phút cuối của game (mỗi 5 giây): FPS …`. Game chạy mượt thì FPS đều, không có "không vẽ
+      khung nào". Rời app rồi thoát game từ thông báo: không có dòng này.
 - [ ] Game Unity ở Đồ họa Siêu nhẹ, chọn "Game tự tắt, văng ra" (hoặc Unity tự bắt crash): có "Để game Unity tự chọn
       chất lượng hình". Thử: lần mở sau `adb logcat -s AGVN` có `Unity quality back to the game's own`.
 - [ ] Game Nhật bị chữ ô vuông, chọn "Chữ lỗi, ô vuông, ký tự lạ": "Chạy game bằng tiếng Nhật" sửa được; game đã chạy

@@ -34,4 +34,5 @@
     <string name="agvn_fix_godot_light">Chạy nhẹ: chạy game Godot thẳng trên Android, không qua Wine (mượt hơn nhiều)</string>
     <string name="agvn_fix_godot_light_gl">Cho game Godot (Chạy nhẹ) vẽ bằng OpenGL</string>
     <string name="agvn_fix_godot_light_vulkan">Cho game Godot (Chạy nhẹ) vẽ bằng Vulkan</string>
+    <string name="agvn_fix_mods_off">Chạy game không có mod (%1$s), như bản gốc; file của game giữ nguyên</string>
 </resources>
