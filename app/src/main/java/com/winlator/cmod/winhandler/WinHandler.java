@@ -57,6 +57,7 @@ public class WinHandler {
     private final DatagramPacket receivePacket = new DatagramPacket(receiveData.array(), 64);
     private final ArrayDeque<Runnable> actions = new ArrayDeque<>();
     private boolean initReceived = false;
+    private int agvnVersion = 0; // AGVN: what agvn-winhandler.exe adds (RC_AGVN_POINTER), told with INIT
     private boolean running = false;
     private OnGetProcessInfoListener onGetProcessInfoListener;
     private final Map<Integer, ExternalController> controllers = new HashMap<>();
@@ -234,6 +235,27 @@ public class WinHandler {
             sendData.putShort((short) dy);
             sendData.putShort((short) wheelDelta);
             sendData.put((byte) ((flags & MouseEventFlags.MOVE) != 0 ? 1 : 0)); // cursor pos feedback
+            sendPacket(CLIENT_PORT);
+        });
+    }
+
+    /** AGVN: true when agvn-winhandler.exe started the game, so {@link #agvnPointer} reaches it. */
+    public boolean agvnPointerReady() {
+        return initReceived && agvnVersion >= 1;
+    }
+
+    /**
+     * AGVN: the mouse at pixel (x, y) of the screen with {@link MouseEventFlags} buttons and a wheel step, as one
+     * SendInput in agvn-winhandler.exe, so the game gets raw input (WM_INPUT) too (agvn/AgvnRawMouse).
+     */
+    public void agvnPointer(int flags, int x, int y, int wheelDelta) {
+        addAction(() -> {
+            sendData.rewind();
+            sendData.put(RequestCodes.AGVN_POINTER);
+            sendData.putInt(flags);
+            sendData.putShort((short) x);
+            sendData.putShort((short) y);
+            sendData.putShort((short) wheelDelta);
             sendPacket(CLIENT_PORT);
         });
     }
@@ -482,6 +504,7 @@ public void setVibrationEnabledForSlot(int slot, boolean enabled) {
         switch (requestCode) {
             case RequestCodes.INIT: {
                 initReceived = true;
+                agvnVersion = receivePacket.getLength() > 1 ? receiveData.get() : 0; // AGVN: Winlator's exe sends the code alone
 
                 preferences = PreferenceManager.getDefaultSharedPreferences(activity.getBaseContext());
 

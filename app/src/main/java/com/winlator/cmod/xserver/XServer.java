@@ -38,6 +38,7 @@ public class XServer {
     public final Keyboard keyboard = Keyboard.createKeyboard(this);
     public final Pointer pointer = new Pointer(this);
     private final com.winlator.cmod.agvn.AgvnInputHold inputHold = new com.winlator.cmod.agvn.AgvnInputHold(); // AGVN: taps the game sees
+    public final com.winlator.cmod.agvn.AgvnRawMouse agvnRawMouse = new com.winlator.cmod.agvn.AgvnRawMouse(this); // AGVN: raw input
     public final InputDeviceManager inputDeviceManager;
     public final GrabManager grabManager;
     public final CursorLocker cursorLocker;
@@ -194,12 +195,14 @@ public class XServer {
     }
 
     public void injectPointerMove(int x, int y) {
+        if (agvnRawMouse.move(x, y)) return; // AGVN: a game that reads raw input gets the touch as a real mouse
         try (XLock lock = lock(Lockable.WINDOW_MANAGER, Lockable.INPUT_DEVICE)) {
             pointer.setPosition(x, y);
         }
     }
 
     public void injectPointerMoveDelta(int dx, int dy) {
+        if (agvnRawMouse.move(pointer.getX() + dx, pointer.getY() + dy)) return; // AGVN
         try (XLock lock = lock(Lockable.WINDOW_MANAGER, Lockable.INPUT_DEVICE)) {
             pointer.setPosition(pointer.getX() + dx, pointer.getY() + dy);
         }
@@ -207,6 +210,7 @@ public class XServer {
 
     public void injectPointerButtonPress(Pointer.Button buttonCode) {
         if (heldForGame(buttonCode)) inputHold.pressing(-buttonCode.code()); // AGVN
+        if (agvnRawMouse.button(buttonCode, true)) return; // AGVN
         try (XLock lock = lock(Lockable.WINDOW_MANAGER, Lockable.INPUT_DEVICE)) {
             pointer.setButton(buttonCode, true);
         }
@@ -219,6 +223,7 @@ public class XServer {
     }
 
     private void releasePointerButton(Pointer.Button buttonCode) {
+        if (agvnRawMouse.button(buttonCode, false)) return; // AGVN
         try (XLock lock = lock(Lockable.WINDOW_MANAGER, Lockable.INPUT_DEVICE)) {
             pointer.setButton(buttonCode, false);
         }

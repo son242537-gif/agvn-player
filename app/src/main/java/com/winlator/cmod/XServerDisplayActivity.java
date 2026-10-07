@@ -223,6 +223,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private com.winlator.cmod.agvn.AgvnStatusLine agvnStatus; // AGVN: "Bật debug Wine" is on; how a slow start goes
     private volatile com.winlator.cmod.agvn.AgvnStartupProgress agvnStartup;
     private String agvnEffectiveExePath; // AGVN: exe actually launched (Unreal bootstrap -> Shipping redirect)
+    private String agvnStarter = com.winlator.cmod.agvn.AgvnRawMouse.WINLATOR_EXE; // AGVN: or agvn-winhandler.exe
 
     private SensorManager sensorManager;
 
@@ -742,6 +743,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
                     preloaderDialog.setStatusOnUiThread(text); // AGVN: .NET for a .NET game, unpacked once
                     runOnUiThread(() -> agvnStatus.setProgress(text));
                 });
+                agvnStarter = com.winlator.cmod.agvn.AgvnRawMouse.prepare(this, xServer, shortcut); // AGVN: raw input
                 setupWineSystemFiles();
                 extractGraphicsDriverFiles();
                 changeWineAudioDriver();
@@ -3044,7 +3046,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             }
         }
 
-        String command = "winhandler.exe " + args;
+        String command = agvnStarter + " " + args; // AGVN: agvn-winhandler.exe for a game that reads raw input
 
         return command;
     }

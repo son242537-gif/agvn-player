@@ -249,6 +249,7 @@ lỗi: người chơi báo …, thử: …"). Trạng thái nằm cùng file c�
 | Chữ lỗi, ô vuông, ký tự lạ | Chạy game bằng tiếng Nhật; bằng tiếng Trung; về cấu hình gốc |
 | Hình mờ, vỡ hoặc quá nhỏ | Nâng Đồ họa; Godot: Chạy nhẹ; để game Unity tự chọn chất lượng |
 | Hoạt ảnh, video hoặc hiệu ứng không chạy (bản 0.1.28) | Godot: Chạy nhẹ, cách vẽ khác; tắt DXVK async; nâng Đồ họa; để game Unity tự chọn chất lượng; đổi DXVK; đổi driver; WineD3D; về cấu hình gốc |
+| Chạm, bấm không ăn (bản 0.1.31) | Gửi cú chạm như chuột thật, hoặc như trước với game đang bật cách đó; chạy bằng bản Windows (game Chạy nhẹ); về cấu hình gốc |
 | Lỗi khác | Dùng lại cấu hình đã chạy được; về cấu hình gốc; giả lập CPU ổn định hơn; Godot: Chạy nhẹ, cách vẽ khác; đổi DXVK; đổi driver; chạy không có mod |
 
 Mọi lỗi đều kết thúc bằng "Gửi nhật ký". Game "Chạy nhẹ" có thêm "Chạy bằng bản Windows" khi thư mục có file `.exe`.
@@ -286,6 +287,36 @@ Các cách sửa mới (`AgvnRepairFixes`), mỗi cách đổi một cấu hình
   Có ở "Game đứng hình, treo", "Game tự tắt", "Màn hình đen", "Lỗi khác" và ở hộp hỏi tự động khi game crash hay tắt
   ngay. Không giúp được thì cấu hình về như cũ (mod chạy lại). Giúp được thì người chơi biết lỗi do mod: game chạy như
   bản gốc, không có mod. "Về cấu hình gốc" bật lại mod.
+- **Gửi cú chạm như chuột thật** (`raw-mouse`, bản 0.1.31): bật hoặc tắt cách gửi cú chạm của mục "Chạm như chuột thật"
+  bên dưới cho riêng game (`agvnRawMouse` = `1` hay `0`). Không giúp được thì cấu hình về như cũ.
+
+## Chạm như chuột thật (game Windows)
+
+Từ bản 0.1.31 (`AgvnRawMouse`). Phiếu ngày 08/10/2026: Open At Nine (Unity 2020.3.25f1 Mono) vào màn tiêu đề, hình và
+tiếng đúng, nhưng chạm nút menu không có gì xảy ra; chỉ phần đọc chuột kiểu cũ của Unity (`Input.GetMouseButton`) nhận
+cú chạm.
+
+- **Vì sao:** game dùng Input System của Unity cho menu (`InputSystemUIInputModule`). Trên Windows, Input System chỉ
+  đọc chuột từ raw input (`WM_INPUT`). Wine tạo `WM_INPUT` từ `SendInput`, nhưng không tạo từ sự kiện chuột của X
+  server, vì X server của app không có XInput2 (nhật ký Wine: `x11drv_xinput2_init XInput 2.0 not available`). Cú chạm
+  trước đây chỉ đi qua X server, nên game kiểu này không nhận được.
+- **Cách sửa:** với game đó, cú chạm (dời chuột, nhấn và nhả nút, lăn chuột) đi qua `agvn-winhandler.exe`. Đây là
+  `winhandler.exe` của Winlator, dựng lại từ `app/src/main/cpp/winlator/winhandler.c` (script
+  `scripts/agvn/winhandler/build-winhandler.sh`), có thêm lệnh `RC_AGVN_POINTER`: một lần `SendInput` dời chuột tới
+  đúng điểm ảnh rồi nhấn hoặc nhả nút ở đó. Nhờ vậy vị trí cú bấm luôn đúng, và game nhận cả `WM_LBUTTONDOWN` lẫn
+  `WM_INPUT` như với chuột thật. X server vẫn biết con trỏ ở đâu (để vẽ con trỏ), nhưng không gửi sự kiện cho Wine nữa.
+  Vì thế Wine không nhận thêm một lần dời chuột thứ hai, đến muộn. Bản dựng bằng mingw-w64 GCC 13 của Ubuntu 24.04 (gói
+  `gcc-mingw-w64-x86-64-win32`) cho đúng một file, SHA-256
+  `b6a5dd20a0c229973383b720d6c908a34d2051eb8627ba9b05c51afa5be4a4e8`.
+- **Game nào:** game Unity có Input System, tức có `Unity.InputSystem.dll` trong `<tên game>_Data/Managed` (Mono), hoặc
+  có chữ `Unity.InputSystem` trong `il2cpp_data/Metadata/global-metadata.dat` (IL2CPP) (`AgvnUnityInput`). Game khác
+  bật được ở "Tự sửa lỗi" → "Chạm, bấm không ăn". Ở đó, game đang bật cũng tắt được.
+- **Không đổi gì cho các game khác:** chỉ game bật cách này mới chạy qua `agvn-winhandler.exe` (app chép file vào
+  `C:\windows` của container khi mở game). Các game khác vẫn dùng `winhandler.exe` của Winlator và sự kiện của X server
+  như trước. Chế độ chuột tương đối của Winlator vẫn như cũ.
+- **Nhật ký:** `su-kien.txt` có dòng `Chạm gửi như chuột thật, có raw input (qua agvn-winhandler.exe): …` và lý do.
+- **Chưa đo trên máy:** Wine của app (Proton 9, Proton 10) tạo `WM_INPUT` từ `SendInput` theo cách của Windows. Chế độ
+  chuột tương đối của Winlator cũng dựa vào điều này. Cần thử Open At Nine để chốt.
 
 ## App biết gì về từng game (`files/agvn/doctor/`)
 
@@ -785,6 +816,17 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       thanh "GPU hết bộ nhớ dựng hình" hiện trong game với nút hạ Đồ họa; `su-kien.txt` có `GPU hết bộ nhớ dựng hình
       (Mali, TILER_HEAP_OOM) N lần`. Lần mở sau game dùng mức tiết kiệm RAM cao nhất. Game chạy mượt không bị hỏi.
 - [ ] Bản 0.1.30, Cài đặt → cài một bản DXVK, VKD3D hay Box64 đã có sẵn trên máy, hoặc một gói hỏng: app không văng.
+- [ ] Bản 0.1.31, Open At Nine: `su-kien.txt` có `Chạm gửi như chuột thật…: game Unity đọc chuột bằng Input System`.
+      Chạm CÀI ĐẶT thì mở bảng cài đặt, CHƠI MỚI thì vào truyện, chạm màn hình thì sang câu thoại. Bản cheat ghi
+      `AGVN-cheat.log` cạnh exe: có `-> Input moi THAY` từ cú chạm đầu, không có dòng
+      `doi giao dien game sang chuot kieu cu`. Kéo thả (thanh trượt âm lượng) và giữ chạm vẫn đúng chỗ ngón tay.
+- [ ] Bản 0.1.31, một game Unity khác có Input System (như bản GameHub Unity 6): bấm được nút menu bằng chạm.
+- [ ] Bản 0.1.31, game RPG Maker, Ren'Py (qua Windows), KiriKiri và Unity kiểu cũ: `su-kien.txt` không có dòng "Chạm
+      gửi như chuột thật"; bấm, kéo thả, giữ chuột như trước, không bị bấm đôi.
+- [ ] Bản 0.1.31, "Tự sửa lỗi" → "Chạm, bấm không ăn" ở một game Windows bất kỳ: có "Gửi cú chạm như chuột thật";
+      Open At Nine thì có "Gửi cú chạm như trước". Thử rồi chọn "Vẫn còn lỗi": cấu hình về như cũ.
+- [ ] Bản 0.1.31, Mii Chan (Godot 4.5.1 có Spine): app không còn đề nghị "Chạy nhẹ" cho game này. Game đang để Chạy
+      nhẹ thì mở bằng Windows. Hộp "Game Godot bị tắt khi vẽ hình" có Vulkan và Direct3D 11 (ANGLE), không có Chạy nhẹ.
 - [ ] Bản 0.1.29, thoát một game Windows bất kỳ (từ menu, hoặc "Mở lại game ngay" của "Tự sửa lỗi"): gần cuối
       `su-kien.txt` có dòng `Phút cuối của game (mỗi 5 giây): FPS …`. Game chạy mượt thì FPS đều, không có "không vẽ
       khung nào". Rời app rồi thoát game từ thông báo: không có dòng này.

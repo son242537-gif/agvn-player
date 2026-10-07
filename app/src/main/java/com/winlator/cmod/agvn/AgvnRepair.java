@@ -29,13 +29,13 @@ final class AgvnRepair {
             TRIED = "report.tried", HAS_BEFORE = "report.before", BEFORE = "report.before.", AT = "report.at";
     /**
      * Settings the fixes change besides AgvnGoodConfig.KEYS: Đồ họa's texture pool, tier and FPS preset, Unity's own
-     * quality, the runner of a "Chạy nhẹ" game, RPG Maker's frame skip and Godot for Android's renderer. They go back
-     * too.
+     * quality, the runner of a "Chạy nhẹ" game, RPG Maker's frame skip, Godot for Android's renderer and touches as a
+     * real mouse. They go back too.
      */
     static final List<String> MORE_KEYS = Collections.unmodifiableList(Arrays.asList(
             AgvnGameImporter.EXTRA_TEXTURE_POOL, AgvnGameImporter.EXTRA_TIER, "graphicsFpsPreset",
             AgvnUnityQuality.EXTRA_OWN, AgvnHtmlGame.EXTRA_RUNNER, AgvnRgssFiles.EXTRA_FRAME_SKIP,
-            AgvnGodotLight.EXTRA_RENDERER));
+            AgvnGodotLight.EXTRA_RENDERER, AgvnRawMouse.EXTRA));
 
     private AgvnRepair() {}
 

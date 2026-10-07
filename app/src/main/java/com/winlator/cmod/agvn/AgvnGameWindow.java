@@ -8,13 +8,13 @@ import java.util.Locale;
 
 /**
  * The running game's own window: the largest mapped application window, the programs that start it left out (Wine's
- * explorer.exe, its desktop and shell; winhandler.exe and start.exe, which open the game's exe and show Wine's
- * "File not found." box when it is gone: "Vừa màn hình" took a 144x106 one for a game's small frame). In Wine's
+ * explorer.exe, its desktop and shell; winhandler.exe, or AGVN's, and start.exe, which open the game's exe and show
+ * Wine's "File not found." box when it is gone: "Vừa màn hình" took a 144x106 one for a game's small frame). In Wine's
  * virtual desktop ("explorer /desktop=shell,WxH") the game's windows are children of the desktop's window, not of the
  * root, so every level is searched. Call with the X server's window manager locked.
  */
 final class AgvnGameWindow {
-    private static final String[] STARTERS = {"explorer.exe", "winhandler.exe", "start.exe"};
+    private static final String[] STARTERS = {"explorer.exe", "winhandler.exe", AgvnRawMouse.EXE, "start.exe"};
 
     private AgvnGameWindow() {}
 

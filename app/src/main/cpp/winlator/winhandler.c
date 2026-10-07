@@ -33,6 +33,9 @@
 #define RC_KEYBOARD_EVENT 11
 #define RC_BRING_TO_FRONT 12
 #define RC_CURSOR_POS_FEEDBACK 13
+/* AGVN: the mouse at a pixel of the screen, with its buttons; and this winhandler's version, sent after RC_INIT */
+#define RC_AGVN_POINTER 14
+#define AGVN_VERSION 1
 
 #pragma pack(push, 1)
 typedef struct {
@@ -320,6 +323,27 @@ void handleInput(const char *buffer, int len) {
     BYTE vkey = (BYTE)buffer[1];
     int flags = *(int *)(buffer + 2);
     keybd_event(vkey, 0, flags, 0);
+  } else if (code == RC_AGVN_POINTER && len >= 11) {
+    /* AGVN: a touch as a real mouse. One SendInput moves the cursor to the
+       pixel (x, y) and presses or releases its buttons there, so the game gets
+       WM_INPUT too: Unity's Input System reads the mouse only from raw input,
+       which Wine makes from SendInput but not from the X server's core pointer
+       events (the X server has no XInput2). */
+    int flags = *(int *)(buffer + 1);
+    short x = *(short *)(buffer + 5);
+    short y = *(short *)(buffer + 7);
+    short wheel = *(short *)(buffer + 9);
+    int w = GetSystemMetrics(SM_CXSCREEN), h = GetSystemMetrics(SM_CYSCREEN);
+    INPUT in;
+    ZeroMemory(&in, sizeof(in));
+    in.type = INPUT_MOUSE;
+    /* Wine maps 0..65535 to the screen as (v * size) >> 16: rounding up
+       lands on the pixel itself */
+    in.mi.dx = w > 0 ? (LONG)(((LONGLONG)x * 65536 + w - 1) / w) : 0;
+    in.mi.dy = h > 0 ? (LONG)(((LONGLONG)y * 65536 + h - 1) / h) : 0;
+    in.mi.mouseData = (DWORD)(LONG)wheel;
+    in.mi.dwFlags = (DWORD)flags | MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
+    SendInput(1, &in, sizeof(in));
   }
 }
 
@@ -352,7 +376,8 @@ DWORD WINAPI ServerThread(LPVOID lpParam) {
 
   char initBuffer[64];
   initBuffer[0] = RC_INIT;
-  sendto(sock, initBuffer, 1, 0, (struct sockaddr *)&clientAddr, clientAddrLen);
+  initBuffer[1] = AGVN_VERSION; /* AGVN: Winlator's app reads only the code */
+  sendto(sock, initBuffer, 2, 0, (struct sockaddr *)&clientAddr, clientAddrLen);
 
   char buffer[BUFFER_SIZE];
   while (running) {
@@ -384,6 +409,7 @@ DWORD WINAPI ServerThread(LPVOID lpParam) {
         break;
       case RC_MOUSE_EVENT:
       case RC_KEYBOARD_EVENT:
+      case RC_AGVN_POINTER:
         handleInput(buffer, len);
         break;
       case RC_BRING_TO_FRONT:

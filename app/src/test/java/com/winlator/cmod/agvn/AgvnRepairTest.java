@@ -43,7 +43,7 @@ public class AgvnRepairTest {
             assertTrue(p.id + " ends with Gửi nhật ký", p.fixes.get(p.fixes.size() - 1).equals("send-logs"));
             assertFalse(p.id + ": a move to another Wine cannot be put back", p.fixes.contains("wine-old"));
         }
-        assertEquals(11, reported);
+        assertEquals(12, reported);
         // a game that crashed, never started, or ran well: never one of these, whatever it printed
         AgvnEvidence ev = new AgvnEvidence();
         ev.crashed = ev.endedByGame = true;
@@ -63,6 +63,8 @@ public class AgvnRepairTest {
         assertEquals("godot-light", catalog.byId("report-slow").fixes.get(0));
         // a game with mods that freezes: without them second (Rina, BepInEx, 07/10/2026)
         assertEquals(Arrays.asList("emulator-stable", "mods-off"), catalog.byId("report-freeze").fixes.subList(0, 2));
+        // taps a game takes no notice of: as a real mouse first (Open At Nine, Unity Input System, 08/10/2026)
+        assertEquals("raw-mouse", catalog.byId("report-touch").fixes.get(0));
     }
 
     @Test
