@@ -31,6 +31,8 @@ public final class AgvnSlowWatch {
     static final long POLL_S = 5, WARMUP_S = 90;
     static final int WINDOW = 12, SLOW_FPS = 20, STILL_FPS = 5, GPU_BUSY = 85;
     static final double CPU_BUSY = 0.9, CPU_BUSY_ALONE = 0.95;
+    /** game-problems.json: Mali's tiler heap ran out again and again ({@link AgvnEvidence#TILER_OOM_MANY}). */
+    static final String TILER_PROBLEM = "gpu-tiler", TILER_EVENT = "GPU hết bộ nhớ dựng hình (Mali, TILER_HEAP_OOM) ";
 
     /** One poll: frames per second (-1 unknown), GPU percent (-1 unknown), busiest thread in cores (-1 unknown). */
     static final class Sample {
@@ -82,6 +84,8 @@ public final class AgvnSlowWatch {
         if (!polling || SystemClock.uptimeMillis() - lastMs > 3 * POLL_S * 1000) return;
         String last = lastMinute(new ArrayList<>(samples));
         if (last != null) AgvnSessionLog.event(last);
+        int tilerOoms = AgvnWineTail.get().tilerOoms();
+        if (tilerOoms > 0) AgvnSessionLog.event(TILER_EVENT + tilerOoms + " lần cả phiên");
     }
 
     private void poll() {
@@ -94,6 +98,13 @@ public final class AgvnSlowWatch {
                 samples.addLast(new Sample(fps, probe.gpuPercent(now), probe.busiestThread(now)));
                 while (samples.size() > WINDOW) samples.removeFirst();
                 window = new ArrayList<>(samples);
+            }
+            if (!asked && AgvnWineTail.get().tilerOoms() >= AgvnEvidence.TILER_OOM_MANY) {
+                asked = true; // a GPU short of tiler memory stalls the game: asked at once, RAM saved from next start
+                AgvnSessionLog.event(TILER_EVENT + AgvnWineTail.get().tilerOoms() + " lần");
+                AgvnMemorySaver.markRamShort(shortcut);
+                AgvnSlowBar.ask(activity, shortcut, TILER_PROBLEM, params(window), exitGame);
+                return;
             }
             if (asked || !AgvnSessionTrack.started() || AgvnSessionTrack.seconds(System.currentTimeMillis()) < WARMUP_S) return;
             XServerRendererView view = activity.getXServerView();

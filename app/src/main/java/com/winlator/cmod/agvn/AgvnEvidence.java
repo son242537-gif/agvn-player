@@ -24,6 +24,11 @@ final class AgvnEvidence {
      */
     static final long FROZEN_S = 10;
     static final int FROZEN_PRESSES = 5;
+    /**
+     * Mali's tiler heap ran out this often ({@link AgvnWineTail#TILER_OOM}): the GPU draws each frame in parts, so the
+     * game stalls for seconds. Thanh Âm Mùa Hạ (Unreal, Mali-G925, 07/10/2026): 30 to 80 in a minute, 1-5 s stalls.
+     */
+    static final int TILER_OOM_MANY = 20;
 
     final List<String> lines = new ArrayList<>();
     /** Values the problem texts use: "crash", "screen", "free", "fps", "speed", "gpu", "cpu", "godot", "runner", "error". */
@@ -46,6 +51,8 @@ final class AgvnEvidence {
     /** Seconds from the game's last frame to its end (-1: none), and the player's presses in them. */
     long frozenS = -1;
     int frozenPresses;
+    /** Mali's tiler heap ran out this many times in the session ({@link AgvnWineTail#tilerOoms}). */
+    int tilerOoms;
 
     /** The game never drew its window and then closed, or the player gave up on it. */
     boolean noStart() {
@@ -91,8 +98,12 @@ final class AgvnEvidence {
         return frozenS >= FROZEN_S && frozenPresses >= FROZEN_PRESSES;
     }
 
-    /** The game drew its window and ran without a crash or freeze: its settings work and are kept (AgvnGoodConfig). */
+    /**
+     * The game drew its window and ran without a crash, a freeze or its GPU running out of tiler memory again and
+     * again: its settings work and are kept (AgvnGoodConfig).
+     */
     boolean good() {
-        return started && !crashed && killedReason < 0 && !frozeAtEnd() && (playerQuit || seconds >= GOOD_AFTER_S);
+        return started && !crashed && killedReason < 0 && !frozeAtEnd() && tilerOoms < TILER_OOM_MANY
+                && (playerQuit || seconds >= GOOD_AFTER_S);
     }
 }

@@ -47,6 +47,7 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Không tạo được DirectX / thiếu DirectX 11 | Câu lỗi của DXVK, Unity (`InitializeEngineGraphics failed`) | Đổi bản DXVK, đổi driver (Turnip ↔ System), dùng WineD3D |
 | Driver đồ họa lỗi giữa chừng | `VK_ERROR_DEVICE_LOST` | Để Turnip tự chọn chế độ dựng hình, đổi driver, đổi DXVK, hạ Đồ họa |
 | Hết bộ nhớ đồ họa / hết RAM | DXVK, Unity, Unreal báo hết bộ nhớ; DXVK không gắn được bộ nhớ cho texture (`Failed to bind device memory`, xem ví dụ Boxman bên dưới) | Hạ Đồ họa. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ (`giam-ram.md`) |
+| GPU hết bộ nhớ dựng hình (bản 0.1.30) | Driver Mali báo `GROUP_ERROR_TILER_HEAP_OOM` từ 20 lần trong một phiên, khi game đang chạy (xem ví dụ Thanh Âm Mùa Hạ bên dưới) | Hỏi ngay trên thanh trong game: hạ Đồ họa. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ. Phiên đó không được tính là chạy tốt |
 | File game hỏng | Unity: `is corrupted` | Gửi nhật ký (cần chép lại game) |
 | Không tìm thấy file của game | Hộp "File not found." của Wine: file chạy của game, hoặc file game cần, không còn ở chỗ cũ (thư mục game bị đổi tên, chuyển hay xoá) | Gửi nhật ký (cần chép lại thư mục game, thêm lại game) |
 | File chạy của game không đúng định dạng | Hộp "Bad EXE format" của Wine: file được mở không phải chương trình Windows mà Wine chạy được (file hỏng hoặc chép chưa xong, chương trình 16-bit hay DOS, không phải file chạy của game). Trước đây app chỉ báo "Game tắt ngay sau khi mở" | Gửi nhật ký (cần chép lại game, hoặc thêm lại game bằng đúng file chạy) |
@@ -87,6 +88,27 @@ device memory`); Unity không tạo được texture đó (`d3d11: failed to cre
 đó DMA-BUF (bộ nhớ đồ họa) của game lên tới khoảng 1 GB. Đổi giả lập CPU hay Wine không giúp được lỗi này, nên từ bản
 0.1.28 dòng đó thuộc lỗi `gpu-memory` (xét trước `unity-crash`): app đề nghị hạ Đồ họa, và từ lần mở sau dùng mức tiết
 kiệm RAM cao nhất của game (Unity ở chất lượng thấp nhất: texture nhỏ hơn, ít bộ nhớ đồ họa hơn).
+
+Ví dụ ngày 07/10 (bản 0.1.28): Thanh Âm Mùa Hạ (Unreal, `GalHome-Win64-Shipping.exe`, có mod UE4SS) trên Xiaomi
+25060RK16C, GPU Mali-G925-Immortalis, driver của máy. Bốn trong năm lần chơi, driver Mali báo `Received a
+GROUP_ERROR_TILER_HEAP_OOM error` khoảng 0,6 giây một lần (30–80 lần trong `wine-cuoi.txt`). Đó là lúc GPU hết bộ nhớ
+để chia hình thành từng ô màn hình (tiler heap), nên phải vẽ mỗi khung hình thành nhiều phần. Lúc đó:
+- game khựng 1–5 giây liên tục, có lúc đen màn hình;
+- game và app dùng tới 5,5–5,9 GB RAM, máy chỉ còn 0,6–0,7 GB trống;
+- người chơi tự thoát sau hơn một phút.
+
+Lần chơi duy nhất không có lỗi này chỉ dùng 2,7 GB.
+
+Trước bản 0.1.30, người chơi tự thoát sau một phút thì app coi là lần chạy tốt và lưu cấu hình đó. Giờ thì khác:
+- `AgvnWineTail` đếm mọi dòng `TILER_HEAP_OOM`, kể cả những dòng bị gộp trong `wine-cuoi.txt`;
+- từ 20 lần, thanh trong game hỏi ngay ("GPU hết bộ nhớ dựng hình", lỗi `gpu-tiler`, `when: live`) và đề nghị hạ
+  Đồ họa. Từ lần mở sau, game dùng mức tiết kiệm RAM cao nhất (`AgvnMemorySaver.markRamShort`; với Unreal là texture
+  pool nhỏ hơn);
+- phiên đó không được tính là chạy tốt (`AgvnEvidence.good`);
+- `su-kien.txt` ghi số lần.
+
+Lỗi này chỉ nhận ra qua dòng driver in ra, không dựa vào loại GPU. Máy nào báo thì được hỏi, máy chạy tốt không bị
+hỏi.
 
 Khi máy hết RAM, hệ thống có thể tắt riêng tiến trình game mà không tắt AGVN. Lúc đó Wine kết thúc với mã 0, còn Wine,
 DXVK và engine của game đều không kịp ghi gì. Trước đây app coi đó là game thoát bình thường và còn lưu cấu hình đó là
@@ -759,6 +781,10 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       hình, treo": cách thứ hai là "Chạy game không có mod (BepInEx)…". Thử: `moi-truong.txt` của lần chạy đó có
       `winhttp=b`; game chạy không có mod. "Vẫn còn lỗi": lần sau lại `winhttp=n,b` (mod chạy lại).
 - [ ] Bản 0.1.29, game chưa biết engine (Isekai NTR Inn): `su-kien.txt` có `Thư mục game: …` và `File exe: …`.
+- [ ] Bản 0.1.30, máy Mali, một game nặng (Unreal như Thanh Âm Mùa Hạ): khi driver báo `TILER_HEAP_OOM` nhiều lần,
+      thanh "GPU hết bộ nhớ dựng hình" hiện trong game với nút hạ Đồ họa; `su-kien.txt` có `GPU hết bộ nhớ dựng hình
+      (Mali, TILER_HEAP_OOM) N lần`. Lần mở sau game dùng mức tiết kiệm RAM cao nhất. Game chạy mượt không bị hỏi.
+- [ ] Bản 0.1.30, Cài đặt → cài một bản DXVK, VKD3D hay Box64 đã có sẵn trên máy, hoặc một gói hỏng: app không văng.
 - [ ] Bản 0.1.29, thoát một game Windows bất kỳ (từ menu, hoặc "Mở lại game ngay" của "Tự sửa lỗi"): gần cuối
       `su-kien.txt` có dòng `Phút cuối của game (mỗi 5 giây): FPS …`. Game chạy mượt thì FPS đều, không có "không vẽ
       khung nào". Rời app rồi thoát game từ thông báo: không có dòng này.

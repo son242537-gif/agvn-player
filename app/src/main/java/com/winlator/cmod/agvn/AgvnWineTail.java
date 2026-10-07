@@ -21,11 +21,14 @@ import java.util.List;
  * prints two lines hundreds of times a second ({@link AgvnMovieRules}), which pushed everything else out. When no more
  * than {@link #RECENT} come between two kept lines, they are kept after all: DXVK lists Vulkan extensions with
  * "extension supported : 1" under one after another, and its list read "[AGVN] ×1 dòng lặp lại" (0.1.21). The tail goes
- * into the session folder as {@value #FILE}.
+ * into the session folder as {@value #FILE}. Mali's tiler heap running out ({@link #TILER_OOM}) is counted over the
+ * whole session ({@link #tilerOoms}).
  */
 public final class AgvnWineTail implements Callback<String> {
     static final int LINES = 300, CRASH_LINES = 200, LINE_CHARS = 1000, RECENT = 4;
     static final String FILE = "wine-cuoi.txt";
+    /** Mali's driver: the GPU ran out of memory for the geometry it sorts into tiles, and draws a frame in parts. */
+    static final String TILER_OOM = "GROUP_ERROR_TILER_HEAP_OOM";
     private static final AgvnWineTail INSTANCE = new AgvnWineTail();
 
     private final ArrayDeque<String> tail = new ArrayDeque<>();
@@ -34,7 +37,7 @@ public final class AgvnWineTail implements Callback<String> {
     /** The first {@link #RECENT} lines counted in {@link #again}. */
     private final List<String> repeats = new ArrayList<>();
     private boolean inCrash;
-    private int again;
+    private int again, tilerOoms;
 
     public static AgvnWineTail get() {
         return INSTANCE;
@@ -47,13 +50,14 @@ public final class AgvnWineTail implements Callback<String> {
         recentKeys.clear();
         repeats.clear();
         inCrash = false;
-        again = 0;
+        again = tilerOoms = 0;
     }
 
     @Override
     public synchronized void call(String line) {
         if (line == null) return;
         if (line.length() > LINE_CHARS) line = line.substring(0, LINE_CHARS);
+        if (line.contains(TILER_OOM)) tilerOoms++;
         if (!inCrash && crash.isEmpty() && AgvnCrashScan.startsCrash(line)) inCrash = true;
         if (inCrash) {
             crash.add(line);
@@ -80,6 +84,11 @@ public final class AgvnWineTail implements Callback<String> {
     /** The lines counted since the last one kept: themselves when a few, else how many. */
     private List<String> counted() {
         return again <= RECENT ? repeats : Collections.singletonList("[AGVN] ×" + again + " dòng lặp lại");
+    }
+
+    /** How often Mali's driver said the GPU ran out of tiler memory this session ({@link #TILER_OOM}). */
+    public synchronized int tilerOoms() {
+        return tilerOoms;
     }
 
     /** The first crash report of the game, or an empty list. */
