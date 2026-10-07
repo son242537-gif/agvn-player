@@ -500,6 +500,11 @@ Unity trống cả 5 lần chạy; chỉ biến `WINEDLLOVERRIDES` trong `moi-tr
 nạp BepInEx), mà nhật ký của BepInEx thì app chưa chép. Isekai NTR Inn không có nhật ký engine nào và không biết là
 engine gì. Máy HONOR cũng không cho app đọc logcat (`logcat.txt` chỉ có một dòng mã hoá).
 
+Game HTML (RPG Maker MV/MZ, Tyrano): một thông báo của trang lặp lại chỉ được ghi vào logcat lần đầu, rồi lần thứ 10,
+100, 1000… kèm số lần (`AgvnHtmlConsole.repeat`, bản 0.1.28). Lý do: nhật ký Train45 gửi ngày 07/10/2026 có `logcat.txt`
+toàn một dòng của một game RPG Maker khác chạy trước đó ("The provided value 'undefined' is not a valid enum value of
+type CanvasTextAlign": plugin vẽ chữ không kèm cách canh), 19.339 lần trong 9 phút, nên logcat không còn gì khác.
+
 ## Nhật ký Wine luôn có dòng lỗi
 
 Khi tắt "Bật debug Wine", app vẫn cho Wine in ba nhóm lỗi: `err+module` (thiếu hoặc hỏng file `.dll`), `err+mscoree`

@@ -9,9 +9,24 @@ import android.webkit.WebChromeClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-/** Game script messages in logcat (tag AgvnHtml): warnings and errors always, everything with a log setting on. */
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/**
+ * Game script messages in logcat (tag AgvnHtml): warnings and errors always, everything with a log setting on. A
+ * message seen again is counted, not logged again ({@link #repeat}).
+ */
 public final class AgvnHtmlConsole extends WebChromeClient {
+    /** Messages told apart at once: a flood of up to this many different messages is folded. */
+    static final int KEYS = 32;
     private final boolean all;
+    /** Times each recent message came; the least recently seen goes first. UI thread only. */
+    private final Map<String, int[]> seen = new LinkedHashMap<String, int[]>(KEYS, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, int[]> eldest) {
+            return size() > KEYS;
+        }
+    };
 
     AgvnHtmlConsole(boolean all) {
         this.all = all;
@@ -22,9 +37,26 @@ public final class AgvnHtmlConsole extends WebChromeClient {
         ConsoleMessage.MessageLevel level = m.messageLevel();
         boolean problem = level == ConsoleMessage.MessageLevel.ERROR || level == ConsoleMessage.MessageLevel.WARNING;
         if (all || problem) {
-            Log.println(problem ? Log.WARN : Log.INFO, "AgvnHtml", m.message() + " (" + m.sourceId() + ":" + m.lineNumber() + ")");
+            String line = repeat(seen, m.message() + " (" + m.sourceId() + ":" + m.lineNumber() + ")");
+            if (line != null) Log.println(problem ? Log.WARN : Log.INFO, "AgvnHtml", line);
         }
         return true;
+    }
+
+    /**
+     * {@code text} as logged: whole the first time, then only the 10th, 100th, 1000th... time, with its count; null
+     * the other times. An RPG Maker game drawing text without an alignment had WebView warn "The provided value
+     * 'undefined' is not a valid enum value of type CanvasTextAlign" 19,339 times in 9 minutes, and the logcat that
+     * "Gửi nhật ký" sent kept nothing else (07/10/2026).
+     */
+    static String repeat(Map<String, int[]> seen, String text) {
+        int[] times = seen.get(text);
+        if (times == null) seen.put(text, times = new int[1]);
+        int count = ++times[0];
+        if (count == 1) return text;
+        long power = 10;
+        while (power < count) power *= 10;
+        return power == count ? text + " (×" + count + ")" : null;
     }
 
     /** No grey "play" picture on a game video before its first frame. */
