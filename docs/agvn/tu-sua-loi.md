@@ -541,6 +541,20 @@ App có hai bản Wine. Mỗi bản có môi trường chạy (container) riêng
   app chuyển lối tắt sang container kia: file lối tắt, biểu tượng, save trong thư mục Windows (`AgvnSaveLocations`,
   phần `profile/`) và PlayerPrefs của Unity (`AgvnSavePrefs`). Thư mục game không đổi, save nằm trong đó giữ nguyên. Chuyển
   lúc mở chứ không lúc đang chơi, vì game đang chạy ghi lại cài đặt vào file của nó khi tắt.
+- **Bản mới của một game đã có** (`AgvnGameVersions`, từ bản 0.1.33). Phiếu ngày 08/10/2026: khách nhập bản mới AGVN
+  phát hành của một game (thư mục mới, như `…-v0.7.6-VIET-…`) thì mất save, và lần mở đầu tải rất lâu.
+  - Vì sao: thư viện chỉ nhận ra một game qua thư mục của nó. Bản mới bị coi là game mới nên vào container Proton 10,
+    còn bản cũ ở container Proton 9. Save trong thư mục Windows của container cũ (Unity `LocalLow` và PlayerPrefs, Unreal
+    `SaveGames`, Ren'Py `AppData`) không có ở container mới. Container đó cũng chưa có cache shader của game.
+  - Cách sửa: khi thêm game, nếu thư viện có bản khác của cùng game thì bản mới vào đúng container của bản cũ. Save
+    ở đó dùng chung luôn, như cài bản mới trên PC. Save nằm trong thư mục game cũ (RPG Maker, Ren'Py, KiriKiri...)
+    được chép sang thư mục mới, nhưng chỉ khi chỗ đó ở bản mới chưa có save nào; save của bản mới không bao giờ bị
+    ghi đè. Thông báo sau khi thêm: "Đây là bản mới của …: game dùng chung save với bản cũ."
+  - Cùng game: trùng tên file exe, và với Unity thì trùng hãng và tên game trong `app.info` (Unity lưu save theo hai tên
+    này). Game khác thì so tên game đã bỏ số phiên bản (`v0.7.5`, `1.044`). Số của phần tiếp theo ("Game 2") được giữ
+    lại, nên không bị nhầm với phần trước.
+  - Khách đã nhập bản mới trước khi có bản sửa này: save vẫn còn ở bản cũ. Trong thư viện, menu ⋮ của bản cũ →
+    "Xuất save", rồi menu ⋮ của bản mới → "Nhập save" và chọn file .zip vừa xuất (có cả PlayerPrefs của Unity).
 - **Đường lui:** game chạy Proton 10 mà "Game bị lỗi và tự tắt" hoặc "Game tắt ngay sau khi mở": "Tự sửa lỗi" có "Chạy
   bằng Wine cũ (Proton 9)". Bấm thì game về Proton 9 ở lần mở sau, và Proton 10 không được đề nghị cho game đó nữa
   (`agvnNotWine10`).
@@ -848,6 +862,9 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       4.x.y: …`. Nếu là 4.2.x: "Tự sửa lỗi" có "Chạy nhẹ"; chạy nhẹ thì con gà và hiệu ứng tim (cảnh Spine) hiện và
       chuyển động, `godot.log` không có "Cannot get class 'SpineSkeletonDataResource'", vào được màn chơi. Nếu là bản
       khác (4.3...): app không đề nghị "Chạy nhẹ", hộp "Game Godot bị tắt khi vẽ hình" có Vulkan và Direct3D 11 (ANGLE).
+- [ ] Bản 0.1.33, một game Unity đã chơi có save, thêm bản mới của nó ở thư mục khác: thông báo "Đây là bản mới
+      của …"; bản mới cùng container với bản cũ, vào game thấy save cũ. Game RPG Maker MV: thư mục `www/save` của bản
+      mới có các file save của bản cũ. Thêm một game khác hẳn: vẫn vào Proton 10 như trước.
 - [ ] Bản 0.1.32, bàn phím Bluetooth hoặc bộ thu USB: `thiet-bi.txt` có dòng `Bàn phím, chuột, tay cầm ngoài: …`.
       Trong game Windows gõ chữ, mũi tên, Enter, Esc được; `su-kien.txt` có `Bàn phím "…": phím tới game`. Bàn phím mà
       dòng đó ghi "Android gọi là tay cầm" (như của Av Director Life) cũng vậy.

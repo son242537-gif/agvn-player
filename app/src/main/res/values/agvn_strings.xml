@@ -29,6 +29,7 @@
     <string name="agvn_import_no_container">Chưa có môi trường chạy (container). Hãy hoàn tất phần cài đặt ban đầu rồi thử lại.</string>
     <string name="agvn_import_failed">Không nhập được game: %1$s</string>
     <string name="agvn_import_done">Đã thêm \"%1$s\" vào thư viện</string>
+    <string name="agvn_import_new_version">Đã thêm \"%1$s\". Đây là bản mới của \"%2$s\": game dùng chung save với bản cũ.</string>
     <string name="agvn_import_error_title">Profile game không hợp lệ</string>
     <string name="agvn_import_summary">Tự tìm game trong thư mục AGVN, Download và thẻ nhớ</string>
     <string name="agvn_tier_title">Chế độ thiết bị</string>

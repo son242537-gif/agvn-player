@@ -106,15 +106,24 @@ public final class AgvnImportDialog {
         // setting Proton 10 up, writing the shortcut and reading the exe icon touch storage: off the main thread
         IO.execute(() -> {
             Exception error = null;
+            String olderName = null;
             try {
-                Container container = known != null ? known
+                // AGVN: another version of a game in the library joins its container, where its saves are
+                com.winlator.cmod.container.Shortcut older = known != null ? null : AgvnGameVersions.older(
+                        new ContainerManager(activity).loadShortcuts(), candidate.profile.name, exe);
+                Container container = known != null ? known : older != null ? older.container
                         : AgvnWine10.forImport(activity, exe, percent -> activity.runOnUiThread(() -> preparing(activity, percent)));
                 if (container == null) throw new IllegalStateException(activity.getString(R.string.agvn_import_no_container));
-                AgvnGameImporter.importGame(activity, container, candidate, tier);
+                File made = AgvnGameImporter.importGame(activity, container, candidate, tier);
+                if (older != null) {
+                    AgvnGameVersions.copyFolderSaves(older, new com.winlator.cmod.container.Shortcut(container, made));
+                    olderName = older.name;
+                }
             } catch (Exception e) {
                 error = e;
             }
             Exception failure = error;
+            String sharedWith = olderName;
             activity.runOnUiThread(() -> {
                 preparing(activity, -1);
                 if (activity.isFinishing() || activity.isDestroyed()) return;
@@ -122,7 +131,10 @@ public final class AgvnImportDialog {
                     showError(activity, activity.getString(R.string.agvn_import_failed, String.valueOf(failure.getMessage())));
                     return;
                 }
-                Toast.makeText(activity, activity.getString(R.string.agvn_import_done, candidate.profile.name), Toast.LENGTH_LONG).show();
+                String done = sharedWith != null
+                        ? activity.getString(R.string.agvn_import_new_version, candidate.profile.name, sharedWith)
+                        : activity.getString(R.string.agvn_import_done, candidate.profile.name);
+                Toast.makeText(activity, done, Toast.LENGTH_LONG).show();
                 if (onImported != null) onImported.run();
                 activity.navigateToMainDestination(R.id.main_menu_shortcuts);
             });
