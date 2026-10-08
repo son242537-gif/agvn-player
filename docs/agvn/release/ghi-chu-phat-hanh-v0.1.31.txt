@@ -1,0 +1,9 @@
+AGVN Player v0.1.31 - agvn.io
+
+Mới:
+- Game Godot làm bằng Spine (hoạt hình xương, bản Spine 4.2) giờ "Chạy nhẹ" được: nhân vật và hiệu ứng Spine hiện và chuyển động như trên máy tính. Game dùng Spine bản khác vẫn chạy bằng Windows.
+- "Tự sửa lỗi" có thêm lỗi "Chạm, bấm không ăn": app gửi cú chạm như chuột thật cho game không nhận cú chạm.
+Sửa lỗi:
+- Game Unity dùng Input System (như Open At Nine) giờ bấm được nút và menu bằng chạm. Trước đây game hiện hình bình thường nhưng chạm không có tác dụng.
+- Game Godot dùng Spine bản khác 4.2 không còn bị đưa vào "Chạy nhẹ", nơi game chỉ vào được menu còn các cảnh Spine bị lỗi.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
