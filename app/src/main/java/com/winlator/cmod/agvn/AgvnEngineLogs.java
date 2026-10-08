@@ -103,6 +103,7 @@ final class AgvnEngineLogs {
         out.add(new File(exeDir, "BepInEx/LogOutput.log")); // mod loaders next to the exe: BepInEx (winhttp.dll),
         out.add(new File(exeDir, "MelonLoader/Latest.log")); // MelonLoader (version.dll)
         out.add(new File(exeDir, "ue4ss/UE4SS.log")); // and UE4SS (dwmapi.dll) of Unreal games
+        out.add(new File(exeDir, "AGVN-cheat.log")); // AGVN's cheat (agvncheat.dll) of AGVN game packages
         return out;
     }
 

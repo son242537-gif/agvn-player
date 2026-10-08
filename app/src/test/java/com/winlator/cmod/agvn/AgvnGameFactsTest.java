@@ -37,6 +37,8 @@ public class AgvnGameFactsTest {
         List<File> logs = AgvnEngineLogs.candidates(exe, exe.getParentFile(), "UNITY", tmp.getRoot());
         assertTrue(logs.contains(new File(exe.getParentFile(), "BepInEx/LogOutput.log")));
         assertTrue(logs.contains(new File(exe.getParentFile(), "MelonLoader/Latest.log")));
+        // Thorn Sin, 08/10/2026: AGVN's cheat (agvncheat.dll) writes its own log next to the exe
+        assertTrue(logs.contains(new File(exe.getParentFile(), "AGVN-cheat.log")));
     }
 
     @Test
