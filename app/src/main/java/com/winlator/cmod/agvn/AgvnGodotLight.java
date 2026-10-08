@@ -152,7 +152,8 @@ public final class AgvnGodotLight {
         AgvnGodotPack pack = mainPack(exe);
         Fit fit = fit(pack);
         if (fit != Fit.OK) {
-            Log.w(TAG, "Godot game " + exe + " goes to Wine: " + fit);
+            String needs = fit == Fit.MODULES ? " " + AgvnGodotModules.missing(pack) : "";
+            Log.w(TAG, "Godot game " + exe + " goes to Wine: " + fit + needs);
             return false;
         }
         if (!AgvnHtmlGame.RUNNER_GODOT.equals(shortcut.getExtra(AgvnHtmlGame.EXTRA_RUNNER))) {

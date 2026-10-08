@@ -267,9 +267,21 @@ Anh Sơn quyết định ngày 05/10/2026, sau khi Party Me (Godot 4.6) đứng 
   - game có module dựng sẵn trong engine riêng của nó mà engine của app không có (bản 0.1.31, `AgvnGodotModules`).
     Hiện app nhận ra Spine: gói có file `.spatlas`, `.spskel` hay `.spjson` trong `.godot/imported/`. Mii Chan (Godot
     4.5.1 có spine-godot, 08/10/2026) Chạy nhẹ thì vào được menu, nhưng mọi cảnh Spine lỗi ("Cannot get class
-    'SpineSkeletonDataResource'") và phần quản lý game không nạp được. Spine Runtimes dùng giấy phép riêng của Esoteric
-    Software, không phải mã nguồn mở, nên app không tự thêm Spine vào engine; việc này cần anh Sơn quyết;
+    'SpineSkeletonDataResource'") và phần quản lý game không nạp được. `su-kien.txt` của game Godot có Spine ghi bản
+    Spine của game (`Game Godot dùng Spine 4.2.43: …`, đọc từ skeleton trong gói);
   - Godot bản mới hơn 4.7.
+- **Spine trong engine** (anh Sơn quyết thêm ngày 08/10/2026, chưa xong):
+  - **Giấy phép:** Spine Runtimes không phải mã nguồn mở. Phát hành app có Spine cho người chơi không có giấy phép
+    Spine thì AGVN phải có giấy phép Spine (Essential trở lên) từ lúc đưa Spine vào ("Section 2" của Spine Editor
+    License Agreement), và màn "Giấy phép mã nguồn mở" phải có giấy phép Spine Runtimes. Phần Spine không theo GPL.
+  - **Bản Spine:** spine-godot chỉ đọc skeleton xuất từ đúng bản của nó (4.2 đọc 4.2.x). Nhánh 4.2 là bản ổn định game
+    đang dùng; nhánh 4.3 còn đổi lớn. Nhật ký phiên chơi giờ ghi bản Spine của game, để chọn bản cho engine.
+  - **Dựng:** spine-godot 4.2 (commit `e7dc1435`) chưa theo Godot 4.7: dựng thử báo thiếu `core/object/callable_mp.h`,
+    `RS`/`RenderingServerEnums` trong `SpineSprite.h`, và `memnew(JSON)` giờ là `Ref<JSON>`. Nhánh 4.3 đã sửa các chỗ
+    đó (`#if VERSION_MINOR >= 7`), nên vá cho 4.2 theo cùng cách. Phiên cloud bị bộ lọc an toàn chặn bước vá và dựng
+    mã Spine (mã tải từ ngoài), nên việc này dừng ở đây.
+  - **Khi engine có Spine:** `AgvnGodotModules` cho game Spine cùng bản vào Chạy nhẹ (so bản của skeleton với bản
+    Spine của engine), game Spine bản khác vẫn chạy bằng Windows.
 - **Đã làm** (nhánh `agvn/p54-godot-native`, xếp trên bản 0.1.20, chờ anh Sơn thử máy):
   - **Trong app:** `AgvnGodotActivity` (lớp con `GodotActivity` của Godot) chạy game trong tiến trình riêng `:godot`.
     Dòng lệnh: `--main-pack <gói> --log-file AGVN-Player/godot/<thư mục game>/godot.log --fullscreen`. Có thêm

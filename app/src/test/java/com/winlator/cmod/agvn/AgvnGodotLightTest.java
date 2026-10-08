@@ -109,11 +109,6 @@ public class AgvnGodotLightTest {
         File ext = write("d.pck", pack(3, 6, new String[]{".godot/extension_list.cfg", "main.gdc"},
                 new byte[][]{"res://addons/godotsteam/godotsteam.gdextension".getBytes(), tokens(101)}, new int[]{0, 0}));
         assertEquals(AgvnGodotLight.Fit.EXTENSIONS, AgvnGodotLight.fit(AgvnGodotPack.open(ext)));
-        // Mii Chan: Godot 4.5.1 with spine-godot built in, whose atlases Godot 4.7 for Android has no loader for
-        File spine = write("i.pck", pack(3, 5, new String[]{".godot/imported/chicken.atlas-629e.spatlas", "main.gdc"},
-                new byte[][]{"atlas".getBytes(), tokens(101)}, new int[]{0, 0}));
-        assertEquals(AgvnGodotLight.Fit.MODULES, AgvnGodotLight.fit(AgvnGodotPack.open(spine)));
-        assertEquals("Spine", AgvnGodotModules.missing(AgvnGodotPack.open(spine)));
         File enc = write("e.pck", pack(3, 6, new String[]{"main.gdc"}, new byte[][]{tokens(101)}, new int[]{AgvnGodotPack.FILE_ENCRYPTED}));
         assertEquals(AgvnGodotLight.Fit.ENCRYPTED, AgvnGodotLight.fit(AgvnGodotPack.open(enc)));
         File cs = write("f.pck", pack(3, 6, new String[]{"Main.cs"}, new byte[][]{"class".getBytes()}, new int[]{0}));
@@ -121,6 +116,31 @@ public class AgvnGodotLightTest {
         File godot3 = write("g.pck", Arrays.copyOf(le(24).putInt(AgvnGodotFiles.MAGIC).putInt(1).putInt(3).putInt(5).array(), 120));
         assertEquals(AgvnGodotLight.Fit.NOT_GODOT_4, AgvnGodotLight.fit(AgvnGodotPack.open(godot3)));
         assertEquals(AgvnGodotLight.Fit.NO_PACK, AgvnGodotLight.fit(AgvnGodotPack.open(write("h.pck", "Siglus' own pack".getBytes()))));
+    }
+
+    /** A pack with spine-godot's atlas and a skeleton exported from Spine {@code version}, binary or JSON. */
+    private File spineGame(String name, String version, boolean json) throws IOException {
+        byte[] v = version.getBytes(StandardCharsets.US_ASCII), skel = new byte[9 + v.length + 4];
+        skel[8] = (byte) (v.length + 1); // a hash, then the version: its length plus one, then its bytes
+        System.arraycopy(v, 0, skel, 9, v.length);
+        if (json) skel = ("{\"skeleton\":{\"hash\":\"x\",\"spine\":\"" + version + "\"},\"bones\":[]}").getBytes();
+        String imported = json ? ".godot/imported/chick.json-1f.spjson" : ".godot/imported/chick.skel-cb2b.spskel";
+        return write(name, pack(3, 5, new String[]{".godot/imported/chick.atlas-629e.spatlas", imported, "main.gdc"},
+                new byte[][]{"atlas".getBytes(), skel, tokens(101)}, new int[]{0, 0, 0}));
+    }
+
+    @Test
+    public void spineGamesStayOnWindows() throws IOException {
+        // Mii Chan: Godot 4.5.1 with spine-godot built in, which Godot 4.7 for Android lacks; the log names its Spine
+        AgvnGodotPack binary = AgvnGodotPack.open(spineGame("i.pck", "4.2.43", false));
+        assertEquals("4.2.43", AgvnGodotModules.spineVersion(binary));
+        assertEquals(AgvnGodotLight.Fit.MODULES, AgvnGodotLight.fit(binary));
+        assertEquals("Spine 4.2.43", AgvnGodotModules.missing(binary));
+        AgvnGodotPack json = AgvnGodotPack.open(spineGame("j.pck", "4.3.02", true));
+        assertEquals("4.3.02", AgvnGodotModules.spineVersion(json));
+        assertEquals(AgvnGodotLight.Fit.MODULES, AgvnGodotLight.fit(json));
+        assertTrue(AgvnGodotModules.fact(json).startsWith("Game Godot dùng Spine 4.3.02"));
+        assertNull(AgvnGodotModules.fact(AgvnGodotPack.open(write("l.pck", game(3, 5, "main.gdc", tokens(101))))));
     }
 
     @Test

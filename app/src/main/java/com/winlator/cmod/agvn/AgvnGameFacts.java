@@ -41,6 +41,10 @@ final class AgvnGameFacts {
         facts.addAll(mods);
         String pe = unknown ? AgvnPeFacts.describe(exe) : null;
         if (pe != null) facts.add(pe);
+        if (GameExeResolver.Engine.GODOT.name().equals(engine)) { // which Spine a Godot game was made with, if any
+            String spine = AgvnGodotModules.fact(AgvnGodotLight.mainPack(exe));
+            if (spine != null) facts.add(spine);
+        }
         return facts;
     }
 
