@@ -791,6 +791,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     }
 
     private void handleCapturedPointer(MotionEvent event) {
+        com.winlator.cmod.agvn.AgvnInputDevices.click(event, true, xServer.isMouseDisabled());
         switch (event.getAction()) {
             case MotionEvent.ACTION_BUTTON_PRESS: {
                 int button = event.getActionButton();
@@ -2723,6 +2724,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     @Override
     public boolean dispatchGenericMotionEvent(MotionEvent event) {
         com.winlator.cmod.agvn.AgvnMemoryWatch.touched();
+        if (xServer != null) com.winlator.cmod.agvn.AgvnInputDevices.click(event, false, xServer.isMouseDisabled());
         boolean handledByWinHandler = false;
         boolean handledByTouchpadView = false;
 
@@ -2764,9 +2766,13 @@ public class XServerDisplayActivity extends AppCompatActivity {
             }
         }
 
-        return (!inputControlsView.onKeyEvent(event) && !winHandler.onKeyEvent(event)
-                && xServer.keyboard.onKeyEvent(event)) ||
-                (!ExternalController.isGameController(event.getDevice()) && super.dispatchKeyEvent(event));
+        // AGVN: same order as before; a keyboard Android also calls a gamepad keeps its typing and system keys
+        boolean bound = inputControlsView.onKeyEvent(event);
+        boolean toGamepad = !bound && winHandler.onKeyEvent(event);
+        boolean toKeyboard = !bound && !toGamepad && xServer.keyboard.onKeyEvent(event);
+        com.winlator.cmod.agvn.AgvnInputDevices.key(event, bound || toKeyboard);
+        return toKeyboard
+                || (!com.winlator.cmod.agvn.AgvnInputDevices.gamepadKey(event) && super.dispatchKeyEvent(event));
     }
 
     public InputControlsView getInputControlsView() {

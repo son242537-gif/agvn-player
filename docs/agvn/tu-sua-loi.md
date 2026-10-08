@@ -318,6 +318,25 @@ cú chạm.
 - **Chưa đo trên máy:** Wine của app (Proton 9, Proton 10) tạo `WM_INPUT` từ `SendInput` theo cách của Windows. Chế độ
   chuột tương đối của Winlator cũng dựa vào điều này. Cần thử Open At Nine để chốt.
 
+## Bàn phím, chuột ngoài (game Windows)
+
+Từ bản 0.1.32 (`AgvnInputDevices`). Phiếu ngày 08/10/2026: Av Director Life (Unreal) trên Lenovo TB321FU, bản 0.1.30.
+Người chơi nối bàn phím và chuột không dây nhưng game không nhận. Khi mở màn gán phím cho thiết bị ngoài, app văng
+(`NullPointerException` ở `ControlsProfile.save`).
+
+- **Vì sao không nhận phím:** Android coi nhiều bàn phím không dây và bộ thu USB (bàn phím kèm chuột) là cả tay cầm, vì
+  bảng mô tả HID của chúng có nút tay cầm (nguồn có `SOURCE_GAMEPAD`). Winlator thấy thiết bị là tay cầm thì bỏ mọi phím
+  của nó khỏi bàn phím game (`Keyboard.onKeyEvent`), còn phím mũi tên thành D-pad. Game không nhận được phím nào.
+- **Cách sửa:** một phím chỉ dành cho tay cầm khi tay cầm bấm được nó: nút tay cầm (`KeyEvent.isGamepadButton`), hoặc
+  mọi phím của thiết bị không có phím chữ (tay cầm thật). Phím chữ, mũi tên, Enter, Esc của bàn phím đầy đủ luôn tới
+  game. Phím Android (quay lại, âm lượng) của bàn phím đó cũng hoạt động lại. Tay cầm thật không đổi gì.
+- **Màn gán phím:** thiết bị ngắt kết nối (ngủ, rút ra) trước khi màn mở hoặc mở lại (xoay máy) thì app báo "Thiết bị
+  này vừa ngắt kết nối…" và đóng màn, không văng.
+- **Nhật ký:** `thiet-bi.txt` có dòng `Bàn phím, chuột, tay cầm ngoài: …` với tên, loại (bàn phím chữ, chuột, tay cầm)
+  và nguồn Android báo. `su-kien.txt` có các thiết bị đang nối lúc mở game. Mỗi thiết bị, mỗi lần chơi có một dòng:
+  `Bàn phím "…": phím tới game` hoặc `phím … không tới game (…)`, `Chuột "…": app nhận cú bấm (…)`. Nếu "Tắt chuột"
+  đang bật, dòng chuột ghi rõ game không nhận. Không có dòng nào nghĩa là Android không gửi phím, cú bấm cho app.
+
 ## App biết gì về từng game (`files/agvn/doctor/`)
 
 - **Cấu hình đã chạy được:** cấu hình của lần chơi gần nhất mà game hiện hình và không crash, kéo dài ít nhất 1
@@ -829,6 +848,13 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       4.x.y: …`. Nếu là 4.2.x: "Tự sửa lỗi" có "Chạy nhẹ"; chạy nhẹ thì con gà và hiệu ứng tim (cảnh Spine) hiện và
       chuyển động, `godot.log` không có "Cannot get class 'SpineSkeletonDataResource'", vào được màn chơi. Nếu là bản
       khác (4.3...): app không đề nghị "Chạy nhẹ", hộp "Game Godot bị tắt khi vẽ hình" có Vulkan và Direct3D 11 (ANGLE).
+- [ ] Bản 0.1.32, bàn phím Bluetooth hoặc bộ thu USB: `thiet-bi.txt` có dòng `Bàn phím, chuột, tay cầm ngoài: …`.
+      Trong game Windows gõ chữ, mũi tên, Enter, Esc được; `su-kien.txt` có `Bàn phím "…": phím tới game`. Bàn phím mà
+      dòng đó ghi "Android gọi là tay cầm" (như của Av Director Life) cũng vậy.
+- [ ] Bản 0.1.32, tay cầm thật (Xbox, DualSense...): nút, D-pad và cần analog vẫn tới game như trước.
+- [ ] Bản 0.1.32, chuột ngoài: `su-kien.txt` có `Chuột "…": app nhận cú bấm (app đang giữ chuột)`.
+- [ ] Bản 0.1.32, Điều khiển → mở màn gán phím của một thiết bị, tắt thiết bị rồi xoay máy: app báo thiết bị vừa
+      ngắt kết nối, không văng.
 - [ ] Bản 0.1.29, thoát một game Windows bất kỳ (từ menu, hoặc "Mở lại game ngay" của "Tự sửa lỗi"): gần cuối
       `su-kien.txt` có dòng `Phút cuối của game (mỗi 5 giây): FPS …`. Game chạy mượt thì FPS đều, không có "không vẽ
       khung nào". Rời app rồi thoát game từ thông báo: không có dòng này.

@@ -24,7 +24,7 @@ import java.util.TreeSet;
  * thiet-bi.txt: what decides how games run on this phone, so that a player on any phone can send it with "Gửi nhật ký"
  * and the tiers (device-tiers.json) can be tuned for phones AGVN has not seen: chip, GPU and its Vulkan, CPU cores,
  * RAM, screen refresh rates, heat, battery saver, Android's game mode, the tier and why, the drivers tried
- * ({@link AgvnDeviceFacts}).
+ * ({@link AgvnDeviceFacts}), the keyboards, mice and gamepads plugged in ({@link AgvnInputDevices}).
  */
 final class AgvnDeviceReport {
     private static final String[] THERMAL = {"bình thường", "hơi ấm", "ấm", "nóng", "rất nóng", "khẩn cấp", "sắp tắt máy"};
@@ -76,6 +76,9 @@ final class AgvnDeviceReport {
         } catch (Throwable ignored) {}
         try {
             lines.add("Driver đã thử: " + AgvnDeviceFacts.drivers(ctx));
+        } catch (Throwable ignored) {}
+        try {
+            lines.add(AgvnInputDevices.line());
         } catch (Throwable ignored) {}
         return lines;
     }

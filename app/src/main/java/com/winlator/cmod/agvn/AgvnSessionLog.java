@@ -63,7 +63,8 @@ public final class AgvnSessionLog {
             write(new File(dir, ENV), graphicsEnv(env), false);
             current = dir;
             for (String fact : AgvnGameFacts.of(shortcut)) event(fact); // what runs: exe, engine, DLLs, folders, mods
-            String[] notes = {AgvnMemorySaver.takeNote(), AgvnWineMono.takeNote(), AgvnRawMouse.takeNote()};
+            String[] notes = {AgvnMemorySaver.takeNote(), AgvnWineMono.takeNote(), AgvnRawMouse.takeNote(),
+                    AgvnInputDevices.sessionStart()};
             for (String note : notes) if (note != null) event(note);
             AgvnLogFolders.prune(gameLogs);
             AgvnLogFolders.pruneLoose(root(), System.currentTimeMillis());

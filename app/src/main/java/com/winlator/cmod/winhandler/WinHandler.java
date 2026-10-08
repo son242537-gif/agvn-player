@@ -740,7 +740,9 @@ public void setVibrationEnabledForSlot(int slot, boolean enabled) {
         boolean handled = false;
         ExternalController controller = getController(event.getDeviceId());
 
-        if (controller != null && event.getRepeatCount() == 0) {
+        // AGVN: arrows, Enter... of a keyboard Android also calls a gamepad go to the game's keyboard
+        if (controller != null && event.getRepeatCount() == 0
+                && com.winlator.cmod.agvn.AgvnInputDevices.gamepadKey(event)) {
             int action = event.getAction();
 
             if (action == KeyEvent.ACTION_DOWN) {

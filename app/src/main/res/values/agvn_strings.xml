@@ -385,4 +385,6 @@
     <string name="agvn_wine_mono_installing">Đang cài .NET cho game, chỉ lần đầu: %1$d%%</string>
     <string name="agvn_wine_mono_no_space">Chưa cài được .NET cho game: cần %1$d MB trống, máy chỉ còn %2$d MB. Hãy xoá bớt file rồi mở lại game.</string>
     <string name="agvn_wine_mono_failed">Chưa cài được .NET cho game. Hãy mở lại game, nếu vẫn lỗi thì gửi nhật ký cho AGVN.</string>
+    <!-- Key settings of a device that left before its screen opened (ExternalControllerBindingsActivity) -->
+    <string name="agvn_controller_gone">Thiết bị này vừa ngắt kết nối. Hãy bật hoặc cắm lại rồi mở lại.</string>
 </resources>
