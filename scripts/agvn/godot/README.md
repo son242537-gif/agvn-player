@@ -15,8 +15,26 @@ viện chính thức cùng phiên bản: `app/agvn-godot.gradle` tải nó (ghim
 trong bằng bản này (ghim `godot_so_sha256`). Hai bên gọi nhau theo tên hàm JNI, nên phải cùng phiên bản: đổi phiên bản
 ở `sources.lock` thì đổi cả `godotVersion` trong `app/agvn-godot.gradle`.
 
-Script còn tạo `app/src/main/assets/agvn/godot-license.txt`, gồm `LICENSE.txt` và `COPYRIGHT.txt` của Godot cùng giấy
-phép của Swappy. Màn "Giấy phép mã nguồn mở" hiện nguyên văn file này ở cuối trang.
+Script còn tạo `app/src/main/assets/agvn/godot-license.txt`, gồm `LICENSE.txt` và `COPYRIGHT.txt` của Godot, giấy phép
+của Swappy và giấy phép Spine Runtimes. Màn "Giấy phép mã nguồn mở" hiện nguyên văn file này ở cuối trang.
+
+## Spine (từ bản 0.1.31)
+
+Engine có Spine 4.2 (spine-godot dựng vào engine dạng module, như bản "Godot có Spine" của Esoteric), để game Godot làm
+bằng Spine Chạy nhẹ được (Mii Chan, 08/10/2026). Script tải `spine-cpp` và `spine-godot` của
+https://github.com/EsotericSoftware/spine-runtimes ở đúng commit ghi trong `sources.lock` (git kiểm nội dung theo mã
+commit), đặt `spine-godot/spine_godot` cạnh mã nguồn Godot với `spine-cpp` bên trong (như `setup.sh` của Esoteric), áp
+các bản vá trong `spine-patches/`, rồi dựng với `custom_modules`. Sau khi dựng, script kiểm tra thư viện có lớp
+`SpineSkeletonDataResource` và có phần đọc skeleton của spine-cpp.
+
+- `spine-patches/0001-spine-godot-4.2-on-godot-4.7.patch`: spine-godot 4.2 viết cho Godot tới 4.6. Godot 4.7 bỏ vài
+  `#include` gián tiếp, chuyển enum và kiểu của RenderingServer ra ngoài lớp, đổi `free()` thành `free_rid()`, trả `Ref`
+  khi `memnew` một lớp RefCounted, và trả danh sách animation library bằng `LocalVector`. Bản vá đổi đúng các chỗ đó như
+  nhánh 4.3 của spine-godot đã làm (`#if VERSION_MINOR >= 7`).
+- Spine chỉ đọc skeleton xuất từ đúng bản của nó (4.2 đọc 4.2.x). App so bản của game với bản này
+  (`AgvnGodotModules.ENGINE_SPINE`); đổi nhánh Spine trong `sources.lock` thì đổi cả hằng số đó.
+- **Giấy phép:** Spine Runtimes không phải mã nguồn mở. Phát hành app có Spine cho người chơi không có giấy phép Spine thì
+  AGVN phải có giấy phép Spine (xem `docs/agvn/LICENSES.md`).
 
 ## Nguồn và cách kiểm chứng
 

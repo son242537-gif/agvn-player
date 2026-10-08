@@ -10,30 +10,41 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Engine modules a game's own Godot was built with and AGVN's Godot for Android lacks, known by the files their
- * importers leave in the pack. Mii Chan (Godot 4.5.1 with spine-godot built in, 08/10/2026) ran its menus on "Chạy
- * nhẹ" but none of its Spine scenes ("Cannot get class 'SpineSkeletonDataResource'"), so a Spine game stays on
- * Windows. The session log says which Spine the game was exported from: spine-godot reads only skeletons of its own
- * version ("Skeleton version 4.3.x does not match runtime version 4.2"), so an engine with Spine would need that one.
- * Spine as a GDExtension is in extension_list.cfg instead ({@link AgvnGodotPack#extensions}). Pure Java.
+ * Engine modules a game's own Godot was built with, known by the files their importers leave in the pack, against
+ * those of AGVN's Godot for Android. Mii Chan (Godot 4.5.1 with spine-godot built in, 08/10/2026) ran its menus on
+ * "Chạy nhẹ" but none of its Spine scenes ("Cannot get class 'SpineSkeletonDataResource'"), so AGVN's engine has
+ * spine-godot {@link #ENGINE_SPINE} since 0.1.31 (scripts/agvn/godot). Spine reads only skeletons exported from its own
+ * version ("Skeleton version 4.3.x does not match runtime version 4.2"): a game of another one stays on Windows, and
+ * the session log says which Spine it has. Spine as a GDExtension is in extension_list.cfg instead
+ * ({@link AgvnGodotPack#extensions}). Pure Java.
  */
 final class AgvnGodotModules {
+    /** The Spine of AGVN's engine: spine-runtimes 4.2 (scripts/agvn/godot/sources.lock). */
+    static final String ENGINE_SPINE = "4.2";
     private static final Pattern JSON_VERSION = Pattern.compile("\"spine\"\\s*:\\s*\"([0-9][0-9A-Za-z.\\-]*)\"");
     private static final int HEAD = 1024;
 
     private AgvnGodotModules() {}
 
-    /** What {@code pack} needs that AGVN's Godot lacks ("Spine 4.2.43"), or null when it needs nothing it lacks. */
+    /** What {@code pack} needs that AGVN's Godot lacks ("Spine 4.3.02"), or null when it needs nothing it lacks. */
     static String missing(AgvnGodotPack pack) {
         if (!usesSpine(pack)) return null;
         String version = spineVersion(pack);
+        if (version != null && fits(version)) return null;
         return "Spine " + (version != null ? version : "(chưa rõ bản)");
     }
 
-    /** For the session log of a Godot game with Spine: which Spine, and why it is not on Chạy nhẹ; null without. */
+    /** For the session log of a Godot game with Spine: which Spine, and whether Chạy nhẹ reads it; null without. */
     static String fact(AgvnGodotPack pack) {
-        String spine = missing(pack);
-        return spine == null ? null : "Game Godot dùng " + spine + ": Chạy nhẹ chưa có Spine, game chạy bằng Windows";
+        if (!usesSpine(pack)) return null;
+        String version = spineVersion(pack), spine = "Spine " + (version != null ? version : "(chưa rõ bản)");
+        return "Game Godot dùng " + spine + (version != null && fits(version) ? ": Chạy nhẹ đọc được"
+                : ": Chạy nhẹ có Spine " + ENGINE_SPINE + ", không đọc được bản này, game chạy bằng Windows");
+    }
+
+    /** True for a Spine version AGVN's engine reads: the same major and minor ("4.2.43" for 4.2). */
+    static boolean fits(String version) {
+        return version.equals(ENGINE_SPINE) || version.startsWith(ENGINE_SPINE + ".");
     }
 
     /** True when the pack holds spine-godot's imported atlases or skeletons. */

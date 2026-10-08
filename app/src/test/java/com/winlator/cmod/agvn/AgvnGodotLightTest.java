@@ -130,16 +130,20 @@ public class AgvnGodotLightTest {
     }
 
     @Test
-    public void spineGamesStayOnWindows() throws IOException {
-        // Mii Chan: Godot 4.5.1 with spine-godot built in, which Godot 4.7 for Android lacks; the log names its Spine
+    public void spineGamesOfTheEnginesSpine() throws IOException {
+        // Mii Chan: Godot 4.5.1 with spine-godot built in; AGVN's engine has Spine 4.2, which reads 4.2 skeletons only
         AgvnGodotPack binary = AgvnGodotPack.open(spineGame("i.pck", "4.2.43", false));
         assertEquals("4.2.43", AgvnGodotModules.spineVersion(binary));
-        assertEquals(AgvnGodotLight.Fit.MODULES, AgvnGodotLight.fit(binary));
-        assertEquals("Spine 4.2.43", AgvnGodotModules.missing(binary));
+        assertEquals(AgvnGodotLight.Fit.OK, AgvnGodotLight.fit(binary));
+        assertNull(AgvnGodotModules.missing(binary));
+        assertTrue(AgvnGodotModules.fact(binary).endsWith("Chạy nhẹ đọc được"));
+        assertEquals(AgvnGodotLight.Fit.OK, AgvnGodotLight.fit(AgvnGodotPack.open(spineGame("m.pck", "4.2.11", true))));
         AgvnGodotPack json = AgvnGodotPack.open(spineGame("j.pck", "4.3.02", true));
         assertEquals("4.3.02", AgvnGodotModules.spineVersion(json));
         assertEquals(AgvnGodotLight.Fit.MODULES, AgvnGodotLight.fit(json));
+        assertEquals("Spine 4.3.02", AgvnGodotModules.missing(json));
         assertTrue(AgvnGodotModules.fact(json).startsWith("Game Godot dùng Spine 4.3.02"));
+        assertFalse(AgvnGodotModules.fits("4.20.1"));
         assertNull(AgvnGodotModules.fact(AgvnGodotPack.open(write("l.pck", game(3, 5, "main.gdc", tokens(101))))));
     }
 

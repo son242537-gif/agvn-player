@@ -825,9 +825,10 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       gửi như chuột thật"; bấm, kéo thả, giữ chuột như trước, không bị bấm đôi.
 - [ ] Bản 0.1.31, "Tự sửa lỗi" → "Chạm, bấm không ăn" ở một game Windows bất kỳ: có "Gửi cú chạm như chuột thật";
       Open At Nine thì có "Gửi cú chạm như trước". Thử rồi chọn "Vẫn còn lỗi": cấu hình về như cũ.
-- [ ] Bản 0.1.31, Mii Chan (Godot 4.5.1 có Spine): app không còn đề nghị "Chạy nhẹ" cho game này. Game đang để Chạy
-      nhẹ thì mở bằng Windows. Hộp "Game Godot bị tắt khi vẽ hình" có Vulkan và Direct3D 11 (ANGLE), không có Chạy nhẹ.
-      `su-kien.txt` có `Game Godot dùng Spine 4.x.y: Chạy nhẹ chưa có Spine…`: gửi dòng này để chọn bản Spine cho engine.
+- [ ] Bản 0.1.31, Mii Chan (Godot 4.5.1 có Spine): mở bằng Windows một lần, `su-kien.txt` có `Game Godot dùng Spine
+      4.x.y: …`. Nếu là 4.2.x: "Tự sửa lỗi" có "Chạy nhẹ"; chạy nhẹ thì con gà và hiệu ứng tim (cảnh Spine) hiện và
+      chuyển động, `godot.log` không có "Cannot get class 'SpineSkeletonDataResource'", vào được màn chơi. Nếu là bản
+      khác (4.3...): app không đề nghị "Chạy nhẹ", hộp "Game Godot bị tắt khi vẽ hình" có Vulkan và Direct3D 11 (ANGLE).
 - [ ] Bản 0.1.29, thoát một game Windows bất kỳ (từ menu, hoặc "Mở lại game ngay" của "Tự sửa lỗi"): gần cuối
       `su-kien.txt` có dòng `Phút cuối của game (mỗi 5 giây): FPS …`. Game chạy mượt thì FPS đều, không có "không vẽ
       khung nào". Rời app rồi thoát game từ thông báo: không có dòng này.

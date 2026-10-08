@@ -24,6 +24,7 @@ lock() { awk -v k="$1" '$1 == k { $1 = ""; sub(/^ /, ""); print; exit }' "$LOCK"
 read -r GODOT_VERSION GODOT_URL GODOT_SHA <<< "$(lock godot)"
 read -r SWAPPY_URL SWAPPY_SHA <<< "$(lock swappy)"
 read -r SCONS_VERSION SCONS_SHA <<< "$(lock scons)"
+read -r SPINE_BRANCH SPINE_COMMIT SPINE_REPO <<< "$(lock spine)"
 NDK_VERSION=$(lock ndk)
 SDK="${ANDROID_HOME:-/opt/android-sdk}"
 TC="$SDK/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64"
@@ -53,10 +54,37 @@ TARBALL="$WORK/$(basename "$GODOT_URL")"
 SWAPPY="$WORK/$(basename "$SWAPPY_URL")"
 fetch "$GODOT_URL" "$GODOT_SHA" "$TARBALL"
 fetch "$SWAPPY_URL" "$SWAPPY_SHA" "$SWAPPY"
+# Spine Runtimes at the pinned commit: spine-cpp, spine-godot and the top-level files (LICENSE) only
+SPINE_SRC="$WORK/spine-runtimes-$SPINE_COMMIT"
+if [ "$(git -C "$SPINE_SRC" rev-parse HEAD 2> /dev/null)" != "$SPINE_COMMIT" ]; then
+    log "tải Spine Runtimes $SPINE_BRANCH ($SPINE_COMMIT)"
+    rm -rf "$SPINE_SRC"
+    git init -q "$SPINE_SRC"
+    git -C "$SPINE_SRC" remote add origin "$SPINE_REPO"
+    git -C "$SPINE_SRC" sparse-checkout set --cone spine-cpp spine-godot
+    GIT_LFS_SKIP_SMUDGE=1 git -C "$SPINE_SRC" fetch -q --depth 1 --filter=blob:none origin "$SPINE_COMMIT" \
+        || fail "không tải được Spine Runtimes $SPINE_COMMIT"
+    GIT_LFS_SKIP_SMUDGE=1 git -C "$SPINE_SRC" checkout -q FETCH_HEAD
+    [ "$(git -C "$SPINE_SRC" rev-parse HEAD)" = "$SPINE_COMMIT" ] \
+        || fail "Spine Runtimes không đúng commit $SPINE_COMMIT"
+fi
 
 # --- 2. Godot's source with AGVN's patches; kept between runs while nothing changed, so SCons builds only what did ---
+# Spine goes in as the engine module spine_godot beside Godot's source (its SCsub looks for #../spine_godot), with
+# spine-cpp inside it as Esoteric's setup.sh puts it, and AGVN's patches for Godot 4.7 (spine-patches/).
 SRC="$WORK/godot-$GODOT_VERSION-stable"
-STAMP=$(cat "$LOCK" "$HERE"/patches/*.patch | sha256sum | cut -c1-64)
+SPINE_MODULE="$WORK/spine_godot"
+STAMP=$(cat "$LOCK" "$HERE"/patches/*.patch "$HERE"/spine-patches/*.patch | sha256sum | cut -c1-64)
+if [ "$(cat "$SPINE_MODULE/.agvn-stamp" 2> /dev/null)" != "$STAMP" ]; then
+    rm -rf "$SPINE_MODULE"
+    cp -r "$SPINE_SRC/spine-godot/spine_godot" "$SPINE_MODULE"
+    cp -r "$SPINE_SRC/spine-cpp/spine-cpp" "$SPINE_MODULE/spine-cpp"
+    for p in "$HERE"/spine-patches/*.patch; do
+        patch -d "$SPINE_MODULE" -p1 --forward --fuzz=0 --no-backup-if-mismatch -s < "$p" \
+            || fail "không áp được $(basename "$p")"
+    done
+    echo "$STAMP" > "$SPINE_MODULE/.agvn-stamp"
+fi
 if [ "$(cat "$SRC/.agvn-stamp" 2> /dev/null)" != "$STAMP" ]; then
     rm -rf "$SRC"
     tar -xJf "$TARBALL" -C "$WORK"
@@ -75,7 +103,8 @@ fi
 # production=yes: no debug symbols, static checks off, Swappy frame pacing (as Godot's own Android templates).
 # SCons' cache keeps compiled files across runs, so a changed patch rebuilds only what it touches.
 (cd "$SRC" && ANDROID_HOME="$SDK" "$WORK/venv/bin/scons" platform=android target=template_release arch=arm64 \
-    production=yes swappy=yes disable_path_overrides=no cache_path="$WORK/scons-cache" cache_limit=4 -j"$(nproc)")
+    production=yes swappy=yes disable_path_overrides=no custom_modules="$SPINE_MODULE" \
+    cache_path="$WORK/scons-cache" cache_limit=4 -j"$(nproc)")
 LIB="$SRC/platform/android/java/lib/libs/release/arm64-v8a/libgodot_android.so"
 [ -f "$LIB" ] || fail "không thấy $LIB"
 
@@ -99,6 +128,9 @@ grep -q 'AGVN_GODOT_APPDATA' <<< "$texts" || fail "engine thiếu bản vá user
 grep -q 'AGVN_GODOT_EXECUTABLE' <<< "$texts" || fail "engine thiếu bản vá đường dẫn .exe (patches/0002)"
 grep -q 'AGVN Player: binary GDScript is cut short' <<< "$texts" || fail "engine thiếu bản vá đọc script Godot 4.3, 4.4 (patches/0003)"
 # patches/0004 adds no text of its own: step 2 stops when it does not apply
+grep -q 'SpineSkeletonDataResource' <<< "$texts" || fail "engine thiếu Spine (module spine_godot)"
+grep -q "does not match runtime version $SPINE_BRANCH" <<< "$texts" \
+    || grep -q 'does not match runtime version %s' <<< "$texts" || fail "engine thiếu spine-cpp $SPINE_BRANCH"
 grep -q "Godot Engine v$GODOT_VERSION" <<< "$texts" || grep -q "$GODOT_VERSION.stable" <<< "$texts" || fail "không phải Godot $GODOT_VERSION"
 log "libgodot_android.so: Godot $GODOT_VERSION, mở được gói game ngoài APK, có các bản vá của AGVN"
 
@@ -118,6 +150,11 @@ gzip -9 -n -c "$STRIPPED" > "$OUT"
     echo "Swappy Frame Pacing (Android Game SDK), linked into libgodot_android.so"
     echo
     unzip -p "$SWAPPY" LICENSE
+    echo
+    echo "Spine Runtimes $SPINE_BRANCH (spine-cpp and spine-godot, commit $SPINE_COMMIT), built into"
+    echo "libgodot_android.so with the patches in scripts/agvn/godot/spine-patches. Not open source: see below."
+    echo
+    cat "$SPINE_SRC/LICENSE"
 } > "$LICENSE_OUT"
 SO_SHA=$(sha256sum "$STRIPPED" | cut -c1-64)
 PINS="$ROOT/scripts/agvn/pins.txt"

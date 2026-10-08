@@ -1,0 +1,209 @@
+AGVN Player: spine-godot 4.2 (spine-runtimes e7dc1435) built into Godot 4.7 as an engine module. Godot 4.7 no
+longer includes callable_mp.h, scene_tree.h and rendering_server.h through other headers, moved RenderingServer's
+enums and types out of the class (RenderingServerEnums, RenderingServerTypes), renamed free() to free_rid(), gives a
+Ref from memnew of a RefCounted class, and lists animation libraries in a LocalVector. The same changes as
+spine-godot 4.3 (VERSION_MINOR >= 7), so older Godot builds as before. Applied by build-godot.sh with patch -p1.
+
+diff -ruN a/SpineAnimationTrack.cpp b/SpineAnimationTrack.cpp
+--- a/SpineAnimationTrack.cpp
++++ b/SpineAnimationTrack.cpp
+@@ -187,7 +187,13 @@
+ 		add_child(animation_player);
+ 		animation_player->set_owner(sprite->get_owner());
+ 	} else {
+-#if VERSION_MAJOR > 3
++#if VERSION_MAJOR >= 4 && VERSION_MINOR >= 7
++		LocalVector<StringName> animation_libraries; // AGVN: a LocalVector since Godot 4.7
++		animation_player->get_animation_library_list(&animation_libraries);
++		for (uint32_t i = 0; i < animation_libraries.size(); i++) {
++			animation_player->remove_animation_library(animation_libraries[i]);
++		}
++#elif VERSION_MAJOR > 3
+ 		List<StringName> animation_libraries;
+ 		animation_player->get_animation_library_list(&animation_libraries);
+ 		for (auto iter = animation_libraries.front(); iter; iter = iter->next()) {
+diff -ruN a/SpineAtlasResource.cpp b/SpineAtlasResource.cpp
+--- a/SpineAtlasResource.cpp
++++ b/SpineAtlasResource.cpp
+@@ -318,7 +318,13 @@
+ 	if (error != OK) return error;
+ #endif
+ 
+-#if VERSION_MAJOR > 3
++#if VERSION_MAJOR >= 4 && VERSION_MINOR >= 7
++	Ref<JSON> json; // AGVN: memnew of a RefCounted class gives a Ref since Godot 4.7
++	json.instantiate();
++	error = json->parse(json_string);
++	if (error != OK) return error;
++	Variant result = json->get_data();
++#elif VERSION_MAJOR > 3
+ 	JSON *json = memnew(JSON);
+ 	error = json->parse(json_string);
+ 	if (error != OK) {
+@@ -375,7 +381,10 @@
+ 	content["atlas_data"] = atlas_data;
+ 	content["normal_texture_prefix"] = normal_map_prefix;
+ 	content["specular_texture_prefix"] = specular_map_prefix;
+-#if VERSION_MAJOR > 3
++#if VERSION_MAJOR >= 4 && VERSION_MINOR >= 7
++	file->store_string(JSON::stringify(content));
++	file->flush();
++#elif VERSION_MAJOR > 3
+ 	JSON *json = memnew(JSON);
+ 	file->store_string(json->stringify(content));
+ 	file->flush();
+diff -ruN a/SpineBoneNode.cpp b/SpineBoneNode.cpp
+--- a/SpineBoneNode.cpp
++++ b/SpineBoneNode.cpp
+@@ -35,6 +35,7 @@
+ #else
+ #if VERSION_MAJOR > 3
+ #include "core/config/engine.h"
++#include "scene/main/scene_tree.h"
+ #else
+ #include "core/engine.h"
+ #endif
+diff -ruN a/SpineCommon.h b/SpineCommon.h
+--- a/SpineCommon.h
++++ b/SpineCommon.h
+@@ -72,6 +72,11 @@
+ #if VERSION_MAJOR > 3
+ #include "core/core_bind.h"
+ #include "core/error/error_macros.h"
++#if VERSION_MAJOR > 4 || (VERSION_MAJOR == 4 && VERSION_MINOR >= 7)
++#include "core/object/callable_mp.h"
++#else
++#include "core/object/callable_method_pointer.h"
++#endif
+ #define REFCOUNTED RefCounted
+ #define EMPTY(x) ((x).is_empty())
+ #define EMPTY_PTR(x) ((x)->is_empty())
+diff -ruN a/SpineSprite.cpp b/SpineSprite.cpp
+--- a/SpineSprite.cpp
++++ b/SpineSprite.cpp
+@@ -75,6 +75,20 @@
+ 
+ #include "scene/gui/control.h"
+ #include "scene/main/viewport.h"
++#if VERSION_MAJOR > 3
++#include "scene/main/scene_tree.h"
++#endif
++
++#if VERSION_MAJOR == 4 && VERSION_MINOR >= 7
++// AGVN: Godot 4.7 moved RenderingServer's enums and types out of the class, and renamed free() to free_rid()
++#define SPINE_RSE RenderingServerEnums
++#define SPINE_RS_TYPES RenderingServerTypes
++#define SPINE_RS_FREE free_rid
++#else
++#define SPINE_RSE RS
++#define SPINE_RS_TYPES RS
++#define SPINE_RS_FREE free
++#endif
+ 
+ #if TOOLS_ENABLED
+ 
+@@ -298,7 +312,7 @@
+ #ifdef SPINE_GODOT_EXTENSION
+ 			RS::get_singleton()->free_rid(mesh);
+ #else
+-			RS::get_singleton()->free(mesh);
++			RS::get_singleton()->SPINE_RS_FREE(mesh);
+ #endif
+ 		}
+ 		mesh = RS::get_singleton()->mesh_create();
+@@ -308,9 +322,9 @@
+ 		arrays[Mesh::ARRAY_TEX_UV] = uvs;
+ 		arrays[Mesh::ARRAY_COLOR] = colors;
+ 		arrays[Mesh::ARRAY_INDEX] = indices;
+-		RS::SurfaceData surface;
++		SPINE_RS_TYPES::SurfaceData surface;
+ 		uint32_t skin_stride;
+-		RS::get_singleton()->mesh_create_surface_data_from_arrays(&surface, (RS::PrimitiveType) Mesh::PRIMITIVE_TRIANGLES, arrays, TypedArray<Array>(), Dictionary(), Mesh::ArrayFormat::ARRAY_FLAG_USE_DYNAMIC_UPDATE);
++		RS::get_singleton()->mesh_create_surface_data_from_arrays(&surface, (SPINE_RSE::PrimitiveType) Mesh::PRIMITIVE_TRIANGLES, arrays, TypedArray<Array>(), Dictionary(), Mesh::ArrayFormat::ARRAY_FLAG_USE_DYNAMIC_UPDATE);
+ 		RS::get_singleton()->mesh_add_surface(mesh, surface);
+ #if VERSION_MINOR > 1
+ 		RS::get_singleton()->mesh_surface_make_offsets_from_format(surface.format, surface.vertex_count, surface.index_count, surface_offsets, vertex_stride, normal_tangent_stride, attribute_stride, skin_stride);
+@@ -342,9 +356,9 @@
+ 			}
+ 
+ 			float uv[2] = {(float) uvs[i].x, (float) uvs[i].y};
+-			memcpy(&vertex_write_buffer[i * vertex_stride + surface_offsets[RS::ARRAY_VERTEX]], &vertex, sizeof(float) * 2);
+-			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RS::ARRAY_COLOR]], color, 4);
+-			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[RS::ARRAY_TEX_UV]], uv, 8);
++			memcpy(&vertex_write_buffer[i * vertex_stride + surface_offsets[SPINE_RSE::ARRAY_VERTEX]], &vertex, sizeof(float) * 2);
++			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[SPINE_RSE::ARRAY_COLOR]], color, 4);
++			memcpy(&attribute_write_buffer[i * attribute_stride + surface_offsets[SPINE_RSE::ARRAY_TEX_UV]], uv, 8);
+ 		}
+ 		RS::get_singleton()->mesh_surface_update_vertex_region(mesh, 0, 0, vertex_buffer);
+ 		RS::get_singleton()->mesh_surface_update_attribute_region(mesh, 0, 0, attribute_buffer);
+diff -ruN a/SpineSprite.h b/SpineSprite.h
+--- a/SpineSprite.h
++++ b/SpineSprite.h
+@@ -39,6 +39,14 @@
+ #include <godot_cpp/classes/canvas_item_material.hpp>
+ #else
+ #include "scene/2d/node_2d.h"
++#include "scene/resources/font.h"
++#if VERSION_MAJOR > 3
++#if VERSION_MINOR >= 6
++#include "servers/rendering/rendering_server.h"
++#else
++#include "servers/rendering_server.h"
++#endif
++#endif
+ #endif
+ 
+ class SpineSlotNode;
+@@ -75,7 +83,11 @@
+ 
+ #if VERSION_MAJOR > 3
+ 	RID mesh;
++#if !defined(SPINE_GODOT_EXTENSION) && VERSION_MAJOR >= 4 && VERSION_MINOR >= 7
++	uint32_t surface_offsets[RenderingServerEnums::ARRAY_MAX];
++#else
+ 	uint32_t surface_offsets[RS::ARRAY_MAX];
++#endif
+ 	int num_vertices;
+ 	int num_indices;
+ 	PackedByteArray vertex_buffer;
+@@ -99,8 +111,8 @@
+ 	SpineMesh2D() : renderer_object(nullptr), indices_changed(true), num_vertices(0), num_indices(0), vertex_stride(0), normal_tangent_stride(0), attribute_stride(0){};
+ 	~SpineMesh2D() {
+ 		if (mesh.is_valid()) {
+-#ifdef SPINE_GODOT_EXTENSION
+-			RS::get_singleton()->free_rid(mesh);
++#if defined(SPINE_GODOT_EXTENSION) || VERSION_MINOR >= 7
++			RS::get_singleton()->free_rid(mesh); // AGVN: free() is deprecated since Godot 4.7
+ #else
+ 			RS::get_singleton()->free(mesh);
+ #endif
+Binary files a/__pycache__/config.cpython-311.pyc and b/__pycache__/config.cpython-311.pyc differ
+diff -ruN a/register_types.cpp b/register_types.cpp
+--- a/register_types.cpp
++++ b/register_types.cpp
+@@ -174,7 +174,24 @@
+ 	skeleton_file_saver = memnew(SpineSkeletonFileResourceFormatSaver);
+ 	ResourceSaver::get_singleton()->add_resource_format_saver(skeleton_file_saver);
+ #else
+-#if VERSION_MAJOR > 3
++#if VERSION_MAJOR > 4 || (VERSION_MAJOR == 4 && VERSION_MINOR >= 7)
++	// AGVN: memnew of a RefCounted class gives a Ref since Godot 4.7; the statics keep the plain pointers
++	Ref<SpineAtlasResourceFormatLoader> atlas_loader_ref = memnew(SpineAtlasResourceFormatLoader);
++	atlas_loader = atlas_loader_ref.ptr();
++	ResourceLoader::add_resource_format_loader(atlas_loader_ref);
++
++	Ref<SpineAtlasResourceFormatSaver> atlas_saver_ref = memnew(SpineAtlasResourceFormatSaver);
++	atlas_saver = atlas_saver_ref.ptr();
++	ResourceSaver::add_resource_format_saver(atlas_saver_ref);
++
++	Ref<SpineSkeletonFileResourceFormatLoader> skeleton_file_loader_ref = memnew(SpineSkeletonFileResourceFormatLoader);
++	skeleton_file_loader = skeleton_file_loader_ref.ptr();
++	ResourceLoader::add_resource_format_loader(skeleton_file_loader_ref);
++
++	Ref<SpineSkeletonFileResourceFormatSaver> skeleton_file_saver_ref = memnew(SpineSkeletonFileResourceFormatSaver);
++	skeleton_file_saver = skeleton_file_saver_ref.ptr();
++	ResourceSaver::add_resource_format_saver(skeleton_file_saver_ref);
++#elif VERSION_MAJOR > 3
+ 	atlas_loader = memnew(SpineAtlasResourceFormatLoader);
+ 	ResourceLoader::add_resource_format_loader(atlas_loader);
+ 

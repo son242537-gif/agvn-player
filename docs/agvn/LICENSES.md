@@ -38,6 +38,12 @@ Anh Sơn quyết định ngày 02/10/2026: app phát hành theo **GNU GPL phiên
     cùng các thư viện khác. Giấy phép đầy đủ: `app/src/main/assets/agvn/godot-license.txt` (LICENSE.txt và COPYRIGHT.txt của
     Godot, giấy phép của Swappy), tạo bởi `scripts/agvn/godot/build-godot.sh`. Mã nguồn: https://github.com/godotengine/godot;
     bản vá và script dựng: `scripts/agvn/godot`.
+  - Spine Runtimes 4.2 (spine-cpp và spine-godot, dựng vào `libgodot_android.so` từ bản 0.1.31): **không phải mã nguồn
+    mở**, giấy phép Spine Runtimes License Agreement của Esoteric Software. Phát hành cho người chơi không có giấy phép
+    Spine thì AGVN phải có giấy phép Spine từ lúc đưa Spine vào (Section 2 của Spine Editor License Agreement). Phần này
+    không theo GPL. Nguyên văn giấy phép nằm cuối `godot-license.txt`. Mã nguồn:
+    https://github.com/EsotericSoftware/spine-runtimes (commit ghim trong `scripts/agvn/godot/sources.lock`), bản vá cho
+    Godot 4.7: `scripts/agvn/godot/spine-patches`.
   - mkxp-z ("Chạy nhẹ" cho game RPG Maker XP/VX/VX Ace): GPL 3 hoặc mới hơn (dựng kèm shader GPLv3). `libmkxp-z.so`
     chứa thêm Ruby (Ruby License / BSD-2-Clause), SDL2, SDL_image, SDL_sound, SDL_ttf, PhysFS (zlib), OpenAL Soft và
     FluidSynth (LGPL 2.1), FreeType (FTL), pixman, fmt, libffi, libyaml (MIT), libogg/vorbis/theora, libjxl (BSD) cùng
