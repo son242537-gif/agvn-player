@@ -78,6 +78,8 @@ Anh Sơn quyết định ngày 02/10/2026:
     chuyển save qua app (`AgvnHtmlSaves`) thành file, đúng chữ bản PC ghi (UTF-8 như NW.js). Save trong trình duyệt từ
     trước được chép ra file ở lần mở đầu, khi thư mục `save` chưa có file nào. Thư mục đã có save (chép từ PC, hay vừa
     "Nhập save") thì lấy save trong thư mục, bỏ qua save cũ trong trình duyệt.
+  - RPG Maker MV/MZ, dữ liệu riêng của plugin (thành tựu, thư viện CG, mở khoá chung mọi ván): nằm ở file bản PC ghi,
+    cạnh save, như `mydata.rpgsave` hay `fileMy Plugin Data.rpgsave`. Xem "Dữ liệu riêng của plugin MV/MZ" bên dưới.
   - Game HTML khác (Tyrano) vẫn để save trong trình duyệt: hai nút báo chưa làm được.
 - **Nhận diện:** `GameExeResolver` đã nhận ra engine (`RENPY`, `RPGMAKER`). Cần thêm phần đọc phiên bản:
   - Ren'Py: `renpy/__init__.py` hoặc thư mục `lib/py3-*` / `lib/py2-*`.
@@ -332,6 +334,37 @@ Chỗ để save của từng loại game: xem "Save, Nhập save và Xuất sav
      .zip đó trên máy khác: save hiện trong game.
   7. Ren'Py, RPG Maker XP/VX/VX Ace "Chạy nhẹ": "Xuất save" rồi "Nhập save" trên máy khác: save hiện trong game.
   8. Game Tyrano: "Nhập save" / "Xuất save" báo chưa làm được, như trước.
+
+## Dữ liệu riêng của plugin MV/MZ (09/10/2026)
+
+Anh Sơn báo ngày 09/10/2026: game RPG Maker MV chơi bình thường, tới lúc mở một thành tựu thì dừng ở màn lỗi "Error:
+Cannot write save/fileMy Plugin Data.rpgsave". Lỗi có từ bản 0.1.24 (mã 26), bản đầu đưa save ra file.
+- **Nguyên nhân:** plugin lưu dữ liệu riêng bằng mã là chữ (`StorageManager.save('My Plugin Data', ...)`), thường tự
+  đặt tên file bản PC (`localFilePath`) và khoá trình duyệt (`webStorageKey`).
+  - `html-compat.js` chỉ đặt tên file cho mã là số, nên ra `fileMy Plugin Data.rpgsave` và bỏ qua tên plugin đặt.
+  - `AgvnHtmlSaves` chỉ nhận chữ a–z, số, `_` và `-`, nên từ chối dấu cách. Lỗi ném ra từ lệnh của plugin, không ai bắt,
+    nên game dừng. Lần mở sau, plugin đọc không được dữ liệu và tự đưa về rỗng.
+- **Sửa (mọi game):**
+  - Mã không phải số lấy đúng tên file bản PC: đường `localFilePath` trả về, bỏ thư mục `save` (`pcFile` trong
+    `html-compat.js`). Tên đó không dùng được thì là `file<mã>.rpgsave`, ký tự lạ đổi thành `_`. Ô save số giữ tên
+    cũ. MZ cũng vậy, theo `filePath`: `StorageManager.saveObject('My Data', ...)` ra `My Data.rmmzsave`.
+  - Luật tên file (`AgvnHtmlSaves.FILE`, `html-compat.js` dùng đúng luật đó): chữ mọi thứ tiếng, số, dấu cách,
+    `_ . ( ) [ ] -`, tới 60 ký tự; không thư mục, không ký tự Windows cấm. 60 ký tự để tên file cả đuôi `.agvn-part`
+    lúc ghi vẫn dưới 255 byte.
+  - Dữ liệu riêng của plugin không ghi được ra file thì vào bộ nhớ trình duyệt, theo khoá của plugin, và game chạy tiếp.
+    Lần đọc sau lấy lại từ đó, rồi ghi ra file khi được. Ô save số không ghi được vẫn báo lỗi như trước (MV báo lưu
+    thất bại).
+  - Không đổi `path.join` cho giữ dấu `/` cuối như Node. Plugin tự ghi file bằng `fs` đang để dữ liệu trong trình duyệt
+    theo đường cũ (`/savemydata.json`); đổi thì dữ liệu đó không đọc lại được.
+- **Thử máy:**
+  1. Bật plugin thử trong báo cáo (`My Plugin Data`, file `mydata.rpgsave`, khoá `Khoá riêng`) ở một game MV: vào bản
+     đồ không có màn lỗi; có `www/save/mydata.rpgsave`; thoát app mở lại, logcat đếm tiếp (2, 3…), không về 1.
+  2. Chép `www/save/mydata.rpgsave` sang bản PC của game: PC đếm tiếp, và ngược lại. "Xuất save" có file này.
+  3. Đổi tên file trong plugin thử thành `my data (1).rpgsave`: vẫn ghi được.
+  4. Ô save số như cũ: `file1.rpgsave`, `global.rpgsave`, `config.rpgsave`; save cũ trên máy tải được.
+  5. Game MZ có plugin gọi `StorageManager.saveObject('My Data', {...})`: có `save/My Data.rmmzsave`, không "Cannot
+     write".
+  6. Thư mục game không ghi được: mọi thứ ở bộ nhớ trình duyệt như trước, không màn lỗi.
 
 ## Game RPG Maker MZ đứng ở cảnh đầu (bản 0.1.25)
 

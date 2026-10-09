@@ -21,7 +21,12 @@ import java.util.regex.Pattern;
 final class AgvnHtmlSaves {
     static final String NAME = "AgvnSaves", FOLDER = "save";
     private static final String TAG = "AGVN";
-    private static final Pattern FILE = Pattern.compile("[A-Za-z0-9_-]{1,40}\\.(?:rpgsave|rmmzsave)");
+    /**
+     * A save's file name: no folder, nothing Windows refuses, at most 60 characters (with ".agvn-part", under the
+     * 255 bytes of a file name). Plugins name their own data so too ("fileMy Plugin Data.rpgsave", "Thành tựu.rmmzsave"),
+     * which the first rule (a-z, digits, "_" and "-") refused (09/10/2026). html-compat.js's SAVE_NAME is the same.
+     */
+    static final Pattern FILE = Pattern.compile("[\\p{L}\\p{N}_-][\\p{L}\\p{M}\\p{N} _.()\\[\\]-]{0,59}\\.(?:rpgsave|rmmzsave)");
 
     private final File dir;
 
@@ -42,7 +47,7 @@ final class AgvnHtmlSaves {
         File f = new File(dir, name);
         try {
             return f.isFile() ? new String(Files.readAllBytes(f.toPath()), StandardCharsets.UTF_8) : null;
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException e) { // RuntimeException: a name the file system cannot hold
             Log.w(TAG, "save " + f + " not read", e);
             return null;
         }

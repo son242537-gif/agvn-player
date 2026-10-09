@@ -18,6 +18,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,6 +60,38 @@ public class AgvnLightSavesTest {
         // where the library's "Nhập save" / "Xuất save" look for an MV game made for PC: the same folder
         File game = www.getParentFile();
         assertEquals(new File(www, "save"), AgvnSaveLocations.inGameFolder(game, "RPGMAKER_MV").get(0).dir);
+    }
+
+    @Test
+    public void pluginsNameTheirOwnDataAsOnAPc() throws IOException {
+        // an achievements plugin's "fileMy Plugin Data.rpgsave" was refused, and its game stopped on "Cannot write"
+        // (the maintainer's report of 09/10/2026)
+        String[] names = {"fileMy Plugin Data.rpgsave", "mydata.rpgsave", "my data (1).rpgsave", "Thành tựu.rmmzsave",
+                "Tha\u0300nh tu\u0323u.rmmzsave", "セーブデータ[2].rpgsave", "a.b.rpgsave", "file1.rpgsave"};
+        File www = tmp.newFolder("www");
+        AgvnHtmlSaves saves = new AgvnHtmlSaves(www);
+        for (String name : names) {
+            assertTrue(name, AgvnHtmlSaves.valid(name));
+            if (!nameable(new File(www, "save/" + name))) continue;
+            assertTrue(name, saves.write(name, "N4Ig"));
+            assertEquals(name, "N4Ig", saves.read(name));
+        }
+        String sixty = new String(new char[60]).replace('\0', 'ạ');
+        if (nameable(new File(www, sixty))) // 60 letters of 3 bytes, with the part file still a file name
+            assertTrue(saves.write(sixty + ".rpgsave", "x") && new File(www, "save/" + sixty + ".rpgsave").isFile());
+        String[] refused = {sixty + "a.rpgsave", " lead.rpgsave", ".hidden.rpgsave", "a:b.rpgsave", "a?.rpgsave",
+                "a\\b.rpgsave", "a/b.rpgsave", "a*b.rpgsave", "a\"b.rpgsave", "a<b>.rpgsave", "a|b.rpgsave", "file1.RPGSAVE"};
+        for (String name : refused) assertFalse(name, AgvnHtmlSaves.valid(name));
+    }
+
+    /** False where file names cannot hold {@code f}'s: Linux in the POSIX locale (the cloud). Android's are UTF-8. */
+    private static boolean nameable(File f) {
+        try {
+            f.toPath();
+            return true;
+        } catch (InvalidPathException e) {
+            return false;
+        }
     }
 
     /** project.binary as Godot writes it: "ECFG", a count, then keys and their encoded values. */

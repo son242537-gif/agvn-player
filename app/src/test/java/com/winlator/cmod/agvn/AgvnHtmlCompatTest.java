@@ -59,6 +59,13 @@ public class AgvnHtmlCompatTest {
     }
 
     @Test
+    public void bundledCompatScriptNamesSavesAsTheAppTakesThem() throws Exception {
+        // a plugin's own data gets its PC file name only when the app will take it: the page's rule is AgvnHtmlSaves's
+        // (tools/agvn/tests/html_saves_sim.js plays it through with the rule read from AgvnHtmlSaves.java)
+        assertTrue(compatJs().contains("'" + AgvnHtmlSaves.FILE.pattern().replace("\\", "\\\\") + "'"));
+    }
+
+    @Test
     public void bundledCompatScriptLetsRpgMakerMzMoveWhileItShows() throws Exception {
         // MZ updates its scene only while document.hasFocus(), and WebView can leave the page without the focus:
         // every MZ game stood still on its first scene (tools/agvn/tests/html_focus_sim.js plays it through)

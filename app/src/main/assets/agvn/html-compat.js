@@ -15,7 +15,8 @@
  *     in a script as it loads (a plugin's first lines) that keeps RPG Maker MZ from starting, with its file and line.
  *  6. Saves are files in the game's save folder, as on a PC (MV save/file1.rpgsave, MZ save/file1.rmmzsave), through
  *     the app (window.AgvnSaves): "Nhập save" / "Xuất save" and the Windows version reach them. Saves the browser kept
- *     before are carried over while the folder holds none.
+ *     before are carried over while the folder holds none. A plugin's own data (achievements, a gallery) is the file
+ *     its PC version writes; when the folder will not take it, it stays in the browser and the game goes on.
  *  7. The page counts as the picked window while it shows (document.hasFocus): RPG Maker MZ moves its scenes only
  *     then, and WebView can leave the page without the focus, so every MZ game stood still on its first scene.
  */
@@ -185,6 +186,27 @@
 
     // --- 6: saves as files, as on a PC. The engine's browser storage functions are replaced (a plugin that replaces
     // them later keeps its own). While the folder holds no save, the browser's are read as before and written out.
+    // A save's file name, as AgvnHtmlSaves.FILE takes it: no folder, nothing Windows refuses, at most 60 characters.
+    var SAVE_NAME = (function () {
+        try {
+            return new RegExp('^(?:' + '[\\p{L}\\p{N}_-][\\p{L}\\p{M}\\p{N} _.()\\[\\]-]{0,59}\\.(?:rpgsave|rmmzsave)' + ')$', 'u');
+        } catch (e) { // a WebView without Unicode classes in its patterns
+            return /^[A-Za-z0-9_-][A-Za-z0-9 _.()\[\]-]{0,59}\.(?:rpgsave|rmmzsave)$/;
+        }
+    })();
+
+    // The file a plugin's own data has on a PC: the engine's path for it, which the plugin may rename, without its
+    // folder (cut as the engine gives it: path.join here drops the folder's last "/"). Null when no plain save name.
+    function pcFile(SM, dirOf, fileOf, id) {
+        try {
+            var dir = String(SM[dirOf]()), file = String(SM[fileOf](id));
+            file = (file.indexOf(dir) === 0 ? file.slice(dir.length) : file.split(/[\\/]/).pop()).replace(/^[\\/]+/, '');
+            return SAVE_NAME.test(file) ? file : null;
+        } catch (e) {
+            return null; // the engine has no file path for it
+        }
+    }
+
     function filesForSaves(SM) {
         var saves = window.AgvnSaves;
         if (!saves || !SM || SM.__agvnSaves) return;
@@ -195,25 +217,44 @@
         else if (typeof SM.saveToForage === 'function') mzSaves(SM, saves, fromBrowser);
     }
 
+    // A plugin may keep its own data (achievements, a gallery, unlocks for every playthrough) under an id that is not
+    // a number: StorageManager.save('My Plugin Data', json). It gets the file its PC version writes (localFilePath,
+    // "mydata.rpgsave" or "fileMy Plugin Data.rpgsave"), and the browser keeps it when the folder will not: 0.1.24 to
+    // 0.1.32 made "fileMy Plugin Data.rpgsave", which the app refused, and the game stopped on "Cannot write".
     function mvSaves(SM, saves, fromBrowser) {
-        var name = function (id) { return id < 0 ? 'config.rpgsave' : id === 0 ? 'global.rpgsave' : 'file' + id + '.rpgsave'; };
-        var load = SM.loadFromWebStorage, exists = SM.webStorageExists, remove = SM.removeWebStorage, failed = null;
+        var own = function (id) { return typeof id !== 'number'; };
+        var name = function (id) {
+            if (!own(id)) return id < 0 ? 'config.rpgsave' : id === 0 ? 'global.rpgsave' : 'file' + id + '.rpgsave';
+            return pcFile(SM, 'localFileDirectoryPath', 'localFilePath', id)
+                || 'file' + String(id).replace(/[^A-Za-z0-9_-]+/g, '_').slice(0, 40) + '.rpgsave';
+        };
+        var save = SM.saveToWebStorage, load = SM.loadFromWebStorage, exists = SM.webStorageExists, remove = SM.removeWebStorage;
+        var failed = null;
         SM.saveToWebStorage = function (id, json) {
             failed = saves.write(name(id), LZString.compressToBase64(json)) ? null : id;
-            if (failed !== null) throw new Error('Cannot write save/' + name(id));
+            if (failed === null) return;
+            if (!own(id)) throw new Error('Cannot write save/' + name(id));
+            failed = null;
+            console.warn('[AGVN] save/' + name(id) + ' not written: kept in the browser');
+            try {
+                save.call(this, id, json);
+                saves.remove(name(id)); // an older file would be read first
+            } catch (e) {
+                console.warn('[AGVN] ' + e.message);
+            }
         };
         SM.loadFromWebStorage = function (id) {
             var data = saves.read(name(id));
-            if (data !== null || !fromBrowser) return LZString.decompressFromBase64(data);
+            if (data !== null || !fromBrowser && !own(id)) return LZString.decompressFromBase64(data);
             var json = load.call(this, id);
             if (json) saves.write(name(id), LZString.compressToBase64(json));
             return json;
         };
-        SM.webStorageExists = function (id) { return saves.exists(name(id)) || fromBrowser && exists.call(this, id); };
+        SM.webStorageExists = function (id) { return saves.exists(name(id)) || (fromBrowser || own(id)) && exists.call(this, id); };
         SM.removeWebStorage = function (id) {
             if (id === failed) { failed = null; return; } // MV removes a save it failed to write: the last one stays
             saves.remove(name(id));
-            if (fromBrowser) remove.call(this, id);
+            if (fromBrowser || own(id)) remove.call(this, id);
         };
         if (!fromBrowser) return;
         try {
@@ -225,29 +266,42 @@
         } catch (e) { /* no browser storage: nothing to carry over */ }
     }
 
+    // A plugin's own data has a name of its own (StorageManager.saveObject('My Data', ...)): as for MV, the file its PC
+    // version writes (filePath), else the browser.
     function mzSaves(SM, saves, fromBrowser) {
-        var name = function (saveName) { return saveName + '.rmmzsave'; };
+        var own = function (saveName) { return !/^(config|global|file\d+)$/.test(saveName); };
+        var name = function (saveName) {
+            return own(saveName) && pcFile(SM, 'fileDirectoryPath', 'filePath', saveName) || saveName + '.rmmzsave';
+        };
         var save = SM.saveToForage, load = SM.loadFromForage, exists = SM.forageExists, remove = SM.removeForage;
         var carried = null;
         SM.saveToForage = function (saveName, zip) {
             if (typeof zip !== 'string') return save.apply(this, arguments); // not the text a PC writes: kept as before
-            return saves.write(name(saveName), zip) ? Promise.resolve() : Promise.reject(new Error('Cannot write save/' + name(saveName)));
+            if (saves.write(name(saveName), zip)) return Promise.resolve();
+            if (!own(saveName)) return Promise.reject(new Error('Cannot write save/' + name(saveName)));
+            console.warn('[AGVN] save/' + name(saveName) + ' not written: kept in the browser');
+            return save.apply(this, arguments).then(function (r) {
+                saves.remove(name(saveName)); // an older file would be read first
+                return r;
+            });
         };
         SM.loadFromForage = function (saveName) {
             var self = this;
             return carryOver(self).then(function () {
                 var zip = saves.read(name(saveName));
-                if (zip !== null || !fromBrowser) return zip;
+                if (zip !== null || !fromBrowser && !own(saveName)) return zip;
                 return load.call(self, saveName).then(function (z) {
                     if (typeof z === 'string' && z) saves.write(name(saveName), z);
                     return z;
                 });
             });
         };
-        SM.forageExists = function (saveName) { return saves.exists(name(saveName)) || fromBrowser && exists.call(this, saveName); };
+        SM.forageExists = function (saveName) {
+            return saves.exists(name(saveName)) || (fromBrowser || own(saveName)) && exists.call(this, saveName);
+        };
         SM.removeForage = function (saveName) {
             saves.remove(name(saveName));
-            return fromBrowser ? remove.call(this, saveName) : Promise.resolve();
+            return fromBrowser || own(saveName) ? remove.call(this, saveName) : Promise.resolve();
         };
 
         // every save the browser kept, as files, at the first load: the keys hold the game's id, known by then
