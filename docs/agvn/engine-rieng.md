@@ -473,3 +473,18 @@ Có hai chỗ app làm mất bộ phím đã chỉnh, và một trạng thái gi
      game dùng hồ sơ mới. Đổi về "Tự động": game dùng bộ phím AGVN như trước.
   4. Ẩn phím bằng 👁 trong một game, thoát. Chọn một bộ phím cho game đó trong cài đặt rồi mở game: phím hiện.
   5. Hồi quy: game "Chạy nhẹ" không chọn gì (Tự động) vẫn dùng bộ phím AGVN và bộ phím riêng đã sửa trước đây.
+
+Anh Sơn báo lại ngày 09/10/2026: chỉnh bộ phím ở màn "Điều khiển", chọn nó trong cài đặt game, vào game vẫn mất.
+- **Cập nhật app chép đè bộ phím:** Winlator gốc chép lại các hồ sơ đi kèm (RTS, Template (12 buttons), Virtual
+  Gamepad, PC Gamepad) đè lên hồ sơ cùng id và cùng tên ở mỗi bản mới. Phím sửa trong các hồ sơ đó mất ở lần cập nhật
+  sau, mà AGVN cập nhật nhiều lần mỗi ngày. Giờ cập nhật không chép đè nữa
+  (`InputControlsManager.copyAssetProfilesIfNeeded`). Các hồ sơ này không đổi từ lúc tách nhánh.
+- **Game "Chạy nhẹ" giữ bộ phím riêng cũ hơn:** bộ phím riêng sửa trong game (✎) được dùng khi nó làm từ hồ sơ đang
+  chọn, kể cả khi người chơi sửa hồ sơ đó ở màn "Điều khiển" sau đó. Giờ app nhớ lúc lưu bộ phím riêng (`layoutAt.<game>`).
+  Hồ sơ được lưu sau lúc đó thì game dùng hồ sơ (`AgvnLightPick.ownIsNewest`). Bộ phím AGVN còn nguyên như lúc cài
+  (còn `agvnLayoutVersion`) không tính, vì bản cập nhật có thể ghi lại nó.
+- **Thử máy:**
+  1. Sửa phím của "PC Gamepad" ở màn "Điều khiển", chọn nó cho một game Windows, mở game: thấy phím đã sửa. Cập nhật
+     app lên bản mới rồi mở lại game: phím đã sửa vẫn còn.
+  2. Game "Chạy nhẹ" đã có bộ phím riêng (✎) làm từ hồ sơ X. Sửa X ở màn "Điều khiển", mở game: thấy X vừa sửa. ✎ sửa
+     thêm trong game, mở lại: thấy bộ vừa sửa trong game.

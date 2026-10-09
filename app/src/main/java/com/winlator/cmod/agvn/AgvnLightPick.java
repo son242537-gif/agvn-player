@@ -21,10 +21,17 @@ final class AgvnLightPick {
     final int id;
     /** The picked profile's .icp; null unless {@link #id} is a profile's. */
     final String json;
+    /** When the picked profile was last saved (ms); 0 for none or AGVN's layout as installed (updates rewrite it). */
+    final long editedMs;
 
     AgvnLightPick(int id, String json) {
+        this(id, json, 0);
+    }
+
+    AgvnLightPick(int id, String json, long editedMs) {
         this.id = id;
         this.json = json;
+        this.editedMs = editedMs;
     }
 
     /** The pick of the game {@code activity} runs, from its shortcut (shortcut_path). */
@@ -36,7 +43,16 @@ final class AgvnLightPick {
         if (id <= 0) return new AgvnLightPick(id, null);
         File file = ControlsProfile.getProfileFile(activity, id);
         String json = file.isFile() ? FileUtils.readString(file) : null;
-        return json != null && !json.trim().isEmpty() ? new AgvnLightPick(id, json) : new AgvnLightPick(NONE, null);
+        if (json == null || json.trim().isEmpty()) return new AgvnLightPick(NONE, null);
+        return new AgvnLightPick(id, json, json.contains("\"" + AgvnControls.VERSION_KEY + "\"") ? 0 : file.lastModified());
+    }
+
+    /**
+     * Whether the game's own key set, kept at {@code ownAtMs} and made from the picked profile, is still the newest: not
+     * when the player saved the profile in "Điều khiển" after it, wanting those keys in the game (09/10/2026).
+     */
+    static boolean ownIsNewest(long ownAtMs, long profileEditedMs) {
+        return profileEditedMs <= 0 || ownAtMs >= profileEditedMs;
     }
 
     /**

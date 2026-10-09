@@ -46,4 +46,25 @@ public class AgvnLightPickTest {
         later.picked(game, AgvnLightPick.OFF);
         assertTrue("\"Tắt\" leaves the keys as they were", new AgvnLightPrefs(dir).keysHidden(game));
     }
+
+    @Test
+    public void aProfileSavedOutsideAfterTheGamesOwnKeysWins() throws Exception {
+        assertTrue("the profile was saved before the game's own set", AgvnLightPick.ownIsNewest(2_000, 1_000));
+        assertFalse("saved in \"Điều khiển\" after it (09/10/2026)", AgvnLightPick.ownIsNewest(1_000, 2_000));
+        assertTrue("AGVN's layout as installed: an update rewrites it", AgvnLightPick.ownIsNewest(1_000, 0));
+
+        File dir = tmp.newFolder("light");
+        String game = "/sdcard/Games/Nym";
+        AgvnLightPrefs prefs = new AgvnLightPrefs(dir);
+        long before = System.currentTimeMillis();
+        prefs.setLayout(game, "{\"elements\":[]}", 12);
+        long at = new AgvnLightPrefs(dir).layoutAt(game);
+        assertTrue("kept with the time it was made", at >= before && at <= System.currentTimeMillis());
+
+        File file = new File(dir, AgvnLightPrefs.FILE_NAME); // a set kept before 0.1.33 has no time
+        String old = new String(java.nio.file.Files.readAllBytes(file.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+        java.nio.file.Files.write(file.toPath(), old.replaceAll("(?m)^layoutAt\\..*$", "").getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        assertTrue(file.setLastModified(123_000));
+        assertEquals("then the file's last write, at or after it", 123_000, new AgvnLightPrefs(dir).layoutAt(game));
+    }
 }

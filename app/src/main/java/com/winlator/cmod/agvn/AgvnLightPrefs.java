@@ -64,7 +64,20 @@ final class AgvnLightPrefs {
     void setLayout(String game, String json, int base) {
         props.setProperty("layout." + game, json);
         props.setProperty("layoutBase." + game, String.valueOf(base));
+        props.setProperty("layoutAt." + game, String.valueOf(System.currentTimeMillis()));
         save();
+    }
+
+    /**
+     * When the game's own key set was kept (ms); for one kept before 0.1.33, which has no time, the file's last write,
+     * which came at or after it.
+     */
+    long layoutAt(String game) {
+        try {
+            return Long.parseLong(props.getProperty("layoutAt." + game, "").trim());
+        } catch (NumberFormatException e) {
+            return file.lastModified();
+        }
     }
 
     /** The key profile the game's own key set was made from; 0 for AGVN's keys, as every set before 0.1.29. */

@@ -76,7 +76,8 @@ public final class AgvnLightTools {
         pick = AgvnLightPick.of(activity);
         String json = pick.json != null ? pick.json : FileUtils.readString(activity, AgvnLayouts.assetFor(kind));
         layout = AgvnLightLayout.parse(kind, json != null ? json : "{}", host.runner());
-        boolean own = prefs.layoutBase(game) == pick.id && layout.load(prefs.layout(game)); // made from this pick
+        boolean own = prefs.layoutBase(game) == pick.id && AgvnLightPick.ownIsNewest(prefs.layoutAt(game), pick.editedMs)
+                && layout.load(prefs.layout(game)); // made from this pick, which was not saved again since
         if (!own && pick.json == null) layout.apply(prefs.positions(kind)); // else the places of AGVN 0.1.6-0.1.8
         if (pick.id != prefs.lastPick(game)) prefs.picked(game, pick.id);
         keys = new AgvnLightKeys(activity, layout, host::binding);
