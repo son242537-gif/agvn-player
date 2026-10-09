@@ -361,6 +361,7 @@
     <string name="agvn_fix_driver_system">driver của máy (System)</string>
     <string name="agvn_fix_wined3d">Dùng WineD3D thay DXVK (chậm hơn, dễ chạy hơn)</string>
     <string name="agvn_fix_dxvk_back">Dùng lại DXVK (bỏ WineD3D)</string>
+    <string name="agvn_fix_ue_wait">Cho game chờ vẽ hình lâu hơn, không tự dừng sau 120 giây</string>
     <string name="agvn_fix_godot_vulkan">Cho game Godot chạy bằng Vulkan</string>
     <string name="agvn_fix_godot_gles2">Cho game Godot chạy bằng OpenGL đời cũ (GLES2)</string>
     <string name="agvn_fix_godot_angle">Cho game Godot chạy bằng Direct3D 11 (ANGLE)</string>

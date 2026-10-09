@@ -66,6 +66,9 @@ final class AgvnFixApply {
             case "dxvk-back":
                 s.putExtra("dxwrapper", fix.to);
                 break;
+            case "ue-wait":
+                s.putExtra("execArgs", AgvnFixEdits.withArgs(s.getExtra("execArgs"), fix.to));
+                break;
             case "godot-renderer":
             case "godot-angle":
             case "godot-undo":

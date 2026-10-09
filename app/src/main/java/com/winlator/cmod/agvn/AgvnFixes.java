@@ -32,7 +32,7 @@ final class AgvnFixes {
             "driver-other", "wined3d", "godot-renderer", "godot-angle", "godot-undo", "render-gmem", "render-auto",
             "emulator-stable", "emulator-fast", "wincomponent", "wrapper-constants", "wrapper-clip", "wine-mono",
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
-            "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "mods-off", "raw-mouse");
+            "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "mods-off", "raw-mouse", "ue-wait");
     static final String SYSTEM = "System";
 
     /** A button: its fix id, its words, and what it sets ({@code to}). */
@@ -107,6 +107,9 @@ final class AgvnFixes {
             case "dxvk-back":
                 return AgvnOpenGlCheck.wined3d(s)
                         ? new Fix(id, a.getString(R.string.agvn_fix_dxvk_back), AgvnOpenGlCheck.dxvkBack(s)) : null;
+            case "ue-wait":
+                return s.getExtra("execArgs").contains(AgvnFixEdits.UE_NO_TIMEOUT)
+                        ? null : new Fix(id, a.getString(R.string.agvn_fix_ue_wait), AgvnFixEdits.UE_NO_TIMEOUT);
             case "godot-renderer":
             case "godot-angle":
             case "godot-undo":

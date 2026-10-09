@@ -38,6 +38,7 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Wine chưa chạy được phần .NET của game | Wine: `Could not load Mono into this process` hoặc `mscoree.dll not found, IL-only binary`: có Wine Mono rồi mà Wine không nạp được | Gửi nhật ký, kèm gợi ý file chạy như trên |
 | Driver đồ họa bị lỗi khi game vẽ hình | Hộp "Assertion failed!" của Wine nhắc `winevulkan/loader_thunks.c` và một hàm Vulkan (`vkCreateShaderModule`...): driver bị lỗi ngay trong lúc game nhờ nó dựng hình | GPU Mali, lỗi lúc tạo shader: tắt bước sửa shader "hằng số", rồi bước "cắt hình". Đổi bản DXVK, đổi driver, chạy bằng Wine cũ (Proton 9) khi game đang chạy Proton 10, dùng WineD3D. Game Godot: bỏ cách vẽ đã đổi, chạy bằng Direct3D 11 (ANGLE), hai bước sửa shader, đổi driver |
 | Game cần DirectX 11 mức 11.0 | Hộp của game Unreal: "A D3D11-compatible GPU (Feature Level 11.0, Shader Model 5.0) is required to run the engine.": DXVK hay WineD3D, với driver đang chọn, chưa tới mức DirectX 11 game cần (thiếu tessellation...). Bản DXVK nào cũng cần các tính năng đó. Zink không chạy (dòng bên dưới) thì app nói đúng lý do đó trước | Dùng lại DXVK khi game đang chạy WineD3D, đổi driver |
+| Game Unreal tự dừng vì chờ vẽ hình quá lâu | Hộp "LowLevelFatalError … GameThread timed out waiting for RenderThread after 120.00 secs": phần vẽ hình của Unreal 4 bận liền 120 giây (tải, dựng shader và texture lần đầu trên máy chậm), và Unreal tự dừng (`g.TimeoutForBlockOnRenderFence`). Game không hỏng | Cho game chờ lâu hơn: thêm `-nothreadtimeout` vào tham số chạy của game (bản 0.1.34) |
 | Godot không mở được OpenGL | Câu lỗi của Godot (nhật ký `godot.log` hoặc hộp "Unable to initialize video driver"), hoặc game Godot tắt trước khi hiện hình | Chạy Godot bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bằng Direct3D 11 (ANGLE, Godot 4.4 trở lên), bỏ cách vẽ đã đổi, đổi driver |
 | Godot không mở được OpenGL lẫn Direct3D 11 | Hộp lỗi của Godot 4.4 trở lên: "...required OpenGL 3.3 or Direct3D 11 version" | Chạy bằng Vulkan, bỏ cách vẽ đã đổi, đổi driver |
 | Godot không mở được Vulkan | Hộp lỗi của Godot: "...required Vulkan version" | Bỏ cách vẽ đã đổi, chạy bằng Direct3D 11 (ANGLE), đổi driver |
@@ -94,7 +95,13 @@ Nhật ký thứ hai của máy này (09/10, 14:23–14:35, vẫn bản 0.1.32) 
 - Lần cuối, với cấu hình trước khi thử: đứng hình 25 giây, không ra khung hình nào trong 40 giây cuối, RAM còn 600 MB.
 
 Nhiều khả năng máy này không chạy được game: WineD3D cần Zink mà driver thiếu tính năng Zink cần, còn DXVK thì lỗi
-shader hoặc đen màn hình. Người chơi có đổi "Mức tính năng VKD3D" (9_1, 11_0), nhưng mức đó chỉ dùng cho game DirectX 12,
+shader hoặc đen màn hình.
+
+Nhật ký thứ ba (09/10, 17:02–17:59, vẫn bản 0.1.32): lần 17:14 chạy 29 phút và tới được menu, nhưng nền phía sau vẫn
+đen; lúc cuối GPU bận 64–94% mà không ra khung hình nào trong 60 giây. Bật lại bước sửa shader "cắt hình", giải nén BCn
+bằng CPU, đổi tên `d3d11.dll` của gói GameHub: mỗi lần chỉ chạy 1,5–4 phút, vẫn đen. Lần cuối (không còn `d3d11.dll`
+của gói, BCn bằng CPU) Unreal hiện hộp "GameThread timed out waiting for RenderThread after 120.00 secs" rồi tự dừng.
+Bản 0.1.34 nhận ra hộp đó và đề nghị thêm `-nothreadtimeout` vào tham số chạy để Unreal chờ thay vì tự dừng. Người chơi có đổi "Mức tính năng VKD3D" (9_1, 11_0), nhưng mức đó chỉ dùng cho game DirectX 12,
 không đổi gì với game DirectX 11 này.
 
 Ví dụ ngày 06/10 (bản 0.1.23): Become A Vtuber (Unity 6, DirectX 11) trên Redmi K30 5G, GPU Adreno 620, chạy bằng
@@ -939,6 +946,10 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       game mở có thanh "Chưa thử được: Dùng WineD3D …" với nút "Thử: …", không có thanh "Còn lỗi … không?";
       `su-kien.txt` có "Tự sửa lỗi: game chạy không có …". Bấm "Thử: …" rồi "Mở lại game ngay": game chạy WineD3D,
       45 giây sau app mới hỏi.
+- [ ] Bản 0.1.34, game Unreal hiện hộp "GameThread timed out waiting for RenderThread after 120.00 secs" (máy chậm,
+      lần tải đầu), bấm OK: thư viện hỏi "Game Unreal tự dừng vì chờ vẽ hình quá lâu" với nút "Cho game chờ vẽ hình lâu
+      hơn…". Bấm: game mở lại, "Cấu hình" → "Nâng cao" → "Tham số chạy" có `-nothreadtimeout`, và game không còn tự
+      dừng sau 120 giây.
 - [ ] Bản 0.1.32, Điều khiển → mở màn gán phím của một thiết bị, tắt thiết bị rồi xoay máy: app báo thiết bị vừa
       ngắt kết nối, không văng.
 - [ ] Bản 0.1.29, thoát một game Windows bất kỳ (từ menu, hoặc "Mở lại game ngay" của "Tự sửa lỗi"): gần cuối

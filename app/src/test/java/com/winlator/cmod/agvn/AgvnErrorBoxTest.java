@@ -129,6 +129,21 @@ public class AgvnErrorBoxTest {
     }
 
     @Test
+    public void unrealStopsWaitingForItsRenderThread() {
+        // Support Pregnancy School on a Galaxy M34, 09/10 17:59: the box after two and a half minutes of black screen
+        AgvnEvidence ev = box("UNREAL", "");
+        ev.lines.set(0, "0114:trace:msgbox:MSGBOX_OnInit L\"LowLevelFatalError [File:Unknown] [Line: 1209] \\nGameThread "
+                + "timed out waiting for RenderThread after 120.00 secs\\n\\r\\n\\r\\n\"");
+        AgvnProblemCatalog.Finding f = AgvnDoctorTest.catalog.find(ev);
+        assertEquals("ue-render-timeout", f.id());
+        assertEquals(Arrays.asList("ue-wait", "send-logs"), f.fixes());
+        ev.endedByGame = false; // quit from the AGVN bar behind the box: the box still said it
+        assertEquals("ue-render-timeout", AgvnDoctorTest.catalog.find(ev).id());
+        String once = AgvnFixEdits.withArgs("-dx11", AgvnFixEdits.UE_NO_TIMEOUT);
+        assertEquals("-dx11 -nothreadtimeout", AgvnFixEdits.withArgs(once, AgvnFixEdits.UE_NO_TIMEOUT));
+    }
+
+    @Test
     public void unrealOnWineD3dWithoutZinkIsAnOpenGlProblem() {
         // Support Pregnancy School on a Galaxy M34 (Mali-G68, Vulkan 1.1), 09/10 13:06: "Tự sửa lỗi" tried WineD3D for
         // a black screen, Zink did not start, and Unreal showed its box (the maintainer's screenshot)

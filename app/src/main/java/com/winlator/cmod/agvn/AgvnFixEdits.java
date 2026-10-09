@@ -16,6 +16,11 @@ final class AgvnFixEdits {
     /** Godot 4's Compatibility renderer on ANGLE: OpenGL ES drawn with Direct3D 11, so through DXVK instead of Zink. */
     static final String GODOT_ANGLE_ARGS = "--rendering-method gl_compatibility --rendering-driver opengl3_angle";
     private static final String[] GODOT_RENDERERS = {GODOT4_ARGS, GODOT_ANGLE_ARGS, GODOT3_ARGS};
+    /**
+     * Unreal 4 stops itself ("GameThread timed out waiting for RenderThread") once its render thread has been busy for
+     * 120 s (g.TimeoutForBlockOnRenderFence); with this argument it waits instead.
+     */
+    static final String UE_NO_TIMEOUT = "-nothreadtimeout";
 
     private AgvnFixEdits() {}
 
