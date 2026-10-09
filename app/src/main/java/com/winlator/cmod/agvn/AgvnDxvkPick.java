@@ -62,6 +62,14 @@ public final class AgvnDxvkPick {
         return version.contains("arm64ec") ? OLD + "-arm64ec-async" : OLD;
     }
 
+    /**
+     * True when {@code a} and {@code b} start as the same DXVK ({@link #forLaunch}): choosing one for the other changes
+     * nothing. A Galaxy M34's driver (Mali-G68, Vulkan 1.1) was offered DXVK 2.3.1, and each start ran 1.10.3 (09/10).
+     */
+    static boolean sameAtStart(String a, String b, String driver, int systemVulkan) {
+        return java.util.Objects.equals(forLaunch(a, driver, systemVulkan), forLaunch(b, driver, systemVulkan));
+    }
+
     /** {@link #forLaunch} on a start's DXVK settings; {@code driver} is the Vulkan driver the start uses. */
     public static void fitLaunch(Context context, KeyValueSet dxwrapperConfig, String driver) {
         String version = dxwrapperConfig.get("version");

@@ -58,6 +58,12 @@ public class AgvnAllPhonesTest {
         assertEquals("2.3.1", AgvnDxvkPick.forLaunch("2.3.1", "System", 0)); // the phone does not say
         assertEquals("1.10.3", AgvnDxvkPick.forLaunch("1.10.3", "System", VK_1_1));
         assertEquals(null, AgvnDxvkPick.forLaunch(null, "System", VK_1_1));
+        // "Đổi DXVK sang bản 2.3.1" on such a driver changes nothing: not offered (a Galaxy M34, Mali-G68, 09/10)
+        assertTrue(AgvnDxvkPick.sameAtStart("1.10.3", "2.3.1", "System", VK_1_1));
+        assertTrue(AgvnDxvkPick.sameAtStart("2.3.1", "1.10.3", "System", VK_1_1));
+        assertFalse(AgvnDxvkPick.sameAtStart("1.10.3", "2.3.1", "System", VK_1_3));
+        assertFalse(AgvnDxvkPick.sameAtStart("1.10.3", "2.3.1", "turnip26.2.0", VK_1_1));
+        assertFalse(AgvnDxvkPick.sameAtStart("1.10.3-arm64ec-async", "2.3.1-arm64ec-gplasync", "System", 0));
     }
 
     @Test

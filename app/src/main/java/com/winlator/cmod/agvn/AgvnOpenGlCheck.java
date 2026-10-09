@@ -17,7 +17,7 @@ import com.winlator.cmod.container.Shortcut;
  * {@link DriverSafety} keeps its probes: another driver or a newer Mesa may start.
  */
 final class AgvnOpenGlCheck {
-    static final String PROBLEM = "opengl-unavailable", PREFS = "agvn_opengl";
+    static final String PROBLEM = "opengl-unavailable", PREFS = "agvn_opengl", ZINK_FAILED = "failed to load driver: zink";
     private static final String TAG = "AGVN";
 
     private AgvnOpenGlCheck() {}
@@ -30,6 +30,12 @@ final class AgvnOpenGlCheck {
 
     static String key(String driver, long appVersionCode) {
         return driver + "@" + appVersionCode;
+    }
+
+    /** True when Wine's lines say Zink did not start ("failed to load driver: zink"), however the game ended. */
+    static boolean zinkFailed(java.util.List<String> lines) {
+        for (String line : lines) if (line != null && line.contains(ZINK_FAILED)) return true;
+        return false;
     }
 
     /** {@code s} ended with Zink not starting: OpenGL does not work with its driver. */

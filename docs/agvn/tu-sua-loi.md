@@ -37,15 +37,15 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Game cần .NET | Wine: `Wine Mono is not installed`: file chạy của game, hoặc chương trình nó mở, viết bằng .NET (C#) mà Wine chưa có Wine Mono. Xem "Game .NET (Wine Mono)" bên dưới | Cài .NET cho game (Wine Mono), gửi nhật ký. Hộp hỏi cũng gợi ý thêm lại game bằng file chạy chính nếu thư mục còn file `.exe` khác |
 | Wine chưa chạy được phần .NET của game | Wine: `Could not load Mono into this process` hoặc `mscoree.dll not found, IL-only binary`: có Wine Mono rồi mà Wine không nạp được | Gửi nhật ký, kèm gợi ý file chạy như trên |
 | Driver đồ họa bị lỗi khi game vẽ hình | Hộp "Assertion failed!" của Wine nhắc `winevulkan/loader_thunks.c` và một hàm Vulkan (`vkCreateShaderModule`...): driver bị lỗi ngay trong lúc game nhờ nó dựng hình | GPU Mali, lỗi lúc tạo shader: tắt bước sửa shader "hằng số", rồi bước "cắt hình". Đổi bản DXVK, đổi driver, chạy bằng Wine cũ (Proton 9) khi game đang chạy Proton 10, dùng WineD3D. Game Godot: bỏ cách vẽ đã đổi, chạy bằng Direct3D 11 (ANGLE), hai bước sửa shader, đổi driver |
-| Game cần DirectX 11 mức 11.0 | Hộp của game Unreal: "A D3D11-compatible GPU (Feature Level 11.0, Shader Model 5.0) is required to run the engine.": DXVK hay WineD3D, với driver đang chọn, chưa tới mức DirectX 11 game cần (thiếu tessellation...). Bản DXVK nào cũng cần các tính năng đó | Dùng lại DXVK khi game đang chạy WineD3D, đổi driver |
+| Game cần DirectX 11 mức 11.0 | Hộp của game Unreal: "A D3D11-compatible GPU (Feature Level 11.0, Shader Model 5.0) is required to run the engine.": DXVK hay WineD3D, với driver đang chọn, chưa tới mức DirectX 11 game cần (thiếu tessellation...). Bản DXVK nào cũng cần các tính năng đó. Zink không chạy (dòng bên dưới) thì app nói đúng lý do đó trước | Dùng lại DXVK khi game đang chạy WineD3D, đổi driver |
 | Godot không mở được OpenGL | Câu lỗi của Godot (nhật ký `godot.log` hoặc hộp "Unable to initialize video driver"), hoặc game Godot tắt trước khi hiện hình | Chạy Godot bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bằng Direct3D 11 (ANGLE, Godot 4.4 trở lên), bỏ cách vẽ đã đổi, đổi driver |
 | Godot không mở được OpenGL lẫn Direct3D 11 | Hộp lỗi của Godot 4.4 trở lên: "...required OpenGL 3.3 or Direct3D 11 version" | Chạy bằng Vulkan, bỏ cách vẽ đã đổi, đổi driver |
 | Godot không mở được Vulkan | Hộp lỗi của Godot: "...required Vulkan version" | Bỏ cách vẽ đã đổi, chạy bằng Direct3D 11 (ANGLE), đổi driver |
 | Game Godot tự tắt sau khi đổi cách vẽ | App đã đổi cách vẽ của game, rồi game tự tắt trong một phút đầu mà không để lại câu lỗi nào | Chạy bằng Direct3D 11 (ANGLE), bỏ cách vẽ đã đổi, đổi driver |
 | Game bị tắt khi vẽ hình (OpenGL qua Zink) | Zink báo `vkCreateGraphicsPipelines failed` rồi game tự tắt; hay gặp ở GPU Mali, vì Zink thiếu vài tính năng trên đó | Game Godot: chạy bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bằng Direct3D 11 (ANGLE), bỏ cách vẽ đã đổi. Mọi game: đổi driver |
 | Driver đồ họa thiếu tính năng DirectX 11 | DXVK: `D3D11CoreCreateDevice: Requested feature level not supported`: driver không đủ tính năng cho mức DirectX nào game xin (vẽ khung dây, geometry shader, transform feedback...) | Đổi driver, dùng WineD3D (trừ khi OpenGL đã không chạy với driver này), gửi nhật ký. Không đổi bản DXVK: bản nào cũng cần các tính năng đó |
-| Máy không chạy được OpenGL với driver này | Mesa: `failed to load driver: zink`: Zink không khởi động được trên driver Vulkan của game, nên game OpenGL và WineD3D không vẽ được | Dùng lại DXVK (game đang dùng WineD3D), đổi driver, gửi nhật ký. Từ đó app không đề nghị WineD3D với driver này nữa (`AgvnOpenGlCheck`, nhớ theo driver và bản app) |
-| Không tạo được DirectX / thiếu DirectX 11 | Câu lỗi của DXVK, Unity (`InitializeEngineGraphics failed`) | Đổi bản DXVK, đổi driver (Turnip ↔ System), dùng WineD3D |
+| Máy không chạy được OpenGL với driver này | Mesa: `failed to load driver: zink`: Zink không khởi động được trên driver Vulkan của game, nên game OpenGL và WineD3D không vẽ được | Dùng lại DXVK (game đang dùng WineD3D), đổi driver, gửi nhật ký. Từ đó app không đề nghị WineD3D với driver này nữa (`AgvnOpenGlCheck`, nhớ theo driver và bản app), dù game kết thúc thế nào (từ 09/10/2026, cả khi người chơi tự thoát) |
+| Không tạo được DirectX / thiếu DirectX 11 | Câu lỗi của DXVK, Unity (`InitializeEngineGraphics failed`) | Đổi bản DXVK, đổi driver (Turnip ↔ System), dùng WineD3D. "Đổi bản DXVK" chỉ hiện khi bản kia chạy được: DXVK 2.x cần Vulkan 1.3, nên với driver của máy (System) thấp hơn, lúc mở game vẫn chạy 1.10.3 và nút đó không hiện (`AgvnDxvkPick.sameAtStart`) |
 | Driver đồ họa lỗi giữa chừng | `VK_ERROR_DEVICE_LOST` | Để Turnip tự chọn chế độ dựng hình, đổi driver, đổi DXVK, hạ Đồ họa |
 | Hết bộ nhớ đồ họa / hết RAM | DXVK, Unity, Unreal báo hết bộ nhớ; DXVK không gắn được bộ nhớ cho texture (`Failed to bind device memory`, xem ví dụ Boxman bên dưới) | Hạ Đồ họa. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ (`giam-ram.md`) |
 | GPU hết bộ nhớ dựng hình (bản 0.1.30) | Driver Mali báo `GROUP_ERROR_TILER_HEAP_OOM` từ 20 lần trong một phiên, khi game đang chạy (xem ví dụ Thanh Âm Mùa Hạ bên dưới) | Hỏi ngay trên thanh trong game: hạ Đồ họa. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ. Phiên đó không được tính là chạy tốt |
@@ -67,6 +67,23 @@ nguồn DXVK 1.10.3 (`D3D11Device::GetDeviceFeatures`), DirectX 11 cần geometr
 sửa lỗi" chỉ biết "Game báo thiếu DirectX", và vì game đang dùng WineD3D nên hộp hỏi chỉ còn "Gửi nhật ký". Giờ app nói
 đúng lý do, đề nghị đưa game về DXVK, và không đề nghị WineD3D với driver đó nữa. Máy chỉ có driver như vậy thì không
 chạy được game DirectX 10/11. Game "Chạy nhẹ" (Ren'Py, RPG Maker, Godot) không cần DirectX nên vẫn chạy.
+
+Ví dụ ngày 09/10 (bản 0.1.32): Support Pregnancy School (Unreal) trên Samsung Galaxy M34 (Exynos 1280, GPU Mali-G68,
+driver Vulkan 1.1, 7,2 GB RAM), Proton 10. Ở Đồ họa Thấp (854×480), game chạy bằng DXVK 1.10.3 nhưng màn hình đen: GPU
+bận 70–98%, không ra khung hình nào trong 35–55 giây cuối, app và game dùng 3 GB RAM. Người chơi báo "Màn hình đen dù
+game vẫn chạy", và "Tự sửa lỗi" thử từng cách:
+- "Đổi DXVK sang bản 2.3.1": không đổi được gì, vì DXVK 2.x cần Vulkan 1.3 nên lúc mở game app vẫn chạy 1.10.3. Hai lần
+  chơi phí công. Giờ nút này không hiện khi bản kia không chạy được với driver của game.
+- "Dùng WineD3D": Zink không chạy trên driver này (`failed to load driver: zink`), nên WineD3D không có OpenGL, và
+  Unreal hiện hộp "A D3D11-compatible GPU (Feature Level 11.0, Shader Model 5.0) is required to run the engine."
+  (ảnh anh Sơn gửi). Phiên đó kết thúc bằng lệnh thoát của app (mã 137) mà không có câu hỏi nào, nên bản 0.1.32 không
+  ghi nhận Zink lỗi. Giờ app ghi nhận ngay khi thấy dòng đó, dù game kết thúc thế nào, và không đề nghị WineD3D với
+  driver này nữa.
+- "Về cấu hình gốc": game dừng ngay lúc mở, `"d3d11.dll" failed to initialize` (thư mục game có sẵn `d3d11.dll` riêng,
+  gói GameHub). Nhật ký không cho biết vì sao: logcat đã hết chỗ từ 13:07.
+
+Màn hình đen ở DXVK thì chưa rõ lý do: game có thể vẫn đang tải và dựng shader (Unreal trên GPU Mali yếu, texture BCn
+phải giải nén), hoặc bị kẹt. Thử để game chạy 3–5 phút một lần ở Đồ họa Thấp.
 
 Ví dụ ngày 06/10 (bản 0.1.23): Become A Vtuber (Unity 6, DirectX 11) trên Redmi K30 5G, GPU Adreno 620, chạy bằng
 Proton 10. Cả năm lần chơi, game crash ở cùng một chỗ (`UnityPlayer.dll+0x8d8b1a`) lúc tải cảnh đầu; dòng cuối trước
@@ -888,6 +905,8 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
 - [ ] Bản 0.1.33, game Unreal hiện hộp "A D3D11-compatible GPU (Feature Level 11.0, Shader Model 5.0) is required
       to run the engine.", bấm OK: thư viện hỏi "Game cần DirectX 11 mức 11.0". Game đang chạy WineD3D thì có nút
       "Dùng lại DXVK (bỏ WineD3D)".
+- [ ] Bản 0.1.33, máy có driver Vulkan dưới 1.3 (như Galaxy M34): "Tự sửa lỗi" không có "Đổi DXVK sang bản 2.3.1". Máy
+      Zink không chạy: sau một lần WineD3D lỗi (kể cả khi tự thoát game), không game nào được đề nghị WineD3D nữa.
 - [ ] Bản 0.1.32, Điều khiển → mở màn gán phím của một thiết bị, tắt thiết bị rồi xoay máy: app báo thiết bị vừa
       ngắt kết nối, không văng.
 - [ ] Bản 0.1.29, thoát một game Windows bất kỳ (từ menu, hoặc "Mở lại game ngay" của "Tự sửa lỗi"): gần cuối

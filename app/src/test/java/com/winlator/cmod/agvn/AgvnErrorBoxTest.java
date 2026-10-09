@@ -129,6 +129,24 @@ public class AgvnErrorBoxTest {
     }
 
     @Test
+    public void unrealOnWineD3dWithoutZinkIsAnOpenGlProblem() {
+        // Support Pregnancy School on a Galaxy M34 (Mali-G68, Vulkan 1.1), 09/10 13:06: "Tự sửa lỗi" tried WineD3D for
+        // a black screen, Zink did not start, and Unreal showed its box (the maintainer's screenshot)
+        AgvnEvidence ev = box("UNREAL", UNREAL_D3D11);
+        ev.lines.addAll(0, Arrays.asList("WARNING: Some incorrect rendering might occur because the selected Vulkan device "
+                + "(Wrapper(Mali-G68)) doesn't support base Zink requirements: feats.features.logicOp "
+                + "feats.features.fillModeNonSolid feats.features.shaderClipDistance ", "glx: failed to create drisw screen",
+                "failed to load driver: zink"));
+        ev.started = false;
+        assertTrue("kept whatever the end is named: no more WineD3D with this driver", AgvnOpenGlCheck.zinkFailed(ev.lines));
+        assertEquals(AgvnOpenGlCheck.PROBLEM, AgvnDoctorTest.catalog.find(ev).id());
+        ev.endedByGame = false; // the player quit with the box up, after the game's window had shown
+        ev.playerQuit = ev.bigWindowSeen = true;
+        assertEquals("d3d11-level", AgvnDoctorTest.catalog.find(ev).id());
+        assertFalse(AgvnOpenGlCheck.zinkFailed(Collections.singletonList("Zink: logicOp missing")));
+    }
+
+    @Test
     public void anOrdinaryBoxSaysNothing() {
         AgvnEvidence ev = box("UNITY", "Do you want to save your game before quitting?");
         ev.endedByGame = false;

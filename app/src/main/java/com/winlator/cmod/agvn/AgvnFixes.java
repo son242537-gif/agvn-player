@@ -87,8 +87,11 @@ final class AgvnFixes {
             case "quality-down":
             case "quality-up":
                 return quality(a, s, state, id);
-            case "dxvk-other":
-                return !dxvk(s) ? null : fix(a, id, R.string.agvn_fix_dxvk, AgvnFixEdits.otherDxvk(dxvkVersion(s)));
+            case "dxvk-other": { // not one the start trades back for the one it runs now (DXVK 2.x needs Vulkan 1.3)
+                String now = dxvkVersion(s), to = AgvnFixEdits.otherDxvk(now);
+                return !dxvk(s) || AgvnDxvkPick.sameAtStart(now, to, AgvnOpenGlCheck.driver(a, s), AgvnDxvkPick.systemVulkan(a))
+                        ? null : fix(a, id, R.string.agvn_fix_dxvk, to);
+            }
             case "dxvk-arm64ec": {
                 String to = dxvk(s) && s.container.getWineVersion().contains("arm64ec") ? AgvnFixEdits.arm64ecDxvk(dxvkVersion(s)) : null;
                 return to == null ? null : fix(a, id, R.string.agvn_fix_dxvk_arm64ec, to);

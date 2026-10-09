@@ -120,6 +120,7 @@ public final class AgvnDoctor {
 
     /** {@code now}: the settings the session ran with. */
     private static void diagnose(Context ctx, Shortcut s, AgvnEvidence ev, Map<String, String> now) {
+        if (AgvnOpenGlCheck.zinkFailed(ev.lines)) AgvnOpenGlCheck.failed(ctx, s); // no more WineD3D with this driver
         Properties state = AgvnGoodConfig.load(ctx, s);
         List<String> changed = AgvnGoodConfig.changed(AgvnGoodConfig.good(state), now);
         ev.changed = AgvnGoodConfig.hasGood(state) && !changed.isEmpty();
@@ -139,7 +140,6 @@ public final class AgvnDoctor {
         AgvnSessionLog.event("Tự sửa lỗi: " + f.id() + " – " + f.title());
         Log.i(TAG, "doctor: " + f.id() + " for " + s.name);
         if (AgvnMemorySaver.ranOutOfRam(f.id())) AgvnMemorySaver.markRamShort(s); // its next starts save the most RAM
-        if (AgvnOpenGlCheck.PROBLEM.equals(f.id())) AgvnOpenGlCheck.failed(ctx, s); // no more WineD3D with this driver
         AgvnDoctorStore.ask(ctx, s, f);
     }
 
