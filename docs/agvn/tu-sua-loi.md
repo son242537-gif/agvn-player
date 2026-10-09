@@ -336,6 +336,11 @@ Người chơi nối bàn phím và chuột không dây nhưng game không nhậ
   và nguồn Android báo. `su-kien.txt` có các thiết bị đang nối lúc mở game. Mỗi thiết bị, mỗi lần chơi có một dòng:
   `Bàn phím "…": phím tới game` hoặc `phím … không tới game (…)`, `Chuột "…": app nhận cú bấm (…)`. Nếu "Tắt chuột"
   đang bật, dòng chuột ghi rõ game không nhận. Không có dòng nào nghĩa là Android không gửi phím, cú bấm cho app.
+- **Chuột ngoài không làm gì (09/10/2026, bản 0.1.32):** app giữ chuột (`cursor_lock`, bật sẵn), và Android gửi chuột
+  bị giữ tới ô đang được chọn. Bộ phím ảo hiện lên thì được chọn (để nhận cần analog của tay cầm), mà AGVN hiện bộ phím
+  cho mọi game, nên mọi cú di, cú bấm của chuột USB hay Bluetooth tới bộ phím ảo, và nó bỏ đi. Giờ bộ phím ảo chuyển
+  chuột bị giữ sang cùng chỗ với vùng chạm (`handleCapturedPointer`). Đóng menu bên trái thì game lấy lại ô được chọn,
+  vì menu giữ nó sau khi đóng (`XServerDisplayActivity.agvnFocusGame`).
 
 ## App biết gì về từng game (`files/agvn/doctor/`)
 
@@ -870,6 +875,9 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       dòng đó ghi "Android gọi là tay cầm" (như của Av Director Life) cũng vậy.
 - [ ] Bản 0.1.32, tay cầm thật (Xbox, DualSense...): nút, D-pad và cần analog vẫn tới game như trước.
 - [ ] Bản 0.1.32, chuột ngoài: `su-kien.txt` có `Chuột "…": app nhận cú bấm (app đang giữ chuột)`.
+- [ ] Bản 0.1.33, chuột USB hoặc Bluetooth trong game Windows có bộ phím ảo đang hiện: di chuột thì con trỏ của game
+      đi theo, bấm trái, bấm phải, lăn chuột được. Mở menu bên trái, đóng lại: chuột vẫn được. Tay cầm thật: cần analog
+      vẫn tới bộ phím ảo như trước.
 - [ ] Bản 0.1.32, Điều khiển → mở màn gán phím của một thiết bị, tắt thiết bị rồi xoay máy: app báo thiết bị vừa
       ngắt kết nối, không văng.
 - [ ] Bản 0.1.29, thoát một game Windows bất kỳ (từ menu, hoặc "Mở lại game ngay" của "Tự sửa lỗi"): gần cuối

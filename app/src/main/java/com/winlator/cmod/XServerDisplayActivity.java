@@ -381,6 +381,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             @Override
             public void onDrawerClosed(View drawerView) {
                 hideAllSidebarPanels();
+                if (drawerView.hasFocus()) agvnFocusGame(); // AGVN: a held mouse and a gamepad go to the focused view
             }
         });
 
@@ -1422,6 +1423,9 @@ public class XServerDisplayActivity extends AppCompatActivity {
         inputControlsView.setTouchpadView(touchpadView);
         inputControlsView.setXServer(xServer);
         inputControlsView.setVisibility(View.GONE);
+        // AGVN: a held mouse sends its moves and clicks to the focused view, and shown on-screen keys take the focus (for
+        // a gamepad's sticks), so a USB or Bluetooth mouse moved and clicked nothing while they showed (09/10/2026)
+        inputControlsView.setOnCapturedPointerListener(cursorLock ? capturedPointerListener : null);
         rootView.addView(inputControlsView);
 
         boolean isTimeoutEnabled = preferences.getBoolean("touchscreen_timeout_enabled", false);
@@ -2403,6 +2407,17 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (profile == null) return;
         showInputControls(profile);
         com.winlator.cmod.agvn.AgvnControlsFork.rememberShown(shortcut, profile);
+    }
+
+    /**
+     * AGVN: the game's views get the focus back from the sidebar, which kept it after closing: the on-screen keys when
+     * they show (a gamepad's sticks reach them), else the touchpad. A held mouse goes to the focused view too.
+     */
+    private void agvnFocusGame() {
+        if (inputControlsView != null && inputControlsView.getVisibility() == View.VISIBLE && inputControlsView.getProfile() != null)
+            inputControlsView.requestFocus();
+        else if (touchpadView != null)
+            touchpadView.requestFocus();
     }
 
     private void simulateConfirmInputControlsDialog() {
