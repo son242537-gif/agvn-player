@@ -21,6 +21,9 @@ cần bấm "Cập nhật", rồi bấm "Cập nhật" thêm một lần trên h
 - **Sau khi cập nhật:** game, save và cài đặt vẫn giữ nguyên, vì đây là cài đè cùng chữ ký, không phải gỡ ra cài lại.
 - **Không cài được không cần hỏi:** app giữ mức Android 9 (targetSdk 28) như Winlator, nên Android luôn bắt bấm
   xác nhận.
+- **Không ép cập nhật** (luật của anh Sơn, 09/10/2026): người chơi tự chọn "Cập nhật" hay "Để sau", tắt được "Tự
+  kiểm tra", và bản cũ vẫn chạy bình thường. App không tự tải, không tự cài. Mọi thay đổi ở phần cập nhật phải giữ
+  đúng điều này.
 
 ## Một kênh
 

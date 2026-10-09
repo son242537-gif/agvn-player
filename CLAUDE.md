@@ -52,6 +52,8 @@ A Vietnamese-first emulation environment for PC games on weak Android phones (Ad
    - Exception, approved by the maintainer: the in-app updater (`agvn/AgvnUpdater`).
      - It reads `agvn-update.txt` and the APK named there, only from this repository's GitHub Releases.
      - It sends nothing about the device.
+     - Updates are never forced: the player chooses "Cập nhật" or "Để sau", can turn the checks off, and an older
+       version keeps working. Nothing downloads or installs by itself (maintainer's rule, 2026-10-09).
 
 4. **Do not break upstream structure needlessly:** Keep diffs small and focused; new code in new files where sensible.
 
