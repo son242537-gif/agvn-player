@@ -26,6 +26,6 @@ public class AgvnAudioRestTest {
         AgvnAudioRest.environment(env, dir, "/data/user/0/com.agvn.player/files/imagefs/tmp/.sound/AS0");
         assertEquals("/data/user/0/com.agvn.player/files/imagefs/tmp/.sound/AS0", env.get("PULSE_SERVER"));
         assertEquals("/system/lib64:" + new File(dir, "modules") + ":" + dir, env.get("LD_LIBRARY_PATH"));
-        assertEquals(dir.getPath(), env.get("HOME"));
+        assertEquals(dir.getAbsolutePath(), env.get("HOME")); // on Windows too, where "/data/..." gets a drive letter
     }
 }
