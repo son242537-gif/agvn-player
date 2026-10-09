@@ -70,6 +70,7 @@ public final class AgvnUnityCrashWatch {
                 timer.shutdown();
                 return;
             }
+            if (AgvnGamePause.isPaused()) return; // the game is stopped: its log cannot change, no need to read it
             File log = current();
             if (log == null) return;
             long size = log.length();

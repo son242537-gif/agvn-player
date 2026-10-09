@@ -55,7 +55,6 @@ import com.winlator.cmod.container.ContainerManager;
 import com.winlator.cmod.container.Shortcut;
 import com.winlator.cmod.core.WineThemeManager;
 import com.winlator.cmod.xenvironment.ImageFsInstaller;
-import com.winlator.cmod.services.NotificationService;
 
 import java.io.File;
 import java.util.List;
@@ -80,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public final PreloaderDialog preloaderDialog = new PreloaderDialog(this);
     private boolean editInputControls = false;
     private int selectedProfileId;
-    private Intent notificationService;
     private SharedPreferences sharedPreferences;
     private ContainerManager containerManager;
     private boolean isDarkMode;
@@ -137,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // AGVN: sessions whose process Android killed get their logs and exit reason now
         new Thread(() -> com.winlator.cmod.agvn.AgvnSessionLog.finishPending(getApplicationContext()), "AgvnSessionLog").start();
 
-        notificationService = new Intent(this, NotificationService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && (Build.VERSION.SDK_INT < 33 || ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED))
             createNotificationChannel();
 
@@ -219,9 +216,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (savedInstanceState == null && !isBigPictureModeEnabled && !com.winlator.cmod.agvn.CrashRecorder.hasPendingCrash(this))
                 com.winlator.cmod.agvn.AgvnGuideActivity.openOnce(this);
 
+            // AGVN: no keep-alive service for the library: a game starts its own (agvn/AgvnKeepAlive). Started here it ran
+            // as long as the app was open, so Android never let an idle AGVN rest in the background (09/10/2026)
             if (!ImageFsInstaller.installIfNeeded(this, () -> requestAppPermissions())) {
-                if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED)
-                    startForegroundService(notificationService);
                 // AGVN: once a day, say when a new version is out (not while the image installs or over a crash report)
                 if (savedInstanceState == null && !isBigPictureModeEnabled && !com.winlator.cmod.agvn.CrashRecorder.hasPendingCrash(this))
                     com.winlator.cmod.agvn.AgvnUpdateDialogs.checkDaily(this);
@@ -263,8 +260,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == PERMISSION_POST_NOTIFICATIONS_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                startForegroundService(notificationService);
+            // AGVN: nothing to start: a game starts its keep-alive service itself
         } else if (requestCode == PERMISSION_WRITE_EXTERNAL_STORAGE_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 requestAppPermissions();

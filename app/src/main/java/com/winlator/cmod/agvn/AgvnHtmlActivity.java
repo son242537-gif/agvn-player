@@ -193,7 +193,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
             webView.destroy();
             webView = null;
         }
-        if (isFinishing() && !toWindows) AgvnKeepAlive.start(this, null); // back to the library's notification
+        if (isFinishing() && !toWindows) AgvnKeepAlive.stop(this); // back to the library, which needs no keep-alive
         if (isFinishing()) AgvnLightSession.ended(this);
         super.onDestroy();
     }

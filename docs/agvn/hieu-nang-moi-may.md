@@ -61,6 +61,20 @@ Turnip dùng freedreno, vốn đã đặt 3.3.
 Tiết kiệm pin hạ xung CPU trên hầu hết máy, game giả lập chậm thấy rõ. Nếu nó đang bật lúc mở game (Windows hay
 "Chạy nhẹ"), app báo một lần. App không tự tắt nó.
 
+### Pin khi app chạy nền
+
+Người chơi báo AGVN tốn pin khi chạy nền (09/10/2026). Rời một game Windows (về màn hình chính, tắt màn hình) thì app
+dừng các tiến trình Wine, nhưng ba thứ vẫn chạy cho game, và dịch vụ giữ app sống làm chúng chạy mãi:
+- **Âm thanh:** PulseAudio không phải tiến trình Wine, nên không dừng theo game. Luồng AAudio của nó vẫn phát im lặng.
+  Giờ app dùng `pactl` của bản PulseAudio đi kèm để tạm nghỉ âm thanh khi game dừng (`suspend-sink`), rồi mở lại khi
+  quay về (`AgvnAudioRest`). `module-aaudio-sink` dừng hẳn luồng AAudio khi nghỉ. Bản PulseAudio cũ không có `pactl`
+  thì vẫn như trước.
+- **Bộ giữ chuột của X server** (`CursorLocker`) chạy 60 lần mỗi giây từ lúc mở game tới khi app khởi động lại. Giờ nó
+  nghỉ khi game dừng, và chạy theo khoảng nghỉ cố định nên không chạy bù một loạt khi quay lại.
+- **Bộ canh crash Unity** không đọc nhật ký của game khi game đang dừng.
+- **Dịch vụ "AGVN Player đang chạy"** chỉ chạy khi có game (Windows, HTML). Trước đây thư viện bật nó ngay khi mở app,
+  nên app luôn được tính là đang chạy nền, kể cả khi không có game nào.
+
 ### thiet-bi.txt: để chỉnh cho máy chưa đo
 
 "Gửi nhật ký" của game (kể cả khi game đang chạy) có thêm `app/thiet-bi.txt`. File `thiet-bi.txt` của "Xuất nhật ký

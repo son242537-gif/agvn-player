@@ -46,9 +46,21 @@ public final class AgvnKeepAlive {
 
     private AgvnKeepAlive() {}
 
-    /** A game starts in this process (Wine, HTML); null when it has ended and the library is back. */
+    /** A game starts in this process (Wine, HTML). */
     public static void start(Context context, String game) {
         start(context, NotificationService.class, game);
+    }
+
+    /**
+     * The game of this process has ended and the library is back: no service, so Android may let the idle app rest.
+     * The library used to keep it, with "AGVN Player đang chạy", for as long as the app was open (09/10/2026).
+     */
+    static void stop(Context context) {
+        try {
+            context.stopService(new Intent(context, NotificationService.class));
+        } catch (RuntimeException e) {
+            Log.w("AGVN", "keep-alive service not stopped", e);
+        }
     }
 
     /** A Ren'Py game starts in the Ren'Py process. */

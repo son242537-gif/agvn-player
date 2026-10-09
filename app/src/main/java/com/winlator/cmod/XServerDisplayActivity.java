@@ -887,6 +887,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (agvnStatus != null) agvnStatus.followDebugSetting(preferences.getBoolean("enable_wine_debug", false)); // AGVN
         if (!isInPictureInPictureMode()) {
             com.winlator.cmod.agvn.AgvnGamePause.resumed(); // AGVN: the time away is not the game's
+            agvnRest(false);
             ProcessHelper.resumeAllWineProcesses();
         }
     }
@@ -908,6 +909,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
             if (!isFinishing() && !exiting.get()) com.winlator.cmod.agvn.AgvnGamePause.paused(true); // AGVN
             ProcessHelper.pauseAllWineProcesses();
+            if (!isFinishing() && !exiting.get()) agvnRest(true);
         }
 
         savePlaytimeData();
@@ -2407,6 +2409,16 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (profile == null) return;
         showInputControls(profile);
         com.winlator.cmod.agvn.AgvnControlsFork.rememberShown(shortcut, profile);
+    }
+
+    /**
+     * AGVN: while the game is stopped (the player left the app, the screen went off) what still ran for it rests: the
+     * sound output (agvn/AgvnAudioRest) and the X server's cursor check, 60 times a second until the app restarted.
+     * Players found AGVN costly on battery in the background (09/10/2026).
+     */
+    private void agvnRest(boolean rest) {
+        if (xServer != null) xServer.cursorLocker.setEnabled(!rest && !xServer.isRelativeMouseMovement());
+        com.winlator.cmod.agvn.AgvnAudioRest.set(environment != null ? environment.getComponent(PulseAudioComponent.class) : null, rest);
     }
 
     /**
