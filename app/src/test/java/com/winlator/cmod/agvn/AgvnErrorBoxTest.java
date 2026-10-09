@@ -65,8 +65,8 @@ public class AgvnErrorBoxTest {
         AgvnProblemCatalog.Finding f = AgvnDoctorTest.catalog.find(ev);
         assertEquals("vulkan-crash", f.id());
         assertEquals("vkCreateShaderModule", f.params.get("1"));
-        assertEquals(Arrays.asList("wrapper-constants", "wrapper-clip", "dxvk-other", "driver-other", "wined3d", "send-logs"),
-                f.fixes());
+        assertEquals(Arrays.asList("wrapper-constants", "wrapper-clip", "dxvk-other", "driver-other", "wine-old", "wined3d",
+                "send-logs"), f.fixes());
         ev.engine = "GODOT";
         assertEquals("godot-vulkan-crash", AgvnDoctorTest.catalog.find(ev).id());
         ev.endedByGame = false; // the player closed the game behind the box: the box still said it

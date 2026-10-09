@@ -104,7 +104,7 @@ public final class AgvnSessionLog {
         close(context, dir, error != null ? error : how);
     }
 
-    /** The player swiped AGVN away (NotificationService.onTaskRemoved then ends the process): theirs, so not asked about. */
+    /** The player swiped AGVN away (NotificationService.onTaskRemoved then ends the process): asked about only for an error. */
     public static void removedByPlayer(Context context) {
         File dir = current;
         if (dir != null) write(new File(dir, RUNNING), AgvnSessionNotes.REMOVED + "=" + System.currentTimeMillis() + "\n", true);
@@ -128,7 +128,7 @@ public final class AgvnSessionLog {
                         : AgvnExitReason.after(context, start);
                 String error = AgvnCrashScan.sessionError(Collections.emptyList(), files(notes, "log="), start, dir);
                 close(context, dir, error != null ? error + "; sau đó: " + how : how); // the game's crash comes first
-                AgvnDoctor.afterKill(context, notes); // the crash, else Android's end: why, if it can be helped
+                AgvnDoctor.afterKill(context, notes, dir); // the crash, else Android's end: why, if it can be helped
             }
         }
     }

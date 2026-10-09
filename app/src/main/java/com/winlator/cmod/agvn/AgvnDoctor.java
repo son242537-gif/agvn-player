@@ -90,25 +90,28 @@ public final class AgvnDoctor {
     }
 
     /**
-     * A session found unfinished at the next start (AgvnSessionLog.finishPending); its notes name the game. A game that
-     * had crashed (its Unity log says so) is asked about as a crash, however the app ended then; else Android's end is.
+     * A session found unfinished at the next start (AgvnSessionLog.finishPending; {@code dir} its folder). A Unity crash
+     * is asked about however the app ended; else Android's end, or, swiped away, Wine's kept lines (Support Pregnancy
+     * School's "Assertion failed! vkCreateShaderModule" box went unasked, Mali-G615, 09/10/2026).
      */
-    static void afterKill(Context ctx, String notes) {
+    static void afterKill(Context ctx, String notes, File dir) {
         try {
             long start = AgvnSessionNotes.value(notes, "start", 0);
             if (System.currentTimeMillis() - start > KILL_RECENT_MS) return; // too long ago to ask about
             String crash = AgvnUnityCrashFiles.inLogs(AgvnSessionNotes.engineLogs(notes, start), start);
             AgvnExitReason.Exit exit = AgvnSessionNotes.removedByPlayer(notes) ? null : AgvnExitReason.exit(ctx, start);
-            Shortcut s = exit == null && crash == null ? null : AgvnRelaunch.find(ctx,
+            List<String> wine = AgvnWineTail.saved(dir);
+            Shortcut s = exit == null && crash == null && wine.isEmpty() ? null : AgvnRelaunch.find(ctx,
                     (int) AgvnSessionNotes.value(notes, "container", -1), AgvnSessionNotes.text(notes, "shortcut"));
             if (s == null) return;
             AgvnEvidence ev = new AgvnEvidence();
             ev.engine = s.getExtra(AgvnGameImporter.EXTRA_ENGINE);
             ev.ramSaved = AgvnMemorySaver.ranOut(s);
             ev.lines.addAll(engineLogTails(s, start));
+            ev.lines.addAll(wine);
             AgvnUnityCrash.into(ev, crash);
-            ev.killedReason = crash == null ? exit.reason : -1; // a game dead already: its crash, not Android's end
-            ev.killedImportance = crash == null ? exit.importance : 0;
+            ev.killedReason = crash == null && exit != null ? exit.reason : -1; // a dead game: its crash, not Android's end
+            ev.killedImportance = crash == null && exit != null ? exit.importance : 0;
             diagnose(ctx, s, ev, AgvnGoodConfig.snapshot(s));
         } catch (RuntimeException e) {
             Log.w(TAG, "doctor: app end not read", e);

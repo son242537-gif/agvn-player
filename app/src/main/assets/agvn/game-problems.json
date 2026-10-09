@@ -64,7 +64,7 @@
       "lines": ["!status && \\W*(vk\\w+)", "winevulkan/loader_thunks\\.c"],
       "title": "Driver đồ họa bị lỗi khi game vẽ hình",
       "cause": "Driver đồ họa của máy bị lỗi khi game nhờ nó dựng hình bằng Vulkan, nên Wine hiện hộp \"Assertion failed!\" rồi đóng game. Lỗi không nằm ở game: thường là bản DXVK hoặc driver đang chọn chưa hợp với GPU này. Trên máy GPU Mali, lỗi cũng có thể nằm ở bước app sửa shader cho Mali: tắt từng bước một để thử.",
-      "fixes": ["wrapper-constants", "wrapper-clip", "dxvk-other", "driver-other", "wined3d", "send-logs"] },
+      "fixes": ["wrapper-constants", "wrapper-clip", "dxvk-other", "driver-other", "wine-old", "wined3d", "send-logs"] },
     { "id": "godot-gl-angle",
       "engines": ["GODOT"],
       "lines": ["required OpenGL 3\\.3 or Direct3D 11 version", "Could not initialize ANGLE OpenGL"],

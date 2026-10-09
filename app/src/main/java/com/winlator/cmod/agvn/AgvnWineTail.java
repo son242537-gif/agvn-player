@@ -116,4 +116,14 @@ public final class AgvnWineTail implements Callback<String> {
             // one log file less
         }
     }
+
+    /** The lines {@link #save} kept in the session folder {@code dir}; none when it kept none. */
+    static List<String> saved(File dir) {
+        File file = new File(dir, FILE);
+        try {
+            return file.isFile() ? Files.readAllLines(file.toPath(), StandardCharsets.UTF_8) : new ArrayList<>();
+        } catch (IOException | RuntimeException e) {
+            return new ArrayList<>();
+        }
+    }
 }
