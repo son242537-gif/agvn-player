@@ -224,7 +224,7 @@ public class ShortcutsFragment extends Fragment {
 
                     @Override
                     public void onRun(@NonNull String shortcutPath) {
-                        Shortcut shortcut = findShortcut(shortcutPath);
+                        Shortcut shortcut = currentShortcut(shortcutPath);
                         if (shortcut != null) runFromShortcut(shortcut);
                     }
 
@@ -235,7 +235,7 @@ public class ShortcutsFragment extends Fragment {
 
                     @Override
                     public void onAction(@NonNull String shortcutPath, @NonNull String action) {
-                        Shortcut shortcut = findShortcut(shortcutPath);
+                        Shortcut shortcut = currentShortcut(shortcutPath);
                         if (shortcut != null) handleShortcutAction(shortcut, action);
                     }
 
@@ -492,6 +492,15 @@ public class ShortcutsFragment extends Fragment {
         }
         publishLibraryItems();
         syncDynamicAppShortcuts();
+    }
+
+    /** AGVN: the game as its file holds it now, also in the list, so a fix put on it since is not saved over. */
+    private Shortcut currentShortcut(String shortcutPath) {
+        Shortcut listed = findShortcut(shortcutPath);
+        Shortcut now = com.winlator.cmod.agvn.AgvnShortcutReload.of(listed);
+        int index = listed != null ? allShortcuts.indexOf(listed) : -1;
+        if (index >= 0) allShortcuts.set(index, now);
+        return now;
     }
 
     private Shortcut findShortcut(String shortcutPath) {

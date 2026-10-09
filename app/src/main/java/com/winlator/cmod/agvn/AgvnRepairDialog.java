@@ -88,8 +88,12 @@ public final class AgvnRepairDialog {
     private static void status(Activity a, Shortcut s, Properties state, Runnable restartGame) {
         AgvnProblemCatalog.Finding f =
                 AgvnDoctor.catalog(a).finding(AgvnRepair.symptom(state), AgvnGodotGame.params(s));
-        String title = f != null ? f.title() : a.getString(R.string.agvn_repair_title);
         boolean ran = AgvnRepair.ran(state, s.getExtra("lastRunAt"));
+        if (ran && f != null && AgvnRepairCheck.offAtLibrary(a, s, state)) { // not on the game: the fixes left again
+            plan(a, s, f, restartGame);
+            return;
+        }
+        String title = f != null ? f.title() : a.getString(R.string.agvn_repair_title);
         LinearLayout box = box(a);
         box.addView(text(a, a.getString(R.string.agvn_doctor_game, s.name), 13, false));
         box.addView(text(a, a.getString(ran ? R.string.agvn_repair_status : R.string.agvn_repair_not_run,

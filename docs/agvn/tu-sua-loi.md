@@ -85,6 +85,18 @@ game vẫn chạy", và "Tự sửa lỗi" thử từng cách:
 Màn hình đen ở DXVK thì chưa rõ lý do: game có thể vẫn đang tải và dựng shader (Unreal trên GPU Mali yếu, texture BCn
 phải giải nén), hoặc bị kẹt. Thử để game chạy 3–5 phút một lần ở Đồ họa Thấp.
 
+Nhật ký thứ hai của máy này (09/10, 14:23–14:35, vẫn bản 0.1.32) có năm lần chơi:
+- Lần "Dùng WineD3D" thật ra chạy DXVK: `moi-truong.txt` có `DXVK_CONFIG`, không có `WINE_D3D_CONFIG`, và giống hệt
+  cấu hình app trả về sau đó. Cách sửa đã mất trước khi game mở. App vẫn hỏi về WineD3D, người chơi bấm "Vẫn còn lỗi",
+  nên app bỏ một cách chưa chạy. Lý do và cách sửa: "Người chơi báo lỗi" bên dưới (bản 0.1.34).
+- "Về cấu hình gốc": hộp "Assertion failed! … vkCreateShaderModule" (driver Mali không dựng được shader của DXVK), rồi
+  màn hình đen; bật "Đồng bộ khung hình" cũng không hơn, và app báo đã thử hết cách.
+- Lần cuối, với cấu hình trước khi thử: đứng hình 25 giây, không ra khung hình nào trong 40 giây cuối, RAM còn 600 MB.
+
+Nhiều khả năng máy này không chạy được game: WineD3D cần Zink mà driver thiếu tính năng Zink cần, còn DXVK thì lỗi
+shader hoặc đen màn hình. Người chơi có đổi "Mức tính năng VKD3D" (9_1, 11_0), nhưng mức đó chỉ dùng cho game DirectX 12,
+không đổi gì với game DirectX 11 này.
+
 Ví dụ ngày 06/10 (bản 0.1.23): Become A Vtuber (Unity 6, DirectX 11) trên Redmi K30 5G, GPU Adreno 620, chạy bằng
 Proton 10. Cả năm lần chơi, game crash ở cùng một chỗ (`UnityPlayer.dll+0x8d8b1a`) lúc tải cảnh đầu; dòng cuối trước
 crash là cảnh báo về ảnh `mini game1_great`. Người chơi đã đổi bản Turnip và bật DXVK async mà chỗ crash không đổi.
@@ -252,6 +264,18 @@ với lần mở game gần nhất, `lastRunAt` của lối tắt). Trước đ�
 chưa chạy lại với cách này" và chỉ có "Mở lại game ngay" (trong game) hoặc "Chơi thử với cách này" (ở thư viện), cùng
 "Chọn lỗi khác". Nhật ký Isekai NTR Inn (07/10/2026) cho thấy vì sao: người chơi bấm "Vẫn còn lỗi" cho "Về cấu hình gốc"
 11 giây sau khi app đặt cách đó, lúc game vẫn chạy với cấu hình cũ, nên app bỏ một cách chưa ai thử và báo "đã thử hết".
+
+Game cũng phải chạy với đúng cách đang thử (bản 0.1.34). Nhật ký Support Pregnancy School trên Galaxy M34 (09/10/2026,
+bản 0.1.32) cho thấy cách sửa có thể mất trước khi game mở: app đang thử "Dùng WineD3D" mà game chạy DXVK, đúng cấu
+hình trước lần thử. Thư viện và trang game (bấm ảnh game) giữ cài đặt game đọc lúc chúng hiện, và mỗi lần lưu thì ghi
+lại cả bản đó: cách sửa đặt sau đó (trong game, của "Tự sửa lỗi" hay hộp hỏi sau khi chơi, hay dấu hết RAM của game bị
+vuốt tắt) bị ghi đè khi bấm tim, chỉnh "Cấu hình", hay bấm "Chơi" ở thư viện. Hai việc đã sửa:
+- Thư viện và trang game đọc lại file cài đặt của game trước khi làm gì với game (`AgvnShortcutReload`).
+- Lúc game mở, app xem cách đang thử có trong cấu hình game không (`AgvnRepairCheck`; các cách đổi một công tắc:
+  WineD3D, về DXVK, DXVK khác, driver khác). Không có (người chơi tự đổi trong "Cấu hình", hay bị ghi đè) thì app không
+  hỏi về cách đó và không tính là đã thử. `su-kien.txt` có "Tự sửa lỗi: game chạy không có …", và thanh "Chưa thử được:
+  …" mời thử cách còn lại đầu tiên (thường chính là cách đó). Ở thư viện, bấm "Tự sửa lỗi" thì app báo như vậy rồi
+  hiện lại danh sách cách còn lại.
 
 Chỉ game được báo lỗi bị đổi, và chỉ sau khi người chơi báo. Cách không giúp được không ở lại trên game, nên game không
 phải trả giá (chậm hơn, nóng hơn) cho một cách sửa vô ích. App ghi mọi bước vào `su-kien.txt` của phiên chơi ("Tự sửa
@@ -907,6 +931,14 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       "Dùng lại DXVK (bỏ WineD3D)".
 - [ ] Bản 0.1.33, máy có driver Vulkan dưới 1.3 (như Galaxy M34): "Tự sửa lỗi" không có "Đổi DXVK sang bản 2.3.1". Máy
       Zink không chạy: sau một lần WineD3D lỗi (kể cả khi tự thoát game), không game nào được đề nghị WineD3D nữa.
+- [ ] Bản 0.1.34, game DXVK: bấm ảnh game để mở trang game, chơi. Trong game "🩺 Tự sửa" → "Màn hình đen dù game vẫn
+      chạy", thử tới khi app đặt "Dùng WineD3D", đừng bấm "Mở lại game ngay", thoát game. Ở trang game bấm tim, rồi
+      mở "Cấu hình": DX Wrapper vẫn là WineD3D. Bấm "Chơi": `moi-truong.txt` có `WINE_D3D_CONFIG`, không có
+      `DXVK_CONFIG`.
+- [ ] Bản 0.1.34, đang thử "Dùng WineD3D", vào "Cấu hình" của game đổi DX Wrapper về DXVK rồi chơi: vài giây sau khi
+      game mở có thanh "Chưa thử được: Dùng WineD3D …" với nút "Thử: …", không có thanh "Còn lỗi … không?";
+      `su-kien.txt` có "Tự sửa lỗi: game chạy không có …". Bấm "Thử: …" rồi "Mở lại game ngay": game chạy WineD3D,
+      45 giây sau app mới hỏi.
 - [ ] Bản 0.1.32, Điều khiển → mở màn gán phím của một thiết bị, tắt thiết bị rồi xoay máy: app báo thiết bị vừa
       ngắt kết nối, không văng.
 - [ ] Bản 0.1.29, thoát một game Windows bất kỳ (từ menu, hoặc "Mở lại game ngay" của "Tự sửa lỗi"): gần cuối

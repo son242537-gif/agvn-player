@@ -10,6 +10,8 @@ import com.winlator.cmod.XServerDisplayActivity;
 import com.winlator.cmod.container.Shortcut;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -27,6 +29,7 @@ public final class AgvnRepairAsk {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final long startMs = SystemClock.uptimeMillis();
     private final long stoppedAtStartNs = AgvnGamePause.pausedNs(System.nanoTime());
+    private boolean checked;
 
     private AgvnRepairAsk(XServerDisplayActivity activity, Shortcut shortcut) {
         this.activity = activity;
@@ -43,6 +46,16 @@ public final class AgvnRepairAsk {
 
     private void poll() {
         if (activity.isFinishing() || activity.isDestroyed() || AgvnSessionTrack.engineCrash() != null) return;
+        if (!checked) { // first: did the game start with the fix on trial at all (AgvnRepairCheck)?
+            checked = true;
+            Properties state = AgvnGoodConfig.load(activity, shortcut);
+            Map<String, String> ran = AgvnSessionTrack.settings();
+            if (!AgvnRepair.trying(state).isEmpty() && AgvnRepair.ran(state, shortcut.getExtra("lastRunAt"))
+                    && !AgvnRepairCheck.on(shortcut, state, ran.isEmpty() ? AgvnGoodConfig.snapshot(shortcut) : ran)) {
+                notOn(state);
+                return;
+            }
+        }
         long stoppedMs = (AgvnGamePause.pausedNs(System.nanoTime()) - stoppedAtStartNs) / 1_000_000L;
         long played = SystemClock.uptimeMillis() - startMs - stoppedMs;
         if (AgvnGamePause.isPaused() || !AgvnSessionTrack.showedFrames() || played < ASK_AFTER_MS) {
@@ -63,5 +76,28 @@ public final class AgvnRepairAsk {
                 new AgvnWarningBar.Choice(R.string.agvn_repair_still,
                         () -> AgvnRepairDialog.still(activity, shortcut, activity::agvnExit)),
                 new AgvnWarningBar.Choice(R.string.agvn_repair_later, null));
+    }
+
+    /** The game started without the fix on trial: not asked about nor counted; the first fix left is offered. */
+    private void notOn(Properties state) {
+        String label = AgvnRepair.label(state);
+        AgvnRepairCheck.untry(activity, shortcut, state);
+        AgvnProblemCatalog.Finding f =
+                AgvnDoctor.catalog(activity).finding(AgvnRepair.symptom(state), AgvnGodotGame.params(shortcut));
+        List<AgvnFixes.Fix> left = f != null ? AgvnRepair.left(activity, shortcut, f, state) : Collections.emptyList();
+        String title = activity.getString(R.string.agvn_repair_off_title, label);
+        String detail = activity.getString(R.string.agvn_repair_off_detail, label);
+        if (left.isEmpty()) {
+            AgvnWarningBar.show(activity, title, detail, new AgvnWarningBar.Choice(R.string.agvn_movie_ok, null));
+            return;
+        }
+        AgvnFixes.Fix next = left.get(0);
+        AgvnWarningBar.show(activity, title, detail,
+                new AgvnWarningBar.Choice(activity.getString(R.string.agvn_repair_off_try, next.label), () -> {
+                    if (AgvnRepair.start(activity, shortcut, f, next)) {
+                        AgvnSlowBar.offerRestart(activity, shortcut, next.label, activity::agvnExit);
+                    }
+                }),
+                new AgvnWarningBar.Choice(R.string.agvn_doctor_later, null));
     }
 }

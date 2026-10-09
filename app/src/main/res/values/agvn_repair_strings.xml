@@ -19,6 +19,9 @@
     <string name="agvn_repair_other">Chọn lỗi khác</string>
     <string name="agvn_repair_kept">Đã giữ cách sửa: %1$s</string>
     <string name="agvn_repair_done_title">Đã thử hết cách trong app</string>
+    <string name="agvn_repair_off_title">Chưa thử được: %1$s</string>
+    <string name="agvn_repair_off_detail">Game không chạy với cách đang thử (%1$s): cài đặt của game đã đổi sau khi bật cách này. App chưa tính là đã thử cách này.</string>
+    <string name="agvn_repair_off_try">Thử: %1$s</string>
     <string name="agvn_bar_repair_label">🩺 Tự sửa</string>
     <string name="agvn_bar_repair">Tự sửa lỗi: chọn lỗi game đang gặp</string>
 

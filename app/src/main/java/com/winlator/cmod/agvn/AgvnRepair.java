@@ -26,7 +26,8 @@ import java.util.Set;
  */
 final class AgvnRepair {
     static final String PREFIX = "report", SYMPTOM = "report", TRYING = "report.trying", LABEL = "report.label",
-            TRIED = "report.tried", HAS_BEFORE = "report.before", BEFORE = "report.before.", AT = "report.at";
+            TRIED = "report.tried", HAS_BEFORE = "report.before", BEFORE = "report.before.", AT = "report.at",
+            TO = "report.to";
     /**
      * Settings the fixes change besides AgvnGoodConfig.KEYS: Đồ họa's texture pool, tier and FPS preset, Unity's own
      * quality, the runner of a "Chạy nhẹ" game, RPG Maker's frame skip, Godot for Android's renderer and touches as a
@@ -122,6 +123,7 @@ final class AgvnRepair {
     static void trying(Properties state, AgvnFixes.Fix fix) {
         state.setProperty(TRYING, fix.id);
         state.setProperty(LABEL, fix.label);
+        state.setProperty(TO, fix.to != null ? fix.to : ""); // what it sets: did a start have it (AgvnRepairCheck)
         state.setProperty(AT, String.valueOf(System.currentTimeMillis()));
         Set<String> tried = tried(state);
         tried.add(fix.id);

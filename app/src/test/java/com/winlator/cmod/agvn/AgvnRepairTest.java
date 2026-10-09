@@ -15,6 +15,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,6 +118,50 @@ public class AgvnRepairTest {
         assertTrue(AgvnRepair.ran(state, String.valueOf(System.currentTimeMillis() + 1000)));
         AgvnRepair.clear(state);
         assertTrue(state.isEmpty());
+    }
+
+    @Test
+    public void aFixTheGameDidNotStartWithIsNotCounted() {
+        // Support Pregnancy School, Galaxy M34, 09/10/2026: "Dùng WineD3D" on trial, the game started with DXVK
+        String dx = "dxvk+vkd3d", dxConfig = "version=1.10.3,vkd3dLevel=12_1";
+        String driver = "vulkanVersion=1.3;version=;syncFrame=0";
+        Map<String, String> before = new LinkedHashMap<>();
+        before.put("dxwrapperConfig", "version=1.10.3,vkd3dLevel=9_1");
+        assertFalse(AgvnRepairCheck.on("wined3d", "wined3d", before, dx, dxConfig, driver));
+        Map<String, String> wined3d = new LinkedHashMap<>(before);
+        wined3d.put("dxwrapper", "wined3d");
+        assertTrue(AgvnRepairCheck.on("wined3d", "wined3d", wined3d, dx, dxConfig, driver));
+        assertTrue(AgvnRepairCheck.on("dxvk-back", "dxvk+vkd3d", before, dx, dxConfig, driver));
+        assertFalse(AgvnRepairCheck.on("dxvk-back", "dxvk+vkd3d", wined3d, dx, dxConfig, driver));
+        // another DXVK: the version it set, still with DXVK
+        assertFalse(AgvnRepairCheck.on("dxvk-other", "2.3.1", before, dx, dxConfig, driver));
+        Map<String, String> newer = new LinkedHashMap<>();
+        newer.put("dxwrapperConfig", "version=2.3.1,vkd3dLevel=9_1");
+        assertTrue(AgvnRepairCheck.on("dxvk-other", "2.3.1", newer, dx, dxConfig, driver));
+        assertTrue("a trial begun before 0.1.34 has no target",
+                AgvnRepairCheck.on("dxvk-other", "", before, dx, dxConfig, driver));
+        newer.put("dxwrapper", "wined3d");
+        assertFalse(AgvnRepairCheck.on("dxvk-other", "2.3.1", newer, dx, dxConfig, driver));
+        // a driver: no version of the game's own is the phone's
+        assertTrue(AgvnRepairCheck.on("driver-other", AgvnFixes.SYSTEM, before, dx, dxConfig, driver));
+        Map<String, String> turnip = new LinkedHashMap<>();
+        turnip.put("graphicsDriverConfig", "vulkanVersion=1.3;version=turnip26.2.0;syncFrame=1");
+        assertFalse(AgvnRepairCheck.on("driver-other", AgvnFixes.SYSTEM, turnip, dx, dxConfig, driver));
+        assertTrue(AgvnRepairCheck.on("driver-other", "turnip26.2.0", turnip, dx, dxConfig, driver));
+        assertTrue("the others count as on", AgvnRepairCheck.on("reset", "", before, dx, dxConfig, driver));
+
+        // let go: no fix on trial, that one not counted as tried; the report goes on from the same settings before
+        Properties state = new Properties();
+        AgvnRepair.begin(state, "report-black", before);
+        AgvnRepair.trying(state, new AgvnFixes.Fix("dxvk-other", "Đổi DXVK sang bản 2.3.1", "2.3.1"));
+        AgvnRepair.trying(state, new AgvnFixes.Fix("wined3d", "Dùng WineD3D thay DXVK", "wined3d"));
+        assertEquals("wined3d", state.getProperty(AgvnRepair.TO));
+        assertEquals("Dùng WineD3D thay DXVK", AgvnRepairCheck.letGo(state));
+        assertEquals("", AgvnRepair.trying(state));
+        assertEquals(Collections.singleton("dxvk-other"), AgvnRepair.tried(state));
+        assertNull(state.getProperty(AgvnRepair.TO));
+        assertEquals("report-black", AgvnRepair.symptom(state));
+        assertEquals(before, AgvnRepair.before(state));
     }
 
     @Test
