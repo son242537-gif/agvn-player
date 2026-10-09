@@ -1,0 +1,6 @@
+AGVN Player v0.1.35 - agvn.io
+
+Sửa lỗi:
+- Game Unreal báo cần GPU có DirectX 11 mức 11.0 bằng tiếng khác tiếng Anh (như tiếng Nhật): "Tự sửa lỗi" nhận ra hộp lỗi đó và đề nghị dùng lại DXVK, không còn báo nhầm "Game tắt ngay sau khi mở".
+- Game đã hiện hộp lỗi đó khi chạy WineD3D: app không đề nghị lại WineD3D cho game đó với driver đồ họa đang dùng.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
