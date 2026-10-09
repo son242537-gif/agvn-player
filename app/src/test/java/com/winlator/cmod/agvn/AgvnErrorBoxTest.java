@@ -129,6 +129,36 @@ public class AgvnErrorBoxTest {
     }
 
     @Test
+    public void unrealSaysItInAnyLanguage() {
+        // MK Days on a Mali-G610 (10/10 00:19), on WineD3D: Zink started without three features, and Unreal said it in
+        // Japanese, which the app did not read ("Game tắt ngay sau khi mở")
+        String japanese = "D3D11 互換の GPU (機能レベル 11.0、シェーダモデル 5.0) がエンジンを動作させるために必要です。";
+        String wine = "L\"D3D11 \\4e92\\63db\\306e GPU (\\6a5f\\80fd\\30ec\\30d9\\30eb 11.0\\3001\\30b7\\30a7\\30fc"
+                + "\\30c0\\30e2\\30c7\\30eb 5.0) \\304c\\30a8\\30f3\\30b8\\30f3\\3092\\52d5\\4f5c\\3055\\305b"
+                + "\\308b\\305f\\3081\\306b\\5fc5\\8981\\3067\\3059\\3002\"";
+        assertEquals("as Wine traced it", wine, traced(japanese).split("MSGBOX_OnInit ")[1]);
+        AgvnEvidence ev = box("UNREAL", japanese);
+        ev.started = false;
+        ev.seconds = 37;
+        ev.lines.add(0, "WARNING: Some incorrect rendering might occur because the selected Vulkan device "
+                + "(Wrapper(Mali-G610 MC4)) doesn't support base Zink requirements: feats.features.logicOp "
+                + "feats.features.fillModeNonSolid feats.features.shaderClipDistance ");
+        AgvnProblemCatalog.Finding f = AgvnDoctorTest.catalog.find(ev);
+        assertEquals("d3d11-level", f.id());
+        assertEquals("Game cần DirectX 11 mức 11.0", f.title());
+        // the GPU first: the level after "D3D11" all the same
+        ev.lines.set(1, traced("Un GPU compatible D3D11 (niveau 11.0, shader model 5.0) est requis."));
+        assertEquals("d3d11-level", AgvnDoctorTest.catalog.find(ev).id());
+        ev.lines.set(1, traced("Failed to create a D3D11 device (0x887a0004).")); // no level: another problem
+        AgvnProblemCatalog.Finding other = AgvnDoctorTest.catalog.find(ev);
+        assertTrue(other == null || !other.id().equals("d3d11-level"));
+        // WineD3D did not reach the game's level with this driver: not offered to the game again with it
+        assertTrue(AgvnOpenGlCheck.fellShort("d3d11-level", "wined3d"));
+        assertFalse("on DXVK the driver lacks the features", AgvnOpenGlCheck.fellShort("d3d11-level", "dxvk"));
+        assertFalse(AgvnOpenGlCheck.fellShort("no-start", "wined3d"));
+    }
+
+    @Test
     public void unrealStopsWaitingForItsRenderThread() {
         // Support Pregnancy School on a Galaxy M34, 09/10 17:59: the box after two and a half minutes of black screen
         AgvnEvidence ev = box("UNREAL", "");

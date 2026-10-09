@@ -101,8 +101,9 @@ final class AgvnFixes {
                 if (!DriverSafety.isUsable(a, to)) return null;
                 return new Fix(id, a.getString(R.string.agvn_fix_driver, SYSTEM.equals(to) ? a.getString(R.string.agvn_fix_driver_system) : "Turnip"), to);
             }
-            case "wined3d": // WineD3D draws with OpenGL: not once OpenGL did not start with this driver
-                return dxvk(s) && !AgvnOpenGlCheck.failedBefore(a, s)
+            case "wined3d": // WineD3D draws with OpenGL: not once OpenGL did not start with this driver, nor for a game
+                // whose DirectX 11 level it did not reach with it
+                return dxvk(s) && !AgvnOpenGlCheck.failedBefore(a, s) && !AgvnOpenGlCheck.shortBefore(a, s, state)
                         ? new Fix(id, a.getString(R.string.agvn_fix_wined3d), "wined3d") : null;
             case "dxvk-back":
                 return AgvnOpenGlCheck.wined3d(s)

@@ -137,6 +137,7 @@ public final class AgvnDoctor {
             state.setProperty(AgvnGoodConfig.TOO_SMALL, screen);
             AgvnGoodConfig.save(ctx, s, state);
         }
+        if (AgvnOpenGlCheck.keepShort(ctx, s, state, f.id(), now)) AgvnGoodConfig.save(ctx, s, state); // no more WineD3D
         AgvnSessionLog.event("Tự sửa lỗi: " + f.id() + " – " + f.title());
         Log.i(TAG, "doctor: " + f.id() + " for " + s.name);
         if (AgvnMemorySaver.ranOutOfRam(f.id())) AgvnMemorySaver.markRamShort(s); // its next starts save the most RAM

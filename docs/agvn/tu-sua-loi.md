@@ -37,7 +37,7 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Game cần .NET | Wine: `Wine Mono is not installed`: file chạy của game, hoặc chương trình nó mở, viết bằng .NET (C#) mà Wine chưa có Wine Mono. Xem "Game .NET (Wine Mono)" bên dưới | Cài .NET cho game (Wine Mono), gửi nhật ký. Hộp hỏi cũng gợi ý thêm lại game bằng file chạy chính nếu thư mục còn file `.exe` khác |
 | Wine chưa chạy được phần .NET của game | Wine: `Could not load Mono into this process` hoặc `mscoree.dll not found, IL-only binary`: có Wine Mono rồi mà Wine không nạp được | Gửi nhật ký, kèm gợi ý file chạy như trên |
 | Driver đồ họa bị lỗi khi game vẽ hình | Hộp "Assertion failed!" của Wine nhắc `winevulkan/loader_thunks.c` và một hàm Vulkan (`vkCreateShaderModule`...): driver bị lỗi ngay trong lúc game nhờ nó dựng hình | GPU Mali, lỗi lúc tạo shader: tắt bước sửa shader "hằng số", rồi bước "cắt hình". Đổi bản DXVK, đổi driver, chạy bằng Wine cũ (Proton 9) khi game đang chạy Proton 10, dùng WineD3D. Game Godot: bỏ cách vẽ đã đổi, chạy bằng Direct3D 11 (ANGLE), hai bước sửa shader, đổi driver |
-| Game cần DirectX 11 mức 11.0 | Hộp của game Unreal: "A D3D11-compatible GPU (Feature Level 11.0, Shader Model 5.0) is required to run the engine.": DXVK hay WineD3D, với driver đang chọn, chưa tới mức DirectX 11 game cần (thiếu tessellation...). Bản DXVK nào cũng cần các tính năng đó. Zink không chạy (dòng bên dưới) thì app nói đúng lý do đó trước | Dùng lại DXVK khi game đang chạy WineD3D, đổi driver |
+| Game cần DirectX 11 mức 11.0 | Hộp của game Unreal: "A D3D11-compatible GPU (Feature Level 11.0, Shader Model 5.0) is required to run the engine.", hay câu đó bằng tiếng khác (game Nhật: "D3D11 互換の GPU (機能レベル 11.0、…) が…必要です", từ bản 0.1.35): DXVK hay WineD3D, với driver đang chọn, chưa tới mức DirectX 11 game cần (thiếu tessellation...). Bản DXVK nào cũng cần các tính năng đó. Zink không chạy (dòng bên dưới) thì app nói đúng lý do đó trước | Dùng lại DXVK khi game đang chạy WineD3D, đổi driver. Hộp hiện khi game chạy WineD3D thì từ đó app không đề nghị WineD3D cho game này với driver này nữa (`AgvnOpenGlCheck`, nhớ theo driver và bản app, từ bản 0.1.35) |
 | Game Unreal tự dừng vì chờ vẽ hình quá lâu | Hộp "LowLevelFatalError … GameThread timed out waiting for RenderThread after 120.00 secs": phần vẽ hình của Unreal 4 bận liền 120 giây (tải, dựng shader và texture lần đầu trên máy chậm), và Unreal tự dừng (`g.TimeoutForBlockOnRenderFence`). Game không hỏng | Cho game chờ lâu hơn: thêm `-nothreadtimeout` vào tham số chạy của game (bản 0.1.34) |
 | Godot không mở được OpenGL | Câu lỗi của Godot (nhật ký `godot.log` hoặc hộp "Unable to initialize video driver"), hoặc game Godot tắt trước khi hiện hình | Chạy Godot bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bằng Direct3D 11 (ANGLE, Godot 4.4 trở lên), bỏ cách vẽ đã đổi, đổi driver |
 | Godot không mở được OpenGL lẫn Direct3D 11 | Hộp lỗi của Godot 4.4 trở lên: "...required OpenGL 3.3 or Direct3D 11 version" | Chạy bằng Vulkan, bỏ cách vẽ đã đổi, đổi driver |
@@ -101,8 +101,20 @@ Nhật ký thứ ba (09/10, 17:02–17:59, vẫn bản 0.1.32): lần 17:14 ch�
 đen; lúc cuối GPU bận 64–94% mà không ra khung hình nào trong 60 giây. Bật lại bước sửa shader "cắt hình", giải nén BCn
 bằng CPU, đổi tên `d3d11.dll` của gói GameHub: mỗi lần chỉ chạy 1,5–4 phút, vẫn đen. Lần cuối (không còn `d3d11.dll`
 của gói, BCn bằng CPU) Unreal hiện hộp "GameThread timed out waiting for RenderThread after 120.00 secs" rồi tự dừng.
-Bản 0.1.34 nhận ra hộp đó và đề nghị thêm `-nothreadtimeout` vào tham số chạy để Unreal chờ thay vì tự dừng. Người chơi có đổi "Mức tính năng VKD3D" (9_1, 11_0), nhưng mức đó chỉ dùng cho game DirectX 12,
-không đổi gì với game DirectX 11 này.
+Bản 0.1.34 nhận ra hộp đó và đề nghị thêm `-nothreadtimeout` vào tham số chạy để Unreal chờ thay vì tự dừng. Người
+chơi có đổi "Mức tính năng VKD3D" (9_1, 11_0), nhưng mức đó chỉ dùng cho game DirectX 12, không đổi gì với game
+DirectX 11 này.
+
+Ví dụ ngày 10/10 (bản 0.1.27): MK Days (Unreal, gói Việt hoá có cheat AGVN) trên Xiaomi 23090RA98G (Dimensity 7200,
+GPU Mali-G610, driver của máy, Vulkan 1.3). Hai lần đầu chạy Proton 10 với DXVK, lần thứ ba chạy Proton 9: cả ba lần
+đều hiện hộp "Assertion failed! … vkCreateShaderModule" (dòng 3520 của Proton 10, dòng 3275 của Proton 9), nên đổi
+Wine không giúp được. Cả ba lần hai bước sửa shader cho Mali vẫn bật, và người chơi vuốt tắt AGVN thay vì bấm OK, nên
+bản 0.1.27 không hỏi gì (từ bản 0.1.33 app vẫn hỏi sau khi vuốt tắt). Lần thứ tư người chơi tự chọn WineD3D: Zink chạy
+nhưng thiếu ba tính năng trên Mali-G610 (`logicOp`, `fillModeNonSolid`, `shaderClipDistance`), và Unreal hiện hộp
+DirectX 11 mức 11.0 bằng tiếng Nhật. App chưa đọc được câu tiếng Nhật nên báo nhầm "Game tắt ngay sau khi mở". Từ bản
+0.1.35 app nhận ra câu đó bằng mọi thứ tiếng (trong hộp lỗi có "D3D11", mức 10.x hay 11.x rồi shader model 4.x hay
+5.x), và không đề nghị WineD3D cho game này với driver này nữa. Với game này nên thử: dùng lại DXVK, tắt bước sửa
+shader "hằng số", rồi bước "cắt hình".
 
 Ví dụ ngày 06/10 (bản 0.1.23): Become A Vtuber (Unity 6, DirectX 11) trên Redmi K30 5G, GPU Adreno 620, chạy bằng
 Proton 10. Cả năm lần chơi, game crash ở cùng một chỗ (`UnityPlayer.dll+0x8d8b1a`) lúc tải cảnh đầu; dòng cuối trước
@@ -950,6 +962,10 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       lần tải đầu), bấm OK: thư viện hỏi "Game Unreal tự dừng vì chờ vẽ hình quá lâu" với nút "Cho game chờ vẽ hình lâu
       hơn…". Bấm: game mở lại, "Cấu hình" → "Nâng cao" → "Tham số chạy" có `-nothreadtimeout`, và game không còn tự
       dừng sau 120 giây.
+- [ ] Bản 0.1.35, game Unreal chạy WineD3D với driver thiếu tính năng (như MK Days trên Mali-G610), hộp DirectX 11
+      bằng tiếng Nhật ("D3D11 互換の GPU (機能レベル 11.0、…) が…"), bấm OK: thư viện hỏi "Game cần DirectX 11 mức 11.0"
+      với "Dùng lại DXVK (bỏ WineD3D)", không phải "Game tắt ngay sau khi mở". Lần game lỗi sau đó (như hộp
+      vkCreateShaderModule), không còn nút "Dùng WineD3D thay DXVK" cho game này.
 - [ ] Bản 0.1.32, Điều khiển → mở màn gán phím của một thiết bị, tắt thiết bị rồi xoay máy: app báo thiết bị vừa
       ngắt kết nối, không văng.
 - [ ] Bản 0.1.29, thoát một game Windows bất kỳ (từ menu, hoặc "Mở lại game ngay" của "Tự sửa lỗi"): gần cuối

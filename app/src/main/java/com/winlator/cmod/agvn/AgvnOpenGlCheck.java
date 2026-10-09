@@ -7,6 +7,9 @@ import android.util.Log;
 import com.winlator.cmod.container.Container;
 import com.winlator.cmod.container.Shortcut;
 
+import java.util.Map;
+import java.util.Properties;
+
 /**
  * Whether OpenGL starts on this phone with a Vulkan driver. AGVN draws OpenGL with Mesa's Zink on the game's Vulkan
  * driver, and WineD3D draws DirectX with OpenGL, so when Zink does not start ("failed to load driver: zink", the
@@ -14,10 +17,14 @@ import com.winlator.cmod.container.Shortcut;
  * ran on WineD3D five times and failed each time, with nothing left to try: Zink did not start on that driver, and
  * DXVK's DirectX 11 needs features it lacks. Once Zink failed, no game is offered WineD3D with that driver
  * ({@link AgvnFixes}), and a game on WineD3D is offered DXVK back. Kept per driver and app version, as
- * {@link DriverSafety} keeps its probes: another driver or a newer Mesa may start.
+ * {@link DriverSafety} keeps its probes: another driver or a newer Mesa may start. A game whose DirectX 11 level
+ * WineD3D did not reach with a driver (Zink started, without features the game needs) is not offered WineD3D again
+ * with it.
  */
 final class AgvnOpenGlCheck {
     static final String PROBLEM = "opengl-unavailable", PREFS = "agvn_opengl", ZINK_FAILED = "failed to load driver: zink";
+    /** A game's DirectX 11 level was not reached ("d3d11-level"); the doctor-state key of a WineD3D that fell short. */
+    static final String LEVEL_PROBLEM = "d3d11-level", SHORT = "wined3dShort";
     private static final String TAG = "AGVN";
 
     private AgvnOpenGlCheck() {}
@@ -61,5 +68,31 @@ final class AgvnOpenGlCheck {
     static String dxvkBack(Shortcut s) {
         String own = s.container.getDXWrapper();
         return own != null && own.contains("dxvk") ? own : Container.DEFAULT_DXWRAPPER;
+    }
+
+    /**
+     * True when a game that ended with {@code problem} while drawing with {@code dxwrapper} needs more DirectX 11 than
+     * WineD3D gives: Zink started, but without features the game's level needs (MK Days, Mali-G610, 10/10/2026).
+     */
+    static boolean fellShort(String problem, String dxwrapper) {
+        return LEVEL_PROBLEM.equals(problem) && "wined3d".equals(dxwrapper);
+    }
+
+    /**
+     * {@code s} ended with {@code problem}, drawing as {@code ran} says (its container's DirectX when not its own):
+     * when WineD3D fell short of it ({@link #fellShort}), WineD3D is not offered to it again with its driver, in this
+     * app version. Kept in its doctor {@code state}; true when kept.
+     */
+    static boolean keepShort(Context ctx, Shortcut s, Properties state, String problem, Map<String, String> ran) {
+        String dx = ran.containsKey("dxwrapper") ? ran.get("dxwrapper") : s.container.getDXWrapper();
+        if (!fellShort(problem, dx)) return false;
+        state.setProperty(SHORT, key(driver(ctx, s), DriverSafety.appVersionCode(ctx)));
+        Log.i(TAG, s.name + " needs more DirectX 11 than WineD3D gives: no WineD3D for it with this driver");
+        return true;
+    }
+
+    /** True when WineD3D fell short of {@code s} with its driver, in this app version ({@link #keepShort}). */
+    static boolean shortBefore(Context ctx, Shortcut s, Properties state) {
+        return state != null && key(driver(ctx, s), DriverSafety.appVersionCode(ctx)).equals(state.getProperty(SHORT));
     }
 }
