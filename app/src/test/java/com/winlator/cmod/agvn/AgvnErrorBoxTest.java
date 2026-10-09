@@ -27,6 +27,8 @@ public class AgvnErrorBoxTest {
     static final String GODOT_GL = "Your video card drivers seem not to support the required OpenGL 3.3 or Direct3D 11 version.\n\n"
             + "If possible, consider updating your video card drivers.\n\n"
             + "If you have recently updated your video card drivers, try rebooting.";
+    /** Unreal Engine 4 and 5 when Direct3D 11 gives less than 11.0 (D3D11RHI's RequiredDX11Feature_11_SM5), 09/10. */
+    static final String UNREAL_D3D11 = "A D3D11-compatible GPU (Feature Level 11.0, Shader Model 5.0) is required to run the engine.";
 
     @BeforeClass
     public static void load() throws IOException {
@@ -107,6 +109,23 @@ public class AgvnErrorBoxTest {
         vulkan.started = false;
         assertEquals("godot-vulkan", AgvnDoctorTest.catalog.find(vulkan).id());
         assertFalse(AgvnGodotGame.saysGodot(Collections.singletonList(traced(VULKAN_ASSERT))));
+    }
+
+    @Test
+    public void unrealSaysDirectX11IsTooLow() {
+        AgvnEvidence ev = box("UNREAL", UNREAL_D3D11);
+        ev.started = false; // the box comes before the game's window
+        ev.seconds = 30;
+        ev.lines.add(0, "err:   D3D11CoreCreateDevice: Minimum required feature level D3D_FEATURE_LEVEL_11_0 not supported");
+        AgvnProblemCatalog.Finding f = AgvnDoctorTest.catalog.find(ev);
+        assertEquals("d3d11-level", f.id());
+        assertEquals("Game cần DirectX 11 mức 11.0", f.title());
+        assertEquals("from WineD3D back to DXVK first; another DXVK needs the same features",
+                Arrays.asList("dxvk-back", "driver-other", "send-logs"), f.fixes());
+        ev.endedByGame = false; // swiped away behind the box: the box still said it
+        assertEquals("d3d11-level", AgvnDoctorTest.catalog.find(ev).id());
+        ev.lines.set(1, traced("DX11 feature level 10.0 is required to run the engine.")); // Unreal 4.0 to 4.2x
+        assertEquals("Game cần DirectX 11 mức 10.0", AgvnDoctorTest.catalog.find(ev).title());
     }
 
     @Test

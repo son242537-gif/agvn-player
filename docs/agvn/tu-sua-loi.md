@@ -37,6 +37,7 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Game cần .NET | Wine: `Wine Mono is not installed`: file chạy của game, hoặc chương trình nó mở, viết bằng .NET (C#) mà Wine chưa có Wine Mono. Xem "Game .NET (Wine Mono)" bên dưới | Cài .NET cho game (Wine Mono), gửi nhật ký. Hộp hỏi cũng gợi ý thêm lại game bằng file chạy chính nếu thư mục còn file `.exe` khác |
 | Wine chưa chạy được phần .NET của game | Wine: `Could not load Mono into this process` hoặc `mscoree.dll not found, IL-only binary`: có Wine Mono rồi mà Wine không nạp được | Gửi nhật ký, kèm gợi ý file chạy như trên |
 | Driver đồ họa bị lỗi khi game vẽ hình | Hộp "Assertion failed!" của Wine nhắc `winevulkan/loader_thunks.c` và một hàm Vulkan (`vkCreateShaderModule`...): driver bị lỗi ngay trong lúc game nhờ nó dựng hình | GPU Mali, lỗi lúc tạo shader: tắt bước sửa shader "hằng số", rồi bước "cắt hình". Đổi bản DXVK, đổi driver, chạy bằng Wine cũ (Proton 9) khi game đang chạy Proton 10, dùng WineD3D. Game Godot: bỏ cách vẽ đã đổi, chạy bằng Direct3D 11 (ANGLE), hai bước sửa shader, đổi driver |
+| Game cần DirectX 11 mức 11.0 | Hộp của game Unreal: "A D3D11-compatible GPU (Feature Level 11.0, Shader Model 5.0) is required to run the engine.": DXVK hay WineD3D, với driver đang chọn, chưa tới mức DirectX 11 game cần (thiếu tessellation...). Bản DXVK nào cũng cần các tính năng đó | Dùng lại DXVK khi game đang chạy WineD3D, đổi driver |
 | Godot không mở được OpenGL | Câu lỗi của Godot (nhật ký `godot.log` hoặc hộp "Unable to initialize video driver"), hoặc game Godot tắt trước khi hiện hình | Chạy Godot bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bằng Direct3D 11 (ANGLE, Godot 4.4 trở lên), bỏ cách vẽ đã đổi, đổi driver |
 | Godot không mở được OpenGL lẫn Direct3D 11 | Hộp lỗi của Godot 4.4 trở lên: "...required OpenGL 3.3 or Direct3D 11 version" | Chạy bằng Vulkan, bỏ cách vẽ đã đổi, đổi driver |
 | Godot không mở được Vulkan | Hộp lỗi của Godot: "...required Vulkan version" | Bỏ cách vẽ đã đổi, chạy bằng Direct3D 11 (ANGLE), đổi driver |
@@ -180,10 +181,10 @@ RTP), Ren'Py dừng trước màn hình đầu.
 Người chơi tự vuốt tắt AGVN khỏi danh sách app gần đây thì không phải lỗi. Khi đó AGVN tự tắt mình (`SIGKILL`, giống
 như máy tắt), nên trước khi tắt nó ghi lại là người chơi vuốt tắt, cùng các dòng cuối của Wine (`wine-cuoi.txt`).
 Lần mở sau, `tom-tat.txt` ghi "Người chơi vuốt tắt AGVN khỏi danh sách app gần đây", và app chỉ hỏi khi các dòng đó tự
-nói lên một lỗi (hiện là hộp "Assertion failed!" của driver Vulkan). Ngày 09/10/2026, Support Pregnancy School (Unreal,
-Mali-G615, Proton 10) hiện hộp `vkCreateShaderModule`, người chơi vuốt tắt AGVN, và trước bản sửa không có cách sửa
-nào được đưa ra (`AgvnDoctor.afterKill`). Muốn thoát game thì bấm "✕ Thoát" trên thanh ⌨ ✎ 👁 ⛶ của game
-PC (app hỏi lại "Thoát game?"), hoặc "Thoát" trong menu bên trái của game "Chạy nhẹ".
+nói lên một lỗi (hộp "Assertion failed!" của driver Vulkan, hộp DirectX 11 của game Unreal). Ngày 09/10/2026, Support
+Pregnancy School (Unreal, Mali-G615, Proton 10) hiện hộp `vkCreateShaderModule`, người chơi vuốt tắt AGVN, và trước
+bản sửa không có cách sửa nào được đưa ra (`AgvnDoctor.afterKill`). Muốn thoát game thì bấm "✕ Thoát" trên
+thanh ⌨ ✎ 👁 ⛶ của game PC (app hỏi lại "Thoát game?"), hoặc "Thoát" trong menu bên trái của game "Chạy nhẹ".
 
 "Game chậm" là game chạy đều dưới mức của nó suốt 1 phút. Màn hình đứng yên (visual novel chờ bấm) và mức "Giới hạn
 FPS" người chơi tự đặt không tính.
@@ -884,6 +885,9 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
 - [ ] Bản 0.1.33, game hiện hộp "Assertion failed!" nhắc `vkCreateShaderModule`, vuốt tắt AGVN (không bấm OK) rồi mở
       lại app: thư viện hỏi "Driver đồ họa bị lỗi khi game vẽ hình". Game chạy Proton 10 thì có thêm "Chạy bằng Wine
       cũ". Vuốt tắt một game đang chạy bình thường: không có hộp hỏi.
+- [ ] Bản 0.1.33, game Unreal hiện hộp "A D3D11-compatible GPU (Feature Level 11.0, Shader Model 5.0) is required
+      to run the engine.", bấm OK: thư viện hỏi "Game cần DirectX 11 mức 11.0". Game đang chạy WineD3D thì có nút
+      "Dùng lại DXVK (bỏ WineD3D)".
 - [ ] Bản 0.1.32, Điều khiển → mở màn gán phím của một thiết bị, tắt thiết bị rồi xoay máy: app báo thiết bị vừa
       ngắt kết nối, không văng.
 - [ ] Bản 0.1.29, thoát một game Windows bất kỳ (từ menu, hoặc "Mở lại game ngay" của "Tự sửa lỗi"): gần cuối
