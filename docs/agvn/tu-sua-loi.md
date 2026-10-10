@@ -687,6 +687,15 @@ Từ bản 0.1.29, game app chưa biết engine, hay game có mod, có thêm cá
   hay 11, OpenGL, `quartz`/`mfplat` cho phim, `dsound`...); đóng gói (Enigma Virtual Box giữ cả game trong exe;
   SteamStub `.bind` cần Steam); dữ liệu nối sau exe (zip của LÖVE hay NW.js, PyInstaller, bộ cài NSIS...).
 
+Từ bản 0.1.37, dòng thứ hai của `su-kien.txt` là đường dẫn app mở game từ đó: `File chạy: /storage/emulated/0/…/Lifeguard
+Holic.exe`. Dòng này có thêm `KHÔNG có file này trên máy` khi app không thấy file ở đó, hoặc `ổ đĩa không rõ, app không
+kiểm được file` khi đường dẫn dùng ổ đĩa Windows mà container không có. Đường dẫn có chữ ngoài ASCII (chữ có dấu, chữ
+Nhật...) thì dòng ghi các chữ đó, vì `winhandler.exe`, chương trình mở game, đọc dòng lệnh theo bảng mã Windows
+(`__getmainargs`, `ShellExecuteExA`): chữ không có trong bảng mã bị mất. Lý do: ngày 10/10/2026, game "GAMEHUB"
+(Lifeguard Holic, Unity) trên Xiaomi 23090RA98G hiện hộp "File not found." ngay khi mở, trong khi GameHub mở được game.
+Game chưa hề chạy: không có nhật ký Unity, không có `AGVN-cheat.log`. Logcat lúc mở game đã mất vì người chơi vuốt tắt
+app, nên nhật ký không cho biết app tìm file ở đâu.
+
 Khi game Windows kết thúc, `su-kien.txt` có thêm dòng `Phút cuối của game (mỗi 5 giây): FPS …; luồng bận nhất (% một
 nhân) …; GPU (%) …` (`AgvnSlowWatch.lastMinute`). App vốn đo các số này mỗi 5 giây để biết game chậm; giờ app đo suốt
 cả phiên (trước đây dừng sau lần hỏi "Game chậm") và ghi phút cuối. Nếu cuối phút đó game không vẽ khung nào, dòng
@@ -983,6 +992,9 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
 - [ ] Bản 0.1.36, game RPG Maker MV có một ảnh `.rpgmvp` rỗng (0 byte) hay bị xoá: tới chỗ game dùng ảnh đó, game không
       dừng, chỗ ảnh để trống; `logcat -s AGVN` có `HTML game picture … shown empty`; "Gửi nhật ký" có `app/chay-nhe.txt`
       với dòng `standIn=…` tên ảnh đó.
+- [ ] Bản 0.1.37, mở một game Windows bất kỳ: `su-kien.txt` có dòng `File chạy: …` ngay sau dòng `Game: …`. Game nằm
+      trong thư mục có chữ có dấu thì dòng đó có `chữ ngoài ASCII: …`; file chạy đã bị xoá thì có `KHÔNG có file này
+      trên máy`.
 - [ ] Bản 0.1.32, Điều khiển → mở màn gán phím của một thiết bị, tắt thiết bị rồi xoay máy: app báo thiết bị vừa
       ngắt kết nối, không văng.
 - [ ] Bản 0.1.29, thoát một game Windows bất kỳ (từ menu, hoặc "Mở lại game ngay" của "Tự sửa lỗi"): gần cuối

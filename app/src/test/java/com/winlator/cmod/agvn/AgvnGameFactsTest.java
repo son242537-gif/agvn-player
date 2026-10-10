@@ -82,6 +82,23 @@ public class AgvnGameFactsTest {
     }
 
     @Test
+    public void theLogSaysWhereTheGameStartsFrom() throws Exception {
+        // GAMEHUB, 10/10/2026: Wine's "File not found." while GameHub opened the game; the log had no path
+        String path = touch("New Folder 1/GAMEHUB/Lifeguard Holic.exe").getPath();
+        String there = AgvnGameFacts.exeLine("\"" + path + "\"", path);
+        assertTrue(there, there.startsWith("File chạy: " + path) && !there.contains("KHÔNG")
+                && !there.contains("ổ đĩa"));
+        String gone = new File(tmp.getRoot(), "gone/Game.exe").getPath();
+        assertTrue(AgvnGameFacts.exeLine(gone, gone).contains(" · KHÔNG có file này trên máy"));
+        assertEquals("File chạy: F:\\Game.exe · ổ đĩa không rõ, app không kiểm được file",
+                AgvnGameFacts.exeLine("F:\\Game.exe", null));
+        String accented = "/storage/emulated/0/Download/Việt Hóa/Đường Về.exe";
+        assertEquals("File chạy: " + accented + " · KHÔNG có file này trên máy"
+                + " · chữ ngoài ASCII: ệ, ó, Đ, ư, ờ, ề", AgvnGameFacts.exeLine(accented, accented));
+        assertEquals("", AgvnGameFacts.beyondAscii("/storage/emulated/0/Download/MK DAYS/Miko.exe"));
+    }
+
+    @Test
     public void aLongListIsCut() throws Exception {
         File exe = touch("Big/Big.exe");
         for (int i = 0; i < AgvnGameFacts.MAX_DLLS + 3; i++) touch(String.format("Big/lib%02d.dll", i));

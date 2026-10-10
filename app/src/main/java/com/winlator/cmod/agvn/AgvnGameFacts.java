@@ -7,8 +7,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * The first lines of a game's session events (su-kien.txt): its exe, the engine AGVN saw, the DLLs next to the exe (a
@@ -25,7 +27,33 @@ final class AgvnGameFacts {
     private AgvnGameFacts() {}
 
     static List<String> of(Shortcut s) {
-        return facts(AgvnEngineLogs.exe(s), s.getExtra(AgvnGameImporter.EXTRA_ENGINE));
+        List<String> facts = facts(AgvnEngineLogs.exe(s), s.getExtra(AgvnGameImporter.EXTRA_ENGINE));
+        facts.add(1, exeLine(s.path, AgvnExeRedirect.toUnixPath(s.path, s.container)));
+        return facts;
+    }
+
+    /**
+     * "File chạy: {@code path}": where the game starts from, and what can keep Wine from finding it there: the phone
+     * has no such file ({@code unix}, its place on the phone; null when its drive is unknown), or letters beyond
+     * ASCII, which winhandler.exe passes on in the Windows code page (__getmainargs, ShellExecuteExA). GAMEHUB,
+     * 10/10/2026: Wine said "File not found." while GameHub opened the game, and the log did not say from where.
+     */
+    static String exeLine(String path, String unix) {
+        String shown = path == null ? "" : path.replace("\"", "");
+        String line = "File chạy: " + shown;
+        if (unix == null) line += " · ổ đĩa không rõ, app không kiểm được file";
+        else if (!new File(unix).isFile()) line += " · KHÔNG có file này trên máy";
+        String beyond = beyondAscii(shown);
+        return beyond.isEmpty() ? line : line + " · chữ ngoài ASCII: " + beyond;
+    }
+
+    /** The letters of {@code text} beyond ASCII, each once and at most ten ("ệ, ư"); empty when there are none. */
+    static String beyondAscii(String text) {
+        Set<String> found = new LinkedHashSet<>();
+        text.codePoints().filter(c -> c > 0x7e).limit(200).forEach(c -> {
+            if (found.size() < 10) found.add(new String(Character.toChars(c)));
+        });
+        return String.join(", ", found);
     }
 
     static List<String> facts(File exe, String engine) {
