@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onResume();
         com.winlator.cmod.agvn.AgvnDoctorDialog.checkAsync(this); // AGVN: ask about the last game's problem ("Tự sửa lỗi")
         com.winlator.cmod.agvn.AgvnUpdateBadge.refresh(this); // AGVN: a red dot on "Cài đặt" while a newer version is out
+        com.winlator.cmod.agvn.AgvnUpdateRetry.onResume(this); // AGVN: the other way to install, when one did not
     }
 
     @Override

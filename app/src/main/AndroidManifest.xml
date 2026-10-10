@@ -167,6 +167,14 @@
 
         <activity android:name="com.winlator.cmod.BigPictureActivity" android:theme="@style/Theme.AppCompat" android:exported="false" />
 
+        <!-- AGVN: where Android tells how an update session went (agvn/AgvnSessionInstall) -->
+        <activity
+            android:name="com.winlator.cmod.agvn.AgvnUpdateStatusActivity"
+            android:theme="@style/AgvnTranslucent"
+            android:launchMode="singleTop"
+            android:excludeFromRecents="true"
+            android:exported="false" />
+
         <activity
             android:name="com.winlator.cmod.XServerDisplayActivity"
             android:theme="@style/AppThemeFullscreen"

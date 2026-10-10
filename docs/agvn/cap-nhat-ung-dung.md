@@ -18,6 +18,12 @@ cần bấm "Cập nhật", rồi bấm "Cập nhật" thêm một lần trên h
 - **Lần đầu cập nhật:** Android hỏi quyền "Cài ứng dụng không rõ nguồn gốc" cho AGVN Player (chỉ một lần). App mở
   sẵn đúng màn hình đó. Bật xong, quay lại bấm "Cài tiếp".
 - **Mất mạng giữa chừng hay bấm Hủy:** phần đã tải được giữ lại, lần sau tải tiếp.
+- **Trình cài của máy không cài được** (từ bản 0.1.38, `AgvnUpdateRetry`): người chơi quay lại AGVN trong 30 phút mà
+  máy vẫn là bản cũ thì app hỏi một lần "Bản mới chưa được cài" với nút "Cài cách khác". Cách khác là phiên cài đặt của
+  Android (`AgvnSessionInstall`, PackageInstaller): app tự đưa tệp đã kiểm vào Android, Android vẫn hỏi người chơi trước
+  khi cài. Nếu Android từ chối, app nói lý do của Android (thiếu bộ nhớ, tệp không hợp lệ...). Cách nào đã cài được bản
+  mới thì lần sau app dùng cách đó trước. App không xét hãng máy; máy cài được bằng trình cài của máy thì không thấy gì
+  khác.
 - **Sau khi cập nhật:** game, save và cài đặt vẫn giữ nguyên, vì đây là cài đè cùng chữ ký, không phải gỡ ra cài lại.
 - **Không cài được không cần hỏi:** app giữ mức Android 9 (targetSdk 28) như Winlator, nên Android luôn bắt bấm
   xác nhận.
@@ -128,3 +134,9 @@ App không gửi gì về máy điện thoại, chỉ tải hai file công khai.
   - Một số trình cài chỉ đọc chữ ký kiểu cũ (v1, các file trong `META-INF`). Bản 0.1.6 chỉ có chữ ký kiểu mới (v2),
     nên từ bản sau 0.1.6, APK có cả hai.
   - Người đang có app thì cập nhật ngay trong app: app tự kiểm tra SHA-256 trước khi cài.
+- **OnePlus, OPPO, realme, vivo báo "Parsing failed: APK contains no signature files" cả khi cập nhật trong app
+  (10/10/2026, bản 0.1.37):** file đúng (app đã kiểm SHA-256), nhưng trình cài của các máy này không cài được APK 715 MB
+  do một app khác (AGVN, ZArchiver) đưa qua dạng `content://`. Cùng file đó chép từ máy khác sang rồi mở thì cài được.
+  Từ bản 0.1.38, sau lần cài hỏng app hỏi "Cài cách khác" và cài bằng phiên cài đặt của Android, nên trình cài của máy
+  không phải đọc file từ app khác. Máy đang kẹt ở bản cũ hơn thì cài tay bản 0.1.38 một lần: chép file từ máy tính hay
+  máy khác sang, rồi mở bằng app Quản lý tệp của máy.

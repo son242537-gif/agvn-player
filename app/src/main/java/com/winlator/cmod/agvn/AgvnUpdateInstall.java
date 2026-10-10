@@ -17,7 +17,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Downloads the update with a progress dialog (a cut-off download resumes next time), then opens Android's
- * installer. Android asks once for "Cài ứng dụng không rõ nguồn gốc" and always asks the player to confirm.
+ * installer, or writes it into an install session where that installed the last update ({@link AgvnUpdateRetry}).
+ * Android asks once for "Cài ứng dụng không rõ nguồn gốc" and always asks the player to confirm.
  */
 final class AgvnUpdateInstall {
     private static final String TAG = "AGVN";
@@ -70,13 +71,16 @@ final class AgvnUpdateInstall {
                 if (cancel.get()) Toast.makeText(activity, R.string.agvn_update_paused, Toast.LENGTH_LONG).show();
                 else if (failed != null) AgvnUpdateDialogs.message(activity,
                         activity.getString(R.string.agvn_update_failed, AgvnUpdateDialogs.reason(activity, failed)));
-                else install(activity, apk);
+                else install(activity, apk, info.versionCode, AgvnUpdateRetry.preferSession(activity));
             });
         }, "AgvnUpdateDownload").start();
     }
 
-    /** Asks Android to install the checked APK; first sends the player to allow installs once if needed. */
-    static void install(Activity activity, File apk) {
+    /**
+     * Asks Android to install the checked APK of version {@code code}, through the phone's installer or an install
+     * session ({@link AgvnUpdateRetry}); first sends the player to allow installs once if needed.
+     */
+    static void install(Activity activity, File apk, long code, boolean session) {
         if (!AgvnUpdater.canInstall(activity)) {
             new AlertDialog.Builder(activity)
                     .setTitle(R.string.agvn_update_allow_title)
@@ -90,12 +94,18 @@ final class AgvnUpdateInstall {
                         // shown under the Settings screen, so it is there when the player comes back
                         new AlertDialog.Builder(activity)
                                 .setMessage(R.string.agvn_update_allow_done)
-                                .setPositiveButton(R.string.agvn_update_continue, (d2, w2) -> install(activity, apk))
+                                .setPositiveButton(R.string.agvn_update_continue,
+                                        (d2, w2) -> install(activity, apk, code, session))
                                 .setNegativeButton(R.string.agvn_cancel, null)
                                 .show();
                     })
                     .setNegativeButton(R.string.agvn_cancel, null)
                     .show();
+            return;
+        }
+        AgvnUpdateRetry.tried(activity, code, session);
+        if (session) {
+            AgvnSessionInstall.start(activity, apk);
             return;
         }
         try {

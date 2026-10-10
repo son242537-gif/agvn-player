@@ -62,7 +62,11 @@ public final class AgvnUpdater {
     }
 
     public static File apkFile(Context context, AgvnUpdateInfo info) {
-        return new File(new File(context.getCacheDir(), DIR), "AGVN-Player-" + info.versionCode + ".apk");
+        return apkFile(context, info.versionCode);
+    }
+
+    static File apkFile(Context context, long versionCode) {
+        return new File(new File(context.getCacheDir(), DIR), "AGVN-Player-" + versionCode + ".apk");
     }
 
     /** Frees the space of downloads that are installed already (or not ours); a newer partial one stays for resuming. */
