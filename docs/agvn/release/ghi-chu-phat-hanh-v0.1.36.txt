@@ -1,0 +1,6 @@
+AGVN Player v0.1.36 - agvn.io
+
+Sửa lỗi:
+- Chuột USB hoặc Bluetooth trong game Windows chơi bằng chạm ("Giả lập màn hình cảm ứng" đang bật): con trỏ chuột giờ hiện ra khi dùng chuột hoặc bàn di chuột, và ẩn lại khi chạm tay vào màn hình.
+- Game RPG Maker MV/MZ chạy bằng "Chạy nhẹ" không còn dừng ở lỗi "RangeError: Invalid typed array length: 16" khi một file hình của game bị hỏng hoặc thiếu (thường do chép game sang máy chưa đủ): hình đó hiện trống và game chạy tiếp. "Gửi nhật ký" có thêm tên các hình đó, để chép lại đúng file.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
