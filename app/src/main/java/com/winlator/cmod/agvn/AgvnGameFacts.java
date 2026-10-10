@@ -35,8 +35,8 @@ final class AgvnGameFacts {
     /**
      * "File chạy: {@code path}": where the game starts from, and what can keep Wine from finding it there: the phone
      * has no such file ({@code unix}, its place on the phone; null when its drive is unknown), or letters beyond
-     * ASCII, which winhandler.exe passes on in the Windows code page (__getmainargs, ShellExecuteExA). GAMEHUB,
-     * 10/10/2026: Wine said "File not found." while GameHub opened the game, and the log did not say from where.
+     * ASCII, which Winlator's winhandler.exe loses ({@link AgvnStarter}). GAMEHUB, 10/10/2026: Wine said "File not
+     * found." while GameHub opened the game, and the log did not say from where.
      */
     static String exeLine(String path, String unix) {
         String shown = path == null ? "" : path.replace("\"", "");

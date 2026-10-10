@@ -21,8 +21,9 @@ import java.util.Arrays;
  * SendInput, not from the X server's core events (it has no XInput2), and Unity's Input System reads the mouse only
  * from raw input: Open At Nine (Unity 2020.3, menus on InputSystemUIInputModule) showed its title screen and took no
  * tap (08/10/2026). On for a Unity game with the Input System ({@link AgvnUnityInput}), or as "Tự sửa lỗi" set
- * the game ({@link #EXTRA}). Only such a game starts through agvn-winhandler.exe; the others keep Winlator's
- * winhandler.exe and X events. A press goes back the way it went. {@link #wanted} and {@link #install} are pure.
+ * the game ({@link #EXTRA}). Such a game starts through agvn-winhandler.exe, as does one whose start has letters
+ * beyond ASCII ({@link AgvnStarter}, with X events); the others keep Winlator's winhandler.exe and X events. A press
+ * goes back the way it went. {@link #wanted} and {@link #install} are pure.
  */
 public final class AgvnRawMouse {
     /** "1" or "0", set by "Tự sửa lỗi"; none: on for a Unity game with the Input System. */

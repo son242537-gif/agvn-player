@@ -745,7 +745,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
                     preloaderDialog.setStatusOnUiThread(text); // AGVN: .NET for a .NET game, unpacked once
                     runOnUiThread(() -> agvnStatus.setProgress(text));
                 });
-                agvnStarter = com.winlator.cmod.agvn.AgvnRawMouse.prepare(this, xServer, shortcut); // AGVN: raw input
+                agvnStarter = com.winlator.cmod.agvn.AgvnStarter.prepare(this, xServer, shortcut, // AGVN: raw input,
+                        shortcut != null ? agvnExePath() : null); // a folder named in any language
                 setupWineSystemFiles();
                 extractGraphicsDriverFiles();
                 changeWineAudioDriver();

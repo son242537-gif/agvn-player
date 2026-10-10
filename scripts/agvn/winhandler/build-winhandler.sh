@@ -3,8 +3,9 @@
 #
 # Builds app/src/main/assets/agvn/agvn-winhandler.exe from app/src/main/cpp/winlator/winhandler.c: Winlator's helper
 # that starts a game in Wine and takes the app's mouse, keyboard and process requests, with AGVN's RC_AGVN_POINTER
-# (a touch as a real mouse, raw input included). Games that read raw input start through it (AgvnRawMouse); the
-# others keep the container's winhandler.exe.
+# (a touch as a real mouse, raw input included) and its command line read as Unicode. Games that read raw input
+# (AgvnRawMouse) and games whose start has letters beyond ASCII (AgvnStarter) start through it; the others keep the
+# container's winhandler.exe.
 #
 # Needs mingw-w64 from Ubuntu: apt-get install gcc-mingw-w64-x86-64-win32. No timestamp in the exe, so the same
 # compiler gives the same file. The source includes psapi.h before windows.h, hence the two -include.

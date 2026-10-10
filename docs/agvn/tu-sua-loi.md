@@ -369,9 +369,11 @@ cú chạm.
   `scripts/agvn/winhandler/build-winhandler.sh`), có thêm lệnh `RC_AGVN_POINTER`: một lần `SendInput` dời chuột tới
   đúng điểm ảnh rồi nhấn hoặc nhả nút ở đó. Nhờ vậy vị trí cú bấm luôn đúng, và game nhận cả `WM_LBUTTONDOWN` lẫn
   `WM_INPUT` như với chuột thật. X server vẫn biết con trỏ ở đâu (để vẽ con trỏ), nhưng không gửi sự kiện cho Wine nữa.
-  Vì thế Wine không nhận thêm một lần dời chuột thứ hai, đến muộn. Bản dựng bằng mingw-w64 GCC 13 của Ubuntu 24.04 (gói
+  Vì thế Wine không nhận thêm một lần dời chuột thứ hai, đến muộn. Từ bản 0.1.37, chương trình này đọc dòng lệnh bằng
+  Unicode (xem "Thư mục game có dấu"). Bản dựng bằng mingw-w64 GCC 13 của Ubuntu 24.04 (gói
   `gcc-mingw-w64-x86-64-win32`) cho đúng một file, SHA-256
-  `b6a5dd20a0c229973383b720d6c908a34d2051eb8627ba9b05c51afa5be4a4e8`.
+  `a513695104c1c4901ee104ebf147098f6eb6fa477c0e6bd92c66445eb301a9d1` (bản 0.1.31–0.1.36:
+  `b6a5dd20a0c229973383b720d6c908a34d2051eb8627ba9b05c51afa5be4a4e8`).
 - **Game nào:** game Unity có Input System, tức có `Unity.InputSystem.dll` trong `<tên game>_Data/Managed` (Mono), hoặc
   có chữ `Unity.InputSystem` trong `il2cpp_data/Metadata/global-metadata.dat` (IL2CPP) (`AgvnUnityInput`). Game khác
   bật được ở "Tự sửa lỗi" → "Chạm, bấm không ăn". Ở đó, game đang bật cũng tắt được.
@@ -381,6 +383,35 @@ cú chạm.
 - **Nhật ký:** `su-kien.txt` có dòng `Chạm gửi như chuột thật, có raw input (qua agvn-winhandler.exe): …` và lý do.
 - **Chưa đo trên máy:** Wine của app (Proton 9, Proton 10) tạo `WM_INPUT` từ `SendInput` theo cách của Windows. Chế độ
   chuột tương đối của Winlator cũng dựa vào điều này. Cần thử Open At Nine để chốt.
+
+## Thư mục game có dấu (game Windows)
+
+Từ bản 0.1.37 (`AgvnStarter`). Ngày 10/10/2026, game "GAMEHUB" (Lifeguard Holic, Unity) trên Xiaomi 23090RA98G hiện hộp
+"File not found." ngay khi mở, trong khi GameHub mở được game.
+
+- **Vì sao:** `winhandler.exe` của Winlator, chương trình mở game, đọc dòng lệnh theo bảng mã Windows (`__getmainargs`,
+  `ShellExecuteExA`). Với game không đặt ngôn ngữ riêng, bảng mã là 1252, nên các chữ như "ệ", "ư", "đ" trong đường dẫn
+  bị mất và Wine không tìm thấy file. Bản `agvn-winhandler.exe` của bản 0.1.31–0.1.36 cũng vậy, vì dựng từ cùng mã.
+- **Cách sửa:** `agvn-winhandler.exe` đọc dòng lệnh bằng Unicode (`CommandLineToArgvW`, `ShellExecuteExW`). Game có chữ
+  ngoài ASCII trong đường dẫn file chạy hay trong tham số chạy thì mở bằng chương trình này, giống game Unity có Input
+  System. Cú chạm vẫn đi qua X server như trước; chỉ game cần raw input mới gửi cú chạm qua `SendInput`. Game có đường
+  dẫn không dấu không đổi gì, vẫn mở bằng `winhandler.exe` của Winlator.
+- **Phần Wine trên máy:** Proton 9 và Proton 10 của app dựng cho Android, luôn đặt tên file theo UTF-8 như Android:
+  `ntdll.so` của hai bản không có bảng tên bảng mã của Linux (`ANSIX341968`, `EUCJP`...) và không gọi `nl_langinfo`.
+  Vì vậy đường dẫn Unicode tới được đúng file, dù `LC_ALL` để trống.
+- **Đã thử (Wine 9.0 trên máy Linux, đặt tên file UTF-8 như Android):** một file chạy thử ghi lại dòng lệnh của nó, mở
+  qua `explorer /desktop=shell,1280x720 <chương trình> /dir <thư mục> "<file chạy>"` như app:
+
+  | Thư mục | `winhandler.exe` của Winlator | `agvn-winhandler.exe` bản 0.1.36 | `agvn-winhandler.exe` bản 0.1.37 |
+  |---|---|---|---|
+  | `New Folder 1/GAMEHUB` | mở được | mở được | mở được |
+  | `Lifeguard Holic Việt Hóa/GAMEHUB` | "File not found." | "File not found." | mở được |
+  | `ゲーム フォルダ/GAMEHUB` | | | mở được |
+
+  Bản 0.1.37 còn được thử với `/affinity`, với file chạy tên có dấu và tham số chạy có dấu (`"tên có dấu"` tới game
+  nguyên vẹn).
+- **Nhật ký:** `su-kien.txt` có dòng `Đường dẫn game có chữ ngoài ASCII (ệ, ó): mở game bằng agvn-winhandler.exe…`, và
+  dòng `File chạy: …` có `chữ ngoài ASCII: …`.
 
 ## Bàn phím, chuột ngoài (game Windows)
 
@@ -687,14 +718,14 @@ Từ bản 0.1.29, game app chưa biết engine, hay game có mod, có thêm cá
   hay 11, OpenGL, `quartz`/`mfplat` cho phim, `dsound`...); đóng gói (Enigma Virtual Box giữ cả game trong exe;
   SteamStub `.bind` cần Steam); dữ liệu nối sau exe (zip của LÖVE hay NW.js, PyInstaller, bộ cài NSIS...).
 
-Từ bản 0.1.37, dòng thứ hai của `su-kien.txt` là đường dẫn app mở game từ đó: `File chạy: /storage/emulated/0/…/Lifeguard
-Holic.exe`. Dòng này có thêm `KHÔNG có file này trên máy` khi app không thấy file ở đó, hoặc `ổ đĩa không rõ, app không
-kiểm được file` khi đường dẫn dùng ổ đĩa Windows mà container không có. Đường dẫn có chữ ngoài ASCII (chữ có dấu, chữ
-Nhật...) thì dòng ghi các chữ đó, vì `winhandler.exe`, chương trình mở game, đọc dòng lệnh theo bảng mã Windows
-(`__getmainargs`, `ShellExecuteExA`): chữ không có trong bảng mã bị mất. Lý do: ngày 10/10/2026, game "GAMEHUB"
-(Lifeguard Holic, Unity) trên Xiaomi 23090RA98G hiện hộp "File not found." ngay khi mở, trong khi GameHub mở được game.
-Game chưa hề chạy: không có nhật ký Unity, không có `AGVN-cheat.log`. Logcat lúc mở game đã mất vì người chơi vuốt tắt
-app, nên nhật ký không cho biết app tìm file ở đâu.
+Từ bản 0.1.37, dòng thứ hai của `su-kien.txt` là đường dẫn app mở game từ đó: `File chạy:
+/storage/emulated/0/…/Lifeguard Holic.exe`. Dòng này có thêm `KHÔNG có file này trên máy` khi app không thấy file ở đó,
+hoặc `ổ đĩa không rõ, app không kiểm được file` khi đường dẫn dùng ổ đĩa Windows mà container không có. Đường dẫn có chữ
+ngoài ASCII (chữ có dấu, chữ Nhật...) thì dòng ghi các chữ đó: `winhandler.exe` của Winlator làm mất các chữ này, nên
+game đó mở bằng `agvn-winhandler.exe` (xem "Thư mục game có dấu"). Lý do: ngày 10/10/2026, game "GAMEHUB" (Lifeguard
+Holic, Unity) trên Xiaomi 23090RA98G hiện hộp "File not found." ngay khi mở, trong khi GameHub mở được game. Game chưa
+hề chạy: không có nhật ký Unity, không có `AGVN-cheat.log`. Logcat lúc mở game đã mất vì người chơi vuốt tắt app, nên
+nhật ký không cho biết app tìm file ở đâu.
 
 Khi game Windows kết thúc, `su-kien.txt` có thêm dòng `Phút cuối của game (mỗi 5 giây): FPS …; luồng bận nhất (% một
 nhân) …; GPU (%) …` (`AgvnSlowWatch.lastMinute`). App vốn đo các số này mỗi 5 giây để biết game chậm; giờ app đo suốt
@@ -995,6 +1026,9 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
 - [ ] Bản 0.1.37, mở một game Windows bất kỳ: `su-kien.txt` có dòng `File chạy: …` ngay sau dòng `Game: …`. Game nằm
       trong thư mục có chữ có dấu thì dòng đó có `chữ ngoài ASCII: …`; file chạy đã bị xoá thì có `KHÔNG có file này
       trên máy`.
+- [ ] Bản 0.1.37, game Windows trong thư mục có dấu (như `Download/Lifeguard Holic Việt Hóa/GAMEHUB`): game mở được,
+      không còn hộp "File not found."; `su-kien.txt` có `Đường dẫn game có chữ ngoài ASCII (…): mở game bằng
+      agvn-winhandler.exe…`. Game trong thư mục không dấu: không có dòng đó, mở như trước.
 - [ ] Bản 0.1.32, Điều khiển → mở màn gán phím của một thiết bị, tắt thiết bị rồi xoay máy: app báo thiết bị vừa
       ngắt kết nối, không văng.
 - [ ] Bản 0.1.29, thoát một game Windows bất kỳ (từ menu, hoặc "Mở lại game ngay" của "Tự sửa lỗi"): gần cuối

@@ -459,23 +459,28 @@ void handleChildProcesses(int affinityMask) {
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine, int nCmdShow) {
   int affinity = 0;
-  char *directory = NULL;
-  char *executable = "wfm.exe";
-  char *params = NULL;
+  /* AGVN: the command line as Unicode. __argv is in the Windows code page,
+     which loses the letters beyond it: a game in ".../Lifeguard Holic Viet
+     Hoa/GAMEHUB" (with its accents) got "File not found." (10/10/2026),
+     while GameHub opened it. */
+  LPCWSTR directory = NULL;
+  LPCWSTR executable = L"wfm.exe";
 
-  int argc = __argc;
-  char **argv = __argv;
+  int argc = 0;
+  LPWSTR *argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+  if (argv == NULL)
+    argc = 0;
 
   int argIdx = 1;
   while (argIdx < argc) {
-    if (strcmp(argv[argIdx], "/affinity") == 0) {
+    if (wcscmp(argv[argIdx], L"/affinity") == 0) {
       if (argIdx + 1 < argc) {
-        affinity = (int)strtol(argv[argIdx + 1], NULL, 16);
+        affinity = (int)wcstol(argv[argIdx + 1], NULL, 16);
         argIdx += 2;
       } else {
         argIdx++;
       }
-    } else if (strcmp(argv[argIdx], "/dir") == 0) {
+    } else if (wcscmp(argv[argIdx], L"/dir") == 0) {
       if (argIdx + 1 < argc) {
         directory = argv[argIdx + 1];
         argIdx += 2;
@@ -489,24 +494,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
   }
 
-  char execArgs[2048] = {0};
-  if (argIdx < argc) {
-    for (int i = argIdx; i < argc; i++) {
-      strcat(execArgs, "\"");
-      strcat(execArgs, argv[i]);
-      strcat(execArgs, "\" ");
-    }
+  WCHAR execArgs[4096] = {0};
+  size_t used = 0;
+  for (int i = argIdx; i < argc; i++) {
+    size_t len = wcslen(argv[i]);
+    if (used + len + 4 > sizeof(execArgs) / sizeof(execArgs[0]))
+      break; /* AGVN: the arguments that fit, never past the buffer */
+    execArgs[used++] = L'"';
+    wcscpy(execArgs + used, argv[i]);
+    used += len;
+    execArgs[used++] = L'"';
+    execArgs[used++] = L' ';
+    execArgs[used] = 0;
   }
 
-  SHELLEXECUTEINFOA sei = {0};
-  sei.cbSize = sizeof(SHELLEXECUTEINFOA);
+  SHELLEXECUTEINFOW sei = {0};
+  sei.cbSize = sizeof(SHELLEXECUTEINFOW);
   sei.fMask = SEE_MASK_NOCLOSEPROCESS;
   sei.lpFile = executable;
   sei.lpParameters = execArgs[0] ? execArgs : NULL;
   sei.lpDirectory = directory;
   sei.nShow = SW_SHOW;
 
-  ShellExecuteExA(&sei);
+  ShellExecuteExW(&sei);
   if (sei.hProcess)
     CloseHandle(sei.hProcess);
 
