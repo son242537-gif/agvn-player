@@ -152,6 +152,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     public static String NOTIFICATION_CHANNEL_ID = "Winlator";
     public static int NOTIFICATION_ID = -1;
     private XServerRendererView xServerView;
+    private com.winlator.cmod.agvn.AgvnMouseCursor agvnMouseCursor; // AGVN: a mouse's pointer in touch play
     private InputControlsView inputControlsView;
     private TouchpadView touchpadView;
     private XEnvironment environment;
@@ -1352,6 +1353,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
         }
         final XServerRendererView renderer = xServerView;
         renderer.setCursorVisible(false);
+        agvnMouseCursor = new com.winlator.cmod.agvn.AgvnMouseCursor(simulateTouchScreen && !isMouseDisabled,
+                renderer::setCursorVisible);
 
         if (renderer instanceof VulkanXServerView) {
             VulkanXServerView vkRenderer = (VulkanXServerView) renderer;
@@ -1410,6 +1413,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         View.OnCapturedPointerListener capturedPointerListener = new View.OnCapturedPointerListener() {
             @Override
             public boolean onCapturedPointer(View view, MotionEvent event) {
+                agvnMouseCursor.mouse(); // AGVN: a held mouse shows its pointer, also in touch play
                 handleCapturedPointer(event);
                 return true;
             }
@@ -2744,6 +2748,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         com.winlator.cmod.agvn.AgvnMemoryWatch.touched(); // AGVN: memory growth only counts while nobody plays
+        if (agvnMouseCursor != null) agvnMouseCursor.on(event); // AGVN: a mouse click shows the pointer, a finger hides it
         if (isPaused && (drawerLayout == null || !drawerLayout.isDrawerOpen(GravityCompat.START))) return true;
         return super.dispatchTouchEvent(event);
     }
@@ -2752,6 +2757,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     public boolean dispatchGenericMotionEvent(MotionEvent event) {
         com.winlator.cmod.agvn.AgvnMemoryWatch.touched();
         if (xServer != null) com.winlator.cmod.agvn.AgvnInputDevices.click(event, false, xServer.isMouseDisabled());
+        if (agvnMouseCursor != null) agvnMouseCursor.on(event); // AGVN: a mouse moving shows the pointer in touch play
         boolean handledByWinHandler = false;
         boolean handledByTouchpadView = false;
 

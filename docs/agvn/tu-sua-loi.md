@@ -405,6 +405,10 @@ Người chơi nối bàn phím và chuột không dây nhưng game không nhậ
   cho mọi game, nên mọi cú di, cú bấm của chuột USB hay Bluetooth tới bộ phím ảo, và nó bỏ đi. Giờ bộ phím ảo chuyển
   chuột bị giữ sang cùng chỗ với vùng chạm (`handleCapturedPointer`). Đóng menu bên trái thì game lấy lại ô được chọn,
   vì menu giữ nó sau khi đóng (`XServerDisplayActivity.agvnFocusGame`).
+- **Chuột ngoài bấm được mà không thấy con trỏ (10/10/2026, bản 0.1.35):** AGVN thêm game Windows với "Giả lập màn
+  hình cảm ứng" bật (hồ sơ game): chạm ở đâu thì bấm ở đó, và màn hình game không bao giờ vẽ con trỏ. Giờ con trỏ hiện
+  khi chuột thật di, bấm hay lăn, và ẩn lại khi ngón tay chạm màn hình, nên chơi bằng tay vẫn như cũ
+  (`AgvnMouseCursor`). Game không giả lập cảm ứng thì vẫn hiện con trỏ như trước.
 
 ## App biết gì về từng game (`files/agvn/doctor/`)
 
@@ -973,6 +977,9 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       bằng tiếng Nhật ("D3D11 互換の GPU (機能レベル 11.0、…) が…"), bấm OK: thư viện hỏi "Game cần DirectX 11 mức 11.0"
       với "Dùng lại DXVK (bỏ WineD3D)", không phải "Game tắt ngay sau khi mở". Lần game lỗi sau đó (như hộp
       vkCreateShaderModule), không còn nút "Dùng WineD3D thay DXVK" cho game này.
+- [ ] Bản 0.1.36, game Windows nhập bằng AGVN (giả lập cảm ứng bật), chuột USB hoặc Bluetooth: di chuột thì con trỏ
+      hiện và đi theo; chạm màn hình bằng ngón tay thì con trỏ ẩn; di chuột lại thì hiện lại. Chơi chỉ bằng tay: không
+      thấy con trỏ, như trước.
 - [ ] Bản 0.1.36, game RPG Maker MV có một ảnh `.rpgmvp` rỗng (0 byte) hay bị xoá: tới chỗ game dùng ảnh đó, game không
       dừng, chỗ ảnh để trống; `logcat -s AGVN` có `HTML game picture … shown empty`; "Gửi nhật ký" có `app/chay-nhe.txt`
       với dòng `standIn=…` tên ảnh đó.
