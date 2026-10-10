@@ -702,6 +702,13 @@ dụng), rồi người chơi vẫn báo đứng hình.
   nhật ký nào. Vì thế mới có cách "Chạy không có mod".
 - Cả hai: từ giây thứ 10, máy giới hạn nhân CPU mạnh nhất còn 45–66% (headroom 0,80–0,86).
 
+Game HTML RPG Maker MV/MZ có ảnh mã hoá (`.rpgmvp`, `.png_`) bị thiếu, hoặc ngắn hơn 32 byte (16 byte đầu "RPGMV" và
+16 byte khoá che): app đưa một ảnh trống, mã hoá bằng khoá của game (`data/System.json`), như ảnh `.png` bị thiếu
+(`AgvnHtmlStandIn`, bản 0.1.36). Trước đó, file rỗng làm game dừng với "RangeError: Invalid typed array length: 16" ở
+`Decrypter.decryptArrayBuffer` (Yarisutemesubuta trên OPPO CPH2127, 10/10/2026), còn file thiếu làm game dừng ở
+"Failed to load". Tên các ảnh đó (5 ảnh đầu) nằm trong `app/chay-nhe.txt` của "Gửi nhật ký", cùng câu lỗi đầu tiên
+của game, vì logcat của máy bận có khi chỉ giữ được vài chục giây.
+
 Game HTML (RPG Maker MV/MZ, Tyrano): một thông báo của trang lặp lại chỉ được ghi vào logcat lần đầu, rồi lần thứ 10,
 100, 1000… kèm số lần (`AgvnHtmlConsole.repeat`, bản 0.1.28). Lý do: nhật ký Train45 gửi ngày 07/10/2026 có `logcat.txt`
 toàn một dòng của một game RPG Maker khác chạy trước đó ("The provided value 'undefined' is not a valid enum value of
@@ -966,6 +973,9 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       bằng tiếng Nhật ("D3D11 互換の GPU (機能レベル 11.0、…) が…"), bấm OK: thư viện hỏi "Game cần DirectX 11 mức 11.0"
       với "Dùng lại DXVK (bỏ WineD3D)", không phải "Game tắt ngay sau khi mở". Lần game lỗi sau đó (như hộp
       vkCreateShaderModule), không còn nút "Dùng WineD3D thay DXVK" cho game này.
+- [ ] Bản 0.1.36, game RPG Maker MV có một ảnh `.rpgmvp` rỗng (0 byte) hay bị xoá: tới chỗ game dùng ảnh đó, game không
+      dừng, chỗ ảnh để trống; `logcat -s AGVN` có `HTML game picture … shown empty`; "Gửi nhật ký" có `app/chay-nhe.txt`
+      với dòng `standIn=…` tên ảnh đó.
 - [ ] Bản 0.1.32, Điều khiển → mở màn gán phím của một thiết bị, tắt thiết bị rồi xoay máy: app báo thiết bị vừa
       ngắt kết nối, không văng.
 - [ ] Bản 0.1.29, thoát một game Windows bất kỳ (từ menu, hoặc "Mở lại game ngay" của "Tự sửa lỗi"): gần cuối

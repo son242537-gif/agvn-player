@@ -24,15 +24,17 @@ import java.util.concurrent.TimeUnit;
  */
 final class AgvnLiveLogs {
     private static final String TAG = "AGVN";
-    static final String APP = "app", RENPY = "renpy", GODOT = "godot", LOGCAT = "logcat.txt", DEVICE = "thiet-bi.txt";
+    static final String APP = "app", RENPY = "renpy", GODOT = "godot", LOGCAT = "logcat.txt", DEVICE = "thiet-bi.txt",
+            LIGHT = "chay-nhe.txt";
     private static final int LOGCAT_LINES = 20000;
     private static final long LOGCAT_MAX_BYTES = 4L << 20;
 
     private AgvnLiveLogs() {}
 
     /**
-     * Fills {@code into}: "&lt;session&gt;/" for each running session, "app/logcat.txt", "app/thiet-bi.txt", and "renpy/"
-     * and "godot/" for {@code gameDir}.
+     * Fills {@code into}: "&lt;session&gt;/" for each running session, "app/logcat.txt", "app/thiet-bi.txt", the last
+     * "Chạy nhẹ" game as {@link AgvnLightSession} keeps it ("app/chay-nhe.txt": its error, the pictures shown empty,
+     * which a busy logcat loses), and "renpy/" and "godot/" for {@code gameDir}.
      */
     static void collect(Context context, File[] sessions, File gameDir, File into) {
         if (sessions != null) {
@@ -46,6 +48,8 @@ final class AgvnLiveLogs {
         if (app.mkdirs()) {
             logcat(new File(app, LOGCAT));
             write(new File(app, DEVICE), AgvnDeviceReport.text(context));
+            File light = new File(context.getFilesDir(), AgvnLightSession.FILE);
+            if (light.isFile()) copy(light, new File(app, LIGHT));
         }
         if (gameDir == null) return;
         File renpyLogs = AgvnRenpyGame.publicDir(AgvnSessionLog.root().getParentFile(), gameDir);
@@ -83,6 +87,14 @@ final class AgvnLiveLogs {
             Thread.currentThread().interrupt();
         } finally {
             if (process != null) process.destroy();
+        }
+    }
+
+    private static void copy(File from, File to) {
+        try {
+            Files.copy(from.toPath(), to.toPath());
+        } catch (IOException | RuntimeException e) {
+            Log.w(TAG, "not copied: " + from, e);
         }
     }
 

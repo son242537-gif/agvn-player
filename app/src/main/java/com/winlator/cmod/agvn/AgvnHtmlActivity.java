@@ -111,7 +111,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
             Uri url = request.getUrl();
             if (!host.equals(url.getHost())) return AgvnHtmlFiles.blocked(); // no network: nothing leaves the phone
-            return AgvnHtmlFiles.serve(root, url.getEncodedPath(), compatJs);
+            return AgvnHtmlFiles.serve(root, url.getEncodedPath(), compatJs, AgvnLightSession.standIns(view.getContext()));
         }
 
         @Override

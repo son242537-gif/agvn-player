@@ -9,6 +9,7 @@ import android.os.Process;
 
 import java.io.File;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 /**
  * The "Chạy nhẹ" game playing now (Ren'Py, RPG Maker XP/VX/VX Ace, HTML), in files/agvn/light-session.properties,
@@ -20,7 +21,9 @@ public final class AgvnLightSession {
     static final String FILE = "agvn/light-session.properties";
     static final String SHORTCUT = "shortcut", CONTAINER = "container", RUNNER = "runner", NAME = "name", GAME_DIR = "gameDir",
             START = "start", PROCESS = "process", PID = "pid", STARTED = "started", ENDED = "ended", SHOWN = "shown",
-            ERROR = "error", PAGE_CRASH = "pageCrash";
+            ERROR = "error", PAGE_CRASH = "pageCrash", STAND_IN = "standIn";
+    /** Pictures named as shown empty, at most. */
+    static final int STAND_INS = 5;
 
     private AgvnLightSession() {}
 
@@ -59,7 +62,7 @@ public final class AgvnLightSession {
     }
 
     /** The runner showed its own error, with its fixes ("Chạy bằng Windows", the RTP): nothing to ask again. */
-    static void shown(Context ctx, String error) {
+    static synchronized void shown(Context ctx, String error) {
         Properties p = read(ctx);
         if (p.isEmpty()) return;
         p.setProperty(SHOWN, "1");
@@ -68,7 +71,7 @@ public final class AgvnLightSession {
     }
 
     /** An error the game reported while playing (the first one counts). */
-    static void error(Context ctx, String error) {
+    static synchronized void error(Context ctx, String error) {
         Properties p = read(ctx);
         if (p.isEmpty() || p.containsKey(ERROR)) return;
         p.setProperty(ERROR, cut(error));
@@ -88,7 +91,21 @@ public final class AgvnLightSession {
         file(ctx).delete();
     }
 
-    private static void set(Context ctx, String key, String value) {
+    /** A picture of the HTML game was missing or broken and shown empty (AgvnHtmlStandIn): the first few are kept. */
+    static synchronized void standIn(Context ctx, String file) {
+        Properties p = read(ctx);
+        String before = p.getProperty(STAND_IN, "");
+        if (p.isEmpty() || before.contains(file) || before.split(" \\| ").length >= STAND_INS) return;
+        p.setProperty(STAND_IN, before.isEmpty() ? cut(file) : before + " | " + cut(file));
+        store(ctx, p);
+    }
+
+    /** {@link #standIn} for the runner of {@code ctx}, so "Gửi nhật ký" names the pictures. */
+    static Consumer<String> standIns(Context ctx) {
+        return file -> standIn(ctx, file);
+    }
+
+    private static synchronized void set(Context ctx, String key, String value) {
         Properties p = read(ctx);
         if (p.isEmpty()) return;
         p.setProperty(key, value);
