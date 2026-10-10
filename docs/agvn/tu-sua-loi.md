@@ -407,8 +407,8 @@ Người chơi nối bàn phím và chuột không dây nhưng game không nhậ
   vì menu giữ nó sau khi đóng (`XServerDisplayActivity.agvnFocusGame`).
 - **Chuột ngoài bấm được mà không thấy con trỏ (10/10/2026, bản 0.1.35):** AGVN thêm game Windows với "Giả lập màn
   hình cảm ứng" bật (hồ sơ game): chạm ở đâu thì bấm ở đó, và màn hình game không bao giờ vẽ con trỏ. Giờ con trỏ hiện
-  khi chuột thật di, bấm hay lăn, và ẩn lại khi ngón tay chạm màn hình, nên chơi bằng tay vẫn như cũ
-  (`AgvnMouseCursor`). Game không giả lập cảm ứng thì vẫn hiện con trỏ như trước.
+  khi chuột thật hay bàn di chuột (touchpad) di, bấm hay lăn, và ẩn lại khi ngón tay chạm màn hình, nên chơi bằng tay
+  vẫn như cũ (`AgvnMouseCursor`). Game không giả lập cảm ứng thì vẫn hiện con trỏ như trước.
 
 ## App biết gì về từng game (`files/agvn/doctor/`)
 
