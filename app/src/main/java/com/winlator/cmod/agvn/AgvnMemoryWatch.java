@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
@@ -15,12 +15,15 @@ import java.util.concurrent.TimeUnit;
 /**
  * Watches memory every 5 s while a game is on screen ({@link AgvnMemoryRules} decides). On a warning it shows a bar
  * over the game with "Thoát game an toàn", so the player can save and leave before Android kills the whole app.
- * Warnings and the session's peaks go to the session log.
+ * Warnings and the session's peaks go to the session log. Under twice the bar's level, free RAM is also read every
+ * second for "Tự sửa lỗi" ({@link AgvnSessionTrack#memory}): a game that loads fast can use up its last gigabyte
+ * between two polls (Legend Cleaner closed while loading; its lowest poll had 947 MB free).
  */
 public final class AgvnMemoryWatch {
     private static final String TAG = "AGVN";
-    private static final long POLL_S = 5, PEAKS_EVERY_MS = 60_000;
+    private static final long POLL_S = 5, QUICK_MS = 1000, PEAKS_EVERY_MS = 60_000;
     private static volatile long lastInputMs = SystemClock.uptimeMillis();
+    private static volatile long playerInputMs;
 
     private final Activity activity;
     private final Runnable exitGame;
@@ -28,6 +31,8 @@ public final class AgvnMemoryWatch {
     private final long startedMs = SystemClock.uptimeMillis();
     private ScheduledExecutorService poller;
     private long minFreeMb = Long.MAX_VALUE, maxRssMb, maxDmabufMb, peaksWrittenMs;
+    /** The last poll found free RAM under twice the bar's level. */
+    private volatile boolean nearLow;
 
     public AgvnMemoryWatch(Activity activity, Runnable exitGame) {
         this.activity = activity;
@@ -37,12 +42,19 @@ public final class AgvnMemoryWatch {
     /** Called on every touch, key or controller input. */
     public static void touched() {
         lastInputMs = SystemClock.uptimeMillis();
+        playerInputMs = lastInputMs;
+    }
+
+    /** SystemClock.uptimeMillis() of the player's last touch, key or controller input; 0 before the first one. */
+    static long playerInputMs() {
+        return playerInputMs;
     }
 
     public synchronized void start() {
         if (poller != null) return;
         poller = Executors.newSingleThreadScheduledExecutor();
         poller.scheduleWithFixedDelay(this::poll, POLL_S, POLL_S, TimeUnit.SECONDS);
+        poller.scheduleWithFixedDelay(this::quick, QUICK_MS, QUICK_MS, TimeUnit.MILLISECONDS);
     }
 
     public synchronized void stop() {
@@ -66,6 +78,9 @@ public final class AgvnMemoryWatch {
                 maxRssMb = Math.max(maxRssMb, use.rssMb);
                 maxDmabufMb = Math.max(maxDmabufMb, use.dmabufMb);
             }
+            AgvnSessionTrack.memory(System.currentTimeMillis(), free, rules.lowFreeMb); // for AgvnDoctor at the end
+            AgvnSessionTrack.used(System.currentTimeMillis(), use.rssMb + use.dmabufMb); // for AgvnBlackScreen
+            nearLow = free >= 0 && free < 2 * rules.lowFreeMb;
             if (now - peaksWrittenMs >= PEAKS_EVERY_MS) writePeaks();
             AgvnMemoryRules.Reason reason = rules.feed(now, startedMs, free, use.rssMb + use.dmabufMb, lastInputMs);
             if (reason == AgvnMemoryRules.Reason.NONE) return;
@@ -74,6 +89,21 @@ public final class AgvnMemoryWatch {
             activity.runOnUiThread(() -> showBar(reason, free, use));
         } catch (RuntimeException e) {
             Log.w(TAG, "memory watch sample failed", e);
+        }
+    }
+
+    /** Free RAM between polls while it is near the bar's level: the session's lowest, and the doctor's sample. */
+    private void quick() {
+        if (!nearLow) return;
+        try {
+            long free = AgvnMemoryProbe.freeMb();
+            if (free < 0) return;
+            synchronized (this) {
+                minFreeMb = Math.min(minFreeMb, free);
+            }
+            AgvnSessionTrack.memory(System.currentTimeMillis(), free, rules.lowFreeMb);
+        } catch (RuntimeException e) {
+            Log.w(TAG, "memory watch quick sample failed", e);
         }
     }
 

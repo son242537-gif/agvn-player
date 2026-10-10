@@ -1,0 +1,6 @@
+AGVN Player v0.1.37 - agvn.io
+
+Sửa lỗi:
+- Game Windows nằm trong thư mục có chữ có dấu (như "Việt Hóa") hay chữ Nhật, chữ Trung không còn báo "File not found." khi mở: app mở game bằng đường dẫn Unicode, như GameHub. Game trong thư mục không dấu vẫn mở như cũ.
+- "Gửi nhật ký" ghi đường dẫn file chạy của game Windows và báo khi trên máy không có file đó, giúp tìm nguyên nhân lỗi "File not found." nhanh hơn.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

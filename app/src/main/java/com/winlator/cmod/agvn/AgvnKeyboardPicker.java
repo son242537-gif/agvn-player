@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
@@ -17,6 +17,8 @@ import androidx.appcompat.app.AlertDialog;
 import com.winlator.cmod.R;
 import com.winlator.cmod.inputcontrols.Binding;
 import com.winlator.cmod.inputcontrols.ControlElement;
+
+import java.util.function.Predicate;
 
 /**
  * Picks a button's key on a drawn PC keyboard plus a mouse panel (tap the key itself, no scrolling list), with a
@@ -39,15 +41,6 @@ final class AgvnKeyboardPicker {
         hold.setText(R.string.agvn_kb_hold);
         hold.setChecked(element.isToggleSwitch());
 
-        LinearLayout board = new LinearLayout(activity);
-        board.setOrientation(LinearLayout.HORIZONTAL);
-        LinearLayout keys = new LinearLayout(activity);
-        keys.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout mouse = new LinearLayout(activity);
-        mouse.setOrientation(LinearLayout.VERTICAL);
-        board.addView(keys, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 5f));
-        board.addView(mouse, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-
         View.OnClickListener onKey = v -> {
             Binding binding = (Binding) v.getTag();
             handled[0] = true;
@@ -57,19 +50,7 @@ final class AgvnKeyboardPicker {
             result.done(true);
         };
 
-        for (String[] row : AgvnKeyboardRows.ROWS) {
-            LinearLayout line = new LinearLayout(activity);
-            line.setOrientation(LinearLayout.HORIZONTAL);
-            for (String cell : row) addKey(activity, line, cell, onKey, dp);
-            keys.addView(line);
-        }
-        for (String cell : AgvnKeyboardRows.MOUSE) {
-            LinearLayout line = new LinearLayout(activity);
-            addKey(activity, line, cell, onKey, dp);
-            mouse.addView(line);
-        }
-
-        root.addView(board);
+        root.addView(board(activity, b -> true, onKey));
         root.addView(hold);
         ScrollView scroll = new ScrollView(activity);
         scroll.addView(root);
@@ -94,8 +75,41 @@ final class AgvnKeyboardPicker {
         }
     }
 
-    /** Cell format "BINDING_NAME|label|width"; an empty binding name is a gap. Unknown bindings are skipped. */
-    private static void addKey(Activity activity, LinearLayout line, String cell, View.OnClickListener onKey, float dp) {
+    /**
+     * The drawn keyboard and the mouse panel beside it; a tap calls {@code onKey} with the key's Binding as the view's
+     * tag. Keys {@code offered} turns down are gaps, so the rows keep their shape; with no mouse key, no mouse panel.
+     */
+    static LinearLayout board(Activity activity, Predicate<Binding> offered, View.OnClickListener onKey) {
+        float dp = activity.getResources().getDisplayMetrics().density;
+        LinearLayout board = new LinearLayout(activity);
+        board.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout keys = new LinearLayout(activity);
+        keys.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout mouse = new LinearLayout(activity);
+        mouse.setOrientation(LinearLayout.VERTICAL);
+        board.addView(keys, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 5f));
+        for (String[] row : AgvnKeyboardRows.ROWS) {
+            LinearLayout line = new LinearLayout(activity);
+            line.setOrientation(LinearLayout.HORIZONTAL);
+            for (String cell : row) addKey(activity, line, cell, offered, onKey, dp);
+            keys.addView(line);
+        }
+        boolean anyMouse = false;
+        for (String cell : AgvnKeyboardRows.MOUSE) {
+            LinearLayout line = new LinearLayout(activity);
+            anyMouse |= addKey(activity, line, cell, offered, onKey, dp);
+            mouse.addView(line);
+        }
+        if (anyMouse) board.addView(mouse, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        return board;
+    }
+
+    /**
+     * Cell format "BINDING_NAME|label|width"; an empty binding name is a gap, and so are unknown bindings and keys not
+     * {@code offered}. Returns true when a key was added.
+     */
+    private static boolean addKey(Activity activity, LinearLayout line, String cell, Predicate<Binding> offered,
+                                  View.OnClickListener onKey, float dp) {
         String[] parts = cell.split("\\|", -1);
         float weight = parts.length > 2 ? Float.parseFloat(parts[2]) : 1f;
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, (int) (34 * dp), weight);
@@ -106,9 +120,9 @@ final class AgvnKeyboardPicker {
         key.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         key.setSingleLine(true);
         Binding binding = AgvnKeyboardRows.binding(parts[0]);
-        if (binding == null) {
+        if (binding == null || !offered.test(binding)) {
             line.addView(new View(activity), lp);
-            return;
+            return false;
         }
         key.setText(parts.length > 1 && !parts[1].isEmpty() ? parts[1] : AgvnBindingLabels.label(activity, binding));
         key.setTextColor(Color.WHITE);
@@ -119,5 +133,6 @@ final class AgvnKeyboardPicker {
         key.setTag(binding);
         key.setOnClickListener(onKey);
         line.addView(key, lp);
+        return true;
     }
 }

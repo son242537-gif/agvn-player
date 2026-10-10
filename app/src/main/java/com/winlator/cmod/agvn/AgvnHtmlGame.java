@@ -1,9 +1,13 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
 import android.content.Intent;
 
+import com.winlator.cmod.XServerDisplayActivity;
+import com.winlator.cmod.container.Container;
+import com.winlator.cmod.container.ContainerManager;
+import com.winlator.cmod.container.Shortcut;
 import com.winlator.cmod.core.FileUtils;
 
 import java.io.File;
@@ -14,12 +18,17 @@ import java.util.Map;
 /**
  * "Chạy nhẹ": RPG Maker MV/MZ and TyranoBuilder games are web pages (index.html + JavaScript), so they run in an
  * Android WebView ({@link AgvnHtmlActivity}) without Wine or Box64: far lighter, cooler and kinder to the battery.
- * The shortcut keeps its Wine Exec line; the extra {@link #EXTRA_RUNNER} decides which one starts.
+ * Ren'Py 8 games ({@link AgvnRenpyGame}), RPG Maker XP/VX/VX Ace games ({@link AgvnRgssGame}) and Godot 4 games
+ * ({@link AgvnGodotLight}) have their own "Chạy nhẹ". The shortcut keeps its Wine Exec line; the extra
+ * {@link #EXTRA_RUNNER} decides which one starts.
  */
 public final class AgvnHtmlGame {
     public static final String EXTRA_RUNNER = "agvnRunner";
     public static final String EXTRA_INDEX = "agvnHtmlIndex";
     public static final String RUNNER_HTML = "html";
+    public static final String RUNNER_RENPY = "renpy";
+    public static final String RUNNER_RGSS = "rgss";
+    public static final String RUNNER_GODOT = "godot";
     public static final String RUNNER_WINE = "wine";
 
     private AgvnHtmlGame() {}
@@ -44,18 +53,32 @@ public final class AgvnHtmlGame {
     }
 
     public static boolean isValidRunner(String runner) {
-        return runner == null || RUNNER_HTML.equals(runner) || RUNNER_WINE.equals(runner);
+        return runner == null || RUNNER_HTML.equals(runner) || RUNNER_RENPY.equals(runner) || RUNNER_RGSS.equals(runner)
+                || RUNNER_GODOT.equals(runner) || RUNNER_WINE.equals(runner);
+    }
+
+    /** True for "Chạy nhẹ" (HTML, Ren'Py, RGSS or Godot): the game runs on Android itself, without Wine. */
+    public static boolean isLight(String runner) {
+        return RUNNER_HTML.equals(runner) || RUNNER_RENPY.equals(runner) || RUNNER_RGSS.equals(runner)
+                || RUNNER_GODOT.equals(runner);
     }
 
     /**
-     * Called first thing by XServerDisplayActivity: opens the HTML runner instead of Wine when the shortcut asks for it.
-     * Returns true when the caller must finish(). A missing index.html (game moved) falls back to Wine.
+     * Called first thing by XServerDisplayActivity: opens "Chạy nhẹ" instead of Wine when the shortcut asks for it.
+     * Returns true when the caller must finish(). A game that moved (no index.html, no Ren'Py 8 or RGSS game) runs in Wine.
+     * A Godot game imported before Godot had "Chạy nhẹ" (no runner yet) gets it as soon as Godot 4.7 runs it.
      */
     public static boolean redirect(Activity activity) {
         Intent from = activity.getIntent();
         String path = from != null ? from.getStringExtra("shortcut_path") : null;
         if (path == null || path.isEmpty()) return false;
         Map<String, String> extras = readExtras(new File(path));
+        if (RUNNER_RENPY.equals(extras.get(EXTRA_RUNNER))) return AgvnRenpyGame.start(activity, from, extras);
+        if (RUNNER_RGSS.equals(extras.get(EXTRA_RUNNER))) return AgvnRgssFiles.start(activity, from, extras);
+        String runner = extras.get(EXTRA_RUNNER);
+        boolean godot = RUNNER_GODOT.equals(runner) || ((runner == null || runner.isEmpty())
+                && GameExeResolver.Engine.GODOT.name().equals(extras.get(AgvnGameImporter.EXTRA_ENGINE)));
+        if (godot) return AgvnGodotLight.start(activity, from, extras);
         if (!RUNNER_HTML.equals(extras.get(EXTRA_RUNNER))) return false;
         String index = extras.get(EXTRA_INDEX);
         if (index == null || !new File(index).isFile()) return false;
@@ -63,6 +86,42 @@ public final class AgvnHtmlGame {
         if (from.getExtras() != null) intent.putExtras(from.getExtras());
         intent.putExtra(AgvnHtmlActivity.EXTRA_INDEX_PATH, index);
         activity.startActivity(intent);
+        return true;
+    }
+
+    /**
+     * "Chạy bằng Windows" from a "Chạy nhẹ" game: the shortcut remembers Wine. Returns the intent that starts the game
+     * in Wine ({@code ownExtra}, the runner's own extra, left out), or null when the game is no longer in the library.
+     */
+    static Intent toWindows(Activity activity, String ownExtra) {
+        Intent from = activity.getIntent();
+        String path = from.getStringExtra("shortcut_path");
+        int id = from.getIntExtra("container_id", 0);
+        if (id == 0 && path != null) id = containerIdIn(new File(path));
+        Container container = new ContainerManager(activity).getContainerById(id);
+        if (path == null || container == null) return null;
+        Shortcut shortcut = new Shortcut(container, new File(path));
+        shortcut.putExtra(EXTRA_RUNNER, RUNNER_WINE);
+        shortcut.saveData();
+        Intent intent = new Intent(activity, XServerDisplayActivity.class);
+        if (from.getExtras() != null) intent.putExtras(from.getExtras());
+        intent.removeExtra(ownExtra);
+        return intent;
+    }
+
+    /** False when the game's shortcut starts no real .exe (a copy made for phones): "Chạy bằng Windows" cannot run it. */
+    static boolean hasWindowsExe(Activity activity) {
+        String path = activity.getIntent().getStringExtra("shortcut_path");
+        return path == null || exeExists(new File(path));
+    }
+
+    /** True when the exe in the .desktop file's Exec line exists, or when the line cannot be read (nothing to hide then). */
+    static boolean exeExists(File desktopFile) {
+        for (String line : FileUtils.readLines(desktopFile)) {
+            if (!line.startsWith("Exec=")) continue;
+            int end = line.lastIndexOf('"'), start = end > 0 ? line.lastIndexOf('"', end - 1) : -1;
+            return start < 0 || new File(line.substring(start + 1, end)).isFile();
+        }
         return true;
     }
 

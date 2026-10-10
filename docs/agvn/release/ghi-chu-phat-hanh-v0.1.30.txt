@@ -1,0 +1,6 @@
+AGVN Player v0.1.30 - agvn.io
+
+Sửa lỗi:
+- Game bị khựng vài giây hoặc đen màn hình trên máy GPU Mali vì GPU hết bộ nhớ dựng hình (nhật ký ghi "TILER_HEAP_OOM") giờ được nhận ra ngay lúc đang chơi, và app đề nghị hạ Đồ họa. Từ lần mở sau, app tự dùng mức tiết kiệm RAM cao nhất cho game đó.
+- Cài thêm một bản DXVK, VKD3D, Box64 hay Wine trong cài đặt game không còn làm app văng khi cài không được. Bản đó đã có trên máy thì app dùng luôn; gói tải về bị lỗi thì app báo "Không cài được".
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

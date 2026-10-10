@@ -1,0 +1,142 @@
+// Copyright (c) 2026 agvn.io — MIT License (see LICENSE).
+//
+// AGVN: Ren'Py 8 runner ("Chạy nhẹ" for Ren'Py games, docs/agvn/engine-rieng.md). Fetches Ren'Py's own Android build
+// (RAPT) and SDK from renpy.org, checked against scripts/agvn/pins.txt, and makes from them in build/generated/agvn/renpy:
+//   jniLibs/arm64-v8a/librenpython.so   Python 3.12, Ren'Py's C modules and SDL2, built by Ren'Py
+//   java/org/libsdl, java/org/jnius     the SDL2 and pyjnius Java classes that match that library, unchanged
+//   assets/agvn/renpy8.zip              the engine the app unpacks on the first Ren'Py game: main.py (AGVN),
+//                                       renpy.py, renpy/ (compiled modules and common/) and lib/python3.12/
+//   assets/agvn/renpy8.txt              the version of that zip, so the app unpacks it again only when it changes
+//   assets/agvn/renpy-license.txt       Ren'Py's license and the list of libraries in librenpython.so
+// Nothing downloaded is run on the build machine: files are only copied out of the two archives.
+// Applied from build.gradle, which provides agvnPinnedAsset.
+
+import java.security.MessageDigest
+import java.util.zip.CRC32
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+
+interface AgvnRenpyArchives {
+    @javax.inject.Inject
+    ArchiveOperations getArchives()
+}
+
+def renpyVersion = "8.5.3"
+// Bump when the rules below change what goes into the outputs.
+def renpyRules = "1"
+def renpyPinned = project.ext.agvnPinnedAsset
+def renpyArchives = project.objects.newInstance(AgvnRenpyArchives).archives
+def renpyDownloads = new File(projectDir, "agvn-downloads")
+def renpyRapt = new File(renpyDownloads, "renpy-${renpyVersion}-rapt.zip")
+def renpySdk = new File(renpyDownloads, "renpy-${renpyVersion}-sdk.tar.bz2")
+def renpyMain = new File(projectDir, "src/main/renpy/main.py")
+def renpyOut = layout.buildDirectory.dir("generated/agvn/renpy").get().asFile
+def renpyPins = new Properties()
+rootProject.file("scripts/agvn/pins.txt").withInputStream { renpyPins.load(it) }
+
+def renpySha256 = { byte[] data ->
+    MessageDigest.getInstance("SHA-256").digest(data).collect { String.format("%02x", ((int) it) & 0xff) }.join()
+}
+
+// "renpy/display/__pycache__/core.cpython-312.pyc" -> "renpy/display/core.pyc", as Ren'Py's own Android build does;
+// sources and the rest of renpy/ are left out. common/ is kept whole except the .rpy scripts, which are compiled.
+def renpyEnginePath = { String path ->
+    if (path == "renpy.py" || path.startsWith("lib/python3.12/")) return path
+    if (path.startsWith("renpy/common/")) {
+        return path.contains("/__pycache__/") || path.endsWith(".rpy") || path.endsWith("_ren.py") ? null : path
+    }
+    def compiled = path =~ /^(renpy\/(?:.*\/)?)__pycache__\/([^\/.]+)\.cpython-312\.pyc$/
+    return compiled.matches() ? compiled.group(1) + compiled.group(2) + ".pyc" : null
+}
+
+tasks.register("downloadRenpy") {
+    doLast {
+        [renpyRapt, renpySdk].each { File archive ->
+            String pin = archive == renpyRapt ? "renpy8_rapt_sha256" : "renpy8_sdk_sha256"
+            renpyPinned(archive, pin) { File target ->
+                target.parentFile.mkdirs()
+                new URL("https://www.renpy.org/dl/${renpyVersion}/${target.name}").withInputStream { input ->
+                    target.withOutputStream { output -> output << input }
+                }
+            }
+        }
+    }
+}
+
+tasks.register("prepareRenpy") {
+    dependsOn "downloadRenpy"
+    doLast {
+        String stamp = "renpy=${renpyVersion} rules=${renpyRules} rapt=${renpyPins.getProperty("renpy8_rapt_sha256")} " +
+                "sdk=${renpyPins.getProperty("renpy8_sdk_sha256")} main=${renpySha256(renpyMain.bytes)}"
+        File stampFile = new File(renpyOut, "stamp.txt")
+        if (stampFile.isFile() && stampFile.text == stamp) return
+        println("Preparing Ren'Py ${renpyVersion} for the app...")
+        renpyOut.deleteDir()
+
+        // librenpython.so and the Java classes built with it
+        String prototype = "rapt/prototype/renpyandroid/src/main/"
+        renpyArchives.zipTree(renpyRapt).matching {
+            include prototype + "jniLibs/arm64-v8a/librenpython.so"
+            include prototype + "java/org/libsdl/app/*.java", prototype + "java/org/jnius/*.java"
+        }.visit { FileVisitDetails d ->
+            if (d.directory) return
+            String path = d.relativePath.pathString.substring(prototype.length())
+            File target = new File(renpyOut, path.startsWith("java/") ? path : "jniLibs/arm64-v8a/" + d.name)
+            target.parentFile.mkdirs()
+            d.copyTo(target)
+        }
+        if (!new File(renpyOut, "jniLibs/arm64-v8a/librenpython.so").isFile() || !new File(renpyOut, "java/org/libsdl/app/SDLActivity.java").isFile())
+            throw new GradleException("Ren'Py ${renpyVersion} RAPT: librenpython.so or the SDL classes not found")
+
+        // the engine zip; stored, since the APK compresses its assets
+        File assets = new File(renpyOut, "assets/agvn")
+        assets.mkdirs()
+        String sdkRoot = "renpy-${renpyVersion}-sdk/"
+        Map<String, byte[]> files = new TreeMap<>()
+        files.put("main.py", renpyMain.bytes)
+        renpyArchives.tarTree(renpyArchives.bzip2(renpySdk)).matching {
+            include sdkRoot + "renpy.py", sdkRoot + "LICENSE.txt", sdkRoot + "renpy/**", sdkRoot + "lib/python3.12/**"
+        }.visit { FileVisitDetails d ->
+            if (d.directory) return
+            String path = d.relativePath.pathString.substring(sdkRoot.length())
+            if (path == "LICENSE.txt") {
+                d.copyTo(new File(assets, "renpy-license.txt"))
+                return
+            }
+            String target = renpyEnginePath(path)
+            if (target == null) return
+            ByteArrayOutputStream data = new ByteArrayOutputStream()
+            d.copyTo(data)
+            files.put(target, data.toByteArray())
+        }
+        if (!files.containsKey("renpy/bootstrap.pyc") || !files.containsKey("lib/python3.12/os.pyc"))
+            throw new GradleException("Ren'Py ${renpyVersion} SDK: renpy/ or lib/python3.12/ not found")
+        new File(assets, "renpy8.zip").withOutputStream { stream ->
+            ZipOutputStream zip = new ZipOutputStream(stream)
+            files.each { String name, byte[] data ->
+                ZipEntry entry = new ZipEntry(name)
+                CRC32 crc = new CRC32()
+                crc.update(data)
+                entry.method = ZipEntry.STORED
+                entry.size = data.length
+                entry.compressedSize = data.length
+                entry.crc = crc.value
+                entry.time = 0L
+                zip.putNextEntry(entry)
+                zip.write(data)
+                zip.closeEntry()
+            }
+            zip.finish()
+        }
+        new File(assets, "renpy8.txt").text = renpySha256(stamp.getBytes("UTF-8")).substring(0, 16)
+        stampFile.text = stamp
+        println("Ren'Py ${renpyVersion}: ${files.size()} engine files")
+    }
+}
+
+android.sourceSets.main {
+    java.srcDir(new File(renpyOut, "java"))
+    jniLibs.srcDir(new File(renpyOut, "jniLibs"))
+    assets.srcDir(new File(renpyOut, "assets"))
+}
+preBuild.dependsOn("prepareRenpy")

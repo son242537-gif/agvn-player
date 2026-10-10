@@ -1,0 +1,14 @@
+AGVN Player v0.1.33 - agvn.io
+
+Mới:
+- Thêm bản mới của một game đã có trong thư viện (bản phát hành mới ở thư mục khác): bản mới dùng chung save với bản cũ, như cài bản mới trên máy tính. Save nằm trong thư mục game cũ được chép sang khi bản mới chưa có save.
+- "Tự sửa lỗi" nhận ra hộp lỗi của game Unreal "A D3D11-compatible GPU ... is required" (game cần DirectX 11 mức 11.0) và gợi ý cách sửa.
+- "Gửi nhật ký" có thêm nhật ký của cheat AGVN (AGVN-cheat.log), để biết game dừng ở đâu.
+Sửa lỗi:
+- Bộ phím ảo đã chỉnh ở màn "Điều khiển" không còn bị mất sau mỗi lần cập nhật app. Game "Chạy nhẹ" dùng bộ phím được lưu sau cùng, kể cả bộ vừa sửa ở màn "Điều khiển".
+- Chuột USB hoặc Bluetooth giờ dùng được trong game Windows khi bộ phím ảo đang hiện.
+- Đỡ tốn pin khi app chạy nền: rời game thì âm thanh và các phần chạy cho game tạm nghỉ; khi không chơi game, app không còn giữ thông báo "AGVN Player đang chạy".
+- Game RPG Maker MV/MZ không còn dừng ở lỗi "Cannot write save/..." khi mở thành tựu hay khi plugin lưu dữ liệu riêng: dữ liệu đó được lưu thành file như trên máy tính.
+- Game hiện hộp lỗi rồi bị vuốt tắt khỏi danh sách app gần đây: lần mở sau, "Tự sửa lỗi" vẫn hỏi về lỗi đó. Lỗi driver đồ họa lúc game vẽ hình có thêm cách chạy bằng Wine cũ (Proton 9).
+- "Tự sửa lỗi" không còn gợi ý "Đổi DXVK sang bản 2.3.1" trên máy không chạy được bản đó (driver Vulkan dưới 1.3), và không gợi ý lại "Dùng WineD3D" trên máy đã không chạy được OpenGL.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

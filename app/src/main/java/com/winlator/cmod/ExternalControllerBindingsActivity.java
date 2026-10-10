@@ -40,6 +40,11 @@ public class ExternalControllerBindingsActivity extends AppCompatActivity {
         controller = profile.getController(controllerId);
         if (controller == null) {
             controller = profile.addController(controllerId);
+            if (controller == null) { // AGVN: the device left (asleep, unplugged) before this screen opened or reopened
+                com.winlator.cmod.core.AppUtils.showToast(this, R.string.agvn_controller_gone);
+                finish();
+                return;
+            }
             profile.save();
         }
 

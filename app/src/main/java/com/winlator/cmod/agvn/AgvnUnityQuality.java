@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.util.Log;
@@ -24,6 +24,8 @@ final class AgvnUnityQuality {
     /** "UnityGraphicsQuality" plus "_h" and its djb2-xor hash, as Unity names PlayerPrefs registry values. */
     static final String VALUE = "UnityGraphicsQuality_h1669003810";
     static final String EXTRA_WRITTEN = "agvnUnityQuality";
+    /** "1": the game keeps its own quality on every Đồ họa step ("Tự sửa lỗi": unity-quality-own). */
+    static final String EXTRA_OWN = "agvnUnityOwnQuality";
 
     private AgvnUnityQuality() {}
 
@@ -51,6 +53,17 @@ final class AgvnUnityQuality {
         if (byExe.isFile()) return byExe;
         File[] data = dir.listFiles((d, n) -> n.endsWith("_Data") && new File(d, n + "/app.info").isFile());
         return data != null && data.length == 1 ? new File(data[0], "app.info") : null;
+    }
+
+    /** True when the game keeps its own quality ({@link #EXTRA_OWN}). */
+    static boolean own(Shortcut shortcut) {
+        return "1".equals(shortcut.getExtra(EXTRA_OWN));
+    }
+
+    /** True when AGVN set the game's lowest quality (Đồ họa Thấp or Siêu nhẹ) and the game may take its own back. */
+    static boolean forced(Shortcut shortcut) {
+        return "UNITY".equals(shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE))
+                && "1".equals(shortcut.getExtra(EXTRA_WRITTEN)) && !own(shortcut);
     }
 
     static void apply(Shortcut shortcut, File userReg, boolean lowest) throws IOException {

@@ -1,0 +1,96 @@
+// Copyright (c) 2026 agvn.io — MIT License (see LICENSE).
+//
+// AGVN: the Godot runner ("Chạy nhẹ" for Godot 4 games, docs/agvn/engine-rieng.md). The Java side is Godot's own
+// Android library (org.godotengine:godot on Maven Central, pinned as godot_aar_sha256). Its engine library is replaced
+// by AGVN's build of the same Godot (scripts/agvn/godot/build-godot.sh, kept gzipped in app/agvn-godot and pinned as
+// godot_so_sha256), which opens a game's pack outside the APK; only the arm64 libraries stay. Nothing downloaded is run
+// on the build machine: files are only copied out of the archive.
+// Applied from build.gradle, which provides agvnPinnedAsset.
+
+import java.security.MessageDigest
+import java.util.zip.GZIPInputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
+
+// Must be the version scripts/agvn/godot/sources.lock builds: the Java side and the engine call each other by name.
+def godotVersion = "4.7.2.stable"
+// Bump when the rules below change what goes into the library.
+def godotRules = "1"
+def godotPinned = project.ext.agvnPinnedAsset
+def godotAar = new File(projectDir, "agvn-downloads/godot-${godotVersion}.aar")
+def godotEngine = new File(projectDir, "agvn-godot/libgodot_android.so.gz")
+def godotOut = layout.buildDirectory.dir("generated/agvn/godot").get().asFile
+def godotLib = new File(godotOut, "godot-${godotVersion}-agvn.aar")
+def godotPins = new Properties()
+rootProject.file("scripts/agvn/pins.txt").withInputStream { godotPins.load(it) }
+
+tasks.register("downloadGodot") {
+    doLast {
+        godotPinned(godotAar, "godot_aar_sha256") { File target ->
+            target.parentFile.mkdirs()
+            new URL("https://repo1.maven.org/maven2/org/godotengine/godot/${godotVersion}/${target.name}").withInputStream { input ->
+                target.withOutputStream { output -> output << input }
+            }
+        }
+    }
+}
+
+tasks.register("prepareGodot") {
+    dependsOn "downloadGodot"
+    doLast {
+        String engineSha = godotPins.getProperty("godot_so_sha256")
+        if (!engineSha) throw new GradleException("Missing pin 'godot_so_sha256' in scripts/agvn/pins.txt (scripts/agvn/godot/build-godot.sh)")
+        String stamp = "godot=${godotVersion} rules=${godotRules} aar=${godotPins.getProperty("godot_aar_sha256")} so=${engineSha}"
+        File stampFile = new File(godotOut, "stamp.txt")
+        if (godotLib.isFile() && stampFile.isFile() && stampFile.text == stamp) return
+        if (!godotEngine.isFile()) throw new GradleException("Missing ${godotEngine} (scripts/agvn/godot/build-godot.sh)")
+        godotOut.mkdirs()
+        File engine = new File(godotOut, "libgodot_android.so")
+        MessageDigest md = MessageDigest.getInstance("SHA-256")
+        new GZIPInputStream(new FileInputStream(godotEngine)).withCloseable { input ->
+            engine.withOutputStream { output ->
+                byte[] buf = new byte[1 << 16]
+                for (int n; (n = input.read(buf)) > 0; ) {
+                    md.update(buf, 0, n)
+                    output.write(buf, 0, n)
+                }
+            }
+        }
+        String got = md.digest().collect { String.format("%02x", ((int) it) & 0xff) }.join()
+        if (got != engineSha)
+            throw new GradleException("libgodot_android.so is not the build pinned as godot_so_sha256 (scripts/agvn/godot/build-godot.sh)")
+        File part = new File(godotOut, godotLib.name + ".part")
+        boolean stl = false
+        new ZipFile(godotAar).withCloseable { aar ->
+            new ZipOutputStream(new FileOutputStream(part)).withCloseable { out ->
+                aar.entries().each { ZipEntry e ->
+                    // Godot's own engine opens no game outside the APK; other ABIs are not in AGVN Player
+                    if (e.name.startsWith("jni/") && e.name != "jni/arm64-v8a/libc++_shared.so") return
+                    stl |= e.name == "jni/arm64-v8a/libc++_shared.so"
+                    out.putNextEntry(new ZipEntry(e.name))
+                    if (!e.directory) aar.getInputStream(e).withCloseable { out << it }
+                    out.closeEntry()
+                }
+                out.putNextEntry(new ZipEntry("jni/arm64-v8a/libgodot_android.so"))
+                engine.withInputStream { out << it }
+                out.closeEntry()
+            }
+        }
+        engine.delete()
+        if (!stl) throw new GradleException("Godot ${godotVersion}: jni/arm64-v8a/libc++_shared.so not found in ${godotAar.name}")
+        godotLib.delete()
+        if (!part.renameTo(godotLib)) throw new GradleException("Cannot write ${godotLib}")
+        stampFile.text = stamp
+        println("Godot ${godotVersion}: Godot's Java library with AGVN's engine (${godotLib.name})")
+    }
+}
+
+dependencies {
+    implementation files(godotLib).builtBy("prepareGodot")
+    // What Godot's library itself depends on (its .pom): a local .aar brings none of them along
+    implementation 'androidx.fragment:fragment:1.8.6'
+    implementation 'androidx.documentfile:documentfile:1.1.0'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.1.21'
+}
+preBuild.dependsOn("prepareGodot")

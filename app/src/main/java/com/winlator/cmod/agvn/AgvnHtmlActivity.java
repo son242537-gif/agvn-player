@@ -1,19 +1,15 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.webkit.ConsoleMessage;
 import android.webkit.RenderProcessGoneDetail;
-import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -21,31 +17,29 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
 import com.winlator.cmod.R;
-import com.winlator.cmod.XServerDisplayActivity;
-import com.winlator.cmod.container.Container;
-import com.winlator.cmod.container.ContainerManager;
-import com.winlator.cmod.container.Shortcut;
 
 import java.io.File;
 
-/** Plays an HTML game ({@link AgvnHtmlGame}) full screen in a WebView. Offline: only the game's own files load. */
+/**
+ * Plays an HTML game ({@link AgvnHtmlGame}) full screen in a WebView. Offline: only the game's own files load. The
+ * "Chạy nhẹ" toolkit ({@link AgvnLightTools}) gives the keys of the Windows layout (RPG for RPG Maker MV/MZ, visual
+ * novel for Tyrano), the ⌨ ✎ 👁 ☰ bar, the menu on Back and the HUD.
+ */
 public class AgvnHtmlActivity extends AppCompatActivity {
     public static final String EXTRA_INDEX_PATH = "agvn_html_index";
-    /** Presses Esc in the game (RPG Maker's menu / cancel key); keyCode must be forced, KeyboardEvent ignores it. */
-    private static final String PRESS_ESC = "(function(){function k(t){var e=new KeyboardEvent(t,{key:'Escape',code:'Escape',bubbles:true});"
-            + "Object.defineProperty(e,'keyCode',{get:function(){return 27}});Object.defineProperty(e,'which',{get:function(){return 27}});"
-            + "document.dispatchEvent(e);}k('keydown');setTimeout(function(){k('keyup')},120);})();";
 
     private WebView webView;
     private File root;
     private String host;
     /** assets/agvn/html-compat.js; null when unreadable (the game then runs without it). */
     private String compatJs;
+    /** "Chạy bằng Windows" was picked: the Wine game now owns the keep-alive notification. */
+    private boolean toWindows;
+    private AgvnLightTools tools;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -58,9 +52,12 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         }
         root = index.getParentFile();
         host = AgvnHtmlGame.hostFor(index);
+        AgvnKeepAlive.start(this, getIntent().getStringExtra("shortcut_name")); // the game keeps running in the background
+        AgvnLightSession.begin(this, AgvnHtmlGame.RUNNER_HTML, AgvnLightGame.folderOf(index)); // "Tự sửa lỗi" reads its end
         boolean rpgMaker = AgvnHtmlFiles.resolve(root, "/js/rpg_core.js") != null || AgvnHtmlFiles.resolve(root, "/js/rmmz_core.js") != null;
         if (rpgMaker) compatJs = com.winlator.cmod.core.FileUtils.readString(this, "agvn/html-compat.js");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        AgvnRefreshCap.apply(this); // 60 Hz: the page draws every refresh, the games move 60 times a second
         // with a log setting on (Cài đặt > Nhật ký), the page can be inspected over USB and logs all its console
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean logs = prefs.getBoolean("enable_wine_debug", false) || prefs.getBoolean("enable_winlator_logs", false);
@@ -69,9 +66,11 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         try {
             webView = new WebView(this);
         } catch (RuntimeException e) {
-            // Android System WebView disabled or updating: play the Windows version instead
-            Toast.makeText(this, R.string.agvn_html_no_webview, Toast.LENGTH_LONG).show();
-            switchToWindows();
+            // Android System WebView disabled or updating: play the Windows version instead, when there is one
+            boolean windows = AgvnHtmlGame.hasWindowsExe(this);
+            Toast.makeText(this, windows ? R.string.agvn_html_no_webview : R.string.agvn_html_no_webview_no_exe, Toast.LENGTH_LONG).show();
+            if (windows) switchToWindows();
+            else finish();
             return;
         }
         webView.setBackgroundColor(Color.BLACK);
@@ -84,18 +83,35 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         s.setAllowContentAccess(false);
         s.setTextZoom(100);
         webView.setWebViewClient(new GameClient());
-        webView.setWebChromeClient(new ConsoleClient(logs));
+        webView.setWebChromeClient(new AgvnHtmlConsole(logs));
+        if (rpgMaker) webView.addJavascriptInterface(new AgvnHtmlSaves(root), AgvnHtmlSaves.NAME); // saves as on a PC
         setContentView(webView);
         hideSystemUi();
         webView.loadUrl("https://" + host + "/" + Uri.encode(index.getName()));
+        tools = AgvnLightTools.attach(this, rpgMaker ? AgvnLayouts.RPG : AgvnLayouts.VN, getIntent().getStringExtra("shortcut_name"),
+                AgvnLightGame.folderOf(index), new AgvnHtmlHost(this, webView));
+        webView.postDelayed(fatalPoll, AgvnHtmlConsole.FATAL_POLL_MS);
     }
+
+    /** "Tự sửa lỗi": an error that stopped the game (html-compat.js keeps it in __agvnFatal), asked about at the end. */
+    private final Runnable fatalPoll = new Runnable() {
+        @Override
+        public void run() {
+            if (webView == null || isFinishing()) return;
+            webView.evaluateJavascript(AgvnHtmlConsole.FATAL, v -> {
+                String error = AgvnHtmlConsole.unquote(v);
+                if (!error.isEmpty()) AgvnLightSession.error(AgvnHtmlActivity.this, error);
+                else if (webView != null) webView.postDelayed(fatalPoll, AgvnHtmlConsole.FATAL_POLL_MS);
+            });
+        }
+    };
 
     private final class GameClient extends WebViewClient {
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
             Uri url = request.getUrl();
             if (!host.equals(url.getHost())) return AgvnHtmlFiles.blocked(); // no network: nothing leaves the phone
-            return AgvnHtmlFiles.serve(root, url.getEncodedPath(), compatJs);
+            return AgvnHtmlFiles.serve(root, url.getEncodedPath(), compatJs, AgvnLightSession.standIns(view.getContext()));
         }
 
         @Override
@@ -104,8 +120,14 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         }
 
         @Override
+        public void onPageFinished(WebView view, String url) {
+            AgvnLightSession.started(AgvnHtmlActivity.this);
+        }
+
+        @Override
         public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
             // the game page crashed or ran out of memory: close the game, never the whole app
+            AgvnLightSession.pageCrashed(AgvnHtmlActivity.this); // the library then says why and offers Windows
             Toast.makeText(AgvnHtmlActivity.this, R.string.agvn_html_crashed, Toast.LENGTH_LONG).show();
             if (webView != null) {
                 ((android.view.ViewGroup) webView.getParent()).removeView(webView);
@@ -117,64 +139,18 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         }
     }
 
-    /** Game script messages in logcat (tag AgvnHtml): warnings and errors always, everything with a log setting on. */
-    private static final class ConsoleClient extends WebChromeClient {
-        private final boolean all;
-
-        ConsoleClient(boolean all) {
-            this.all = all;
-        }
-
-        @Override
-        public boolean onConsoleMessage(ConsoleMessage m) {
-            ConsoleMessage.MessageLevel level = m.messageLevel();
-            boolean problem = level == ConsoleMessage.MessageLevel.ERROR || level == ConsoleMessage.MessageLevel.WARNING;
-            if (all || problem) {
-                Log.println(problem ? Log.WARN : Log.INFO, "AgvnHtml", m.message() + " (" + m.sourceId() + ":" + m.lineNumber() + ")");
-            }
-            return true;
-        }
-
-        /** No grey "play" picture on a game video before its first frame. */
-        @Override
-        public Bitmap getDefaultVideoPoster() {
-            return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
-        }
-    }
-
     @SuppressWarnings("deprecation")
     @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.agvn_html_back_title)
-                .setItems(new CharSequence[]{getString(R.string.agvn_html_menu), getString(R.string.agvn_html_exit),
-                        getString(R.string.agvn_html_use_windows)}, (d, which) -> {
-                    if (which == 0 && webView != null) webView.evaluateJavascript(PRESS_ESC, null);
-                    else if (which == 1) finish();
-                    else if (which == 2) switchToWindows();
-                })
-                .setNegativeButton(R.string.agvn_html_keep_playing, null)
-                .setOnDismissListener(d -> hideSystemUi())
-                .show();
+        if (tools != null) tools.onBack();
+        else finish();
     }
 
     /** "Chạy bằng Windows": for a game whose scripts need the PC version; the shortcut remembers the choice. */
-    private void switchToWindows() {
-        String path = getIntent().getStringExtra("shortcut_path");
-        int id = getIntent().getIntExtra("container_id", 0);
-        if (id == 0 && path != null) id = AgvnHtmlGame.containerIdIn(new File(path));
-        Container container = new ContainerManager(this).getContainerById(id);
-        if (path == null || container == null) {
-            finish();
-            return;
-        }
-        Shortcut shortcut = new Shortcut(container, new File(path));
-        shortcut.putExtra(AgvnHtmlGame.EXTRA_RUNNER, AgvnHtmlGame.RUNNER_WINE);
-        shortcut.saveData();
-        Intent intent = new Intent(this, XServerDisplayActivity.class);
-        if (getIntent().getExtras() != null) intent.putExtras(getIntent().getExtras());
-        intent.removeExtra(EXTRA_INDEX_PATH);
-        startActivity(intent);
+    void switchToWindows() {
+        Intent intent = AgvnHtmlGame.toWindows(this, EXTRA_INDEX_PATH);
+        toWindows = intent != null;
+        if (intent != null) startActivity(intent);
         finish();
     }
 
@@ -194,6 +170,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        if (tools != null) tools.onPause();
         if (webView != null) {
             webView.onPause();
             webView.pauseTimers();
@@ -207,6 +184,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
             webView.onResume();
             webView.resumeTimers();
         }
+        if (tools != null) tools.onResume();
     }
 
     @Override
@@ -215,6 +193,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
             webView.destroy();
             webView = null;
         }
+        if (isFinishing() && !toWindows) AgvnKeepAlive.stop(this); // back to the library, which needs no keep-alive
+        if (isFinishing()) AgvnLightSession.ended(this);
         super.onDestroy();
     }
 }

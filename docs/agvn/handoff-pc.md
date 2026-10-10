@@ -13,10 +13,12 @@ web GitHub để mở và merge PR.
   từ `agvn/main`.
 - **PR #34 (đã merge)**: Zink mới (Mesa 25.1.9 bản phát hành, `zink@3`). Game OpenGL hết văng trên POCO. Bản vá `0007`
   giới hạn vùng đệm GPU của Zink ở 256 MB.
-- Còn mở: #39 (DDraw) và #52 (quy tắc CLAUDE.md), cả hai tách từ bản 0.1.2. Đang làm, chưa có PR: `agvn/p44-game-cpu`;
-  `agvn/p49-gpl-license` → `p50-renpy8` → `p53-game-session` (giấy phép GPL, Ren'Py 8 chạy trực tiếp; đổi giấy phép
-  cần anh Sơn quyết). ONScripter / mkxp-z vẫn tạm dừng. Bảng đầy đủ: mục "Progress after the 10 phases" trong
-  `ROADMAP.md`.
+- Còn mở: #39 (DDraw) và #52 (quy tắc CLAUDE.md), cả hai tách từ bản 0.1.2. Đang làm, chưa có PR: `agvn/p44-game-cpu`.
+- Engine riêng làm lại theo lời anh Sơn ngày 02/10/2026, app chuyển sang GPL 3 (kế hoạch ở `docs/agvn/engine-rieng.md`):
+  `agvn/p49-gpl-license` → `p50-renpy8` → `p53-game-session` (Ren'Py 8), rồi RPG Maker XP/VX/VX Ace bằng mkxp-z trên
+  nhánh `claude/great-goodall-qjemo1` (đã dựng `libmkxp-z.so` trên cloud và gắn vào app, chờ thử máy theo
+  `engine-rieng.md`, đợt 3). Cùng nhánh: nhập game không có `.exe`, quét sâu hơn, ảnh bìa và icon lấy từ chính game
+  Ren'Py/RPG Maker (cả trong gói `.rpa`, `.rgss*a` và ảnh MV mã hoá). ONScripter chưa làm. Bảng đầy đủ: mục "Progress after the 10 phases" trong `ROADMAP.md`.
 
 ## Việc làm tiếp (theo thứ tự)
 
@@ -93,8 +95,15 @@ Select-String -Path log-toan-bo.txt -Pattern "AGVN|XServerDisplayActivity|GuestP
 - **Game văng ở mã máy:** tìm `F/libc` (`Fatal signal`, `abort`) và `F/DEBUG` (bản ghi crash). Lỗi Zink ở trên hiện
   đúng như vậy.
 - **Log Wine/game:** Cài đặt → bật **"Bật debug Wine"** và **"Bật nhật ký ứng dụng"**, mở game, rồi
-  `& $adb pull /sdcard/AGVN-Player/logs`. Tên file theo dạng `<tên exe>_<ngày giờ>.txt` và
-  `<tên exe>_winlator_<ngày giờ>.txt`.
+  `& $adb pull /sdcard/AGVN-Player/logs`.
+  - Mỗi lần chơi có thư mục `logs/<tên game>/<ngày giờ>/`:
+    - `tom-tat.txt`: cách game kết thúc, kể cả crash của Wine và lỗi Ren'Py;
+    - `crash.txt`: bản crash của Wine, khi có;
+    - log của engine trong phiên đó (file cũ hơn phiên thì không chép).
+  - Log Wine `<tên exe>_<ngày giờ>.txt` được chuyển vào thư mục phiên khi game kết thúc. File log để lẻ ở gốc
+    `logs/` (ví dụ `<tên exe>_winlator_<ngày giờ>.txt`) bị xoá sau 3 ngày.
+  - Khi bật debug, kênh `heap`, `file`, `font` chỉ ghi lỗi, không ghi cảnh báo. Cảnh báo `heap` bật chế độ kiểm tra
+    heap của Wine, làm game Ren'Py 7 crash. Màn game hiện dòng nhỏ nhắc debug đang bật.
 - **Gói gửi hỗ trợ:** Cài đặt → **"Xuất nhật ký lỗi"** tạo `/sdcard/Download/AGVN-nhat-ky-<ngày giờ>.zip` (logcat,
   thông tin máy, cài đặt). Lấy về bằng `& $adb pull /sdcard/Download/`.
 - **RAM và nhiệt:**

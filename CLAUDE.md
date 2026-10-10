@@ -2,7 +2,7 @@
 
 **Repository:** StevenMXZ/Winlator-Ludashi fork at `agvn/base` (upstream commit b8048ac).  
 **Application ID:** `com.agvn.player` · **Branch:** `agvn/main` (new repo, forked after phase 1).  
-**License:** MIT (upstream) + bundled GPL/LGPL libraries (Wine, proot, patchelf, Mesa); see [`docs/agvn/LICENSES.md`](./docs/agvn/LICENSES.md).
+**License:** the app (APK and repository as a whole) is GPL-3.0-or-later ([`COPYING`](./COPYING), maintainer's decision 2026-10-02); upstream Winlator and AGVN source files stay MIT ([`LICENSE`](./LICENSE)); bundled components keep their own licenses. See [`docs/agvn/LICENSES.md`](./docs/agvn/LICENSES.md).
 
 ## What is AGVN Player?
 
@@ -11,7 +11,8 @@ A Vietnamese-first emulation environment for PC games on weak Android phones (Ad
 - Device-tiered presets (weak-phone optimization: 24 FPS cap, scaled resolution, RAM guards)
 - Thermal & memory safeguards (prevents thermal throttle & "Out of Memory" force-close)
 - Vietnamese UI for non-technical players
-- AGVN branding + credit (agvn.io.vn only; no ads, telemetry, or third-party accounts)
+- AGVN branding + credit (agvn.io only; no ads, telemetry, or third-party accounts)
+  - The site is agvn.io since 2026-10-05 (maintainer's decision). It was agvn.io.vn, which the published release notes keep.
 
 **Goal:** Every AGVN game runs smoothly at 24–30 FPS on Snapdragon 6xx (2.8 GHz, Adreno 650) or equiv. with 6 GB RAM, measured on real devices by the maintainer before release.
 
@@ -21,6 +22,11 @@ A Vietnamese-first emulation environment for PC games on weak Android phones (Ad
 - **Repository structure:** Minimize diffs against upstream (`agvn/base` at b8048ac). New AGVN code lives in `app/src/main/java/com/winlator/cmod/agvn/` (package `com.winlator.cmod.agvn`); keep `namespace 'com.winlator.cmod'` in `app/build.gradle` (unchanged from Ludashi).
 - **File size:** Keep newly created files ≤ 200 lines; split if larger.
 - **Naming:** Kebab-case files/directories (already enforced by upstream); class names in PascalCase; constants in SCREAMING_SNAKE_CASE.
+
+### Fixes Apply to Every Phone (maintainer's rule, 2026-10-05)
+- A fix is general: it works from what a game did on the phone (its log: an error box, a crash, a black screen, running out of RAM), on any phone. It is never switched on by the phone's model, GPU or RAM alone.
+- Never sacrifice games that already run well to fix one game on one phone: no lower quality, fewer frames or extra prompts for them. A fix with a cost is offered when its problem shows, not turned on for every phone of a kind.
+- An offer that did not help is not made again, and a run that froze or failed never counts as one that ran well.
 
 ### Commits & Branches
 - **Conventional format** (no AI/assistant references):
@@ -42,10 +48,12 @@ A Vietnamese-first emulation environment for PC games on weak Android phones (Ad
 
 2. **No features requiring root or in-app ADB self-pairing** (security risk for non-technical users).
 
-3. **No in-app telemetry, ads, or external links** (except agvn.io.vn in About screen and diagnostic exports).
+3. **No in-app telemetry, ads, or external links** (except agvn.io in About screen and diagnostic exports).
    - Exception, approved by the maintainer: the in-app updater (`agvn/AgvnUpdater`).
      - It reads `agvn-update.txt` and the APK named there, only from this repository's GitHub Releases.
      - It sends nothing about the device.
+     - Updates are never forced: the player chooses "Cập nhật" or "Để sau", can turn the checks off, and an older
+       version keeps working. Nothing downloads or installs by itself (maintainer's rule, 2026-10-09).
 
 4. **Do not break upstream structure needlessly:** Keep diffs small and focused; new code in new files where sensible.
 
@@ -69,6 +77,13 @@ export AGVN_VERSION_CODE=2
 ./gradlew assembleRelease --no-daemon
 # Output: app/build/outputs/apk/release/app-release.apk
 ```
+The first build downloads large archives and checks each against `scripts/agvn/pins.txt`: imagefs, Proton 9, Proton
+10.0-4 (the second Wine for new games and WMV movies, a `.wcp` in `assets/agvn/`, see `app/agvn-wine.gradle`) and Wine
+Mono 9.3.1 (the .NET runtime, unpacked on the phone only for .NET games) from GitHub, and Ren'Py 8.5.3 (RAPT and SDK,
+for the Ren'Py runner) from renpy.org into `app/agvn-downloads/` (see `app/agvn-renpy.gradle`), and Godot's Android
+library 4.7.2 from Maven Central (for the Godot runner; its engine is AGVN's own build, `app/agvn-godot/`, made by
+`scripts/agvn/godot/build-godot.sh`, see `app/agvn-godot.gradle`). In a fresh cloud checkout, run
+`scripts/agvn/prepare-native-deps.sh` first.
 
 ### Publish an Update (maintainer's PC only)
 Phones update themselves from GitHub Releases (Cài đặt → Cập nhật ứng dụng). There is one channel: every phone gets the
@@ -128,9 +143,9 @@ See [`docs/agvn/ROADMAP.md`](./docs/agvn/ROADMAP.md) for the full 10-phase plan,
 ## Attribution & Copyright
 
 - **Original:** BrunoSX (Winlator), StevenMXZ (Ludashi fork)
-- **AGVN additions:** Licensed MIT (same as upstream); source code must remain public
+- **AGVN additions:** Licensed MIT (same as upstream), distributed as part of the GPL-3.0-or-later app; source code must remain public, and every release tag is the source of that APK
 - **Third-party notices:** Wine, proot, patchelf, Mesa, DXVK, FEX, Box64, Turnip — see bundled licenses in app
-- **Copyright year:** Keep BrunoSX/StevenMXZ notices in all derivative files; add "Copyright (c) 2026 agvn.io.vn" to new AGVN modules
+- **Copyright year:** Keep BrunoSX/StevenMXZ notices in all derivative files; add "Copyright (c) 2026 agvn.io" to new AGVN modules
 
 ## Further Reading
 

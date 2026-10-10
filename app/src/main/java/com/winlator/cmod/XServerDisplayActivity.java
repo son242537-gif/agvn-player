@@ -152,6 +152,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     public static String NOTIFICATION_CHANNEL_ID = "Winlator";
     public static int NOTIFICATION_ID = -1;
     private XServerRendererView xServerView;
+    private com.winlator.cmod.agvn.AgvnMouseCursor agvnMouseCursor; // AGVN: a mouse's pointer in touch play
     private InputControlsView inputControlsView;
     private TouchpadView touchpadView;
     private XEnvironment environment;
@@ -160,6 +161,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     protected Container container;
     private XServer xServer;
     private InputControlsManager inputControlsManager;
+    private int agvnEditedProfileId; // AGVN: the controls profile to show again after the controls screen
     private ImageFs imageFs;
     private FrameRating classicHud = null;
     private WinlatorHUD modernHud = null;
@@ -218,7 +220,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private com.winlator.cmod.agvn.GameSessionGuard agvnSessionGuard;
     private com.winlator.cmod.agvn.AgvnMemoryWatch agvnMemoryWatch;
     private com.winlator.cmod.agvn.AgvnHeatWatch agvnHeatWatch;
+    private com.winlator.cmod.agvn.AgvnSlowWatch agvnSlowWatch;
+    private com.winlator.cmod.agvn.AgvnStatusLine agvnStatus; // AGVN: "Bật debug Wine" is on; how a slow start goes
+    private volatile com.winlator.cmod.agvn.AgvnStartupProgress agvnStartup;
     private String agvnEffectiveExePath; // AGVN: exe actually launched (Unreal bootstrap -> Shipping redirect)
+    private String agvnStarter = com.winlator.cmod.agvn.AgvnRawMouse.WINLATOR_EXE; // AGVN: or agvn-winhandler.exe
 
     private SensorManager sensorManager;
 
@@ -376,6 +382,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             @Override
             public void onDrawerClosed(View drawerView) {
                 hideAllSidebarPanels();
+                if (drawerView.hasFocus()) agvnFocusGame(); // AGVN: a held mouse and a gamepad go to the focused view
             }
         });
 
@@ -384,6 +391,10 @@ public class XServerDisplayActivity extends AppCompatActivity {
         boolean enableWinlatorLogs = preferences.getBoolean("enable_winlator_logs", false);
 
         wireSidebarListeners(enableLogs);
+        // AGVN: the game keeps the app alive while the player is in another app; the screen says when Wine logs a lot
+        com.winlator.cmod.agvn.AgvnKeepAlive.start(this, getIntent().getStringExtra("shortcut_name"));
+        agvnStatus = new com.winlator.cmod.agvn.AgvnStatusLine(this);
+        if (preferences.getBoolean("enable_wine_debug", false)) agvnStatus.setDebug(getString(R.string.agvn_debug_on_notice));
 
         imageFs = ImageFs.find(this);
 
@@ -444,6 +455,17 @@ public class XServerDisplayActivity extends AppCompatActivity {
             return;
         }
 
+        // AGVN: a game moved to the other Wine (agvn/AgvnGameMove) moves now, before anything reads it
+        if (shortcutPath != null && !shortcutPath.isEmpty()) {
+            Shortcut moved = com.winlator.cmod.agvn.AgvnGameMove.pending(this, new Shortcut(container, new File(shortcutPath)));
+            if (moved != null) {
+                container = moved.container;
+                shortcutPath = moved.file.getPath();
+                getIntent().putExtra("shortcut_path", shortcutPath);
+                getIntent().putExtra("container_id", container.id);
+            }
+        }
+
         containerManager.activateContainer(container);
 
         if (shortcutPath != null && !shortcutPath.isEmpty()) {
@@ -485,6 +507,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
         imageFs.setWinePath(wineInfo.path);
 
         ProcessHelper.removeAllDebugCallbacks();
+        ProcessHelper.addDebugCallback(com.winlator.cmod.agvn.AgvnWineTail.get()); // AGVN: a crash shows in the session summary, logs on or off
+        com.winlator.cmod.agvn.AgvnMovieWatch.attach(this); // AGVN: a movie Wine cannot decode, which the game waits on
         if (enableLogs || enableWinlatorLogs) LogView.setFilename(getExecutable());
         if (enableLogs) {
             ProcessHelper.addDebugCallback(debugDialog = new DebugDialog(this));
@@ -520,6 +544,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             dxwrapper = shortcut.getExtra("dxwrapper", container.getDXWrapper());
             dxwrapperConfig = shortcut.getExtra("dxwrapperConfig", container.getDXWrapperConfig());
             screenSize = shortcut.getExtra("screenSize", container.getScreenSize());
+            screenSize = com.winlator.cmod.agvn.AgvnKirikiriScreen.atLaunch(shortcut, screenSize); // AGVN: KAG3 hangs full screen on a screen not larger than it
             lc_all = shortcut.getExtra("lc_all", container.getLC_ALL());
             midiSoundFont = shortcut.getExtra("midiSoundFont", container.getMIDISoundFont()); // AGVN: the game's own choice, "" = off
             String inputType = shortcut.getExtra("inputType");
@@ -601,6 +626,9 @@ public class XServerDisplayActivity extends AppCompatActivity {
         xServer.windowManager.addOnWindowModificationListener(new WindowManager.OnWindowModificationListener() {
             @Override
             public void onUpdateWindowContent(Window window) {
+                if (agvnStartup != null && window.isApplicationWindow()) agvnStartup.onWindowUpdate(); // AGVN: the game draws
+                com.winlator.cmod.agvn.AgvnSessionTrack.onWindowUpdate(window.getWidth(), window.getHeight(), // AGVN: its own window?
+                        xServer.screenInfo.width, xServer.screenInfo.height, window.isApplicationWindow());
                 if (!winStarted[0] && window.isApplicationWindow()) {
                     if (!simulateTouchScreen) {
                         xServerView.setCursorVisible(true);
@@ -623,6 +651,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
                     if (classicHud != null) classicHud.update();
                     if (modernHud != null) modernHud.onFrame();
                 }
+            }
+
+            @Override
+            public void onUpdateWindowContentDirect(Window window, Drawable drawable) {
+                com.winlator.cmod.agvn.AgvnBlackScreen.onDirectFrame(window, drawable); // AGVN: the game's Vulkan/OpenGL frame
             }
 
             @Override
@@ -697,13 +730,23 @@ public class XServerDisplayActivity extends AppCompatActivity {
             setupUI();
             setupSidebarInputControls();
             com.winlator.cmod.agvn.AgvnControlsBar.attach(this); // AGVN: ⌨ ✎ 👁 bar, after the sidebar (its first apply re-shows the controls)
+            com.winlator.cmod.agvn.AgvnSidebarLogs.attach(this); // AGVN: "Gửi nhật ký" while the game runs
+            com.winlator.cmod.agvn.AgvnPowerSave.warn(this); // AGVN: battery saver slows the game
             if (controlsProfile.isEmpty()) {
 
                 simulateConfirmInputControlsDialog();
             }
             Executors.newSingleThreadExecutor().execute(() -> {
                 if (shortcut != null) agvnEffectiveExePath = com.winlator.cmod.agvn.AgvnExeRedirect.effectivePath(shortcut.path, container); // AGVN
+                com.winlator.cmod.agvn.AgvnGodotGame.recognize(shortcut); // AGVN: a Godot game in one exe gets Godot's settings
+                com.winlator.cmod.agvn.AgvnKirikiri.recognize(shortcut); // AGVN: a KiriKiri game's size, for the black-screen bar
                 com.winlator.cmod.agvn.AgvnMemorySaver.applyGameSettings(this, shortcut); // AGVN: Ren'Py/Unity RAM per step
+                if (shortcut != null) com.winlator.cmod.agvn.AgvnWineMono.prepare(this, shortcut, wineInfo.path, agvnExePath(), text -> {
+                    preloaderDialog.setStatusOnUiThread(text); // AGVN: .NET for a .NET game, unpacked once
+                    runOnUiThread(() -> agvnStatus.setProgress(text));
+                });
+                agvnStarter = com.winlator.cmod.agvn.AgvnStarter.prepare(this, xServer, shortcut, // AGVN: raw input,
+                        shortcut != null ? agvnExePath() : null); // a folder named in any language
                 setupWineSystemFiles();
                 extractGraphicsDriverFiles();
                 changeWineAudioDriver();
@@ -751,6 +794,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     }
 
     private void handleCapturedPointer(MotionEvent event) {
+        com.winlator.cmod.agvn.AgvnInputDevices.click(event, true, xServer.isMouseDisabled());
         switch (event.getAction()) {
             case MotionEvent.ACTION_BUTTON_PRESS: {
                 int button = event.getActionButton();
@@ -840,8 +884,14 @@ public class XServerDisplayActivity extends AppCompatActivity {
         agvnMemoryWatch.start();
         if (agvnHeatWatch == null) agvnHeatWatch = new com.winlator.cmod.agvn.AgvnHeatWatch(this);
         agvnHeatWatch.start();
-        if (!isInPictureInPictureMode())
+        if (agvnSlowWatch == null) agvnSlowWatch = new com.winlator.cmod.agvn.AgvnSlowWatch(this, shortcut, this::exit); // AGVN
+        agvnSlowWatch.start();
+        if (agvnStatus != null) agvnStatus.followDebugSetting(preferences.getBoolean("enable_wine_debug", false)); // AGVN
+        if (!isInPictureInPictureMode()) {
+            com.winlator.cmod.agvn.AgvnGamePause.resumed(); // AGVN: the time away is not the game's
+            agvnRest(false);
             ProcessHelper.resumeAllWineProcesses();
+        }
     }
 
     @Override
@@ -850,6 +900,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (agvnSessionGuard != null) agvnSessionGuard.stop();
         if (agvnMemoryWatch != null) agvnMemoryWatch.stop();
         if (agvnHeatWatch != null) agvnHeatWatch.stop();
+        if (agvnSlowWatch != null) agvnSlowWatch.stop();
         super.onPause();
 
         if (!isInPictureInPictureMode()) {
@@ -858,7 +909,9 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 xServerView.onPause();
             }
 
+            if (!isFinishing() && !exiting.get()) com.winlator.cmod.agvn.AgvnGamePause.paused(true); // AGVN
             ProcessHelper.pauseAllWineProcesses();
+            if (!isFinishing() && !exiting.get()) agvnRest(true);
         }
 
         savePlaytimeData();
@@ -925,9 +978,12 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
     private void exit() {
         if (!exiting.compareAndSet(false, true)) return;
+        com.winlator.cmod.agvn.AgvnSessionTrack.exitStarted(); // AGVN: the player, unless Wine ended first
         if (agvnSessionGuard != null) agvnSessionGuard.destroy();
         if (agvnMemoryWatch != null) agvnMemoryWatch.finish();
         if (agvnHeatWatch != null) agvnHeatWatch.finish();
+        if (agvnSlowWatch != null) agvnSlowWatch.finish(); // AGVN: the game's last minute, for the session log
+        if (agvnStartup != null) agvnStartup.stop();
         NotificationManagerCompat.from(this).cancel(NOTIFICATION_ID);
         boolean removeLoadingBar = PreferenceManager.getDefaultSharedPreferences(this)
                 .getBoolean("remove_loading_bar_when_booting_games", false);
@@ -970,7 +1026,9 @@ public class XServerDisplayActivity extends AppCompatActivity {
                     break;
                 }
             }
-            // AGVN: the game has ended, so its engine logs are complete
+            // AGVN: the game has ended, so its engine logs are complete (Wine's own log is written out first)
+            if (debugDialog != null) debugDialog.flush();
+            if (shortcut != null) com.winlator.cmod.agvn.AgvnDoctor.afterGame(this, shortcut); // AGVN: what went wrong, if anything
             if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.finish(this, "Game kết thúc bình thường (thoát từ menu hoặc game tự đóng)");
             if (shortcut != null && GameSaveManager.shouldAutoBackup(this, shortcut)) {
                 GameSaveManager.BackupResult saveResult = GameSaveManager.backup(shortcut, true);
@@ -997,6 +1055,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (agvnSessionGuard != null) agvnSessionGuard.destroy();
         if (agvnMemoryWatch != null) agvnMemoryWatch.stop();
         if (agvnHeatWatch != null) agvnHeatWatch.stop();
+        if (agvnSlowWatch != null) agvnSlowWatch.stop();
         super.onDestroy();
     }
 
@@ -1063,6 +1122,9 @@ public class XServerDisplayActivity extends AppCompatActivity {
         String dxwrapper = this.dxwrapper;
 
         if (dxwrapper.contains("dxvk")) {
+            // AGVN: DXVK 2.x needs Vulkan 1.3; on an older phone driver this start gets 1.10.3
+            com.winlator.cmod.agvn.AgvnDxvkPick.fitLaunch(this, dxwrapperConfig,
+                    com.winlator.cmod.agvn.DriverSafety.resolveUsable(this, graphicsDriverConfig.get("version")));
             String dxvkWrapper = "dxvk-" + dxwrapperConfig.get("version");
             String vkd3dWrapper = "vkd3d-" + dxwrapperConfig.get("vkd3dVersion");
             String ddrawrapper = dxwrapperConfig.get("ddrawrapper");
@@ -1142,6 +1204,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         String wineDebugChannels = preferences.getString("wine_debug_channels",
                 SettingsFragment.DEFAULT_WINE_DEBUG_CHANNELS);
         envVars.put("WINEDEBUG", com.winlator.cmod.agvn.AgvnWineDebug.spec(enableWineDebug, wineDebugChannels)); // AGVN: "warn+all", not "+warn"
+        if (!enableWineDebug) envVars.put("GST_DEBUG", com.winlator.cmod.agvn.AgvnWineDebug.QUIET_GST); // AGVN: a movie's decoder warnings only
 
         String rootPath = imageFs.getRootDir().getPath();
         FileUtils.clear(imageFs.getTmpDir());
@@ -1234,7 +1297,9 @@ public class XServerDisplayActivity extends AppCompatActivity {
         guestProgramLauncherComponent.setEnvVars(envVars);
         if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.start(shortcut, envVars); // AGVN: logs of this play session
         if (shortcut != null && debugDialog != null) com.winlator.cmod.agvn.AgvnSessionLog.addLog(debugDialog.getLogFile()); // AGVN: and Wine's own log
+        if (shortcut != null) agvnStartup = com.winlator.cmod.agvn.AgvnStartupProgress.start(this, shortcut, agvnStatus); // AGVN: a slow start shows how it goes
         guestProgramLauncherComponent.setTerminationCallback((status) -> {
+            com.winlator.cmod.agvn.AgvnSessionTrack.wineEnded(); // AGVN: the game ended by itself
             com.winlator.cmod.agvn.AgvnSessionLog.event("Wine kết thúc, mã thoát " + status);
             runOnUiThread(this::exit);
         });
@@ -1289,6 +1354,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
         }
         final XServerRendererView renderer = xServerView;
         renderer.setCursorVisible(false);
+        agvnMouseCursor = new com.winlator.cmod.agvn.AgvnMouseCursor(simulateTouchScreen && !isMouseDisabled,
+                renderer::setCursorVisible);
 
         if (renderer instanceof VulkanXServerView) {
             VulkanXServerView vkRenderer = (VulkanXServerView) renderer;
@@ -1347,6 +1414,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         View.OnCapturedPointerListener capturedPointerListener = new View.OnCapturedPointerListener() {
             @Override
             public boolean onCapturedPointer(View view, MotionEvent event) {
+                agvnMouseCursor.mouse(); // AGVN: a held mouse shows its pointer, also in touch play
                 handleCapturedPointer(event);
                 return true;
             }
@@ -1362,6 +1430,9 @@ public class XServerDisplayActivity extends AppCompatActivity {
         inputControlsView.setTouchpadView(touchpadView);
         inputControlsView.setXServer(xServer);
         inputControlsView.setVisibility(View.GONE);
+        // AGVN: a held mouse sends its moves and clicks to the focused view, and shown on-screen keys take the focus (for
+        // a gamepad's sticks), so a USB or Bluetooth mouse moved and clicked nothing while they showed (09/10/2026)
+        inputControlsView.setOnCapturedPointerListener(cursorLock ? capturedPointerListener : null);
         rootView.addView(inputControlsView);
 
         boolean isTimeoutEnabled = preferences.getBoolean("touchscreen_timeout_enabled", false);
@@ -1380,6 +1451,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 classicHud = new FrameRating(this, graphicsDriverConfig);
                 classicHud.setVisibility(View.GONE);
                 rootView.addView(classicHud);
+                com.winlator.cmod.agvn.AgvnEditPen.clearOf(classicHud); // AGVN: beside the ✎ in the corner
                 renderer.setFrameRating(classicHud);
             } else if (hudMode == 2) {
 
@@ -1434,6 +1506,9 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> controlsEditorActivityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
+                Intent agvnResult = result.getData(); // AGVN: the profile the controls screen ended on
+                if (agvnResult != null && agvnResult.getIntExtra("profile_id", 0) > 0)
+                    agvnEditedProfileId = agvnResult.getIntExtra("profile_id", 0);
                 if (editInputControlsCallback != null) {
                     editInputControlsCallback.run();
                     editInputControlsCallback = null;
@@ -1495,9 +1570,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
             ImageView pauseIcon = (ImageView) btItemPause.getChildAt(0);
             btItemPause.setOnClickListener(v -> {
                 if (isPaused) {
+                    com.winlator.cmod.agvn.AgvnGamePause.resumed(); // AGVN
                     ProcessHelper.resumeAllWineProcesses();
                     if (pauseIcon != null) pauseIcon.setImageResource(R.drawable.icon_pause);
                 } else {
+                    com.winlator.cmod.agvn.AgvnGamePause.paused(false); // AGVN
                     ProcessHelper.pauseAllWineProcesses();
                     if (pauseIcon != null) pauseIcon.setImageResource(R.drawable.icon_play);
                 }
@@ -1882,6 +1959,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 classicHud = new FrameRating(this, graphicsDriverConfig);
                 classicHud.setVisibility(View.GONE);
                 rootView.addView(classicHud);
+                com.winlator.cmod.agvn.AgvnEditPen.clearOf(classicHud); // AGVN: beside the ✎ in the corner
                 renderer.setFrameRating(classicHud);
                 if (rendererAlreadyActive) {
                     frameRatingWindowId = activeRendererWindowId;
@@ -2218,9 +2296,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 intent.putExtra("edit_input_controls", true);
                 intent.putExtra("selected_profile_id",
                         position > 0 ? inputControlsManager.getProfiles().get(position - 1).id : 0);
+                agvnEditedProfileId = intent.getIntExtra("selected_profile_id", 0); // AGVN
                 editInputControlsCallback = () -> {
                     hideInputControls();
                     inputControlsManager.loadProfiles(true);
+                    agvnShowEditedControls(); // AGVN: the controls just edited come back
                     loadProfileSpinner.run();
                     applySidebarInputControls.run();
                 };
@@ -2285,9 +2365,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
             intent.putExtra("edit_input_controls", true);
             intent.putExtra("selected_profile_id",
                     position > 0 ? inputControlsManager.getProfiles().get(position - 1).id : 0);
+            agvnEditedProfileId = intent.getIntExtra("selected_profile_id", 0); // AGVN
             editInputControlsCallback = () -> {
                 hideInputControls();
                 inputControlsManager.loadProfiles(true);
+                agvnShowEditedControls(); // AGVN: the controls just edited come back
                 loadProfileSpinner.run();
                 updateProfile.run();
             };
@@ -2320,6 +2402,39 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
+    }
+
+    /**
+     * AGVN: back from the controls screen opened in the game, the profile it ended on (else the one it opened) is shown
+     * again, edits included, and kept as this game's. Upstream rebuilt the profile list from the controls it had just
+     * hidden, so the list fell to "Disabled" and the game went on without controls.
+     */
+    private void agvnShowEditedControls() {
+        ControlsProfile profile = agvnEditedProfileId > 0 ? inputControlsManager.getProfile(agvnEditedProfileId) : null;
+        if (profile == null) return;
+        showInputControls(profile);
+        com.winlator.cmod.agvn.AgvnControlsFork.rememberShown(shortcut, profile);
+    }
+
+    /**
+     * AGVN: while the game is stopped (the player left the app, the screen went off) what still ran for it rests: the
+     * sound output (agvn/AgvnAudioRest) and the X server's cursor check, 60 times a second until the app restarted.
+     * Players found AGVN costly on battery in the background (09/10/2026).
+     */
+    private void agvnRest(boolean rest) {
+        if (xServer != null) xServer.cursorLocker.setEnabled(!rest && !xServer.isRelativeMouseMovement());
+        com.winlator.cmod.agvn.AgvnAudioRest.set(environment != null ? environment.getComponent(PulseAudioComponent.class) : null, rest);
+    }
+
+    /**
+     * AGVN: the game's views get the focus back from the sidebar, which kept it after closing: the on-screen keys when
+     * they show (a gamepad's sticks reach them), else the touchpad. A held mouse goes to the focused view too.
+     */
+    private void agvnFocusGame() {
+        if (inputControlsView != null && inputControlsView.getVisibility() == View.VISIBLE && inputControlsView.getProfile() != null)
+            inputControlsView.requestFocus();
+        else if (touchpadView != null)
+            touchpadView.requestFocus();
     }
 
     private void simulateConfirmInputControlsDialog() {
@@ -2502,6 +2617,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
             }
             if (!envVars.has("ZINK_DESCRIPTORS")) envVars.put("ZINK_DESCRIPTORS", "lazy");
             if (!envVars.has("ZINK_DEBUG")) envVars.put("ZINK_DEBUG", "compact");
+            if (shortcut != null) // AGVN: Godot games need OpenGL 3.3
+                com.winlator.cmod.agvn.AgvnGlDriver.forGodot(shortcut.getExtra(com.winlator.cmod.agvn.AgvnGameImporter.EXTRA_ENGINE), envVars);
         }
     }
 
@@ -2522,7 +2639,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (dxwrapper.contains("dxvk")) {
             DXVKConfigDialog.setEnvVars(this, dxwrapperConfig, envVars);
             String version = dxwrapperConfig.get("version");
-            if (version.equals("1.11.1-sarek")) {
+            if (com.winlator.cmod.agvn.AgvnDxvkPick.isSarek(version)) { // AGVN: an installed Sarek too, not only upstream's
                 Log.d("GraphicsDriverExtraction", "Disabling Wrapper PATCH_OPCONSTCOMP SPIR-V pass");
                 envVars.put("WRAPPER_NO_PATCH_OPCONSTCOMP", "1");
             }
@@ -2567,7 +2684,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
         String gpuName = graphicsDriverConfig.get("gpuName");
         String dxvkVersion = dxwrapperConfig.get("version");
-        if (!gpuName.equals("Device") && !dxvkVersion.equals("1.11.1-sarek")) {
+        if (!gpuName.equals("Device") && !com.winlator.cmod.agvn.AgvnDxvkPick.isSarek(dxvkVersion)) {
             envVars.put("WRAPPER_DEVICE_NAME", gpuName);
             envVars.put("WRAPPER_DEVICE_ID", WineD3DConfigDialog.getDeviceIdFromGPUName(this, gpuName));
             envVars.put("WRAPPER_VENDOR_ID", WineD3DConfigDialog.getVendorIdFromGPUName(this, gpuName));
@@ -2632,6 +2749,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         com.winlator.cmod.agvn.AgvnMemoryWatch.touched(); // AGVN: memory growth only counts while nobody plays
+        if (agvnMouseCursor != null) agvnMouseCursor.on(event); // AGVN: a mouse click shows the pointer, a finger hides it
         if (isPaused && (drawerLayout == null || !drawerLayout.isDrawerOpen(GravityCompat.START))) return true;
         return super.dispatchTouchEvent(event);
     }
@@ -2639,6 +2757,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
     @Override
     public boolean dispatchGenericMotionEvent(MotionEvent event) {
         com.winlator.cmod.agvn.AgvnMemoryWatch.touched();
+        if (xServer != null) com.winlator.cmod.agvn.AgvnInputDevices.click(event, false, xServer.isMouseDisabled());
+        if (agvnMouseCursor != null) agvnMouseCursor.on(event); // AGVN: a mouse moving shows the pointer in touch play
         boolean handledByWinHandler = false;
         boolean handledByTouchpadView = false;
 
@@ -2680,13 +2800,22 @@ public class XServerDisplayActivity extends AppCompatActivity {
             }
         }
 
-        return (!inputControlsView.onKeyEvent(event) && !winHandler.onKeyEvent(event)
-                && xServer.keyboard.onKeyEvent(event)) ||
-                (!ExternalController.isGameController(event.getDevice()) && super.dispatchKeyEvent(event));
+        // AGVN: same order as before; a keyboard Android also calls a gamepad keeps its typing and system keys
+        boolean bound = inputControlsView.onKeyEvent(event);
+        boolean toGamepad = !bound && winHandler.onKeyEvent(event);
+        boolean toKeyboard = !bound && !toGamepad && xServer.keyboard.onKeyEvent(event);
+        com.winlator.cmod.agvn.AgvnInputDevices.key(event, bound || toKeyboard);
+        return toKeyboard
+                || (!com.winlator.cmod.agvn.AgvnInputDevices.gamepadKey(event) && super.dispatchKeyEvent(event));
     }
 
     public InputControlsView getInputControlsView() {
         return inputControlsView;
+    }
+
+    /** AGVN: the status line in the corner (a slow start, Wine's debug notice). */
+    public com.winlator.cmod.agvn.AgvnStatusLine agvnStatus() {
+        return agvnStatus;
     }
 
     // AGVN: hooks for the in-game controls editor (agvn/AgvnControlsBar, AgvnControlsEditor); UI thread only
@@ -2704,6 +2833,15 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
     public void agvnHideControls() {
         hideInputControls();
+    }
+
+    // AGVN: "Vừa màn hình" (agvn/AgvnScreenFit) maps touches as it draws, and closes the game for "Mở lại game ngay"
+    public TouchpadView agvnTouchpadView() {
+        return touchpadView;
+    }
+
+    public void agvnExit() {
+        exit();
     }
 
     // AGVN: rebuilds the sidebar profile list around the shown profile (its listener then re-applies that same profile)
@@ -2948,7 +3086,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             }
         }
 
-        String command = "winhandler.exe " + args;
+        String command = agvnStarter + " " + args; // AGVN: agvn-winhandler.exe for a game that reads raw input
 
         return command;
     }
@@ -3023,18 +3161,17 @@ public class XServerDisplayActivity extends AppCompatActivity {
         final boolean xrandrCapable = isSelectedWineXrandrCapable();
         File userRegFile = new File(imageFs.getRootDir(), ImageFs.WINEPREFIX + "/user.reg");
 
+        // AGVN: a game picks its resolution from Wine's mode list, so every Wine gets the emulated list and mode
+        // changes, XRandR or not; a Wine that does not know these keys ignores them. proton-9.0-arm64ec reads neither:
+        // in the virtual desktop every game starts in, its win32u lists the usual sizes up to the screen's, the
+        // screen's own included (desktop_update_display_devices), whatever the keys say.
         try (WineRegistryEditor registryEditor = new WineRegistryEditor(userRegFile)) {
-            if (xrandrCapable) {
-                registryEditor.setStringValue(x11DriverKey, "EmulateModelist", "Y");
-                registryEditor.setStringValue(x11DriverKey, "EmulateModeset", "Y");
-            } else {
-                registryEditor.removeValue(x11DriverKey, "EmulateModelist");
-                registryEditor.removeValue(x11DriverKey, "EmulateModeset");
-            }
+            registryEditor.setStringValue(x11DriverKey, "EmulateModelist", "Y");
+            registryEditor.setStringValue(x11DriverKey, "EmulateModeset", "Y");
         }
 
-        Log.d("XServerDisplayActivity", "RandR Wine mode emulation: "
-                + (xrandrCapable ? "disabled" : "unchanged (layer has no XRandR)"));
+        Log.d("XServerDisplayActivity", "Wine mode emulation keys written (a Wine may ignore them)"
+                + (xrandrCapable ? "" : ", layer has no XRandR"));
     }
 
     private boolean isSelectedWineXrandrCapable() {

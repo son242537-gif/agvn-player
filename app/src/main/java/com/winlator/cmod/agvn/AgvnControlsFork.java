@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.content.Context;
@@ -177,7 +177,7 @@ public final class AgvnControlsFork {
     }
 
     /** Remembers that the player shows {@code profile} in this game (controls back on, not hidden). */
-    static void rememberShown(Shortcut shortcut, ControlsProfile profile) {
+    public static void rememberShown(Shortcut shortcut, ControlsProfile profile) {
         if (shortcut == null || profile == null) return;
         String id = String.valueOf(profile.id);
         if (!id.equals(shortcut.getExtra(AgvnLayouts.EXTRA_PROFILE, null))) {

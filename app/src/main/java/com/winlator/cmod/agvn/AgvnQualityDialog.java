@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
@@ -27,6 +27,7 @@ public final class AgvnQualityDialog {
         AgvnQuality.Level saved = AgvnQuality.current(shortcut);
         AgvnQuality.Level suggested = AgvnQuality.recommended(activity);
         boolean[] auto = {saved == AgvnQuality.Level.AUTO};
+        java.util.Properties doctor = AgvnGoodConfig.load(activity, shortcut); // a screen this game refused ("Tự sửa lỗi")
 
         LinearLayout root = new LinearLayout(activity);
         root.setOrientation(LinearLayout.VERTICAL);
@@ -72,7 +73,8 @@ public final class AgvnQualityDialog {
             LaunchPresetResolver.Effective eff = AgvnQuality.effective(activity, shortcut, level);
             String fps = eff.fps > 0 ? eff.fps + " FPS" : activity.getString(R.string.agvn_quality_fps_unlimited);
             String res = eff.resolution != null ? eff.resolution.replace('x', '×') : activity.getString(R.string.agvn_default_value);
-            detail.setText(activity.getString(R.string.agvn_quality_detail, res, fps));
+            detail.setText(activity.getString(R.string.agvn_quality_detail, res, fps)
+                    + (AgvnGoodConfig.refused(doctor, eff.resolution) ? "\n" + activity.getString(R.string.agvn_quality_refused) : ""));
             note.setText(auto[0] ? activity.getString(R.string.agvn_quality_auto_note) + "\n" + activity.getString(R.string.agvn_quality_restart_note)
                     : activity.getString(R.string.agvn_quality_restart_note));
         };

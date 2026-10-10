@@ -1,0 +1,11 @@
+AGVN Player v0.1.24 - agvn.io
+
+Mới:
+- "Tự sửa lỗi" cho lỗi bạn nhìn thấy: trong menu ⋮ của game (cạnh "Gửi nhật ký") và nút "🩺 Tự sửa" trên thanh nhỏ ở đầu màn hình game. Chọn lỗi game đang gặp: hình chập chờn, đốm đen hoặc sai màu, màn hình đen, chậm, đứng hình, tự tắt, mất tiếng, chữ lỗi, hình mờ, hoặc lỗi khác.
+- App thử từng cách một: game mở lại, bạn chơi khoảng 45 giây rồi app hỏi còn lỗi không. Hết lỗi thì app giữ cách đó. Còn lỗi thì app trả cài đặt về như cũ rồi thử cách sau. Thử hết mà vẫn lỗi thì cài đặt về như trước và có nút "Gửi nhật ký". Chỉ game bạn báo lỗi bị đổi cài đặt.
+- Game RPG Maker MV/MZ "Chạy nhẹ": "Nhập save" và "Xuất save" dùng được. Save nằm trong thư mục save của game như bản PC nên dùng chung được với bản Windows; save đã có từ trước được chuyển sang.
+- Game Godot: app tìm đúng chỗ game lưu save, nên "Nhập save" và "Xuất save" dùng được.
+Sửa lỗi:
+- Game Unity bị crash rồi đứng hình (Unity tự bắt lỗi nên trước đây app không biết): app báo "Game bị lỗi và đã dừng", đóng game sau 10 giây, rồi "Tự sửa lỗi" gợi ý cách chạy khác. App cũng nhận ra lỗi này khi bạn đã vuốt tắt app.
+- Ở Đồ họa Thấp và Siêu nhẹ, app ép game Unity về chất lượng hình thấp nhất, và có game Unity bị crash vì vậy. Với lỗi này, "Tự sửa lỗi" giờ thử "Để game Unity tự chọn chất lượng hình" trước tiên.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

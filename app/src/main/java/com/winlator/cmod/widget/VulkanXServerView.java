@@ -288,8 +288,23 @@ public class VulkanXServerView extends XServerRendererView implements SurfaceHol
     @Override
     public void onResume() {}
 
+    /** AGVN: a part of the screen (a game's own window, agvn/AgvnScreenFit) drawn over the whole view; null: all of it. */
+    private volatile float[] agvnFitRect;
+
+    public void setAgvnFitRect(float[] rect) {
+        agvnFitRect = rect;
+        synchronized (lock) { updateTransform(); }
+    }
+
     private void updateTransform() {
         if (nativeHandle == 0) return;
+        final float[] fit = agvnFitRect;
+        if (fit != null && surfaceWidth > 0 && surfaceHeight > 0) { // AGVN: "Vừa màn hình"
+            float[] t = com.winlator.cmod.agvn.AgvnFitMath.render(fit, xServer.screenInfo.width, xServer.screenInfo.height,
+                    surfaceWidth, surfaceHeight, fullscreen);
+            nativeSetTransformAndScissor(nativeHandle, t[0], t[1], t[2], t[3], true, (int) t[4], (int) t[5], (int) t[6], (int) t[7]);
+            return;
+        }
         final float zoom = magnifierZoom;
         final float ptrX = xServer.pointer.getX();
         final float ptrY = xServer.pointer.getY();

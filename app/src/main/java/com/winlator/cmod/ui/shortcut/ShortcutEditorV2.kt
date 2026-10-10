@@ -68,6 +68,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -411,7 +412,8 @@ private class ShortcutEditorStateV2(val shortcut: Shortcut) {
 
 @Composable
 internal fun ShortcutEditorV2(fragment: Fragment, shortcut: Shortcut, close: () -> Unit) {
-    val context = fragment.requireContext()
+    // AGVN: the dialog's own context; the library can be detached while this dialog is still open
+    val context = LocalContext.current
     val state = remember(shortcut.file.path) {
         OpenGLDriverDefaults.initialize(context, shortcut.container)
         ShortcutEditorStateV2(shortcut)
@@ -486,12 +488,12 @@ internal fun ShortcutEditorV2(fragment: Fragment, shortcut: Shortcut, close: () 
 
     fun closeEditor() {
         renameShortcutV2(shortcut, state.name)
-        if (fragment is ShortcutsFragment) fragment.loadShortcutsList()
+        if (fragment is ShortcutsFragment && fragment.isAdded) fragment.loadShortcutsList()
         close()
     }
 
     fun enterContainer() {
-        val activity = fragment.requireActivity()
+        val activity = fragment.activity ?: return
         if (!XrActivity.isEnabled(context)) {
             activity.startActivity(Intent(activity, XServerDisplayActivity::class.java).putExtra("container_id", state.container.id))
         } else {
@@ -508,7 +510,7 @@ internal fun ShortcutEditorV2(fragment: Fragment, shortcut: Shortcut, close: () 
         if (target.id == state.container.id) return
         if (shortcut.cloneToContainer(target)) {
             Toast.makeText(context, "Đã chép lối tắt sang ${target.name}", Toast.LENGTH_SHORT).show()
-            if (fragment is ShortcutsFragment) fragment.loadShortcutsList()
+            if (fragment is ShortcutsFragment && fragment.isAdded) fragment.loadShortcutsList()
             close()
         }
     }
@@ -1127,7 +1129,12 @@ private fun ShortcutCategoryV2(
 
         "Điều khiển" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
-                SettingMappedChoice("Cấu hình phím ảo", s.controlsProfile, profiles) { s.controlsProfile = it; s.shortcut.putExtra(com.winlator.cmod.agvn.AgvnLayouts.EXTRA_AUTO, null); s.extra("controlsProfile", it.ifEmpty { null }) } // AGVN: player's choice; "0" = controls off, "" = automatic
+                SettingMappedChoice("Cấu hình phím ảo", s.controlsProfile, profiles) {
+                    s.controlsProfile = it
+                    s.shortcut.putExtra(com.winlator.cmod.agvn.AgvnLayouts.EXTRA_AUTO, null)
+                    if (it != "0") s.shortcut.putExtra(com.winlator.cmod.agvn.AgvnControlsFork.EXTRA_HIDDEN, null) // AGVN: picked keys show
+                    s.extra("controlsProfile", it.ifEmpty { null })
+                } // AGVN: player's choice; "0" = controls off, "" = automatic; Chạy nhẹ games too (AgvnLightPick)
                 SettingsDivider()
                 SettingToggle("Nhập độc quyền", s.exclusive) {
                     s.exclusive = it

@@ -12,12 +12,45 @@ giữ lại. Tài liệu này ghi lại AGVN làm gì ở từng mức và vì s
 | FPS lúc vào game (mọi loại game; chỉnh lại được trong game) | 20 | 24 | 30 | Cao: 30. Rất cao: không giới hạn |
 | DXVK: khối bộ nhớ 16 MB (`dxvk.maxChunkSize=16`) | có | có | có | không |
 | DXVK: giải phóng pipeline library không dùng (`dxvk.trackPipelineLifetime=True`) | có | có | không | không |
-| Ren'Py: bộ đệm ảnh (`config.image_cache_size_mb`) | 128 MB | 192 MB | 256 MB | để game tự chọn |
+| Ren'Py: bộ đệm ảnh (`config.image_cache_size_mb`), trong Wine và "Chạy nhẹ" | 128 MB | 192 MB | 256 MB | để game tự chọn |
 | Unity: mức chất lượng thấp nhất của game | có | có | không | không |
-| Unreal: texture pool (`r.Streaming.PoolSize`) | 384 MB | 512 MB | 768 MB | Cao: 1024 MB. Rất cao: 1536 MB |
+| Unreal: texture pool (`r.Streaming.PoolSize`); với driver của máy (Mali, Qualcomm) là một phần tư, ít nhất 64 MB | 384 MB | 512 MB | 768 MB | Cao: 1024 MB. Rất cao: 1536 MB |
 | Zink (OpenGL): vùng đệm bộ đệm GPU đã dùng xong | 256 MB | 256 MB | 256 MB | 256 MB |
 
 Mức "Tự động" dùng mức gợi ý cho máy: máy yếu là Thấp, máy tầm trung là Trung bình, máy flagship là Cao.
+
+## Khi game từng hết RAM trên máy
+
+Ở bất kỳ mức nào, app dùng phần tiết kiệm RAM của Siêu nhẹ cho một game đã từng bị tắt vì hết RAM trên máy này
+(`AgvnMemorySaver.ranOut`). Độ phân giải và FPS vẫn theo mức đã chọn. "Tự sửa lỗi" gặp lỗi `memory`, `gpu-memory`,
+`killed-low-memory` hoặc `low-ram-end` thì đánh dấu game (`agvnRamShort` trong lối tắt), và hộp hỏi báo "Từ lần mở sau,
+app tự dùng mức tiết kiệm RAM cao nhất mà game này có".
+
+Chỉ lỗi thật của chính game đó mới làm app giảm thêm, trên mọi máy. RAM hay GPU của máy thì không. Bản 0.1.17 còn giảm
+như Siêu nhẹ cho mọi game DirectX trên máy dưới 9 GB RAM chạy driver của máy (Mali, và Qualcomm khi không dùng Turnip),
+dù người chơi chọn mức nào. Kết quả là cả những game vẫn chạy tốt cũng bị giảm chất lượng (máy Mali-G615 chọn mức
+FLAGSHIP vẫn bị giảm). Bản sau bỏ cách đó, theo nguyên tắc của người bảo trì (05/10): sửa lỗi phải áp dụng chung, không
+hy sinh game khác để sửa lỗi riêng của một máy.
+
+| Engine | Phần giảm |
+|---|---|
+| DXVK (mọi game DirectX 8–11: Unity, Unreal, game khác) | Khối bộ nhớ 16 MB, giải phóng pipeline library không dùng |
+| Unity | Mức chất lượng thấp nhất của game |
+| Unreal | Texture pool của Siêu nhẹ (384 MB), trên driver của máy là một phần tư: 96 MB |
+| Ren'Py (Wine và "Chạy nhẹ") | Bộ đệm ảnh 128 MB, chỉ khi game từng hết RAM (ảnh Ren'Py không phải BCn) |
+| Zink (OpenGL) | Như mọi mức |
+
+Game chưa từng hết RAM thì giữ phần tiết kiệm của mức đã chọn. Trên driver của máy, texture pool của Unreal vẫn là một
+phần tư (xem bảng trên), vì đó là cách tính đúng RAM chứ không phải giảm thêm. `su-kien.txt` của phiên chơi ghi "Tiết
+kiệm RAM như Siêu nhẹ: game từng bị tắt vì hết RAM trên máy này" khi app giảm.
+
+"Đồng bộ khung hình" và "Tắt Present Wait" là cách một người chơi Mali-G615 (7,2 GB) mở được Support Pregnancy School
+(Unreal): với mặc định, game đen màn hình rồi không vào được. Bản 0.1.18 tự bật hai mục này cho mọi game DirectX trên
+máy như vậy. Bản sau chỉ đề nghị chúng trên thanh "Màn hình game vẫn đen" của game DirectX, trên mọi máy (xem
+`tu-sua-loi.md`).
+
+App chưa giảm được texture của Godot, KiriKiri, RPG Maker (XP/VX/VX Ace, MV/MZ) và game HTML: chưa có thiết lập nào
+app ghi được từ bên ngoài game cho phần này.
 
 ## Chi tiết
 
@@ -32,7 +65,9 @@ Mức "Tự động" dùng mức gợi ý cho máy: máy yếu là Thấp, máy 
   - Ô này còn thử nghiệm: ngày 01/10 một game đứng hình 5–9 giây, hai lần trong 30 giây, khi bật. Mỗi lần game ngừng gửi
     khung hình từ 1 giây trở lên, nhật ký của lần chơi (và logcat, thẻ `AGVN`) có một dòng "Đứng hình …" ghi giới hạn FPS
     đang chạy theo cách nào. Với khớp nhịp, dòng đó còn cho biết app có giữ bộ đệm nào của game không, tức đứng hình do
-    app hay do game (`AgvnFrameStalls`).
+    app hay do game (`AgvnFrameStalls`). Lúc app dừng game (người chơi rời app hoặc tắt màn hình, hay bấm nút tạm dừng
+    ⏸) không tính là đứng hình: nhật ký ghi "Rời app…" và "Game chạy tiếp sau N giây dừng…" (`AgvnGamePause`). Bản
+    0.1.21 trở về trước tính cả lúc đó vào "Đứng hình".
   - Trong game, người chơi nâng, hạ hoặc tắt được. Khi tắt, game và menu cheat tự chỉnh FPS.
   - AGVN không còn ghi `DXVK_FRAME_RATE`: DXVK khoá cứng mức này, trong game không nâng lên được. Game cũ có biến này
     được chuyển sang "Giới hạn FPS" khi mở (`AgvnQuality.upgrade`).
@@ -53,8 +88,54 @@ Mức "Tự động" dùng mức gợi ý cho máy: máy yếu là Thấp, máy 
     container. Công ty và tên game lấy từ hai dòng đầu của `<exe>_Data/app.info`.
   - Ở mức cao hơn, AGVN xoá giá trị này, nhưng chỉ khi chính AGVN đã ghi nó.
   - Mức thấp nhất của Unity thường giảm độ phân giải texture và tắt bóng. Game có menu cài đặt riêng có thể ghi đè.
+- **Unreal trên driver của máy:**
+  - Unreal tính texture theo cỡ nén BCn. Driver của máy (Mali, và Qualcomm khi không dùng Turnip) không đọc được BCn,
+    nên wrapper giải nén texture ra lớn gấp 4–8 lần. Texture pool vì vậy chiếm RAM gấp ít nhất 4 lần con số đặt.
+  - AGVN đặt pool bằng một phần tư mức của thanh, ít nhất 64 MB và không lớn hơn mức gốc (`AgvnBcn.texturePool`).
+    Turnip đọc BCn trực tiếp nên giữ nguyên mức.
+  - Ví dụ ngày 05/10: Legend Cleaner (Unreal) trên máy Mali-G610 7,2 GB lên 4,1 GB khi đang tải rồi bị tắt vì hết RAM.
+  - Đổi lại, texture của game Unreal trên các máy này mờ hơn. Mức mới chưa được đo trên máy thật.
 - **Zink:** bản vá `scripts/agvn/zink/patches/0007-agvn-cap-buffer-cache.patch`. Trên POCO F8 Pro, bộ nhớ GPU của một
   game OpenGL giảm từ 2,78 GB xuống 2,52 GB.
+
+## Khi game vẫn bị tắt vì hết RAM
+
+Thanh "Đồ họa" chỉ bớt được những phần trong bảng trên. Nếu game cần nhiều RAM hơn máy còn trống, hệ thống tắt tiến
+trình game, thường không để lại dòng lỗi nào. App nhận ra trường hợp này và hỏi "Game tự tắt lúc máy gần hết RAM"
+(`tu-sua-loi.md`). Khi RAM trống dưới hai lần mức cảnh báo, app đọc RAM mỗi giây thay vì 5 giây, để không bỏ sót game
+dùng hết RAM giữa hai lần đo (`AgvnMemoryWatch`).
+
+Ví dụ ngày 04/10: With The Devilish Her (Unity 2021.3, bản Việt hoá GameHub) trên Xiaomi 23090RA98G (Mali-G610, RAM
+7,2 GB, còn trống 3,0 GB trước khi chơi). App và game lên 4,0–4,2 GB RSS, RAM trống xuống 0,4–0,7 GB. Cả bốn lần chơi,
+game đều bị tắt ở cùng một cảnh, khoảng 2,5 phút sau khi mở.
+
+Ví dụ ngày 05/10: Lg Light (Lifeguard Holic 1.2, Unity 6, bản Việt hoá GameHub "Siêu nhẹ") trên OPPO PKC110 (Mali-G925,
+RAM 11,1 GB, còn trống 5,3 GB). Game chưa qua được màn tải lần nào: app và game lên 5,6–7,1 GB trong khoảng một phút,
+rồi game bị tắt (lần cuối Android tắt luôn cả AGVN). Game đã tiết kiệm RAM như Siêu nhẹ từ trước, và người chơi hạ màn
+hình từ 1600×900 xuống 640×360, mà RAM vẫn lên 5,8 rồi 6,8 GB: phần lớn RAM là texture, không phải màn hình. Hết RAM
+khi đã tiết kiệm như vậy thì "Tự sửa lỗi" không đề nghị hạ Đồ họa nữa (`tu-sua-loi.md`).
+
+- **Người chơi:**
+  - Đóng các app khác hoặc khởi động lại máy trước khi chơi.
+  - Lưu game trước đoạn hay bị tắt.
+  - Khi thanh "Game đang dùng quá nhiều RAM" hiện, lưu game rồi thoát.
+- **Người làm bản vá game Unity:**
+  - GPU Mali không đọc được texture BCn (DXT1, DXT5, BC7), nên wrapper giải nén chúng ra RGBA8, lớn gấp 4–8 lần.
+    Driver Qualcomm cũng vậy. Turnip thì đọc được BCn, nên game vừa RAM trên POCO F8 Pro vẫn có thể hết RAM trên máy
+    Mali có cùng dung lượng RAM.
+  - Cụ thể, app có hai bộ giải BCn, cả hai giải lúc game chép texture lên GPU (`vkCmdCopyBufferToImage`): wrapper
+    (`libvulkan_wrapper.so`, bằng CPU) và lớp `libbcn_layer.so` (bằng compute shader, bật khi `ENABLE_BCN_COMPUTE=1`).
+    BC1 lớn gấp 8, BC2, BC3, BC7 gấp 4 ở cả hai. BC4, BC5 gấp 2 ở wrapper (ra R8, RG8), nhưng lớp compute giải mọi
+    loại ra 4 kênh (RGBA8, BC6H ra RGBA16F). Phần này chỉ bớt khi game nạp ít texture hơn, hoặc texture nhỏ hơn (nửa
+    cỡ là một phần tư số điểm ảnh). Texture không nén (RGBA32) trên Mali tốn bằng BCn đã giải nén.
+  - Trong game, GPU Mali có `SystemInfo.graphicsDeviceVendor` là `ARM` (Player.log ghi `Vendor: ARM`). RAM của máy là
+    `SystemInfo.systemMemorySize`.
+  - `QualitySettings.masterTextureLimit` chỉ thu nhỏ texture có mipmap. Ảnh CG và sprite thường không có mipmap nên vẫn
+    được nạp đủ cỡ.
+  - Chỉ nạp thứ gì khi cần. Bản vá ở ví dụ trên nạp sẵn 3 gói DLC lúc mở game, và Player.log có hai lần dòng
+    `Warmed 38 gallery thumbnail(s)`.
+  - `tools/agvn/do-bo-nho-anh.py` đo bộ nhớ texture của game trên PC. Số đo là cỡ texture khi GPU đọc được BCn, chưa
+    tính phần lớn thêm trên Mali.
 
 ## Những cách không giúp hoặc chưa làm
 
@@ -70,6 +151,8 @@ Mức "Tự động" dùng mức gợi ý cho máy: máy yếu là Thấp, máy 
   - Wrapper của GameNative đổi BCn sang ASTC thay vì giải nén ra RGBA8 (lớn gấp 4–8 lần). Cách này chỉ có ích với
     driver không hỗ trợ BCn, như driver Qualcomm và Mali. Turnip hỗ trợ BCn sẵn.
   - Trên Mali, bộ giải BCn bằng compute và bộ giải BCn của wrapper đang cùng bật (`ENABLE_BCN_COMPUTE` và
-    `WRAPPER_EMULATE_BCN=3`).
+    `WRAPPER_EMULATE_BCN=3`). Lớp compute giải BC4, BC5 ra RGBA8, tốn gấp đôi hoặc gấp bốn bộ giải của wrapper. Cần đo
+    trên máy Mali xem game nào nhiều BC4, BC5 (thường là normal map của game 3D) có bớt RAM khi chỉ dùng bộ giải của
+    wrapper ("Kiểu giả lập BCN: software") không, và tải chậm hơn bao nhiêu.
   - Cờ V8 `--optimize-for-size` cho game NW.js (RPG Maker MV/MZ, Tyrano).
   - Giảm số luồng dịch shader của DXVK.

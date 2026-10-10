@@ -1,6 +1,7 @@
 package com.winlator.cmod.agvn;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,18 +22,71 @@ public class DeviceTierTest {
     @Test
     public void classifiesByGpu() {
         assertEquals(DeviceTier.FLAGSHIP, rules.classify("Adreno (TM) 830", "SM8750", 11000));
-        assertEquals(DeviceTier.TRUNG_BINH, rules.classify("Adreno (TM) 730", "SM8450", 11000));
         assertEquals(DeviceTier.YEU, rules.classify("Adreno (TM) 650", "SM8250", 11000));
         assertEquals(DeviceTier.YEU, rules.classify("Adreno (TM) 619", "SM6375", 7500));
         assertEquals(DeviceTier.YEU, rules.classify("Mali-G57", "MT6833", 7500));
         assertEquals(DeviceTier.TRUNG_BINH, rules.classify("Mali-G715", "MT6985", 11000));
     }
 
+    /** Adreno numbers are not generations: 725-750 are the 8 Gen 1-3 class, 810 is mid-range, 70x entry level. */
+    @Test
+    public void adrenoByClassNotByFirstDigit() {
+        for (String flagship : new String[]{"725", "730", "732", "735", "740", "750", "825", "830", "840"})
+            assertEquals(flagship, DeviceTier.FLAGSHIP, rules.classify("Adreno (TM) " + flagship, "", 11000));
+        for (String mid : new String[]{"710", "720", "722", "810"})
+            assertEquals(mid, DeviceTier.TRUNG_BINH, rules.classify("Adreno (TM) " + mid, "", 11000));
+        for (String weak : new String[]{"702", "506", "610", "644", "660"})
+            assertEquals(weak, DeviceTier.YEU, rules.classify("Adreno (TM) " + weak, "", 11000));
+        // a letter after the number (778G's 642L) no longer hides the GPU and leaves the tier to the SoC
+        assertEquals(DeviceTier.YEU, rules.classify("Adreno (TM) 642L", "SM7325", 7500));
+        assertEquals(DeviceTier.FLAGSHIP, rules.classify("Turnip Adreno (TM) 750", "", 11000));
+    }
+
+    @Test
+    public void otherGpus() {
+        assertEquals(DeviceTier.TRUNG_BINH, rules.classify("Mali-G610 MC6", "MT6895", 11000)); // Dimensity 8100
+        assertEquals(DeviceTier.TRUNG_BINH, rules.classify("Mali-G615 MC6", "MT6897", 11000)); // Dimensity 8300
+        assertEquals(DeviceTier.YEU, rules.classify("Mali-G610 MC4", "MT6886", 11000)); // Dimensity 7200
+        assertEquals(DeviceTier.YEU, rules.classify("Mali-G615 MC2", "MT6878", 7500)); // Dimensity 7300
+        assertEquals(DeviceTier.YEU, rules.classify("Mali-G68 MC4", "MT6877", 7500));
+        assertEquals(DeviceTier.YEU, rules.classify("Mali-G78 MP20", "GS101", 11000)); // Tensor G1
+        assertEquals(DeviceTier.TRUNG_BINH, rules.classify("Mali-G710 MC10", "MT6983", 11000));
+        assertEquals(DeviceTier.TRUNG_BINH, rules.classify("Immortalis-G925 MC12", "MT6991", 11000));
+        assertEquals(DeviceTier.TRUNG_BINH, rules.classify("Samsung Xclipse 940", "s5e9945", 11000));
+        assertEquals(DeviceTier.TRUNG_BINH, rules.classify("Maleoon 910", "", 11000));
+        assertEquals(DeviceTier.TRUNG_BINH, rules.classify("PowerVR D-Series DXT-48-1536", "", 11000)); // Tensor G5
+        assertEquals(DeviceTier.YEU, rules.classify("PowerVR B-Series BXM-8-256", "MT6855", 7500));
+        assertEquals(DeviceTier.YEU, rules.classify("PowerVR Rogue GE8320", "MT6765", 3700));
+    }
+
     @Test
     public void fallsBackToSocWhenGpuUnknown() {
         assertEquals(DeviceTier.FLAGSHIP, rules.classify("", "SM8650", 11000));
-        assertEquals(DeviceTier.YEU, rules.classify(null, "SM6450", 11000));
+        assertEquals(DeviceTier.FLAGSHIP, rules.classify("Unknown", "SM8450", 11000));
+        assertEquals(DeviceTier.YEU, rules.classify(null, "SM8250", 11000)); // 865/870: Adreno 650
+        assertEquals(DeviceTier.TRUNG_BINH, rules.classify(null, "SM6450", 11000)); // 6 Gen 1: Adreno 710
+        assertEquals(DeviceTier.TRUNG_BINH, rules.classify(null, "SM7550", 11000));
+        assertEquals(DeviceTier.YEU, rules.classify(null, "SM7325", 11000));
+        assertEquals(DeviceTier.YEU, rules.classify(null, "SM6375", 11000));
+        assertEquals(DeviceTier.TRUNG_BINH, rules.classify(null, "MT6991", 11000)); // Dimensity 9400
+        assertEquals(DeviceTier.TRUNG_BINH, rules.classify(null, "MT6897", 11000)); // Dimensity 8300
+        assertEquals(DeviceTier.YEU, rules.classify(null, "MT6789", 11000)); // Helio G99
+        assertEquals(DeviceTier.TRUNG_BINH, rules.classify(null, "s5e9925", 11000)); // Exynos 2200
+        assertEquals(DeviceTier.YEU, rules.classify(null, "s5e8835", 11000)); // Exynos 1380
+        assertEquals(DeviceTier.YEU, rules.classify(null, "T606", 11000)); // Unisoc
         assertEquals(DeviceTier.TRUNG_BINH, rules.classify(null, "unknown-chip", 11000));
+    }
+
+    @Test
+    public void explainsTheTier() {
+        String why = rules.why("Adreno (TM) 830", "SM8750", 5600);
+        assertEquals(DeviceTier.TRUNG_BINH, rules.classify("Adreno (TM) 830", "SM8750", 5600));
+        assertTrue(why, why.startsWith("GPU \"Adreno (TM) 830\" → FLAGSHIP"));
+        assertTrue(why, why.contains("RAM 5600 MB → TRUNG_BINH"));
+        assertTrue(why, why.endsWith("= TRUNG_BINH"));
+        String bySoc = rules.why("Unknown", "SM6375", 7500);
+        assertTrue(bySoc, bySoc.contains("GPU \"Unknown\" không khớp; chip \"SM6375\" → YEU"));
+        assertTrue(rules.why(null, null, 7500).contains("không rõ → TRUNG_BINH"));
     }
 
     @Test

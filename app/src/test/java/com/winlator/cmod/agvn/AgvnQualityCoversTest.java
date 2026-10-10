@@ -56,8 +56,8 @@ public class AgvnQualityCoversTest {
         File splash = new File(ue, "Proj/Content/Splash/Splash.bmp");
         assertTrue(splash.getParentFile().mkdirs());
         assertTrue(splash.createNewFile());
-        assertEquals(splash, AgvnCoverSources.find(ue));
-        assertEquals(splash, AgvnCoverSources.find(new File(ue, "Proj")));
+        assertEquals(splash.getPath(), AgvnCoverSources.candidates(ue).get(0).name);
+        assertEquals(splash.getPath(), AgvnCoverSources.candidates(new File(ue, "Proj")).get(0).name);
 
         File rpg = tmp.newFolder("RPG");
         File titles = new File(rpg, "www/img/titles1");
@@ -65,8 +65,11 @@ public class AgvnQualityCoversTest {
         java.nio.file.Files.write(new File(titles, "small.png").toPath(), new byte[10]);
         java.nio.file.Files.write(new File(titles, "Big.png").toPath(), new byte[100]);
         java.nio.file.Files.write(new File(titles, "enc.png_").toPath(), new byte[1000]);
-        assertEquals("Big.png", AgvnCoverSources.find(rpg).getName());
-        assertNull(AgvnCoverSources.find(tmp.newFolder("Empty")));
+        java.util.List<AgvnArt> art = AgvnCoverSources.candidates(rpg);
+        assertEquals(new File(titles, "enc.png_").getPath(), art.get(0).name); // encrypted titles count too
+        assertNull(art.get(0).read()); // ...but this one is no RPGMV file, so the next is used
+        assertEquals(new File(titles, "Big.png").getPath(), art.get(1).name);
+        assertTrue(AgvnCoverSources.candidates(tmp.newFolder("Empty")).isEmpty());
     }
 
     @Test

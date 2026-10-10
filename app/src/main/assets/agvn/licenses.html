@@ -1,15 +1,23 @@
 <html><body>
 <h2>AGVN Player</h2>
-<p>Phát hành bởi agvn.io.vn. Mã nguồn mở theo giấy phép MIT.</p>
+<p>Phát hành bởi agvn.io. AGVN Player là phần mềm tự do, phát hành theo Giấy phép Công cộng GNU (GNU GPL) phiên bản 3 hoặc mới hơn. Toàn văn giấy phép ở cuối trang.</p>
+<p>Mã nguồn đầy đủ của từng bản phát hành: https://github.com/son242537-gif/agvn-player (thẻ v0.1.x của bản đó).</p>
 <p>AGVN Player dựa trên Winlator của BrunoSX và bản Winlator Ludashi của StevenMXZ và pipetto-crypto
 (https://github.com/StevenMXZ/Winlator-Ludashi). Xin cảm ơn các tác giả gốc.</p>
 <h3>Giấy phép MIT (Winlator)</h3>
+<p>Mã của Winlator và mã AGVN viết thêm vẫn dùng được riêng theo giấy phép MIT dưới đây.</p>
 <p>MIT License</p><p>Copyright (c) 2023 BrunoSX</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 <h3>Thành phần bên thứ ba</h3>
 <p>Các thành phần sau có giấy phép riêng; mã nguồn của chúng có tại các địa chỉ bên dưới.</p>
 <ul>
 <li>Wine (LGPL 2.1+): https://www.winehq.org</li>
 <li>Proton (LGPL/BSD, Valve): https://github.com/ValveSoftware/Proton</li>
+<li>Proton 10.0-4 arm64ec cho Android (LGPL 2.1, Wine thứ hai của app): gói proton-10.0-4-arm64ec.wcp, mã nguồn ở nhánh
+proton_10.0 của https://github.com/The412Banner/proton-wine</li>
+<li>Wine Mono 9.3.1 (bộ chạy .NET cho Wine, chỉ giải nén cho game cần .NET): phần Mono là MIT X11 hoặc LGPL, FNA là
+MS-PL và MIT, FAudio và SDL2 là zlib, WinForms và WPF là MIT, SharpZipLib là GPL có ngoại lệ (xem file COPYING của Wine
+Mono). App kèm nguyên bản phát hành gốc; mã nguồn đúng bản này (wine-mono-9.3.1-src.tar.xz) ở
+https://github.com/wine-mono/wine-mono/releases/tag/wine-mono-9.3.1, kho mã: https://gitlab.winehq.org/mono/wine-mono</li>
 <li>Box64 (MIT): https://github.com/ptitSeb/box64</li>
 <li>FEX-Emu (MIT): https://github.com/FEX-Emu/FEX</li>
 <li>Mesa: Turnip, Wrapper (MIT): https://github.com/xMeM/mesa/tree/wrapper</li>
@@ -27,7 +35,31 @@
 <li>PulseAudio (LGPL 2.1): https://www.freedesktop.org/wiki/Software/PulseAudio</li>
 <li>GLIBC fork by longjunyu2: https://github.com/longjunyu2/winlator/tree/use-glibc-instead-of-proot</li>
 <li>Big Picture Mode music: Dale Melvin Blevens III (Fumer)</li>
+<li>Ren'Py 8.5.3 (MIT, Copyright 2004-2026 Tom Rothamel và cộng sự; Chạy nhẹ cho game Ren'Py), gồm Python 3.12 (PSF License,
+Copyright 2001-2023 Python Software Foundation), SDL2 (zlib, Copyright 1997-2022 Sam Lantinga), pyjnius (MIT, Copyright
+2010-2023 Kivy Team and other contributors), FFmpeg (LGPL 2.1) và các thư viện khác: https://www.renpy.org, mã nguồn
+https://github.com/renpy/renpy và https://github.com/renpy/renpy-build. Giấy phép đầy đủ của Ren'Py và danh sách thư viện
+ở cuối trang.</li>
+<li>mkxp-z (GPL 3.0 hoặc mới hơn, Copyright 2013-2023 Amaryllis Kulla và các tác giả mkxp-z; Chạy nhẹ cho game RPG Maker
+XP/VX/VX Ace), gồm Ruby 3.1 (Ruby License / BSD-2-Clause), SDL2, SDL_image, SDL_sound, SDL_ttf và PhysicsFS (zlib), OpenAL
+Soft và FluidSynth (LGPL 2.1), FreeType (FreeType License) cùng các thư viện khác: https://github.com/mkxp-z/mkxp-z. Mã nguồn
+và script dựng cho Android: scripts/agvn/mkxp-z trong kho mã AGVN Player. Giấy phép đầy đủ ở cuối trang.</li>
+<li>Godot Engine 4.7.2 (MIT, Copyright 2014-present Godot Engine contributors, 2007-2014 Juan Linietsky và Ariel Manzur;
+Chạy nhẹ cho game Godot 4), gồm FreeType, HarfBuzz, ICU, mbedTLS, Vulkan Memory Allocator, Swappy (Apache 2.0) cùng các
+thư viện khác: https://godotengine.org, mã nguồn https://github.com/godotengine/godot. Engine trong app được dựng lại từ mã
+nguồn chính thức, có bản vá: scripts/agvn/godot trong kho mã AGVN Player. Giấy phép đầy đủ ở cuối trang.</li>
+<li>Spine Runtimes 4.2 (spine-cpp và spine-godot, Copyright (c) 2013-2025 Esoteric Software LLC), dựng vào engine
+Godot ở trên để game Godot làm bằng Spine Chạy nhẹ được. Spine Runtimes không phải mã nguồn mở và không theo GPL: dùng
+theo Spine Runtimes License Agreement, nguyên văn ở cuối trang. Mã nguồn: https://github.com/EsotericSoftware/spine-runtimes.</li>
 <li>Thư viện Android: AndroidX, Material Components, Gson, OkHttp, Retrofit, Glide, zstd-jni, XZ for Java,
 Apache Commons Compress, Conscrypt, Bouncy Castle, OpenJSSE, junixsocket (Apache 2.0 / MIT / BSD tương ứng)</li>
 </ul>
+<h3>Giấy phép của Ren'Py</h3>
+<p>Nguyên văn file LICENSE.txt của Ren'Py 8.5.3, nằm sau toàn văn GNU GPL 3.</p>
+<h3>Giấy phép của mkxp-z và thư viện đi kèm</h3>
+<p>Nằm sau giấy phép của Ren'Py, ở cuối trang.</p>
+<h3>Giấy phép của Godot và thư viện đi kèm</h3>
+<p>Nguyên văn LICENSE.txt và COPYRIGHT.txt của Godot 4.7.2, giấy phép của Swappy và giấy phép Spine Runtimes, nằm sau
+giấy phép của mkxp-z.</p>
+<h3>GNU GPL phiên bản 3</h3>
 </body></html>

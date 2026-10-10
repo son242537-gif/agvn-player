@@ -1,0 +1,15 @@
+AGVN Player v0.1.21 - agvn.io
+
+Mới:
+- Wine mới (Proton 10): game thêm mới chạy bằng Proton 10, phát được phim WMV (Windows Media Video 9) mà Wine cũ không phát được, ví dụ phim mở đầu của nhiều game KiriKiri. Lần thêm game đầu tiên, app chuẩn bị Wine mới khoảng 1 phút và cần máy còn trống khoảng 900 MB. Game .NET vẫn chạy bằng Wine cũ.
+- Game đã thêm từ trước vẫn chạy như cũ. Nếu phim trong game không phát được, thanh báo có nút "Chạy lại bằng Wine mới": game mở lại trên Proton 10, save đi theo.
+- Game chạy Proton 10 mà tự tắt hoặc không mở được: "Tự sửa lỗi" có nút "Chạy bằng Wine cũ (Proton 9)".
+- Nhiều game Godot 4 giờ "Chạy nhẹ" ngay trên điện thoại, không qua Wine, nên mượt hơn hẳn (trước đây có game đứng hình 10–17 giây mỗi lần). Save dùng chung với bản Windows. Game Godot mã hóa, dùng C# hoặc Godot 3 vẫn chạy bằng Windows.
+- Phim trong game không phát được: app báo "Phim trong game không phát được" và có nút "Bỏ qua phim", thay vì để game đứng chờ im lặng.
+- Bản cập nhật này nặng hơn khoảng 140 MB vì có sẵn Wine mới và Godot.
+Sửa lỗi:
+- Game KiriKiri treo màn hình đen ngay khi mở: app cho game màn hình lớn hơn khổ game (ví dụ 1280×720 thành 1280×1024) để game chạy trong cửa sổ, rồi phóng khung game vừa màn hình điện thoại. Game đã thêm từ trước được sửa ở lần mở sau.
+- Thanh "Màn hình game vẫn đen" nhận ra cả kiểu treo này, và vẫn ghi vào nhật ký khi bạn đã chọn không hỏi lại.
+- Khung game nhỏ trên màn hình điện thoại (ví dụ game 16:9 trong màn hình 5:4) được phóng vừa màn hình.
+- Bật "Bật debug Wine" mà phim trong game lỗi: nhật ký Wine không còn phình lên hàng chục MB.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

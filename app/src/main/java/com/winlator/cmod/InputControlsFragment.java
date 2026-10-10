@@ -318,6 +318,11 @@ public class InputControlsFragment extends Fragment {
         }
     }
 
+    /** AGVN: the profile on screen (0 for none), given back to the game that opened this screen. */
+    public int agvnProfileId() {
+        return currentProfile != null ? currentProfile.id : 0;
+    }
+
     private void openControlsEditor() {
         if (currentProfile == null) {
             showNoProfileToast();

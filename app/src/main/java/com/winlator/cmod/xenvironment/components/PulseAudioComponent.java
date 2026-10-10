@@ -60,6 +60,16 @@ public class PulseAudioComponent extends EnvironmentComponent {
         }
     }
 
+    /** AGVN: the running PulseAudio's folder (its pactl, libraries and modules), for agvn/AgvnAudioRest. */
+    public File agvnRuntimeDir() {
+        return new File(environment.getContext().getFilesDir(), gameNative ? "pulseaudio-gn" : "pulseaudio");
+    }
+
+    /** AGVN: the socket the game's PulseAudio listens on. */
+    public String agvnSocketPath() {
+        return socketConfig.path;
+    }
+
     @Override
     public void stop() {
         synchronized (lock) {

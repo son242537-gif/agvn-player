@@ -1,0 +1,6 @@
+AGVN Player v0.1.38 - agvn.io
+
+Sửa lỗi:
+- Máy OnePlus, OPPO, realme, vivo báo "Parsing failed: APK contains no signature files" khi cập nhật: từ bản này, ở các lần cập nhật sau, nếu máy chưa cài được bản mới thì quay lại app sẽ thấy nút "Cài cách khác"; app tự đưa bản mới đã kiểm vào Android để cài. Android vẫn hỏi bạn trước khi cài.
+- Máy đang không cập nhật được thì cài tay bản này một lần: tải file trên máy tính hay máy khác, chép sang điện thoại, rồi mở bằng app Quản lý tệp của máy. Game, save và cài đặt vẫn giữ nguyên.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

@@ -44,6 +44,7 @@ import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.BugReport
+import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material3.DropdownMenu
@@ -85,6 +86,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.winlator.cmod.MainActivity
 import com.winlator.cmod.R
+import com.winlator.cmod.agvn.AgvnRedDot
+import com.winlator.cmod.agvn.rememberAgvnUpdateDot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -236,7 +239,7 @@ private fun LibraryLandscapeHeader(
         LibraryTopIcon(Icons.Outlined.HelpOutline, false) { activity?.let { com.winlator.cmod.agvn.AgvnGuideActivity.open(it) } }
         LibraryTopIcon(Icons.Outlined.Home, true) {}
         LibraryTopIcon(Icons.Outlined.SportsEsports, false) { activity?.navigateToMainDestination(R.id.main_menu_input_controls) }
-        LibraryTopIcon(Icons.Outlined.Settings, false) { activity?.navigateToMainDestination(R.id.main_menu_settings) }
+        LibraryTopIcon(Icons.Outlined.Settings, false, rememberAgvnUpdateDot()) { activity?.navigateToMainDestination(R.id.main_menu_settings) }
         LibraryOrientationMenu(activity)
     }
 }
@@ -282,7 +285,7 @@ private fun OrientationToggleMenuItem(label: String, checked: Boolean, onClick: 
 }
 
 @Composable
-private fun LibraryTopIcon(icon: ImageVector, selected: Boolean, click: () -> Unit) {
+private fun LibraryTopIcon(icon: ImageVector, selected: Boolean, dot: Boolean = false, click: () -> Unit) {
     val whiteTheme = MaterialTheme.colorScheme.background.luminance() > .65f
     val background = if (whiteTheme) Color.Black.copy(if (selected) .90f else .78f)
     else if (selected) Color.White.copy(.16f) else Color.Transparent
@@ -293,7 +296,12 @@ private fun LibraryTopIcon(icon: ImageVector, selected: Boolean, click: () -> Un
         shape = RoundedCornerShape(12.dp),
         color = background,
         contentColor = content
-    ) { Box(Modifier.size(44.dp), contentAlignment = Alignment.Center) { Icon(icon, null, modifier = Modifier.size(23.dp)) } }
+    ) {
+        Box(Modifier.size(44.dp), contentAlignment = Alignment.Center) {
+            Icon(icon, null, modifier = Modifier.size(23.dp))
+            if (dot) AgvnRedDot(Modifier.align(Alignment.TopEnd).padding(6.dp)) // AGVN: a newer AGVN Player is out
+        }
+    }
 }
 
 @Composable
@@ -525,14 +533,18 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_EXPORT)
                 }
             }
-            LibraryActionTileCompat(
-                Icons.Outlined.BugReport,
-                "Gửi nhật ký",
-                Modifier.fillMaxWidth().padding(top = 8.dp),
-                horizontal = landscape
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                close()
-                cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SEND_LOGS)
+                LibraryActionTileCompat(Icons.Outlined.Build, "Tự sửa lỗi", Modifier.weight(1f), horizontal = true) {
+                    close()
+                    cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_REPAIR)
+                }
+                LibraryActionTileCompat(Icons.Outlined.BugReport, "Gửi nhật ký", Modifier.weight(1f), horizontal = true) {
+                    close()
+                    cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SEND_LOGS)
+                }
             }
             LibraryActionTileCompat(
                 Icons.Outlined.DeleteOutline,

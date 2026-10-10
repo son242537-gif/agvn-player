@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.os.SystemClock;
@@ -36,6 +36,7 @@ public final class AgvnInputHold {
     public static void onGameFrame() {
         FRAMES.incrementAndGet();
         lastFrameMs = SystemClock.uptimeMillis();
+        AgvnSessionTrack.onFrame(); // a Vulkan or OpenGL frame never reaches the window's own content
     }
 
     /**
@@ -53,6 +54,7 @@ public final class AgvnInputHold {
 
     /** Before a press of {@code input}: sends its waiting release first, then notes the press. */
     public void pressing(int input) {
+        AgvnSessionTrack.onPress();
         Runnable release;
         synchronized (this) {
             release = waiting.remove(input);

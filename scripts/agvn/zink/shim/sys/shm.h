@@ -1,4 +1,4 @@
-/* AGVN Player - <sys/shm.h> for building Mesa against the imagefs. Copyright (c) 2026 agvn.io.vn - MIT License.
+/* AGVN Player - <sys/shm.h> for building Mesa against the imagefs. Copyright (c) 2026 agvn.io - MIT License.
  *
  * Android blocks System V shared memory (shmget & co. fail), but X11 MIT-SHM needs it. The imagefs ships
  * Winlator's libandroid-sysvshm, which implements it under the libandroid_shm* names (the interface of Termux's

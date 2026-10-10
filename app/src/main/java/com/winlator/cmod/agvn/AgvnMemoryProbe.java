@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.system.Os;
@@ -30,6 +30,12 @@ final class AgvnMemoryProbe {
     /** MemAvailable in MB, or -1 when unreadable. */
     static long freeMb() {
         long kb = kb(read(new File("/proc/meminfo")), "MemAvailable:");
+        return kb < 0 ? -1 : kb / 1024;
+    }
+
+    /** Resident memory of this process (VmRSS) in MB, or -1: the game's own, for an engine in a process of its own. */
+    static long processMb() {
+        long kb = kb(read(new File("/proc/self/status")), "VmRSS:");
         return kb < 0 ? -1 : kb / 1024;
     }
 

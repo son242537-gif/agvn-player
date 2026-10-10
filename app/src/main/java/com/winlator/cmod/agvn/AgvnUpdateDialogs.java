@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
@@ -22,6 +22,8 @@ import java.net.UnknownHostException;
 /**
  * "Cập nhật ứng dụng" in Settings, and the once-a-day check when the app opens. When a newer version is out the
  * player sees its notes and size and taps "Cập nhật"; {@link AgvnUpdateInstall} downloads, checks and installs it.
+ * Every check also sets the red dot ({@link AgvnUpdateBadge}); a check in the background tells the player with a
+ * notification ({@link AgvnUpdateJob}), whose tap brings the offer here at once.
  */
 public final class AgvnUpdateDialogs {
     private static final String TAG = "AGVN";
@@ -55,7 +57,9 @@ public final class AgvnUpdateDialogs {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(activity);
         new Thread(() -> AgvnUpdater.cleanupInstalled(activity), "AgvnUpdateCleanup").start();
         if (!prefs.getBoolean(PREF_AUTO, true)) return;
-        if (!AgvnUpdateInfo.dueForCheck(prefs.getLong(PREF_LAST_CHECK, 0), System.currentTimeMillis())) return;
+        AgvnUpdateJob.schedule(activity);
+        boolean tapped = activity.getIntent() != null && activity.getIntent().getBooleanExtra(AgvnUpdateJob.EXTRA_OFFER, false);
+        if (!tapped && !AgvnUpdateInfo.dueForCheck(prefs.getLong(PREF_LAST_CHECK, 0), System.currentTimeMillis())) return;
         check(activity, false);
     }
 
@@ -69,6 +73,7 @@ public final class AgvnUpdateDialogs {
             try {
                 info = AgvnUpdater.fetch();
                 prefs.edit().putLong(PREF_LAST_CHECK, System.currentTimeMillis()).apply();
+                AgvnUpdateBadge.found(activity, info);
             } catch (Exception e) {
                 Log.w(TAG, "update check failed", e);
                 error = e;
@@ -78,6 +83,7 @@ public final class AgvnUpdateDialogs {
             activity.runOnUiThread(() -> {
                 if (activity.isFinishing() || activity.isDestroyed()) return;
                 if (working != null && working.isShowing()) working.dismiss();
+                AgvnUpdateBadge.refresh(activity);
                 if (found != null && found.isNewerThan(AgvnUpdater.installedCode(activity))) offer(activity, found);
                 else if (!manual) return;
                 else if (failed != null) message(activity, activity.getString(R.string.agvn_update_failed, reason(activity, failed)));

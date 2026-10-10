@@ -1,0 +1,5 @@
+AGVN Player v0.1.16 - agvn.io.vn
+
+Mới:
+- Game bị tắt giữa chừng vì máy hết RAM: khi về thư viện, app báo "Game tự tắt lúc máy gần hết RAM" kèm số RAM còn trống và cách xử lý. Trước đây app coi đó là thoát game bình thường nên không báo gì.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.

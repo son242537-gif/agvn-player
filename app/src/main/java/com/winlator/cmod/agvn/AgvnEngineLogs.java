@@ -1,5 +1,8 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
+
+import com.winlator.cmod.container.Shortcut;
+import com.winlator.cmod.xenvironment.ImageFs;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -7,8 +10,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * The log files game engines write, copied into the session folder when a game ends. They sit inside the app's
@@ -18,8 +25,48 @@ import java.util.List;
 final class AgvnEngineLogs {
     static final long MAX_BYTES = 2L * 1024 * 1024;
     static final int HEAD_BYTES = 256 * 1024;
+    /** A log of the session may be this much older than its start (the engine opens it as Wine starts). */
+    static final long OLD_SLACK_MS = 5000;
+
+    /** What {@link #copy} did. */
+    static final class Copied {
+        final List<File> copied = new ArrayList<>();
+        /** Written before the session began, so not about it (a traceback.txt of last month): not copied. */
+        final List<File> old = new ArrayList<>();
+    }
 
     private AgvnEngineLogs() {}
+
+    /** The log files the shortcut's game engine may write. */
+    static List<File> of(Shortcut shortcut) {
+        return candidates(exe(shortcut), gameDir(shortcut), shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE), profile(shortcut));
+    }
+
+    /** The game's exe as a file on the phone. */
+    static File exe(Shortcut shortcut) {
+        return new File(shortcut.path.replace("\"", ""));
+    }
+
+    /** The game's folder: the one it was imported from, else the exe's. */
+    static File gameDir(Shortcut shortcut) {
+        String path = shortcut.getExtra(AgvnGameImporter.EXTRA_GAME_DIR);
+        return !path.isEmpty() ? new File(path) : exe(shortcut).getParentFile();
+    }
+
+    /** Windows' users/xuser of the game's container. */
+    private static File profile(Shortcut shortcut) {
+        return new File(shortcut.container.getRootDir(), ".wine/drive_c/users/" + ImageFs.USER);
+    }
+
+    /**
+     * Folders searched for the engine's logs when the session ends, as their names are the project's, which only the
+     * game knows: a Godot game's %APPDATA% ({@link AgvnGodotFiles#logs}).
+     */
+    static List<File> scanned(Shortcut shortcut) {
+        List<File> out = new ArrayList<>();
+        if ("GODOT".equals(shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE))) out.add(new File(profile(shortcut), "AppData/Roaming"));
+        return out;
+    }
 
     /** Files the engine may write; missing ones are skipped when copying. {@code profile} = Windows users/xuser. */
     static List<File> candidates(File exe, File gameDir, String engine, File profile) {
@@ -53,23 +100,59 @@ final class AgvnEngineLogs {
                 break;
         }
         out.add(new File(exeDir, "Log.txt")); // DxLib (WOLF RPG and many doujin engines) logs next to the exe
+        out.add(new File(exeDir, "BepInEx/LogOutput.log")); // mod loaders next to the exe: BepInEx (winhttp.dll),
+        out.add(new File(exeDir, "MelonLoader/Latest.log")); // MelonLoader (version.dll)
+        out.add(new File(exeDir, "ue4ss/UE4SS.log")); // and UE4SS (dwmapi.dll) of Unreal games
+        out.add(new File(exeDir, "AGVN-cheat.log")); // AGVN's cheat (agvncheat.dll) of AGVN game packages
         return out;
     }
 
-    /** Copies each existing candidate into {@code dir} (a big one shortened), returns how many were copied. */
-    static int copy(List<File> files, File dir) {
-        int copied = 0;
+    /**
+     * Copies each existing candidate into {@code dir} (a big one shortened). Leaves out a file last written before
+     * {@code sinceMs} (0: no limit), and a file already met under another name: on /sdcard, Ren'Py's "log.txt" and
+     * DxLib's "Log.txt" are one file.
+     */
+    static Copied copy(List<File> files, File dir, long sinceMs) {
+        Copied result = new Copied();
+        List<File> seen = new ArrayList<>();
         for (File src : files) {
-            if (!src.isFile()) continue;
+            if (!src.isFile() || sameAsAny(src, seen)) continue;
+            seen.add(src);
+            if (sinceMs > 0 && src.lastModified() < sinceMs - OLD_SLACK_MS) {
+                result.old.add(src);
+                continue;
+            }
             String name = uniqueName(dir, src.getName());
             try (OutputStream out = new FileOutputStream(new File(dir, name))) {
                 copyShortened(src, out);
-                copied++;
+                result.copied.add(src);
             } catch (IOException ignored) {
                 // an unreadable log is skipped; the summary still lists the session
             }
         }
-        return copied;
+        return result;
+    }
+
+    /** For the summary: "traceback.txt (cũ, 22/08/2026 – không phải lỗi phiên này)", or "" when none was old. */
+    static String oldNote(List<File> old) {
+        StringBuilder sb = new StringBuilder();
+        SimpleDateFormat day = new SimpleDateFormat("dd/MM/yyyy", Locale.ROOT);
+        for (File f : old) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append(f.getName()).append(" (cũ, ").append(day.format(new Date(f.lastModified()))).append(" – không phải lỗi phiên này)");
+        }
+        return sb.toString();
+    }
+
+    private static boolean sameAsAny(File file, List<File> seen) {
+        for (File other : seen) {
+            try {
+                if (Files.isSameFile(file.toPath(), other.toPath())) return true;
+            } catch (IOException | RuntimeException ignored) {
+                // cannot tell: copy both
+            }
+        }
+        return false;
     }
 
     private static String uniqueName(File dir, String name) {

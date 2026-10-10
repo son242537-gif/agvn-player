@@ -1,19 +1,22 @@
 {
-  "comment": "Ordered rules, first match wins. GPU renderer is checked first, then SoC model (Build.SOC_MODEL / ro.soc.model), then RAM caps the result. RAM thresholds use the kernel-reported total (an advertised 8 GB phone reports about 7.3 GB).",
+  "comment": "Ordered rules, first match wins (case-insensitive, anywhere in the text). GPU = the system Vulkan device name (\"Adreno (TM) 642L\", \"Mali-G610 MC6\"); then SoC model (Build.SOC_MODEL / ro.soc.model) when the GPU matches nothing; then RAM caps the result. RAM thresholds use the kernel-reported total (an advertised 8 GB phone reports about 7.3 GB). Adreno numbers are not generations: 725-750 are the 8 Gen 1-3 (and 7+ Gen 2-3) flagships, 810 is a 7s Gen 3 / 6 Gen 4 mid-range GPU, 70x are entry level. Mali G610/G615 count as Trung binh only with 6 or more cores (Dimensity 8100-8300). See docs/agvn/hieu-nang-moi-may.md.",
   "gpus": [
-    {"pattern": "Adreno.*\\b8\\d\\d\\b", "tier": "FLAGSHIP"},
-    {"pattern": "Adreno.*\\b7\\d\\d\\b", "tier": "TRUNG_BINH"},
-    {"pattern": "Adreno.*\\b[1-6]\\d\\d\\b", "tier": "YEU"},
-    {"pattern": "Immortalis|Mali-G7[12]\\d|Mali-G9\\d\\d", "tier": "TRUNG_BINH"},
-    {"pattern": "Xclipse", "tier": "TRUNG_BINH"},
+    {"pattern": "Adreno\\D*(725|73\\d|74\\d|75\\d|8[2-9]\\d)(?!\\d)", "tier": "FLAGSHIP"},
+    {"pattern": "Adreno\\D*(70\\d|[1-6]\\d\\d)(?!\\d)", "tier": "YEU"},
+    {"pattern": "Adreno\\D*[78]\\d\\d(?!\\d)", "tier": "TRUNG_BINH"},
+    {"pattern": "Mali-G6[1-9]\\d\\D*MC([6-9]|\\d\\d)", "tier": "TRUNG_BINH"},
+    {"pattern": "Immortalis|Mali-G7[1-9]\\d|Mali-G9\\d\\d", "tier": "TRUNG_BINH"},
+    {"pattern": "Xclipse|Maleoon|DXT-(48|72)", "tier": "TRUNG_BINH"},
     {"pattern": "Mali|PowerVR|IMG", "tier": "YEU"}
   ],
   "socs": [
-    {"pattern": "^SM8\\d{3}", "tier": "FLAGSHIP"},
-    {"pattern": "^SM7\\d{3}", "tier": "TRUNG_BINH"},
-    {"pattern": "^SM[46]\\d{3}", "tier": "YEU"},
-    {"pattern": "^MT69[89]\\d", "tier": "TRUNG_BINH"},
-    {"pattern": "^MT6\\d{3}", "tier": "YEU"}
+    {"pattern": "^SM8[4-9]\\d\\d", "tier": "FLAGSHIP"},
+    {"pattern": "^SM7(435|47\\d|[5-9]\\d\\d)|^SM6(4[5-9]|[5-9]\\d)\\d", "tier": "TRUNG_BINH"},
+    {"pattern": "^SM\\d{4}", "tier": "YEU"},
+    {"pattern": "^MT69[89]\\d|^MT689[5-9]", "tier": "TRUNG_BINH"},
+    {"pattern": "^MT\\d{4}", "tier": "YEU"},
+    {"pattern": "^s5e99\\d\\d|^Exynos ?2\\d{3}", "tier": "TRUNG_BINH"},
+    {"pattern": "^s5e\\d|^Exynos|^ums\\d|^T\\d{3,4}$", "tier": "YEU"}
   ],
   "ram": {"flagshipMinMb": 7000, "trungBinhMinMb": 5000},
   "presets": {

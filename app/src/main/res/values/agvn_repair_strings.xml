@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN: "Tự sửa lỗi" for what the player reports (agvn/AgvnRepair*), and its fixes. Copyright (c) 2026 agvn.io — MIT License. -->
+<resources>
+    <string name="agvn_repair_title">Tự sửa lỗi</string>
+    <string name="agvn_repair_pick">Game đang bị gì?</string>
+    <string name="agvn_repair_plan">App sẽ thử lần lượt từng cách dưới đây, mỗi lần một cách: game mở lại, bạn chơi thử, rồi app hỏi còn lỗi không. Cách không giúp được, app trả cấu hình về như cũ trước khi thử cách sau.</string>
+    <string name="agvn_repair_none">App đã thử hết cách trong app cho lỗi này. Cấu hình của game đã về như trước khi sửa. Bấm \"Gửi nhật ký\" để AGVN xem giúp.</string>
+    <string name="agvn_repair_no_fix">App chưa có cách sửa nào cho lỗi này với game này. Bấm \"Gửi nhật ký\" để AGVN xem giúp.</string>
+    <string name="agvn_repair_start">Thử cách 1: %1$s</string>
+    <string name="agvn_repair_trying">Đang thử: %1$s. Game đang mở lại…</string>
+    <string name="agvn_repair_status">App đang thử cách sửa: %1$s. Lỗi còn không?</string>
+    <string name="agvn_repair_not_run">App đã đặt cách sửa: %1$s, nhưng game chưa chạy lại với cách này. Mở game để thử; chơi một lúc, app sẽ hỏi lỗi còn không.</string>
+    <string name="agvn_repair_play">Chơi thử với cách này</string>
+    <string name="agvn_repair_ask_title">Còn lỗi \"%1$s\" không?</string>
+    <string name="agvn_repair_ask_detail">App đang thử cách sửa: %1$s. Chơi thử một lúc rồi trả lời giúp app.</string>
+    <string name="agvn_repair_gone">Hết lỗi rồi</string>
+    <string name="agvn_repair_still">Vẫn còn lỗi</string>
+    <string name="agvn_repair_later">Hỏi lần sau</string>
+    <string name="agvn_repair_other">Chọn lỗi khác</string>
+    <string name="agvn_repair_kept">Đã giữ cách sửa: %1$s</string>
+    <string name="agvn_repair_done_title">Đã thử hết cách trong app</string>
+    <string name="agvn_repair_off_title">Chưa thử được: %1$s</string>
+    <string name="agvn_repair_off_detail">Game không chạy với cách đang thử (%1$s): cài đặt của game đã đổi sau khi bật cách này. App chưa tính là đã thử cách này.</string>
+    <string name="agvn_repair_off_try">Thử: %1$s</string>
+    <string name="agvn_bar_repair_label">🩺 Tự sửa</string>
+    <string name="agvn_bar_repair">Tự sửa lỗi: chọn lỗi game đang gặp</string>
+
+    <string name="agvn_fix_render_sysmem">Cho Turnip vẽ cả khung hình trong bộ nhớ (sysmem)</string>
+    <string name="agvn_fix_turnip_nolrz">Tắt LRZ của Turnip (sửa đốm đen, hình chập chờn)</string>
+    <string name="agvn_fix_turnip_noubwc">Tắt nén hình UBWC của Turnip (sửa mảng đen, sọc, sai màu)</string>
+    <string name="agvn_fix_async_off">Tắt DXVK async (hết nhấp nháy, lúc đầu có thể giật hơn)</string>
+    <string name="agvn_fix_bcn_full">Giải nén mọi texture BCn (sửa texture đen, mất hình)</string>
+    <string name="agvn_fix_unity_quality_own">Để game Unity tự chọn chất lượng hình</string>
+    <string name="agvn_fix_audio">Đổi cách phát tiếng sang %1$s</string>
+    <string name="agvn_fix_locale_ja">Chạy game bằng tiếng Nhật (sửa chữ lỗi của game Nhật)</string>
+    <string name="agvn_fix_locale_zh">Chạy game bằng tiếng Trung (sửa chữ lỗi của game Trung)</string>
+    <string name="agvn_fix_godot_light">Chạy nhẹ: chạy game Godot thẳng trên Android, không qua Wine (mượt hơn nhiều)</string>
+    <string name="agvn_fix_godot_light_gl">Cho game Godot (Chạy nhẹ) vẽ bằng OpenGL</string>
+    <string name="agvn_fix_godot_light_vulkan">Cho game Godot (Chạy nhẹ) vẽ bằng Vulkan</string>
+    <string name="agvn_fix_mods_off">Chạy game không có mod (%1$s), như bản gốc; file của game giữ nguyên</string>
+    <string name="agvn_fix_raw_mouse">Gửi cú chạm như chuột thật (cho game chỉ đọc chuột thật, như game Unity dùng Input System)</string>
+    <string name="agvn_fix_raw_mouse_off">Gửi cú chạm như trước (như các game khác)</string>
+</resources>

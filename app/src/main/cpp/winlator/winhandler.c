@@ -33,6 +33,9 @@
 #define RC_KEYBOARD_EVENT 11
 #define RC_BRING_TO_FRONT 12
 #define RC_CURSOR_POS_FEEDBACK 13
+/* AGVN: the mouse at a pixel of the screen, with its buttons; and this winhandler's version, sent after RC_INIT */
+#define RC_AGVN_POINTER 14
+#define AGVN_VERSION 1
 
 #pragma pack(push, 1)
 typedef struct {
@@ -320,6 +323,27 @@ void handleInput(const char *buffer, int len) {
     BYTE vkey = (BYTE)buffer[1];
     int flags = *(int *)(buffer + 2);
     keybd_event(vkey, 0, flags, 0);
+  } else if (code == RC_AGVN_POINTER && len >= 11) {
+    /* AGVN: a touch as a real mouse. One SendInput moves the cursor to the
+       pixel (x, y) and presses or releases its buttons there, so the game gets
+       WM_INPUT too: Unity's Input System reads the mouse only from raw input,
+       which Wine makes from SendInput but not from the X server's core pointer
+       events (the X server has no XInput2). */
+    int flags = *(int *)(buffer + 1);
+    short x = *(short *)(buffer + 5);
+    short y = *(short *)(buffer + 7);
+    short wheel = *(short *)(buffer + 9);
+    int w = GetSystemMetrics(SM_CXSCREEN), h = GetSystemMetrics(SM_CYSCREEN);
+    INPUT in;
+    ZeroMemory(&in, sizeof(in));
+    in.type = INPUT_MOUSE;
+    /* Wine maps 0..65535 to the screen as (v * size) >> 16: rounding up
+       lands on the pixel itself */
+    in.mi.dx = w > 0 ? (LONG)(((LONGLONG)x * 65536 + w - 1) / w) : 0;
+    in.mi.dy = h > 0 ? (LONG)(((LONGLONG)y * 65536 + h - 1) / h) : 0;
+    in.mi.mouseData = (DWORD)(LONG)wheel;
+    in.mi.dwFlags = (DWORD)flags | MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
+    SendInput(1, &in, sizeof(in));
   }
 }
 
@@ -352,7 +376,8 @@ DWORD WINAPI ServerThread(LPVOID lpParam) {
 
   char initBuffer[64];
   initBuffer[0] = RC_INIT;
-  sendto(sock, initBuffer, 1, 0, (struct sockaddr *)&clientAddr, clientAddrLen);
+  initBuffer[1] = AGVN_VERSION; /* AGVN: Winlator's app reads only the code */
+  sendto(sock, initBuffer, 2, 0, (struct sockaddr *)&clientAddr, clientAddrLen);
 
   char buffer[BUFFER_SIZE];
   while (running) {
@@ -384,6 +409,7 @@ DWORD WINAPI ServerThread(LPVOID lpParam) {
         break;
       case RC_MOUSE_EVENT:
       case RC_KEYBOARD_EVENT:
+      case RC_AGVN_POINTER:
         handleInput(buffer, len);
         break;
       case RC_BRING_TO_FRONT:
@@ -433,23 +459,28 @@ void handleChildProcesses(int affinityMask) {
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    LPSTR lpCmdLine, int nCmdShow) {
   int affinity = 0;
-  char *directory = NULL;
-  char *executable = "wfm.exe";
-  char *params = NULL;
+  /* AGVN: the command line as Unicode. __argv is in the Windows code page,
+     which loses the letters beyond it: a game in ".../Lifeguard Holic Viet
+     Hoa/GAMEHUB" (with its accents) got "File not found." (10/10/2026),
+     while GameHub opened it. */
+  LPCWSTR directory = NULL;
+  LPCWSTR executable = L"wfm.exe";
 
-  int argc = __argc;
-  char **argv = __argv;
+  int argc = 0;
+  LPWSTR *argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+  if (argv == NULL)
+    argc = 0;
 
   int argIdx = 1;
   while (argIdx < argc) {
-    if (strcmp(argv[argIdx], "/affinity") == 0) {
+    if (wcscmp(argv[argIdx], L"/affinity") == 0) {
       if (argIdx + 1 < argc) {
-        affinity = (int)strtol(argv[argIdx + 1], NULL, 16);
+        affinity = (int)wcstol(argv[argIdx + 1], NULL, 16);
         argIdx += 2;
       } else {
         argIdx++;
       }
-    } else if (strcmp(argv[argIdx], "/dir") == 0) {
+    } else if (wcscmp(argv[argIdx], L"/dir") == 0) {
       if (argIdx + 1 < argc) {
         directory = argv[argIdx + 1];
         argIdx += 2;
@@ -463,24 +494,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
   }
 
-  char execArgs[2048] = {0};
-  if (argIdx < argc) {
-    for (int i = argIdx; i < argc; i++) {
-      strcat(execArgs, "\"");
-      strcat(execArgs, argv[i]);
-      strcat(execArgs, "\" ");
-    }
+  WCHAR execArgs[4096] = {0};
+  size_t used = 0;
+  for (int i = argIdx; i < argc; i++) {
+    size_t len = wcslen(argv[i]);
+    if (used + len + 4 > sizeof(execArgs) / sizeof(execArgs[0]))
+      break; /* AGVN: the arguments that fit, never past the buffer */
+    execArgs[used++] = L'"';
+    wcscpy(execArgs + used, argv[i]);
+    used += len;
+    execArgs[used++] = L'"';
+    execArgs[used++] = L' ';
+    execArgs[used] = 0;
   }
 
-  SHELLEXECUTEINFOA sei = {0};
-  sei.cbSize = sizeof(SHELLEXECUTEINFOA);
+  SHELLEXECUTEINFOW sei = {0};
+  sei.cbSize = sizeof(SHELLEXECUTEINFOW);
   sei.fMask = SEE_MASK_NOCLOSEPROCESS;
   sei.lpFile = executable;
   sei.lpParameters = execArgs[0] ? execArgs : NULL;
   sei.lpDirectory = directory;
   sei.nShow = SW_SHOW;
 
-  ShellExecuteExA(&sei);
+  ShellExecuteExW(&sei);
   if (sei.hProcess)
     CloseHandle(sei.hProcess);
 

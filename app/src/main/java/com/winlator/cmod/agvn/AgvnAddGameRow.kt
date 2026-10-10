@@ -1,7 +1,6 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -34,7 +33,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.winlator.cmod.R
-import com.winlator.cmod.core.ExeIconExtractor
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
@@ -97,12 +95,15 @@ fun AgvnAddGameRow(entry: AgvnImportEntry, icons: HashMap<String, ImageBitmap?>,
     }
 }
 
-/** The exe icon (loaded lazily, cached per screen) or a coloured tile with the title's first letter. */
+/**
+ * The game's icon (loaded lazily, cached per screen): for Ren'Py and RPG Maker its own picture rather than the engine's
+ * exe icon (AgvnGameIcons), else the exe icon; a coloured tile with the title's first letter when there is none.
+ */
 @Composable
 private fun GameThumb(entry: AgvnImportEntry, icons: HashMap<String, ImageBitmap?>) {
     val key = entry.key
     val icon by produceState(icons[key], key) {
-        if (icons.containsKey(key) || entry.exe == null) return@produceState
+        if (icons.containsKey(key)) return@produceState
         val loaded = withContext(iconDispatcher) { loadIcon(entry) }
         icons[key] = loaded
         value = loaded
@@ -121,15 +122,8 @@ private fun GameThumb(entry: AgvnImportEntry, icons: HashMap<String, ImageBitmap
     }
 }
 
-private fun loadIcon(entry: AgvnImportEntry): ImageBitmap? {
-    val exe = entry.exe ?: return null
-    if (!exe.isFile) return null
-    return try {
-        val full = ExeIconExtractor.extractBitmap(exe) ?: return null
-        val small = if (full.width > ICON_PX || full.height > ICON_PX) Bitmap.createScaledBitmap(full, ICON_PX, ICON_PX, true) else full
-        if (small !== full) full.recycle()
-        small.asImageBitmap()
-    } catch (t: Throwable) {
-        null
-    }
+private fun loadIcon(entry: AgvnImportEntry): ImageBitmap? = try {
+    AgvnGameIcons.make(entry.dir, entry.engine, entry.exe, ICON_PX)?.asImageBitmap()
+} catch (t: Throwable) {
+    null
 }

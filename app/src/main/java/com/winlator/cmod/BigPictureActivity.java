@@ -1338,6 +1338,7 @@ public class BigPictureActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        com.winlator.cmod.agvn.AgvnDoctorDialog.checkAsync(this); // AGVN: ask about the last game's problem ("Tự sửa lỗi")
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isBgMusicEnabled = preferences.getBoolean("bg_music_enabled", true);
         String musicSource = preferences.getString("music_source", "mp3"); // Default to "mp3"
