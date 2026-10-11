@@ -1,0 +1,7 @@
+AGVN Player v0.1.39 - agvn.io
+
+Mới:
+- Toàn màn hình cho mọi game: vào Cài đặt → "MÀN HÌNH GAME" → bật "Toàn màn hình cho mọi game". Hình game kéo kín màn hình điện thoại, không còn viền đen hai bên (hình hơi bè ngang một chút). Áp cho game Windows, RPG Maker, Ren'Py và Godot. Mặc định tắt. Game nào muốn giữ tỷ lệ thì tắt "Kéo giãn toàn màn hình" trong cài đặt riêng của game đó.
+Sửa lỗi:
+- Bấm "Thoát" trong menu khi đang chơi giờ để game tự đóng và lưu như khi tắt trên máy tính, rồi mới tắt hẳn. Trước đây game bị tắt ngay nên có thể mất tiến độ chưa kịp lưu (nhất là game Unity), mở lại thấy save cũ. Game hỏi "Thoát không?" thì app vẫn tắt ngay như trước.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
