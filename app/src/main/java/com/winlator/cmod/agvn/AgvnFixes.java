@@ -69,6 +69,14 @@ final class AgvnFixes {
         return fixes;
     }
 
+    /**
+     * "Chạy bằng Wine cũ (Proton 9)" for a game on Proton 10 that has not tried it yet, or null: the black-screen bar
+     * offers it once "Đồng bộ khung hình" did not help ({@link AgvnBlackScreen}).
+     */
+    static Fix wineOld(Activity a, Shortcut s, Properties state) {
+        return AgvnGoodConfig.tried(state).contains("wine-old") ? null : make(a, s, null, state, "wine-old");
+    }
+
     private static Fix make(Activity a, Shortcut s, AgvnProblemCatalog.Finding finding, Properties state, String id) {
         String runner = s.getExtra(AgvnHtmlGame.EXTRA_RUNNER);
         boolean light = AgvnHtmlGame.isLight(runner);

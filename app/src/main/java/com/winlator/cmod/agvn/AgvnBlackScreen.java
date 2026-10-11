@@ -134,18 +134,35 @@ public final class AgvnBlackScreen {
         String bigger = AgvnBlackScreenRules.bigger(screen, s.getExtra(AgvnKirikiri.EXTRA_GAME_SIZE),
                 follows ? null : window, refused);
         boolean sync = bigger == null && AgvnPresentSync.offerable(s);
+        // still black with frame sync on (or nothing else to offer): a game on Proton 10 may want Proton 9 back
+        java.util.Properties state = AgvnGoodConfig.load(activity, s);
+        AgvnFixes.Fix wineOld = bigger == null && !sync ? AgvnFixes.wineOld(activity, s, state) : null;
         long seconds = elapsedMs / 1000;
         String frame = window != null ? window[2] + "x" + window[3] : "?";
         AgvnSessionLog.event("Màn hình đen sau " + seconds + " giây, màn hình " + screen + ", khung game " + frame
                 + (refused ? ", Wine từ chối độ phân giải game xin" : "")
                 + (bigger != null ? ": hỏi đổi sang " + bigger
-                : sync ? ": hỏi bật đồng bộ khung hình" : ": không hỏi")
-                + (ask || bigger == null && !sync ? "" : " (không hiện thanh: game đã chọn \"Để vậy, không hỏi lại\")"));
+                : sync ? ": hỏi bật đồng bộ khung hình"
+                : wineOld != null ? ": hỏi chạy bằng Wine cũ (Proton 9)" : ": không hỏi")
+                + (ask || bigger == null && !sync && wineOld == null ? ""
+                : " (không hiện thanh: game đã chọn \"Để vậy, không hỏi lại\")"));
         Log.i(TAG, "black screen after " + seconds + " s on " + screen + ", window " + frame
-                + (refused ? ", mode refused" : "") + ", offer " + (sync ? "frame sync" : bigger) + (ask ? "" : ", not asked"));
+                + (refused ? ", mode refused" : "") + ", offer " + (sync ? "frame sync" : bigger != null ? bigger
+                : wineOld != null ? "Proton 9" : null) + (ask ? "" : ", not asked"));
         if (!ask) return; // "Để vậy, không hỏi lại"
         if (bigger != null) offerScreen(s, bigger, screen, seconds, refused);
         else if (sync) offerSync(s, seconds);
+        else if (wineOld != null) offerWineOld(s, wineOld, state, seconds);
+    }
+
+    /** Black on Proton 10 with frame sync on: the game back on Proton 9, its saves with it (AgvnGameMove). */
+    private void offerWineOld(Shortcut s, AgvnFixes.Fix fix, java.util.Properties state, long seconds) {
+        String detail = activity.getString(R.string.agvn_black_wine_old_detail, seconds)
+                + "\n" + activity.getString(R.string.agvn_doctor_lead);
+        show(s, detail, new AgvnWarningBar.Choice(fix.label, () -> {
+            if (AgvnFixApply.apply(activity, s, fix, state))
+                AgvnSlowBar.offerRestart(activity, s, fix.label, activity::agvnExit);
+        }));
     }
 
     /** The watch ended on a black window it did not ask about: why, in su-kien.txt, for "Gửi nhật ký". */

@@ -586,6 +586,13 @@ màn hình thì Wine trả lỗi -2, và game không vẽ gì nữa. `AgvnBlackS
   khung hình" (`AgvnPresentSync`). Bấm thì cài đặt đồ họa của game có `syncFrame=1` và `disablePresentWait=1`, rồi "Mở
   lại game ngay". Người chơi tắt lại được trong cài đặt game. Bản 0.1.18 tự bật hai mục này cho mọi game DirectX trên
   máy dưới 9 GB RAM không dùng Turnip, nên cả game vẫn chạy tốt cũng mất khung hình. Bản sau chỉ đề nghị khi game đen.
+- Game chạy Proton 10 vẫn đen khi "Đồng bộ khung hình" đã bật (hoặc không có gì khác để đề nghị): thanh đề nghị "Chạy
+  bằng Wine cũ (Proton 9)" (từ bản 0.1.40, `AgvnFixes.wineOld`). Bấm thì game về container Proton 9 ở lần mở sau, cùng save
+  trong thư mục Windows (`AgvnGameMove`), và Proton 10 không được đề nghị lại cho game đó. Phiếu ngày 12/10: Xung Đột Bại
+  Đức (HaitokunoShoudou.exe, DirectX 11, khung 854×480 kín màn) trên Galaxy S20 FE (Adreno 650), bản 0.1.38, chạy Proton
+  10: chỉ vẽ 2 khung rồi đen; bật đồng bộ khung hình, đổi Đồ họa, đổi DXVK 1.10.3 đều không giúp, và từ lần mở thứ hai
+  thanh không hỏi gì nữa. Không đưa vào "Tự sửa lỗi" cho lỗi người chơi báo: vòng thử ở đó trả cấu hình về nếu không giúp,
+  mà chuyển Wine thì không trả về được (`AgvnRepairTest`).
 - Khung game lớn theo màn hình (xem trên) thì không được đề nghị màn hình cỡ khung nữa.
 - Lúc app dừng game (người chơi rời app hoặc tắt màn hình, hay bấm nút tạm dừng ⏸ ở thanh bên), app không đọc hình,
   và khoảng đó không tính vào thời gian chờ và thời gian canh (`AgvnGamePause`). Trước đây, game đang đen lúc tải mà
@@ -1028,6 +1035,8 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
 - [ ] Bản 0.1.39, Cài đặt → "Toàn màn hình cho mọi game" bật: game Windows, RPG Maker XP/VX (Chạy nhẹ), RPG Maker
       MV/MZ, Ren'Py và Godot (Chạy nhẹ) đều kín màn hình, không viền đen; chạm vào nút ở mép phải và mép dưới vẫn trúng.
       Một game chọn tắt "Kéo giãn toàn màn hình" trong cài đặt game thì vẫn giữ tỉ lệ. Tắt công tắc: mọi game như cũ.
+- [ ] Bản 0.1.40, game DirectX chạy Proton 10 đen màn hình: lần đầu thanh hỏi "Bật Đồng bộ khung hình"; bật mà vẫn đen
+      thì lần sau thanh hỏi "Chạy bằng Wine cũ (Proton 9)". Bấm, mở lại: `moi-truong.txt` là Proton 9, save còn.
 - [ ] Bản 0.1.39, game Unity lưu bằng PlayerPrefs: chơi, lưu, bấm "Thoát" ngay. `su-kien.txt` có `Thoát: game tự
       đóng sau … ms`; mở lại game thì save còn. Game KiriKiri hỏi khi đóng: app tắt game ngay, không treo.
 - [ ] Bản 0.1.32, bàn phím Bluetooth hoặc bộ thu USB: `thiet-bi.txt` có dòng `Bàn phím, chuột, tay cầm ngoài: …`.
