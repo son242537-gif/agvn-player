@@ -413,6 +413,24 @@ Từ bản 0.1.37 (`AgvnStarter`). Ngày 10/10/2026, game "GAMEHUB" (Lifeguard H
 - **Nhật ký:** `su-kien.txt` có dòng `Đường dẫn game có chữ ngoài ASCII (ệ, ó): mở game bằng agvn-winhandler.exe…`, và
   dòng `File chạy: …` có `chữ ngoài ASCII: …`.
 
+## Thoát game: để game tự đóng và lưu (game Windows)
+
+Từ bản 0.1.39 (`AgvnGracefulExit`). Phiếu ngày 08/10/2026: khách cập nhật AGVN Player rồi mở lại game thì mất save.
+
+- **Cập nhật app không xoá save:** mọi bản từ 0.1.4 cùng một khoá ký, cài đè giữ nguyên dữ liệu; imagefs không cài
+  lại (giữ `home`), container và prefix Wine không bị tạo lại.
+- **Lỗi thật:** nút "Thoát" trong menu tắt Wine ngay (SIGKILL trình chạy, SIGTERM các tiến trình Wine), game không được
+  đóng như trên PC. Unity chỉ ghi PlayerPrefs (nhiều game Unity cất tiến độ ở đó) vào registry khi nó thoát; game khác
+  cũng hay lưu lúc đóng. Tiến độ chưa ghi bị mất, và lần mở sau (thường là sau khi cập nhật app) khách thấy save cũ.
+- **Cách sửa:** "Thoát" gửi cho cửa sổ game `WM_DELETE_WINDOW` (như nút X của trình quản lý cửa sổ; Wine đổi thành
+  `WM_CLOSE`). App chờ tối đa 5 giây, rồi tắt Wine như trước. Hết chờ sớm khi cửa sổ và tiến trình của game đều không còn,
+  hoặc khi game mở thêm một cửa sổ (hộp "thoát không?" của KiriKiri...): khi đó app tắt game ngay như trước. Game đang
+  tạm dừng (⏸) được chạy lại để trả lời.
+- **Cái giá:** game hỏi xác nhận ngay trong màn chơi (Ren'Py chạy bằng Windows) phải chờ đủ 5 giây mới tắt. Các cách
+  tắt khác (hết RAM, game treo, chuyển sang Proton 10) vẫn tắt ngay.
+- **Nhật ký:** `su-kien.txt` có `Thoát: game tự đóng sau … ms`, `Thoát: game mở hộp hỏi khi đóng, app tắt game` hoặc
+  `Thoát: game không tự đóng sau 5 giây, app tắt game`.
+
 ## Bàn phím, chuột ngoài (game Windows)
 
 Từ bản 0.1.32 (`AgvnInputDevices`). Phiếu ngày 08/10/2026: Av Director Life (Unreal) trên Lenovo TB321FU, bản 0.1.30.
@@ -985,6 +1003,8 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
 - [ ] Bản 0.1.33, một game Unity đã chơi có save, thêm bản mới của nó ở thư mục khác: thông báo "Đây là bản mới
       của …"; bản mới cùng container với bản cũ, vào game thấy save cũ. Game RPG Maker MV: thư mục `www/save` của bản
       mới có các file save của bản cũ. Thêm một game khác hẳn: vẫn vào Proton 10 như trước.
+- [ ] Bản 0.1.39, game Unity lưu bằng PlayerPrefs: chơi, lưu, bấm "Thoát" ngay. `su-kien.txt` có `Thoát: game tự
+      đóng sau … ms`; mở lại game thì save còn. Game KiriKiri hỏi khi đóng: app tắt game ngay, không treo.
 - [ ] Bản 0.1.32, bàn phím Bluetooth hoặc bộ thu USB: `thiet-bi.txt` có dòng `Bàn phím, chuột, tay cầm ngoài: …`.
       Trong game Windows gõ chữ, mũi tên, Enter, Esc được; `su-kien.txt` có `Bàn phím "…": phím tới game`. Bàn phím mà
       dòng đó ghi "Android gọi là tay cầm" (như của Av Director Life) cũng vậy.

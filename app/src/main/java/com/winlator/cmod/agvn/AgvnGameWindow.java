@@ -45,6 +45,19 @@ final class AgvnGameWindow {
         return best;
     }
 
+    /** How many game windows {@link #find} weighs: one more after a close request means a "quit?" box. */
+    static int count(Window root) {
+        int n = 0;
+        ArrayDeque<Window> todo = new ArrayDeque<>(root.getChildren());
+        while (!todo.isEmpty()) {
+            Window w = todo.pop();
+            if (!w.attributes.isMapped()) continue;
+            if (!starter(w.getClassName()) && w.isApplicationWindow()) n++;
+            else todo.addAll(w.getChildren());
+        }
+        return n;
+    }
+
     /** The game window {@code w} is part of (itself or an ancestor, as {@link #find} counts them), or null. */
     static Window topLevel(Window w) {
         for (Window p = w; p != null; p = p.getParent())

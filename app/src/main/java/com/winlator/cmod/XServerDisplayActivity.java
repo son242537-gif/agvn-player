@@ -225,6 +225,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private volatile com.winlator.cmod.agvn.AgvnStartupProgress agvnStartup;
     private String agvnEffectiveExePath; // AGVN: exe actually launched (Unreal bootstrap -> Shipping redirect)
     private String agvnStarter = com.winlator.cmod.agvn.AgvnRawMouse.WINLATOR_EXE; // AGVN: or agvn-winhandler.exe
+    private boolean agvnClosing; // AGVN: "Thoát" waits for the game to close (AgvnGracefulExit)
 
     private SensorManager sensorManager;
 
@@ -1715,7 +1716,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (btItemExit != null) {
             btItemExit.setOnClickListener(v -> {
                 drawerLayout.closeDrawers();
-                exit();
+                agvnCloseGame(); // AGVN: the game closes as on a PC first, so it saves (AgvnGracefulExit)
             });
         }
     }
@@ -2842,6 +2843,20 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
     public void agvnExit() {
         exit();
+    }
+
+    /** AGVN: "Thoát": the game is asked to close and may save (a paused one is resumed to answer), then {@link #exit}. */
+    private void agvnCloseGame() {
+        if (agvnClosing || exiting.get()) return;
+        agvnClosing = true;
+        if (isPaused) {
+            com.winlator.cmod.agvn.AgvnGamePause.resumed();
+            ProcessHelper.resumeAllWineProcesses();
+            isPaused = false;
+        }
+        preloaderDialog.showOnUiThread(R.string.shutdown);
+        com.winlator.cmod.agvn.AgvnGracefulExit.close(xServer, handler, shortcut != null ? agvnExePath() : null,
+                this::exit);
     }
 
     // AGVN: rebuilds the sidebar profile list around the shown profile (its listener then re-applies that same profile)
