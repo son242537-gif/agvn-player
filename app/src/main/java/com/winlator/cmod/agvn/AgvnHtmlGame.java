@@ -73,6 +73,7 @@ public final class AgvnHtmlGame {
         String path = from != null ? from.getStringExtra("shortcut_path") : null;
         if (path == null || path.isEmpty()) return false;
         Map<String, String> extras = readExtras(new File(path));
+        AgvnFullscreen.forLight(activity, from, extras); // each runner's intent copies it from "from"
         if (RUNNER_RENPY.equals(extras.get(EXTRA_RUNNER))) return AgvnRenpyGame.start(activity, from, extras);
         if (RUNNER_RGSS.equals(extras.get(EXTRA_RUNNER))) return AgvnRgssFiles.start(activity, from, extras);
         String runner = extras.get(EXTRA_RUNNER);

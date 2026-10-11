@@ -50,7 +50,8 @@ public class AgvnRgssActivity extends SDLActivity {
         fpsFile = new File(runDir, "fps.txt");
         fpsFile.delete();
         if (dir != null) config = AgvnRgssFiles.prepare(this, new File(dir), driveC != null ? new File(driveC) : null, runDir,
-                getIntent().getBooleanExtra(EXTRA_FRAME_SKIP, false));
+                getIntent().getBooleanExtra(EXTRA_FRAME_SKIP, false),
+                getIntent().getBooleanExtra(AgvnFullscreen.INTENT, false));
         super.onCreate(savedInstanceState);
         if (mBrokenLibraries) return; // SDL shows its own error
         if (config == null) {

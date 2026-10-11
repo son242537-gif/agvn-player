@@ -20,6 +20,8 @@ final class AgvnRgssConfig {
     final List<File> rtpDirs = new ArrayList<>();
     /** RTP packs the game asks for that the phone does not have. */
     final List<String> missingRtp = new ArrayList<>();
+    /** The picture stretched over the whole screen ("Toàn màn hình cho mọi game", {@link AgvnFullscreen}). */
+    boolean stretch;
 
     AgvnRgssConfig(File gameDir, File agvnDir, File driveC) {
         this.gameDir = gameDir;
@@ -34,8 +36,9 @@ final class AgvnRgssConfig {
     }
 
     /**
-     * mkxp.json: full screen, picture scaled with its aspect ratio kept, the game's own frame rate, MIDI through the
-     * app's sound font, and mkxp-z's Win32API stand-ins (win32_wrap.rb) for scripts written for Windows.
+     * mkxp.json: full screen, picture scaled with its aspect ratio kept (stretched when {@link #stretch}), the game's
+     * own frame rate, MIDI through the app's sound font, and mkxp-z's Win32API stand-ins (win32_wrap.rb) for
+     * scripts written for Windows.
      * {@code frameSkip}: when the phone falls a whole frame behind, mkxp-z skips drawing one, so the game keeps its
      * speed instead of slowing down (no effect while the phone keeps up).
      */
@@ -45,7 +48,7 @@ final class AgvnRgssConfig {
         if (ini != null) field(sb, "execName", quote(ini.execName()));
         field(sb, "rgssVersion", String.valueOf(rgss));
         field(sb, "fullscreen", "true");
-        field(sb, "fixedAspectRatio", "true");
+        field(sb, "fixedAspectRatio", String.valueOf(!stretch)); // "Toàn màn hình cho mọi game" (AgvnFullscreen)
         field(sb, "smoothScaling", "1");
         field(sb, "vsync", "true");
         field(sb, "frameSkip", String.valueOf(frameSkip));

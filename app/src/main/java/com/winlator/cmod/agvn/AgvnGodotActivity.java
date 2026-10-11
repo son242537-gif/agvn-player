@@ -42,6 +42,8 @@ public class AgvnGodotActivity extends GodotActivity {
         gameDir = dir != null ? new File(dir) : null;
         AgvnGodotLight.setenv("AGVN_GODOT_APPDATA", intent.getStringExtra(EXTRA_APPDATA)); // read by the engine at its start
         AgvnGodotLight.setenv("AGVN_GODOT_EXECUTABLE", intent.getStringExtra(EXTRA_EXE));
+        // "Toàn màn hình cho mọi game" (AgvnFullscreen, engine patch 0005); set either way, the process may be reused
+        AgvnGodotLight.setenv("AGVN_GODOT_STRETCH", intent.getBooleanExtra(AgvnFullscreen.INTENT, false) ? "1" : "0");
         String log = intent.getStringExtra(EXTRA_LOG);
         if (log != null) {
             File file = new File(log);

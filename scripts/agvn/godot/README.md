@@ -50,8 +50,8 @@ kiểm tra:
 - thư viện chỉ cần các thư viện có sẵn trên Android, giống bản chính thức;
 - có các hàm JNI mà phần Java gọi;
 - không còn câu chặn gói game ngoài APK;
-- có các bản vá 0001–0003 (tìm chữ riêng của từng bản trong thư viện). Bản 0004 không thêm chữ nào, nhưng script dừng
-  ngay nếu một bản vá không áp được.
+- có các bản vá 0001–0003 và 0005 (tìm chữ riêng của từng bản trong thư viện). Bản 0004 không thêm chữ nào, nhưng
+  script dừng ngay nếu một bản vá không áp được.
 
 Đã so với bản chính thức 4.7.2: hai thư viện xuất đúng 1022 hàm như nhau.
 
@@ -77,6 +77,10 @@ kiểm tra:
    Godot bỏ qua class nào thiếu hai mục đó, nên script dùng class của game bị lỗi. Bản vá coi hai mục thiếu là
    `false`, giống Godot 4.3. Lý do: class GDScript chỉ trừu tượng được từ Godot 4.5 (`@abstract`), còn `is_tool` chỉ
    dùng trong editor.
+5. `0005-stretch-over-the-whole-screen`: khi có `AGVN_GODOT_STRETCH=1` ("Toàn màn hình cho mọi game" trong Cài đặt của
+   app, `AgvnFullscreen`), game giữ tỉ lệ khung hình (`display/window/stretch/aspect` là `keep`, `keep_width` hoặc
+   `keep_height`, nên có viền đen) được kéo giãn kín màn hình (`ignore`). Game đặt `expand` vốn đã kín màn nên giữ
+   nguyên. Game tự đổi cách co giãn trong script thì theo game.
 
 ## Cách chạy (Linux x86_64: máy cloud hoặc WSL)
 

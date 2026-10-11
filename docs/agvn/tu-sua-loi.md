@@ -482,6 +482,28 @@ app đọc file này cùng lý do Android ghi lại cho tiến trình đó. Th�
   lần trong một tiến trình. Yêu cầu mở lại chỉ có hiệu lực 2 phút: người chơi trả lời "không" khi Ren'Py hỏi thoát
   thì lần thoát sau game không tự mở lại.
 
+## Toàn màn hình cho mọi game
+
+Từ bản 0.1.39 (`AgvnFullscreen`). Anh Sơn yêu cầu ngày 11/10/2026: một nút cho mọi game chơi trong app hiện kín màn
+hình. Anh chọn kiểu "kéo giãn đầy màn" (hình bè ngang một chút, không mất phần nào của khung game), tắt sẵn.
+
+- **Ở đâu:** Cài đặt → "MÀN HÌNH GAME" → "Toàn màn hình cho mọi game" (`agvn_fullscreen_all`), tắt sẵn. Game đang
+  chạy tốt không đổi gì nếu người chơi không bật.
+- **Thứ tự:** lựa chọn riêng của game ("Kéo giãn toàn màn hình" trong cài đặt game, `fullscreenStretched` = "1" hay
+  "0") thắng; game chưa chọn thì theo môi trường chạy (container), rồi tới công tắc chung. Ô của game hiện đúng trạng
+  thái đang áp; người chơi đổi ô đó thì game có lựa chọn riêng từ đó.
+- **Từng cách chạy:**
+  - Game Windows: kéo giãn màn hình X như ô "Kéo giãn toàn màn hình" sẵn có (hình và cú chạm).
+  - RPG Maker XP/VX/VX Ace (mkxp-z): `fixedAspectRatio` = `false` trong `mkxp.json`.
+  - RPG Maker MV/MZ (trang HTML): `html-compat.js` phần 7 kéo canvas, video, hộp lỗi kín trang; cú chạm đổi về toạ độ
+    game theo từng chiều (`Graphics.pageToCanvasX/Y`). Thử: `node tools/agvn/tests/html_stretch_sim.js`. Game HTML
+    khác (không phải RPG Maker) tự lo khung hình của nó.
+  - Ren'Py: `main.py` của app đặt `config.adjust_view_size` thành cả màn hình, trừ khi game tự đặt. Đã đọc
+    `renpy/gl2/gl2draw.pyx`: khi có hàm này, Ren'Py không chừa viền, vẽ và đổi toạ độ chạm theo từng chiều.
+  - Godot: bản vá engine `0005` (`AGVN_GODOT_STRETCH`), xem `scripts/agvn/godot/README.md`.
+- **Cái giá:** hình bị bè ngang theo tỉ lệ màn máy (ví dụ khung 16:9 trên màn 20:9 rộng thêm khoảng 25%). Vì vậy là
+  công tắc người chơi tự bật, không bật sẵn.
+
 ## Vừa màn hình (game Windows)
 
 Nhiều game mở khung cố định, ví dụ 640×480 hoặc 1280×720. Khi màn hình game (mức "Đồ họa") khác cỡ khung đó, game
@@ -1003,6 +1025,9 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
 - [ ] Bản 0.1.33, một game Unity đã chơi có save, thêm bản mới của nó ở thư mục khác: thông báo "Đây là bản mới
       của …"; bản mới cùng container với bản cũ, vào game thấy save cũ. Game RPG Maker MV: thư mục `www/save` của bản
       mới có các file save của bản cũ. Thêm một game khác hẳn: vẫn vào Proton 10 như trước.
+- [ ] Bản 0.1.39, Cài đặt → "Toàn màn hình cho mọi game" bật: game Windows, RPG Maker XP/VX (Chạy nhẹ), RPG Maker
+      MV/MZ, Ren'Py và Godot (Chạy nhẹ) đều kín màn hình, không viền đen; chạm vào nút ở mép phải và mép dưới vẫn trúng.
+      Một game chọn tắt "Kéo giãn toàn màn hình" trong cài đặt game thì vẫn giữ tỉ lệ. Tắt công tắc: mọi game như cũ.
 - [ ] Bản 0.1.39, game Unity lưu bằng PlayerPrefs: chơi, lưu, bấm "Thoát" ngay. `su-kien.txt` có `Thoát: game tự
       đóng sau … ms`; mở lại game thì save còn. Game KiriKiri hỏi khi đóng: app tắt game ngay, không treo.
 - [ ] Bản 0.1.32, bàn phím Bluetooth hoặc bộ thu USB: `thiet-bi.txt` có dòng `Bàn phím, chuột, tay cầm ngoài: …`.

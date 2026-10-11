@@ -113,6 +113,7 @@ data class SettingsModel(
     val pauseWine: Boolean,
     val removeLoadingBar: Boolean,
     val gameSavesAllShortcuts: Boolean,
+    val fullscreenAll: Boolean,
     val wineDebug: Boolean,
     val wineDebugChannels: String,
     val winlatorLogs: Boolean,
@@ -223,6 +224,17 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
 
             item("appearance-title") { SectionTitle("GIAO DIỆN") }
             item("theme") { WinlatorThemePreferenceCard() }
+
+            item("game-screen-title") { SectionTitle("MÀN HÌNH GAME") }
+            item("game-screen") {
+                GroupCard {
+                    ToggleRow(
+                        "Toàn màn hình cho mọi game",
+                        model.fullscreenAll,
+                        "Kéo giãn hình game cho kín màn hình, không còn viền đen hai bên"
+                    ) { callbacks.onBooleanChanged(com.winlator.cmod.agvn.AgvnFullscreen.PREF, it) }
+                }
+            }
 
             item("game-saves-title") { SectionTitle("BẢN LƯU GAME") }
             item("game-saves") {

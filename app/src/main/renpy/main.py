@@ -6,6 +6,8 @@
 #   - AGVN_RENPY_NAME: the game's launcher name (MyGame.py next to MyGame.exe), which Ren'Py uses to find game/.
 #   - AGVN_RENPY_QUIT_FILE: the app creates this file for "Thoát game"; the game then quits as when its window is
 #     closed on a PC (its own question, persistent data saved).
+#   - AGVN_RENPY_STRETCH: "1" for "Toàn màn hình cho mọi game": the game is drawn over the whole screen, without the
+#     bars Ren'Py keeps at the sides, through config.adjust_view_size (unless the game sets that itself).
 # Then Ren'Py's renpy.py runs unchanged, in this module, so its path functions are the ones Ren'Py calls.
 
 import os
@@ -37,7 +39,26 @@ def watch_quit(path):
             time.sleep(2)
 
 
+def stretch_to_screen():
+    def whole(width, height):
+        return width, height
+
+    # Set as soon as Ren'Py's config has the setting, before the window is made. Ren'Py sets its config back to its
+    # defaults when it reloads a game, so this looks again now and then.
+    while True:
+        config = sys.modules.get("renpy.config")
+
+        if config is not None and hasattr(config, "adjust_view_size") and config.adjust_view_size is None:
+            config.adjust_view_size = whole
+
+        ready = config is not None and getattr(config, "adjust_view_size", None) is not None
+        time.sleep(1.0 if ready else 0.05)
+
+
 quit_file = os.environ.get("AGVN_RENPY_QUIT_FILE")
+
+if os.environ.get("AGVN_RENPY_STRETCH") == "1":
+    threading.Thread(target=stretch_to_screen, name="agvn-stretch", daemon=True).start()
 
 if quit_file:
     threading.Thread(target=watch_quit, args=(quit_file,), name="agvn-quit", daemon=True).start()

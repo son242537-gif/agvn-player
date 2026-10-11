@@ -431,6 +431,11 @@ Là gì: Cách app vẽ hình của game lên màn hình điện thoại: Vulkan
 Vì sao chỉnh: Đổi khi màn hình đen, nhấp nháy, hình bị lỗi hoặc app thoát ngay lúc mở game.
 Chỉnh thế nào: Mặc định: Vulkan (có bộ lọc như Snapdragon Super Resolution). Gặp lỗi hiển thị: thử EGL; EGL chỉ có bộ lọc Bilinear và Điểm gần nhất. Mở lại game để áp dụng.
 
+[Toàn màn hình cho mọi game]
+Là gì: Kéo giãn hình của mọi game cho phủ kín màn hình điện thoại, không còn viền đen hai bên, cho cả game Windows lẫn game Chạy nhẹ.
+Vì sao chỉnh: Bật khi muốn hình game to hết màn hình. Màn điện thoại dài hơn khung game, nên hình sẽ hơi bè ngang (nhân vật béo ra một chút).
+Chỉnh thế nào: Mặc định tắt (giữ đúng tỷ lệ). Game nào đã chọn riêng "Kéo giãn toàn màn hình" trong cài đặt game thì theo lựa chọn của game đó. Áp dụng từ lần mở game sau.
+
 [Sao lưu bản lưu cho mọi game]
 Là gì: Khi bật, mỗi lần game đóng lại, app tự tìm và nén bản lưu của game vào thư mục AGVN-Player/Saves/<tên game>/ trong bộ nhớ máy.
 Vì sao chỉnh: Bật để đỡ mất tiến trình chơi khi game lỗi, lỡ xóa dữ liệu hoặc cài lại app.

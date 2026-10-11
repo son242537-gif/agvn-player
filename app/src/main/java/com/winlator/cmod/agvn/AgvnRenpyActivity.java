@@ -100,6 +100,8 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
         quitFile.delete();
         Map<String, String> env = AgvnRenpyGame.environment(engine, gameDir, publicDir, getApplicationInfo().sourceDir, quitFile);
         for (Map.Entry<String, String> e : env.entrySet()) nativeSetEnv(e.getKey(), e.getValue());
+        // "Toàn màn hình cho mọi game" (AgvnFullscreen): main.py stretches the game over the whole screen
+        nativeSetEnv("AGVN_RENPY_STRETCH", getIntent().getBooleanExtra(AgvnFullscreen.INTENT, false) ? "1" : "0");
         Log.i(TAG, "Ren'Py game " + gameDir + ", logs in " + publicDir);
     }
 

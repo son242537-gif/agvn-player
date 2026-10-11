@@ -1464,18 +1464,12 @@ public class XServerDisplayActivity extends AppCompatActivity {
             }
         }
 
-        String shortcutFullscreenStretched = shortcut != null ? shortcut.getExtra("fullscreenStretched") : null;
+        String shortcutFullscreenStretched = shortcut != null ? shortcut.getExtra("fullscreenStretched") : "";
 
-        boolean shouldStretch = false;
-
-        // AGVN: getExtra returns "" (not null) when the game has no choice, so fall back to the environment then
-        if (shortcut != null && !shortcutFullscreenStretched.isEmpty()) {
-
-            shouldStretch = shortcutFullscreenStretched.equals("1");
-        } else if (container != null && container.isFullscreenStretched()) {
-
-            shouldStretch = true;
-        }
+        // AGVN: the game's own choice, else its environment's, else "Toàn màn hình cho mọi game" (AgvnFullscreen)
+        boolean shouldStretch = com.winlator.cmod.agvn.AgvnFullscreen.stretch(shortcutFullscreenStretched,
+                container != null && container.isFullscreenStretched(),
+                shortcut != null && com.winlator.cmod.agvn.AgvnFullscreen.all(this));
 
         if (shouldStretch) {
 

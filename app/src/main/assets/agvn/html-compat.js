@@ -332,6 +332,7 @@
         filesForSaves(window.StorageManager);
         var isMz = window.Utils && Utils.RPGMAKER_NAME === 'MZ';
         if (!isMz) desktopMv(); // before main.js starts the game: the renderer and screen size are chosen then
+        if (window.__agvnStretch) stretch(window.Graphics); // "Toàn màn hình cho mọi game"
         var original = SM.catchException;
         SM.catchException = function (e) {
             if (isMinor(e)) {
@@ -355,6 +356,34 @@
             if (typeof AM.checkWebAudioError === 'function') AM.checkWebAudioError = function () {};
         }
         return true;
+    }
+
+    // --- 7: "Toàn màn hình cho mọi game" (the app sets __agvnStretch first): the game's canvas, video and error box
+    // stretched over the whole page instead of centred with bars, and a touch mapped back on each axis on its own.
+    // MV and MZ both size them in Graphics._centerElement and read touches through pageToCanvasX/Y.
+    function stretch(G) {
+        if (!G || G.__agvnStretched || typeof G._centerElement !== 'function') return;
+        G.__agvnStretched = true;
+        var center = G._centerElement;
+        G._centerElement = function (element) {
+            center.apply(this, arguments);
+            if (!element || !element.style) return;
+            element.style.margin = '0';
+            element.style.width = window.innerWidth + 'px';
+            element.style.height = window.innerHeight + 'px';
+        };
+        var axis = function (page, start, size, game) {
+            return size > 0 ? Math.round((page - start) * game / size) : 0;
+        };
+        G.pageToCanvasX = function (x) {
+            var c = this._canvas;
+            return c ? axis(x, c.getBoundingClientRect().left + window.pageXOffset, c.clientWidth, this._width) : 0;
+        };
+        G.pageToCanvasY = function (y) {
+            var c = this._canvas;
+            return c ? axis(y, c.getBoundingClientRect().top + window.pageYOffset, c.clientHeight, this._height) : 0;
+        };
+        if (G._canvas && typeof G._updateAllElements === 'function') G._updateAllElements();
     }
 
     function keepFatal(text) {

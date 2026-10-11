@@ -70,6 +70,10 @@ public class AgvnRgssConfigTest {
         assertEquals(Collections.singletonList("Standard"), config.missingRtp);
         JsonObject json = JsonParser.parseString(config.json(null, Collections.emptyList(), false)).getAsJsonObject();
         assertFalse(json.get("frameSkip").getAsBoolean());
+        assertTrue("kept in proportion unless stretched", json.get("fixedAspectRatio").getAsBoolean());
+        config.stretch = true; // "Toàn màn hình cho mọi game"
+        json = JsonParser.parseString(config.json(null, Collections.emptyList(), false)).getAsJsonObject();
+        assertFalse(json.get("fixedAspectRatio").getAsBoolean());
         assertEquals(0, json.getAsJsonArray("RTP").size());
         assertEquals("", json.get("midiSoundFont").getAsString());
     }

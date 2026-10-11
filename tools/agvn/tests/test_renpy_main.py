@@ -38,6 +38,24 @@ if quit_file:
     report["posted"] = posted
     report["quit_file_left"] = os.path.exists(quit_file)
 
+stretch = os.environ.get("TEST_STRETCH")
+if stretch:
+    # Ren'Py's config as it imports, then a game that sets its own setting, then a reload back to the defaults
+    config = types.ModuleType("renpy.config")
+    sys.modules["renpy.config"] = config
+    time.sleep(0.2)
+    config.adjust_view_size = None
+    for _ in range(40):
+        if config.adjust_view_size is not None:
+            break
+        time.sleep(0.05)
+    report["view"] = config.adjust_view_size(2400, 1080) if config.adjust_view_size else None
+    if stretch == "game":
+        own = lambda w, h: (w // 2, h // 2)
+        config.adjust_view_size = own
+        time.sleep(1.3)
+        report["game_kept"] = config.adjust_view_size is own
+
 with open(os.environ["TEST_REPORT"], "w") as f:
     json.dump(report, f)
 '''
@@ -81,6 +99,15 @@ class RenpyMainTest(unittest.TestCase):
         r = self.run_main(AGVN_RENPY_BASEDIR=self.game, AGVN_RENPY_QUIT_FILE=quit_file)
         self.assertEqual([["event", 256]], r["posted"])
         self.assertFalse(r["quit_file_left"])
+
+    def test_stretch_fills_the_screen_unless_the_game_sizes_it(self):
+        # "Toàn màn hình cho mọi game": the whole screen, as the app's AGVN_RENPY_STRETCH asks
+        r = self.run_main(AGVN_RENPY_BASEDIR=self.game, AGVN_RENPY_STRETCH="1", TEST_STRETCH="1")
+        self.assertEqual([2400, 1080], r["view"])
+        r = self.run_main(AGVN_RENPY_BASEDIR=self.game, AGVN_RENPY_STRETCH="1", TEST_STRETCH="game")
+        self.assertTrue(r["game_kept"], "a game's own adjust_view_size stays")
+        r = self.run_main(AGVN_RENPY_BASEDIR=self.game, AGVN_RENPY_STRETCH="0", TEST_STRETCH="1")
+        self.assertIsNone(r["view"], "off: Ren'Py keeps its bars")
 
 
 if __name__ == "__main__":

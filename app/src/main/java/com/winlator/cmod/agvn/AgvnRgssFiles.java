@@ -71,13 +71,15 @@ final class AgvnRgssFiles {
     }
 
     /** Writes everything mkxp-z needs; returns the config, or null when the files cannot be written. */
-    static AgvnRgssConfig prepare(Context context, File gameDir, File driveC, File runDir, boolean forceFrameSkip) {
+    static AgvnRgssConfig prepare(Context context, File gameDir, File driveC, File runDir, boolean forceFrameSkip,
+                                  boolean stretch) {
         try {
             if (!runDir.isDirectory() && !runDir.mkdirs()) throw new IOException("cannot create " + runDir);
             List<File> preload = new ArrayList<>();
             for (String name : PRELOAD) preload.add(copyAsset(context, "agvn/mkxp-z/" + name, new File(runDir, name), false));
             File soundFont = copyAsset(context, SOUND_FONT, new File(runDir, new File(SOUND_FONT).getName()), true);
             AgvnRgssConfig config = new AgvnRgssConfig(gameDir, new File(SettingsFragment.DEFAULT_WINLATOR_PATH), driveC);
+            config.stretch = stretch;
             try (OutputStream out = new FileOutputStream(new File(runDir, "mkxp.json"))) {
                 // weak and mid phones skip drawing a frame when they fall behind, rather than slowing the game down
                 boolean frameSkip = forceFrameSkip || DeviceTierManager.current(context) != DeviceTier.FLAGSHIP;

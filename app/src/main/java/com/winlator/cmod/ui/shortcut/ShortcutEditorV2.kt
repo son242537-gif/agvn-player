@@ -225,8 +225,9 @@ private class ShortcutEditorStateV2(val shortcut: Shortcut) {
     var boxPreset by mutableStateOf(shortcut.getExtra("box64Preset", container.getBox64Preset()))
 
     var controlsProfile by mutableStateOf(shortcut.getExtra("controlsProfile", "")) // AGVN: missing = automatic layout, "0" = off
-    // AGVN: no choice of its own = the environment's; the toggle then stores "1" or "0" so the game can differ
-    var fullscreen by mutableStateOf(shortcut.getExtra("fullscreenStretched", if (container.isFullscreenStretched) "1" else "0") == "1")
+    // AGVN: no choice of its own = the environment's or "Toàn màn hình cho mọi game"; the toggle then stores "1" or "0"
+    var fullscreen by mutableStateOf(shortcut.getExtra("fullscreenStretched",
+        com.winlator.cmod.agvn.AgvnFullscreen.inherited(container.manager.context, container)) == "1")
     private var inputType by mutableIntStateOf(shortcut.getExtra("inputType", container.getInputType().toString()).toIntOrNull() ?: container.getInputType())
     var exclusive by mutableStateOf(shortcut.getExtra("exclusiveXInput").let { if (it.isBlank()) container.isExclusiveXInput() else it == "1" })
     var xinput by mutableStateOf((inputType and WinHandler.FLAG_INPUT_TYPE_XINPUT.toInt()) != 0)

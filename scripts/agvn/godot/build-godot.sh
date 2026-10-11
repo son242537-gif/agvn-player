@@ -128,6 +128,7 @@ grep -q 'AGVN_GODOT_APPDATA' <<< "$texts" || fail "engine thiếu bản vá user
 grep -q 'AGVN_GODOT_EXECUTABLE' <<< "$texts" || fail "engine thiếu bản vá đường dẫn .exe (patches/0002)"
 grep -q 'AGVN Player: binary GDScript is cut short' <<< "$texts" || fail "engine thiếu bản vá đọc script Godot 4.3, 4.4 (patches/0003)"
 # patches/0004 adds no text of its own: step 2 stops when it does not apply
+grep -q 'AGVN_GODOT_STRETCH' <<< "$texts" || fail "engine thiếu bản vá kéo giãn toàn màn hình (patches/0005)"
 grep -q 'SpineSkeletonDataResource' <<< "$texts" || fail "engine thiếu Spine (module spine_godot)"
 grep -q "does not match runtime version $SPINE_BRANCH" <<< "$texts" \
     || grep -q 'does not match runtime version %s' <<< "$texts" || fail "engine thiếu spine-cpp $SPINE_BRANCH"
