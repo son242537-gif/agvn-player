@@ -22,13 +22,20 @@ final class AgvnFontFiles {
 
     private AgvnFontFiles() {}
 
-    /** {@code dir}'s file named {@code name} in any case, or null. */
+    /**
+     * {@code dir}'s file named {@code name} in any case, or null, under its name on disk: the registry gets that
+     * name, and on a disk that ignores case new File(dir, "nirmala.ttf") finds Nirmala.ttf but keeps "nirmala.ttf".
+     */
     static File find(File dir, String name) {
-        File exact = new File(dir, name);
-        if (exact.isFile()) return exact;
         File[] files = dir.listFiles();
-        if (files != null) for (File f : files) if (f.isFile() && f.getName().equalsIgnoreCase(name)) return f;
-        return null;
+        if (files == null) return null;
+        File any = null;
+        for (File f : files) {
+            if (!f.isFile()) continue;
+            if (f.getName().equals(name)) return f;
+            if (any == null && f.getName().equalsIgnoreCase(name)) any = f;
+        }
+        return any;
     }
 
     /** What {@code path} ("/" between parts) names below {@code root}, each part in any case; null when nothing. */
