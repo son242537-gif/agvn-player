@@ -23,6 +23,10 @@ Anh Sơn quyết định ngày 02/10/2026: app phát hành theo **GNU GPL phiên
     nguyên file phát hành gốc `wine-mono-9.3.1-x86.tar.xz`. Mã nguồn đúng bản này là `wine-mono-9.3.1-src.tar.xz`
     trên trang phát hành https://github.com/wine-mono/wine-mono/releases/tag/wine-mono-9.3.1; kho mã:
     https://gitlab.winehq.org/mono/wine-mono.
+  - Phông DejaVu (có trong imagefs): giấy phép Bitstream Vera, phần DejaVu là public domain. Từ bản 0.1.40 app tạo
+    trên máy bản đổi tên "Tahoma" và "Segoe UI" của DejaVu Sans cho chữ DirectWrite (`AgvnDwriteFonts`). Giấy phép cho
+    sửa phông khi tên mới không chứa "Bitstream" hay "Vera"; dòng bản quyền và nguyên văn giấy phép trong phông được
+    giữ. Mã nguồn: https://github.com/dejavu-fonts/dejavu-fonts.
   - Termux:X11, termux-packages, patchelf: GPL 3.
   - proot: GPL 2.
   - DXVK, D8VK, dxwrapper: zlib.

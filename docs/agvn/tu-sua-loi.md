@@ -459,6 +459,46 @@ Người chơi nối bàn phím và chuột không dây nhưng game không nhậ
   khi chuột thật hay bàn di chuột (touchpad) di, bấm hay lăn, và ẩn lại khi ngón tay chạm màn hình, nên chơi bằng tay
   vẫn như cũ (`AgvnMouseCursor`). Game không giả lập cảm ứng thì vẫn hiện con trỏ như trước.
 
+## Chữ vẽ bằng DirectWrite không hiện (game Windows)
+
+Từ bản 0.1.40 (`AgvnDwriteFonts`). Báo cáo ngày 12/10/2026 (bản 0.1.32, Proton 10, POCO F8 Pro): game vẽ chữ bằng
+DirectWrite + Direct2D (`dwrite.dll`, `d2d1.dll`) chạy đủ hình, tiếng nhưng menu và hộp thoại không có chữ. Nhật ký Wine
+có `create_local_cached_stream Failed to open … C:\windows\fonts\tahoma.ttf` rồi, mỗi khung hình,
+`layout_run_get_last_resort_font Failed to create last resort font`. Lỗi chung của app, không riêng game nào.
+
+- **Vì sao:** DirectWrite của Wine chỉ biết các phông ghi trong khoá
+  `HKLM\Software\Microsoft\Windows NT\CurrentVersion\Fonts`; mục ghi tên file trần là file trong `C:\windows\Fonts`.
+  Mẫu prefix của Proton 9 và Proton 10 ghi Tahoma, Marlett, Symbol, Wingdings, SimSun, Malgun Gothic, Nirmala UI,
+  MS Gothic, Microsoft YaHei… nhưng thư mục đó không có các file này. Phông app thêm vào thư mục (Verdana, Georgia,
+  Trebuchet MS, Source Han Sans CN…) thì không có mục nào, nên DirectWrite chỉ thấy Arial, Courier New và Times New
+  Roman. Game xin một phông máy ảo không có (Segoe UI, MS Gothic, tên tự đặt…) thì DirectWrite thay bằng Tahoma, và
+  Tahoma là phông cứu cánh cuối. Tahoma không mở được, nên Direct2D bỏ cả đoạn chữ.
+- **Cách sửa:** trước mỗi lần chạy Wine, mọi mục trong khoá phải có file:
+  - Phông riêng của Wine (`share/wine/fonts` của gói Wine đang dùng) được chép vào `C:\windows\Fonts` đúng tên mục ghi
+    (`wingdings.ttf` lấy từ `wingding.ttf`).
+  - File có sẵn dưới đuôi khác thì mục ghi file đó (`msyh.ttf` → `msyh.ttc`).
+  - Phông có trong imagefs thì mục trỏ tới đó (`Z:\usr\share\fonts\truetype\ms\simsun.ttc`, `malgun.ttf`,
+    `Nirmala.ttf`), không chép (18 MB và 13 MB).
+  - Mục không có file ở đâu cả thì bỏ (`msgothic.ttc`, `micross.ttf`, `serife.fon`, các đường dẫn `Z:\system\fonts\…`
+    và `Z:\data\data\com.termux\…` của máy dựng prefix).
+  - Phông trong `C:\windows\Fonts` chưa có mục thì được thêm mục theo tên đầy đủ của phông.
+- **Tiếng Việt:** Tahoma của Wine thiếu 95 trong 134 chữ Việt có dấu, mà DirectWrite dùng Tahoma cho mọi chữ của phông
+  thiếu. App làm từ DejaVu Sans của imagefs (đủ 134 chữ) bộ phông `C:\windows\Fonts\agvn\tahoma.ttc` và
+  `tahomabd.ttc`, mỗi bộ gồm "Tahoma" và "Segoe UI" (thường, đậm), dùng chung hình chữ. Hai mục Tahoma của khoá trỏ
+  tới đó. GDI (chữ của hộp thoại và game cũ) không đọc thư mục con `agvn`, và bỏ qua mục vì nó đã có Tahoma của Wine
+  trong `C:\windows\Fonts`, nên chữ GDI vẫn là Tahoma của Wine. Tahoma thật của người chơi chép vào (khác file của
+  Wine) thì được giữ cho DirectWrite.
+- **Wine tự sửa khoá:** khi Wine mở, nó xoá khỏi khoá các phông ngoài ghi trong `HKCU\Software\Wine\Fonts\External
+  Fonts` mà nó không thấy ở chỗ cũ. App bỏ khỏi danh sách đó các tên nay đã nằm trong `C:\windows\Fonts`
+  (Tahoma, Marlett…), để Wine không xoá mục của chúng. Lần cập nhật prefix đầu tiên của Proton 10 có thể ghi lại mục
+  Tahoma cũ; lần mở sau app sửa lại.
+- **Cái giá:** lần đầu mở mỗi container mất khoảng 0,2 giây và thêm khoảng 1,8 MB (hai bộ phông, phông Wine); các lần
+  sau dưới 0,02 giây. Chữ DirectWrite xin Tahoma hay Segoe UI có dáng DejaVu Sans (rộng hơn Tahoma một chút).
+- **Còn thiếu:** chữ Nhật, chữ Trung của DirectWrite vẫn phụ thuộc phông dự phòng "Noto Sans CJK" (Wine tìm trong
+  phông của Android). Game Nhật vẽ kana bằng DirectWrite mà vẫn ra ô vuông thì cần nhật ký của game đó.
+- **Nhật ký:** `su-kien.txt` có `Phông DirectWrite: chép …; ghi …; lấy … trong app; bỏ mục không có file: …; Tahoma,
+  Segoe UI đủ chữ Việt cho DirectWrite (từ DejaVu Sans); thêm … phông có sẵn vào danh sách`, chỉ ở lần mở có thay đổi.
+
 ## App biết gì về từng game (`files/agvn/doctor/`)
 
 - **Cấu hình đã chạy được:** cấu hình của lần chơi gần nhất mà game hiện hình và không crash, kéo dài ít nhất 1
@@ -880,6 +920,11 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       nào bị phóng ra cả màn hình.
 - [ ] Đang chơi một game Windows (game không crash), vuốt AGVN khỏi danh sách app gần đây rồi mở lại app: không có hộp
       hỏi; `tom-tat.txt` của phiên đó ghi "Người chơi vuốt tắt AGVN…".
+- [ ] Game vẽ chữ bằng DirectWrite (nạp `dwrite.dll`, `d2d1.dll`) trong container tạo trước bản 0.1.40: mở game,
+      menu và hộp thoại có chữ, chữ Việt đủ dấu (ẳ ẵ ặ ữ ự). `su-kien.txt` có dòng `Phông DirectWrite: …`; nhật ký Wine
+      không còn `Failed to open … tahoma.ttf` hay `Failed to create last resort font`. Mở lần hai: không còn dòng
+      `Phông DirectWrite`.
+- [ ] Game cũ vẽ chữ bằng GDI (hộp thoại Wine, game RPG Maker 2003…): chữ vẫn đủ, không đổi sang dáng DejaVu Sans.
 - [ ] Game Windows: "✕ Thoát" trên thanh ⌨ ✎ 👁 ⛶ hiện thanh "Thoát game?"; "Chơi tiếp" để game chạy tiếp, "Thoát game"
       đưa về thư viện và không có hộp hỏi.
 - [ ] Game mở chậm (hơn 10 giây không vẽ, ví dụ game Unity trên máy yếu): lần mở sau, dòng trên góc phải ghi "Đang khởi

@@ -1179,6 +1179,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
             containerDataChanged = true;
         com.winlator.cmod.agvn.VcRuntimeMarker.apply(new File(container.getRootDir(), ".wine/system.reg")); // AGVN: Visual C++ 2015-2022 markers
         com.winlator.cmod.agvn.AgvnFontFallback.apply(new File(container.getRootDir(), ".wine/user.reg")); // AGVN: MS Gothic etc. for Japanese games
+        com.winlator.cmod.agvn.AgvnDwriteFonts.apply(new File(container.getRootDir(), ".wine"), // AGVN: DirectWrite's fonts
+                wineInfo.path != null ? new File(wineInfo.path, "share/wine/fonts") : null, imageFs.getRootDir());
 
         if (shortcut != null)
             startupSelection = shortcut.getExtra("startupSelection", String.valueOf(container.getStartupSelection()));
