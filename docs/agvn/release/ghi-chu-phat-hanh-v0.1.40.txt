@@ -1,0 +1,6 @@
+AGVN Player v0.1.40 - agvn.io
+
+Sửa lỗi:
+- Game vẽ chữ bằng DirectWrite (nhiều game mới) không hiện chữ ở menu và hộp thoại, chỉ còn khung trống: giờ chữ hiện đủ, chữ Việt đủ dấu (ẳ, ẵ, ặ, ữ, ự...). Game đã thêm từ trước cũng được sửa, từ lần mở tiếp theo.
+- Game Windows chạy mà màn hình vẫn đen: với game đang chạy bằng Proton 10, thanh "Màn hình game vẫn đen" giờ có thể đề nghị "Chạy bằng Wine cũ (Proton 9)". Save trong thư mục Windows của game được chép sang.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
