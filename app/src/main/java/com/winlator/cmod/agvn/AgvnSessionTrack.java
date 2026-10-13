@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *   times. An error box ("The current resolution is too low...") is smaller, so a game that only showed one never
  *   started;</li>
  *   <li>who ended it: Wine by itself (the game closed, crashed or showed its error and quit), or the player;</li>
- *   <li>how many frames its window drew, when it last showed one (drawn or presented, Vulkan and OpenGL included),
+ *   <li>how many frames it showed and when it last showed one (drawn or presented, Vulkan and OpenGL included),
  *   and how often the player pressed something since: a game that shows nothing while the player keeps pressing has
  *   frozen;</li>
  *   <li>when free RAM last fell under the RAM bar's level ({@link AgvnMemoryWatch}): a game that ends just after it
@@ -72,7 +72,16 @@ public final class AgvnSessionTrack {
         onFrame();
     }
 
-    /** The game showed a frame: drawn into its window, or presented (AgvnInputHold.onGameFrame). Kept cheap. */
+    /**
+     * The game presented a frame (AgvnInputHold.onGameFrame): Vulkan and OpenGL frames never reach its window's
+     * content, so they count here for the FPS ({@link #takeFrames}). Kept cheap.
+     */
+    static void onPresent() {
+        frames.incrementAndGet();
+        onFrame();
+    }
+
+    /** The game showed a frame: drawn into its window, or presented ({@link #onPresent}). Kept cheap. */
     static void onFrame() {
         onFrame(System.currentTimeMillis());
     }
@@ -193,7 +202,7 @@ public final class AgvnSessionTrack {
         return startMs > 0 ? Math.max(0, nowMs - startMs) / 1000 : 0;
     }
 
-    /** Frames the game's window drew since the last call. */
+    /** Frames the game drew into its window or presented since the last call. */
     static int takeFrames() {
         return frames.getAndSet(0);
     }

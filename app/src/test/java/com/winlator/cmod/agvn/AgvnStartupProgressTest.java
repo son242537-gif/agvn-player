@@ -43,6 +43,14 @@ public class AgvnStartupProgressTest {
     }
 
     @Test
+    public void presentedFramesMeanTheGameDraws() {
+        assertTrue("a DXVK menu at 25 FPS draws nothing into its window", AgvnStartupProgress.drawing(0, 50));
+        assertTrue(AgvnStartupProgress.drawing(AgvnStartupProgress.DRAWING, 0));
+        assertFalse("a presplash draws once", AgvnStartupProgress.drawing(1, 0));
+        assertFalse("a loading game presented a frame or two", AgvnStartupProgress.drawing(1, 2));
+    }
+
+    @Test
     public void clockReadsMinutesAndSeconds() {
         assertEquals("4:12", AgvnStartupProgress.clock(252_400));
         assertEquals("0:09", AgvnStartupProgress.clock(9_999));

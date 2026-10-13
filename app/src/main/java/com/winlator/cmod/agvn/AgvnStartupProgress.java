@@ -31,9 +31,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * on a PC, about 520 s here) while the screen shows its presplash and the FPS reads 0. Once the game has not drawn for
  * {@link #QUIET_MS}, the status line shows the time so far every {@link #TICK_MS} ("Đang khởi động 4:12"), the game's
  * last slow start ("· lần trước 1:58", {@link AgvnStartTimes}) and, with "Bật debug Wine" on, the engine log's last
- * line. It goes when the game draws steadily, its log says the interface is up, the game draws in answer to the player
- * (a visual novel that redraws only when tapped), or after {@link #MAX_MS}. A log that has not moved for
- * {@link #STALL_MS} while Wine used under 5% of a core reads "Có thể đang treo". The static helpers are pure Java.
+ * line. It goes when the game draws steadily, into its window or as Vulkan and OpenGL frames it presents (which never
+ * reach the window: Legend Cleaner's menu ran at 25 FPS under "Đang khởi động 3:16", 14/10/2026), its log says the
+ * interface is up, the game draws in answer to the player (a visual novel that redraws only when tapped), or after
+ * {@link #MAX_MS}. A log that has not moved for {@link #STALL_MS} while Wine used under 5% of a core reads "Có thể
+ * đang treo". The static helpers are pure Java.
  */
 public final class AgvnStartupProgress {
     private static final String TAG = "AGVN";
@@ -62,6 +64,8 @@ public final class AgvnStartupProgress {
         return t;
     });
     private int drawingTicks;
+    /** Frames presented by the last tick ({@link AgvnInputHold#framesShown}). */
+    private long presented = AgvnInputHold.framesShown();
     private String lastLine = "";
     private long lastChangeMs = startMs;
     private volatile boolean done, answered;
@@ -89,6 +93,11 @@ public final class AgvnStartupProgress {
         if (answers(AgvnMemoryWatch.playerInputMs(), SystemClock.uptimeMillis(), startUptimeMs)) answered = true;
     }
 
+    /** True when one tick's window updates and presented frames mean the game draws (a presplash draws once). */
+    static boolean drawing(int windowUpdates, long framesPresented) {
+        return windowUpdates + framesPresented >= DRAWING;
+    }
+
     /** True when a window update at {@code nowMs} answers the player's input at {@code inputMs} (uptime clock). */
     static boolean answers(long inputMs, long nowMs, long startMs) {
         return inputMs > startMs && nowMs - inputMs >= 0 && nowMs - inputMs <= ANSWER_MS;
@@ -109,7 +118,10 @@ public final class AgvnStartupProgress {
     private void tick() {
         try {
             long now = System.currentTimeMillis(), elapsed = now - startMs;
-            drawingTicks = updates.getAndSet(0) >= DRAWING ? drawingTicks + 1 : 0;
+            long shown = AgvnInputHold.framesShown();
+            drawingTicks = drawing(updates.getAndSet(0), shown - presented) ? drawingTicks + 1 : 0;
+            presented = shown;
+            if (answers(AgvnMemoryWatch.playerInputMs(), AgvnInputHold.lastFrameMs(), startUptimeMs)) answered = true;
             String tail = tail(log());
             boolean up = drawingTicks >= 2 || answered || ready(tail);
             if (up || elapsed >= MAX_MS) {

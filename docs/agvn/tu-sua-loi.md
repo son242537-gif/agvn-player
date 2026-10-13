@@ -822,6 +822,13 @@ có thêm "không vẽ khung nào trong N giây cuối". Đọc dòng này:
 - FPS 0, một luồng bận gần 100%: game đang làm việc mà không vẽ (đang tải, tạo file lần đầu, hay vòng lặp);
 - FPS 0, không luồng nào bận: game đang đợi một thứ không đến (đứng hẳn).
 
+FPS ở dòng này đếm cả khung hình game vẽ vào cửa sổ lẫn khung hình Vulkan, OpenGL game đưa ra qua Present (DXVK,
+VKD3D, Godot, NW.js...). Trước bản 0.1.41 chỉ có loại đầu được đếm, nên game DXVK chạy đều vẫn bị ghi "FPS 0 0 0;
+không vẽ khung nào". Dòng "Đang khởi động" cũng vậy: nó chỉ tắt khi game vẽ vào cửa sổ, nên game DXVK đã vào menu vẫn
+còn dòng này. Ví dụ ngày 14/10/2026: Legend Cleaner (Unreal) trên LG LM-V510N (Adreno 640) lần đầu mở mất hơn 1 phút
+ở màn hình đen, rồi menu chạy 25 FPS mà dòng vẫn ghi "Đang khởi động 3:16". Từ bản 0.1.41 cả hai đếm khung hình đưa
+ra qua Present (`AgvnInputHold.onGameFrame`).
+
 Lý do (bản 0.1.29): nhật ký thứ hai của Isekai NTR Inn và Rina (bản 0.1.28, cùng máy HONOR AAK-AN00, 07/10/2026) vẫn
 không cho biết game bị gì. Cả hai đều thử đủ 3 cách, mỗi cách chạy thật 1–2 phút (sửa lỗi của bản 0.1.27 đã có tác
 dụng), rồi người chơi vẫn báo đứng hình.
@@ -929,6 +936,9 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
       đưa về thư viện và không có hộp hỏi.
 - [ ] Game mở chậm (hơn 10 giây không vẽ, ví dụ game Unity trên máy yếu): lần mở sau, dòng trên góc phải ghi "Đang khởi
       động 0:25 · lần trước 1:40".
+- [ ] Bản 0.1.41, game DXVK mở chậm (như Legend Cleaner lần đầu): dòng "Đang khởi động" mất trong vài giây sau khi
+      game vào menu. Thoát game: `su-kien.txt` có `Phút cuối của game … FPS` gần mức FPS của HUD, không có "không vẽ
+      khung nào" khi game vẫn chạy.
 - [ ] Thêm một game KiriKiri 1280×720 (máy nào cũng vậy): hộp xem trước ghi "Độ phân giải: 1280x1024 (lớn hơn khổ game,
       …)"; `adb logcat -s AGVN` có `KiriKiri game size 1280x720 (data.xp3>system/Config.tjs)`. Vào game: không có dòng
       `DDSCL_ALLOWREBOOT` trong nhật ký Wine, plugin nạp ở `first.ks` có trong nhật ký, game vẽ hình trong cửa sổ, và

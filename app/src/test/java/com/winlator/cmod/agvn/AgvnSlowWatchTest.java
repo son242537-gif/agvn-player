@@ -107,6 +107,15 @@ public class AgvnSlowWatchTest {
     }
 
     @Test
+    public void presentedFramesCountForTheFps() {
+        AgvnSessionTrack.start(1_000);
+        for (int i = 0; i < 125; i++) AgvnSessionTrack.onPresent(); // DXVK at 25 FPS for 5 s: its window gets none
+        assertEquals(125, AgvnSessionTrack.takeFrames());
+        assertTrue(AgvnSessionTrack.showedFrames());
+        assertEquals(0, AgvnSessionTrack.takeFrames());
+    }
+
+    @Test
     public void whoEndedTheGame() {
         AgvnSessionTrack.start(0);
         AgvnSessionTrack.wineEnded(); // the game closed itself

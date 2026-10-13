@@ -36,7 +36,17 @@ public final class AgvnInputHold {
     public static void onGameFrame() {
         FRAMES.incrementAndGet();
         lastFrameMs = SystemClock.uptimeMillis();
-        AgvnSessionTrack.onFrame(); // a Vulkan or OpenGL frame never reaches the window's own content
+        AgvnSessionTrack.onPresent(); // a Vulkan or OpenGL frame never reaches the window's own content
+    }
+
+    /** Game frames shown so far, this game and those before it ({@link AgvnStartupProgress}). */
+    static long framesShown() {
+        return FRAMES.get();
+    }
+
+    /** When the last game frame was shown (uptime clock). */
+    static long lastFrameMs() {
+        return lastFrameMs;
     }
 
     /**
