@@ -170,7 +170,7 @@ Anh Sơn chốt ngày 02/10/2026:
 - game thiếu RTP: app tự tìm RTP, thiếu thì báo bằng tiếng Việt.
 
 - **Nguồn:** mkxp-z 2.4.2 (commit `095b9cc3`), cùng Ruby 3.1.3, SDL2 2.28.1, OpenAL Soft, FluidSynth, PhysFS, FreeType,
-  SDL_image/sound/ttf và các thư viện khác do mkxp-z ghim. Cách lấy nguồn, 4 bản vá và cách kiểm chứng ở
+  SDL_image/sound/ttf và các thư viện khác do mkxp-z ghim. Cách lấy nguồn, 5 bản vá và cách kiểm chứng ở
   [`scripts/agvn/mkxp-z/README.md`](../../scripts/agvn/mkxp-z/README.md).
 - **Giấy phép:** mkxp-z dựng kèm shader GPLv3, nên là GPL-3.0-or-later, hợp với app (đợt 0). Giấy phép đủ của mkxp-z và
   mọi thư viện trong `libmkxp-z.so` nằm ở cuối màn "Giấy phép mã nguồn mở".
@@ -552,3 +552,30 @@ chỉ 1/4 lần có swapchain. Cùng game đó, JoiPlay mở như một trang we
   3. "Tự sửa lỗi" → "Lỗi khác" có "Chạy bằng Windows"; chọn thì lần sau game chạy bằng Wine và giữ như vậy.
   4. Hồi quy: một game RPG Maker MV (Chạy nhẹ) và một game Tyrano vẫn chạy, save như cũ; game Windows khác (Unity,
      Unreal) không đổi cách chạy.
+
+## RPG Maker XP/VX/VX Ace "Chạy nhẹ" văng ngay khi mở (bản 0.1.42)
+
+Báo cáo ngày 14/10/2026 (POCO F8 Pro, bản 0.1.32, `libmkxp-z.so` trùng SHA-256 với bản 0.1.41): mọi game XP/VX/VX Ace
+mở bằng "Chạy nhẹ" đều văng khoảng 70 ms sau khi SDL gọi `SDL_main`, trước khi đọc tệp nào của game. Tombstone:
+`SIGSEGV`, `fault addr 0x636f72705f707061`, tức là chữ `app_proc` bị đọc như một con trỏ.
+
+- **Vì sao:** trên Android, PhysFS 3.2.0 coi tham số `argv0` của `PHYSFS_init` là con trỏ tới `PHYSFS_AndroidInit`
+  (JNIEnv và Context). mkxp-z truyền `argv[0]` mà SDL đặt là chữ `"app_process"`, nên PhysFS đọc chữ đó như con trỏ.
+- **Sửa (bản vá `0005-android-physfs-init`):** trên Android, `FileSystem` của mkxp-z gọi `PHYSFS_init(NULL)`. PhysFS lấy
+  `/` làm thư mục gốc. mkxp-z không dùng thư mục đó: thư mục game, gói `.rgss*a` và RTP đều được gắn theo đường dẫn
+  riêng. Trên các hệ khác, mã không đổi. `libmkxp-z.so` dựng lại, `mkxpz_so_sha256` mới trong `pins.txt`.
+- **Runner văng vì lỗi mã máy thì có nhật ký (`AgvnTombstone`):** trước đây tiến trình `:rgss` chết vì tín hiệu thì
+  không để lại gì trong `AGVN-Player/logs/`, vì mkxp-z chưa kịp ghi lỗi. Nay khi thư viện mở lại, "Tự sửa lỗi" đọc lý do
+  Android ghi lại. Runner Chạy nhẹ (mkxp-z, Ren'Py, Godot) bị crash thì app ghi một phiên vào
+  `AGVN-Player/logs/<tên game>/<giờ mở>/`:
+  - `tom-tat.txt`: runner, thư mục game, đã lên màn đầu chưa, lý do kết thúc;
+  - `loi-ma-may.txt` (Android 12 trở lên, crash mã máy): tín hiệu, địa chỉ lỗi, thông báo abort, rồi tối đa 16 dòng
+    `#00 pc …` của luồng bị crash, đọc từ tombstone Android giữ lại.
+  - "Gửi nhật ký" gửi kèm phiên này.
+- **Test:** `AgvnTombstoneTest`.
+- **Thử máy:** cần một game XP, một game VX, một game VX Ace.
+  1. Mỗi game, mở bằng "Chạy nhẹ": vào được màn tiêu đề. `adb logcat -s mkxp SDL AGVN DEBUG` không có `SIGSEGV`.
+  2. Đi hết danh sách "Thử máy" của đợt 3 ở trên. Bản này là lần đầu mkxp-z qua được bước khởi động trên điện thoại,
+     nên lỗi nào hiện ra sau đó cũng cần ghi lại.
+  3. Một game còn văng: mở lại thư viện, rồi "Gửi nhật ký" của game đó. File zip có `tom-tat.txt` và
+     `loi-ma-may.txt` với dòng `signal …` và các dòng `#00 pc …`.

@@ -7,6 +7,9 @@ import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 /** Why the app process ended, from Android's exit records, in words for the session summary. */
 final class AgvnExitReason {
     private static final String TAG = "AGVN";
@@ -25,11 +28,18 @@ final class AgvnExitReason {
     static final class Exit {
         final int reason, importance;
         final String description;
+        /** A native crash's tombstone in words ({@link AgvnTombstone}), or null. */
+        final String tombstone;
 
         Exit(int reason, int importance, String description) {
+            this(reason, importance, description, null);
+        }
+
+        Exit(int reason, int importance, String description, String tombstone) {
             this.reason = reason;
             this.importance = importance;
             this.description = description;
+            this.tombstone = tombstone;
         }
     }
 
@@ -38,7 +48,10 @@ final class AgvnExitReason {
         return exit(context, startMs, 0);
     }
 
-    /** As {@link #exit(Context, long)} for one process ({@code pid}, 0 for any): a "Chạy nhẹ" runner's own. */
+    /**
+     * As {@link #exit(Context, long)} for one process ({@code pid}, 0 for any): a "Chạy nhẹ" runner's own, with its
+     * tombstone when it crashed in native code (Android 12+).
+     */
     static Exit exit(Context context, long startMs, int pid) {
         if (Build.VERSION.SDK_INT < 30 || startMs <= 0) return null;
         try {
@@ -46,7 +59,16 @@ final class AgvnExitReason {
             ApplicationExitInfo first = null; // the list is newest first; the session ended with the oldest one after it began
             for (ApplicationExitInfo info : am.getHistoricalProcessExitReasons(context.getPackageName(), Math.max(0, pid), 16))
                 if (info.getTimestamp() >= startMs) first = info;
-            return first != null ? new Exit(first.getReason(), first.getImportance(), first.getDescription()) : null;
+            if (first == null) return null;
+            String tombstone = null;
+            if (pid > 0 && Build.VERSION.SDK_INT >= 31 && first.getReason() == ApplicationExitInfo.REASON_CRASH_NATIVE) {
+                try (InputStream trace = first.getTraceInputStream()) {
+                    if (trace != null) tombstone = AgvnTombstone.read(trace);
+                } catch (IOException e) {
+                    Log.w(TAG, "tombstone not readable", e);
+                }
+            }
+            return new Exit(first.getReason(), first.getImportance(), first.getDescription(), tombstone);
         } catch (RuntimeException e) {
             Log.w(TAG, "exit reasons not readable", e);
             return null;

@@ -10,12 +10,16 @@ import android.util.Log;
 
 import com.winlator.cmod.SettingsFragment;
 import com.winlator.cmod.container.Shortcut;
+import com.winlator.cmod.core.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 /**
@@ -29,6 +33,8 @@ public final class AgvnLightDoctor {
     private static final String TAG = "AGVN";
     /** ApplicationExitInfo: REASON_CRASH, REASON_CRASH_NATIVE, REASON_ANR. */
     static final int REASON_CRASH = 4, REASON_CRASH_NATIVE = 5, REASON_ANR = 6;
+    /** The tombstone of a runner that crashed in native code, beside the session's summary. */
+    static final String CRASH_FILE = "loi-ma-may.txt";
 
     private AgvnLightDoctor() {}
 
@@ -47,7 +53,9 @@ public final class AgvnLightDoctor {
             Shortcut s = AgvnRelaunch.find(ctx, (int) number(p.getProperty(AgvnLightSession.CONTAINER)),
                     p.getProperty(AgvnLightSession.SHORTCUT, ""));
             if (s == null) return;
-            AgvnEvidence ev = evidence(p, ended ? null : exitOf(ctx, start, pid), renpyError(p, start));
+            AgvnExitReason.Exit exit = ended ? null : exitOf(ctx, start, pid);
+            if (exit != null && (exit.reason == REASON_CRASH || exit.reason == REASON_CRASH_NATIVE)) saveCrash(s.name, p, start, exit);
+            AgvnEvidence ev = evidence(p, exit, renpyError(p, start));
             ev.engine = s.getExtra(AgvnGameImporter.EXTRA_ENGINE);
             ev.ramSaved = AgvnMemorySaver.ranOut(s);
             AgvnDoctor.diagnoseLight(ctx, s, ev);
@@ -76,6 +84,23 @@ public final class AgvnLightDoctor {
             if (ev.crashed) ev.params.put("crash", AgvnExitReason.describe(exit.reason));
         }
         return ev;
+    }
+
+    /**
+     * A runner that crashed leaves a session in AGVN-Player/logs/&lt;game&gt;, for "Gửi nhật ký": how it ended and, for a
+     * native crash, the tombstone's signal and frames (mkxp-z died before any log of its own, 14/10/2026).
+     */
+    private static void saveCrash(String game, Properties p, long start, AgvnExitReason.Exit exit) {
+        File dir = new File(new File(AgvnSessionLog.root(), AgvnLogFolders.safeName(game)),
+                new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.ROOT).format(new Date(start)));
+        if (!dir.mkdirs()) return;
+        String how = AgvnExitReason.describe(exit.reason) + " (" + exit.description + ")";
+        FileUtils.writeString(new File(dir, AgvnSessionLog.SUMMARY), "runner=" + runnerName(p.getProperty(AgvnLightSession.RUNNER, ""))
+                + "\ngame=" + p.getProperty(AgvnLightSession.GAME_DIR, "") + "\nprocess=" + p.getProperty(AgvnLightSession.PROCESS, "")
+                + "\nstarted=" + "1".equals(p.getProperty(AgvnLightSession.STARTED)) + "\nend=crash: " + how + "\n"
+                + (exit.tombstone != null ? "tombstone=" + CRASH_FILE + "\n" : ""));
+        if (exit.tombstone != null) FileUtils.writeString(new File(dir, CRASH_FILE), exit.tombstone + "\n");
+        Log.w(TAG, "light game crashed: " + AgvnExitReason.describe(exit.reason) + (exit.tombstone != null ? "\n" + exit.tombstone : ""));
     }
 
     /** How Android ended the runner's process: its record is written a moment after the library comes back. */
