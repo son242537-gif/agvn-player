@@ -1,0 +1,9 @@
+AGVN Player v0.1.42 - agvn.io
+
+Mới:
+- Game NW.js dạng trang web (như Love My Back) giờ chạy bằng "Chạy nhẹ", không qua Windows, nên không còn đen màn hình trên máy yếu. Game đã thêm từ trước tự chuyển ở lần mở tiếp theo. Game cần chạy bằng Windows thì chọn "Chạy bằng Windows" trong menu của game.
+Sửa lỗi:
+- Game RPG Maker XP, VX, VX Ace mở bằng "Chạy nhẹ" bị tắt ngay khi vừa mở: giờ game mở được. Game bạn đã chuyển sang "Chạy bằng Windows" vì lỗi này: khi game lỗi lúc chạy bằng Windows, "Tự sửa lỗi" có nút "Chạy nhẹ" để đổi lại.
+- Game báo "No access to memory location." rồi tắt (như game RPG Maker VX Ace để trong thư mục Download): "Tự sửa lỗi" giờ nhận ra lỗi này và đề nghị "Chạy nhẹ" hoặc "Chạy bằng Wine cũ (Proton 9)".
+- Game "Chạy nhẹ" bị tắt đột ngột giờ để lại nhật ký, nên "Gửi nhật ký" gửi được cho AGVN lý do game tắt.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
