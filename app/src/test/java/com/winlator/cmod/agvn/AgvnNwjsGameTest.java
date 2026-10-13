@@ -11,6 +11,7 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Locale;
 
 /** NW.js page games for "Chạy nhẹ": Love My Back's folder, and the ones that need Node and stay on Windows. */
 public class AgvnNwjsGameTest {
@@ -73,8 +74,12 @@ public class AgvnNwjsGameTest {
     public void aPageNamedOtherwiseOnDiskIsFound() throws Exception {
         File dir = loveMyBack("{\"main\":\"index.html\"}");
         new File(dir, "index.html").delete();
-        file(dir, "Index.html", "");
-        assertEquals("Index.html", AgvnNwjsGame.index(dir).getName());
+        file(dir, "Index.html", "<html>Index</html>");
+        // the name read back depends on the disk: "Index.html" where case counts (Linux), "index.html" where it does
+        // not (Windows, a phone's shared storage); either way it is that file
+        File found = AgvnNwjsGame.index(dir);
+        assertEquals("index.html", found.getName().toLowerCase(Locale.ROOT));
+        assertEquals("<html>Index</html>", new String(Files.readAllBytes(found.toPath()), StandardCharsets.UTF_8));
         new File(dir, "Index.html").delete();
         assertNull("no page: Windows", AgvnNwjsGame.index(dir));
     }
