@@ -46,6 +46,9 @@ Một số nguồn không tải thẳng được trên máy cloud (chính sách 
    kèm FreeType 2.10.4 của nó, đè lên FreeType của mkxp-z. Bản vá cho SDL_ttf dựng như trên các hệ khác.
 4. `0004-error-file`: khi game dừng vì lỗi, mkxp-z ghi nội dung lỗi vào file `$AGVN_MKXPZ_ERROR_FILE`. App đọc file này
    để phân biệt game lỗi với người chơi tự thoát, rồi gợi ý "Chạy bằng Windows" hoặc cách thêm RTP.
+5. `0005-android-physfs-init`: trên Android, PhysFS coi `argv0` của `PHYSFS_init` là con trỏ `PHYSFS_AndroidInit`,
+   còn `argv[0]` của SDL là chữ `"app_process"`. Vì vậy trước bản vá, mọi game văng (SIGSEGV) trước khi đọc tệp nào.
+   Bản vá truyền NULL trên Android: PhysFS lấy `/` làm thư mục gốc, và mkxp-z không dùng thư mục đó.
 
 ## Cách chạy (Linux x86_64: máy cloud hoặc WSL)
 
