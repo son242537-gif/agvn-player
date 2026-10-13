@@ -19,6 +19,8 @@
  *     its PC version writes; when the folder will not take it, it stays in the browser and the game goes on.
  *  7. The page counts as the picked window while it shows (document.hasFocus): RPG Maker MZ moves its scenes only
  *     then, and WebView can leave the page without the focus, so every MZ game stood still on its first scene.
+ *  8. Other NW.js games made of pages (the app sets __agvnNwjs first, AgvnNwjsGame) also get `nw` as NW.js has it,
+ *     for scripts that call nw.Window.get() or nw.App without asking whether they run on NW.js.
  */
 (function () {
     'use strict';
@@ -108,12 +110,16 @@
     fs.exists = function (p, cb) { cb(fs.existsSync(p)); };
 
     var noop = function () {};
-    var nwWindow = { on: noop, close: noop, focus: noop, maximize: noop, enterFullscreen: noop, leaveFullscreen: noop,
-        toggleFullscreen: noop, showDevTools: noop, closeDevTools: noop, resizeTo: noop, moveTo: noop, setPosition: noop,
+    var nwWindow = { on: noop, once: noop, removeAllListeners: noop, close: noop, focus: noop, maximize: noop,
+        unmaximize: noop, minimize: noop, restore: noop, show: noop, hide: noop, enterFullscreen: noop,
+        leaveFullscreen: noop, toggleFullscreen: noop, showDevTools: noop, closeDevTools: noop, resizeTo: noop,
+        resizeBy: noop, moveTo: noop, moveBy: noop, setPosition: noop, setAlwaysOnTop: noop, setResizable: noop,
+        setMinimumSize: noop, setMaximumSize: noop, reload: function () { location.reload(); },
         isFullscreen: true, title: document.title };
+    nwWindow.on = nwWindow.once = function () { return nwWindow; };
     var gui = { Window: { get: function () { return nwWindow; } }, App: { quit: noop, argv: [], dataPath: '/' },
         Shell: { openExternal: noop, openItem: noop }, Menu: function () { return { append: noop, createMacBuiltin: noop }; },
-        MenuItem: function () { return {}; } };
+        MenuItem: function () { return {}; }, Screen: { Init: noop, on: noop, screens: [] } };
     var modules = { fs: fs, path: path, 'nw.gui': gui, os: { platform: function () { return 'android'; }, EOL: '\n' } };
 
     // `process` for plugins written for NW.js that read it as they load (path.dirname(process.mainModule.filename),
@@ -141,6 +147,15 @@
         proc.memoryUsage = function () { return { rss: 0, heapTotal: 0, heapUsed: 0, external: 0 }; };
         proc.stdout = proc.stderr = { write: function (s) { console.log(String(s)); return true; } };
         window.process = proc;
+    }
+
+    // --- 8: `nw` for an NW.js page game, whose scripts may use it without require('nw.gui'); package.json read on demand
+    if (window.__agvnNwjs && typeof window.nw === 'undefined') {
+        Object.defineProperty(gui.App, 'manifest', { get: function () {
+            var xhr = httpGet('/package.json');
+            try { return xhr ? JSON.parse(xhr.responseText) : {}; } catch (e) { return {}; }
+        } });
+        window.nw = gui;
     }
 
     if (typeof window.require !== 'function') {

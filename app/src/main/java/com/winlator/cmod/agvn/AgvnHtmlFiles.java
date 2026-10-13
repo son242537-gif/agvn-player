@@ -61,11 +61,12 @@ public final class AgvnHtmlFiles {
     private AgvnHtmlFiles() {}
 
     /**
-     * The response for URL path {@code urlPath}: the game file (index.html with {@code compatJs} loaded first, see
-     * assets/agvn/html-compat.js), a transparent picture for a missing .png so the game does not stop (also for a
-     * missing or broken encrypted one, {@link AgvnHtmlStandIn}, told to {@code standIn}), or 404.
+     * The response for URL path {@code urlPath}: the game file (its {@code entry} page, index.html or an NW.js game's
+     * own, with {@code compatJs} loaded first, see assets/agvn/html-compat.js), a transparent picture for a missing .png
+     * so the game does not stop (also for a missing or broken encrypted one, {@link AgvnHtmlStandIn}, told to
+     * {@code standIn}), or 404.
      */
-    public static WebResourceResponse serve(File root, String urlPath, String compatJs, Consumer<String> standIn) {
+    public static WebResourceResponse serve(File root, String entry, String urlPath, String compatJs, Consumer<String> standIn) {
         if (COMPAT_PATH.equals(urlPath) && compatJs != null)
             return text("application/javascript", compatJs);
         File file = fileFor(root, urlPath);
@@ -84,7 +85,7 @@ public final class AgvnHtmlFiles {
             return new WebResourceResponse("text/plain", "UTF-8", 404, "Not Found", CORS, empty());
         }
         String mime = mimeType(file.getName());
-        if (compatJs != null && file.getName().equalsIgnoreCase("index.html")) {
+        if (compatJs != null && (file.getName().equalsIgnoreCase("index.html") || file.getName().equalsIgnoreCase(entry))) {
             String html = FileUtils.readString(file);
             if (html != null) return text("text/html", inject(html));
         }

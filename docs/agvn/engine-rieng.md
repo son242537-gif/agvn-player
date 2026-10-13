@@ -521,3 +521,34 @@ Anh Sơn báo lại ngày 09/10/2026: chỉnh bộ phím ở màn "Điều khi�
      app lên bản mới rồi mở lại game: phím đã sửa vẫn còn.
   2. Game "Chạy nhẹ" đã có bộ phím riêng (✎) làm từ hồ sơ X. Sửa X ở màn "Điều khiển", mở game: thấy X vừa sửa. ✎ sửa
      thêm trong game, mở lại: thấy bộ vừa sửa trong game.
+
+## Game NW.js dạng trang chạy nhẹ (bản 0.1.42)
+
+Anh Sơn báo ngày 14/10/2026: Love My Back (`僕と両想いのオタク女子`, game NW.js: `index.html`, `script.js` 8 MB,
+`asset/`, chưa rõ engine) trên realme RMX2103 (Adreno 610) đen màn hình 5 lần liền, cả trước lẫn sau khi đổi tên exe.
+Qua Wine, NW.js vẽ bằng Chromium trên DXVK: thiết bị Direct3D 11 có, nhưng DXVK không lần nào tạo swapchain (không có
+dòng `Presenter: Actual swap chain properties`), app và game dùng 2 GB RAM. Game MV trên OPPO CPH2333 (cùng Adreno 610)
+chỉ 1/4 lần có swapchain. Cùng game đó, JoiPlay mở như một trang web.
+
+- **Game nào (`AgvnNwjsGame`):** engine chưa rõ (`UNKNOWN`), cạnh exe có `package.json` mà `"main"` là một trang `.html`
+  ngay trong thư mục game (`index.html`, `app://./index.html`, `./game.htm?x`), và đúng là NW.js: `package.json` có
+  `"window"`, hoặc cạnh đó có `nw.dll`, `nw_elf.dll`, `nw.pak`, `resources.pak`. Game cần Node thật ở lại Windows:
+  `"node-main"`, `"bg-script"`, thư mục `node_modules`, addon `.node` (như greenworks của Steam). Trang nằm ở thư mục
+  con (`www/index.html`) cũng ở lại Windows, vì thư mục game là gốc của trang. RPG Maker MV/MZ và Tyrano giữ cách cũ.
+- **Khi nào:** thêm game mới thì "Chạy nhẹ" (hộp xem trước ghi "Cách chạy: Chạy nhẹ"). Game đã thêm từ trước, chưa
+  chọn cách chạy, được chuyển ở lần mở sau, như game Godot (`AgvnNwjsLight`); logcat có `NW.js page game … moves to
+  Chạy nhẹ`. Game đã chọn "Chạy bằng Windows" giữ Windows. Game lỗi khi chạy nhẹ: "Tự sửa lỗi" và hộp hỏi khi game tắt
+  có "Chạy bằng Windows" như các game HTML khác.
+- **Trong WebView:** trang của game nạp `html-compat.js` trước mọi script (cả khi trang không tên `index.html`), với
+  `window.__agvnNwjs`: có `require('fs'/'path'/'os'/'nw.gui')`, `process` như game MV, và thêm `nw` (`nw.Window.get()`
+  với `on`, `enterFullscreen`, `setAlwaysOnTop`, `reload`..., `nw.App.manifest` đọc `package.json`, `nw.Screen`), cho
+  script gọi thẳng `nw` mà không hỏi. Game MV và Tyrano không có `nw` như trước. Save: localStorage của trang, hay file
+  ghi qua `fs` (cũng vào localStorage). Save của bản Windows hay JoiPlay (`save/`, `savedata/`) chưa được chuyển sang.
+- **Test:** `AgvnNwjsGameTest`, `tools/agvn/tests/html_nwjs_sim.js`.
+- **Thử máy:**
+  1. Love My Back đã có trong thư viện (bản 0.1.41 trở về trước): mở game, game chạy trong "Chạy nhẹ" (thanh ⌨ ✎ 👁 ☰,
+     không có Wine), vào được màn tiêu đề, có tiếng, chạm được. Thư viện ghi cách chạy "Chạy nhẹ".
+  2. Thêm lại Love My Back: hộp xem trước ghi "Cách chạy: Chạy nhẹ". Lưu ván, thoát, mở lại: ván còn.
+  3. "Tự sửa lỗi" → "Lỗi khác" có "Chạy bằng Windows"; chọn thì lần sau game chạy bằng Wine và giữ như vậy.
+  4. Hồi quy: một game RPG Maker MV (Chạy nhẹ) và một game Tyrano vẫn chạy, save như cũ; game Windows khác (Unity,
+     Unreal) không đổi cách chạy.

@@ -27,7 +27,7 @@ import java.io.File;
 /**
  * Plays an HTML game ({@link AgvnHtmlGame}) full screen in a WebView. Offline: only the game's own files load. The
  * "Chạy nhẹ" toolkit ({@link AgvnLightTools}) gives the keys of the Windows layout (RPG for RPG Maker MV/MZ, visual
- * novel for Tyrano), the ⌨ ✎ 👁 ☰ bar, the menu on Back and the HUD.
+ * novel for Tyrano and other NW.js page games), the ⌨ ✎ 👁 ☰ bar, the menu on Back and the HUD.
  */
 public class AgvnHtmlActivity extends AppCompatActivity {
     public static final String EXTRA_INDEX_PATH = "agvn_html_index";
@@ -35,6 +35,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     private WebView webView;
     private File root;
     private String host;
+    /** The page the game starts on, which gets html-compat.js. */
+    private String entry;
     /** assets/agvn/html-compat.js; null when unreadable (the game then runs without it). */
     private String compatJs;
     /** "Chạy bằng Windows" was picked: the Wine game now owns the keep-alive notification. */
@@ -55,7 +57,11 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         AgvnKeepAlive.start(this, getIntent().getStringExtra("shortcut_name")); // the game keeps running in the background
         AgvnLightSession.begin(this, AgvnHtmlGame.RUNNER_HTML, AgvnLightGame.folderOf(index)); // "Tự sửa lỗi" reads its end
         boolean rpgMaker = AgvnHtmlFiles.resolve(root, "/js/rpg_core.js") != null || AgvnHtmlFiles.resolve(root, "/js/rmmz_core.js") != null;
-        if (rpgMaker) compatJs = com.winlator.cmod.core.FileUtils.readString(this, "agvn/html-compat.js");
+        // an NW.js page game (AgvnNwjsGame) gets the stand-ins for require, process and nw too; Tyrano runs as before
+        boolean nwjs = !rpgMaker && !new File(root, "tyrano").isDirectory() && AgvnNwjsGame.index(root) != null;
+        entry = index.getName();
+        if (rpgMaker || nwjs) compatJs = com.winlator.cmod.core.FileUtils.readString(this, "agvn/html-compat.js");
+        if (compatJs != null && nwjs) compatJs = "window.__agvnNwjs = true;\n" + compatJs;
         if (compatJs != null && getIntent().getBooleanExtra(AgvnFullscreen.INTENT, false))
             compatJs = "window.__agvnStretch = true;\n" + compatJs; // "Toàn màn hình cho mọi game"
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -113,7 +119,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
             Uri url = request.getUrl();
             if (!host.equals(url.getHost())) return AgvnHtmlFiles.blocked(); // no network: nothing leaves the phone
-            return AgvnHtmlFiles.serve(root, url.getEncodedPath(), compatJs, AgvnLightSession.standIns(view.getContext()));
+            return AgvnHtmlFiles.serve(root, entry, url.getEncodedPath(), compatJs, AgvnLightSession.standIns(view.getContext()));
         }
 
         @Override

@@ -16,8 +16,9 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * "Chạy nhẹ": RPG Maker MV/MZ and TyranoBuilder games are web pages (index.html + JavaScript), so they run in an
- * Android WebView ({@link AgvnHtmlActivity}) without Wine or Box64: far lighter, cooler and kinder to the battery.
+ * "Chạy nhẹ": RPG Maker MV/MZ, TyranoBuilder and other NW.js page games ({@link AgvnNwjsGame}) are web pages
+ * (index.html + JavaScript), so they run in an Android WebView ({@link AgvnHtmlActivity}) without Wine or Box64: far
+ * lighter, cooler and kinder to the battery.
  * Ren'Py 8 games ({@link AgvnRenpyGame}), RPG Maker XP/VX/VX Ace games ({@link AgvnRgssGame}) and Godot 4 games
  * ({@link AgvnGodotLight}) have their own "Chạy nhẹ". The shortcut keeps its Wine Exec line; the extra
  * {@link #EXTRA_RUNNER} decides which one starts.
@@ -33,8 +34,12 @@ public final class AgvnHtmlGame {
 
     private AgvnHtmlGame() {}
 
-    /** index.html of a web-engine game, or null (other engines, or files packed into package.nw / the exe). */
+    /**
+     * index.html of a web-engine game, or the page an NW.js game starts on ({@link AgvnNwjsGame}); null for other
+     * engines, or files packed into package.nw / the exe.
+     */
     public static File indexFor(File gameDir, GameExeResolver.Engine engine) {
+        if (engine == GameExeResolver.Engine.UNKNOWN) return AgvnNwjsGame.index(gameDir);
         if (engine == GameExeResolver.Engine.RPGMAKER_MV) {
             File www = findIndex(new File(gameDir, "www"));
             return www != null ? www : findIndex(gameDir);
@@ -66,7 +71,8 @@ public final class AgvnHtmlGame {
     /**
      * Called first thing by XServerDisplayActivity: opens "Chạy nhẹ" instead of Wine when the shortcut asks for it.
      * Returns true when the caller must finish(). A game that moved (no index.html, no Ren'Py 8 or RGSS game) runs in Wine.
-     * A Godot game imported before Godot had "Chạy nhẹ" (no runner yet) gets it as soon as Godot 4.7 runs it.
+     * A Godot game imported before Godot had "Chạy nhẹ" (no runner yet) gets it as soon as Godot 4.7 runs it, and an
+     * NW.js page game as soon as its page is fit ({@link AgvnNwjsLight}).
      */
     public static boolean redirect(Activity activity) {
         Intent from = activity.getIntent();
@@ -80,8 +86,8 @@ public final class AgvnHtmlGame {
         boolean godot = RUNNER_GODOT.equals(runner) || ((runner == null || runner.isEmpty())
                 && GameExeResolver.Engine.GODOT.name().equals(extras.get(AgvnGameImporter.EXTRA_ENGINE)));
         if (godot) return AgvnGodotLight.start(activity, from, extras);
-        if (!RUNNER_HTML.equals(extras.get(EXTRA_RUNNER))) return false;
-        String index = extras.get(EXTRA_INDEX);
+        // an NW.js page game imported before Chạy nhẹ took such games gets it now (AgvnNwjsLight)
+        String index = RUNNER_HTML.equals(runner) ? extras.get(EXTRA_INDEX) : AgvnNwjsLight.take(activity, from, extras);
         if (index == null || !new File(index).isFile()) return false;
         Intent intent = new Intent(activity, AgvnHtmlActivity.class);
         if (from.getExtras() != null) intent.putExtras(from.getExtras());
@@ -118,12 +124,18 @@ public final class AgvnHtmlGame {
 
     /** True when the exe in the .desktop file's Exec line exists, or when the line cannot be read (nothing to hide then). */
     static boolean exeExists(File desktopFile) {
+        File exe = exeIn(desktopFile);
+        return exe == null || exe.isFile();
+    }
+
+    /** The exe in the .desktop file's Exec line (its last quoted path), or null when there is none to read. */
+    static File exeIn(File desktopFile) {
         for (String line : FileUtils.readLines(desktopFile)) {
             if (!line.startsWith("Exec=")) continue;
             int end = line.lastIndexOf('"'), start = end > 0 ? line.lastIndexOf('"', end - 1) : -1;
-            return start < 0 || new File(line.substring(start + 1, end)).isFile();
+            return start < 0 ? null : new File(line.substring(start + 1, end));
         }
-        return true;
+        return null;
     }
 
     /** The "container_id:N" line launcher shortcuts rely on, or 0. */
