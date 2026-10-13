@@ -101,7 +101,8 @@ final class AgvnFixApply {
                 break;
             }
             case "run-windows":
-                s.putExtra(AgvnHtmlGame.EXTRA_RUNNER, fix.to); // the next start is Wine's
+            case "rgss-light":
+                s.putExtra(AgvnHtmlGame.EXTRA_RUNNER, fix.to); // the next start is Wine's, or mkxp-z's
                 break;
             case "rgss-frameskip":
                 s.putExtra(AgvnRgssFiles.EXTRA_FRAME_SKIP, fix.to);

@@ -564,6 +564,9 @@ mở bằng "Chạy nhẹ" đều văng khoảng 70 ms sau khi SDL gọi `SDL_ma
 - **Sửa (bản vá `0005-android-physfs-init`):** trên Android, `FileSystem` của mkxp-z gọi `PHYSFS_init(NULL)`. PhysFS lấy
   `/` làm thư mục gốc. mkxp-z không dùng thư mục đó: thư mục game, gói `.rgss*a` và RTP đều được gắn theo đường dẫn
   riêng. Trên các hệ khác, mã không đổi. `libmkxp-z.so` dựng lại, `mkxpz_so_sha256` mới trong `pins.txt`.
+- **Game đã chuyển sang Windows vì lỗi này:** lối tắt giữ lựa chọn của người chơi. Khi game đó lỗi lúc chạy bằng
+  Windows (crash, tắt ngay, hộp "No access to memory location."), "Tự sửa lỗi" có nút đầu "Chạy nhẹ" (fix
+  `rgss-light`, xem "DLL ở bộ nhớ chung" trong `tu-sua-loi.md`).
 - **Runner văng vì lỗi mã máy thì có nhật ký (`AgvnTombstone`):** trước đây tiến trình `:rgss` chết vì tín hiệu thì
   không để lại gì trong `AGVN-Player/logs/`, vì mkxp-z chưa kịp ghi lỗi. Nay khi thư viện mở lại, "Tự sửa lỗi" đọc lý do
   Android ghi lại. Runner Chạy nhẹ (mkxp-z, Ren'Py, Godot) bị crash thì app ghi một phiên vào

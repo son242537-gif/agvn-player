@@ -52,13 +52,14 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | GPU hết bộ nhớ dựng hình (bản 0.1.30) | Driver Mali báo `GROUP_ERROR_TILER_HEAP_OOM` từ 20 lần trong một phiên, khi game đang chạy (xem ví dụ Thanh Âm Mùa Hạ bên dưới) | Hỏi ngay trên thanh trong game: hạ Đồ họa. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ. Phiên đó không được tính là chạy tốt |
 | File game hỏng | Unity: `is corrupted` | Gửi nhật ký (cần chép lại game) |
 | Không tìm thấy file của game | Hộp "File not found." của Wine: file chạy của game, hoặc file game cần, không còn ở chỗ cũ (thư mục game bị đổi tên, chuyển hay xoá) | Gửi nhật ký (cần chép lại thư mục game, thêm lại game) |
+| Game không mở được thư viện DLL của nó (bản 0.1.42) | Hộp "No access to memory location." của Wine (dòng `MSGBOX_OnInit`, có cả khi tắt nhật ký Wine). Ca đầu, 14/10/2026: game RPG Maker VX Ace ở `Download`, Proton 10 + FEX. `DllMain` của `RGSS301.dll` gặp lỗi truy cập bộ nhớ, ngay sau dòng `noexec filesystem, mapped … without PROT_EXEC`. Xem "DLL ở bộ nhớ chung" bên dưới | Chạy nhẹ (game RPG Maker XP/VX/VX Ace), chạy bằng Wine cũ (Proton 9), gửi nhật ký |
 | File chạy của game không đúng định dạng | Hộp "Bad EXE format" của Wine: file được mở không phải chương trình Windows mà Wine chạy được (file hỏng hoặc chép chưa xong, chương trình 16-bit hay DOS, không phải file chạy của game). Trước đây app chỉ báo "Game tắt ngay sau khi mở" | Gửi nhật ký (cần chép lại game, hoặc thêm lại game bằng đúng file chạy) |
 | Game Unity crash rồi đứng hình | Unity tự bắt crash nên Wine không thấy gì: nhật ký Unity (`Player.log`) có `Crash!!!` và "A crash has been intercepted by the crash handler". App đọc nhật ký này cả lúc game đang chạy (xem ví dụ Become A Vtuber bên dưới) | Giả lập CPU ổn định hơn, Wine cũ (Proton 9), đổi DXVK, đổi driver, về cấu hình gốc, gửi nhật ký |
-| Game crash | Wine in báo cáo crash | Đổi DXVK, giả lập CPU ổn định hơn, đổi driver, về cấu hình gốc |
+| Game crash | Wine in báo cáo crash | Chạy nhẹ (game RPG Maker XP/VX/VX Ace đang chạy Windows), đổi DXVK, giả lập CPU ổn định hơn, đổi driver, về cấu hình gốc |
 | Game tự tắt lúc máy gần hết RAM | Game tự đóng, không crash, không câu lỗi, trong khi 30 giây trước đó RAM trống đã xuống dưới mức của thanh cảnh báo RAM (một phần mười RAM của máy, từ 600 MB đến 1,2 GB), kể cả khi game chưa kịp hiện hình | Dùng lại cấu hình đã chạy được, hạ Đồ họa, gửi nhật ký. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ. Game đã tiết kiệm như vậy mà vẫn hết RAM: không đề nghị hạ Đồ họa nữa |
 | Game không chịu độ phân giải nhỏ ("The current resolution is too low") | Game tắt trước khi hiện hình, màn hình dưới 480 dòng | Nâng Đồ họa (thường là Thấp 854×480), dùng lại cấu hình đã chạy được |
 | Game không chạy với cấu hình mới | Lần trước chạy được, đổi cấu hình xong thì tắt trước khi hiện hình | Dùng lại cấu hình đã chạy được, về cấu hình gốc |
-| Game tắt ngay, không rõ lỗi | Game tắt trước khi hiện hình | Về cấu hình gốc, đổi DXVK, đổi driver, gửi nhật ký |
+| Game tắt ngay, không rõ lỗi | Game tắt trước khi hiện hình | Chạy nhẹ (game RPG Maker XP/VX/VX Ace đang chạy Windows), về cấu hình gốc, đổi DXVK, đổi driver, gửi nhật ký |
 
 Ví dụ ngày 06/10 (bản 0.1.20): Thorn Sin (Unity 2020.3, DirectX 11) trên Xiaomi 24094RAD4G, GPU PowerVR BXM-8-256,
 driver Vulkan 1.1. Cả năm lần chơi, game chạy bằng WineD3D và tắt ở "Failed to initialize graphics": WineD3D vẽ bằng
@@ -209,7 +210,7 @@ nút vẫn được hỏi (`AgvnWrapperPasses.creatingShader`).
 |---|---|---|
 | Game báo lỗi script | Ren'Py ghi `traceback.txt` trong lúc chơi; game MV/MZ hiện màn hình lỗi hoặc thiếu file ảnh, dữ liệu (`html-compat.js` giữ câu lỗi) | Chạy bằng Windows, gửi nhật ký |
 | Trang game HTML bị tắt | WebView của Android mất trang game (thường do hết RAM) | Chạy bằng Windows, gửi nhật ký |
-| Game bị tắt đột ngột | Android ghi tiến trình của Ren'Py hoặc mkxp-z bị lỗi (`CRASH`, `CRASH_NATIVE`) | Chạy bằng Windows, gửi nhật ký |
+| Game bị tắt đột ngột | Android ghi tiến trình của Ren'Py hoặc mkxp-z bị lỗi (`CRASH`, `CRASH_NATIVE`). Từ bản 0.1.42, phiên đó được lưu vào `AGVN-Player/logs/<tên game>/<giờ>/`: `tom-tat.txt`, và với lỗi mã máy, `loi-ma-may.txt` (tín hiệu, địa chỉ lỗi, các dòng `#00 pc …` đọc từ tombstone của Android 12 trở lên, `AgvnTombstone`) | Chạy bằng Windows, gửi nhật ký |
 | Game bị treo | Android ghi tiến trình không phản hồi (`ANR`) | Chạy bằng Windows, gửi nhật ký |
 
 Lỗi mà bộ chạy game đã tự giải thích kèm cách sửa thì không hỏi lại ở thư viện: lỗi của mkxp-z (kể cả hướng dẫn chép
@@ -1150,3 +1151,45 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
 - [ ] Một game khác không bị báo lỗi: cấu hình không đổi gì.
 - [ ] Nếu gặp game Unity chỉ crash lúc thoát từ menu (hộp "Game bị lỗi và đứng hình" sau khi thoát): gửi nhật ký phiên
       đó (`Player.log` cho biết Unity ghi gì ngay trước `Crash!!!`), để app nhận ra crash lúc thoát và thôi hỏi.
+
+## DLL ở bộ nhớ chung: "No access to memory location." (bản 0.1.42)
+
+Báo cáo ngày 14/10/2026 (POCO F8 Pro, bản 0.1.32): một game RPG Maker VX Ace bản PC chuẩn ở
+`/storage/emulated/0/Download/AGVN/…`, chạy bằng Windows (Proton 10, FEX), hiện hộp "No access to memory location." ở
+cả hai lần mở. Log Wine (đã bật nhật ký):
+
+```
+warn:module:alloc_module disabling no-exec because of L"RGSS301.dll"
+warn:virtual:map_file_into_view noexec filesystem, mapped 0x1440000-0x154a000 without PROT_EXEC
+warn:seh:dispatch_exception EXCEPTION_ACCESS_VIOLATION exception (code=c0000005) raised
+warn:module:process_attach Initialization of L"RGSS301.dll" failed
+trace:msgbox:MSGBOX_OnInit L"No access to memory location.\r\n"
+```
+
+- **Hai bản Wine xử lý khác nhau.** Bộ nhớ chung của Android gắn `noexec`: không chạy mã thẳng từ file được. Đọc mã máy
+  `ntdll.so` của hai gói trong app:
+  - Proton 10 (`proton-10.0-4-arm64ec.wcp`) có đoạn sửa riêng, không có trong Wine gốc: khi ánh xạ chung (`MAP_SHARED`)
+    của một file cần quyền chạy bị từ chối, nó ánh xạ lại file mà bỏ quyền chạy (`noexec filesystem, mapped … without
+    PROT_EXEC`).
+  - Proton 9 (Wine 9.0) chép file vào bộ nhớ thường rồi cấp quyền chạy, cho mọi ánh xạ (`failed to set PROT_EXEC on
+    file map, noexec filesystem?`).
+  - `RGSS301.dll` không có cờ NX, nên từ lúc nạp nó, Wine xin quyền chạy cho mọi vùng nhớ đọc được. Ở Proton 10, vùng
+    ánh xạ từ file ở `Download` không có quyền đó, và Wine không đổi được quyền của vùng này nữa. Chưa thử trên máy
+    xem Proton 9 có chạy được game này không.
+- **App làm gì (`dll-no-access`):** hộp đó hiện thì "Tự sửa lỗi" đề nghị, theo thứ tự:
+  1. "Chạy nhẹ" (fix `rgss-light`), cho game RPG Maker XP/VX/VX Ace đang chạy Windows. mkxp-z chạy game thẳng trên
+     Android, không qua Wine. Fix này cũng đứng đầu "Game crash" và "Game tắt ngay, không rõ lỗi" của game RPG Maker
+     XP/VX/VX Ace đang chạy Windows (bản 0.1.41 trở về trước, Chạy nhẹ văng ngay ở mọi game loại này, nên có người
+     chơi đã chuyển game sang Windows).
+  2. "Chạy bằng Wine cũ (Proton 9)", cho game đang chạy Proton 10.
+  3. Gửi nhật ký.
+  Như mọi cách sửa, cách nào đã thử mà không hết lỗi thì không đề nghị lại.
+- **Chưa làm:** sửa trong Wine của Proton 10 (cho ánh xạ đó chép file vào bộ nhớ như Proton 9) cần dựng lại gói Proton.
+- **Test:** `AgvnDoctorTest.aDllThatCannotRunFromSharedStorage`.
+- **Thử máy:**
+  1. Game VX Ace của báo cáo, đang chạy bằng Windows (Proton 10): hộp "No access to memory location." hiện, tắt game,
+     về thư viện. "Tự sửa lỗi" hỏi "Game không mở được thư viện DLL của nó", nút đầu là "Chạy nhẹ: chạy game RPG
+     Maker…". Bấm: game mở bằng Chạy nhẹ, vào màn tiêu đề.
+  2. Để biết Proton 9 có chạy được game không: trong Chạy nhẹ, menu ☰ → "Chạy bằng Windows". Hộp hiện lại, tắt game;
+     ở "Tự sửa lỗi" bấm "Chạy bằng Wine cũ (Proton 9)". Ghi lại kết quả, gửi nhật ký Wine.
+  3. Hồi quy: game Windows 32-bit đã chạy được (KiriKiri, Unity x86, game DirectX) vẫn chạy, không có hộp hỏi.

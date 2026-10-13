@@ -13,6 +13,7 @@ import com.winlator.cmod.core.DefaultVersion;
 import com.winlator.cmod.core.EnvVars;
 import com.winlator.cmod.core.OpenGLDriverDefaults;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -87,6 +88,11 @@ final class AgvnFixes {
             case "rgss-frameskip":
                 return AgvnHtmlGame.RUNNER_RGSS.equals(runner) && !AgvnRgssFiles.frameSkip(a, s)
                         ? new Fix(id, a.getString(R.string.agvn_fix_rgss_frameskip), "1") : null;
+            case "rgss-light": { // an RPG Maker XP/VX/VX Ace game on Windows, back on mkxp-z (Chạy nhẹ needs no Wine)
+                String dir = s.getExtra(AgvnGameImporter.EXTRA_GAME_DIR);
+                return !light && !dir.isEmpty() && AgvnRgssGame.canRun(new File(dir))
+                        ? new Fix(id, a.getString(R.string.agvn_fix_rgss_light), AgvnHtmlGame.RUNNER_RGSS) : null;
+            }
             case "restore-good":
                 return AgvnGoodConfig.hasGood(state) && !AgvnGoodConfig.changed(AgvnGoodConfig.good(state),
                         AgvnGoodConfig.snapshot(s)).isEmpty() ? new Fix(id, a.getString(R.string.agvn_fix_restore_good), null) : null;

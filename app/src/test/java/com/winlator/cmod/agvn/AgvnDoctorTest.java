@@ -27,7 +27,7 @@ public class AgvnDoctorTest {
     private static final Set<String> FIXES = new HashSet<>(Arrays.asList("restore-good", "reset", "quality-down",
             "quality-up", "dxvk-other", "dxvk-arm64ec", "driver-other", "wined3d", "godot-renderer", "godot-angle", "godot-undo",
             "render-gmem", "render-auto", "emulator-stable", "emulator-fast", "wincomponent", "power-save-settings",
-            "app-settings", "send-logs", "run-windows", "rgss-frameskip", "wrapper-constants", "wrapper-clip", "wine-mono",
+            "app-settings", "send-logs", "run-windows", "rgss-frameskip", "rgss-light", "wrapper-constants", "wrapper-clip", "wine-mono",
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "godot-light",
             "godot-light-renderer", "mods-off", "raw-mouse", "ue-wait"));
@@ -236,6 +236,22 @@ public class AgvnDoctorTest {
         ev.changed = true;
         assertEquals("file-not-found", found(ev));
         assertEquals("only Wine's box", "no-start", found(noStart("File not found: save1.dat")));
+    }
+
+    @Test
+    public void aDllThatCannotRunFromSharedStorage() {
+        // an RPG Maker VX Ace game in Download on Proton 10 + FEX (POCO F8 Pro, 14/10/2026): RGSS301.dll's DllMain hit an
+        // access violation, and Game.exe showed Wine's text of ERROR_NOACCESS, whether the game window drew or not
+        String box = "0124:trace:msgbox:MSGBOX_OnInit L\"No access to memory location.\\r\\n\"";
+        assertEquals("dll-no-access", found(noStart(
+                "0124:warn:virtual:map_file_into_view noexec filesystem, mapped 0x1440000-0x154a000 without PROT_EXEC",
+                "0124:warn:module:process_attach Initialization of L\"RGSS301.dll\" failed", box)));
+        AgvnEvidence drew = new AgvnEvidence();
+        drew.lines.add(box);
+        assertEquals("dll-no-access", found(drew));
+        assertEquals(Arrays.asList("rgss-light", "wine-old", "send-logs"), catalog.byId("dll-no-access").fixes);
+        assertEquals("no box, no finding", "no-start", found(noStart("0124:warn:module:process_attach Initialization of "
+                + "L\"RGSS301.dll\" failed")));
     }
 
     @Test
