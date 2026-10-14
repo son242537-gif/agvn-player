@@ -1,0 +1,5 @@
+AGVN Player v0.1.44 - agvn.io
+
+Sửa lỗi:
+- Thông báo "Game đang dùng quá nhiều RAM" không còn hiện lại liên tục: bấm "Để sau" thì thông báo không hiện nữa trong lần chơi đó, trừ khi RAM trống tiếp tục giảm mạnh. Bỏ hộp "Sắp hết RAM" đếm ngược 30 giây, vì nó báo trùng với thông báo trên.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
