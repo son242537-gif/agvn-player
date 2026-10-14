@@ -156,3 +156,24 @@ khi đã tiết kiệm như vậy thì "Tự sửa lỗi" không đề nghị h�
     wrapper ("Kiểu giả lập BCN: software") không, và tải chậm hơn bao nhiêu.
   - Cờ V8 `--optimize-for-size` cho game NW.js (RPG Maker MV/MZ, Tyrano).
   - Giảm số luồng dịch shader của DXVK.
+
+## Thanh "Game đang dùng quá nhiều RAM" không quay lại sau "Để sau" (bản 0.1.44)
+
+Anh Sơn báo ngày 14/10/2026: thông báo hết RAM cứ hiện lại sau khi tắt. Có hai chỗ báo:
+
+- **Thanh RAM (`AgvnMemoryWatch`, `AgvnMemoryRules`):** báo khi RAM trống dưới một phần mười RAM của máy (600 MB–1,2 GB),
+  hai lần đo liền nhau, mỗi lần đo cách 5 giây. Sau mỗi lần báo, thanh nghỉ 5 phút, **trừ khi RAM trống dưới một nửa
+  mức đó**. Máy chạy game nặng có thể ở dưới nửa mức đó suốt lúc chơi mà game vẫn chạy được. Vì vậy cứ bấm "Để sau"
+  thì 10 giây sau thanh lại hiện.
+- **Hộp "Sắp hết RAM" (`GameSessionGuard`):** báo khi RAM trống dưới 300 MB, nghỉ 5 phút. Thanh RAM luôn báo trước nó,
+  nên đây là thông báo thứ hai cho cùng một việc, cứ 5 phút lại hiện.
+
+Từ bản 0.1.44:
+- Thanh RAM chỉ báo lại sớm khi RAM trống **giảm còn dưới một nửa so với lúc báo lần trước**. Ví dụ báo lúc còn 420 MB
+  thì lần sau báo khi xuống dưới 210 MB. Ở yên một mức thấp thì 5 phút mới báo lại một lần.
+- Người chơi bấm "Để sau": thanh không hiện lại trong lần chơi đó, trừ khi RAM trống lại giảm còn một nửa như trên.
+- Hộp "Sắp hết RAM" bỏ, chỉ còn thanh RAM. Hộp "Máy đang nóng" vẫn giữ như cũ.
+- Mức báo không đổi, và `su-kien.txt` vẫn ghi mỗi lần báo. "Tự sửa lỗi" vẫn đọc RAM trống như trước.
+- **Test:** `AgvnMemoryWatchTest.ramThatStaysLowIsToldOnceAndLaterIsKept`.
+- **Thử máy:** mở một game nặng tới khi thanh RAM hiện, bấm "Để sau", chơi tiếp 10 phút: thanh không hiện lại (trừ khi
+  RAM trống giảm còn một nửa). Không còn hộp "Sắp hết RAM" có đếm ngược 30 giây.

@@ -19,7 +19,23 @@ public class AgvnMemoryWatchTest {
         assertEquals(AgvnMemoryRules.Reason.LOW_FREE, rules.feed(t + 5 * S, START, 1000, 3000, t));
         assertEquals("cooldown", NONE, rules.feed(t + 10 * S, START, 1000, 3000, t));
         assertEquals("cooldown", NONE, rules.feed(t + 15 * S, START, 1000, 3000, t));
-        assertEquals("under half the threshold breaks the cooldown", AgvnMemoryRules.Reason.LOW_FREE, rules.feed(t + 20 * S, START, 500, 3000, t));
+        assertEquals("under half the last warning's free RAM breaks the cooldown", AgvnMemoryRules.Reason.LOW_FREE,
+                rules.feed(t + 20 * S, START, 450, 3000, t));
+    }
+
+    @Test
+    public void ramThatStaysLowIsToldOnceAndLaterIsKept() {
+        // 14/10/2026: free RAM stayed under half the bar's level, and the bar came back 10 s after every "Để sau"
+        AgvnMemoryRules rules = new AgvnMemoryRules(11_000);
+        long t = START + 10 * S;
+        rules.feed(t, START, 450, 3000, t);
+        assertEquals(AgvnMemoryRules.Reason.LOW_FREE, rules.feed(t += 5 * S, START, 450, 3000, t));
+        for (int i = 0; i < 59; i++) assertEquals("still low, not lower: nothing new", NONE, rules.feed(t += 5 * S, START, 420, 3000, t));
+        assertEquals("after the cooldown, told again", AgvnMemoryRules.Reason.LOW_FREE, rules.feed(t += 5 * S, START, 420, 3000, t));
+        rules.later(); // "Để sau"
+        for (int i = 0; i < 100; i++) assertEquals("for the rest of the game", NONE, rules.feed(t += 5 * S, START, 400, 3000, t));
+        assertEquals("unless free RAM halves", AgvnMemoryRules.Reason.LOW_FREE, rules.feed(t += 5 * S, START, 200, 3000, t));
+        assertEquals(NONE, rules.feed(t + 5 * S, START, 190, 3000, t));
     }
 
     @Test

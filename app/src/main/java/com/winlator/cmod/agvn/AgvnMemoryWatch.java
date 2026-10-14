@@ -118,7 +118,7 @@ public final class AgvnMemoryWatch {
         String detail = activity.getString(R.string.agvn_ram_detail, gb(freeMb), gb(use.rssMb + use.dmabufMb), gb(use.dmabufMb));
         if (reason == AgvnMemoryRules.Reason.GROWING) detail += "\n" + activity.getString(R.string.agvn_ram_growing);
         AgvnWarningBar.show(activity, activity.getString(R.string.agvn_ram_title), detail,
-                new AgvnWarningBar.Choice(R.string.agvn_ram_later, null),
+                new AgvnWarningBar.Choice(R.string.agvn_ram_later, rules::later), // asked again only if RAM halves
                 new AgvnWarningBar.Choice(R.string.agvn_ram_exit, exitGame));
     }
 

@@ -11,9 +11,10 @@ import androidx.appcompat.app.AlertDialog;
 import com.winlator.cmod.R;
 
 /**
- * Polls temperature and free RAM every 2 s while a game is in the foreground and shows a gentle warning
- * with a 30 s countdown. Never closes the game or other apps by itself. The heat warning's "Máy bố, bố biết" keeps
- * heat quiet for a day ({@link AgvnHeatAck}).
+ * Polls temperature every 2 s while a game is in the foreground and shows a gentle warning with a 30 s countdown.
+ * Never closes the game or other apps by itself. The heat warning's "Máy bố, bố biết" keeps heat quiet for a day
+ * ({@link AgvnHeatAck}). Free RAM is {@link AgvnMemoryWatch}'s bar alone: its level follows the phone's RAM and it keeps
+ * the player's "Để sau", while this dialog's "Sắp hết RAM" under 300 MB came back every 5 minutes (14/10/2026).
  */
 public final class GameSessionGuard {
     private static final String TAG = "AGVN";
@@ -38,7 +39,7 @@ public final class GameSessionGuard {
                     Log.w(TAG, "session guard sample failed", e);
                     decision = SessionGuard.Decision.OK;
                 }
-                if (decision != SessionGuard.Decision.OK) warn(decision);
+                if (decision == SessionGuard.Decision.WARN_THERMAL) warn();
             }
             handler.postDelayed(this, POLL_MS);
         }
@@ -73,19 +74,16 @@ public final class GameSessionGuard {
         dialog = null;
     }
 
-    private void warn(SessionGuard.Decision decision) {
+    private void warn() {
         if (activity.isFinishing()) return;
-        boolean heat = decision == SessionGuard.Decision.WARN_THERMAL;
         // AGVN: heat is told once per game (this dialog or the heat bar), not for a day after "Máy bố, bố biết"
-        if (heat && (AgvnHeatAck.quiet(activity) || !AgvnHeatWatch.firstHeatWarning(activity))) return;
-        Log.w(TAG, "session guard: " + decision);
-        String message = activity.getString(heat ? R.string.agvn_guard_thermal : R.string.agvn_guard_low_ram);
-        if (heat) message += "\n" + activity.getString(R.string.agvn_guard_heat_ack_note);
+        if (AgvnHeatAck.quiet(activity) || !AgvnHeatWatch.firstHeatWarning(activity)) return;
+        Log.w(TAG, "session guard: " + SessionGuard.Decision.WARN_THERMAL);
+        String message = activity.getString(R.string.agvn_guard_thermal) + "\n" + activity.getString(R.string.agvn_guard_heat_ack_note);
         AlertDialog.Builder builder = new AlertDialog.Builder(activity)
-                .setTitle(heat ? R.string.agvn_guard_thermal_title : R.string.agvn_guard_low_ram_title)
-                .setMessage(message);
-        if (heat) builder.setPositiveButton(R.string.agvn_guard_heat_ack, (d, w) -> AgvnHeatAck.acknowledge(activity));
-        else builder.setPositiveButton(android.R.string.ok, null);
+                .setTitle(R.string.agvn_guard_thermal_title)
+                .setMessage(message)
+                .setPositiveButton(R.string.agvn_guard_heat_ack, (d, w) -> AgvnHeatAck.acknowledge(activity));
         dialog = builder.create();
         dialog.show();
         countdown(dialog, message, COUNTDOWN_S);
