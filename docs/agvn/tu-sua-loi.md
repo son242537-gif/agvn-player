@@ -1193,3 +1193,32 @@ trace:msgbox:MSGBOX_OnInit L"No access to memory location.\r\n"
   2. Để biết Proton 9 có chạy được game không: trong Chạy nhẹ, menu ☰ → "Chạy bằng Windows". Hộp hiện lại, tắt game;
      ở "Tự sửa lỗi" bấm "Chạy bằng Wine cũ (Proton 9)". Ghi lại kết quả, gửi nhật ký Wine.
   3. Hồi quy: game Windows 32-bit đã chạy được (KiriKiri, Unity x86, game DirectX) vẫn chạy, không có hộp hỏi.
+
+## Thư mục có dấu cách hoặc dấu chấm ở cuối tên ("Game ")
+
+Nhật ký ngày 14/10/2026 (Lifeguard Holic, Unity 6, Xiaomi 23049RAD8C, bản 0.1.42): game đứng ở màn hình chờ, cả 4 lần
+mở. Game vẫn vẽ 29 FPS, luồng bận nhất 2%, GPU 7%. `Player.log` của Unity ghi ngay lúc khởi động:
+
+```
+System.Exception: Invalid path in TextDataProvider : 'F:/Game /LifeguardHolic-GAMEHUB-AGVN/Lifeguard Holic_Data/StreamingAssets/aa/settings.json'
+```
+
+- **Vì sao:** thư mục chứa game tên là `Game ` (dấu cách ở cuối). Bàn phím điện thoại tự thêm dấu cách sau một từ gợi ý,
+  và Android giữ nguyên tên đó. Windows không có tên như vậy: Mono và .NET (phần C# của game Unity) cắt dấu cách ở cuối
+  mọi thư mục trong đường dẫn, nên game đi tìm `F:/Game/…` và không thấy. Phần C++ của Unity vẫn mở được game, nên
+  game lên tới màn hình chờ rồi đứng ở đó: Addressables không nạp được, Naninovel không khởi động được. Wine cũng tự bỏ
+  dấu chấm ở cuối tên thư mục, nên thư mục `Game.` thì game không mở được.
+- **Từ bản 0.1.43 (`AgvnPathLink`):** khi một thư mục trên đường tới file chạy có tên kết thúc bằng dấu cách hoặc dấu
+  chấm, app mở game qua một liên kết trong ổ C:, `C:\agvn-links\Game-<mã>`. Liên kết mang tên đã bỏ dấu cách và trỏ về
+  đúng thư mục đó, nên file, save và cài đặt của game vẫn ở chỗ cũ. Chỉ lệnh mở game của lần đó đổi; lối tắt giữ đường
+  dẫn thật. `su-kien.txt` ghi một dòng "Thư mục "Game " có dấu cách hoặc dấu chấm ở cuối tên…". Game ở thư mục bình
+  thường mở như trước.
+- **Trước khi có bản đó:** đổi tên thư mục bỏ dấu cách ở cuối (`Game ` → `Game`), rồi thêm lại game. Save của game Unity
+  nằm trong ổ C: của app nên vẫn còn.
+- **Test:** `AgvnPathLinkTest`. Test tạo liên kết thật chỉ chạy trên ổ kiểu Linux; trên Windows, nơi anh Sơn dựng bản phát
+  hành, test đó được bỏ qua, vì Windows tự cắt dấu cách và cần quyền mới tạo được liên kết.
+- **Thử máy:**
+  1. Đổi tên thư mục chứa một game Unity thành `Game ` (có dấu cách ở cuối), mở game: game qua màn hình chờ, vào menu.
+     `su-kien.txt` có dòng "Thư mục "Game " có dấu cách…".
+  2. Lưu, thoát, mở lại: save còn.
+  3. Hồi quy: game ở thư mục bình thường không có dòng đó, mở như trước.
