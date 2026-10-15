@@ -1,0 +1,6 @@
+AGVN Player v0.1.46 - agvn.io
+
+Sửa lỗi:
+- Game Windows tự tắt khi bạn rời app (về màn hình chính, tắt màn hình) một lúc rồi quay lại: giờ game chạy tiếp như trước khi rời.
+- "Tự sửa lỗi" không còn tính cách đang thử là "không giúp" khi game tắt vì bạn đã rời app rồi quay lại.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
