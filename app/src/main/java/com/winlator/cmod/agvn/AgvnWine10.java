@@ -23,8 +23,8 @@ import java.util.regex.Pattern;
 /**
  * Proton 10, AGVN's second Wine (app/agvn-wine.gradle). Proton 9's mfplat drops the codec data of a movie's video type,
  * so a WMV3 movie never plays and the game waits for ever (KiriKiri ticket, 06/10); Proton 10 plays it. New games go
- * to Proton 10, but .NET games ({@link #forImport}); a game on Proton 9 whose movie does not play moves over
- * ({@link AgvnMovieWatch}), and one that fails on Proton 10 can go back ("Tự sửa lỗi": wine-old). Wine belongs to a
+ * to Proton 9 ({@link #forImport}); a game on Proton 9 whose movie does not play moves over ({@link AgvnMovieWatch}),
+ * and one that fails on Proton 10 can go back ("Tự sửa lỗi": wine-old). Wine belongs to a
  * container, so Proton 10 has its own ({@link #CONTAINER_NAME}), made once like the first one. The bundled package is
  * unpacked once, as the player's .wcp would be (ContentsManager), without its build files (.a) and the libraries in
  * lib/, which nothing here loads: AGVN draws through X11 and lib/ is not on the library path. Worker threads.
@@ -129,15 +129,13 @@ public final class AgvnWine10 {
     }
 
     /**
-     * The container a game being added goes to: Proton 10's; for a .NET game (Proton 10 asks for Wine Mono 10.4.1, the
-     * app has 9.3.1), or when Proton 10 cannot be set up, one with the other Wine. Null when there is no container.
+     * The container a game being added goes to: Proton 9's, the maintainer's default since 15/10/2026 (0.1.45). Proton
+     * 10 is offered to a game when its problem shows: a movie Proton 9 cannot play ({@link AgvnMovieWatch}). Proton 10's
+     * only when no container has another Wine; null when there is no container.
      */
-    static Container forImport(Context ctx, File exe, IntConsumer percent) {
+    static Container forImport(Context ctx) {
         List<Container> all = new ContainerManager(ctx).getContainers();
-        Container other = find(all, false);
-        if (other == null && !all.isEmpty()) other = all.get(0);
-        if (exe != null && exe.isFile() && AgvnWineMono.isDotNet(exe)) return other;
-        Container ten = container(ctx, percent);
-        return ten != null ? ten : other;
+        Container nine = find(all, false);
+        return nine != null ? nine : all.isEmpty() ? null : all.get(0);
     }
 }

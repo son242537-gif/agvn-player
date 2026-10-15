@@ -26,7 +26,6 @@ import java.util.concurrent.Executors;
 public final class AgvnImportDialog {
     /** One import at a time, in tap order. */
     private static final ExecutorService IO = Executors.newSingleThreadExecutor();
-    private static AlertDialog preparing;
 
     private AgvnImportDialog() {}
 
@@ -91,8 +90,8 @@ public final class AgvnImportDialog {
     }
 
     /**
-     * Imports into the container the game already lives in (same name, so the shortcut is updated), else Proton 10's
-     * ({@link AgvnWine10#forImport}: made once, about a minute, said in a dialog), or Proton 9's for a .NET game.
+     * Imports into the container the game already lives in (same name, so the shortcut is updated), else Proton 9's
+     * ({@link AgvnWine10#forImport}).
      */
     private static void doImport(MainActivity activity, AgvnGameImporter.Candidate candidate, DeviceTier tier,
                                  AgvnLibraryIndex.Existing existing, Runnable onImported) {
@@ -103,7 +102,7 @@ public final class AgvnImportDialog {
         if (existing != null) candidate.profile.name = existing.name;
         Container known = existing != null ? existing.container : null;
         File exe = new File(candidate.gameDir, candidate.exe);
-        // setting Proton 10 up, writing the shortcut and reading the exe icon touch storage: off the main thread
+        // writing the shortcut and reading the exe icon touch storage: off the main thread
         IO.execute(() -> {
             Exception error = null;
             String olderName = null;
@@ -111,8 +110,7 @@ public final class AgvnImportDialog {
                 // AGVN: another version of a game in the library joins its container, where its saves are
                 com.winlator.cmod.container.Shortcut older = known != null ? null : AgvnGameVersions.older(
                         new ContainerManager(activity).loadShortcuts(), candidate.profile.name, exe);
-                Container container = known != null ? known : older != null ? older.container
-                        : AgvnWine10.forImport(activity, exe, percent -> activity.runOnUiThread(() -> preparing(activity, percent)));
+                Container container = known != null ? known : older != null ? older.container : AgvnWine10.forImport(activity);
                 if (container == null) throw new IllegalStateException(activity.getString(R.string.agvn_import_no_container));
                 File made = AgvnGameImporter.importGame(activity, container, candidate, tier);
                 if (older != null) {
@@ -125,7 +123,6 @@ public final class AgvnImportDialog {
             Exception failure = error;
             String sharedWith = olderName;
             activity.runOnUiThread(() -> {
-                preparing(activity, -1);
                 if (activity.isFinishing() || activity.isDestroyed()) return;
                 if (failure != null) {
                     showError(activity, activity.getString(R.string.agvn_import_failed, String.valueOf(failure.getMessage())));
@@ -139,23 +136,6 @@ public final class AgvnImportDialog {
                 activity.navigateToMainDestination(R.id.main_menu_shortcuts);
             });
         });
-    }
-
-    /** "Đang chuẩn bị Wine mới…" while Proton 10 is set up for the first game (UI thread); -1 closes it. */
-    private static void preparing(MainActivity activity, int percent) {
-        try {
-            if (percent < 0 || activity.isFinishing() || activity.isDestroyed()) {
-                if (preparing != null) preparing.dismiss();
-                preparing = null;
-                return;
-            }
-            String text = activity.getString(R.string.agvn_import_wine10, percent);
-            if (preparing == null) preparing = new AlertDialog.Builder(activity).setTitle(R.string.agvn_import_title)
-                    .setMessage(text).setCancelable(false).show();
-            else preparing.setMessage(text);
-        } catch (RuntimeException e) {
-            preparing = null; // the window went away: the import goes on
-        }
     }
 
     private static void openStoragePermission(MainActivity activity) {

@@ -13,7 +13,7 @@ Anh Sơn quyết định ngày 02/10/2026: app phát hành theo **GNU GPL phiên
   - File AGVN mới ghi `Copyright (c) 2026 agvn.io — MIT License`.
 - **Thành phần bên thứ ba** giữ giấy phép riêng, danh sách ở `app/src/main/assets/agvn/licenses.html`. Ví dụ:
   - Wine, Proton, VKD3D, PulseAudio: LGPL 2.1.
-  - Proton 10.0-4 arm64ec (Wine thứ hai, cho game mới và game có phim WMV3 mà Proton 9 không phát được): LGPL 2.1.
+  - Proton 10.0-4 arm64ec (Wine thứ hai, cho game có phim WMV3 mà Proton 9 không phát được): LGPL 2.1.
     App giữ nguyên gói `proton-10.0-4-arm64ec.wcp` của bản phát hành `build-bionic-layers-20260930-v9` tại
     https://github.com/The412Banner/proton-wine (SHA-256 ghim trong `scripts/agvn/pins.txt`); mã nguồn đúng bản này là
     nhánh `proton_10.0` của kho đó, dựng từ Proton 10 của Valve (https://github.com/ValveSoftware/wine).

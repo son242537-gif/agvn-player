@@ -717,14 +717,17 @@ ghi đủ. Bản 0.1.21 gộp cả một dòng: danh sách extension Vulkan củ
 
 App có hai bản Wine. Mỗi bản có môi trường chạy (container) riêng, vì Wine gắn với container:
 
-- **Proton 9** (`proton-9.0-arm64ec`, có sẵn từ trước): container đầu tiên. Game đã thêm từ trước ở yên đây, và game
-  .NET mới thêm cũng vào đây (Proton 10 cần Wine Mono 10.4.1, app chỉ có 9.3.1).
-- **Proton 10** (`Proton-10.0-4-arm64ec-9`, `AgvnWine10`): container "AGVN Proton 10". **Game mới thêm vào đây theo mặc
-  định** (`AgvnImportDialog`, `AgvnWine10.forImport`), vì nó phát được phim WMV3 mà Proton 9 không phát được.
-  - Gói `proton-10.0-4-arm64ec.wcp` nằm trong APK (thêm khoảng 114 MB). Lần đầu cần (thêm game đầu tiên, hoặc bấm "Chạy
-    lại bằng Wine mới"), app giải nén vào `files/contents/Proton/10.0-4-arm64ec-9` như một gói `.wcp` người chơi tự cài,
-    rồi tạo container "AGVN Proton 10". Mất khoảng 1 phút, cần trống khoảng 900 MB. Hộp "Đang chuẩn bị Wine mới…" hoặc
-    dòng góc phải báo tiến độ.
+- **Proton 9** (`proton-9.0-arm64ec`, có sẵn từ trước): container đầu tiên. **Game mới thêm vào đây theo mặc định**
+  (`AgvnImportDialog`, `AgvnWine10.forImport`; quyết định của anh Sơn ngày 15/10/2026, từ bản 0.1.45). Game .NET cũng
+  cần Proton 9 (Proton 10 cần Wine Mono 10.4.1, app chỉ có 9.3.1).
+- **Proton 10** (`Proton-10.0-4-arm64ec-9`, `AgvnWine10`): container "AGVN Proton 10". Nó phát được phim WMV3 mà Proton
+  9 không phát được, nên app chỉ đề nghị khi phim của game không chạy ("Chạy lại bằng Wine mới", `AgvnMovieWatch`).
+  - Từ 0.1.21 đến 0.1.44, game mới vào Proton 10 theo mặc định. Game đã thêm trong thời gian đó vẫn ở Proton 10; app
+    không tự chuyển game đang chạy tốt. Game lỗi trên Proton 10 vẫn được "Tự sửa lỗi" và thanh màn hình đen đề nghị
+    "Chạy bằng Wine cũ (Proton 9)".
+  - Gói `proton-10.0-4-arm64ec.wcp` nằm trong APK (thêm khoảng 114 MB). Lần đầu cần (bấm "Chạy lại bằng Wine mới"), app
+    giải nén vào `files/contents/Proton/10.0-4-arm64ec-9` như một gói `.wcp` người chơi tự cài, rồi tạo container "AGVN
+    Proton 10". Mất khoảng 1 phút, cần trống khoảng 900 MB. Dòng góc phải báo tiến độ.
   - App bỏ các file không dùng tới: thư viện tĩnh `.a` (không thì mỗi container chép thêm vào `system32`), và các thư
     viện Wayland/Mesa trong `lib/` cùng `share/vulkan` (app vẽ qua X11, `lib/` không nằm trong đường dẫn thư viện). Còn
     khoảng 394 MB thay vì 553 MB.
