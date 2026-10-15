@@ -1,0 +1,9 @@
+AGVN Player v0.1.45 - agvn.io
+
+Mới:
+- Game thêm mới chạy bằng Wine cũ (Proton 9), như trước bản 0.1.21. Game có phim không phát được thì thanh báo vẫn có nút "Chạy lại bằng Wine mới" (Proton 10). Game bạn đã thêm vẫn chạy như cũ.
+Sửa lỗi:
+- Game Unreal báo lỗi "CreateShaderResourceView ... E_INVALIDARG" rồi tắt (như Av Director Life trên máy GPU Mali): "Tự sửa lỗi" giờ nhận ra lỗi này và đề nghị "Đổi DXVK sang bản 1.10.3".
+- "Tự sửa lỗi" đang thử một cách mà game tự tắt ngay khi mở: app không giữ cách đó trên game nữa mà trả cấu hình về như trước, rồi mời bạn thử cách tiếp theo.
+- Chọn "Chạy bằng Wine cũ (Proton 9)" khi màn hình đen lúc "Tự sửa lỗi" đang thử một cách: cách đó được trả về trước khi chuyển.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
