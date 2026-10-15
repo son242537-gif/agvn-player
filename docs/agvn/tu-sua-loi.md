@@ -298,6 +298,14 @@ vuốt tắt) bị ghi đè khi bấm tim, chỉnh "Cấu hình", hay bấm "Ch�
   …" mời thử cách còn lại đầu tiên (thường chính là cách đó). Ở thư viện, bấm "Tự sửa lỗi" thì app báo như vậy rồi
   hiện lại danh sách cách còn lại.
 
+Cách đang thử mà game tự tắt (hay crash) trước một phút thì app không chờ hỏi nữa (bản 0.1.45, `AgvnRepairEnd`). Thanh
+chỉ hỏi sau 45 giây chơi, nên trước đây một cách làm game tắt sớm hơn thì không bao giờ được hỏi và cứ ở lại trên game:
+Av Director Life (15/10/2026) giữ "Đổi DXVK sang bản 2.3.1" và tắt ở mọi lần mở (xem "Texture nén BCn với DXVK 2.x").
+Giờ, khi game có bật cách đó và tự tắt trong 60 giây đầu, app làm như khi người chơi bấm "Vẫn còn lỗi": tính là cách đó
+không giúp, trả cấu hình về như trước khi sửa. Về thư viện, app mở lại lỗi người chơi đã báo, nói cách nào vừa làm game
+tự tắt sau bao nhiêu giây, và có nút thử cách tiếp theo. Người chơi tự thoát game thì app vẫn hỏi như trước. Thanh màn
+hình đen chuyển game sang Proton 9 ("Chạy bằng Wine cũ") lúc đang thử một cách cũng trả cách đó về trước khi chuyển.
+
 Chỉ game được báo lỗi bị đổi, và chỉ sau khi người chơi báo. Cách không giúp được không ở lại trên game, nên game không
 phải trả giá (chậm hơn, nóng hơn) cho một cách sửa vô ích. App ghi mọi bước vào `su-kien.txt` của phiên chơi ("Tự sửa
 lỗi: người chơi báo …, thử: …"). Trạng thái nằm cùng file của "Tự sửa lỗi" (`files/agvn/doctor/`, các khóa
@@ -1226,3 +1234,70 @@ System.Exception: Invalid path in TextDataProvider : 'F:/Game /LifeguardHolic-GA
      `su-kien.txt` có dòng "Thư mục "Game " có dấu cách…".
   2. Lưu, thoát, mở lại: save còn.
   3. Hồi quy: game ở thư mục bình thường không có dòng đó, mở như trước.
+
+## Texture nén BCn với DXVK 2.x (bản 0.1.45)
+
+Nhật ký ngày 15/10/2026 (Av Director Life, Unreal 5, bản GameHub; vivo V2405A: Dimensity 9400, Mali-G925; bản 0.1.44):
+game không vào được, 7 lần mở. Ở các lần cuối, game hiện hộp:
+
+```
+LowLevelFatalError [File:D:\build\++UE5\Sync\Engine\Source\Runtime\Windows\D3D11RHI\Private\D3D11Util.cpp] [Line: 236]
+Direct3DDevice->CreateShaderResourceView(TextureResource,&SRVDesc,ShaderResourceView.GetInitReference()) failed with error E_INVALIDARG
+```
+
+và log Wine có:
+
+```
+err:   D3D11: Cannot create shader resource view:
+err:     Resource type:   3
+err:     Resource usage:  8
+err:     Resource format: 70
+err:     View format:     72
+err:     View plane:      0
+```
+
+- **Vì sao:** DXGI 70 → 72 là BC1 → BC1_UNORM_SRGB. Nhật ký còn có 74 → 74 (BC2) và 76 → 78 (BC3 → BC3_UNORM_SRGB). GPU
+  Mali không đọc được texture BCn, nên app giải nén chúng: wrapper (`libvulkan_wrapper.so`) và lớp `libbcn_layer.so`
+  (`bcnEmulation=auto`, `bcnEmulationType=compute`, mặc định).
+  - DXVK 2.3.1 cho mỗi texture BC1–BC3 hai dạng xem (UNORM và sRGB), nên ảnh là "mutable". Khi tạo chỗ đọc (shader
+    resource view), DXVK hỏi driver dạng đó có đọc được trong shader không, qua `vkGetPhysicalDeviceFormatProperties2`
+    (`VkFormatProperties3`; `D3D11CommonTexture::CheckViewCompatibility`). Với BC2 và BC1/BC3 sRGB, câu trả lời là
+    không, nên DXVK trả `E_INVALIDARG` và Unreal dừng.
+  - Lớp `libbcn_layer.so` chỉ trả lời hàm cũ `vkGetPhysicalDeviceFormatProperties` (các hàm có trong file `.so` không có
+    bản `…2`). DXVK 1.10.3 hỏi bằng hàm cũ đó (`DxvkAdapter::formatProperties`), nên không gặp lỗi này: hai lần chạy
+    đầu bằng 1.10.3, game chạy gần một phút và 1 phút 40 giây mà không hiện hộp.
+  - Chưa rõ phần nào trả "không" cho DXVK 2.x: app không có mã nguồn của đúng bản wrapper và lớp đó. Wrapper đi kèm là
+    bản của Pipetto; tên biến môi trường của nó khác bản trên GitHub của leegao.
+- **Vì sao game kẹt ở DXVK 2.3.1:** người chơi báo "Màn hình đen dù game vẫn chạy". "Tự sửa lỗi" thử "Đổi Đồ họa sang
+  Trung bình" (không giúp), rồi "Đổi DXVK sang bản 2.3.1". Từ đó:
+  1. Game tắt ở giây 30, trước khi thanh kịp hỏi (45 giây), nên cách này ở lại trên game.
+  2. Hộp của Unreal không phải hộp thông báo của Windows (MessageBox) nên Wine không ghi lại. Wine thoát với mã 0, app
+     coi là "kết thúc bình thường" và không hỏi gì.
+  3. Thanh màn hình đen chuyển game sang Proton 9 nhưng giữ DXVK 2.3.1 đang thử.
+- **Từ bản 0.1.45:**
+  - Lỗi mới `dxvk-view`: dòng `D3D11: Cannot create shader resource view` của DXVK, khi game tự tắt. Cách sửa: "Đổi
+    DXVK sang bản 1.10.3" (fix `dxvk-old`: chỉ hiện khi game đang dùng DXVK 2.x, đưa về 1.10.3 cùng loại, arm64ec hay
+    không; khác `dxvk-other`, nên vẫn hiện dù "Đổi DXVK" đã thử), đổi driver (máy Adreno: Turnip đọc được BCn), gửi nhật
+    ký.
+  - Cách đang thử mà game tự tắt trước một phút: trả cấu hình về như trước (xem "Người chơi báo lỗi").
+  - Thanh màn hình đen trả cách đang thử về trước khi chuyển game sang Proton 9.
+  - Game mới thêm vào Proton 9 (xem "Hai bản Wine").
+- **Lần mở thứ 3 (DXVK 1.10.3, Proton 10):** hộp "Assertion failed! … vkCreateShaderModule". Trên Mali, "Tự sửa lỗi" có
+  sẵn hai cách: tắt bước sửa shader "hằng số" (`WRAPPER_NO_PATCH_OPCONSTCOMP=1`), rồi bước "cắt hình". Hai cách này chưa
+  được thử, vì app đang thử cách cho màn hình đen.
+- **Chưa làm:** cho lớp giải nén BCn trả lời cả `vkGetPhysicalDeviceFormatProperties2`. Cần mã nguồn của lớp đó; file
+  `.so` trong app là bản dựng sẵn.
+- **Test:** `AgvnDoctorTest.dxvkCannotReadACompressedTexture`, `AgvnRepairTest.aFixTheGameClosedWithTooSoonGoesBackTried`.
+- **Thử máy (máy Mali):**
+  1. Av Director Life đang ở DXVK 2.3.1: mở game, hộp của Unreal hiện, bấm OK. Về thư viện, "Tự sửa lỗi" hỏi "Game tắt
+     vì DXVK không đọc được texture nén", nút đầu "Đổi DXVK sang bản 1.10.3". Bấm: game mở lại và không còn hộp đó.
+     Lần đầu có thể đen 1–2 phút, vì Unreal dịch shader.
+  2. Nếu hiện hộp "Assertion failed … vkCreateShaderModule": "Tự sửa lỗi" đề nghị tắt bước sửa shader "hằng số". Bấm,
+     game mở lại.
+  3. Vòng thử: báo "Màn hình đen dù game vẫn chạy" cho một game, đến khi app thử một cách làm game tự tắt sớm (ví dụ
+     DXVK 2.3.1 ở game trên). Game tắt; về thư viện thấy lại lỗi đã báo, dòng đầu "Với cách đang thử (…), game tự tắt
+     sau … giây…", cấu hình đã về như trước, có nút thử cách tiếp theo. `su-kien.txt` có "Tự sửa lỗi: game tự tắt sau …
+     giây khi đang thử …".
+  4. Thêm một game mới: game vào container Proton 9, không có hộp "Đang chuẩn bị Wine mới". Game có phim WMV không chạy
+     thì thanh vẫn mời "Chạy lại bằng Wine mới".
+  5. Hồi quy: game đã thêm trên Proton 10 vẫn ở Proton 10 và chạy như trước.

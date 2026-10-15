@@ -65,6 +65,9 @@ public final class AgvnRepairDialog {
         List<AgvnFixes.Fix> left = AgvnRepair.left(a, s, f, state);
         LinearLayout box = box(a);
         box.addView(text(a, a.getString(R.string.agvn_doctor_game, s.name), 13, false));
+        String undone = f.params.get(AgvnRepairEnd.UNDONE); // a fix the game closed with went back (AgvnRepairEnd)
+        if (undone != null) box.addView(text(a, a.getString(R.string.agvn_repair_undone, undone,
+                f.params.get(AgvnRepairEnd.AFTER)), 15, true));
         box.addView(text(a, f.cause(), 15, false));
         int intro = left.isEmpty() ? R.string.agvn_repair_no_fix : R.string.agvn_repair_plan;
         StringBuilder steps = new StringBuilder(a.getString(intro));

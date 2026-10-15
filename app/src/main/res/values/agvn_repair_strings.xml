@@ -22,6 +22,7 @@
     <string name="agvn_repair_off_title">Chưa thử được: %1$s</string>
     <string name="agvn_repair_off_detail">Game không chạy với cách đang thử (%1$s): cài đặt của game đã đổi sau khi bật cách này. App chưa tính là đã thử cách này.</string>
     <string name="agvn_repair_off_try">Thử: %1$s</string>
+    <string name="agvn_repair_undone">Với cách đang thử (%1$s), game tự tắt sau %2$s giây. App đã tính là cách này không giúp, và trả cấu hình của game về như trước khi sửa.</string>
     <string name="agvn_bar_repair_label">🩺 Tự sửa</string>
     <string name="agvn_bar_repair">Tự sửa lỗi: chọn lỗi game đang gặp</string>
 

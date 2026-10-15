@@ -59,7 +59,9 @@ public final class AgvnDoctorDialog {
         if (e == null || System.currentTimeMillis() - e.time > AgvnDoctor.KILL_RECENT_MS) return; // a day old: moved on
         Shortcut s = AgvnRelaunch.find(a, e.container, e.shortcut);
         AgvnProblemCatalog.Finding f = AgvnDoctor.catalog(a).finding(e.problem, e.params);
-        if (s != null && f != null) show(a, s, f);
+        if (s == null || f == null) return;
+        if (f.params.containsKey(AgvnRepairEnd.UNDONE)) AgvnRepairDialog.plan(a, s, f, null); // the player's report goes on
+        else show(a, s, f);
     }
 
     static void show(Activity a, Shortcut s, AgvnProblemCatalog.Finding f) {

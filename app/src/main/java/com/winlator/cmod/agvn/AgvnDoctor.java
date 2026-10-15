@@ -83,7 +83,7 @@ public final class AgvnDoctor {
             ev.godotSwitched = AgvnFixEdits.godotSwitched(ranWith.get("execArgs"));
             if (ev.frozeAtEnd()) AgvnSessionLog.event("Game đứng hình " + ev.frozenS + " giây trước khi tắt (người chơi "
                     + "bấm " + ev.frozenPresses + " lần mà hình không đổi): không tính là lần chạy tốt");
-            diagnose(ctx, s, ev, ranWith);
+            diagnose(ctx, s, ev, ranWith, true);
         } catch (RuntimeException e) {
             Log.w(TAG, "doctor: game end not read", e);
         }
@@ -112,15 +112,16 @@ public final class AgvnDoctor {
             AgvnUnityCrash.into(ev, crash);
             ev.killedReason = crash == null && exit != null ? exit.reason : -1; // a dead game: its crash, not Android's end
             ev.killedImportance = crash == null && exit != null ? exit.importance : 0;
-            diagnose(ctx, s, ev, AgvnGoodConfig.snapshot(s));
+            diagnose(ctx, s, ev, AgvnGoodConfig.snapshot(s), false);
         } catch (RuntimeException e) {
             Log.w(TAG, "doctor: app end not read", e);
         }
     }
 
-    /** {@code now}: the settings the session ran with. */
-    private static void diagnose(Context ctx, Shortcut s, AgvnEvidence ev, Map<String, String> now) {
+    /** {@code now}: the settings the session ran with; {@code timed}: the app saw the session end, so its length is known. */
+    private static void diagnose(Context ctx, Shortcut s, AgvnEvidence ev, Map<String, String> now, boolean timed) {
         if (AgvnOpenGlCheck.zinkFailed(ev.lines)) AgvnOpenGlCheck.failed(ctx, s); // no more WineD3D with this driver
+        if (timed && AgvnRepairEnd.afterGame(ctx, s, ev, now)) return; // the fix on trial went back: its report goes on
         Properties state = AgvnGoodConfig.load(ctx, s);
         List<String> changed = AgvnGoodConfig.changed(AgvnGoodConfig.good(state), now);
         ev.changed = AgvnGoodConfig.hasGood(state) && !changed.isEmpty();

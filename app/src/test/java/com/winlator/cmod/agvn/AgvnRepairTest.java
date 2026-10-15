@@ -165,6 +165,58 @@ public class AgvnRepairTest {
     }
 
     @Test
+    public void aFixTheGameClosedWithTooSoonGoesBackTried() {
+        // Av Director Life, vivo V2405A (Mali-G925), 15/10/2026: "Đổi DXVK sang bản 2.3.1", tried for a black screen;
+        // Unreal's box after 30 s at every start, OK, and Wine ended with 0: the bar never asked about it
+        AgvnEvidence box = new AgvnEvidence();
+        box.started = box.endedByGame = true;
+        box.seconds = 30;
+        assertTrue(AgvnRepairEnd.endedTooSoon(box));
+        AgvnEvidence crash = new AgvnEvidence();
+        crash.crashed = true;
+        crash.seconds = 12;
+        assertTrue(AgvnRepairEnd.endedTooSoon(crash));
+        box.seconds = AgvnEvidence.GOOD_AFTER_S; // a minute in: the bar could ask
+        assertFalse(AgvnRepairEnd.endedTooSoon(box));
+        AgvnEvidence quit = new AgvnEvidence();
+        quit.started = quit.playerQuit = true;
+        quit.seconds = 20;
+        assertFalse("the player quit: asked about as before", AgvnRepairEnd.endedTooSoon(quit));
+
+        // the trial stops, the fix stays tried, and the report goes on from the same settings before
+        Map<String, String> before = new LinkedHashMap<>();
+        before.put("dxwrapperConfig", "version=1.10.3");
+        Properties state = new Properties();
+        AgvnRepair.begin(state, "report-black", before);
+        AgvnRepair.trying(state, new AgvnFixes.Fix("dxvk-other", "Đổi DXVK sang bản 2.3.1", "2.3.1"));
+        AgvnRepair.stopTrying(state);
+        assertEquals("", AgvnRepair.trying(state));
+        assertEquals("", AgvnRepair.label(state));
+        assertNull(state.getProperty(AgvnRepair.AT));
+        assertNull(state.getProperty(AgvnRepair.TO));
+        assertEquals(Collections.singleton("dxvk-other"), AgvnRepair.tried(state));
+        assertEquals("report-black", AgvnRepair.symptom(state));
+        assertEquals(before, AgvnRepair.before(state));
+
+        // the library shows the report again, saying which fix went back and when
+        Map<String, String> own = new LinkedHashMap<>();
+        own.put("engine", "UNREAL");
+        Map<String, String> params = AgvnRepairEnd.params(own, "Đổi DXVK sang bản 2.3.1", 30);
+        assertEquals("Đổi DXVK sang bản 2.3.1", params.get(AgvnRepairEnd.UNDONE));
+        assertEquals("30", params.get(AgvnRepairEnd.AFTER));
+        assertEquals("UNREAL", params.get("engine"));
+        assertEquals(1, own.size());
+        assertEquals("30", catalog.finding("report-black", params).params.get(AgvnRepairEnd.AFTER));
+
+        // DXVK back to 1.10.3 (dxvk-old, for dxvk-view) is on when the game ran 1.10.3
+        String dx = "dxvk+vkd3d", dxConfig = "version=2.3.1", driver = "vulkanVersion=1.3;version=";
+        assertTrue(AgvnRepairCheck.on("dxvk-old", "1.10.3", before, dx, dxConfig, driver));
+        Map<String, String> newer = new LinkedHashMap<>();
+        newer.put("dxwrapperConfig", "version=2.3.1");
+        assertFalse(AgvnRepairCheck.on("dxvk-old", "1.10.3", newer, dx, dxConfig, driver));
+    }
+
+    @Test
     public void turnipFlagsAndOtherSettings() {
         assertEquals("TU_DEBUG=noconform,nolrz", AgvnRepairFixes.withTuFlag("", "noconform", "nolrz"));
         assertEquals("TU_DEBUG=gmem,noubwc", AgvnRepairFixes.withTuFlag("TU_DEBUG=gmem", "noconform", "noubwc"));

@@ -130,6 +130,11 @@ final class AgvnRepair {
         state.setProperty(TRIED, String.join(",", tried));
     }
 
+    /** No fix on trial any more; the report goes on (its settings before, the fixes tried, that one too). */
+    static void stopTrying(Properties state) {
+        for (String key : new String[]{TRYING, LABEL, AT, TO}) state.remove(key);
+    }
+
     /** Forgets the report: what was tried and the settings before it. */
     static void clear(Properties state) {
         for (String key : state.stringPropertyNames()) {

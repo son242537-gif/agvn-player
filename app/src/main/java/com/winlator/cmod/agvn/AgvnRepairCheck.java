@@ -59,9 +59,7 @@ final class AgvnRepairCheck {
         Set<String> tried = AgvnRepair.tried(state);
         tried.remove(AgvnRepair.trying(state));
         state.setProperty(AgvnRepair.TRIED, String.join(",", tried));
-        for (String key : new String[]{AgvnRepair.TRYING, AgvnRepair.LABEL, AgvnRepair.AT, AgvnRepair.TO}) {
-            state.remove(key);
-        }
+        AgvnRepair.stopTrying(state);
         return label;
     }
 

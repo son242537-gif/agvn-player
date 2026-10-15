@@ -152,14 +152,20 @@ public final class AgvnBlackScreen {
         if (!ask) return; // "Để vậy, không hỏi lại"
         if (bigger != null) offerScreen(s, bigger, screen, seconds, refused);
         else if (sync) offerSync(s, seconds);
-        else if (wineOld != null) offerWineOld(s, wineOld, state, seconds);
+        else if (wineOld != null) offerWineOld(s, wineOld, seconds);
     }
 
-    /** Black on Proton 10 with frame sync on: the game back on Proton 9, its saves with it (AgvnGameMove). */
-    private void offerWineOld(Shortcut s, AgvnFixes.Fix fix, java.util.Properties state, long seconds) {
+    /**
+     * Black on Proton 10 with frame sync on: the game back on Proton 9, its saves with it (AgvnGameMove). A fix "Tự sửa
+     * lỗi" was trying, black too, goes back first (AgvnRepairEnd).
+     */
+    private void offerWineOld(Shortcut s, AgvnFixes.Fix fix, long seconds) {
         String detail = activity.getString(R.string.agvn_black_wine_old_detail, seconds)
                 + "\n" + activity.getString(R.string.agvn_doctor_lead);
         show(s, detail, new AgvnWarningBar.Choice(fix.label, () -> {
+            java.util.Properties state = AgvnGoodConfig.load(activity, s);
+            java.util.Map<String, String> ran = AgvnSessionTrack.settings();
+            AgvnRepairEnd.beforeMove(activity, s, state, ran.isEmpty() ? AgvnGoodConfig.snapshot(s) : ran);
             if (AgvnFixApply.apply(activity, s, fix, state))
                 AgvnSlowBar.offerRestart(activity, s, fix.label, activity::agvnExit);
         }));
