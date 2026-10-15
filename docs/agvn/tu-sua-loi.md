@@ -48,6 +48,7 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Máy không chạy được OpenGL với driver này | Mesa: `failed to load driver: zink`: Zink không khởi động được trên driver Vulkan của game, nên game OpenGL và WineD3D không vẽ được | Dùng lại DXVK (game đang dùng WineD3D), đổi driver, gửi nhật ký. Từ đó app không đề nghị WineD3D với driver này nữa (`AgvnOpenGlCheck`, nhớ theo driver và bản app), dù game kết thúc thế nào (từ 09/10/2026, cả khi người chơi tự thoát) |
 | Không tạo được DirectX / thiếu DirectX 11 | Câu lỗi của DXVK, Unity (`InitializeEngineGraphics failed`) | Đổi bản DXVK, đổi driver (Turnip ↔ System), dùng WineD3D. "Đổi bản DXVK" chỉ hiện khi bản kia chạy được: DXVK 2.x cần Vulkan 1.3, nên với driver của máy (System) thấp hơn, lúc mở game vẫn chạy 1.10.3 và nút đó không hiện (`AgvnDxvkPick.sameAtStart`) |
 | DXVK không đọc được texture nén (bản 0.1.45) | DXVK: `D3D11: Cannot create shader resource view`, rồi game tự tắt (game Unreal hiện hộp "LowLevelFatalError … CreateShaderResourceView … failed with error E_INVALIDARG"). Ca đầu, 15/10/2026: Av Director Life, Mali-G925, DXVK 2.3.1. Xem "Texture nén BCn với DXVK 2.x" bên dưới | Đổi DXVK về 1.10.3 (fix `dxvk-old`, có cả khi "Đổi DXVK" đã thử), đổi driver (Turnip tự đọc được BCn), gửi nhật ký |
+| Game Unreal báo lỗi rồi tự tắt (bản 0.1.46) | Hộp "The UE-… Game has crashed and will close" của Unreal. Hộp này không phải hộp thông báo của Windows nên Wine không ghi; app đọc tiêu đề của nó từ cửa sổ X (`AgvnUnrealBox`, `WM_NAME`), ghi vào `su-kien.txt` và vào dòng cuối của Wine (`[AGVN] Unreal crash box: …`). Câu lỗi trong hộp thì app chưa đọc được. Dòng của DXVK (`dxvk-view`…) nói rõ hơn thì app báo lỗi đó trước | Đổi DXVK, đổi driver, giả lập CPU ổn định hơn, chạy bằng Wine cũ (Proton 9), về cấu hình gốc, gửi nhật ký |
 | Driver đồ họa lỗi giữa chừng | `VK_ERROR_DEVICE_LOST` | Để Turnip tự chọn chế độ dựng hình, đổi driver, đổi DXVK, hạ Đồ họa |
 | Hết bộ nhớ đồ họa / hết RAM | DXVK, Unity, Unreal báo hết bộ nhớ; DXVK không gắn được bộ nhớ cho texture (`Failed to bind device memory`, xem ví dụ Boxman bên dưới) | Hạ Đồ họa. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ (`giam-ram.md`) |
 | GPU hết bộ nhớ dựng hình (bản 0.1.30) | Driver Mali báo `GROUP_ERROR_TILER_HEAP_OOM` từ 20 lần trong một phiên, khi game đang chạy (xem ví dụ Thanh Âm Mùa Hạ bên dưới) | Hỏi ngay trên thanh trong game: hạ Đồ họa. Từ lần mở sau, game tự tiết kiệm RAM như Siêu nhẹ. Phiên đó không được tính là chạy tốt |
@@ -1275,7 +1276,8 @@ err:     View plane:      0
   Trung bình" (không giúp), rồi "Đổi DXVK sang bản 2.3.1". Từ đó:
   1. Game tắt ở giây 30, trước khi thanh kịp hỏi (45 giây), nên cách này ở lại trên game.
   2. Hộp của Unreal không phải hộp thông báo của Windows (MessageBox) nên Wine không ghi lại. Wine thoát với mã 0, app
-     coi là "kết thúc bình thường" và không hỏi gì.
+     coi là "kết thúc bình thường" và không hỏi gì. Từ bản 0.1.46 app đọc tiêu đề hộp đó ("Game Unreal báo lỗi rồi tự
+     tắt" ở bảng trên).
   3. Thanh màn hình đen chuyển game sang Proton 9 nhưng giữ DXVK 2.3.1 đang thử.
 - **Từ bản 0.1.45:**
   - Lỗi mới `dxvk-view`: dòng `D3D11: Cannot create shader resource view` của DXVK, khi game tự tắt. Cách sửa: "Đổi

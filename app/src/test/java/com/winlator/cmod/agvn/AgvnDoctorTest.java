@@ -126,6 +126,29 @@ public class AgvnDoctorTest {
     }
 
     @Test
+    public void unrealsOwnCrashBoxIsNamed() {
+        // its title, as the app reads it from the box's window (AgvnUnrealBox), among Wine's lines
+        String box = AgvnUnrealBox.LINE + "The UE-AVDirectorLife Game has crashed and will close";
+        assertTrue(AgvnUnrealBox.crashBox("The UE4-Legend Game has crashed and will close"));
+        assertFalse(AgvnUnrealBox.crashBox("AVDirectorLife"));
+        assertFalse(AgvnUnrealBox.crashBox(null));
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.started = ev.endedByGame = true;
+        ev.seconds = 30;
+        ev.lines.add(box);
+        AgvnProblemCatalog.Finding f = catalog.find(ev);
+        assertEquals("ue-crash-box", f.id());
+        assertEquals("dxvk-other", f.fixes().get(0));
+        ev.endedByGame = false; // quit from the AGVN bar behind the box: the box still said it
+        ev.playerQuit = true;
+        assertEquals("ue-crash-box", found(ev));
+        // DXVK's own line names the cause better (Av Director Life on DXVK 2.3.1)
+        ev.endedByGame = true;
+        ev.lines.add(0, "err:   D3D11: Cannot create shader resource view:");
+        assertEquals("dxvk-view", found(ev));
+    }
+
+    @Test
     public void aGpuWithoutWhatDirectX11AndOpenGlNeed() {
         // Thorn Sin (Unity 2020.3) on a PowerVR BXM-8-256, Vulkan 1.1 (06/10): DXVK 1.10.3 had no feature level to
         // give, then WineD3D, the next fix, had no OpenGL, as Zink did not start on that driver

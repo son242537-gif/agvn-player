@@ -662,11 +662,13 @@ public class XServerDisplayActivity extends AppCompatActivity {
             @Override
             public void onMapWindow(Window window) {
                 assignTaskAffinity(window);
+                com.winlator.cmod.agvn.AgvnUnrealBox.onWindowName(window.getName()); // AGVN: Unreal's crash box
             }
 
             @Override
             public void onModifyWindowProperty(Window window, Property property) {
                 changeFrameRatingVisibility(window, property);
+                if ("WM_NAME".equals(property.nameAsString())) com.winlator.cmod.agvn.AgvnUnrealBox.onWindowName(property.toString()); // AGVN
             }
 
             @Override
