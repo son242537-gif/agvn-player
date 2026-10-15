@@ -25,7 +25,7 @@ import java.util.Set;
 /** "Tự sửa lỗi": game-problems.json read with the lines Wine, DXVK, Godot and Unity really print. */
 public class AgvnDoctorTest {
     private static final Set<String> FIXES = new HashSet<>(Arrays.asList("restore-good", "reset", "quality-down",
-            "quality-up", "dxvk-other", "dxvk-arm64ec", "driver-other", "wined3d", "godot-renderer", "godot-angle", "godot-undo",
+            "quality-up", "dxvk-other", "dxvk-old", "dxvk-arm64ec", "driver-other", "wined3d", "godot-renderer", "godot-angle", "godot-undo",
             "render-gmem", "render-auto", "emulator-stable", "emulator-fast", "wincomponent", "power-save-settings",
             "app-settings", "send-logs", "run-windows", "rgss-frameskip", "rgss-light", "wrapper-constants", "wrapper-clip", "wine-mono",
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
@@ -104,6 +104,25 @@ public class AgvnDoctorTest {
         assertEquals("gpu-lost", found(lost));
         lost.lines.set(0, "Could not allocate memory: System out of memory!");
         assertEquals("memory", found(lost));
+    }
+
+    @Test
+    public void dxvkCannotReadACompressedTexture() {
+        // Av Director Life (Unreal 5) on a vivo V2405A (Mali-G925), 15/10/2026, DXVK 2.3.1: Unreal's box
+        // "CreateShaderResourceView(...) failed with error E_INVALIDARG", OK, and Wine ended with 0 after 30 s
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.started = ev.endedByGame = true;
+        ev.seconds = 30;
+        ev.lines.addAll(Arrays.asList("warn:  DXGI: MakeWindowAssociation: Ignoring flags",
+                "err:   D3D11: Cannot create shader resource view:", "err:     Resource type:   3",
+                "err:     Resource usage:  8", "err:     Resource format: 70", "err:     View format:     72",
+                "err:     View plane:      0"));
+        AgvnProblemCatalog.Finding f = catalog.find(ev);
+        assertEquals("dxvk-view", f.id());
+        assertEquals(Arrays.asList("dxvk-old", "driver-other", "send-logs"), f.fixes());
+        ev.endedByGame = false; // the player quit a game that was still running: nothing to ask
+        ev.playerQuit = true;
+        assertNull(found(ev));
     }
 
     @Test

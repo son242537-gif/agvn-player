@@ -40,6 +40,7 @@ final class AgvnRepairCheck {
             case "dxvk-back":
                 return dx.contains("dxvk");
             case "dxvk-other":
+            case "dxvk-old":
             case "dxvk-arm64ec":
                 return dx.contains("dxvk") && (to.isEmpty() || to.equals(
                         AgvnFixEdits.configValue(value(ran, "dxwrapperConfig", envDxConfig), "version", ',')));

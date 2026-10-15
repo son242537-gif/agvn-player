@@ -56,6 +56,7 @@ final class AgvnFixApply {
                 AgvnQuality.apply(a, s, AgvnQuality.Level.valueOf(fix.to));
                 break;
             case "dxvk-other":
+            case "dxvk-old":
             case "dxvk-arm64ec":
                 s.putExtra("dxwrapperConfig", AgvnFixEdits.withConfigValue(AgvnFixes.dxvkConfig(s), "version", fix.to, ','));
                 break;

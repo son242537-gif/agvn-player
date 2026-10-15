@@ -29,7 +29,7 @@ final class AgvnFixes {
     /** Fixes that change no game setting: offered every time. */
     private static final List<String> ALWAYS = Arrays.asList("send-logs", "power-save-settings", "app-settings");
     /** Fixes of Wine's settings: none of them changes a "Chạy nhẹ" game. */
-    private static final List<String> WINE_ONLY = Arrays.asList("restore-good", "reset", "dxvk-other", "dxvk-arm64ec",
+    private static final List<String> WINE_ONLY = Arrays.asList("restore-good", "reset", "dxvk-other", "dxvk-old", "dxvk-arm64ec",
             "driver-other", "wined3d", "godot-renderer", "godot-angle", "godot-undo", "render-gmem", "render-auto",
             "emulator-stable", "emulator-fast", "wincomponent", "wrapper-constants", "wrapper-clip", "wine-mono",
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
@@ -104,6 +104,12 @@ final class AgvnFixes {
             case "dxvk-other": { // not one the start trades back for the one it runs now (DXVK 2.x needs Vulkan 1.3)
                 String now = dxvkVersion(s), to = AgvnFixEdits.otherDxvk(now);
                 return !dxvk(s) || AgvnDxvkPick.sameAtStart(now, to, AgvnOpenGlCheck.driver(a, s), AgvnDxvkPick.systemVulkan(a))
+                        ? null : fix(a, id, R.string.agvn_fix_dxvk, to);
+            }
+            case "dxvk-old": { // DXVK 2.x back to 1.10.3 of its kind, whatever was tried before: for what only 2.x does
+                String now = dxvkVersion(s), to = AgvnFixEdits.otherDxvk(now);
+                return !dxvk(s) || now.startsWith("1.")
+                        || AgvnDxvkPick.sameAtStart(now, to, AgvnOpenGlCheck.driver(a, s), AgvnDxvkPick.systemVulkan(a))
                         ? null : fix(a, id, R.string.agvn_fix_dxvk, to);
             }
             case "dxvk-arm64ec": {
