@@ -1,4 +1,5 @@
 #include <jni.h>
+#include <errno.h>
 #include <sys/epoll.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
@@ -14,8 +15,6 @@
 #define printf(...) __android_log_print(ANDROID_LOG_DEBUG, "System.out", __VA_ARGS__);
 #define MAX_EVENTS 10
 #define MAX_FDS 32
-
-struct epoll_event events[MAX_EVENTS];
 
 JNIEXPORT jint JNICALL
 Java_com_winlator_cmod_xconnector_XConnectorEpoll_createAFUnixSocket(JNIEnv *env, jobject obj,
@@ -62,7 +61,13 @@ Java_com_winlator_cmod_xconnector_XConnectorEpoll_doEpollIndefinitely(JNIEnv *en
     jmethodID handleNewConnection = (*env)->GetMethodID(env, cls, "handleNewConnection", "(I)V");
     jmethodID handleExistingConnection = (*env)->GetMethodID(env, cls, "handleExistingConnection", "(I)V");
 
+    // AGVN: one array per call: the X server, ALSA and SysV shm connectors each wait in a thread of their own
+    struct epoll_event events[MAX_EVENTS];
     int numFds = epoll_wait(epollFd, events, MAX_EVENTS, -1);
+    // AGVN: interrupted, as when Android freezes the app in the background and thaws it: wait again. Returning false
+    // ended the connector, which closed every client: the game died at the player's return ("X connection to :0
+    // broken", Rj01608199 on a vivo V2403A, 16/10/2026).
+    if (numFds < 0) return errno == EINTR ? JNI_TRUE : JNI_FALSE;
     for (int i = 0; i < numFds; i++) {
         if (events[i].data.fd == serverFd) {
             int clientFd = accept(serverFd, NULL, NULL);
@@ -204,7 +209,8 @@ Java_com_winlator_cmod_xconnector_XConnectorEpoll_waitForSocketRead(JNIEnv *env,
     pfds[1].events = POLLIN;
 
     int res = poll(pfds, 2, -1);
-    if (res < 0 || (pfds[1].revents & POLLIN)) return JNI_FALSE;
+    if (res < 0) return errno == EINTR ? JNI_TRUE : JNI_FALSE; // AGVN: interrupted (the app frozen, thawed): poll again
+    if (pfds[1].revents & POLLIN) return JNI_FALSE;
 
     if (pfds[0].revents & POLLIN) {
         jclass cls = (*env)->GetObjectClass(env, obj);

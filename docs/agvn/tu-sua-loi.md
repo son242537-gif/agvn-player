@@ -1301,3 +1301,36 @@ err:     View plane:      0
   4. Thêm một game mới: game vào container Proton 9, không có hộp "Đang chuẩn bị Wine mới". Game có phim WMV không chạy
      thì thanh vẫn mời "Chạy lại bằng Wine mới".
   5. Hồi quy: game đã thêm trên Proton 10 vẫn ở Proton 10 và chạy như trước.
+
+## Game chết khi quay lại app (bản 0.1.46)
+
+Nhật ký ngày 16/10/2026 (Rj01608199, game 32-bit dùng Direct2D và Direct3D 11; vivo V2403A: Snapdragon 8 Gen 3, Adreno
+750; bản 0.1.44 và 0.1.45): người chơi báo "đen màn hình, đơ máy". Cả 3 lần người chơi rời app rồi quay lại sau 28–59
+giây, game tắt ngay khi app cho game chạy tiếp. Lần rời app 3 giây thì game chạy tiếp bình thường.
+
+```
+I AGVN    : game resumed after 30 s
+I System.out: X connection to :0 broken (explicit kill or server shutdown).    (×5, mọi tiến trình Wine cùng lúc)
+```
+
+- **Vì sao:** X server của app chạy một vòng `epoll_wait` cho mọi kết nối (`XConnectorEpoll`, `xconnector_epoll.c`).
+  `doEpollIndefinitely` trả `numFds >= 0`, nên khi `epoll_wait` bị ngắt (`EINTR`) vòng đó dừng và `shutdown()` đóng mọi
+  kết nối. Wine thấy kết nối X đứt và thoát với mã 1. Trên Linux, `epoll_wait` trả `EINTR` sau khi tiến trình bị dừng
+  rồi chạy lại (`man 7 signal`), và khi Android hay hệ điều hành của hãng đóng băng app ở nền rồi rã băng. Vì vậy chỉ lần
+  rời app lâu mới làm game chết. Lỗi này có từ bản Winlator gốc. Luồng đọc từng client của ALSA (`waitForSocketRead`,
+  `poll`) cũng dừng khi gặp `EINTR`.
+- **Từ bản 0.1.46:** cả hai vòng chờ lại khi gặp `EINTR`. Mảng `events` của `epoll_wait` trước đây dùng chung cho ba
+  luồng (X server, ALSA, SysV shm) chạy cùng lúc; giờ mỗi lần gọi có mảng riêng.
+- **"Tự sửa lỗi" ở bản 0.1.45:** game tắt khi quay lại app bị tính là "tự tắt trước một phút" khi đang thử một cách, nên
+  "Đổi DXVK sang bản 1.10.3" và "Đổi driver sang System" bị tính là không giúp. Từ bản 0.1.46, phiên có lúc bị dừng không
+  tính như vậy (xem "Người chơi báo lỗi").
+- **Chưa rõ:** phần "đen màn hình, đơ" trong lúc chơi. Ở lần 2 (30 phút), trước khi người chơi rời app, game không đổi
+  hình 13 giây dù người chơi bấm 20 lần. Nhật ký Wine tắt, nên không biết game kẹt ở đâu. Cần nhật ký có "Bật debug
+  Wine" và file `Game_d3d11.log`, `Game_dxgi.log` mà DXVK 1.10.3 ghi trong thư mục game.
+- **Test:** `AgvnRepairTest.aSessionTheAppStoppedIsKnown`, `AgvnRepairTest.aFixTheGameClosedWithTooSoonGoesBackTried`.
+  Phần C không có unit test: thử trên máy.
+- **Thử máy:**
+  1. Mở một game Windows, chơi một lúc, về màn hình chính, chờ 1–2 phút (tắt màn hình càng tốt), quay lại: game chạy tiếp,
+     không tắt. `logcat -s AGVN System.out` không có "X connection to :0 broken".
+  2. Làm lại với một game có tiếng: tiếng chạy lại khi quay lại (ALSA).
+  3. Đang "Tự sửa lỗi" thử một cách, rời app một lúc rồi quay lại: cách đó không bị tính là "tự tắt" chỉ vì đã rời app.
