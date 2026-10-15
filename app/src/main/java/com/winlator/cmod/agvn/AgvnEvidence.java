@@ -39,6 +39,8 @@ final class AgvnEvidence {
     boolean crashed, endedByGame, playerQuit, started, bigWindowSeen, changed, smallScreen;
     /** A Godot game started with the renderer a fix picked (AgvnFixEdits.godotSwitched). */
     boolean godotSwitched;
+    /** The app stopped the game's processes during the session: the player left the app, or ⏸ (AgvnGamePause). */
+    boolean stopped;
     /** "Chạy nhẹ": the game reported an error, its page process died, Android found it frozen. */
     boolean scriptError, pageCrash, frozen;
     long seconds;

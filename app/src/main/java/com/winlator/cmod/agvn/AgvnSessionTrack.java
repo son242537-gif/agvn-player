@@ -33,7 +33,7 @@ public final class AgvnSessionTrack {
     private static volatile Map<String, String> settings = Collections.emptyMap();
     private static volatile String engineCrash;
     private static volatile boolean bigSeen, wineEnded, playerQuit, exiting;
-    private static volatile long lastFrameMs, endMs;
+    private static volatile long lastFrameMs, endMs, stoppedAtStartNs;
     private static final AtomicInteger pressesSinceFrame = new AtomicInteger(), framesSeen = new AtomicInteger();
     private static long lowRamAtMs, lowRamFreeMb = -1;
     private static long usedAtMs, usedMb = -1, usedBeforeMb = -1;
@@ -61,6 +61,12 @@ public final class AgvnSessionTrack {
         usedMb = usedBeforeMb = -1;
         engineCrash = null;
         AgvnGamePause.reset(System.nanoTime());
+        stoppedAtStartNs = AgvnGamePause.pausedNs(System.nanoTime());
+    }
+
+    /** True when the app stopped this game's processes for a while (the player left the app, or ⏸). */
+    static boolean stopped(long nowNs) {
+        return AgvnGamePause.pausedNs(nowNs) > stoppedAtStartNs;
     }
 
     /** A window's content changed: X server thread, every frame, so kept cheap. */

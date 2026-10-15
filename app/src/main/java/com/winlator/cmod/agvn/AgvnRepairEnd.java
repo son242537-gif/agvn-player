@@ -25,9 +25,13 @@ final class AgvnRepairEnd {
 
     private AgvnRepairEnd() {}
 
-    /** True when the game closed by itself (or crashed) before it could be asked about the fix on trial. */
+    /**
+     * True when the game closed by itself (or crashed) before it could be asked about the fix on trial. Not when the app
+     * stopped the game meanwhile: Rj01608199 (vivo V2403A, 16/10/2026) died at each return to the app, when the X server
+     * had dropped it, and two fixes went back counted as tried after "42 s", 28 of them stopped.
+     */
     static boolean endedTooSoon(AgvnEvidence ev) {
-        return (ev.crashed || ev.endedByGame) && ev.seconds < AgvnEvidence.GOOD_AFTER_S;
+        return !ev.stopped && (ev.crashed || ev.endedByGame) && ev.seconds < AgvnEvidence.GOOD_AFTER_S;
     }
 
     /** True when a fix is on trial, it was put on before this start, and the game ran with it ({@code ran}). */

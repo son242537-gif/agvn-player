@@ -165,6 +165,19 @@ public class AgvnRepairTest {
     }
 
     @Test
+    public void aSessionTheAppStoppedIsKnown() {
+        AgvnSessionTrack.start(1000);
+        long now = System.nanoTime();
+        assertFalse(AgvnSessionTrack.stopped(now));
+        assertTrue(AgvnGamePause.pause(now));
+        assertTrue("a stop going on counts", AgvnSessionTrack.stopped(now + 1_000_000_000L));
+        AgvnGamePause.resume(now + 30_000_000_000L);
+        assertTrue(AgvnSessionTrack.stopped(now + 31_000_000_000L));
+        AgvnSessionTrack.start(2000); // the next game: the stops before it do not count
+        assertFalse(AgvnSessionTrack.stopped(System.nanoTime()));
+    }
+
+    @Test
     public void aFixTheGameClosedWithTooSoonGoesBackTried() {
         // Av Director Life, vivo V2405A (Mali-G925), 15/10/2026: "Đổi DXVK sang bản 2.3.1", tried for a black screen;
         // Unreal's box after 30 s at every start, OK, and Wine ended with 0: the bar never asked about it
@@ -182,6 +195,11 @@ public class AgvnRepairTest {
         quit.started = quit.playerQuit = true;
         quit.seconds = 20;
         assertFalse("the player quit: asked about as before", AgvnRepairEnd.endedTooSoon(quit));
+        AgvnEvidence left = new AgvnEvidence();
+        left.started = left.endedByGame = left.stopped = true;
+        left.seconds = 42;
+        assertFalse("Rj01608199, 16/10/2026: it died at the return to the app, 28 of its 42 s stopped",
+                AgvnRepairEnd.endedTooSoon(left));
 
         // the trial stops, the fix stays tried, and the report goes on from the same settings before
         Map<String, String> before = new LinkedHashMap<>();

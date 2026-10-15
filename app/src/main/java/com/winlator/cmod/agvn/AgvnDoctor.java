@@ -166,6 +166,7 @@ public final class AgvnDoctor {
         ev.started = AgvnSessionTrack.started();
         ev.bigWindowSeen = AgvnSessionTrack.bigWindowSeen();
         ev.seconds = AgvnSessionTrack.seconds(nowMs);
+        ev.stopped = AgvnSessionTrack.stopped(System.nanoTime());
         ev.smallScreen = screenLines(screen) < SMALL_SCREEN_LINES;
         ev.params.put("screen", screen.replace('x', '×'));
         ev.lowRamFreeMb = AgvnSessionTrack.lowRamFreeMb(nowMs, LOW_RAM_RECENT_MS);

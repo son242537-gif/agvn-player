@@ -305,6 +305,9 @@ Giờ, khi game có bật cách đó và tự tắt trong 60 giây đầu, app l
 không giúp, trả cấu hình về như trước khi sửa. Về thư viện, app mở lại lỗi người chơi đã báo, nói cách nào vừa làm game
 tự tắt sau bao nhiêu giây, và có nút thử cách tiếp theo. Người chơi tự thoát game thì app vẫn hỏi như trước. Thanh màn
 hình đen chuyển game sang Proton 9 ("Chạy bằng Wine cũ") lúc đang thử một cách cũng trả cách đó về trước khi chuyển.
+Phiên mà app có lúc dừng game (người chơi rời app, hay bấm ⏸) thì không tính theo cách này (bản 0.1.46,
+`AgvnSessionTrack.stopped`): ở bản 0.1.45, Rj01608199 chết mỗi lần người chơi quay lại app (xem "Game chết khi quay lại
+app"), và hai cách bị tính là không giúp sau "42 giây", trong đó 28 giây game đang bị dừng.
 
 Chỉ game được báo lỗi bị đổi, và chỉ sau khi người chơi báo. Cách không giúp được không ở lại trên game, nên game không
 phải trả giá (chậm hơn, nóng hơn) cho một cách sửa vô ích. App ghi mọi bước vào `su-kien.txt` của phiên chơi ("Tự sửa
