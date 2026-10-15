@@ -44,6 +44,16 @@ public class AgvnSessionLogTest {
     }
 
     @Test
+    public void dxvkOneLogsSitNextToTheExe() throws Exception {
+        // Rj01608199, 16/10/2026: DXVK 1.10.3 left Game_d3d10.log, Game_d3d11.log and Game_dxgi.log in the game folder
+        File game = tmp.newFolder("rj");
+        List<File> logs = AgvnEngineLogs.candidates(new File(game, "Game.EXE"), game, "", tmp.getRoot());
+        for (String name : new String[]{"Game_dxgi.log", "Game_d3d11.log", "Game_d3d10.log", "Game_d3d9.log"}) {
+            assertTrue(name, logs.contains(new File(game, name)));
+        }
+    }
+
+    @Test
     public void bigLogsKeepTheirStartAndEnd() throws Exception {
         File small = tmp.newFile("small.log");
         Files.write(small.toPath(), "short".getBytes(StandardCharsets.UTF_8));

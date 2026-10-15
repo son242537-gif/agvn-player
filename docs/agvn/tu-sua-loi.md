@@ -1330,6 +1330,11 @@ I System.out: X connection to :0 broken (explicit kill or server shutdown).    (
 - **Chưa rõ:** phần "đen màn hình, đơ" trong lúc chơi. Ở lần 2 (30 phút), trước khi người chơi rời app, game không đổi
   hình 13 giây dù người chơi bấm 20 lần. Nhật ký Wine tắt, nên không biết game kẹt ở đâu. Cần nhật ký có "Bật debug
   Wine" và file `Game_d3d11.log`, `Game_dxgi.log` mà DXVK 1.10.3 ghi trong thư mục game.
+- **Log của DXVK 1.x (bản 0.1.46):** DXVK 1.10.3, bản mặc định trên Mali, ghi log qua `std::cerr`, không tới log của
+  Wine, nên nhật ký của game chạy bản đó không có dòng DXVK nào. Nó còn ghi mỗi DLL một file cạnh exe (`<exe>_dxgi.log`,
+  `_d3d11.log`, `_d3d10.log`, `_d3d9.log`). Từ bản 0.1.46, các file đó được chép vào phiên chơi như log của engine
+  (`AgvnEngineLogs`), nên "Gửi nhật ký" có chúng, và "Tự sửa lỗi" đọc phần cuối của chúng như log Wine (các lỗi DXVK
+  trong bảng trên giờ nhận ra cả với DXVK 1.10.3). Test: `AgvnSessionLogTest.dxvkOneLogsSitNextToTheExe`.
 - **Test:** `AgvnRepairTest.aSessionTheAppStoppedIsKnown`, `AgvnRepairTest.aFixTheGameClosedWithTooSoonGoesBackTried`.
   Phần C không có unit test: thử trên máy.
 - **Thử máy:**

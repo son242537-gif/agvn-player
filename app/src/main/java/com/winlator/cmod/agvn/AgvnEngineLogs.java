@@ -104,6 +104,10 @@ final class AgvnEngineLogs {
         out.add(new File(exeDir, "MelonLoader/Latest.log")); // MelonLoader (version.dll)
         out.add(new File(exeDir, "ue4ss/UE4SS.log")); // and UE4SS (dwmapi.dll) of Unreal games
         out.add(new File(exeDir, "AGVN-cheat.log")); // AGVN's cheat (agvncheat.dll) of AGVN game packages
+        // DXVK 1.x (1.10.3, the default on Mali) writes one log per DLL beside the exe, "Game_d3d11.log": its lines do
+        // not reach Wine's log, so a game on it had no DXVK line in "Gửi nhật ký" (Rj01608199, 16/10/2026)
+        String dxvk = exe.getName().replaceFirst("(?i)\\.exe$", "") + "_";
+        for (String dll : new String[]{"dxgi", "d3d11", "d3d10", "d3d9"}) out.add(new File(exeDir, dxvk + dll + ".log"));
         return out;
     }
 
