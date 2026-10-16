@@ -1419,3 +1419,42 @@ E AndroidRuntime:   at com.winlator.cmod.winhandler.WinHandler.lambda$setProcess
      `WinHandler request not sent`.
   3. Làm app gặp lỗi (hay chờ lần lỗi thật), mở lại app, bấm "Xuất": gói trong Download có thư mục `phien/` với 3 lần
      chơi mới nhất.
+
+## Chạm làm app tắt: số ngón của touchpad bị lệch (bản 0.1.49)
+
+Báo cáo ngày 16/10/2026 (POCO F8 Pro, Android 16, HyperOS 3; bản 0.1.42; một game Unity bản PC chạy Windows, đang ở màn
+nạp lâu). Người chơi chạm liên tiếp khoảng 15 lần trong 2 giây rồi vuốt hai lần. Ở lần vuốt thứ hai app tắt hẳn, game mất
+theo, không có hộp báo lỗi. Trước đó game vẫn chạy (153% CPU).
+
+```
+E AndroidRuntime: FATAL EXCEPTION: main
+E AndroidRuntime: java.lang.NullPointerException: Attempt to read from field 'long com.winlator.cmod.widget.TouchpadView$Finger.touchTime' on a null object reference
+E AndroidRuntime:   at com.winlator.cmod.widget.TouchpadView.handleTouchpadEvent(TouchpadView.java:319)
+E AndroidRuntime:   at com.winlator.cmod.widget.TouchpadView.onTouchEvent(TouchpadView.java:199)
+E AndroidRuntime:   at com.winlator.cmod.widget.InputControlsView.onTouchEvent(InputControlsView.java:744)
+```
+
+- **Vì sao:** `TouchpadView` giữ các ngón trong `fingers[]` nhưng đếm riêng bằng `numFingers`: cộng một mỗi lần đặt ngón,
+  trừ một khi nhấc một ngón đang có. Chạm tới touchpad qua `InputControlsView` (ngón đặt trên nút điều khiển ảo ở lại nút
+  đó) và qua `XServerDisplayActivity.dispatchTouchEvent` (bỏ mọi chạm khi game đang tạm dừng ⏸), nên có lúc ngón nhấc lên
+  mà touchpad không biết. Ngón đó nằm lại trong mảng; lần đặt ngón sau ghi đè lên nó mà vẫn cộng thêm, nên số đếm trôi
+  dần lên. Ở chế độ chạm giả lập màn cảm ứng, khi ngón số 1 đặt xuống lúc số đếm từ 2 trở lên, mã đọc thời điểm chạm của
+  ngón số 0. Ngón 0 không có ở touchpad (đang trên nút ảo, hoặc đã bị ghi đè rồi nhấc), nên lỗi NullPointerException trên
+  luồng chính tắt cả app. Số đếm lệch còn làm một lần chạm bị tính là hai ngón: nút trái đã nhấn không được nhả (kẹt nút
+  trái). Lỗi có từ bản Winlator gốc.
+- **Từ bản 0.1.49 (`TouchpadView`):**
+  - lúc đặt ngón, ngón nào còn trong mảng mà không còn trên màn hình (không có trong sự kiện) thì bị bỏ, và nút chuột nó
+    đang giữ được nhả (`dropFinger`);
+  - số ngón được đếm lại từ mảng sau mỗi thay đổi (`countFingers`), nên không lệch được nữa;
+  - ngón số 1 so thời điểm với một ngón khác đang có trên touchpad, không đọc thẳng ngón 0;
+  - khi Android lấy lại cử chỉ (`ACTION_CANCEL`, như vuốt từ mép màn hình), nút chuột các ngón đang giữ được nhả;
+  - lỗi khác lúc xử lý chạm thì ghi `touch not handled` vào `logcat -s AGVN` và một dòng `Lỗi xử lý chạm, đã bỏ qua: …`
+    vào `su-kien.txt`, rồi bỏ các ngón: một lần chạm không bao giờ tắt app nữa.
+- **Test:** không có unit test (cần View và X server). Thử trên máy.
+- **Thử máy** (chế độ touchpad, có nút điều khiển ảo):
+  1. chạm dồn dập 20 lần trong 2 giây rồi vuốt hai ngón;
+  2. giữ một ngón trên nút ảo, ngón kia chạm và vuốt vùng game;
+  3. đang chạm thì vuốt từ mép màn hình để gọi cử chỉ hệ thống, rồi quay lại game.
+
+  Cả ba: app không tắt, con trỏ trong game ở đúng chỗ, không kẹt nút trái. Chạm một ngón vẫn là nhấn trái, chạm hai ngón
+  vẫn là nhấn phải như trước.
