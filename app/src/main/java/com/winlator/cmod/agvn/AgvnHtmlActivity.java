@@ -23,6 +23,7 @@ import androidx.preference.PreferenceManager;
 import com.winlator.cmod.R;
 
 import java.io.File;
+import java.util.function.Consumer;
 
 /**
  * Plays an HTML game ({@link AgvnHtmlGame}) full screen in a WebView. Offline: only the game's own files load. The
@@ -42,6 +43,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     /** "Chạy bằng Windows" was picked: the Wine game now owns the keep-alive notification. */
     private boolean toWindows;
     private AgvnLightTools tools;
+    /** For "Gửi nhật ký" ({@link AgvnLightSession#keeper}): the pictures shown empty, the files the page did not find. */
+    private Consumer<String> standIns, missing;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -56,6 +59,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         host = AgvnHtmlGame.hostFor(index);
         AgvnKeepAlive.start(this, getIntent().getStringExtra("shortcut_name")); // the game keeps running in the background
         AgvnLightSession.begin(this, AgvnHtmlGame.RUNNER_HTML, AgvnLightGame.folderOf(index)); // "Tự sửa lỗi" reads its end
+        standIns = AgvnLightSession.keeper(getApplicationContext(), AgvnLightSession.STAND_IN, AgvnLightSession.STAND_INS);
+        missing = AgvnLightSession.keeper(getApplicationContext(), AgvnLightSession.MISSING, AgvnLightSession.LISTED);
         boolean rpgMaker = AgvnHtmlFiles.resolve(root, "/js/rpg_core.js") != null || AgvnHtmlFiles.resolve(root, "/js/rmmz_core.js") != null;
         // an NW.js page game (AgvnNwjsGame) gets the stand-ins for require, process and nw too; Tyrano runs as before
         boolean nwjs = !rpgMaker && !new File(root, "tyrano").isDirectory() && AgvnNwjsGame.index(root) != null;
@@ -91,7 +96,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         s.setAllowContentAccess(false);
         s.setTextZoom(100);
         webView.setWebViewClient(new GameClient());
-        webView.setWebChromeClient(new AgvnHtmlConsole(logs));
+        webView.setWebChromeClient(new AgvnHtmlConsole(logs,
+                AgvnLightSession.keeper(getApplicationContext(), AgvnLightSession.PAGE, AgvnLightSession.LISTED)));
         if (rpgMaker) webView.addJavascriptInterface(new AgvnHtmlSaves(root), AgvnHtmlSaves.NAME); // saves as on a PC
         setContentView(webView);
         hideSystemUi();
@@ -119,7 +125,9 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
             Uri url = request.getUrl();
             if (!host.equals(url.getHost())) return AgvnHtmlFiles.blocked(); // no network: nothing leaves the phone
-            return AgvnHtmlFiles.serve(root, entry, url.getEncodedPath(), compatJs, AgvnLightSession.standIns(view.getContext()));
+            // a HEAD only asks whether a file is there (fs.existsSync of html-compat.js): its absence is no problem
+            boolean asked = "HEAD".equalsIgnoreCase(request.getMethod());
+            return AgvnHtmlFiles.serve(root, entry, url.getEncodedPath(), compatJs, asked ? null : standIns, asked ? null : missing);
         }
 
         @Override

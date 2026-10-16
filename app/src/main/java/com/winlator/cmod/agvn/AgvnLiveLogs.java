@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 final class AgvnLiveLogs {
     private static final String TAG = "AGVN";
     static final String APP = "app", RENPY = "renpy", GODOT = "godot", LOGCAT = "logcat.txt", DEVICE = "thiet-bi.txt",
-            LIGHT = "chay-nhe.txt";
+            LIGHT = "chay-nhe.txt", LIGHT_LAST = "chay-nhe-lan-truoc.txt";
     private static final int LOGCAT_LINES = 20000;
     private static final long LOGCAT_MAX_BYTES = 4L << 20;
 
@@ -34,9 +34,11 @@ final class AgvnLiveLogs {
     /**
      * Fills {@code into}: "&lt;session&gt;/" for each running session, "app/logcat.txt", "app/thiet-bi.txt", the last
      * "Chạy nhẹ" game as {@link AgvnLightSession} keeps it ("app/chay-nhe.txt": its error, the pictures shown empty,
-     * which a busy logcat loses), and "renpy/" and "godot/" for {@code gameDir}.
+     * an HTML page's first messages and the files it did not find, which a busy logcat loses and a HONOR phone sends
+     * encrypted), the last run of {@code gameName} that has ended ("app/chay-nhe-lan-truoc.txt"), and "renpy/" and
+     * "godot/" for {@code gameDir}.
      */
-    static void collect(Context context, File[] sessions, File gameDir, File into) {
+    static void collect(Context context, File[] sessions, String gameName, File gameDir, File into) {
         if (sessions != null) {
             for (File session : sessions) {
                 if (!new File(session, AgvnSessionLog.RUNNING).isFile()) continue;
@@ -50,6 +52,8 @@ final class AgvnLiveLogs {
             write(new File(app, DEVICE), AgvnDeviceReport.text(context));
             File light = new File(context.getFilesDir(), AgvnLightSession.FILE);
             if (light.isFile()) copy(light, new File(app, LIGHT));
+            File last = AgvnLightSession.lastFile(context);
+            if (gameName != null && gameName.equals(AgvnLightSession.nameIn(last))) copy(last, new File(app, LIGHT_LAST));
         }
         if (gameDir == null) return;
         File renpyLogs = AgvnRenpyGame.publicDir(AgvnSessionLog.root().getParentFile(), gameDir);

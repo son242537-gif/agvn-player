@@ -1344,3 +1344,40 @@ I System.out: X connection to :0 broken (explicit kill or server shutdown).    (
      không tắt. `logcat -s AGVN System.out` không có "X connection to :0 broken".
   2. Làm lại với một game có tiếng: tiếng chạy lại khi quay lại (ALSA).
   3. Đang "Tự sửa lỗi" thử một cách, rời app một lúc rồi quay lại: cách đó không bị tính là "tự tắt" chỉ vì đã rời app.
+
+## Game HTML không có chữ, nhật ký không có gì (bản 0.1.47)
+
+Nhật ký ngày 16/10/2026 (Vệ Tinh Đức Miễn Phí v2.0.1, bản RPG Maker dạng web "JoiPlay universal", chạy bằng "Chạy nhẹ";
+HONOR AAK-AN00: Snapdragon 8 Elite, Adreno 830, Android 17; bản 0.1.46): game vào được mà không có chữ. Gói nhật ký chỉ
+có `app/chay-nhe.txt` (`runner=html`, `started=1`: trang đã mở, không lỗi, không ảnh nào để trống), `app/thiet-bi.txt`
+và `app/logcat.txt`. Logcat là một dòng `--------- beginning of (HKS)…`: máy HONOR mã hoá logcat của app.
+
+- **Vì sao không biết gì:** mọi thứ trang game báo (lỗi script, câu `[AGVN] skipped game error: …` của
+  `html-compat.js`, phông hay file data không tải được) chỉ ghi vào logcat (`AgvnHtmlConsole`, tag `AgvnHtml`), và file
+  game thiếu cũng vậy (`HTML game file missing`). Trên máy HONOR các dòng đó không đọc được. Gói gửi lúc 14:48 cùng ngày
+  (bản 0.1.38) không có cả `chay-nhe.txt`: file này chỉ có khi game đang mở, vì thư viện đọc xong lần chơi đã kết thúc
+  thì xoá nó.
+- **Từ bản 0.1.47, `chay-nhe.txt` của game HTML có thêm** (`AgvnLightSession.keeper`):
+  - `page`: 8 cảnh báo và lỗi đầu tiên của trang, mỗi câu một lần, kèm file và dòng trong thư mục game
+    (`AgvnHtmlConsole.brief`: `… (/js/plugins/Tên plugin.js:12)`);
+  - `missing`: 8 file đầu tiên trang xin mà thư mục game không có (phông, file data, tiếng, phim). Câu hỏi `HEAD` của
+    `fs.existsSync` (`html-compat.js`) chỉ hỏi file có hay không, nên không tính;
+  - `standIn`: ảnh `.png` thiếu (app đưa ảnh trong suốt) giờ cũng được ghi, như ảnh mã hoá (`… (missing)`).
+  Mỗi danh sách cũng được nhớ trong bộ nhớ, nên một tiếng game xin lại mỗi lần phát, hay một tràng thông báo, không đọc
+  và ghi file mỗi lần.
+- **Lần chơi trước:** thư viện đọc xong lần chơi đã kết thúc thì giữ file thành `files/agvn/light-session-last.properties`
+  (thay cho lần trước nữa). "Gửi nhật ký" của đúng game đó có thêm `app/chay-nhe-lan-truoc.txt`, nên gửi từ thư viện sau
+  khi thoát game vẫn có.
+- **`thiet-bi.txt`** có thêm dòng `WebView (game HTML): <phiên bản> · <gói>`: game HTML chạy trong WebView của máy, và máy
+  bán ở Trung Quốc (như HONOR AAK-AN00) thường có WebView riêng của hãng, không phải bản của Google.
+- **Chưa rõ:** vì sao Vệ Tinh Đức không có chữ. Cần gói nhật ký từ bản 0.1.47 (gửi lúc game đang mở, hay ngay sau khi
+  thoát), có `page`, `missing` và dòng WebView.
+- **Test:** `AgvnLightNotesTest`.
+- **Thử máy:**
+  1. Game RPG Maker MV/MZ "Chạy nhẹ": đổi tên một file trong `audio/se/` (tiếng con trỏ, như `Cursor1.ogg`), thêm dòng
+     `console.warn('AGVN thu');` vào đầu một file trong `js/plugins/`, mở game, di con trỏ vài lần rồi bấm "Gửi nhật ký"
+     trong menu Chạy nhẹ: `app/chay-nhe.txt` có `missing=` tên file tiếng đó một lần (dù tiếng phát nhiều lần) và
+     `page=` có `AGVN thu (/js/plugins/<file>.js:1)`. `app/thiet-bi.txt` có dòng `WebView (game HTML): …`.
+  2. Thoát game, về thư viện, bấm "Gửi nhật ký" của game đó trong menu ⋮: có `app/chay-nhe-lan-truoc.txt` với các dòng
+     trên. "Gửi nhật ký" của một game khác thì không có file này.
+  3. Game chạy như trước: tiếng thiếu vẫn bị bỏ qua, ảnh thiếu vẫn để trống, không có hộp lỗi mới.

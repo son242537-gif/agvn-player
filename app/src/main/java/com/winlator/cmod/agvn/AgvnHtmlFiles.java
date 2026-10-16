@@ -63,10 +63,11 @@ public final class AgvnHtmlFiles {
     /**
      * The response for URL path {@code urlPath}: the game file (its {@code entry} page, index.html or an NW.js game's
      * own, with {@code compatJs} loaded first, see assets/agvn/html-compat.js), a transparent picture for a missing .png
-     * so the game does not stop (also for a missing or broken encrypted one, {@link AgvnHtmlStandIn}, told to
-     * {@code standIn}), or 404.
+     * so the game does not stop (also for a missing or broken encrypted one, {@link AgvnHtmlStandIn}), told to
+     * {@code standIn}, or 404, told to {@code missing} (a font, a data file, a sound...). Either may be null.
      */
-    public static WebResourceResponse serve(File root, String entry, String urlPath, String compatJs, Consumer<String> standIn) {
+    public static WebResourceResponse serve(File root, String entry, String urlPath, String compatJs, Consumer<String> standIn,
+                                            Consumer<String> missing) {
         if (COMPAT_PATH.equals(urlPath) && compatJs != null)
             return text("application/javascript", compatJs);
         File file = fileFor(root, urlPath);
@@ -80,8 +81,11 @@ public final class AgvnHtmlFiles {
         }
         if (file == null) {
             Log.w("AGVN", "HTML game file missing: " + urlPath);
-            if (urlPath != null && urlPath.toLowerCase(Locale.ROOT).endsWith(".png"))
+            if (urlPath != null && urlPath.toLowerCase(Locale.ROOT).endsWith(".png")) {
+                if (standIn != null) standIn.accept(decode(urlPath) + " (missing)");
                 return new WebResourceResponse("image/png", null, 200, "OK", CORS, new ByteArrayInputStream(TRANSPARENT_PNG));
+            }
+            if (missing != null) missing.accept(decode(urlPath == null ? "" : urlPath));
             return new WebResourceResponse("text/plain", "UTF-8", 404, "Not Found", CORS, empty());
         }
         String mime = mimeType(file.getName());
@@ -181,7 +185,8 @@ public final class AgvnHtmlFiles {
         return null;
     }
 
-    private static String decode(String path) {
+    /** URL path {@code path} as the file name it stands for ("/img/a%20b.png" -> "/img/a b.png"; "+" stays "+"). */
+    static String decode(String path) {
         try {
             return URLDecoder.decode(path.replace("+", "%2B"), "UTF-8");
         } catch (UnsupportedEncodingException | IllegalArgumentException e) {

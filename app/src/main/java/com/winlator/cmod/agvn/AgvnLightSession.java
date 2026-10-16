@@ -8,22 +8,31 @@ import android.content.Intent;
 import android.os.Process;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
  * The "Chạy nhẹ" game playing now (Ren'Py, RPG Maker XP/VX/VX Ace, HTML), in files/agvn/light-session.properties,
  * which the runner's own process writes and the library reads ({@link AgvnLightDoctor}): which game, when, in which
  * process, whether its first screen came up, whether it ended normally, and an error it reported. One at a time, as
- * one light game runs at a time.
+ * one light game runs at a time. An HTML game's page also leaves its first warnings and errors, and the files it asked
+ * for that its folder lacks: they were only in logcat, which a HONOR phone sends encrypted, so the log of Vệ Tinh Đức
+ * (RPG Maker web build, no text on screen, HONOR AAK-AN00, 16/10/2026) could not say why. Once the library has read a
+ * session that is over, it stays as the last one ({@link #LAST}), so "Gửi nhật ký" after the game still has it.
  */
 public final class AgvnLightSession {
-    static final String FILE = "agvn/light-session.properties";
+    static final String FILE = "agvn/light-session.properties", LAST = "agvn/light-session-last.properties";
     static final String SHORTCUT = "shortcut", CONTAINER = "container", RUNNER = "runner", NAME = "name", GAME_DIR = "gameDir",
             START = "start", PROCESS = "process", PID = "pid", STARTED = "started", ENDED = "ended", SHOWN = "shown",
-            ERROR = "error", PAGE_CRASH = "pageCrash", STAND_IN = "standIn";
+            ERROR = "error", PAGE_CRASH = "pageCrash", STAND_IN = "standIn", MISSING = "missing", PAGE = "page";
     /** Pictures named as shown empty, at most. */
     static final int STAND_INS = 5;
+    /** Missing files, and page messages, kept at most. */
+    static final int LISTED = 8;
 
     private AgvnLightSession() {}
 
@@ -87,22 +96,53 @@ public final class AgvnLightSession {
         return AgvnPropsFile.load(file(ctx));
     }
 
+    /** The library has read the session, which is over: it is kept as the last one, in place of the one before. */
     static void clear(Context ctx) {
-        file(ctx).delete();
+        File f = file(ctx);
+        if (!f.renameTo(lastFile(ctx))) f.delete();
     }
 
-    /** A picture of the HTML game was missing or broken and shown empty (AgvnHtmlStandIn): the first few are kept. */
-    static synchronized void standIn(Context ctx, String file) {
+    /** The last session the library read ({@link #clear}), which may be missing. */
+    static File lastFile(Context ctx) {
+        return new File(ctx.getFilesDir(), LAST);
+    }
+
+    /** The game a session file names ({@link #NAME}), or null. */
+    static String nameIn(File f) {
+        return f.isFile() ? AgvnPropsFile.load(f).getProperty(NAME) : null;
+    }
+
+    /**
+     * For the runner of {@code ctx}, the first {@code max} different items in the list under {@code key} ("a | b"):
+     * the pictures of an HTML game shown empty ({@link #STAND_IN}, AgvnHtmlStandIn), the files its page asked for that
+     * are not there ({@link #MISSING}), its page's warnings and errors ({@link #PAGE}). Each item is also kept in memory,
+     * so a file asked for again and again, or a flood of messages, does not read the session's file each time.
+     */
+    static Consumer<String> keeper(Context ctx, String key, int max) {
+        return firstDifferent(max, item -> add(ctx, key, item, max));
+    }
+
+    /** {@code sink}, told each item the first time it comes, up to {@code max} different items; null is left out. */
+    static Consumer<String> firstDifferent(int max, Consumer<String> sink) {
+        Set<String> seen = Collections.synchronizedSet(new HashSet<>());
+        return item -> {
+            if (item != null && seen.size() < max && seen.add(item)) sink.accept(item);
+        };
+    }
+
+    private static synchronized void add(Context ctx, String key, String item, int max) {
         Properties p = read(ctx);
-        String before = p.getProperty(STAND_IN, "");
-        if (p.isEmpty() || before.contains(file) || before.split(" \\| ").length >= STAND_INS) return;
-        p.setProperty(STAND_IN, before.isEmpty() ? cut(file) : before + " | " + cut(file));
+        String list = p.isEmpty() ? null : added(p.getProperty(key, ""), cut(item).replace(" | ", " / "), max);
+        if (list == null) return;
+        p.setProperty(key, list);
         store(ctx, p);
     }
 
-    /** {@link #standIn} for the runner of {@code ctx}, so "Gửi nhật ký" names the pictures. */
-    static Consumer<String> standIns(Context ctx) {
-        return file -> standIn(ctx, file);
+    /** {@code list} ("a | b") with {@code item} at its end; null when it holds {@code item} already, or {@code max} items. */
+    static String added(String list, String item, int max) {
+        if (list.isEmpty()) return item;
+        String[] items = list.split(" \\| ");
+        return items.length >= max || Arrays.asList(items).contains(item) ? null : list + " | " + item;
     }
 
     private static synchronized void set(Context ctx, String key, String value) {

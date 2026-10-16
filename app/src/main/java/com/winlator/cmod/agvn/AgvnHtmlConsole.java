@@ -11,15 +11,18 @@ import org.json.JSONException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Game script messages in logcat (tag AgvnHtml): warnings and errors always, everything with a log setting on. A
- * message seen again is counted, not logged again ({@link #repeat}).
+ * message seen again is counted, not logged again ({@link #repeat}). The first warnings and errors also go to the
+ * session ({@link AgvnLightSession#PAGE}), for a phone whose logcat cannot be read.
  */
 public final class AgvnHtmlConsole extends WebChromeClient {
     /** Messages told apart at once: a flood of up to this many different messages is folded. */
     static final int KEYS = 32;
     private final boolean all;
+    private final Consumer<String> problems;
     /** Times each recent message came; the least recently seen goes first. UI thread only. */
     private final Map<String, int[]> seen = new LinkedHashMap<String, int[]>(KEYS, 0.75f, true) {
         @Override
@@ -28,8 +31,10 @@ public final class AgvnHtmlConsole extends WebChromeClient {
         }
     };
 
-    AgvnHtmlConsole(boolean all) {
+    /** {@code problems}: told each warning or error the first time it comes ({@link #brief}); may be null. */
+    AgvnHtmlConsole(boolean all, Consumer<String> problems) {
         this.all = all;
+        this.problems = problems;
     }
 
     @Override
@@ -37,10 +42,18 @@ public final class AgvnHtmlConsole extends WebChromeClient {
         ConsoleMessage.MessageLevel level = m.messageLevel();
         boolean problem = level == ConsoleMessage.MessageLevel.ERROR || level == ConsoleMessage.MessageLevel.WARNING;
         if (all || problem) {
-            String line = repeat(seen, m.message() + " (" + m.sourceId() + ":" + m.lineNumber() + ")");
+            String text = m.message() + " (" + m.sourceId() + ":" + m.lineNumber() + ")";
+            String line = repeat(seen, text);
             if (line != null) Log.println(problem ? Log.WARN : Log.INFO, "AgvnHtml", line);
+            if (problem && problems != null && text.equals(line)) problems.accept(brief(m.message(), m.sourceId(), m.lineNumber()));
         }
         return true;
+    }
+
+    /** A message as the session keeps it: where it came from as a path in the game folder ("/js/plugins/A B.js:12"). */
+    static String brief(String message, String source, int line) {
+        String path = source == null ? "" : source.replaceFirst("^[A-Za-z][A-Za-z0-9+.-]*://[^/]*", "");
+        return message + (path.isEmpty() ? "" : " (" + AgvnHtmlFiles.decode(path) + ":" + line + ")");
     }
 
     /**

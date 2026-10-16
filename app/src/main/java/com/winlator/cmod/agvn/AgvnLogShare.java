@@ -58,7 +58,7 @@ public final class AgvnLogShare {
             int entries = 0;
             try {
                 AgvnLiveLogs.delete(live);
-                AgvnLiveLogs.collect(activity, sessions, gameDir, live);
+                AgvnLiveLogs.collect(activity, sessions, gameName, gameDir, live);
                 entries = zip(sessions, live, zip);
                 if (entries == 0) zip.delete();
             } catch (IOException | RuntimeException e) {
