@@ -4,11 +4,13 @@ package com.winlator.cmod.agvn;
 import android.app.ActivityManager;
 import android.app.GameManager;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.PerformanceHintManager;
 import android.os.PowerManager;
 import android.view.Display;
+import android.webkit.WebView;
 
 import androidx.preference.PreferenceManager;
 
@@ -24,7 +26,8 @@ import java.util.TreeSet;
  * thiet-bi.txt: what decides how games run on this phone, so that a player on any phone can send it with "Gửi nhật ký"
  * and the tiers (device-tiers.json) can be tuned for phones AGVN has not seen: chip, GPU and its Vulkan, CPU cores,
  * RAM, screen refresh rates, heat, battery saver, Android's game mode, the tier and why, the drivers tried
- * ({@link AgvnDeviceFacts}), the keyboards, mice and gamepads plugged in ({@link AgvnInputDevices}).
+ * ({@link AgvnDeviceFacts}), the WebView that "Chạy nhẹ" HTML games run in, the keyboards, mice and gamepads plugged in
+ * ({@link AgvnInputDevices}).
  */
 final class AgvnDeviceReport {
     private static final String[] THERMAL = {"bình thường", "hơi ấm", "ấm", "nóng", "rất nóng", "khẩn cấp", "sắp tắt máy"};
@@ -76,6 +79,10 @@ final class AgvnDeviceReport {
         } catch (Throwable ignored) {}
         try {
             lines.add("Driver đã thử: " + AgvnDeviceFacts.drivers(ctx));
+        } catch (Throwable ignored) {}
+        try { // "Chạy nhẹ" HTML games run in it, and phones sold in China often ship their own
+            PackageInfo web = WebView.getCurrentWebViewPackage();
+            lines.add("WebView (game HTML): " + (web == null ? "không có" : web.versionName + " · " + web.packageName));
         } catch (Throwable ignored) {}
         try {
             lines.add(AgvnInputDevices.line());
