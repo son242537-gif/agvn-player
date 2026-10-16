@@ -316,8 +316,18 @@ public class WinHandler {
         Executors.newSingleThreadExecutor().execute(() -> {
             while (running) {
                 synchronized (actions) {
-                    while (initReceived && !actions.isEmpty())
-                        actions.poll().run();
+                    while (initReceived && !actions.isEmpty()) {
+                        Runnable action = actions.poll();
+                        try {
+                            action.run();
+                        } catch (RuntimeException e) {
+                            // AGVN: a request over the 64-byte packet that agvn-winhandler.exe reads (a window class,
+                            // process name or command past about 50 bytes) is not sent. Its BufferOverflowException
+                            // closed the whole app as a game opened, 4 times in 4 minutes (OPPO PLE110, 15/10/2026).
+                            Log.w("AGVN", "WinHandler request not sent", e);
+                            com.winlator.cmod.agvn.AgvnSessionLog.event("Yêu cầu tới Windows không gửi được (quá dài): " + e);
+                        }
+                    }
                     try {
                         actions.wait();
                     } catch (InterruptedException e) {
