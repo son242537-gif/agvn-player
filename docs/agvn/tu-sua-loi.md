@@ -1381,3 +1381,41 @@ và `app/logcat.txt`. Logcat là một dòng `--------- beginning of (HKS)…`: 
   2. Thoát game, về thư viện, bấm "Gửi nhật ký" của game đó trong menu ⋮: có `app/chay-nhe-lan-truoc.txt` với các dòng
      trên. "Gửi nhật ký" của một game khác thì không có file này.
   3. Game chạy như trước: tiếng thiếu vẫn bị bỏ qua, ảnh thiếu vẫn để trống, không có hộp lỗi mới.
+
+## App tự tắt khi mở game: tên quá dài cho WinHandler (bản 0.1.48)
+
+Nhật ký ngày 16/10/2026 (OPPO PLE110: Snapdragon, Adreno 825, Android 16; bản 0.1.46). Người chơi gửi gói của hộp
+"Ứng dụng vừa gặp lỗi. Xuất nhật ký để gửi AGVN?" (`AGVN-nhat-ky-<ngày>-<giờ>.zip`) khi hỏi về Song Tu Vo Lam đen màn
+hình. Gói có logcat với 4 lần app tắt hẳn ngày 15/10, 16:23–16:27, mỗi lần một tiến trình mới:
+
+```
+E AndroidRuntime: FATAL EXCEPTION: pool-20-thread-1
+E AndroidRuntime: java.nio.BufferOverflowException
+E AndroidRuntime:   at java.nio.ByteBuffer.put(ByteBuffer.java:1329)
+E AndroidRuntime:   at com.winlator.cmod.winhandler.WinHandler.lambda$setProcessAffinity$3(WinHandler.java:209)
+```
+
+- **Vì sao:** khi một cửa sổ game hiện ra, app gán nhân CPU cho tiến trình của nó (`assignTaskAffinity`). Cửa sổ không có
+  `_NET_WM_PID` thì app gửi tên lớp cửa sổ (`WM_CLASS`, tức tên file exe) cho `agvn-winhandler.exe`. Gói tin chỉ có 64
+  byte (`winhandler.c` cũng chỉ đọc 64), tên chiếm 14 byte sau phần đầu, nên tên dài hơn 50 byte làm `ByteBuffer.put`
+  ném lỗi trong luồng gửi, và lỗi đó tắt cả app. `WM_CLASS` được đọc như Latin-1 rồi ghi lại bằng UTF-8, nên mỗi byte
+  của chữ Trung, Nhật thành 2 byte: tên exe 8 chữ Hán cộng `.exe` đã là 52 byte. `exec` và `killProcess` của Trình quản
+  lý tác vụ cũng có lỗi này với lệnh hay tên dài. Lỗi có từ bản Winlator gốc.
+- **Từ bản 0.1.48:** yêu cầu nào không vừa gói tin thì không gửi; `logcat -s AGVN` có `WinHandler request not sent`, và
+  `su-kien.txt` có `Yêu cầu tới Windows không gửi được (quá dài): …`. Phía Windows chỉ đọc 64 byte và so cả tên, nên với
+  tên dài như vậy việc gán nhân CPU vốn không có tác dụng: bỏ yêu cầu không đổi gì cho game.
+- **Gói của hộp báo lỗi** (`DiagnosticsExporter`) trước đây chỉ có `thiet-bi.txt`, logcat, `last-crash.txt` và hai file
+  log rời, không có lần chơi nào, dù app tắt lúc đang chơi. Từ bản 0.1.48 gói có thêm 3 lần chơi mới nhất của mọi game
+  (`phien/<game>/<lần chơi>/`, xếp theo giờ trong tên thư mục), mỗi file tối đa 3 MB như các file khác.
+- **Song Tu Vo Lam hiện hai mục ở "Thêm game":** thư mục có hai file exe (`SongTu_GameHub.exe` và `雙修武林.exe`), app
+  không nhận ra engine, nên coi là một bộ nhiều game (`GameExeResolver.gameExes`) và hiện mỗi exe một
+  mục (`Song Tu Vo Lam - SongTu_GameHub`, `Song Tu Vo Lam - 雙修武林`). App không biết exe nào là game, exe nào là bản
+  chép hay trình mở. Cả ba lối tắt của game trên máy (hai container) có `agvn_last_start_ms=0`: chưa lần nào hiện hình.
+  Lý do màn hình đen cần nhật ký "Gửi nhật ký" của chính game đó.
+- **Test:** `DiagnosticsExporterTest`. Phần WinHandler không có unit test (cần Activity): thử trên máy.
+- **Thử máy:**
+  1. Mở một game Windows tên ngắn: game chạy như trước; `logcat -s AGVN` không có `WinHandler request not sent`.
+  2. Trong game, "Quản lý tiến trình" → "Tác vụ mới", gõ một lệnh dài hơn 60 ký tự: app không tắt; `logcat -s AGVN` có
+     `WinHandler request not sent`.
+  3. Làm app gặp lỗi (hay chờ lần lỗi thật), mở lại app, bấm "Xuất": gói trong Download có thư mục `phien/` với 3 lần
+     chơi mới nhất.
