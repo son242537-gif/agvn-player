@@ -1,0 +1,7 @@
+AGVN Player v0.1.25 - agvn.io
+
+Bản nhỏ: chỉ sửa game "Chạy nhẹ" chạy bằng trình duyệt (RPG Maker MV/MZ, Tyrano). Game khác chạy như bản 0.1.24.
+Sửa lỗi:
+- Game RPG Maker MZ đứng ở cảnh đầu tiên (màn đen hoặc logo), chạm bao nhiêu cũng không đi tiếp: game giờ tự qua màn giới thiệu tới màn tiêu đề. Game vẫn dừng khi bạn rời app và chạy tiếp khi quay lại.
+- Game chạy bằng trình duyệt nhận phím của bàn phím rời và tay cầm chắc chắn hơn, cả sau khi đóng bàn phím ảo.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

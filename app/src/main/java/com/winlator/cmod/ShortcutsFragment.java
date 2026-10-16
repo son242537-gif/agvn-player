@@ -224,7 +224,7 @@ public class ShortcutsFragment extends Fragment {
 
                     @Override
                     public void onRun(@NonNull String shortcutPath) {
-                        Shortcut shortcut = findShortcut(shortcutPath);
+                        Shortcut shortcut = currentShortcut(shortcutPath);
                         if (shortcut != null) runFromShortcut(shortcut);
                     }
 
@@ -235,7 +235,7 @@ public class ShortcutsFragment extends Fragment {
 
                     @Override
                     public void onAction(@NonNull String shortcutPath, @NonNull String action) {
-                        Shortcut shortcut = findShortcut(shortcutPath);
+                        Shortcut shortcut = currentShortcut(shortcutPath);
                         if (shortcut != null) handleShortcutAction(shortcut, action);
                     }
 
@@ -494,6 +494,15 @@ public class ShortcutsFragment extends Fragment {
         syncDynamicAppShortcuts();
     }
 
+    /** AGVN: the game as its file holds it now, also in the list, so a fix put on it since is not saved over. */
+    private Shortcut currentShortcut(String shortcutPath) {
+        Shortcut listed = findShortcut(shortcutPath);
+        Shortcut now = com.winlator.cmod.agvn.AgvnShortcutReload.of(listed);
+        int index = listed != null ? allShortcuts.indexOf(listed) : -1;
+        if (index >= 0) allShortcuts.set(index, now);
+        return now;
+    }
+
     private Shortcut findShortcut(String shortcutPath) {
         for (Shortcut shortcut : allShortcuts) {
             if (shortcut.file != null && shortcut.file.getPath().equals(shortcutPath)) return shortcut;
@@ -513,6 +522,10 @@ public class ShortcutsFragment extends Fragment {
             if (artworkChecked.add(baseName)) { // AGVN: redraw artwork made by an older AGVN version
                 com.winlator.cmod.agvn.AgvnCovers.dropIfOutdated(cover);
                 com.winlator.cmod.agvn.AgvnCovers.dropIfOutdated(banner);
+                // AGVN: a Ren'Py/RPG Maker game imported earlier gets its icon from its own art instead of the engine's
+                com.winlator.cmod.agvn.AgvnGameIcons.refreshAsync(shortcut, resolveExeFile(shortcut), autoIcon, () -> {
+                    if (getActivity() != null) getActivity().runOnUiThread(() -> refreshArtworkAndLauncherShortcuts(shortcut));
+                });
             }
             String iconPath = userIcon.exists() ? userIcon.getPath() :
                     (autoIcon.exists() ? autoIcon.getPath() : null);
@@ -743,6 +756,9 @@ public class ShortcutsFragment extends Fragment {
         }
         else if (LibraryComposeHost.ACTION_SEND_LOGS.equals(action)) {
             com.winlator.cmod.agvn.AgvnLogShare.share(requireActivity(), shortcut);
+        }
+        else if (LibraryComposeHost.ACTION_REPAIR.equals(action)) {
+            com.winlator.cmod.agvn.AgvnRepairDialog.pick(requireActivity(), shortcut, null); // AGVN: "Tự sửa lỗi"
         }
         else if (LibraryComposeHost.ACTION_SAVE_IMPORT.equals(action)) {
             com.winlator.cmod.agvn.AgvnSaveDialogs.askImport(requireActivity(), shortcut, () -> {

@@ -1,0 +1,25 @@
+// Copyright (c) 2026 agvn.io — MIT License (see LICENSE).
+//
+// AGVN: a second Wine, for a game the bundled Proton 9 cannot play (agvn/AgvnWine10.java). Proton 9's mfplat drops the
+// data after a movie's VIDEOINFOHEADER (MF_MT_USER_DATA), so a WMV3 movie reaches GStreamer's decoder without its
+// sequence header and never plays (KiriKiri ticket, 06/10); Proton 10 keeps it (dlls/mfplat/mediatype.c,
+// MFInitMediaTypeFromVideoInfoHeader). This is Valve's Proton 10.0-4 for Android (bionic, arm64ec) as a contents
+// package (.wcp: profile.json, bin, lib, prefixPack.txz), built from public source by The412Banner/proton-wine (branch
+// proton_10.0, release build-bionic-layers-20260930-v9). Pinned as proton10_wcp_sha256; nothing in it runs on the build
+// machine. Applied from build.gradle, which provides agvnPinnedAsset.
+
+def wine10Pinned = project.ext.agvnPinnedAsset
+def wine10Wcp = new File(projectDir, "src/main/assets/agvn/proton-10.0-4-arm64ec.wcp")
+def wine10Url = "https://github.com/The412Banner/proton-wine/releases/download/build-bionic-layers-20260930-v9/proton-10.0-4-arm64ec.wcp"
+
+tasks.register("downloadWine10") {
+    doLast {
+        wine10Pinned(wine10Wcp, "proton10_wcp_sha256") { File target ->
+            target.parentFile.mkdirs()
+            new URL(wine10Url).withInputStream { input ->
+                target.withOutputStream { output -> output << input }
+            }
+        }
+    }
+}
+preBuild.dependsOn("downloadWine10")

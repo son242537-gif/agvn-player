@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.util.Log;
@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,21 +61,35 @@ public final class AgvnHtmlFiles {
     private AgvnHtmlFiles() {}
 
     /**
-     * The response for URL path {@code urlPath}: the game file (index.html with {@code compatJs} loaded first, see
-     * assets/agvn/html-compat.js), a transparent picture for a missing .png so the game does not stop, or 404.
+     * The response for URL path {@code urlPath}: the game file (its {@code entry} page, index.html or an NW.js game's
+     * own, with {@code compatJs} loaded first, see assets/agvn/html-compat.js), a transparent picture for a missing .png
+     * so the game does not stop (also for a missing or broken encrypted one, {@link AgvnHtmlStandIn}), told to
+     * {@code standIn}, or 404, told to {@code missing} (a font, a data file, a sound...). Either may be null.
      */
-    public static WebResourceResponse serve(File root, String urlPath, String compatJs) {
+    public static WebResourceResponse serve(File root, String entry, String urlPath, String compatJs, Consumer<String> standIn,
+                                            Consumer<String> missing) {
         if (COMPAT_PATH.equals(urlPath) && compatJs != null)
             return text("application/javascript", compatJs);
         File file = fileFor(root, urlPath);
+        byte[] empty = AgvnHtmlStandIn.bytesFor(root, urlPath, file, TRANSPARENT_PNG);
+        if (empty != null) {
+            String why = file == null ? "missing" : file.length() + " bytes";
+            Log.w("AGVN", "HTML game picture " + why + ", shown empty: " + urlPath);
+            if (standIn != null) standIn.accept(decode(urlPath) + " (" + why + ")");
+            return new WebResourceResponse("application/octet-stream", null, 200, "OK", CORS,
+                    new ByteArrayInputStream(empty));
+        }
         if (file == null) {
             Log.w("AGVN", "HTML game file missing: " + urlPath);
-            if (urlPath != null && urlPath.toLowerCase(Locale.ROOT).endsWith(".png"))
+            if (urlPath != null && urlPath.toLowerCase(Locale.ROOT).endsWith(".png")) {
+                if (standIn != null) standIn.accept(decode(urlPath) + " (missing)");
                 return new WebResourceResponse("image/png", null, 200, "OK", CORS, new ByteArrayInputStream(TRANSPARENT_PNG));
+            }
+            if (missing != null) missing.accept(decode(urlPath == null ? "" : urlPath));
             return new WebResourceResponse("text/plain", "UTF-8", 404, "Not Found", CORS, empty());
         }
         String mime = mimeType(file.getName());
-        if (compatJs != null && file.getName().equalsIgnoreCase("index.html")) {
+        if (compatJs != null && (file.getName().equalsIgnoreCase("index.html") || file.getName().equalsIgnoreCase(entry))) {
             String html = FileUtils.readString(file);
             if (html != null) return text("text/html", inject(html));
         }
@@ -170,7 +185,8 @@ public final class AgvnHtmlFiles {
         return null;
     }
 
-    private static String decode(String path) {
+    /** URL path {@code path} as the file name it stands for ("/img/a%20b.png" -> "/img/a b.png"; "+" stays "+"). */
+    static String decode(String path) {
         try {
             return URLDecoder.decode(path.replace("+", "%2B"), "UTF-8");
         } catch (UnsupportedEncodingException | IllegalArgumentException e) {

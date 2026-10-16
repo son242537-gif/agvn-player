@@ -99,4 +99,24 @@ public class AgvnGameScannerTest {
         for (File g : games) names.append(g.getName()).append('|');
         assertEquals("One Game|Deep Game|", names.toString());
     }
+
+    @Test
+    public void phoneCopiesWithoutExeAreGamesForChayNhe() throws Exception {
+        File sd = tmp.newFolder("sd-phone");
+        // JoiPlay-style copies: no Windows .exe, still runnable on "Chạy nhẹ"
+        File ace = new File(sd, "RPG/Ace Viet hoa");
+        touch(new File(ace, "Game.rgss3a"));
+        java.nio.file.Files.write(new File(ace, "Game.ini").toPath(), "[Game]\nLibrary=System\\RGSS301.dll\n".getBytes("UTF-8"));
+        touch(new File(sd, "RPG/MV Game/www/index.html"));
+        touch(new File(sd, "RPG/MV Game/www/js/rpg_core.js"));
+        touch(new File(sd, "RPG/Tyrano Game/index.html"));
+        new File(sd, "RPG/Tyrano Game/tyrano").mkdirs();
+        touch(new File(sd, "RPG/Web page/index.html"));                    // just a page: not a game
+        touch(new File(sd, "RPG/RM2003/RPG_RT.ini"));                      // 2003 without exe: Wine only, so not a game
+        touch(new File(sd, "RPG/RM2003/RPG_RT.ldb"));
+        List<File> games = AgvnGameScanner.scan(Arrays.asList(new AgvnGameScanner.Root(sd, 2)));
+        StringBuilder names = new StringBuilder();
+        for (File g : games) names.append(g.getName()).append('|');
+        assertEquals("Ace Viet hoa|MV Game|Tyrano Game|", names.toString());
+    }
 }

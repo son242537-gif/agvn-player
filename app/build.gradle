@@ -65,6 +65,8 @@ def pinnedAsset = { File target, String pinKey, Closure download ->
         cached.bytes = target.bytes
     }
 }
+// for agvn-renpy.gradle and agvn-rgss.gradle (applied at the end of this file)
+ext.agvnPinnedAsset = pinnedAsset
 
 tasks.register("downloadImageFS") {
     def assetDir = new File(project.rootDir, ["app","src","main","assets"].join(File.separator))
@@ -99,9 +101,26 @@ tasks.register("downloadProton") {
     }
 }
 
+// AGVN: Wine Mono, the .NET runtime that the bundled Proton's mscoree.dll asks for. The app unpacks it only for a game
+// that needs .NET (agvn/AgvnWineMono.java).
+tasks.register("downloadWineMono") {
+    def assetDir = new File(project.rootDir, ["app","src","main","assets"].join(File.separator))
+    File wineMono = new File(assetDir, "wine-mono-9.3.1-x86.tar.xz")
+    String wineMonoURL = "https://github.com/wine-mono/wine-mono/releases/download/wine-mono-9.3.1/wine-mono-9.3.1-x86.tar.xz"
+
+    doLast {
+        pinnedAsset(wineMono, "wine_mono_sha256") { File target ->
+            new URL(wineMonoURL).withInputStream { input ->
+                target.withOutputStream { output -> output << input }
+            }
+        }
+    }
+}
+
 tasks.register("prepareKotlinBuildScriptModel"){}
 downloadProton.dependsOn(downloadImageFS)
-preBuild.dependsOn(downloadProton)
+downloadWineMono.dependsOn(downloadProton)
+preBuild.dependsOn(downloadWineMono)
 
 File agvnKeystorePropsFile = System.getenv("AGVN_KEYSTORE_PROPS") ?
         new File(System.getenv("AGVN_KEYSTORE_PROPS")) : rootProject.file("keystore.properties")
@@ -165,8 +184,16 @@ android {
     // AGVN release signing: the maintainer keeps keystore.properties (storeFile, storePassword, keyAlias,
     // keyPassword) outside git; AGVN_KEYSTORE_PROPS may point to it. Without it the release APK is
     // debug-signed (cloud/test builds); -PagvnRequireReleaseSigning=true turns that into a hard error.
+    // Both signatures, old (v1, META-INF) and new (v2): with minSdk 28 the build would write only v2, and
+    // some phone installers then report "APK contains no signature files". Android itself verifies v2.
     signingConfigs {
+        debug {
+            enableV1Signing true
+            enableV2Signing true
+        }
         release {
+            enableV1Signing true
+            enableV2Signing true
             File propsFile = agvnKeystorePropsFile
             if (propsFile.isFile()) {
                 def props = new Properties()
@@ -255,3 +282,12 @@ dependencies {
     // AGVN unit tests (pure-Java logic in com.winlator.cmod.agvn)
     testImplementation 'junit:junit:4.13.2'
 }
+
+// AGVN: Ren'Py 8 runner (librenpython.so, its Java classes and the engine zip), see agvn-renpy.gradle
+apply from: "agvn-renpy.gradle"
+// AGVN: RPG Maker XP/VX/VX Ace runner (libmkxp-z.so is checked, SDL's Java classes are generated), see agvn-rgss.gradle
+apply from: "agvn-rgss.gradle"
+// AGVN: the Godot runner's engine, Godot's Java library with AGVN's build of Godot (see the file)
+apply from: "agvn-godot.gradle"
+// AGVN: Proton 10, a second Wine for games Proton 9 cannot play (WMV3 movies), see agvn-wine.gradle
+apply from: "agvn-wine.gradle"

@@ -2,7 +2,7 @@
 
 Mirrors app/src/main/java/com/winlator/cmod/agvn/GameExeResolver.java and AgvnProfileValidator.java.
 Keep both sides in sync; tests/test_toolkit.py and the Java unit tests validate the same example profile.
-Copyright (c) 2026 agvn.io.vn - MIT License.
+Copyright (c) 2026 agvn.io - MIT License.
 """
 import os
 import re
@@ -80,6 +80,32 @@ def _is_rpgmaker(game_dir):
         or _any_file(_path(game_dir, "data"), "", ".rxdata", ".rvdata", ".rvdata2"))
 
 
+GODOT_MAGIC = b"GDPC"
+
+
+def _embeds_godot(game_dir, limit=8):
+    """A Godot game exported as one exe ("Embed PCK"): its pack ends the exe, then its size and "GDPC" (AgvnGodotFiles)."""
+    exes = [n for n in _children(game_dir) if n.lower().endswith(".exe") and os.path.isfile(os.path.join(game_dir, n))]
+    for n in exes[:limit]:
+        try:
+            with open(os.path.join(game_dir, n), "rb") as f:
+                length = f.seek(0, os.SEEK_END)
+                if length < 32:
+                    continue
+                f.seek(length - 12)
+                end = f.read(12)
+                size = int.from_bytes(end[:8], "little")
+                if end[8:] != GODOT_MAGIC or not 8 <= size <= length - 12:
+                    continue
+                f.seek(length - 12 - size)
+                head = f.read(20)
+                if head[:4] == GODOT_MAGIC and 2 <= int.from_bytes(head[8:12], "little") <= 9:
+                    return True
+        except OSError:
+            continue
+    return False
+
+
 def detect_engine(game_dir):
     """Same rules and order as GameExeResolver.detectEngine (Siglus before the generic *.pck Godot rule)."""
     if find_shipping(game_dir) or os.path.isdir(os.path.join(game_dir, "Engine", "Binaries")):
@@ -108,7 +134,7 @@ def detect_engine(game_dir):
         return "TYRANO"
     if _is_dir(sub("renpy")) or _any_file(sub("game"), "", ".rpa", ".rpyc"):
         return "RENPY"
-    if _any_file(game_dir, "", ".pck"):
+    if _any_file(game_dir, "", ".pck") or _embeds_godot(game_dir):
         return "GODOT"
     if _is_file(sub("data.win")):
         return "GAMEMAKER"
@@ -198,8 +224,8 @@ def validate(profile, game_dir):
     controls = profile.get("controls")
     if controls is not None and controls not in CONTROLS:
         raise ProfileError("Bộ phím (controls) phải là một trong: %s: %s" % (", ".join(CONTROLS), controls))
-    if profile.get("runner") not in (None, "html", "wine"):
-        raise ProfileError("Cách chạy (runner) phải là html hoặc wine: %s" % profile.get("runner"))
+    if profile.get("runner") not in (None, "html", "renpy", "rgss", "godot", "wine"):
+        raise ProfileError("Cách chạy (runner) phải là html, renpy, rgss, godot hoặc wine: %s" % profile.get("runner"))
     locale = profile.get("locale")
     if locale not in (None, "") and not (isinstance(locale, str) and re.match(r"^[a-z]{2}_[A-Z]{2}(\.UTF-8)?$", locale)):
         raise ProfileError("Ngôn ngữ (locale) phải có dạng ja_JP hoặc ja_JP.UTF-8: %s" % locale)

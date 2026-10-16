@@ -1,0 +1,14 @@
+--- a/main/main.cpp
++++ b/main/main.cpp
+@@ -4626,6 +4626,11 @@
+ 
+ 			String stretch_mode = GLOBAL_GET("display/window/stretch/mode");
+ 			String stretch_aspect = GLOBAL_GET("display/window/stretch/aspect");
++			// AGVN Player: "Toàn màn hình cho mọi game" (AGVN_GODOT_STRETCH=1): a game that keeps its aspect ratio,
++			// with bars at the sides, is stretched over the whole screen instead.
++			if (stretch_aspect.begins_with("keep") && OS::get_singleton()->get_environment("AGVN_GODOT_STRETCH") == "1") {
++				stretch_aspect = "ignore";
++			}
+ 			Size2i stretch_size = Size2i(GLOBAL_GET("display/window/size/viewport_width"),
+ 					GLOBAL_GET("display/window/size/viewport_height"));
+ 			real_t stretch_scale = GLOBAL_GET("display/window/stretch/scale");

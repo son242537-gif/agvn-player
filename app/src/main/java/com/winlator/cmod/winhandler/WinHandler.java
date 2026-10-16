@@ -57,6 +57,7 @@ public class WinHandler {
     private final DatagramPacket receivePacket = new DatagramPacket(receiveData.array(), 64);
     private final ArrayDeque<Runnable> actions = new ArrayDeque<>();
     private boolean initReceived = false;
+    private int agvnVersion = 0; // AGVN: what agvn-winhandler.exe adds (RC_AGVN_POINTER), told with INIT
     private boolean running = false;
     private OnGetProcessInfoListener onGetProcessInfoListener;
     private final Map<Integer, ExternalController> controllers = new HashMap<>();
@@ -238,6 +239,27 @@ public class WinHandler {
         });
     }
 
+    /** AGVN: true when agvn-winhandler.exe started the game, so {@link #agvnPointer} reaches it. */
+    public boolean agvnPointerReady() {
+        return initReceived && agvnVersion >= 1;
+    }
+
+    /**
+     * AGVN: the mouse at pixel (x, y) of the screen with {@link MouseEventFlags} buttons and a wheel step, as one
+     * SendInput in agvn-winhandler.exe, so the game gets raw input (WM_INPUT) too (agvn/AgvnRawMouse).
+     */
+    public void agvnPointer(int flags, int x, int y, int wheelDelta) {
+        addAction(() -> {
+            sendData.rewind();
+            sendData.put(RequestCodes.AGVN_POINTER);
+            sendData.putInt(flags);
+            sendData.putShort((short) x);
+            sendData.putShort((short) y);
+            sendData.putShort((short) wheelDelta);
+            sendPacket(CLIENT_PORT);
+        });
+    }
+
     public void keyboardEvent(byte vkey, int flags) {
         if (!initReceived)
             return;
@@ -294,8 +316,18 @@ public class WinHandler {
         Executors.newSingleThreadExecutor().execute(() -> {
             while (running) {
                 synchronized (actions) {
-                    while (initReceived && !actions.isEmpty())
-                        actions.poll().run();
+                    while (initReceived && !actions.isEmpty()) {
+                        Runnable action = actions.poll();
+                        try {
+                            action.run();
+                        } catch (RuntimeException e) {
+                            // AGVN: a request over the 64-byte packet that agvn-winhandler.exe reads (a window class,
+                            // process name or command past about 50 bytes) is not sent. Its BufferOverflowException
+                            // closed the whole app as a game opened, 4 times in 4 minutes (OPPO PLE110, 15/10/2026).
+                            Log.w("AGVN", "WinHandler request not sent", e);
+                            com.winlator.cmod.agvn.AgvnSessionLog.event("Yêu cầu tới Windows không gửi được (quá dài): " + e);
+                        }
+                    }
                     try {
                         actions.wait();
                     } catch (InterruptedException e) {
@@ -482,6 +514,7 @@ public void setVibrationEnabledForSlot(int slot, boolean enabled) {
         switch (requestCode) {
             case RequestCodes.INIT: {
                 initReceived = true;
+                agvnVersion = receivePacket.getLength() > 1 ? receiveData.get() : 0; // AGVN: Winlator's exe sends the code alone
 
                 preferences = PreferenceManager.getDefaultSharedPreferences(activity.getBaseContext());
 
@@ -717,7 +750,9 @@ public void setVibrationEnabledForSlot(int slot, boolean enabled) {
         boolean handled = false;
         ExternalController controller = getController(event.getDeviceId());
 
-        if (controller != null && event.getRepeatCount() == 0) {
+        // AGVN: arrows, Enter... of a keyboard Android also calls a gamepad go to the game's keyboard
+        if (controller != null && event.getRepeatCount() == 0
+                && com.winlator.cmod.agvn.AgvnInputDevices.gamepadKey(event)) {
             int action = event.getAction();
 
             if (action == KeyEvent.ACTION_DOWN) {

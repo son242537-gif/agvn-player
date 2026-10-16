@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.content.Context;
@@ -62,7 +62,11 @@ public final class AgvnUpdater {
     }
 
     public static File apkFile(Context context, AgvnUpdateInfo info) {
-        return new File(new File(context.getCacheDir(), DIR), "AGVN-Player-" + info.versionCode + ".apk");
+        return apkFile(context, info.versionCode);
+    }
+
+    static File apkFile(Context context, long versionCode) {
+        return new File(new File(context.getCacheDir(), DIR), "AGVN-Player-" + versionCode + ".apk");
     }
 
     /** Frees the space of downloads that are installed already (or not ours); a newer partial one stays for resuming. */

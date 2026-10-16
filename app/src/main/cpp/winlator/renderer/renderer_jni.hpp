@@ -113,9 +113,10 @@ class JNICache {
             return env;
         }
         
-        void detachEnv(JNIEnv *env) {
+        // AGVN: the VM owns a thread's JNIEnv and frees it in DetachCurrentThread. Deleting it after that freed it
+        // twice: the app aborted (Scudo) when DisplayX or EGL stopped as a game ended.
+        void detachEnv(JNIEnv *) {
             vm->DetachCurrentThread();
-            delete env;
         }
         
         void init (JavaVM *vm, JNIEnv *env) {

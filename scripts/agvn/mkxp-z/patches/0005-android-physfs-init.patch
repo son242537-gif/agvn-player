@@ -1,0 +1,22 @@
+AGVN Player: on Android, PhysFS reads PHYSFS_init's argv0 as a PHYSFS_AndroidInit* (JNIEnv and Context), and SDL's
+argv[0] there is the text "app_process": every game crashed (SIGSEGV) before it read a file. Pass NULL on Android;
+PhysFS then takes "/" as its base dir, which mkxp-z never uses. Elsewhere nothing changes.
+
+diff --git a/src/filesystem/filesystem.cpp b/src/filesystem/filesystem.cpp
+index 67c9be0..3d98a81 100644
+--- a/src/filesystem/filesystem.cpp
++++ b/src/filesystem/filesystem.cpp
+@@ -295,6 +295,13 @@ static void throwPhysfsError(const char *desc) {
+ }
+ 
+ FileSystem::FileSystem(const char *argv0, bool allowSymlinks) {
++#ifdef __ANDROID__
++  /* AGVN Player: PhysFS on Android reads argv0 as a PHYSFS_AndroidInit*
++   * (JNIEnv and Context). SDL's argv[0] is the text "app_process", which
++   * PhysFS would read as pointers. NULL gives the base dir "/"; nothing
++   * here uses it, as the game folder and RTPs are mounted by their paths. */
++  argv0 = NULL;
++#endif
+   if (PHYSFS_init(argv0) == 0)
+     throwPhysfsError("Error initializing PhysFS");
+ 

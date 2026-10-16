@@ -39,9 +39,10 @@ The stacked PRs for 0.1.4 (#37, #38, #40–#51) are in `agvn/main` through #53 a
 | DDraw wrapper: restore Wine's ddraw | #39 `agvn/fix-ddraw-restore` | ⏳ Open, based on 0.1.2, not released |
 | CLAUDE.md rule: fix for every game, never for one game | #52 `agvn/p42-every-game-rule` | ⏳ Open, based on 0.1.2 |
 | Game main thread on fast cores + perf hints | `agvn/p44-game-cpu` (no PR) | 🚧 In progress, on 0.1.5 |
-| App under GPL-3.0-or-later; plan for native Ren'Py / RPG Maker XP–VX Ace | `agvn/p49-gpl-license` (no PR) | 🚧 Needs maintainer decision (licence change) |
+| App under GPL-3.0-or-later (maintainer's decision 2026-10-02); plan for native Ren'Py / RPG Maker XP–VX Ace | `agvn/p49-gpl-license` (no PR) | 🚧 Waiting for the release with the first native engine |
 | Ren'Py 8 games run natively (Ren'Py 8.5.3 Android) | `agvn/p50-renpy8` (on p49, no PR) | 🚧 In progress |
 | Keep games alive; tell a crash from a normal exit | `agvn/p53-game-session` (on p50, no PR) | 🚧 In progress |
+| RPG Maker XP/VX/VX Ace games run natively with mkxp-z (`libmkxp-z.so` built from pinned sources) | `claude/great-goodall-qjemo1` (on p53, no PR) | 🚧 Built and wired in; waiting for device test |
 
 Still open from `handoff-pc.md`:
 - OpenGL games flicker black once a second at low settings. The Zink abort is fixed by #34; the flicker cause is unknown.

@@ -71,7 +71,8 @@ public class ControlsProfile implements Comparable<ControlsProfile> {
 
     public ExternalController addController(String id) {
         ExternalController controller = getController(id);
-        if (controller == null) controllers.add(controller = ExternalController.getController(id));
+        if (controller == null) controller = ExternalController.getController(id);
+        if (controller != null && !controllers.contains(controller)) controllers.add(controller); // AGVN: no null entry
         controllersLoaded = true;
         return controller;
     }

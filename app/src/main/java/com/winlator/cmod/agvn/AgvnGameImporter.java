@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.content.Context;
@@ -7,7 +7,6 @@ import android.os.Environment;
 import com.winlator.cmod.SettingsFragment;
 import com.winlator.cmod.container.Container;
 import com.winlator.cmod.container.Shortcut;
-import com.winlator.cmod.core.ExeIconExtractor;
 import com.winlator.cmod.core.FileUtils;
 import com.winlator.cmod.xenvironment.ImageFs;
 
@@ -37,6 +36,8 @@ public final class AgvnGameImporter {
         public final GameExeResolver.Engine engine;
         /** The exe of one game of a folder that holds several, or of an exe picked by hand; null for the folder's game. */
         public final String variant;
+        /** A KiriKiri game's own size ("1280x720"), or null when unknown. */
+        public final String gameSize;
 
         Candidate(File gameDir, AgvnProfile profile, String exe, GameExeResolver.Engine engine, String variant) {
             this.gameDir = gameDir;
@@ -44,6 +45,7 @@ public final class AgvnGameImporter {
             this.exe = exe;
             this.engine = engine;
             this.variant = variant;
+            this.gameSize = engine == GameExeResolver.Engine.KIRIKIRI ? AgvnKirikiri.gameSize(gameDir) : null;
         }
     }
 
@@ -58,19 +60,19 @@ public final class AgvnGameImporter {
     }
 
     /**
-     * Game folders found anywhere a player is likely to copy them: folders picked with "Chọn thư mục khác" (3 levels,
-     * the folder itself included), internal storage/AGVN, Download and Games (3 levels), the storage root (2 levels:
-     * /sdcard/NINJA DISGRACE/Shinobi), and the same places on SD cards / USB drives. A folder holding just one folder
-     * (a download unpacked into its own folder) costs no level. Each folder is listed once.
+     * Game folders found anywhere a player is likely to copy them: folders picked with "Chọn thư mục khác" (4 levels,
+     * the folder itself included), internal storage/AGVN, Download and Games (4 levels), the storage root (3 levels:
+     * /sdcard/RPG/Việt hoá/Game), and the same places on SD cards / USB drives. A folder holding just one folder (a
+     * download unpacked into its own folder) costs no level. Each folder is listed once.
      */
     public static List<File> listGameDirs(List<File> extraRoots) {
         List<AgvnGameScanner.Root> roots = new ArrayList<>();
         for (File extra : extraRoots) roots.add(new AgvnGameScanner.Root(extra, AgvnGameRoots.DEPTH, true));
         for (File volume : storageVolumes()) {
-            roots.add(new AgvnGameScanner.Root(new File(volume, "AGVN"), 3));
-            roots.add(new AgvnGameScanner.Root(new File(volume, "Download"), 3));
-            roots.add(new AgvnGameScanner.Root(new File(volume, "Games"), 3));
-            roots.add(new AgvnGameScanner.Root(volume, 2));
+            roots.add(new AgvnGameScanner.Root(new File(volume, "AGVN"), 4));
+            roots.add(new AgvnGameScanner.Root(new File(volume, "Download"), 4));
+            roots.add(new AgvnGameScanner.Root(new File(volume, "Games"), 4));
+            roots.add(new AgvnGameScanner.Root(volume, 3));
         }
         return AgvnGameScanner.scan(roots);
     }
@@ -160,8 +162,8 @@ public final class AgvnGameImporter {
         shortcut.putExtra(EXTRA_TIER, tier.name());
         shortcut.saveData();
         shortcut.genUUID();
-        PreLaunchCheck.applyUeConfig(shortcut);
-        extractIcon(container, exeFile, name);
+        PreLaunchCheck.applyUeConfig(ctx, shortcut);
+        AgvnGameIcons.write(container, c.gameDir, c.engine, exeFile, name);
         return desktopFile;
     }
 
@@ -188,7 +190,9 @@ public final class AgvnGameImporter {
         shortcut.putExtra("envVars", buildEnvVars(p.env, dlls));
         AgvnQuality.setStartFps(shortcut, eff.fps);
         AgvnLayouts.applyImport(shortcut, AgvnLayouts.kindFor(p, c.engine));
-        if (eff.resolution != null) shortcut.putExtra("screenSize", eff.resolution);
+        String screen = AgvnKirikiriScreen.larger(eff.resolution, c.gameSize); // a KiriKiri game plays in its window
+        if (screen != null) shortcut.putExtra("screenSize", screen);
+        shortcut.putExtra(AgvnKirikiri.EXTRA_GAME_SIZE, c.gameSize);
         shortcut.putExtra("simTouchScreen", p.isSimulatedTouchscreen() ? "1" : "0");
         shortcut.putExtra(EXTRA_PROFILE_PATH, profileCopy.getAbsolutePath());
         shortcut.putExtra(EXTRA_GAME_DIR, c.gameDir.getAbsolutePath());
@@ -198,9 +202,15 @@ public final class AgvnGameImporter {
         shortcut.putExtra("lc_all", AgvnLocale.forGame(p, c.engine, c.gameDir.getName(), c.exe));
         File index = AgvnHtmlGame.indexFor(c.gameDir, c.engine);
         // a player who picked "Chạy bằng Windows" keeps it on re-import unless the profile decides
-        boolean pickedWine = p.runner == null && AgvnHtmlGame.RUNNER_WINE.equals(shortcut.getExtra(AgvnHtmlGame.EXTRA_RUNNER));
+        // (a game without an .exe cannot have picked Windows)
+        boolean pickedWine = p.runner == null && AgvnHtmlGame.RUNNER_WINE.equals(shortcut.getExtra(AgvnHtmlGame.EXTRA_RUNNER))
+                && new File(c.gameDir, c.exe).isFile();
         boolean html = AgvnHtmlGame.useHtml(p, index) && !pickedWine;
-        shortcut.putExtra(AgvnHtmlGame.EXTRA_RUNNER, html ? AgvnHtmlGame.RUNNER_HTML : pickedWine ? AgvnHtmlGame.RUNNER_WINE : null);
+        boolean renpy = !html && !pickedWine && AgvnRenpyGame.useRenpy(p, c.engine, c.gameDir);
+        boolean rgss = !html && !renpy && !pickedWine && AgvnRgssGame.useRgss(p, c.engine, c.gameDir);
+        boolean godot = !html && !renpy && !rgss && !pickedWine && AgvnGodotLight.useGodot(p, c.engine, new File(c.gameDir, c.exe));
+        shortcut.putExtra(AgvnHtmlGame.EXTRA_RUNNER, html ? AgvnHtmlGame.RUNNER_HTML : renpy ? AgvnHtmlGame.RUNNER_RENPY
+                : rgss ? AgvnHtmlGame.RUNNER_RGSS : godot ? AgvnHtmlGame.RUNNER_GODOT : pickedWine ? AgvnHtmlGame.RUNNER_WINE : null);
         shortcut.putExtra(AgvnHtmlGame.EXTRA_INDEX, html ? index.getAbsolutePath() : null);
     }
 
@@ -233,21 +243,6 @@ public final class AgvnGameImporter {
             return f.getCanonicalPath();
         } catch (IOException e) {
             return f.getAbsolutePath();
-        }
-    }
-
-    private static void extractIcon(Container container, File exeFile, String name) {
-        try {
-            File iconDir = container.getIconsDir(64);
-            iconDir.mkdirs();
-            File icon = new File(iconDir, name + ".png");
-            if (ExeIconExtractor.extractIcon(exeFile, icon)) {
-                File userIcons = new File(SettingsFragment.DEFAULT_WINLATOR_PATH, "icons");
-                userIcons.mkdirs();
-                FileUtils.copy(icon, new File(userIcons, name + ".png"));
-            }
-        } catch (Exception ignored) {
-            // the library falls back to a generic icon
         }
     }
 }

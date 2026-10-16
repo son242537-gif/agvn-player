@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN styles. Copyright (c) 2026 agvn.io — MIT License. -->
+<resources>
+    <!-- An activity with no window of its own, only its dialogs (agvn/AgvnUpdateStatusActivity) -->
+    <style name="AgvnTranslucent" parent="@style/Theme.AppCompat.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+</resources>

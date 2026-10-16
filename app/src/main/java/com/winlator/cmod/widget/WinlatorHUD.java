@@ -1289,7 +1289,7 @@ public class WinlatorHUD extends View {
         float scale = prefs.getFloat(KEY_SCALE, 1f);
         setScaleX(scale);
         setScaleY(scale);
-        setX(prefs.getFloat(KEY_X, 16f));
+        setX(prefs.getFloat(KEY_X, com.winlator.cmod.agvn.AgvnEditPen.clearX(getContext()))); // AGVN: beside the ✎
         setY(prefs.getFloat(KEY_Y, 16f));
         userEnabled = false;
         setVisibility(GONE);
@@ -1509,7 +1509,7 @@ public class WinlatorHUD extends View {
         vertical = false;
         setScaleX(1.0f);
         setScaleY(1.0f);
-        setX(16f);
+        setX(com.winlator.cmod.agvn.AgvnEditPen.clearX(getContext())); // AGVN: beside the ✎ in the corner
         setY(16f);
         uiHandler.post(() -> {
             uiHandler.removeCallbacks(redrawRunnable);
@@ -1526,7 +1526,7 @@ public class WinlatorHUD extends View {
                     .putInt(KEY_ALPHA, 100)
                     .putBoolean(KEY_VERT, false)
                     .putFloat(KEY_SCALE, 1.0f)
-                    .putFloat(KEY_X, 16f)
+                    .putFloat(KEY_X, com.winlator.cmod.agvn.AgvnEditPen.clearX(getContext()))
                     .putFloat(KEY_Y, 16f)
                     .putBoolean(KEY_VIS, true)
                     .putBoolean(KEY_DUAL_CELL, false)

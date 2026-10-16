@@ -45,12 +45,32 @@ public class AgvnHtmlCompatTest {
     }
 
     @Test
-    public void bundledCompatScriptKeepsProcessUndefined() throws Exception {
+    public void bundledCompatScriptKeepsTheEngineOffNwjs() throws Exception {
         String js = compatJs();
-        // RPG Maker treats require + process as NW.js and would then save to real files, which the phone cannot do
+        // RPG Maker treats require + typeof process === 'object' as NW.js and would then save through require('fs'),
+        // whose stand-in keeps files in the browser; its browser save functions go to real files instead
+        // (window.AgvnSaves). `process` is a function for plugins that read it (tools/agvn/tests/html_compat_sim.js)
         assertTrue(js.contains("window.require = function"));
-        assertTrue(!js.contains("window.process ="));
+        assertTrue(js.contains("var proc = function process() {};") && js.contains("window.process = proc;"));
+        assertTrue(!js.contains("window.process = {"));
         assertTrue(js.contains("SM.catchException = function"));
+        assertTrue(js.contains("filesForSaves(window.StorageManager);"));
+        assertTrue(js.contains("window.AgvnSaves") && AgvnHtmlSaves.NAME.equals("AgvnSaves"));
+    }
+
+    @Test
+    public void bundledCompatScriptNamesSavesAsTheAppTakesThem() throws Exception {
+        // a plugin's own data gets its PC file name only when the app will take it: the page's rule is AgvnHtmlSaves's
+        // (tools/agvn/tests/html_saves_sim.js plays it through with the rule read from AgvnHtmlSaves.java)
+        assertTrue(compatJs().contains("'" + AgvnHtmlSaves.FILE.pattern().replace("\\", "\\\\") + "'"));
+    }
+
+    @Test
+    public void bundledCompatScriptLetsRpgMakerMzMoveWhileItShows() throws Exception {
+        // MZ updates its scene only while document.hasFocus(), and WebView can leave the page without the focus:
+        // every MZ game stood still on its first scene (tools/agvn/tests/html_focus_sim.js plays it through)
+        String js = compatJs();
+        assertTrue(js.contains("document.hasFocus = function () { return document.visibilityState !== 'hidden'; };"));
     }
 
     @Test

@@ -91,6 +91,7 @@ object LibraryComposeHost {
     const val ACTION_SAVE_IMPORT = "save_import"
     const val ACTION_SAVE_EXPORT = "save_export"
     const val ACTION_SEND_LOGS = "send_logs"
+    const val ACTION_REPAIR = "repair"
 
     @JvmStatic
     fun create(

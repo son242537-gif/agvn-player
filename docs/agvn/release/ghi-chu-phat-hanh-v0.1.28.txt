@@ -1,0 +1,11 @@
+AGVN Player v0.1.28 - agvn.io
+
+Mới:
+- Game Godot 4.3 và 4.4 giờ "Chạy nhẹ" ngay trên điện thoại, không qua Wine, nên mượt hơn nhiều. Trước đây những game này luôn chạy bằng Windows. Game đã thêm từ trước tự chuyển ở lần mở sau. Game bạn đã chọn "Chạy bằng Windows" thì giữ nguyên, và "Tự sửa lỗi" có cách "Chạy nhẹ" cho game đó.
+- "Tự sửa lỗi" cho game Godot: thử "Chạy nhẹ" trước tiên, rồi đổi cách vẽ: OpenGL hoặc Vulkan khi Chạy nhẹ, Vulkan hoặc Direct3D 11 khi chạy bằng Windows.
+- "Tự sửa lỗi" có thêm lỗi "Hoạt ảnh, video hoặc hiệu ứng không chạy".
+Sửa lỗi:
+- Game Godot 4.0–4.3 "Chạy nhẹ" không còn lỗi script ở game dùng class riêng của game.
+- Game tắt vì hết bộ nhớ đồ họa mà nhật ký ghi "Failed to bind device memory" giờ được nhận ra. Từ lần mở sau, app tự dùng mức tiết kiệm RAM cao nhất cho game đó, và "Tự sửa lỗi" gợi ý hạ chất lượng hình.
+- Game RPG Maker MV/MZ "Chạy nhẹ" lặp một cảnh báo hàng nghìn lần không còn làm đầy nhật ký. Nhật ký gửi về vẫn giữ được các lỗi khác.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

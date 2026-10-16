@@ -118,6 +118,11 @@ public class ContainerManager {
         });
     }
 
+    /** AGVN: makes a container on the calling (worker) thread; null when it could not be made (agvn/AgvnWine10). */
+    public Container createContainerNow(JSONObject data, ContentsManager contentsManager) {
+        return createContainer(data, contentsManager);
+    }
+
     public void duplicateContainerAsync(Container container, Runnable callback) {
         final Handler handler = new Handler();
         Executors.newSingleThreadExecutor().execute(() -> {

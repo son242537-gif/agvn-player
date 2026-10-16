@@ -125,7 +125,9 @@ public abstract class ProcessHelper {
     }
 
     private static void createDebugThread(final InputStream inputStream) {
-        Executors.newSingleThreadExecutor().execute(() -> {
+        // AGVN: a thread that ends with its stream, not an executor kept forever; every game's output is read now
+        // (agvn/AgvnWineTail keeps the end of it for the play session summary)
+        Thread thread = new Thread(() -> {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -140,7 +142,9 @@ public abstract class ProcessHelper {
             catch (IOException e) {
                 Log.e("ProcessHelper", "Error in debug thread", e);
             }
-        });
+        }, "ProcessHelper-output");
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private static void createWaitForThread(java.lang.Process process, final Callback<Integer> terminationCallback) {

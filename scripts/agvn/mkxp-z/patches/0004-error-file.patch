@@ -1,0 +1,87 @@
+AGVN Player: when the game stops on an error, write the message to $AGVN_MKXPZ_ERROR_FILE, so the app can tell
+an error from a normal quit and offer "Chạy bằng Windows". Android only; elsewhere nothing changes.
+
+diff --git a/binding/binding-mri.cpp b/binding/binding-mri.cpp
+index b6344f92..2e3bef1c 100644
+--- a/binding/binding-mri.cpp
++++ b/binding/binding-mri.cpp
+@@ -19,6 +19,7 @@
+  ** along with mkxp.  If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
++#include "util/agvn-error.h"
+ #include "audio/audio.h"
+ #include "filesystem/filesystem.h"
+ #include "display/graphics.h"
+@@ -1177,6 +1178,7 @@ static void showExc(VALUE exc, const BacktraceData &btData) {
+     snprintf(&ms[0], ms.size(), "Script '%s' line %s: %s occurred.\n\n%s",
+              file.c_str(), line, RSTRING_PTR(name), RSTRING_PTR(msg));
+     
++    agvnReportError(std::string(ms.c_str()) + "\n\n" + StringValueCStr(ds));
+     showMsg(ms);
+ }
+ 
+diff --git a/src/main.cpp b/src/main.cpp
+index af81d669..95265b96 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -43,6 +43,7 @@
+ #include "eventthread.h"
+ #include "util/debugwriter.h"
+ #include "util/exception.h"
++#include "util/agvn-error.h"
+ #include "display/gl/gl-debug.h"
+ #include "display/gl/gl-fun.h"
+ 
+@@ -200,6 +201,7 @@ static void rgssThreadError(RGSSThreadData *rtData, const std::string &msg) {
+ 
+ static void showInitError(const std::string &msg) {
+   Debug() << msg;
++  agvnReportError(msg);
+   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "mkxp-z", msg.c_str(), 0);
+ }
+ 
+@@ -737,6 +739,7 @@ int main(int argc, char *argv[]) {
+ 
+     if (!rtData.rgssErrorMsg.empty()) {
+       Debug() << rtData.rgssErrorMsg;
++      agvnReportError(rtData.rgssErrorMsg);
+       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, conf.game.title.c_str(),
+                                rtData.rgssErrorMsg.c_str(), win);
+     }
+diff --git a/src/util/agvn-error.h b/src/util/agvn-error.h
+new file mode 100644
+index 00000000..5698bf56
+--- /dev/null
++++ b/src/util/agvn-error.h
+@@ -0,0 +1,30 @@
++/*
++** agvn-error.h
++**
++** AGVN Player (agvn.io): on Android, the app sets AGVN_MKXPZ_ERROR_FILE before the game starts and reads that file
++** after the game ends, so it can tell a game that stopped on an error from one the player quit. Elsewhere: no-op.
++*/
++
++#ifndef AGVN_ERROR_H
++#define AGVN_ERROR_H
++
++#include <cstdio>
++#include <cstdlib>
++#include <string>
++
++static inline void agvnReportError(const std::string &msg) {
++#ifdef __ANDROID__
++    const char *path = std::getenv("AGVN_MKXPZ_ERROR_FILE");
++    if (!path || !*path)
++        return;
++    FILE *f = std::fopen(path, "wb");
++    if (!f)
++        return;
++    std::fwrite(msg.data(), 1, msg.size(), f);
++    std::fclose(f);
++#else
++    (void)msg;
++#endif
++}
++
++#endif // AGVN_ERROR_H

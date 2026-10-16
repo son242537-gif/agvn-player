@@ -94,7 +94,8 @@ public class Keyboard {
     }
 
     public boolean onKeyEvent(KeyEvent event) {
-        if (ExternalController.isGameController(event.getDevice())) return false;
+        // AGVN: a keyboard Android also calls a gamepad keeps its typing keys (agvn/AgvnInputDevices)
+        if (com.winlator.cmod.agvn.AgvnInputDevices.gamepadKey(event)) return false;
 
         int action = event.getAction();
         int keyCode = event.getKeyCode();

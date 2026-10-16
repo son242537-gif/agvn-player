@@ -105,7 +105,19 @@ public class TouchpadView extends View {
         resolutionScale = 1000.0f / Math.min(xServer.screenInfo.width, xServer.screenInfo.height);
     }
 
+    /** AGVN: touches land on this part of the screen (a game's own window), as the renderer draws it (agvn/AgvnScreenFit). */
+    private float[] agvnFitRect;
+
+    public void setAgvnFitRect(float[] rect) {
+        agvnFitRect = rect;
+        if (getWidth() > 0 && getHeight() > 0) updateXform(getWidth(), getHeight(), xServer.screenInfo.width, xServer.screenInfo.height);
+    }
+
     private void updateXform(int outerWidth, int outerHeight, int innerWidth, int innerHeight) {
+        if (agvnFitRect != null && outerWidth > 0 && outerHeight > 0) {
+            com.winlator.cmod.agvn.AgvnFitMath.touch(xform, agvnFitRect, outerWidth, outerHeight, xServer.getXServerView().isFullscreen());
+            return;
+        }
         ViewTransformation viewTransformation = new ViewTransformation();
         viewTransformation.update(outerWidth, outerHeight, innerWidth, innerHeight);
 
@@ -179,13 +191,52 @@ public class TouchpadView extends View {
         // Continue handling touch events as usual
         int toolType = event.getToolType(0);
 
-        if (toolType == MotionEvent.TOOL_TYPE_STYLUS) {
-            return handleStylusEvent(event);
-        } else if (isTouchscreenMode) {
-            return handleTouchscreenEvent(event);
-        } else {
-            return handleTouchpadEvent(event);
+        try {
+            if (toolType == MotionEvent.TOOL_TYPE_STYLUS) {
+                return handleStylusEvent(event);
+            } else if (isTouchscreenMode) {
+                return handleTouchscreenEvent(event);
+            } else {
+                return handleTouchpadEvent(event);
+            }
+        } catch (RuntimeException e) {
+            // AGVN: a touch this code did not expect must never close the app and the game in it: forget the fingers
+            Log.w("AGVN", "touch not handled", e);
+            if (!agvnTouchFailed) com.winlator.cmod.agvn.AgvnSessionLog.event("Lỗi xử lý chạm, đã bỏ qua: " + e);
+            agvnTouchFailed = true;
+            for (int i = 0; i < MAX_FINGERS; i++) dropFinger(i);
+            numFingers = 0;
+            scrolling = false;
+            return true;
         }
+    }
+
+    /** AGVN: a touch failed in this game screen (logged once in su-kien.txt). */
+    private boolean agvnTouchFailed;
+
+    /**
+     * AGVN: forgets finger {@code id}, whose UP never came here (the controls took it, or the game was paused), and lets go
+     * of the mouse button it held.
+     */
+    private void dropFinger(int id) {
+        Finger stale = fingers[id];
+        if (stale == null) return;
+        if (stale == fingerPointerButtonLeft) {
+            if (xServer.pointer.isButtonPressed(Pointer.Button.BUTTON_LEFT)) xServer.injectPointerButtonRelease(Pointer.Button.BUTTON_LEFT);
+            fingerPointerButtonLeft = null;
+        }
+        if (stale == fingerPointerButtonRight) {
+            if (xServer.pointer.isButtonPressed(Pointer.Button.BUTTON_RIGHT)) xServer.injectPointerButtonRelease(Pointer.Button.BUTTON_RIGHT);
+            fingerPointerButtonRight = null;
+        }
+        fingers[id] = null;
+    }
+
+    /** AGVN: the fingers down on the touchpad, counted from {@link #fingers} so the count cannot drift from it. */
+    private byte countFingers() {
+        byte count = 0;
+        for (Finger finger : fingers) if (finger != null) count++;
+        return count;
     }
 
     private void resetTouchscreenTimeout() {
@@ -277,8 +328,14 @@ public class TouchpadView extends View {
                 if (event.isFromSource(InputDevice.SOURCE_MOUSE)) return true;
                 scrollAccumY = 0;
                 scrolling = false;
+                // AGVN: a finger kept here but not down any more (its UP went elsewhere) is forgotten, and the count is
+                // that of the fingers kept: numFingers had drifted up, and two fingers with finger 0 missing closed the
+                // app at a tap (NullPointerException below, POCO F8 Pro, 16/10/2026)
+                for (int i = 0; i < MAX_FINGERS; i++) {
+                    if (i == pointerId || event.findPointerIndex(i) < 0) dropFinger(i);
+                }
                 fingers[pointerId] = new Finger(event.getX(actionIndex), event.getY(actionIndex));
-                numFingers++;
+                numFingers = countFingers();
                 if (simTouchScreen) {
                     final Runnable clickDelay = () -> {
                         if (continueClick) {
@@ -296,7 +353,8 @@ public class TouchpadView extends View {
                     } else if (pointerId == 1) {
                         // When put a finger on InputControl, such as a button.
                         // The pointerId that TouchPadView got won't increase from 1, so map 1 as 0 here.
-                        if (numFingers < 2) {
+                        Finger first = findSecondFinger(fingers[1]); // AGVN: finger 0 may be on a control: not here
+                        if (first == null) {
                             continueClick = true;
                             if (Math.hypot(fingers[1].x - lastTouchedPosX, fingers[1].y - lastTouchedPosY) * resolutionScale > EFFECTIVE_TOUCH_DISTANCE) {
                                 lastTouchedPosX = fingers[1].x;
@@ -304,7 +362,7 @@ public class TouchpadView extends View {
                             }
                             postDelayed(clickDelay, CLICK_DELAYED_TIME);
                         } else
-                            continueClick = System.currentTimeMillis() - fingers[0].touchTime > CLICK_DELAYED_TIME;
+                            continueClick = System.currentTimeMillis() - first.touchTime > CLICK_DELAYED_TIME;
                     }
                 }
                 break;
@@ -325,7 +383,7 @@ public class TouchpadView extends View {
                             } else {
                                 handleFingerUp(fingers[i]);
                                 fingers[i] = null;
-                                numFingers--;
+                                numFingers = countFingers();
                             }
                         }
                     }
@@ -337,11 +395,12 @@ public class TouchpadView extends View {
                     fingers[pointerId].update(event.getX(actionIndex), event.getY(actionIndex));
                     handleFingerUp(fingers[pointerId]);
                     fingers[pointerId] = null;
-                    numFingers--;
+                    numFingers = countFingers();
                 }
                 break;
             case MotionEvent.ACTION_CANCEL:
-                for (byte i = 0; i < MAX_FINGERS; i++) fingers[i] = null;
+                // AGVN: as Android takes the touch (a system gesture), a button a finger held is let go, not left down
+                for (byte i = 0; i < MAX_FINGERS; i++) dropFinger(i);
                 numFingers = 0;
                 break;
         }

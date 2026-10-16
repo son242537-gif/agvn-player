@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import com.winlator.cmod.container.Shortcut;
@@ -19,7 +19,9 @@ import java.util.regex.Pattern;
  *       only those files, directly in the game folder.</li>
  * </ul>
  * Then folders in the container's Windows user folder (users/xuser): Unity AppData/LocalLow/&lt;company&gt;/&lt;product&gt;,
- * Unreal AppData/Local/&lt;project&gt;/Saved/SaveGames, and those {@link GameSaveManager} finds by the game's name.
+ * Unreal AppData/Local/&lt;project&gt;/Saved/SaveGames, Godot's user:// ({@link AgvnGodotUserDir}, the same on "Chạy
+ * nhẹ"), and those {@link GameSaveManager} finds by the game's name. Ren'Py and RPG Maker games on "Chạy nhẹ" save in
+ * the game folder as on a PC, RPG Maker MV/MZ ones through {@link AgvnHtmlSaves}.
  * Unity PlayerPrefs, which live in the registry, are handled by {@link AgvnSavePrefs}.
  */
 final class AgvnSaveLocations {
@@ -49,7 +51,8 @@ final class AgvnSaveLocations {
     /** Every place the shortcut's game may keep saves; the first one is where "Nhập save" puts plain files. */
     static List<Location> find(Shortcut shortcut) {
         String engine = shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE);
-        File exe = new File(shortcut.path.replace("\"", ""));
+        String unix = AgvnExeRedirect.toUnixPath(shortcut.path, shortcut.container); // a Windows path: its drive's folder
+        File exe = new File(unix != null ? unix : shortcut.path.replace("\"", ""));
         String gameDirPath = shortcut.getExtra(AgvnGameImporter.EXTRA_GAME_DIR);
         File gameDir = !gameDirPath.isEmpty() ? new File(gameDirPath) : exe.isAbsolute() ? exe.getParentFile() : null;
         List<Location> out = new ArrayList<>();
@@ -86,6 +89,9 @@ final class AgvnSaveLocations {
         if ("UNITY".equals(engine)) {
             String[] names = unityNames(exe);
             if (names != null) rels.add("AppData/LocalLow/" + names[0] + "/" + names[1]);
+        } else if ("GODOT".equals(engine)) {
+            String userDir = AgvnGodotUserDir.of(exe);
+            if (userDir != null) rels.add(userDir);
         } else if ("UNREAL".equals(engine) && gameDir != null) {
             String exePath = exe.getPath(), base = gameDir.getPath() + "/";
             String relative = exePath.startsWith(base) ? exePath.substring(base.length()) : exe.getName();

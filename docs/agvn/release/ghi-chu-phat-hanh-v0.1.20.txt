@@ -1,0 +1,12 @@
+AGVN Player v0.1.20 - agvn.io
+
+Mới:
+- Game và trình mở game viết bằng .NET (C#): trước đây tắt ngay khi mở và báo "Game cần .NET". Giờ lần đầu mở game như vậy, app cài .NET cho game (Wine Mono, chiếm khoảng 240 MB bộ nhớ máy, chỉ cài một lần), màn hình khởi động ghi tiến độ. Game khác không tốn thêm chỗ. Bản cập nhật này nặng hơn khoảng 44 MB vì có sẵn bộ .NET.
+- Trang web của AGVN giờ là agvn.io (trước là agvn.io.vn). Mục "Giới thiệu" trong app ghi địa chỉ mới.
+Sửa lỗi:
+- Game bị tắt vì máy hết RAM, kể cả lúc đang tải: app báo đúng "Game tự tắt lúc máy gần hết RAM", không còn báo nhầm "Game tắt ngay sau khi mở" hay "Game không chạy ở độ phân giải 640×360" rồi đề nghị đổi DXVK, đổi driver hay nâng "Đồ họa".
+- Game đã tiết kiệm RAM như "Siêu nhẹ" mà vẫn hết RAM: app nói rõ điều đó và không đề nghị hạ "Đồ họa" nữa, vì hạ cũng không bớt được RAM. Hãy đóng các app khác hoặc khởi động lại máy trước khi chơi.
+- Game hết RAM sau khi bạn đổi cấu hình: app đề nghị dùng lại cấu hình đã chạy được.
+- Game còn đang tải nên màn hình còn đen: thanh "Màn hình game vẫn đen" chờ game tải xong mới hỏi, không còn đề nghị màn hình lớn hơn lúc đó. Màn hình lớn hơn chỉ làm game tốn RAM hơn.
+- Wine báo "Bad EXE format" (file được mở không phải chương trình Windows chạy được): app báo rõ "File chạy của game không đúng định dạng" và cách xử lý, thay cho "Game tắt ngay sau khi mở".
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

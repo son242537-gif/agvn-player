@@ -1,0 +1,9 @@
+AGVN Player v0.1.7 - agvn.io.vn
+
+Sửa lỗi:
+- Game làm bằng Godot báo "Unable to initialize video driver" (đòi OpenGL 3.3) trên máy không dùng Turnip, thường là máy chip MediaTek hoặc Exynos: app tự bật OpenGL 3.3 cho game Godot trên các máy này.
+- Game báo thiếu DirectX 11 trên máy có Vulkan cũ hơn 1.3: khi DXVK 2.x không chạy được trên máy, app tự dùng DXVK 1.10.3 lúc mở game.
+- Cài từ file APK báo "APK contains no signature files": file APK giờ có thêm chữ ký kiểu cũ mà trình cài của một số máy cần.
+Mới:
+- Nhật ký mỗi lần chơi có thêm những dòng cuối game in ra, kể cả khi game tự thoát. Game lỗi thì bấm ⋮ ở game đó > "Gửi nhật ký" để AGVN tìm lỗi nhanh hơn.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.

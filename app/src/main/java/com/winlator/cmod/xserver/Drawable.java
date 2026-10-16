@@ -145,6 +145,20 @@ public class Drawable extends XResource {
         return dstData;
     }
 
+    /**
+     * AGVN: row {@code y} of the image, 4 bytes a pixel, or null when the CPU cannot read this buffer (copyArea2 then
+     * copies nothing, and getImage's zeros would read as black).
+     */
+    public ByteBuffer agvnReadRow(int y) {
+        if (backingAHB == 0 || width <= 0 || height <= 0) return null;
+        final byte unread = (byte) 0xa5;
+        ByteBuffer row = ByteBuffer.allocateDirect(width * 4).order(ByteOrder.LITTLE_ENDIAN);
+        for (int i = 0; i < width * 4; i++) row.put(i, unread);
+        copyArea2((short) 0, (short) Mathf.clamp(y, 0, height - 1), (short) 0, (short) 0, width, (short) 1, getStride(), width, backingAHB, row);
+        for (int i = 0; i < width * 4; i++) if (row.get(i) != unread) return row;
+        return null;
+    }
+
     public void copyArea(short srcX, short srcY, short dstX, short dstY, short width, short height, Drawable drawable) {
         copyArea(srcX, srcY, dstX, dstY, width, height, drawable, GraphicsContext.Function.COPY);
     }

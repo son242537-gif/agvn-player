@@ -1,5 +1,5 @@
 HƯỚNG DẪN CÀI VÀ DÙNG AGVN PLAYER
-agvn.io.vn
+agvn.io
 ==================================================
 
 AGVN Player giúp chơi game PC (Windows) trên điện thoại Android.
@@ -49,15 +49,23 @@ bộ nhớ trống ít nhất 4 GB cộng dung lượng game.
   hoặc đóng bớt ứng dụng khác. Thông báo tự tắt sau 30 giây.
 - Nếu khi bấm Chơi hiện "RAM trống chưa đủ": đóng bớt ứng dụng trong danh sách
   ứng dụng gần đây rồi bấm "Kiểm tra lại".
+- Bàn phím, chuột không dây: nối với máy trước khi mở game.
+  + Bluetooth: Cài đặt Android → Bluetooth → Ghép nối thiết bị mới; giữ nút
+    kết nối trên bàn phím, chuột tới khi đèn nháy rồi chọn tên của nó.
+  + Đầu thu USB: cắm qua đầu chuyển OTG (USB-C ra USB-A).
+  + Trong game, chuột điều khiển con trỏ của game; dùng ngón tay để mở menu.
+  + Game 3D xoay góc nhìn bằng chuột: menu → biểu tượng chuột → bật
+    "Chuột tương đối".
+  + Bàn phím vẫn không gõ được: cập nhật app lên bản mới nhất.
 
 6. KHI GẶP LỖI
 --------------------------------------------------
 - Vào Cài đặt → AGVN → "Xuất nhật ký lỗi".
 - File AGVN-nhat-ky-<ngày-giờ>.zip sẽ nằm trong thư mục Download.
-- Gửi file này kèm một dòng mô tả lỗi cho AGVN qua agvn.io.vn.
+- Gửi file này kèm một dòng mô tả lỗi cho AGVN qua agvn.io.
   File chỉ chứa thông tin máy và nhật ký, không chứa mật khẩu hay dữ liệu cá nhân.
 
 7. CẬP NHẬT
 --------------------------------------------------
 - Cài bản mới đè lên bản cũ; game và bản lưu được giữ nguyên.
-- Chỉ tải bản cập nhật từ agvn.io.vn.
+- Chỉ tải bản cập nhật từ agvn.io.

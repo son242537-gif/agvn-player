@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import java.util.ArrayDeque;
@@ -12,7 +12,10 @@ import java.util.ArrayDeque;
  * - or the app's memory (RSS + DMA-BUF) up 768 MB in each of the last two minutes while nobody touched anything: a
  *   leak, like a video that fails and retries every 15 s (+288 MB a try). A level loading 1–2 GB and then staying flat
  *   is not one. The first 90 s of a session are skipped, since games load then.
- * After a warning the rules wait 5 minutes, unless free RAM drops under half the threshold.
+ * After a warning the rules wait 5 minutes; after the player's "Để sau" ({@link #later}), for the rest of the game.
+ * Either way a warning comes again at once when free RAM falls under half of what it was at the last one, not merely
+ * because it stays low: a phone that kept running with free RAM under half the threshold got the bar back 10 s after
+ * every "Để sau" (14/10/2026).
  */
 final class AgvnMemoryRules {
     enum Reason { NONE, LOW_FREE, GROWING }
@@ -20,16 +23,21 @@ final class AgvnMemoryRules {
     static final long GROWTH_MB = 768;
     static final long WINDOW_MS = 60_000, GRACE_MS = 90_000, COOLDOWN_MS = 300_000;
 
-    final long lowFreeMb, criticalFreeMb;
+    final long lowFreeMb;
     /** {time, used MB} of the last two minutes. */
     private final ArrayDeque<long[]> history = new ArrayDeque<>();
     private int lowCount;
-    private long lastWarn = Long.MIN_VALUE / 2;
+    private long lastWarn = Long.MIN_VALUE / 2, lastWarnFreeMb = -1;
+    private volatile boolean later;
 
     /** {@code totalMb}: the phone's RAM (MemTotal), or 0 when unknown. */
     AgvnMemoryRules(long totalMb) {
         lowFreeMb = totalMb > 0 ? Math.max(600, Math.min(1200, totalMb / 10)) : 1200;
-        criticalFreeMb = lowFreeMb / 2;
+    }
+
+    /** The player answered the bar with "Để sau": no warning again this game unless free RAM halves. Any thread. */
+    void later() {
+        later = true;
     }
 
     /** Times are one clock (uptime ms); {@code sessionStartMs} = when the game started. */
@@ -43,9 +51,10 @@ final class AgvnMemoryRules {
 
         Reason reason = lowCount >= 2 ? Reason.LOW_FREE : growing ? Reason.GROWING : Reason.NONE;
         if (reason == Reason.NONE) return reason;
-        boolean critical = freeMb >= 0 && freeMb < criticalFreeMb;
-        if (nowMs - lastWarn < COOLDOWN_MS && !critical) return Reason.NONE;
+        boolean worse = freeMb >= 0 && lastWarnFreeMb >= 0 && freeMb < lastWarnFreeMb / 2;
+        if ((later || nowMs - lastWarn < COOLDOWN_MS) && !worse) return Reason.NONE;
         lastWarn = nowMs;
+        if (freeMb >= 0) lastWarnFreeMb = freeMb;
         lowCount = 0;
         return reason;
     }

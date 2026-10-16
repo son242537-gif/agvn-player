@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import java.io.File;
@@ -13,8 +13,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Finds Windows game folders so players never have to browse: a folder counts as a game when it has
- * agvn-profile.json or GameExeResolver finds an exe to launch. Search stops descending once a game is found.
+ * Finds game folders so players never have to browse: a folder counts as a game when it has agvn-profile.json,
+ * GameExeResolver finds an exe to launch, or "Chạy nhẹ" can run it without one ({@link AgvnLightGame}). Search stops
+ * descending once a game is found.
  * Pure Java (JVM-testable); the Android roots are chosen in {@link AgvnGameImporter}.
  */
 public final class AgvnGameScanner {
@@ -49,7 +50,8 @@ public final class AgvnGameScanner {
     public static boolean isGameDir(File dir) {
         if (new File(dir, AgvnProfile.FILE_NAME).isFile()) return true;
         GameExeResolver.Engine engine = GameExeResolver.detectEngine(dir);
-        if (GameExeResolver.resolveExe(dir, engine) == null) return false;
+        // copies made for phones often have no .exe; "Chạy nhẹ" runs them anyway
+        if (GameExeResolver.resolveExe(dir, engine) == null) return AgvnLightGame.canRun(dir, engine);
         // unknown engine: a lone installer in Download is not a game; real games ship DLLs next to the exe
         return engine != GameExeResolver.Engine.UNKNOWN || hasDll(dir);
     }

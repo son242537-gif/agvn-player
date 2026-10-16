@@ -97,6 +97,13 @@ class ProfileRulesTest(unittest.TestCase):
             with self.assertRaises(ProfileError, msg=str(extra)):
                 validate(p, self.ue)
 
+    def test_runner_values(self):
+        game = os.path.join(self.tmp.name, "RenPyGame")
+        for rel in ("MyGame.exe", "MyGame.py", "game/script.rpyc", "renpy/common/00start.rpyc"):
+            touch(game, rel)
+        for runner in ("html", "renpy", "rgss", "godot", "wine"):
+            self.assertEqual("MyGame.exe", validate({"schemaVersion": 1, "name": "g", "runner": runner}, game))
+
     def test_rejects_wine_in_path(self):
         g = os.path.join(self.tmp.name, "Red wine 2")
         touch(g, "game.exe")
@@ -140,6 +147,17 @@ class EngineDetectionTest(unittest.TestCase):
         self.check("SIGLUS", "siglus2", "Game.exe", "Gameexe.dat")
         self.check("GODOT", "godot", "Game.exe", "Game.pck")
         self.assertEqual("SiglusEngine.exe", resolve_exe(siglus, "SIGLUS"))
+
+    def test_godot_in_one_exe(self):
+        # "Embed PCK": the exe, the pack ("GDPC", format, major, minor, patch...), the pack's size, "GDPC"
+        pck = struct.pack("<4s4I", b"GDPC", 3, 4, 5, 1) + bytes(76)
+        root = self.game("embedded", "readme.txt")
+        with open(os.path.join(root, "Game.exe"), "wb") as f:
+            f.write(b"MZ... the engine ..." + pck + struct.pack("<Q", len(pck)) + b"GDPC")
+        self.assertEqual("GODOT", detect_engine(root))
+        with open(os.path.join(root, "Game.exe"), "wb") as f:  # a size bigger than the file: not a pack
+            f.write(b"MZ... the engine ..." + pck + struct.pack("<Q", 1 << 40) + b"GDPC")
+        self.assertEqual("UNKNOWN", detect_engine(root))
 
     def test_rpgmaker_families(self):
         mv = self.check("RPGMAKER_MV", "mv", "Game.exe", "notification_helper.exe", "nw.dll", "www/js/rpg_core.js")
@@ -299,6 +317,24 @@ class HtmlCompatTest(unittest.TestCase):
     @unittest.skipIf(shutil.which("node") is None, "node is not installed")
     def test_compat_script_in_simulated_rpg_maker(self):
         sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_compat_sim.js")
+        out = subprocess.run(["node", sim], capture_output=True, text=True)
+        self.assertEqual(0, out.returncode, out.stdout + out.stderr)
+
+    @unittest.skipIf(shutil.which("node") is None, "node is not installed")
+    def test_rpg_maker_saves_are_files_as_on_a_pc(self):
+        sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_saves_sim.js")
+        out = subprocess.run(["node", sim], capture_output=True, text=True)
+        self.assertEqual(0, out.returncode, out.stdout + out.stderr)
+
+    @unittest.skipIf(shutil.which("node") is None, "node is not installed")
+    def test_rpg_maker_mz_moves_while_the_page_shows(self):
+        sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_focus_sim.js")
+        out = subprocess.run(["node", sim], capture_output=True, text=True)
+        self.assertEqual(0, out.returncode, out.stdout + out.stderr)
+
+    @unittest.skipIf(shutil.which("node") is None, "node is not installed")
+    def test_a_plugin_that_fails_as_it_loads_is_named(self):
+        sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_load_error_sim.js")
         out = subprocess.run(["node", sim], capture_output=True, text=True)
         self.assertEqual(0, out.returncode, out.stdout + out.stderr)
 

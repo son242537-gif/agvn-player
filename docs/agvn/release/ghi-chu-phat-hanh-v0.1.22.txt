@@ -1,0 +1,8 @@
+AGVN Player v0.1.22 - agvn.io
+
+Bản nhỏ: chỉ sửa cách app ghi nhật ký và canh màn hình đen. Game chạy như bản 0.1.21.
+Sửa lỗi:
+- Lúc bạn rời app, tắt màn hình hoặc bấm nút tạm dừng ⏸, game được tạm dừng. Nhật ký lần chơi không còn ghi nhầm khoảng đó là "Đứng hình", mà ghi lúc rời app và lúc game chạy tiếp.
+- Game đang tải, màn hình còn đen, mà bạn sang app khác: quay lại không còn bị hỏi "Màn hình game vẫn đen" chỉ vì đã rời app.
+- Nhật ký Wine gửi về ghi đủ thông tin đồ họa (DXVK), giúp tìm lỗi nhanh hơn.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
