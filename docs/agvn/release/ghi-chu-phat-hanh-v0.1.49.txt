@@ -1,0 +1,5 @@
+AGVN Player v0.1.49 - agvn.io
+
+Sửa lỗi:
+- Chạm hoặc vuốt màn hình liên tục khi đang chơi game Windows có thể làm app tự tắt và mất game: giờ không còn. Lỗi này cũng có lúc làm chuột trong game bị kẹt nút trái.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
