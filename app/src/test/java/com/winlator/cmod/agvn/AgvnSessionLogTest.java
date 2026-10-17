@@ -54,6 +54,25 @@ public class AgvnSessionLogTest {
     }
 
     @Test
+    public void aGamesOwnLogsBesideItsExeComeToo() throws Exception {
+        // The Agnietta (cocos2d-x), 17/10/2026: it closed by itself, and its action_log.txt and thread.log stayed behind
+        File game = tmp.newFolder("agnietta");
+        for (String name : new String[]{"action_log.txt", "thread.log", "Game_d3d11.log", "LOG.TXT", "readme.txt", "changelog.txt"}) {
+            Files.write(new File(game, name).toPath(), "x".getBytes(StandardCharsets.UTF_8));
+        }
+        List<File> logs = AgvnEngineLogs.candidates(new File(game, "Game.exe"), game, "UNKNOWN", tmp.getRoot());
+        assertTrue(logs.contains(new File(game, "action_log.txt")));
+        assertTrue(logs.contains(new File(game, "thread.log")));
+        assertFalse(logs.contains(new File(game, "readme.txt")));
+        assertFalse("a game's notes", logs.contains(new File(game, "changelog.txt")));
+        int d3d11 = 0;
+        for (File f : logs) if (f.getName().equals("Game_d3d11.log")) d3d11++;
+        assertEquals("a name already looked for is not listed twice", 1, d3d11);
+        assertTrue("DxLib's log as it is named on disk", logs.contains(new File(game, "LOG.TXT"))
+                || logs.contains(new File(game, "Log.txt")) && new File(game, "Log.txt").isFile());
+    }
+
+    @Test
     public void bigLogsKeepTheirStartAndEnd() throws Exception {
         File small = tmp.newFile("small.log");
         Files.write(small.toPath(), "short".getBytes(StandardCharsets.UTF_8));

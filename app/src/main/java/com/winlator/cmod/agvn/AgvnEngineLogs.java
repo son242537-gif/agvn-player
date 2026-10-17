@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * The log files game engines write, copied into the session folder when a game ends. They sit inside the app's
@@ -108,7 +109,17 @@ final class AgvnEngineLogs {
         // not reach Wine's log, so a game on it had no DXVK line in "Gửi nhật ký" (Rj01608199, 16/10/2026)
         String dxvk = exe.getName().replaceFirst("(?i)\\.exe$", "") + "_";
         for (String dll : new String[]{"dxgi", "d3d11", "d3d10", "d3d9"}) out.add(new File(exeDir, dxvk + dll + ".log"));
+        for (File log : AgvnGameDirLogs.beside(exeDir)) if (!named(out, log)) out.add(log); // the game's own names
         return out;
+    }
+
+    /** True when {@code files} has {@code file}: its very name in its folder, or another case of it that is there too. */
+    private static boolean named(List<File> files, File file) {
+        for (File f : files) {
+            if (!Objects.equals(f.getParentFile(), file.getParentFile()) || !f.getName().equalsIgnoreCase(file.getName())) continue;
+            if (f.getName().equals(file.getName()) || f.isFile()) return true;
+        }
+        return false;
     }
 
     /**

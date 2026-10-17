@@ -1466,3 +1466,28 @@ E AndroidRuntime:   at com.winlator.cmod.widget.InputControlsView.onTouchEvent(I
 
   Cả ba: app không tắt, con trỏ trong game ở đúng chỗ, không kẹt nút trái. Chạm một ngón vẫn là nhấn trái, chạm hai ngón
   vẫn là nhấn phải như trước.
+
+## Game chỉ vẽ bằng OpenGL, và nhật ký riêng cạnh file chạy (bản 0.1.50)
+
+Nhật ký The Agnietta (cocos2d-x, JavaScript bằng SpiderMonkey `mozjs-33.dll`, 32-bit, Xiaomi 2510DRA23E, Mali-G57 MC2,
+17/10/2026): game không vẽ khung nào hơn một phút, một nhân CPU bận 90–99%. Lần duy nhất game vẽ được (19 khung/giây ở
+giây 79), game tự thoát với mã 0, không có hộp lỗi. "Tự sửa lỗi" cho thử "Đổi DXVK sang bản 2.3.1", dù game vẽ bằng
+OpenGL (`glew32`, `opengl32`, qua Zink) và DXVK không chạy. "Gửi nhật ký" cũng không có `action_log.txt` và `thread.log`,
+hai nhật ký của chính game nằm cạnh file chạy.
+
+- **Game chỉ vẽ bằng OpenGL (`AgvnGlGame`):** file chạy, hoặc một DLL cạnh nó, nạp `opengl32`, và không file nào nạp
+  Direct3D, DXGI hay DirectDraw (`d3d*`, `dxgi`, `ddraw`; `d3dcompiler_47` của ANGLE cũng tính là Direct3D). Chỉ xét game
+  có engine app chưa biết: Unity, Unreal và các engine app đã biết tự nạp Direct3D lúc chạy, nên danh sách nạp không cho
+  thấy. Game chưa ghi engine thì app nhận diện engine trước. Kết quả được nhớ theo file chạy trong lúc app mở.
+  - Với game như vậy, `AgvnFixes.dxvk` trả về sai, nên các cách sửa chỉ đổi DXVK không được đề nghị: đổi bản DXVK,
+    DXVK arm64ec, WineD3D, tắt async, giải nén mọi texture BCn, "Bật Đồng bộ khung hình".
+  - Driver, chế độ dựng hình của Turnip, các bước sửa shader cho Mali, giả lập CPU và Wine cũ vẫn được đề nghị, vì
+    OpenGL qua Zink cũng đi qua chúng.
+- **Nhật ký riêng cạnh file chạy (`AgvnGameDirLogs`):** ngoài các tên nhật ký app đã biết (Unity, Unreal, Ren'Py,
+  DxLib, BepInEx, DXVK 1.x, cheat AGVN), app chép thêm các file `*.log` và `*log*.txt` nằm ngay cạnh file chạy (không
+  lấy `changelog.txt`), tối đa 8 file mới nhất. Như mọi nhật ký khác, file chỉ được chép khi được ghi trong lần chơi
+  đó, và file lớn được cắt bớt phần giữa.
+- **Test:** `AgvnGlGameTest`, `AgvnSessionLogTest.aGamesOwnLogsBesideItsExeComeToo`.
+- **Thử máy:**
+  1. The Agnietta: "Tự sửa lỗi" không còn "Đổi DXVK…"; "Gửi nhật ký" có `action_log.txt` và `thread.log` của lần chơi.
+  2. Hồi quy: một game Unity và một game DirectX 9/11 vẫn có "Đổi DXVK…" trong "Tự sửa lỗi".
