@@ -1,0 +1,7 @@
+AGVN Player v0.1.51 - agvn.io
+
+Sửa lỗi:
+- Game có cả bản 64-bit và bản 32-bit (như game Ren'Py: "Tên.exe" và "Tên-32.exe") giờ được thêm bằng bản 64-bit. Trước đây app chọn nhầm bản 32-bit, nên trên máy GPU Mali game chỉ hiện màn hình đen.
+- Game đã thêm bằng bản 32-bit: "Tự sửa lỗi" có thêm cách "Chạy bản 64-bit của game". Nếu cách này không giúp được, app trả game về như cũ.
+- App nhận ra khi bản 32-bit của game không dùng được bộ nhớ đồ họa trên máy, kể cả khi game không tự tắt, và đề nghị chạy bản 64-bit.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
