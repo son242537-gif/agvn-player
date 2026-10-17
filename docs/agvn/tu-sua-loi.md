@@ -280,6 +280,12 @@ app không nhìn ra chắc chắn từ hình. Với những lỗi đó, người
    - **Vẫn còn lỗi:** app trả mọi cấu hình về như trước khi thử cách đầu tiên, rồi đặt cách tiếp theo và hỏi "Mở lại
      game ngay". Hết cách: cấu hình về như cũ, app mời "Gửi nhật ký".
    - **Hỏi lần sau:** lần mở game sau app hỏi lại.
+   - **Game đang không vẽ gì thì chưa hỏi (bản 0.1.50):** tới lúc hỏi mà 5 giây qua game không vẽ khung nào, có thể game
+     đang tải. App chờ game vẽ lại rồi mới hỏi. Game đứng yên 3 phút liền thì app hỏi luôn (`AgvnRepairAsk.waitsForFrames`;
+     thời gian app dừng game không tính). `su-kien.txt` ghi một dòng "Tự sửa lỗi: game không vẽ khung nào từ … giây (có
+     thể đang tải)…". Nhật ký Immoral Bathhouse (Unity, Adreno 725, 17/10/2026): game vẽ logo, rồi không vẽ gì 2–2,5 phút
+     trong lúc tải cảnh đầu. App hỏi ở giây 45, người chơi bấm "Vẫn còn lỗi" cho 4 cách liền, và mỗi lần mở lại cắt ngang
+     lúc game đang tải.
 
 App chỉ hỏi về một cách khi game đã chạy lại với cách đó (bản 0.1.27; `AgvnRepair.ran`: giờ đặt cách, `report.at`, so
 với lần mở game gần nhất, `lastRunAt` của lối tắt). Trước đó, bấm lại "Tự sửa lỗi" hay "🩺 Tự sửa" thì hộp nói "game
@@ -1069,6 +1075,8 @@ Cách sửa mới (một nút mới) thì cần thêm code ở `AgvnFixes` và `
 - [ ] Chơi khoảng 45 giây: thanh "Còn lỗi … không?". "Vẫn còn lỗi": cấu hình về như trước (xem trong "Cấu hình" của
       game), app đặt cách tiếp và hỏi "Mở lại game ngay". "Hết lỗi rồi": thông báo "Đã giữ cách sửa: …", lần mở sau
       không hỏi nữa.
+- [ ] Đang thử một cách sửa cho "Game đứng hình, treo", game đứng yên ở màn tải (như Immoral Bathhouse sau logo): thanh
+      hỏi chưa hiện; game tải xong và vẽ lại thì thanh mới hỏi. Game đứng yên 3 phút liền thì thanh hỏi.
 - [ ] Sang app khác ngay sau khi game mở rồi quay lại: thanh hỏi chỉ hiện sau 45 giây chơi thật (không tính lúc ở
       ngoài app).
 - [ ] Thử đến hết cách: thanh "Đã thử hết cách trong app", cấu hình của game đúng như trước lần thử đầu, có nút "Gửi

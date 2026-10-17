@@ -20,16 +20,25 @@ import java.util.Properties;
  * reported is gone. "Hết lỗi rồi" keeps the fix, "Vẫn còn lỗi" puts the settings back and the next fix on (then "Mở lại
  * game ngay"), "Hỏi lần sau" asks at the next start. Not over a game that crashed: the doctor asks about that. Once per
  * start. UI thread.
+ * <p>Not while the game shows nothing ({@link #waitsForFrames}): it may be loading. Immoral Bathhouse (Unity, Adreno 725,
+ * 17/10/2026) drew its logo, then nothing for 2–2.5 min while its first scene loaded; asked at 45 s, the player answered
+ * "Vẫn còn lỗi" to four fixes in a row, and each restart cut the load short.
  */
 public final class AgvnRepairAsk {
     static final long ASK_AFTER_MS = 45_000, POLL_MS = 5000;
+    /** No frame for this long: the game shows nothing now, so the bar waits for it to draw again. */
+    static final long STILL_MS = 5_000;
+    /** ... unless it has shown nothing for this long of play: frozen, or a load longer than any seen. */
+    static final long FROZEN_MS = 180_000;
 
     private final XServerDisplayActivity activity;
     private final Shortcut shortcut;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final long startMs = SystemClock.uptimeMillis();
     private final long stoppedAtStartNs = AgvnGamePause.pausedNs(System.nanoTime());
-    private boolean checked;
+    private boolean checked, waitNoted;
+    /** Play time (without the time the app kept the game stopped) when it last showed a frame. */
+    private long drawnAtPlayedMs;
 
     private AgvnRepairAsk(XServerDisplayActivity activity, Shortcut shortcut) {
         this.activity = activity;
@@ -58,7 +67,14 @@ public final class AgvnRepairAsk {
         }
         long stoppedMs = (AgvnGamePause.pausedNs(System.nanoTime()) - stoppedAtStartNs) / 1_000_000L;
         long played = SystemClock.uptimeMillis() - startMs - stoppedMs;
-        if (AgvnGamePause.isPaused() || !AgvnSessionTrack.showedFrames() || played < ASK_AFTER_MS) {
+        if (AgvnSessionTrack.msSinceFrame(System.currentTimeMillis()) < STILL_MS) drawnAtPlayedMs = played;
+        boolean still = waitsForFrames(played - drawnAtPlayedMs);
+        if (AgvnGamePause.isPaused() || !AgvnSessionTrack.showedFrames() || played < ASK_AFTER_MS || still) {
+            if (still && played >= ASK_AFTER_MS && !waitNoted) {
+                waitNoted = true;
+                AgvnSessionLog.event("Tự sửa lỗi: game không vẽ khung nào từ " + (played - drawnAtPlayedMs) / 1000
+                        + " giây (có thể đang tải): chờ game vẽ lại, hoặc đứng yên " + FROZEN_MS / 60_000 + " phút, rồi mới hỏi");
+            }
             handler.postDelayed(this::poll, POLL_MS);
             return;
         }
@@ -76,6 +92,11 @@ public final class AgvnRepairAsk {
                 new AgvnWarningBar.Choice(R.string.agvn_repair_still,
                         () -> AgvnRepairDialog.still(activity, shortcut, activity::agvnExit)),
                 new AgvnWarningBar.Choice(R.string.agvn_repair_later, null));
+    }
+
+    /** True while the game has shown nothing for {@code stillMs} of play, under {@link #FROZEN_MS}. Pure Java. */
+    static boolean waitsForFrames(long stillMs) {
+        return stillMs >= STILL_MS && stillMs < FROZEN_MS;
     }
 
     /** The game started without the fix on trial: not asked about nor counted; the first fix left is offered. */

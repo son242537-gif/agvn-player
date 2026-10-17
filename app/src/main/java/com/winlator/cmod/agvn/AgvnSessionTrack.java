@@ -136,6 +136,12 @@ public final class AgvnSessionTrack {
         return framesSeen.get() >= STARTED_UPDATES && end >= last ? (end - last) / 1000 : -1;
     }
 
+    /** Milliseconds from the game's last frame (drawn or presented) to {@code nowMs}; Long.MAX_VALUE before one. */
+    static long msSinceFrame(long nowMs) {
+        long last = lastFrameMs;
+        return last == 0 ? Long.MAX_VALUE : Math.max(0, nowMs - last);
+    }
+
     /** Presses since the game's last frame. */
     static int pressesWithoutFrame() {
         return pressesSinceFrame.get();
