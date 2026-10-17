@@ -95,6 +95,7 @@ public final class GameExeResolver {
             if (f.isFile() && n.endsWith(".exe") && !IGNORED.contains(n) && !n.startsWith("unins")) exes.add(f);
         }
         if (exes.isEmpty()) return null;
+        exes.removeIf(exe -> AgvnExe64.twin(exe) != null); // "<Name>-32.exe" sorts before its 64-bit "<Name>.exe"
         if (engine == Engine.UNITY) {
             for (File exe : exes) {
                 String base = exe.getName().substring(0, exe.getName().length() - 4);
@@ -120,8 +121,8 @@ public final class GameExeResolver {
         if (engine == Engine.UNKNOWN) {
             for (File f : listOrEmpty(gameDir)) {
                 String n = f.getName().toLowerCase(Locale.ROOT);
-                if (f.isFile() && n.endsWith(".exe") && !IGNORED.contains(n) && !n.startsWith("unins") && !isHelper(n))
-                    games.add(f.getName());
+                if (f.isFile() && n.endsWith(".exe") && !IGNORED.contains(n) && !n.startsWith("unins") && !isHelper(n)
+                        && AgvnExe64.twin(f) == null) games.add(f.getName());
             }
         }
         if (games.size() > 1 && games.size() <= MAX_GAMES) return games;

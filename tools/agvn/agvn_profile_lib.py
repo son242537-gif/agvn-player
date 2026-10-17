@@ -141,6 +141,31 @@ def detect_engine(game_dir):
     return "UNKNOWN"
 
 
+def _machine(path):
+    """The machine a PE file is for (0x8664: 64-bit, 0x14c: 32-bit), or None for no PE file."""
+    try:
+        with open(path, "rb") as f:
+            dos = f.read(64)
+            if len(dos) < 64 or dos[:2] != b"MZ":
+                return None
+            f.seek(int.from_bytes(dos[0x3c:0x40], "little"))
+            nt = f.read(6)
+    except OSError:
+        return None
+    return int.from_bytes(nt[4:6], "little") if len(nt) == 6 and nt[:4] == b"PE\0\0" else None
+
+
+def has_64bit_twin(game_dir, name):
+    """True for "<Name>-32.exe" beside a 64-bit "<Name>.exe" that can start (Ren'Py 7), as AgvnExe64.twin."""
+    if len(name) <= 7 or not name.lower().endswith("-32.exe"):
+        return False
+    twin = os.path.join(game_dir, name[:-7] + name[-4:])
+    if not os.path.isfile(twin) or _machine(twin) != 0x8664:
+        return False
+    libs = [c.lower() for c in _children(os.path.join(game_dir, "lib"))]
+    return any("windows-x86_64" in c for c in libs) or not any("windows-i686" in c for c in libs)
+
+
 def resolve_exe(game_dir, engine):
     if engine == "UNREAL":
         shipping = find_shipping(game_dir)
@@ -151,6 +176,7 @@ def resolve_exe(game_dir, engine):
             and n.lower() not in IGNORED_EXES and not n.lower().startswith("unins")]
     if not exes:
         return None
+    exes = [n for n in exes if not has_64bit_twin(game_dir, n)]  # "<Name>-32.exe" sorts before "<Name>.exe"
     if engine == "UNITY":
         for n in exes:
             if os.path.isdir(os.path.join(game_dir, n[:-4] + "_Data")):

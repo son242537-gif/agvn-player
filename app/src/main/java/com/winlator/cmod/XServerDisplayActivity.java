@@ -741,6 +741,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             }
             Executors.newSingleThreadExecutor().execute(() -> {
                 if (shortcut != null) agvnEffectiveExePath = com.winlator.cmod.agvn.AgvnExeRedirect.effectivePath(shortcut.path, container); // AGVN
+                if (shortcut != null) agvnEffectiveExePath = com.winlator.cmod.agvn.AgvnExe64.apply(agvnEffectiveExePath, shortcut, container); // AGVN: <Name>.exe for <Name>-32.exe
                 if (shortcut != null) agvnEffectiveExePath = com.winlator.cmod.agvn.AgvnPathLink.apply(agvnEffectiveExePath, container); // AGVN: "Game " folder
                 com.winlator.cmod.agvn.AgvnGodotGame.recognize(shortcut); // AGVN: a Godot game in one exe gets Godot's settings
                 com.winlator.cmod.agvn.AgvnKirikiri.recognize(shortcut); // AGVN: a KiriKiri game's size, for the black-screen bar

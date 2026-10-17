@@ -45,6 +45,7 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Game Godot tự tắt sau khi đổi cách vẽ | App đã đổi cách vẽ của game, rồi game tự tắt trong một phút đầu mà không để lại câu lỗi nào | Chạy bằng Direct3D 11 (ANGLE), bỏ cách vẽ đã đổi, đổi driver |
 | Game bị tắt khi vẽ hình (OpenGL qua Zink) | Zink báo `vkCreateGraphicsPipelines failed` rồi game tự tắt; hay gặp ở GPU Mali, vì Zink thiếu vài tính năng trên đó | Game Godot: chạy bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bằng Direct3D 11 (ANGLE), bỏ cách vẽ đã đổi. Mọi game: đổi driver |
 | Driver đồ họa thiếu tính năng DirectX 11 | DXVK: `D3D11CoreCreateDevice: Requested feature level not supported`: driver không đủ tính năng cho mức DirectX nào game xin (vẽ khung dây, geometry shader, transform feedback...) | Đổi driver, dùng WineD3D (trừ khi OpenGL đã không chạy với driver này), gửi nhật ký. Không đổi bản DXVK: bản nào cũng cần các tính năng đó |
+| Bản 32-bit của game không dùng được bộ nhớ đồ họa (bản 0.1.51) | DXVK: `DxvkMemoryAllocator: Mapping memory failed with VK_ERROR_MEMORY_MAP_FAILED`: chương trình 32-bit không nhận được bộ nhớ đồ họa với driver này (Mali), nên không có DirectX; tìm cả khi game không tự tắt | Chạy bản 64-bit của game (nếu có), đổi driver, dùng WineD3D, gửi nhật ký. Không đổi bản DXVK: bản nào cũng cần bộ nhớ đó |
 | Máy không chạy được OpenGL với driver này | Mesa: `failed to load driver: zink`: Zink không khởi động được trên driver Vulkan của game, nên game OpenGL và WineD3D không vẽ được | Dùng lại DXVK (game đang dùng WineD3D), đổi driver, gửi nhật ký. Từ đó app không đề nghị WineD3D với driver này nữa (`AgvnOpenGlCheck`, nhớ theo driver và bản app), dù game kết thúc thế nào (từ 09/10/2026, cả khi người chơi tự thoát) |
 | Không tạo được DirectX / thiếu DirectX 11 | Câu lỗi của DXVK, Unity (`InitializeEngineGraphics failed`) | Đổi bản DXVK, đổi driver (Turnip ↔ System), dùng WineD3D. "Đổi bản DXVK" chỉ hiện khi bản kia chạy được: DXVK 2.x cần Vulkan 1.3, nên với driver của máy (System) thấp hơn, lúc mở game vẫn chạy 1.10.3 và nút đó không hiện (`AgvnDxvkPick.sameAtStart`) |
 | DXVK không đọc được texture nén (bản 0.1.45) | DXVK: `D3D11: Cannot create shader resource view`, rồi game tự tắt (game Unreal hiện hộp "LowLevelFatalError … CreateShaderResourceView … failed with error E_INVALIDARG"). Ca đầu, 15/10/2026: Av Director Life, Mali-G925, DXVK 2.3.1. Xem "Texture nén BCn với DXVK 2.x" bên dưới | Đổi DXVK về 1.10.3 (fix `dxvk-old`, có cả khi "Đổi DXVK" đã thử), đổi driver (Turnip tự đọc được BCn), gửi nhật ký |
@@ -1491,3 +1492,45 @@ hai nhật ký của chính game nằm cạnh file chạy.
 - **Thử máy:**
   1. The Agnietta: "Tự sửa lỗi" không còn "Đổi DXVK…"; "Gửi nhật ký" có `action_log.txt` và `thread.log` của lần chơi.
   2. Hồi quy: một game Unity và một game DirectX 9/11 vẫn có "Đổi DXVK…" trong "Tự sửa lỗi".
+
+## Game có bản 32-bit và 64-bit: chạy bản 64-bit (bản 0.1.51)
+
+Nhật ký Being Adik 0.12.1 (Ren'Py 7.4.10, realme RMX3686, Mali-G68 MC4, 17/10/2026): cửa sổ game đen, `log.txt` của
+Ren'Py ghi mọi cách vẽ đều hỏng (gl2, angle2, gles2, gl, angle, gles, sw), lỗi cuối là "No matching GL pixel format
+available". Game được thêm bằng `BeingADIK-32.exe`, vì tên này đứng trước `BeingADIK.exe` khi xếp theo tên (`-` đứng
+trước `.`). Hai lý do cộng lại:
+
+- OpenGL: Zink không khởi động được trên driver Vulkan 1.1 của Mali-G68 (`failed to load driver: zink`, thiếu
+  `logicOp`), nên `gl2`/`gl` hỏng. App không có VirGL hay llvmpipe để thay.
+- Direct3D: Ren'Py chuyển sang ANGLE (OpenGL ES trên Direct3D 11, qua DXVK). Nhưng chương trình 32-bit chạy qua wow64,
+  và driver Mali không đặt được bộ nhớ đồ họa vào vùng 4 GB mà chương trình 32-bit với tới.
+  `BeingADIK-32_d3d11.log` ghi 36 dòng `Mapping memory failed with VK_ERROR_MEMORY_MAP_FAILED`, rồi `Memory allocation
+  failed`, rồi `Failed to create D3D11 device`. Nên `angle2`/`gles2` cũng hỏng.
+
+Bản 64-bit `BeingADIK.exe` không bị giới hạn bộ nhớ này: ANGLE có DirectX 11 qua DXVK như các game 64-bit khác trên máy.
+
+- **Thêm game (`GameExeResolver`, `AgvnExe64.twin`):** khi cạnh "`<Tên>`-32.exe" có "`<Tên>`.exe" là file 64-bit, app bỏ
+  bản -32. Với game Ren'Py, bản 64-bit còn cần thư mục `lib/…windows-x86_64` (`lib/windows-x86_64`,
+  `lib/py2-windows-x86_64`, `lib/py3-windows-x86_64`). Nếu `lib` chỉ có `windows-i686`, app giữ bản -32. Bộ công cụ PC
+  (`agvn_profile_lib.resolve_exe`) làm giống vậy. Game đã thêm từ trước không đổi gì.
+- **Cách sửa "Chạy bản 64-bit của game" (`exe-64`):** chỉ có cho game đang chạy "`<Tên>`-32.exe" mà có bản 64-bit như
+  trên. Cách sửa này bật `agvnExe64` của game. Lúc mở game, `AgvnExe64.apply` đổi file chạy trong lệnh mở, giống
+  `AgvnExeRedirect`; đường dẫn của game giữ nguyên. Nhật ký phiên ghi một dòng: "Chạy bản 64-bit của game: … thay cho
+  …". "Tự sửa lỗi" trả lại `agvnExe64` như các cài đặt khác khi cách sửa không giúp được. Thứ tự trong danh sách cách sửa:
+  - đứng đầu: lỗi mới `dxvk-map-32`, "Game báo thiếu DirectX", "Màn hình đen", "Game tự tắt, văng ra";
+  - sau "Chạy nhẹ" (RPG Maker): game tắt ngay khi mở, game bị lỗi và tự tắt;
+  - sau giả lập ổn định và mod: game đứng hình;
+  - sau hạ Đồ họa: game hết RAM. Chương trình 32-bit chỉ có 4 GB bộ nhớ.
+  - sau "Trả về cấu hình chạy tốt": lỗi khác.
+- **Lỗi `dxvk-map-32`:** `"when": []`, nên app tìm cả khi game không tự tắt (Ren'Py để cửa sổ đen tới khi người chơi
+  thoát). Trước bản này, app không thấy lỗi gì ở những lần chạy như vậy, nên chúng có thể được ghi là "chạy tốt". Khi DXVK không đặt được bộ nhớ đồ họa vào
+  game, nó không tạo được thiết bị DirectX, nên dòng lỗi này không xuất hiện ở game chạy được.
+- **Test:** `AgvnExe64Test`, `AgvnDoctorTest.aThirtyTwoBitGameGetsNoGpuMemory`,
+  `test_toolkit.test_renpy_runs_its_64bit_exe`.
+- **Thử máy:**
+  1. Being Adik trên máy Mali: bấm "Tự sửa lỗi" → "Màn hình đen dù game vẫn chạy". Cách đầu tiên phải là "Chạy bản 64-bit
+     của game (BeingADIK.exe)". Sau khi chọn, nhật ký có dòng "Chạy bản 64-bit của game", và `BeingADIK_d3d11.log`
+     không có `VK_ERROR_MEMORY_MAP_FAILED`. Game hiện menu, nếu DXVK 64-bit chạy được trên máy đó.
+  2. Thêm lại game Ren'Py 7 có cả hai file chạy: game được thêm bằng `<Tên>.exe`.
+  3. Hồi quy: một game Ren'Py đang chạy tốt bằng bản -32 vẫn mở như cũ cho tới khi người chơi chọn cách sửa. Một game
+     chỉ có một file chạy không có cách sửa này.

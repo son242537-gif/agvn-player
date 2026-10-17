@@ -66,6 +66,16 @@ final class AgvnPeFacts {
         }
     }
 
+    /** The machine {@code file} is for (0x8664: 64-bit, 0x14c: 32-bit), or -1 for no PE file. */
+    static int machine(File file) {
+        try (RandomAccessFile f = new RandomAccessFile(file, "r")) {
+            Header h = Header.read(f);
+            return h != null ? h.machine : -1;
+        } catch (IOException | RuntimeException e) {
+            return -1;
+        }
+    }
+
     /** The PE headers {@link #describe} and {@link #imports} read. */
     private static final class Header {
         int machine, count, dirs, entries;

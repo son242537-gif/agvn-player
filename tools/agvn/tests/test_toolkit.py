@@ -186,6 +186,22 @@ class EngineDetectionTest(unittest.TestCase):
         self.check("RENPY", "renpy3", "Game.exe", "game/script.rpyc")
         self.check("UNKNOWN", "plain", "Game.exe", "game/readme.txt")
 
+    def test_renpy_runs_its_64bit_exe(self):
+        def pe(machine):
+            head = bytearray(0x100)
+            head[0:2], head[0x3c:0x40] = b"MZ", (0x80).to_bytes(4, "little")
+            head[0x80:0x84], head[0x84:0x86] = b"PE\0\0", machine.to_bytes(2, "little")
+            return bytes(head)
+        game = os.path.join(self.tmp.name, "adik")
+        touch(game, "BeingADIK.exe", pe(0x8664))
+        touch(game, "BeingADIK-32.exe", pe(0x14c))
+        touch(game, "game/archive.rpa")
+        for lib in ("windows-i686", "windows-x86_64"):
+            os.makedirs(os.path.join(game, "lib", lib))
+        self.assertEqual("BeingADIK.exe", resolve_exe(game, detect_engine(game)))
+        shutil.rmtree(os.path.join(game, "lib", "windows-x86_64"))
+        self.assertEqual("BeingADIK-32.exe", resolve_exe(game, "RENPY"), "no 64-bit Python beside it")
+
     def test_controls_kind(self):
         self.assertEqual(("pc", "vn", "rpg", "2d", "action", "mouse"), CONTROLS)
         for engine, kind in (("RENPY", "vn"), ("KIRIKIRI", "vn"), ("TYRANO", "vn"), ("SIGLUS", "vn"), ("NSCRIPTER", "vn"),

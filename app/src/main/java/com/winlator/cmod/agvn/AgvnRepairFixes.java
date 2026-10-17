@@ -27,14 +27,15 @@ import java.util.Map;
  *   <li>locale-ja, locale-zh: the language Windows runs the game in, which its text needs (LC_ALL);</li>
  *   <li>mods-off: the game without its mod loader, through Wine's own copy of the loader's DLL ({@link AgvnMods});</li>
  *   <li>raw-mouse: touches as a real mouse, raw input included, or back to the X server's pointer events for a game
- *   that has them so ({@link AgvnRawMouse}).</li>
+ *   that has them so ({@link AgvnRawMouse});</li>
+ *   <li>exe-64: the game's 64-bit exe instead of its 32-bit one ({@link AgvnExe64}).</li>
  * </ul>
  * Pure Java except {@link #make}.
  */
 final class AgvnRepairFixes {
     static final List<String> IDS = Arrays.asList("render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off",
             "present-sync", "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "mods-off",
-            "raw-mouse");
+            "raw-mouse", AgvnExe64.FIX);
     static final String CHINESE = "zh_CN.UTF-8", PULSE = "pulse-audio-gn", ALSA = "alsa";
 
     private AgvnRepairFixes() {}
@@ -83,6 +84,8 @@ final class AgvnRepairFixes {
                 return on ? fix(a, id, R.string.agvn_fix_raw_mouse_off, "0")
                         : fix(a, id, R.string.agvn_fix_raw_mouse, "1");
             }
+            case AgvnExe64.FIX:
+                return AgvnExe64.fix(a, s);
             default:
                 return null;
         }
@@ -126,6 +129,9 @@ final class AgvnRepairFixes {
                 return true;
             case "raw-mouse":
                 s.putExtra(AgvnRawMouse.EXTRA, fix.to);
+                return true;
+            case AgvnExe64.FIX:
+                s.putExtra(AgvnExe64.EXTRA, fix.to);
                 return true;
             default:
                 return false;

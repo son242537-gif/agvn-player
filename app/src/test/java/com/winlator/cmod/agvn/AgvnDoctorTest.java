@@ -30,7 +30,7 @@ public class AgvnDoctorTest {
             "app-settings", "send-logs", "run-windows", "rgss-frameskip", "rgss-light", "wrapper-constants", "wrapper-clip", "wine-mono",
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "godot-light",
-            "godot-light-renderer", "mods-off", "raw-mouse", "ue-wait"));
+            "godot-light-renderer", "mods-off", "raw-mouse", "ue-wait", "exe-64"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
             "ram-saved", "live", "light", "script-error", "page-crash", "frozen", "reported"));
@@ -104,6 +104,25 @@ public class AgvnDoctorTest {
         assertEquals("gpu-lost", found(lost));
         lost.lines.set(0, "Could not allocate memory: System out of memory!");
         assertEquals("memory", found(lost));
+    }
+
+    @Test
+    public void aThirtyTwoBitGameGetsNoGpuMemory() {
+        // Being Adik 0.12.1 (Ren'Py 7.4.10, BeingADIK-32.exe) on a realme RMX3686 (Mali-G68), 17/10/2026: Zink did not
+        // start, DXVK made no device for ANGLE, and the window stayed black until the player quit minutes later: no
+        // problem was found, so such a run could count as one that went well.
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.started = ev.playerQuit = true;
+        ev.seconds = 200;
+        ev.lines.addAll(Arrays.asList("failed to load driver: zink",
+                "err:   DxvkMemoryAllocator: Mapping memory failed with VK_ERROR_MEMORY_MAP_FAILED",
+                "err:   DxvkMemoryAllocator: Memory allocation failed",
+                "err:   D3D11CoreCreateDevice: Failed to create D3D11 device"));
+        AgvnProblemCatalog.Finding f = catalog.find(ev);
+        assertEquals("dxvk-map-32", f.id());
+        assertEquals("its 64-bit exe first", Arrays.asList(AgvnExe64.FIX, "driver-other", "wined3d", "send-logs"), f.fixes());
+        assertEquals("then a game that cannot start DirectX", AgvnExe64.FIX, catalog.finding("directx",
+                Collections.<String, String>emptyMap()).fixes().get(0));
     }
 
     @Test
