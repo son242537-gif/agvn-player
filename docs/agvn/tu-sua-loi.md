@@ -45,6 +45,7 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Game Godot tự tắt sau khi đổi cách vẽ | App đã đổi cách vẽ của game, rồi game tự tắt trong một phút đầu mà không để lại câu lỗi nào | Chạy bằng Direct3D 11 (ANGLE), bỏ cách vẽ đã đổi, đổi driver |
 | Game bị tắt khi vẽ hình (OpenGL qua Zink) | Zink báo `vkCreateGraphicsPipelines failed` rồi game tự tắt; hay gặp ở GPU Mali, vì Zink thiếu vài tính năng trên đó | Game Godot: chạy bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bằng Direct3D 11 (ANGLE), bỏ cách vẽ đã đổi. Mọi game: đổi driver |
 | Driver đồ họa thiếu tính năng DirectX 11 | DXVK: `D3D11CoreCreateDevice: Requested feature level not supported`: driver không đủ tính năng cho mức DirectX nào game xin (vẽ khung dây, geometry shader, transform feedback...) | Đổi driver, dùng WineD3D (trừ khi OpenGL đã không chạy với driver này), gửi nhật ký. Không đổi bản DXVK: bản nào cũng cần các tính năng đó |
+| Wine lỗi khi game gọi dịch vụ của Windows (bản 0.1.52) | Wine: một lỗi truy cập bộ nhớ (`EXCEPTION_ACCESS_VIOLATION`) có khung `L"rpcrt4.dll"` trong backtrace, thường ngay sau đó game đứng màn hình đen (Unreal tự bắt lỗi, Wine không in lỗi nào của nó); tìm cả khi game không tự tắt | Chạy bằng Wine cũ (Proton 9), giả lập CPU ổn định, gửi nhật ký |
 | Bản 32-bit của game không dùng được bộ nhớ đồ họa (bản 0.1.51) | DXVK: `DxvkMemoryAllocator: Mapping memory failed with VK_ERROR_MEMORY_MAP_FAILED`: chương trình 32-bit không nhận được bộ nhớ đồ họa với driver này (Mali), nên không có DirectX; tìm cả khi game không tự tắt | Chạy bản 64-bit của game (nếu có), đổi driver, dùng WineD3D, gửi nhật ký. Không đổi bản DXVK: bản nào cũng cần bộ nhớ đó |
 | Máy không chạy được OpenGL với driver này | Mesa: `failed to load driver: zink`: Zink không khởi động được trên driver Vulkan của game, nên game OpenGL và WineD3D không vẽ được | Dùng lại DXVK (game đang dùng WineD3D), đổi driver, gửi nhật ký. Từ đó app không đề nghị WineD3D với driver này nữa (`AgvnOpenGlCheck`, nhớ theo driver và bản app), dù game kết thúc thế nào (từ 09/10/2026, cả khi người chơi tự thoát) |
 | Không tạo được DirectX / thiếu DirectX 11 | Câu lỗi của DXVK, Unity (`InitializeEngineGraphics failed`) | Đổi bản DXVK, đổi driver (Turnip ↔ System), dùng WineD3D. "Đổi bản DXVK" chỉ hiện khi bản kia chạy được: DXVK 2.x cần Vulkan 1.3, nên với driver của máy (System) thấp hơn, lúc mở game vẫn chạy 1.10.3 và nút đó không hiện (`AgvnDxvkPick.sameAtStart`) |
@@ -1534,3 +1535,27 @@ Bản 64-bit `BeingADIK.exe` không bị giới hạn bộ nhớ này: ANGLE có
   2. Thêm lại game Ren'Py 7 có cả hai file chạy: game được thêm bằng `<Tên>.exe`.
   3. Hồi quy: một game Ren'Py đang chạy tốt bằng bản -32 vẫn mở như cũ cho tới khi người chơi chọn cách sửa. Một game
      chỉ có một file chạy không có cách sửa này.
+
+## Wine lỗi khi game gọi dịch vụ của Windows (bản 0.1.52)
+
+Nhật ký Three Gals (Unreal Engine 5, bản đóng gói GameHub, Xiaomi 2510DPC44G, Snapdragon 8 Elite / Adreno 830,
+app 0.1.42, 18/10/2026): ba lần chơi đều qua logo, rồi đúng một lỗi truy cập bộ nhớ trên luồng game, ngay sau khi
+âm thanh của game khởi động. Unreal tự bắt lỗi đó (luồng `CrashReportingThread` gom thông tin máy), nên Wine không in
+lỗi nào của nó, và game đứng màn hình đen tới khi tắt. Máy không hết RAM. Bản shipping của Unreal không ghi log
+riêng, nên nhật ký Wine là tất cả những gì app có.
+
+- Backtrace của lỗi: `rpcrt4.dll` (phần gọi dịch vụ, RPC) ← `sechost.dll` (`OpenSCManagerW`, mở trình quản lý dịch
+  vụ của Windows) ← `ThreeGals-Win64-Shipping.exe`. Lỗi nằm trong Wine chứ không phải trong game.
+- Game chạy trên Proton 10 (bản arm64ec): app 0.1.42 thêm game mới vào Proton 10. Từ 0.1.47 game mới vào Proton 9. Ở
+  Proton 9, `NdrClientCall2` (phần đóng gói lời gọi RPC) là mã x64 chạy qua bộ giả lập; ở Proton 10 nó là mã ARM64EC,
+  nên lời gọi đi theo đường khác.
+- **Lỗi mới `wine-rpc-crash`:** dòng backtrace có `L"rpcrt4.dll"`. `"when": []`, nên app tìm cả khi game đứng màn hình
+  đen rồi bị vuốt tắt (đọc phần cuối nhật ký Wine đã giữ lại, `AgvnDoctor.afterKill`). Thứ tự cách sửa: Chạy bằng Wine
+  cũ (Proton 9, chỉ hiện cho game đang chạy Proton 10), giả lập CPU ổn định, gửi nhật ký. Trong nhật ký Three Gals, mỗi lần chơi có đúng một backtrace,
+  chính là lỗi này; nhật ký Being Adik (Ren'Py) không có backtrace nào.
+- **Test:** `AgvnDoctorTest.wineFailsInsideItsRpc`.
+- **Thử máy:**
+  1. Three Gals đang chạy Proton 10: mở game, chờ màn hình đen, thoát hoặc vuốt tắt app. Lần mở app sau, app hỏi
+     "Wine bị lỗi khi game gọi dịch vụ của Windows", cách đầu tiên là "Chạy bằng Wine cũ (Proton 9)". Chọn xong, game
+     qua được cảnh đầu và nhật ký không còn backtrace `rpcrt4.dll`. Nếu vẫn lỗi trên Proton 9, gửi nhật ký mới.
+  2. Hồi quy: một game Unreal và một game Unity đang chạy tốt không bị hỏi gì sau khi chơi.

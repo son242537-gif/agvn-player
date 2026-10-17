@@ -126,6 +126,30 @@ public class AgvnDoctorTest {
     }
 
     @Test
+    public void wineFailsInsideItsRpc() {
+        // Three Gals (Unreal 5, Proton 10 arm64ec) on a Xiaomi 2510DPC44G (Adreno 830), 18/10/2026: an access violation
+        // in rpcrt4 under OpenSCManagerW, then Unreal's crash handler kept a black screen. Wine printed no crash of its
+        // own, the player swiped the app away, and nothing was asked.
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.started = ev.playerQuit = true;
+        ev.seconds = 210;
+        ev.lines.addAll(Arrays.asList(
+                "0134:warn:seh:dispatch_exception backtrace: --- Exception 0xc0000005.",
+                "0134:warn:seh:dispatch_exception EXCEPTION_ACCESS_VIOLATION exception (code=c0000005) raised",
+                "0134:warn:seh:virtual_unwind backtrace: 0000006FFF773ADC: L\"rpcrt4.dll\" + 0000000000053ADC.",
+                "0134:warn:seh:virtual_unwind backtrace: 0000006FFFB8B044: L\"sechost.dll\" + 000000000001B044.",
+                "0134:warn:seh:virtual_unwind backtrace: 000000014463DF1E: L\"ThreeGals-Win64-Shipping.exe\" + 000000000463DF1E."));
+        AgvnProblemCatalog.Finding f = catalog.find(ev);
+        assertEquals("wine-rpc-crash", f.id());
+        assertEquals("Proton 9 first", Arrays.asList("wine-old", "emulator-stable", "send-logs"), f.fixes());
+        AgvnEvidence game = new AgvnEvidence();
+        game.started = game.playerQuit = true;
+        game.seconds = 210;
+        game.lines.addAll(Arrays.asList(ev.lines.get(0), ev.lines.get(1), ev.lines.get(4)));
+        assertNull("an exception of the game's own, that it handles", catalog.find(game));
+    }
+
+    @Test
     public void dxvkCannotReadACompressedTexture() {
         // Av Director Life (Unreal 5) on a vivo V2405A (Mali-G925), 15/10/2026, DXVK 2.3.1: Unreal's box
         // "CreateShaderResourceView(...) failed with error E_INVALIDARG", OK, and Wine ended with 0 after 30 s
