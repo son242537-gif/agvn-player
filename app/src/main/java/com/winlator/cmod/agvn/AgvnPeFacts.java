@@ -29,23 +29,12 @@ final class AgvnPeFacts {
     /** One line for the session events, or null when {@code exe} is not a PE file or cannot be read. */
     static String describe(File exe) {
         try (RandomAccessFile f = new RandomAccessFile(exe, "r")) {
-            byte[] dos = read(f, 0, 64);
-            if (dos == null || dos[0] != 'M' || dos[1] != 'Z') return null;
-            long pe = u32(dos, 0x3c);
-            byte[] nt = read(f, pe, 24);
-            if (nt == null || nt[0] != 'P' || nt[1] != 'E' || nt[2] != 0 || nt[3] != 0) return null;
-            int machine = u16(nt, 4), count = u16(nt, 6), optSize = u16(nt, 20);
-            byte[] opt = read(f, pe + 24, optSize);
-            byte[] table = read(f, pe + 24 + optSize, count * 40);
-            if (opt == null || table == null || optSize < 96) return null;
-            boolean plus = u16(opt, 0) == 0x20b;
-            int dirs = plus ? 112 : 96;
-            long base = plus ? u32(opt, 24) | u32(opt, 28) << 32 : u32(opt, 28);
-            int entries = (int) Math.min(16, Math.max(0, (optSize - dirs) / 8));
-            StringBuilder line = new StringBuilder("File exe: ").append(bits(machine));
-            List<String> dlls = imports(f, table, entries > 1 ? u32(opt, dirs + 8) : 0, 20, 12, 0);
-            if (entries > 13) dlls.addAll(imports(f, table, u32(opt, dirs + 104), 32, 4, base));
-            List<String> names = new ArrayList<>(new TreeSet<>(dlls));
+            Header h = Header.read(f);
+            if (h == null) return null;
+            byte[] opt = h.opt, table = h.table;
+            int count = h.count, dirs = h.dirs, entries = h.entries;
+            StringBuilder line = new StringBuilder("File exe: ").append(bits(h.machine));
+            List<String> names = h.dlls(f);
             if (!names.isEmpty()) {
                 int more = names.size() - MAX_DLLS;
                 line.append(" · nạp: ").append(String.join(", ", more > 0 ? names.subList(0, MAX_DLLS) : names));
@@ -64,6 +53,49 @@ final class AgvnPeFacts {
             return line.toString();
         } catch (IOException | RuntimeException e) {
             return null;
+        }
+    }
+
+    /** The DLLs {@code file} imports, delay-loaded ones too: lower case, without ".dll", sorted; null for no PE file. */
+    static List<String> imports(File file) {
+        try (RandomAccessFile f = new RandomAccessFile(file, "r")) {
+            Header h = Header.read(f);
+            return h != null ? h.dlls(f) : null;
+        } catch (IOException | RuntimeException e) {
+            return null;
+        }
+    }
+
+    /** The PE headers {@link #describe} and {@link #imports} read. */
+    private static final class Header {
+        int machine, count, dirs, entries;
+        byte[] opt, table;
+        long base;
+
+        static Header read(RandomAccessFile f) throws IOException {
+            byte[] dos = AgvnPeFacts.read(f, 0, 64);
+            if (dos == null || dos[0] != 'M' || dos[1] != 'Z') return null;
+            long pe = u32(dos, 0x3c);
+            byte[] nt = AgvnPeFacts.read(f, pe, 24);
+            if (nt == null || nt[0] != 'P' || nt[1] != 'E' || nt[2] != 0 || nt[3] != 0) return null;
+            Header h = new Header();
+            h.machine = u16(nt, 4);
+            h.count = u16(nt, 6);
+            int optSize = u16(nt, 20);
+            h.opt = AgvnPeFacts.read(f, pe + 24, optSize);
+            h.table = AgvnPeFacts.read(f, pe + 24 + optSize, h.count * 40);
+            if (h.opt == null || h.table == null || optSize < 96) return null;
+            boolean plus = u16(h.opt, 0) == 0x20b;
+            h.dirs = plus ? 112 : 96;
+            h.base = plus ? u32(h.opt, 24) | u32(h.opt, 28) << 32 : u32(h.opt, 28);
+            h.entries = (int) Math.min(16, Math.max(0, (optSize - h.dirs) / 8));
+            return h;
+        }
+
+        List<String> dlls(RandomAccessFile f) throws IOException {
+            List<String> dlls = imports(f, table, entries > 1 ? u32(opt, dirs + 8) : 0, 20, 12, 0);
+            if (entries > 13) dlls.addAll(imports(f, table, u32(opt, dirs + 104), 32, 4, base));
+            return new ArrayList<>(new TreeSet<>(dlls));
         }
     }
 

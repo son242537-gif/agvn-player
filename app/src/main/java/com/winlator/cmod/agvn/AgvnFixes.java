@@ -205,8 +205,9 @@ final class AgvnFixes {
         return new Fix(id, a.getString(constants ? R.string.agvn_fix_wrapper_constants : R.string.agvn_fix_wrapper_clip), name);
     }
 
+    /** The game's Direct3D goes through DXVK: DXVK is its wrapper and it does not draw with OpenGL alone (AgvnGlGame). */
     static boolean dxvk(Shortcut s) {
-        return s.getExtra("dxwrapper", s.container.getDXWrapper()).contains("dxvk");
+        return s.getExtra("dxwrapper", s.container.getDXWrapper()).contains("dxvk") && !AgvnGlGame.openGlOnly(s);
     }
 
     static String dxvkConfig(Shortcut s) {
