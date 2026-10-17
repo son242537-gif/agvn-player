@@ -40,7 +40,8 @@ một bản. Không có bản thử nghiệm.
 
 **Chuẩn bị một lần:**
 
-1. Cài GitHub CLI: `winget install GitHub.cli`.
+1. Cài Git và GitHub CLI: `winget install --id Git.Git -e` và `winget install GitHub.cli`, rồi mở PowerShell mới.
+   Script dừng ngay nếu PowerShell không thấy `git`.
 2. Đăng nhập: `gh auth login`.
 3. Có khoá ký ở `C:\AGVN\Keys\keystore.properties`. Có thể đặt đường dẫn khác bằng `-Keystore` hoặc biến
    `AGVN_KEYSTORE_PROPS`.
