@@ -2,4 +2,6 @@ AGVN Player v0.1.55 - agvn.io
 
 Sửa lỗi:
 - Nhật ký của game Windows ghi thêm lỗi của driver đồ họa khi nó không cấp được bộ nhớ cho game, để tìm cách sửa màn hình đen của game 32-bit trên máy GPU Mali.
+- Nhật ký ghi cú bấm đầu tiên của mỗi lần chơi có tới được game không, để tìm vì sao chạm hay chuột không ăn trong một số game Unity.
+- Game Unity thêm bằng lối tắt riêng cũng được gửi kèm nhật ký của chính game.
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
