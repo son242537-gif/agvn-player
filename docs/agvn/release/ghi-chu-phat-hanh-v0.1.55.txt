@@ -1,0 +1,5 @@
+AGVN Player v0.1.55 - agvn.io
+
+Sửa lỗi:
+- Nhật ký của game Windows ghi thêm lỗi của driver đồ họa khi nó không cấp được bộ nhớ cho game, để tìm cách sửa màn hình đen của game 32-bit trên máy GPU Mali.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
