@@ -11,9 +11,10 @@ Script còn chép ra hai thứ:
   "Giấy phép mã nguồn mở" hiện nguyên văn file này ở cuối trang.
 
 Cùng thư mục `assets/agvn/mkxp-z` còn có phần của AGVN, script này không chép và không xoá:
-- `agvn_files.rb` (từ bản 0.1.53): mở file của game khi tên file trên điện thoại viết khác tên game hỏi (dạng Unicode
-  NFC/NFD, hoa thường của chữ ngoài A–Z, dấu Nhật kiểu Shift_JIS/CP932). Ghi `tim-tep.txt`. Xem `docs/agvn/tu-sua-loi.md`,
-  "Game RPG Maker dừng ở màn tiêu đề: tên file viết khác trên điện thoại". Kiểm trên PC:
+- `agvn_files.rb` (từ bản 0.1.53) và `agvn_names.rb` (từ bản 0.1.54): mở file của game khi tên file trên điện thoại
+  viết khác tên game hỏi (dạng Unicode NFC/NFD, hoa thường của chữ ngoài A–Z, dấu Nhật kiểu Shift_JIS/CP932, tên bị
+  giải nén sai bảng mã). Ghi `tim-tep.txt`. Xem `docs/agvn/tu-sua-loi.md`, "Game RPG Maker dừng ở màn tiêu đề: tên file
+  viết khác trên điện thoại" và "Tên file bị giải nén sai bảng mã". Kiểm trên PC:
   `ruby scripts/agvn/mkxp-z/test-agvn-files.rb` (Ruby 3.1 trở lên).
 - `ruby/unicode_normalize/normalize.rb` và `tables.rb`: nguyên văn từ Ruby 3.1.3 (thẻ `v3_1_3`, commit `1a6b1675`;
   giấy phép Ruby, có trong `mkxp-z-license.txt`). `String#unicode_normalize` của Ruby nạp chúng khi cần; mkxp-z không

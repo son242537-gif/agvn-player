@@ -1626,3 +1626,50 @@ từng byte với tên file, dạng NFC. Trên Windows game chạy bình thườ
      `Get-ChildItem -Recurse | Sort-Object { $_.FullName.Length } -Descending | % { $n = $_.Name.Normalize([Text.NormalizationForm]::FormD); if ($n -ne $_.Name) { Rename-Item -LiteralPath $_.FullName -NewName $n } }`
   3. Hồi quy: game RPG Maker tên file ASCII vẫn chạy như cũ, FPS không đổi, và "Gửi nhật ký" không có `tim-tep.txt`.
   4. Một game Windows bất kỳ: `tom-tat.txt` của phiên có dòng `Wine: …` đúng với Wine của game.
+
+## Tên file bị giải nén sai bảng mã (bản 0.1.54)
+
+Nhật ký Rj245859 (RPG Maker VX Ace, gói AGVN có cheat, nubia Z2465N, Unisoc UMS9620, Mali-G57, bản 0.1.53,
+18/10/2026). Ở "Chạy nhẹ", game vẫn dừng ở màn tiêu đề với `Errno::ENOENT` cho `Audio/BGM/bgmオープニング`. Lần này
+`tim-tep.txt` cho thấy tên file trên điện thoại:
+
+```
+Không có: game hỏi "Audio/BGM/bgmオープニング" <30AA 30FC 30D7 30CB 30F3 30B0>; gần nhất trong "Audio/BGM":
+  "bgm銉曘偅銉笺儷銉�3.ogg" <9289 66D8 5045 9289 7B3A 5137 9289 FFFD>, "bgm1.ogg", "bgm5.ogg"
+```
+
+- **Vì sao:** công cụ giải nén trên máy đọc byte UTF-8 của tên tiếng Nhật như thể chúng là mã Trung Quốc (GB18030),
+  rồi lưu tên đã đọc sai đó. `bgm銉曘偅銉笺儷銉�3.ogg` chính là `bgmフィールド3.ogg`. Byte cuối của chữ `ド` không đọc
+  được thành chữ Trung nào nên thành `�`, và byte đó mất hẳn. Viết lại tên trên máy bằng GB18030 thì ra đúng byte UTF-8
+  của tên trong game, chỉ thiếu byte đã mất. Lỗi không nằm ở game hay ở mkxp-z: trên máy, các file của game đã mang tên
+  khác.
+- **Từ bản 0.1.54 (`agvn_names.rb`, dùng trong `agvn_files.rb`):** khi không có tên nào khớp theo cách của bản 0.1.53,
+  app đọc ngược tên trên máy. Nó viết lại tên đó bằng từng bảng mã mà công cụ giải nén có thể đã dùng nhầm (GB18030,
+  Shift_JIS/CP932, Big5, CP949, CP437, Windows-1252, ISO-8859-1), rồi so với tên game hỏi viết bằng các bảng mã tên file
+  hay dùng (UTF-8, Shift_JIS/CP932, GB18030, Big5, CP949). Mỗi `�` thay cho 1–2 byte ngoài ASCII đã mất.
+  - Tên đọc ngược không mất byte nào thì được dùng ngay.
+  - Tên có byte mất chỉ được dùng khi trong thư mục chỉ có đúng một tên như vậy khớp (không tính khác phần đuôi). Nếu
+    có hai tên cùng khớp, app không đoán, và game báo lỗi như cũ.
+  - Tên không phải UTF-8 (công cụ giữ nguyên byte, ví dụ byte Shift_JIS) được so thẳng theo byte.
+  - Ruby trong mkxp-z có sẵn mọi bảng mã này (`--with-static-linked-ext`, `libenc.a`, `libtrans.a`). Việc đọc ngược chỉ
+    chạy khi mkxp-z không thấy file, mỗi thư mục làm một lần.
+- **Nhật ký:** dòng "Tìm ra" có thêm cách tên bị hỏng, ví dụ `tên bị giải nén sai bảng mã: UTF-8 đọc thành GB18030`
+  hoặc `Windows-31J giữ nguyên byte`.
+- **Cách sạch nhất vẫn là giải nén lại** bằng công cụ cho chọn bảng mã của tên file, và chọn UTF-8. Khi hai tên gốc
+  khác nhau chỉ ở byte đã mất, công cụ giải nén sai đã ghi đè file này bằng file kia, và app không lấy lại được file bị
+  đè.
+- **"Chạy bằng Windows" vẫn hiện "No access to memory location."**, cả ba lần, với `Wine: proton-9.0-arm64ec` (dòng mới
+  của 0.1.53). Vậy Proton 9 cũng gặp, dù `ntdll.so` của Proton 9 (gói `proton-9.0-arm64ec`) đọc DLL ở bộ nhớ chung vào
+  bộ nhớ thường (`noexec file system, falling back to read`). Nguyên nhân của bản 0.1.42 (Proton 10 ánh xạ DLL không có
+  quyền chạy) không áp dụng ở đây, và chưa biết nguyên nhân. Nhật ký mặc định không có kênh `warn` của Wine. Cần bật
+  "Bật debug Wine" (mặc định `warn+all,err+all,fixme+all`), chạy game bằng Windows một lần rồi gửi nhật ký. Trong lúc
+  chờ, "Tự sửa lỗi" vẫn đề nghị "Chạy nhẹ" trước.
+- **Test:** `scripts/agvn/mkxp-z/test-agvn-files.rb`, với đúng các tên trong nhật ký này (một tên mất byte, một tên có
+  chữ vùng riêng U+E15C, một tên không mất byte), tên UTF-8 đọc thành Windows-1252, byte Shift_JIS giữ nguyên, và hai
+  tên mất byte cùng khớp (không chọn tên nào). Bài thử nạp sẵn các bảng mã trước khi xoá `$LOAD_PATH`, vì Ruby trên PC
+  nạp chúng từ thư viện, còn mkxp-z có sẵn.
+- **Thử máy:**
+  1. Rj245859 trên nubia Z2465N (chưa giải nén lại): "Chạy nhẹ" vào màn tiêu đề, có nhạc. "Gửi nhật ký" có
+     `tim-tep.txt` với các dòng "Tìm ra … UTF-8 đọc thành GB18030".
+  2. Chơi tiếp vài cảnh có tiếng và ảnh tên tiếng Nhật: không dừng vì `ENOENT`.
+  3. Hồi quy: một game RPG Maker tên file đúng vẫn chạy như cũ, không có dòng nào trong `tim-tep.txt`.

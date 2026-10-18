@@ -33,11 +33,11 @@ final class AgvnRgssFiles {
     static final String RUN_DIR = "rgss";
     /**
      * The preload scripts: mkxp-z's own (Ruby 1.8/1.9 names RGSS scripts use, mkxp names, Win32API stand-ins), then
-     * AGVN's: agvn_files.rb, which opens a game's file whose name the phone writes otherwise, and agvn_fps.rb, which
-     * reports the frames the game runs per second (the HUD, "Tự sửa lỗi").
+     * AGVN's: agvn_names.rb and agvn_files.rb, which open a game's file whose name the phone writes otherwise, and
+     * agvn_fps.rb, which reports the frames the game runs per second (the HUD, "Tự sửa lỗi").
      */
-    static final String[] PRELOAD = {"ruby_classic_wrap.rb", "mkxp_wrap.rb", "win32_wrap.rb", "agvn_files.rb",
-            "agvn_fps.rb"};
+    static final String[] PRELOAD = {"ruby_classic_wrap.rb", "mkxp_wrap.rb", "win32_wrap.rb", "agvn_names.rb",
+            "agvn_files.rb", "agvn_fps.rb"};
     /** Ruby 3.1.3's own String#unicode_normalize (Ruby License), for agvn_files.rb: mkxp-z carries no Ruby library. */
     static final String[] RUBY_LIB = {"unicode_normalize/normalize.rb", "unicode_normalize/tables.rb"};
     /**
