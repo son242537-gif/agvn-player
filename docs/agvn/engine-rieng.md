@@ -702,3 +702,43 @@ hình.
      mở được", với câu về Live2D. Bấm "Chạy bằng Windows": game chạy, Live2D chuyển động.
   2. Game Ren'Py có nhánh `if renpy.has_live2d():`: vào được game bằng "Chạy nhẹ", không có Live2D.
   3. Hồi quy: game Ren'Py không dùng Live2D chạy như trước. `AGVN-Player/renpy/<game>/faulthandler.txt` có và trống.
+
+## Game Ren'Py không mở được ở bản 0.1.56, và khi bật "Toàn màn hình cho mọi game" (bản 0.1.57)
+
+Báo cáo ngày 19/10/2026, cập nhật của báo cáo Live2D: ở bản 0.1.56 game Ren'Py đứng ngay lúc mở rồi bị tắt, không
+riêng game Live2D. `log.txt` không được ghi lại, `faulthandler.txt` trống. Logcat:
+`Cannot pickle renpy.gl2.live2dmodel.load = <function check_live2d.<locals>.checked_load …>`, rồi
+`AttributeError: Can't get local object 'check_live2d.<locals>.checked_load'`. Cùng thư mục game, JoiPlay 1.21 vào
+tới menu chính.
+
+- **Vì sao:**
+  - Ngay sau khi nhập các module của mình, Ren'Py sao lưu mọi giá trị trong các module `renpy.*` bằng pickle
+    (`renpy/__init__.py`, `Backup.backup`). Khi nạp lại game, nó khôi phục từ bản sao lưu này.
+  - Pickle không lưu được hàm tạo bên trong hàm khác. Bản vá Live2D của 0.1.56 gán đúng loại hàm đó vào
+    `renpy.gl2.live2dmodel.load` và `renpy.gl2.live2d.onetime_init`, nên bản sao lưu lỗi và game dừng trước khi chạy
+    mã init.
+  - Bật "Toàn màn hình cho mọi game" cũng gặp đúng lỗi này **từ bản 0.1.39**: `main.py` gán một hàm như vậy
+    (`stretch_to_screen.<locals>.whole`) vào `renpy.config.adjust_view_size`. Thử trên Ren'Py 8.5.3 bản Linux: game thường lỗi
+    3/3 lần.
+  - Bộ kiểm của 0.1.56 dùng `renpy` giả không có bước sao lưu, nên không bắt được.
+- **Sửa (`main.py`):**
+  - Các tên app gán (`renpy.gl2.live2dmodel.load`, `renpy.gl2.live2d.onetime_init`, `renpy.config.adjust_view_size`)
+    được thêm vào `renpy.name_blacklist` trước khi gán. Đây là danh sách tên mà Ren'Py không sao lưu.
+  - Khi nạp lại game, Ren'Py khôi phục bản sao lưu và giữ nguyên các tên đó. Thử trên Ren'Py bản Linux: sau
+    `backup.restore()`, `load` và `onetime_init` vẫn là của app, và Live2D vẫn bị từ chối đúng câu.
+  - Nếu một bản Ren'Py không có `name_blacklist` thì app không gán gì. Lỗi trong phần kiểm Live2D không bao giờ làm
+    dừng Ren'Py.
+- **Test:**
+  - `python3 scripts/agvn/renpy/test-main.py`: bản `renpy` giả giờ có bước sao lưu và khôi phục như Ren'Py
+    (`Backup`, `name_blacklist`). Với `main.py` của 0.1.56, bộ kiểm báo lỗi.
+  - `python3 scripts/agvn/renpy/test-main-sdk.py <thư mục SDK>`: chạy `main.py` trên Ren'Py 8.5.3 bản Linux (từ SDK đã
+    ghim), lệnh `lint`, với ba game nhỏ.
+    - Game thường: chạy hết mã init.
+    - Game thường khi bật "Toàn màn hình cho mọi game": cũng vậy, và `config.adjust_view_size` là của app.
+    - Game có `Live2D(…)` lúc init: `has_live2d()` là False, mô hình bị từ chối kèm câu tiếng Việt.
+    - Không có dòng "Cannot pickle".
+    - Với `main.py` của 0.1.56, mọi bước đều lỗi như báo cáo.
+- **Thử máy:**
+  1. Một game Ren'Py thường và một game có Live2D, mở bằng "Chạy nhẹ". Game thường vào tới menu chính, và `log.txt` có
+     `Running init code` và `Interface start`. Game Live2D hiện màn lỗi hoặc hộp "Game chưa mở được" nói về Live2D.
+  2. Bật "Toàn màn hình cho mọi game" rồi mở game Ren'Py thường: game vào được và phủ kín màn hình.

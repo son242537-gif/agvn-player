@@ -19,6 +19,11 @@ import sys
 import threading
 import time
 
+# The names check_live2d sets. Ren'Py backs up its modules with pickle once it has imported them (renpy.Backup), and a
+# function made inside another cannot be pickled: in 0.1.56 the backup failed ("Can't get local object
+# 'check_live2d.<locals>.checked_load'") and every Ren'Py game stopped as it started. They go in Ren'Py's own list of
+# names its backup leaves out, so a reload (which restores the backup) keeps them too.
+LIVE2D_NAMES = ("renpy.gl2.live2dmodel.load", "renpy.gl2.live2d.onetime_init")
 LIVE2D_MISSING = ("Game cần Live2D, mà bản Chạy nhẹ của AGVN Player không có thư viện Live2D Cubism Core "
                   "(libLive2DCubismCore.so). Bản Windows của game có thư viện này: chọn \"Chạy bằng Windows\".")
 
@@ -46,19 +51,26 @@ def watch_quit(path):
             time.sleep(2)
 
 
-def stretch_to_screen():
-    def whole(width, height):
-        return width, height
+def whole_screen(width, height):
+    return width, height
 
-    # Set as soon as Ren'Py's config has the setting, before the window is made. Ren'Py sets its config back to its
-    # defaults when it reloads a game, so this looks again now and then.
+
+def stretch_to_screen():
+    # Set as soon as Ren'Py's config has the setting, before the window is made, and left out of Ren'Py's backup of its
+    # modules, which pickles every value (see LIVE2D_NAMES): from 0.1.39 to 0.1.56 a function of main.py was backed up,
+    # and with "Toàn màn hình cho mọi game" on no Ren'Py game started. This looks again now and then, should a game's
+    # reload set its config back.
     while True:
         config = sys.modules.get("renpy.config")
+        blacklist = getattr(sys.modules.get("renpy"), "name_blacklist", None)
 
-        if config is not None and hasattr(config, "adjust_view_size") and config.adjust_view_size is None:
-            config.adjust_view_size = whole
+        if config is not None and hasattr(config, "adjust_view_size") and config.adjust_view_size is None \
+                and isinstance(blacklist, set):
+            blacklist.add("renpy.config.adjust_view_size")
+            config.adjust_view_size = whole_screen
 
-        ready = config is not None and getattr(config, "adjust_view_size", None) is not None
+        ready = config is not None and (getattr(config, "adjust_view_size", None) is not None
+                                        or not isinstance(blacklist, set))  # a Ren'Py whose backup this does not know
         time.sleep(1.0 if ready else 0.05)
 
 
@@ -71,10 +83,13 @@ def check_live2d(live2d):
     and a game that makes a Live2D model anyway stops on Ren'Py's error screen, which "Tự sửa lỗi" then reads.
     """
     model = getattr(live2d, "live2dmodel", None)
-    if model is None:
-        return  # not built in: Ren'Py raises itself
+    blacklist = getattr(sys.modules.get("renpy"), "name_blacklist", None)
+    if model is None or not isinstance(blacklist, set):
+        return  # not built in (Ren'Py raises itself), or a backup this does not know: Ren'Py left as it is
 
-    if not hasattr(model.load, "agvn_loaded"):  # the extension stays loaded through a reload, and so does this
+    blacklist.update(LIVE2D_NAMES)
+
+    if not hasattr(model.load, "agvn_loaded"):  # once: the extension module is never imported twice
         load = model.load
 
         def checked_load(dll):
@@ -101,7 +116,7 @@ def check_live2d(live2d):
 
 
 class Live2DCheck(importlib.abc.MetaPathFinder):
-    """Runs check_live2d on renpy.gl2.live2d as it is imported, also when Ren'Py imports it again (a reload)."""
+    """Runs check_live2d on renpy.gl2.live2d as it is imported. Whatever goes wrong here, Ren'Py goes on as it is."""
 
     def find_spec(self, name, path, target=None):
         if name != "renpy.gl2.live2d":
@@ -113,7 +128,10 @@ class Live2DCheck(importlib.abc.MetaPathFinder):
 
         def exec_module(module):
             run(module)
-            check_live2d(module)
+            try:
+                check_live2d(module)
+            except Exception as e:
+                print("AGVN: Live2D check:", e)
 
         spec.loader.exec_module = exec_module
         return spec
