@@ -2654,6 +2654,10 @@ public class XServerDisplayActivity extends AppCompatActivity {
         }
 
         envVars.put("VK_ICD_FILENAMES", imageFs.getShareDir() + "/vulkan/icd.d/wrapper_icd.aarch64.json");
+        if (!envVars.has("WRAPPER_LOG_LEVEL")) { // AGVN: the wrapper's errors (memory it could not allocate or map) into
+            envVars.put("WRAPPER_LOG_LEVEL", "error"); // Wine's output, which the session keeps (wine-cuoi.txt); it
+            envVars.put("WRAPPER_LOG_FILE", "stdout"); // writes nothing while all goes well
+        }
 
         File graphicsRuntimeMarker = new File(rootDir,
                 "usr/lib/.winlator-graphics-runtime-c7474f7e-25b50a11-v2");

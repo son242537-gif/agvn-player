@@ -1673,3 +1673,35 @@ Không có: game hỏi "Audio/BGM/bgmオープニング" <30AA 30FC 30D7 30CB 30
      `tim-tep.txt` với các dòng "Tìm ra … UTF-8 đọc thành GB18030".
   2. Chơi tiếp vài cảnh có tiếng và ảnh tên tiếng Nhật: không dừng vì `ENOENT`.
   3. Hồi quy: một game RPG Maker tên file đúng vẫn chạy như cũ, không có dòng nào trong `tim-tep.txt`.
+
+## Game 32-bit màn hình đen trên Mali: nhật ký của wrapper (bản 0.1.55)
+
+Nhật ký The Clumsy Witch Seris (WOLF RPG, `GamePro.exe` 32-bit, DirectX 9; vivo V2160, Dimensity 700, Mali-G57 MC2,
+driver System Vulkan 1.1; Proton 9; bản 0.1.54; 19/10/2026): năm lần mở, màn hình đen.
+
+- DXVK 1.10.3 (`GamePro_d3d9.log`) tạo thiết bị DirectX 9 bảy lần. Lần nào cũng gặp `Mapping memory failed with
+  VK_ERROR_MEMORY_MAP_FAILED` rồi `Memory allocation failed`: chương trình 32-bit không nhận được bộ nhớ đồ họa. "Tự sửa
+  lỗi" nhận ra lỗi `dxvk-map-32` (bản 0.1.52). Game không có bản 64-bit. Driver Turnip không chạy trên Mali. Lần thử
+  WineD3D cũng không vẽ được: Zink không khởi động trên driver Vulkan 1.1 này (`failed to load driver: zink`), nên không có
+  OpenGL. Nhật ký riêng của game (`Game_ErrorLog.txt`) đầy dòng "次の文字がキャッシュできませんでした" (không tạo được
+  ảnh cho chữ). Lần mở sau, game báo "前回の起動失敗を検知しました" (đã thấy lần mở trước bị lỗi).
+- **Vì sao bộ nhớ không vào được:** chương trình 32-bit chỉ dùng được địa chỉ dưới 4 GB, mà driver Mali đặt bộ nhớ đồ
+  họa ở địa chỉ cao. Wine (winevulkan của Proton 9 có `VK_EXT_map_memory_placed`) xin wrapper đặt bộ nhớ vào một chỗ dưới
+  4 GB. Wrapper của app (`libvulkan_wrapper.so`, bản Pipetto, đọc mã máy) giả lập việc này:
+  - nó tự xin bộ nhớ theo "Loại tài nguyên bộ nhớ" (`WRAPPER_RESOURCE_TYPE`): `auto` thử dma-heap/ION
+    (`/dev/dma_heap/system`) rồi AHardwareBuffer; `dmabuf`, `ahb` và `opaque` chỉ dùng một cách;
+  - rồi `mmap` file của bộ nhớ đó vào đúng địa chỉ Wine đưa (`MAP_FIXED`).
+
+  Một bước trong đó hỏng trên máy này. Đến bản 0.1.54, wrapper không ghi gì ra, nên chưa biết bước nào.
+- **Từ bản 0.1.55:** mỗi phiên Windows đặt `WRAPPER_LOG_LEVEL=error` và `WRAPPER_LOG_FILE=stdout`. Lỗi của wrapper
+  vào đầu ra của Wine, và phiên giữ lại phần cuối trong `wine-cuoi.txt`. Các dòng có dạng `[error]: mmap failed: error
+  <errno>`, `[error]: Failed to import dmaheap memory, res <mã Vulkan>` hay `[error]: Placed address/mapped address
+  mismatch`. Khi mọi thứ chạy tốt, wrapper không ghi dòng nào. Nếu người chơi đã tự đặt `WRAPPER_LOG_LEVEL` thì app giữ
+  nguyên.
+- **Thử ngay, không cần bản mới:** trong cấu hình driver đồ họa của game ("Cấu hình driver đồ họa"), đổi "Loại tài
+  nguyên bộ nhớ" từ `auto` sang `ahb`, rồi mở game. Vẫn đen thì thử `opaque`. Ghi lại kết quả: nếu một kiểu chạy được,
+  "Tự sửa lỗi" có thể đề nghị kiểu đó khi gặp `dxvk-map-32`.
+- **Thử máy:**
+  1. The Clumsy Witch Seris trên vivo V2160 (bản 0.1.55, `auto`): "Gửi nhật ký" có `wine-cuoi.txt` với các dòng
+     `[error]: …` của wrapper.
+  2. Hồi quy: một game chạy tốt không có dòng `[error]:` nào trong `wine-cuoi.txt`, FPS như cũ.
