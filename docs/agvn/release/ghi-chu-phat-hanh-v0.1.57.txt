@@ -1,0 +1,6 @@
+AGVN Player v0.1.57 - agvn.io
+
+Sửa lỗi:
+- Game Ren'Py mở bằng Chạy nhẹ không còn đứng rồi tự thoát lúc mở. Lỗi này có ở mọi game Ren'Py trong bản 0.1.56.
+- Game Ren'Py mở được bằng Chạy nhẹ khi bật "Toàn màn hình cho mọi game". Từ bản 0.1.39, bật mục này thì game Ren'Py không mở được.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
