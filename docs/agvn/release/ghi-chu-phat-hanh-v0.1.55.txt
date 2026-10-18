@@ -1,6 +1,11 @@
 AGVN Player v0.1.55 - agvn.io
 
+Mới:
+- Nút 🗂 "Bộ phím ảo" trong mọi game (game Chạy nhẹ có thêm ở menu ☰): chạm tên một bộ để tải cho game, 💾 Lưu để giữ phím đang dùng thành bộ có tên, ✎ Sửa để sửa phím. Bộ đã lưu có ở mọi game và trong cài đặt game.
+
 Sửa lỗi:
+- Bộ phím chọn ở menu bên trái trong game Windows được nhớ cho game, không về bộ cũ ở lần mở sau.
+- Sửa phím trong game không còn ghi đè bộ phím riêng đã chỉnh trước đó. Game Chạy nhẹ đổi sang bộ khác thì phím đã sửa được giữ thành bộ mang tên game.
 - Nhật ký của game Windows ghi thêm lỗi của driver đồ họa khi nó không cấp được bộ nhớ cho game, để tìm cách sửa màn hình đen của game 32-bit trên máy GPU Mali.
 - Nhật ký ghi cú bấm đầu tiên của mỗi lần chơi có tới được game không, để tìm vì sao chạm hay chuột không ăn trong một số game Unity.
 - Game Unity thêm bằng lối tắt riêng cũng được gửi kèm nhật ký của chính game.
