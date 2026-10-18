@@ -637,3 +637,31 @@ mở bằng "Chạy nhẹ" đều văng khoảng 70 ms sau khi SDL gọi `SDL_ma
      nên lỗi nào hiện ra sau đó cũng cần ghi lại.
   3. Một game còn văng: mở lại thư viện, rồi "Gửi nhật ký" của game đó. File zip có `tom-tat.txt` và
      `loi-ma-may.txt` với dòng `signal …` và các dòng `#00 pc …`.
+
+## Game MV đọc tệp theo thư mục có `package.json` (bản 0.1.56)
+
+Báo cáo ngày 19/10/2026: một game RPG Maker MV có bộ chạy NW.js riêng (`package.json` và `nw.dll` ở thư mục game,
+`"main": "www/index.html"`) đứng ở màn đen trên "Chạy nhẹ", không có bảng lỗi. Logcat:
+`HTML game file missing: /lng.txt`, `Uncaught Error: ENOENT: lng.txt (…/__agvn/compat.js:76)`, rồi
+`PluginManager.setup is not a function (…/js/main.js:5)`.
+
+- **Vì sao:**
+  - Đầu `js/rpg_managers.js` của game có `LngMode = fs.readFileSync("lng.txt", 'utf-8')`.
+  - Trên PC, NW.js lấy thư mục có `package.json` làm thư mục làm việc, nên đọc được `<game>/lng.txt`.
+  - Trên điện thoại, gốc của trang là `www/` (nơi có `index.html`). `fs` giả của `html-compat.js` hỏi `/lng.txt`,
+    `www/` không có tệp đó, nên `readFileSync` ném lỗi. Cả tệp `rpg_managers.js` dừng ở dòng đó, nên `DataManager`,
+    `PluginManager` và các lớp sau không có, và `main.js` văng.
+- **Sửa (`AgvnNwjsGame.appDir`, `AgvnHtmlFiles.fileFor`):**
+  - Tệp game hỏi mà `www/` không có thì app tìm thêm ở thư mục ngay trên, nếu thư mục đó có `package.json` và `www/`
+    thì không. Đây là thư mục làm việc của NW.js.
+  - Cách này cũng đúng cho plugin ghép `process.cwd()` với `www/data/…`.
+  - Tệp có trong `www/` vẫn được lấy trước, như trước.
+  - Game MZ và game NW.js dạng trang có `package.json` ngay cạnh trang, nên không tìm lên trên. Game web không có
+    `package.json` cũng vậy: app không lấy tệp nào ngoài thư mục game.
+  - Tệp game ghi (như `lng.txt` khi chọn ngôn ngữ) vẫn vào bộ nhớ của trang, như mọi tệp ghi bằng `fs` giả. Lần đọc sau
+    lấy giá trị vừa ghi, kể cả sau khi game tự mở lại.
+- **Test:** `AgvnHtmlCompatTest.aNameReadRelativeToAnMvGamesFolderIsFoundAboveWww`.
+- **Thử máy:**
+  1. Game MV có `<game>/lng.txt` và `www/js/rpg_managers.js` đọc nó ở dòng đầu: vào được màn tiêu đề.
+  2. Chọn ngôn ngữ khác trong game (game ghi lại `lng.txt` rồi tự mở lại), thoát, mở lại: vẫn ngôn ngữ vừa chọn.
+  3. Hồi quy: một game MV và một game MZ khác vẫn chạy và lưu save như trước (`www/save/`, `save/`).

@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
  * Serves a web game's files to the WebView. Games made on Windows often name files with the wrong upper/lower case
  * ("Actor1.png" vs "actor1.png"), which Windows ignores but Android does not, so a missing file is looked up again
  * ignoring case. A sound or video asked for in a format the game does not ship is served in the one it does
- * ({@link #sibling}). Nothing outside the game folder is ever served.
+ * ({@link #sibling}). Nothing outside the game folder (an MV game's www/ and the one above it) is ever served.
  */
 public final class AgvnHtmlFiles {
     private static final Map<String, String> MIME = new HashMap<>();
@@ -102,12 +102,14 @@ public final class AgvnHtmlFiles {
         }
     }
 
-    /** The file for {@code urlPath}, else the same sound or video in its other format ({@link #sibling}), else null. */
+    /** The file for {@code urlPath}, else in its other format ({@link #sibling}), else in {@link AgvnNwjsGame#appDir}. */
     static File fileFor(File root, String urlPath) {
         File file = resolve(root, urlPath);
         if (file != null) return file;
         String other = sibling(urlPath);
-        return other != null ? resolve(root, other) : null;
+        file = other != null ? resolve(root, other) : null;
+        File app = file == null ? AgvnNwjsGame.appDir(root) : null;
+        return app != null ? resolve(app, urlPath) : file;
     }
 
     /** {@code urlPath} with the other extension of its format pair ("/audio/a.m4a" -> "/audio/a.ogg"), or null. */

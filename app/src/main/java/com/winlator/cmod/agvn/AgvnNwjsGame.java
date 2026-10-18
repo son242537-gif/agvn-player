@@ -30,6 +30,18 @@ final class AgvnNwjsGame {
 
     private AgvnNwjsGame() {}
 
+    /**
+     * The folder an NW.js game runs in (process.cwd()) when it is above the page's: the one with package.json, the
+     * parent of an RPG Maker MV game's www/ ("main": "www/index.html"). A name the game reads relative to it is found
+     * there: a game's rpg_managers.js read fs.readFileSync("lng.txt") as it loaded, the page's root www/ had no such
+     * file, and the engine stopped loading, black (19/10/2026). Null when the page's folder has package.json itself.
+     */
+    static File appDir(File root) {
+        File parent = root != null ? root.getParentFile() : null;
+        if (parent == null || new File(root, PACKAGE).isFile() || !new File(parent, PACKAGE).isFile()) return null;
+        return parent;
+    }
+
     /** The page an NW.js game starts on, beside its package.json in {@code gameDir}; null for any other folder. */
     static File index(File gameDir) {
         File pkg = gameDir != null ? new File(gameDir, PACKAGE) : null;

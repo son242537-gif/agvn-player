@@ -104,4 +104,28 @@ public class AgvnHtmlCompatTest {
         File m4a = touch("audio/se/click.m4a");
         assertEquals("the exact file wins when both are there", m4a, AgvnHtmlFiles.fileFor(root, "/audio/se/click.m4a"));
     }
+
+    /** An RPG Maker MV game on NW.js reads names relative to its folder with package.json, above the page's www/. */
+    @Test
+    public void aNameReadRelativeToAnMvGamesFolderIsFoundAboveWww() throws Exception {
+        File lng = touch("mv/lng.txt"); // fs.readFileSync("lng.txt") at the top of the game's rpg_managers.js
+        touch("mv/package.json");
+        File data = touch("mv/www/data/System.json");
+        File www = data.getParentFile().getParentFile();
+        assertEquals(lng, AgvnHtmlFiles.fileFor(www, "/lng.txt"));
+        assertEquals("a plugin's path.join(process.cwd(), 'www/data/...')", data, AgvnHtmlFiles.fileFor(www, "/www/data/System.json"));
+        assertEquals("the page's own file first", data, AgvnHtmlFiles.fileFor(www, "/data/System.json"));
+        assertNull(AgvnHtmlFiles.fileFor(www, "/missing.txt"));
+        assertEquals(new File(tmp.getRoot(), "mv"), AgvnNwjsGame.appDir(www));
+
+        touch("mz/lng.txt");
+        touch("mz/game/package.json"); // MZ, or an NW.js page game: package.json beside the page, which is the root
+        File mz = new File(tmp.getRoot(), "mz/game");
+        assertNull(AgvnNwjsGame.appDir(mz));
+        assertNull("nothing above the game's own folder", AgvnHtmlFiles.fileFor(mz, "/lng.txt"));
+        touch("web/lng.txt");
+        touch("web/page/index.html"); // no package.json anywhere: a plain web game, served from its folder only
+        assertNull(AgvnHtmlFiles.fileFor(new File(tmp.getRoot(), "web/page"), "/lng.txt"));
+        assertNull(AgvnNwjsGame.appDir(null));
+    }
 }
