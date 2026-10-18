@@ -1,0 +1,8 @@
+AGVN Player v0.1.53 - agvn.io
+
+Sửa lỗi:
+- Game RPG Maker XP/VX/VX Ace ở "Chạy nhẹ" dừng ở màn tiêu đề với lỗi "No such file or directory" dù file nhạc hay ảnh có trong thư mục game: giờ app tìm được file khi tên trên máy viết khác tên trong game (chữ có dấu hay chữ Nhật lưu theo kiểu khác, khác chữ hoa chữ thường, dấu ～ kiểu Nhật). Game vẫn chạy nhanh như trước.
+- Thông báo lỗi của game RPG Maker giữ đúng chữ Nhật, không còn hiện thành dấu "�".
+- "Gửi nhật ký" của game RPG Maker kèm thêm tên các file game không mở được, để biết vì sao game dừng.
+- Nhật ký mỗi lần chơi game Windows ghi thêm bản Wine game đang dùng.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
