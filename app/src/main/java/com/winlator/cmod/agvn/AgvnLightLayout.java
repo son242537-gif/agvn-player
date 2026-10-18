@@ -54,7 +54,8 @@ final class AgvnLightLayout {
     final String kind;
     final List<Element> elements = new ArrayList<>();
     /** The .icp, and the runner its keys go to, for {@link #reset}. */
-    private final String defaults, runner;
+    private String defaults;
+    private final String runner;
 
     private AgvnLightLayout(String kind, String defaults, String runner) {
         this.kind = kind;
@@ -78,6 +79,12 @@ final class AgvnLightLayout {
         List<Element> read = read(defaults, runner);
         elements.clear();
         if (read != null) elements.addAll(read);
+    }
+
+    /** The keys of another .icp from now on, "Mặc định" included: a set loaded in the game ({@link AgvnLightSets}). */
+    void use(String json) {
+        defaults = json;
+        reset();
     }
 
     /** The game's own key set ({@link #toJson}) instead; false, the keys unchanged, when it cannot be read. */

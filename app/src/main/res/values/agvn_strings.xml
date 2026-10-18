@@ -387,4 +387,19 @@
     <string name="agvn_wine_mono_failed">Chưa cài được .NET cho game. Hãy mở lại game, nếu vẫn lỗi thì gửi nhật ký cho AGVN.</string>
     <!-- Key settings of a device that left before its screen opened (ExternalControllerBindingsActivity) -->
     <string name="agvn_controller_gone">Thiết bị này vừa ngắt kết nối. Hãy bật hoặc cắm lại rồi mở lại.</string>
+    <!-- "Bộ phím ảo" of every game: load, save and edit key sets (agvn/AgvnKeySetDialog) -->
+    <string name="agvn_bar_sets">Bộ phím ảo: tải, lưu, sửa</string>
+    <string name="agvn_light_sets">Bộ phím: tải, lưu</string>
+    <string name="agvn_sets_title">Bộ phím ảo · chạm một bộ để tải cho game</string>
+    <string name="agvn_sets_save">💾 Lưu…</string>
+    <string name="agvn_sets_edit">✎ Sửa</string>
+    <string name="agvn_sets_none">Chưa có bộ phím nào. Bấm ✎ Sửa để đặt phím, rồi 💾 Lưu.</string>
+    <string name="agvn_sets_loaded">Đã tải bộ phím \"%1$s\": game dùng bộ này cả ở lần mở sau</string>
+    <string name="agvn_sets_failed">Không lưu hoặc tải được bộ phím</string>
+    <string name="agvn_sets_nothing">Game chưa có phím ảo để lưu</string>
+    <string name="agvn_sets_save_title">Lưu bộ phím đang dùng với tên</string>
+    <string name="agvn_sets_saved">Đã lưu bộ phím \"%1$s\". Game nào cũng tải được: bấm 🗂 rồi chạm tên.</string>
+    <string name="agvn_sets_overwrite">Đã có bộ phím \"%1$s\". Ghi đè bằng phím đang dùng? Game nào đang dùng bộ đó cũng đổi theo.</string>
+    <string name="agvn_sets_overwrite_ok">Ghi đè</string>
+    <string name="agvn_sets_kept">Phím đã sửa trước đây của game được giữ thành bộ phím \"%1$s\" (bấm 🗂 để tải lại)</string>
 </resources>

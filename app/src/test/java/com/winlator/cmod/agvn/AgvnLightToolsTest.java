@@ -109,6 +109,10 @@ public class AgvnLightToolsTest {
         assertEquals("0.1,0.2,1.0", new AgvnLightPrefs(dir).positions("rpg"));
         other.setKeysHidden("/sdcard/Games/A", false);
         assertFalse(new AgvnLightPrefs(dir).keysHidden("/sdcard/Games/A"));
+        other.clearLayout("/sdcard/Games/A"); // kept as a saved set (AgvnLightSets.keep): the game's pick shows
+        AgvnLightPrefs after = new AgvnLightPrefs(dir);
+        assertNull(after.layout("/sdcard/Games/A"));
+        assertEquals(0, after.layoutBase("/sdcard/Games/A"));
     }
 
     /** The settings file is replaced whole, also over one that exists (File.renameTo refuses that on Windows). */

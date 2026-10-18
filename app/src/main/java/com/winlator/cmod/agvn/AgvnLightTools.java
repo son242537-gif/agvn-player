@@ -17,7 +17,7 @@ import java.io.File;
  * ({@link AgvnLightKeys}), the ⌨ ✎ 👁 ☰ bar at the top ({@link AgvnLightBar}), the menu Back opens
  * ({@link AgvnLightMenu}), moving, changing, adding and deleting keys ({@link AgvnLightEditor}) and the HUD
  * ({@link AgvnLightHud}). Each game can have a key set of its own ({@link AgvnLightPrefs#layout}); a ✎ stays in the
- * top-left corner to edit it ({@link AgvnEditPen}).
+ * top-left corner to edit it ({@link AgvnEditPen}). [🗂] loads and saves key sets ({@link AgvnLightSets}).
  * The runner (Ren'Py, RPG Maker XP/VX/VX Ace, Godot, HTML) is the {@link Host}. All calls on the UI thread.
  */
 public final class AgvnLightTools {
@@ -50,13 +50,13 @@ public final class AgvnLightTools {
 
     final Activity activity;
     final Host host;
-    private final String gameName;
+    final String gameName;
     private final File gameDir;
     /** The game's folder (or name): its own key set and hidden keys are kept under it. */
     final String game;
     final AgvnLightPrefs prefs;
-    /** The key profile picked for the game in its settings, which its keys start from. */
-    final AgvnLightPick pick;
+    /** The key profile picked for the game in its settings or loaded with [🗂], which its keys start from. */
+    AgvnLightPick pick;
     final AgvnLightLayout layout;
     final AgvnLightKeys keys;
     private final AgvnLightHud hud;
@@ -65,6 +65,7 @@ public final class AgvnLightTools {
     private final AgvnLightSlow slow;
     private final AgvnLightEditor editor = new AgvnLightEditor(this);
     private final AgvnEditPen pen;
+    private final AgvnLightSets sets = new AgvnLightSets(this);
 
     private AgvnLightTools(Activity activity, String kind, String gameName, File gameDir, Host host) {
         this.activity = activity;
@@ -76,8 +77,9 @@ public final class AgvnLightTools {
         pick = AgvnLightPick.of(activity);
         String json = pick.json != null ? pick.json : FileUtils.readString(activity, AgvnLayouts.assetFor(kind));
         layout = AgvnLightLayout.parse(kind, json != null ? json : "{}", host.runner());
-        boolean own = prefs.layoutBase(game) == pick.id && AgvnLightPick.ownIsNewest(prefs.layoutAt(game), pick.editedMs)
-                && layout.load(prefs.layout(game)); // made from this pick, which was not saved again since
+        boolean made = prefs.layoutBase(game) == pick.id && AgvnLightPick.ownIsNewest(prefs.layoutAt(game), pick.editedMs);
+        boolean own = made && layout.load(prefs.layout(game)); // made from this pick, which was not saved again since
+        if (!made && pick.id != AgvnLightPick.OFF) AgvnLightSets.keep(activity, prefs, game, this.gameName); // not lost
         if (!own && pick.json == null) layout.apply(prefs.positions(kind)); // else the places of AGVN 0.1.6-0.1.8
         if (pick.id != prefs.lastPick(game)) prefs.picked(game, pick.id);
         keys = new AgvnLightKeys(activity, layout, host::binding);
@@ -172,6 +174,13 @@ public final class AgvnLightTools {
         bar.suspend();
         pen.setVisible(false);
         editor.start();
+    }
+
+    /** [🗂]: the game's key sets, to load one or save the keys on screen ({@link AgvnLightSets}). */
+    void openSets() {
+        if (editor.active()) return;
+        if (menu.isOpen()) menu.close();
+        sets.open();
     }
 
     /** The editor is done: the keys show again at the player's opacity, with the bar. */

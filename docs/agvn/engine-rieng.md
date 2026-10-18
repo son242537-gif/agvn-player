@@ -522,6 +522,61 @@ Anh Sơn báo lại ngày 09/10/2026: chỉnh bộ phím ở màn "Điều khi�
   2. Game "Chạy nhẹ" đã có bộ phím riêng (✎) làm từ hồ sơ X. Sửa X ở màn "Điều khiển", mở game: thấy X vừa sửa. ✎ sửa
      thêm trong game, mở lại: thấy bộ vừa sửa trong game.
 
+## Bộ phím ảo của mỗi game: Sửa, Lưu, Tải (bản 0.1.55)
+
+Anh Sơn báo ngày 18/10/2026: chỉnh bộ phím ở ngoài, vào game không chọn được bộ đó, hoặc mất luôn bộ đã chỉnh. Anh muốn
+mỗi game có chỗ đặt phím ảo và chỗ tải: "set - lưu - tải".
+
+- **Vì sao không chọn được hay mất:**
+  - Game Windows: chọn bộ phím ở menu bên trái trong game chỉ đổi phím cho lần chơi đó. Mở lại thì game về bộ cũ.
+  - Game Windows: ✎ Sửa trên một bộ không phải của riêng game thì chép bộ đó đè lên bộ riêng cũ của game (mỗi game chỉ
+    có một bản). Phím đã chỉnh trước đó mất.
+  - Game Windows: danh sách bộ phím chỉ đọc một lần lúc mở game. Bộ lưu ở chỗ khác lúc game đang chạy không có trong
+    danh sách.
+  - Game "Chạy nhẹ": trong game không có chỗ chọn bộ phím. Phím sửa trong game (✎) gắn với bộ đang chọn trong cài đặt.
+    Đổi bộ trong cài đặt thì phím đã sửa không được dùng nữa, và không có cách lấy lại.
+- **Từ bản 0.1.55, hộp "Bộ phím ảo"** (`AgvnKeySetDialog`): nút 🗂 trên thanh trên cùng của mọi game, và dòng
+  "🗂 Bộ phím: tải, lưu" trong menu ☰ của game "Chạy nhẹ".
+  - **Tải:** chạm tên một bộ. Game dùng bộ đó ngay và ở mọi lần mở sau, như chọn trong cài đặt game (`controlsProfile`).
+    App bỏ `agvnControlsAuto` để AGVN không tự đổi bộ lúc mở game, và bỏ `agvnControlsHidden` để phím hiện.
+  - **💾 Lưu…:** lưu phím đang dùng thành một bộ có tên (gợi ý tên game).
+    - Mỗi bộ là một hồ sơ điều khiển (`files/profiles/controls-<id>.icp`, `AgvnKeySets`), nên có ở mọi game, ở màn
+      "Điều khiển" và ở "Cấu hình phím ảo" trong cài đặt game.
+    - Trùng tên một bộ của người chơi thì app hỏi trước khi ghi đè. Bộ của AGVN không bao giờ bị ghi đè: bộ mới được
+      lưu thành "… (1)".
+    - Phím của game "Chạy nhẹ" được lưu đủ các trường mà game Windows cần để mở bộ (`toggleSwitch`, `iconId`).
+  - **✎ Sửa:** sửa phím ngay trên màn game, như nút ✎.
+- **Game Windows:**
+  - Chọn bộ ở menu bên trái giờ được nhớ cho game (`AgvnControlsSets.sidebarPicked`). Chọn "Tắt" ở đó thì như 👁 Ẩn: bộ
+    của game vẫn giữ.
+  - ✎ Sửa luôn tạo bản mới ("Tên game (1)"...). Bản riêng cũ vẫn là một bộ để tải lại (`AgvnControlsFork.editable`).
+    Rời ✎ mà không đổi gì thì bản mới bị xoá như trước.
+  - Mở menu bên trái hay hộp 🗂 thì app đọc lại danh sách nếu thư mục hồ sơ đã đổi (`AgvnControlsSets.refresh`).
+  - Bộ mang tên game là bộ riêng của game: sửa phím trong game đổi luôn bộ đó. Muốn giữ một bản cố định thì lưu với tên
+    khác.
+- **Game "Chạy nhẹ":**
+  - Tải một bộ trong game ghi lựa chọn vào file `.desktop` của game (`AgvnDesktopExtras`), vì game chạy ở tiến trình
+    riêng.
+  - Phím riêng sửa trong game không bị bỏ nữa. Game chuyển sang bộ khác khi người chơi tải bộ khác trong game, chọn bộ
+    khác trong cài đặt, hoặc lưu lại bộ đang chọn ở chỗ khác. Lúc đó app lưu phím riêng thành bộ mang tên game trước
+    (`AgvnLightSets.keep`) và báo "Phím đã sửa trước đây của game được giữ thành bộ phím …". Đã có bộ đúng các phím đó
+    thì app không lưu thêm.
+- **Test:** `AgvnKeySetsTest`, `AgvnDesktopExtrasTest`, `AgvnLightToolsTest.settingsLiveInAFileEveryProcessReads`.
+- **Thử máy:**
+  1. Game Windows: ✎ sửa phím (thêm một nút) → Xong. 🗂 → 💾 Lưu… đặt tên "Thử A" → Lưu. 🗂 → chạm "AGVN · Máy tính":
+     phím đổi ngay. Thoát, mở lại: vẫn "AGVN · Máy tính". 🗂 → chạm "Thử A": có lại nút vừa thêm.
+  2. Game Windows: menu bên trái → chọn một bộ khác trong danh sách → đóng menu. Thoát, mở lại: vẫn bộ đó.
+  3. Game Windows đã có bộ riêng (tên game): 🗂 → tải "AGVN · RPG", ✎ sửa một nút → Xong. 🗂 có cả bộ tên game cũ lẫn
+     "Tên game (1)". Tải bộ cũ: đúng phím cũ.
+  4. Game "Chạy nhẹ" (RPG Maker hoặc Ren'Py): ✎ sửa phím → Xong. ☰ → 🗂 Bộ phím → 💾 Lưu… đặt tên "Thử B". Mở một game
+     Windows: 🗂 có "Thử B", tải được, các nút bấm được.
+  5. Game "Chạy nhẹ" đã sửa phím trong game. Ngoài thư viện: cài đặt game → Điều khiển → "Cấu hình phím ảo" chọn một bộ
+     khác → mở game. App báo phím cũ được giữ thành bộ tên game, game dùng bộ vừa chọn, 🗂 có bộ tên game và tải lại
+     được.
+  6. Game "Chạy nhẹ": 🗂 → tải một bộ: phím đổi ngay. Thoát, mở lại: vẫn bộ đó.
+  7. Hồi quy: game chưa chọn gì vẫn dùng bộ AGVN theo loại game. 👁 Ẩn vẫn giữ ẩn ở lần mở sau. ✎ rồi Xong mà không đổi
+     gì thì không có bộ mới.
+
 ## Game NW.js dạng trang chạy nhẹ (bản 0.1.42)
 
 Anh Sơn báo ngày 14/10/2026: Love My Back (`僕と両想いのオタク女子`, game NW.js: `index.html`, `script.js` 8 MB,

@@ -11,8 +11,8 @@ import com.winlator.cmod.R;
 
 /**
  * The bar at the top centre of a "Chạy nhẹ" game, as on Windows games ({@link AgvnControlsBar}): [⌨] the Android
- * keyboard, [✎ Sửa] moves the on-screen keys, [👁 Ẩn / 👁 Hiện] hides or shows them, and [☰] opens the game's
- * menu. It tucks itself away after 3 s without a tap ({@link AgvnBarAutoHide}).
+ * keyboard, [✎ Sửa] moves the on-screen keys, [👁 Ẩn / 👁 Hiện] hides or shows them, [🗂] loads and saves key sets
+ * ({@link AgvnLightSets}), and [☰] opens the game's menu. It tucks itself away after 3 s without a tap ({@link AgvnBarAutoHide}).
  */
 final class AgvnLightBar {
     private final LinearLayout bar;
@@ -29,6 +29,7 @@ final class AgvnLightBar {
         eye = AgvnBarButton.make(tools.activity, tools.activity.getString(R.string.agvn_bar_hide_label), 14,
                 R.string.agvn_bar_toggle, v -> tools.toggleKeys());
         bar.addView(eye);
+        bar.addView(AgvnBarButton.make(tools.activity, "🗂", 16, R.string.agvn_bar_sets, v -> tools.openSets()));
         bar.addView(AgvnBarButton.make(tools.activity, "☰", 18, R.string.agvn_light_menu, v -> tools.openMenu()));
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.CENTER_HORIZONTAL);

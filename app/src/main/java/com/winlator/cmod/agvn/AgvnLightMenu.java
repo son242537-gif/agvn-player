@@ -21,7 +21,7 @@ import com.winlator.cmod.R;
 
 /**
  * The menu Back (or [☰]) opens on a "Chạy nhẹ" game: a panel on the left, dark as the Windows games' sidebar, with
- * the game's own menu, the keyboard, the on-screen keys (show, opacity, move), the HUD, "Gửi nhật ký", "Chạy bằng
+ * the game's own menu, the keyboard, the on-screen keys (show, opacity, move, key sets), the HUD, "Gửi nhật ký", "Chạy bằng
  * Windows" and quitting. The game keeps running behind it; Back or a tap beside the panel closes it.
  */
 final class AgvnLightMenu {
@@ -68,6 +68,7 @@ final class AgvnLightMenu {
         keys = switchRow("👁", R.string.agvn_rgss_show_keys, (b, on) -> { if (!filling) tools.setKeysShown(on); });
         opacity = seekRow();
         row("✎", R.string.agvn_light_edit, TEXT, tools::edit);
+        row("🗂", R.string.agvn_light_sets, TEXT, tools::openSets);
         text(a.getString(R.string.agvn_light_other_section), 12, MUTED, true, px(12), 0);
         hud = switchRow("📊", R.string.agvn_light_hud, (b, on) -> { if (!filling) tools.setHud(on); });
         row("📋", R.string.agvn_logs_send, TEXT, () -> after(tools::sendLogs));

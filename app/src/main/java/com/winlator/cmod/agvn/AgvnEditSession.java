@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.winlator.cmod.XServerDisplayActivity;
 import com.winlator.cmod.container.Shortcut;
-import com.winlator.cmod.core.FileUtils;
 import com.winlator.cmod.inputcontrols.ControlElement;
 import com.winlator.cmod.inputcontrols.ControlsProfile;
 import com.winlator.cmod.inputcontrols.InputControlsManager;
@@ -17,7 +16,7 @@ import java.io.File;
 /**
  * One visit of the in-game controls editor. [✎] gives the game its own copy of the shown profile and points the game at
  * it before anything is edited ({@link AgvnControlsFork#editable}); when the player leaves without changing a control,
- * all of that is put back (the copy removed or its earlier content restored, the shortcut's controls extras restored),
+ * all of that is put back (the copy removed, the shortcut's controls extras restored),
  * so a stray tap on [✎] does not cut the game off from AGVN layout updates. UI thread only.
  */
 final class AgvnEditSession {
@@ -28,17 +27,12 @@ final class AgvnEditSession {
     final ControlsProfile profile;
     private final int baseId;
     private final String[] extrasBefore;
-    private final int ownIdBefore;
-    /** The game's earlier copy, which a new copy is written over; null when there was none. */
-    private final String ownJsonBefore;
     private String controlsBefore;
 
-    private AgvnEditSession(ControlsProfile profile, int baseId, String[] extrasBefore, int ownIdBefore, String ownJsonBefore) {
+    private AgvnEditSession(ControlsProfile profile, int baseId, String[] extrasBefore) {
         this.profile = profile;
         this.baseId = baseId;
         this.extrasBefore = extrasBefore;
-        this.ownIdBefore = ownIdBefore;
-        this.ownJsonBefore = ownJsonBefore;
     }
 
     /** Makes {@code base} editable for this game; null when no copy could be made. */
@@ -47,11 +41,8 @@ final class AgvnEditSession {
         Shortcut shortcut = activity.agvnShortcut();
         String[] extras = new String[EXTRAS.length];
         for (int i = 0; i < EXTRAS.length; i++) extras[i] = shortcut != null ? shortcut.getExtra(EXTRAS[i], null) : null;
-        int ownId = AgvnControlsFork.parseId(extras[2]);
-        File ownFile = ownId > 0 ? ControlsProfile.getProfileFile(activity, ownId) : null;
-        String ownJson = ownFile != null && ownFile.isFile() ? FileUtils.readString(ownFile) : null;
         ControlsProfile profile = AgvnControlsFork.editable(activity, base);
-        return profile != null ? new AgvnEditSession(profile, base.id, extras, ownId, ownJson) : null;
+        return profile != null ? new AgvnEditSession(profile, base.id, extras) : null;
     }
 
     /** Remembers the controls before editing; call once the profile is on screen. */
@@ -77,9 +68,8 @@ final class AgvnEditSession {
             shortcut.saveData();
         }
         if (profile.id == baseId) return; // the game's own copy was opened: nothing was copied
-        File file = ControlsProfile.getProfileFile(activity, profile.id);
-        boolean undone = profile.id == ownIdBefore && ownJsonBefore != null ? FileUtils.writeString(file, ownJsonBefore) : file.delete();
-        if (!undone) Log.w(TAG, "cannot undo controls copy " + file.getName());
+        File file = ControlsProfile.getProfileFile(activity, profile.id); // a new copy (AgvnControlsFork#editable)
+        if (!file.delete()) Log.w(TAG, "cannot undo controls copy " + file.getName());
         InputControlsManager manager = activity.agvnControlsManager();
         if (manager == null) return;
         manager.loadProfiles(false);

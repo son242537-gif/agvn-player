@@ -100,8 +100,9 @@ public final class AgvnControlsFork {
     }
 
     /**
-     * The profile the editor may change for this game: {@code base} itself if it is the game's own copy, else a copy
-     * (written over the game's earlier copy, one per game). Either way the game uses it from now on.
+     * The profile the editor may change for this game: {@code base} itself if it is the game's own copy, else a new
+     * copy. The game's earlier copy stays a set of its own, loadable in every game ("Bộ phím ảo", AgvnKeySetDialog):
+     * it was written over, and players lost keys they had set up (18/10/2026). Either way the game uses it from now on.
      */
     static ControlsProfile editable(XServerDisplayActivity activity, ControlsProfile base) {
         Shortcut shortcut = activity.agvnShortcut();
@@ -114,7 +115,7 @@ public final class AgvnControlsFork {
         }
         String name = shortcut != null && !shortcut.name.trim().isEmpty() ? shortcut.name.trim()
                 : activity.getString(R.string.agvn_edit_own_profile);
-        ControlsProfile fork = fork(activity, manager, base.id, parseId(own), name);
+        ControlsProfile fork = fork(activity, manager, base.id, name);
         if (fork != null && shortcut != null) {
             shortcut.putExtra(EXTRA_OWN, String.valueOf(fork.id));
             useFor(shortcut, fork.id);
@@ -129,13 +130,13 @@ public final class AgvnControlsFork {
         shortcut.saveData();
     }
 
-    private static ControlsProfile fork(Context ctx, InputControlsManager manager, int sourceId, int ownId, String name) {
+    private static ControlsProfile fork(Context ctx, InputControlsManager manager, int sourceId, String name) {
         try {
             File source = ControlsProfile.getProfileFile(ctx, sourceId);
             String json = source.isFile() ? FileUtils.readString(source) : "";
             if (json.trim().isEmpty()) return null;
             Set<Integer> ids = idsOf(InputControlsManager.getProfilesDir(ctx).list());
-            int id = ownId > 0 && !isReservedId(ownId) && ids.contains(ownId) ? ownId : nextForkId(ids);
+            int id = nextForkId(ids);
             Set<String> taken = new HashSet<>();
             for (ControlsProfile p : manager.getProfiles()) if (p.id != id) taken.add(p.getName());
             if (!FileUtils.writeString(ControlsProfile.getProfileFile(ctx, id), forkJson(json, id, uniqueName(name, taken)))) return null;

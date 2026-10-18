@@ -2205,6 +2205,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (spInputControlsProfile == null)
             return;
 
+        final int[] agvnListed = {-1}; // AGVN: the item the list was set to; another one is the player's pick
         Runnable loadProfileSpinner = () -> {
             ArrayList<ControlsProfile> profiles = inputControlsManager.getProfiles(true);
             ArrayList<String> profileItems = new ArrayList<>();
@@ -2221,6 +2222,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spInputControlsProfile.setAdapter(adapter);
             spInputControlsProfile.setSelection(selectedPosition, false);
+            agvnListed[0] = selectedPosition;
         };
         agvnReloadProfileSpinner = loadProfileSpinner; // AGVN
         loadProfileSpinner.run();
@@ -2276,6 +2278,9 @@ public class XServerDisplayActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 applySidebarInputControls.run();
+                if (position != agvnListed[0]) // AGVN: the player's pick stays the game's (agvn/AgvnControlsSets)
+                    com.winlator.cmod.agvn.AgvnControlsSets.sidebarPicked(shortcut, inputControlsView.getProfile());
+                agvnListed[0] = position;
             }
 
             @Override

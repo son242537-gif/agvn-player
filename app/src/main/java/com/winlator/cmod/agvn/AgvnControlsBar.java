@@ -20,9 +20,10 @@ import com.winlator.cmod.widget.InputControlsView;
 /**
  * Small bar at the top centre of the game screen: [⌨] opens the Android keyboard, [✎ Sửa] edits the on-screen controls
  * right on the game ({@link AgvnControlsEditor}), [👁 Ẩn / 👁 Hiện] hides or shows them for this game (remembered in the
- * shortcut, extra agvnControlsHidden), [⛶] fits the game's window to the screen ({@link AgvnScreenFit}), [✕ Thoát]
- * quits the game after asking, as the sidebar's ⏻ does (players swiped AGVN away instead, which reads like Android
- * ending the game). Hidden controls are really gone (View.GONE), so touches reach the game.
+ * shortcut, extra agvnControlsHidden), [🗂] loads, saves and edits key sets ({@link AgvnControlsSets}), [⛶] fits the
+ * game's window to the screen ({@link AgvnScreenFit}), [✕ Thoát] quits the game after asking, as the sidebar's ⏻ does
+ * (players swiped AGVN away instead, which reads like Android ending the game). Hidden controls are really gone
+ * (View.GONE), so touches reach the game.
  * Long-press a button for its full name. The bar tucks itself away after 3 s without a tap, leaving a thin line at the
  * top edge that brings it back ({@link AgvnBarAutoHide}); it hides while the sidebar drawer is open. A ✎ stays in the
  * top-left corner all the time ({@link AgvnEditPen}).
@@ -36,6 +37,7 @@ public final class AgvnControlsBar {
     private final AgvnControlsEditor editor;
     private final AgvnBarAutoHide autoHide;
     private final AgvnEditPen pen;
+    private final AgvnControlsSets sets;
     /** Profile that was on screen before the player hid it (-1: none), shown again by [👁]. */
     private int hiddenProfileId = -1;
     /** The sidebar drawer started to open and hid the bar. */
@@ -46,10 +48,12 @@ public final class AgvnControlsBar {
         float dp = activity.getResources().getDisplayMetrics().density;
         bar = new LinearLayout(activity);
         bar.setOrientation(LinearLayout.HORIZONTAL);
+        sets = new AgvnControlsSets(activity, this::edit, () -> { hiddenProfileId = -1; updateEye(); });
         bar.addView(barButton("⌨", 18, R.string.agvn_bar_keyboard, v -> AppUtils.showKeyboard(activity)));
         bar.addView(barButton(activity.getString(R.string.agvn_bar_edit_label), 14, R.string.agvn_bar_edit, v -> edit()));
         eye = barButton(activity.getString(R.string.agvn_bar_hide_label), 14, R.string.agvn_bar_toggle, v -> toggle());
         bar.addView(eye);
+        bar.addView(barButton("🗂", 16, R.string.agvn_bar_sets, v -> sets.open()));
         AgvnScreenFit fit = new AgvnScreenFit(activity);
         new AgvnBlackScreen(activity); // a game that stays black: a larger screen
         AgvnUnityCrashWatch.start(activity); // a crash Unity caught: the frozen game is closed, "Tự sửa lỗi" asks
@@ -165,12 +169,12 @@ public final class AgvnControlsBar {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 if (slideOffset <= 0f) { // back to closed; a drawer that never fully opened gets no onDrawerClosed
-                    if (drawerHid) autoHide.reveal();
-                    if (drawerHid) pen.setVisible(true);
+                    if (drawerHid) { autoHide.reveal(); pen.setVisible(true); }
                     drawerHid = false;
                     return;
                 }
                 if (editor.isActive()) editor.finish(); // opening the menu ends editing (saved)
+                if (!drawerHid) sets.refresh(); // a set saved elsewhere joins the list
                 autoHide.suspend();
                 pen.setVisible(false); // it would sit on the drawer
                 drawerHid = true;

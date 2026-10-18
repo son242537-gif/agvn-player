@@ -68,6 +68,14 @@ final class AgvnLightPrefs {
         save();
     }
 
+    /** The game's own key set is a saved set now ({@link AgvnLightSets#keep}): the game's pick shows. */
+    void clearLayout(String game) {
+        props.remove("layout." + game);
+        props.remove("layoutBase." + game);
+        props.remove("layoutAt." + game);
+        save();
+    }
+
     /**
      * When the game's own key set was kept (ms); for one kept before 0.1.33, which has no time, the file's last write,
      * which came at or after it.
