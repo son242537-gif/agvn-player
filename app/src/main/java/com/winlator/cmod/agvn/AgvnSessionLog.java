@@ -56,7 +56,8 @@ public final class AgvnSessionLog {
             File dir = new File(gameLogs, new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.ROOT).format(new Date()));
             if (!dir.mkdirs() && !dir.isDirectory()) return;
             StringBuilder running = new StringBuilder("start=" + System.currentTimeMillis() + "\ngame=" + shortcut.name + "\n"
-                    + "shortcut=" + shortcut.file.getPath() + "\ncontainer=" + shortcut.container.id + "\n");
+                    + "shortcut=" + shortcut.file.getPath() + "\ncontainer=" + shortcut.container.id + "\n"
+                    + "winever=" + shortcut.container.getWineVersion() + "\n"); // Proton 9 or 10 (AgvnWine10)
             for (File f : AgvnEngineLogs.of(shortcut)) running.append("log=").append(f.getPath()).append('\n');
             for (File f : AgvnEngineLogs.scanned(shortcut)) running.append("logscan=").append(f.getPath()).append('\n');
             write(new File(dir, RUNNING), running.toString(), false);
@@ -172,6 +173,7 @@ public final class AgvnSessionLog {
                 + "Kết thúc (ghi lúc): " + fmt.format(new Date()) + "\n"
                 + "Cách kết thúc: " + how + "\n"
                 + "App: " + AgvnUpdater.installedName(context) + " (" + AgvnUpdater.installedCode(context) + ")\n"
+                + "Wine: " + (text(notes, "winever").isEmpty() ? "?" : text(notes, "winever")) + "\n"
                 + "Máy: " + Build.MANUFACTURER + " " + Build.MODEL + ", Android " + Build.VERSION.RELEASE + "\n"
                 + "Nhật ký engine đã chép: " + copied + " file" + (old.isEmpty() ? "" : "; bỏ qua: " + old) + "\n"
                 + "RAM: " + (new File(dir, RAM).isFile() ? read(new File(dir, RAM)).trim() : "không đo") + "\n"
