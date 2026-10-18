@@ -665,3 +665,40 @@ Báo cáo ngày 19/10/2026: một game RPG Maker MV có bộ chạy NW.js riêng
   1. Game MV có `<game>/lng.txt` và `www/js/rpg_managers.js` đọc nó ở dòng đầu: vào được màn tiêu đề.
   2. Chọn ngôn ngữ khác trong game (game ghi lại `lng.txt` rồi tự mở lại), thoát, mở lại: vẫn ngôn ngữ vừa chọn.
   3. Hồi quy: một game MV và một game MZ khác vẫn chạy và lưu save như trước (`www/save/`, `save/`).
+
+## Game Ren'Py có Live2D văng ngay khi mở (bản 0.1.56)
+
+Báo cáo ngày 19/10/2026 (POCO F8 Pro, Android 16, Adreno 830): mọi game Ren'Py dựng mô hình Live2D lúc khởi động
+(`image … = Live2D(…)` trong khối init) đều văng sau màn tải, 4/4 lần. Tiến trình `:renpy` chết vì `SIGSEGV`, khung
+trên cùng `pc 00000000`. Không có `traceback.txt`. `faulthandler` chỉ ra `renpy/gl2/live2d.py`, dòng 288, lúc dựng mô
+hình.
+
+- **Vì sao:** lỗi của chính Ren'Py 8.5.3, đọc từ mã nguồn trong SDK đã ghim:
+  - App không có `libLive2DCubismCore.so` (Live2D Cubism Core), nên `live2dmodel.load()` trả False.
+  - `onetime_init()` (`live2d.py`, dòng 82–89) bắt lỗi "Could not load Live2D", thêm một ghi chú rồi bỏ qua, không ném
+    lại. Ren'Py coi như Live2D đã sẵn sàng.
+  - `load()` (`live2dcsm.pxi`) đặt `did_load = True` trước khi nạp, nên từ lần gọi thứ hai luôn trả True.
+  - Vì vậy `renpy.has_live2d()` báo True, và mô hình đầu tiên gọi một hàm `csm…` chưa nạp (con trỏ NULL).
+- **Sửa (`main.py`, `check_live2d`):**
+  - Khi Ren'Py nạp `renpy.gl2.live2d`, kể cả khi nạp lại game, app giữ kết quả lần đầu của `load()`. Nếu nạp thất bại
+    thì `onetime_init()` ném lỗi, đúng ý Ren'Py.
+  - `has_live2d()` báo False. Game nào có nhánh không dùng Live2D thì chạy tiếp.
+  - Game dựng Live2D bất chấp thì dừng ở màn lỗi của Ren'Py, với câu "Game cần Live2D, mà bản Chạy nhẹ của AGVN Player
+    không có thư viện Live2D Cubism Core…". Hộp "Game chưa mở được" hoặc "Tự sửa lỗi" có nút "Chạy bằng Windows". Bản
+    Windows của game có sẵn `Live2DCubismCore.dll`: launcher của Ren'Py chép nó vào `lib/py3-windows-x86_64/` của mọi
+    bản dựng (`launcher/game/install.rpy`).
+  - Khi có thư viện thì không đổi gì.
+- **Vì sao không kèm Cubism Core:** Cubism Core là phần mềm đóng của Live2D Inc. Muốn tải phải đồng ý giấy phép của
+  hãng, và phát hành kèm thì theo điều khoản riêng của Live2D. Kèm nó vào app hay không là quyết định của anh Sơn.
+- **`faulthandler.txt`:** `main.py` bật `faulthandler` của Python, ghi vào `AGVN-Player/renpy/<thư mục game>/`, cạnh
+  `log.txt`. Tệp trống, trừ khi game văng vì lỗi mã máy: khi đó tệp có các dòng Python dẫn tới chỗ văng. "Gửi nhật ký"
+  gửi kèm tệp khi nó có nội dung (`AgvnLiveLogs`).
+- **Test (trên PC):** `python3 scripts/agvn/renpy/test-main.py` chạy `main.py` với một gói `renpy` giả, giữ đúng các
+  hàm Live2D của Ren'Py 8.5.3. Không có thư viện: `has_live2d()` là False, mô hình bị từ chối kèm câu trên, kể cả sau
+  khi nạp lại, và `faulthandler.txt` có, trống. Có thư viện: mô hình được dựng. Bỏ bản vá thì bộ kiểm báo lỗi:
+  `has_live2d()` là True và mô hình được dựng, tức là văng trên máy.
+- **Thử máy:**
+  1. Game Ren'Py có `Live2D(…)` lúc init, mở bằng "Chạy nhẹ": không văng. Hiện màn lỗi Ren'Py, hoặc hộp "Game chưa
+     mở được", với câu về Live2D. Bấm "Chạy bằng Windows": game chạy, Live2D chuyển động.
+  2. Game Ren'Py có nhánh `if renpy.has_live2d():`: vào được game bằng "Chạy nhẹ", không có Live2D.
+  3. Hồi quy: game Ren'Py không dùng Live2D chạy như trước. `AGVN-Player/renpy/<game>/faulthandler.txt` có và trống.

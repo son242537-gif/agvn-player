@@ -65,6 +65,8 @@ final class AgvnLiveLogs {
         File renpyLogs = AgvnRenpyGame.publicDir(AgvnSessionLog.root().getParentFile(), gameDir);
         List<File> files = new ArrayList<>();
         for (String name : new String[]{"log.txt", "traceback.txt", "errors.txt"}) files.add(new File(renpyLogs, name));
+        File fault = new File(renpyLogs, "faulthandler.txt"); // main.py: the Python lines of a native crash, else empty
+        if (fault.length() > 0) files.add(fault);
         File renpy = new File(into, RENPY);
         if (renpy.mkdirs()) AgvnEngineLogs.copy(files, renpy, 0);
         File godotLog = new File(AgvnGodotLight.publicDir(AgvnSessionLog.root().getParentFile(), gameDir), "godot.log");
