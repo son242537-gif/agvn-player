@@ -80,13 +80,15 @@ public class AgvnRgssConfigTest {
 
     @Test
     public void filesLogGoesWithItsOwnGameOnlyAndOnlyWithALine() {
-        File game = new File("/storage/emulated/0/AGVN-Player/games/Song Tu");
+        File games = new File("AGVN-Player", "games");
+        File game = new File(games, "Song Tu"); // the platform's separator: the release script tests on Windows
         String header = AgvnRgssConfig.filesHeader(game);
-        assertEquals("game=/storage/emulated/0/AGVN-Player/games/Song Tu\n", header);
+        assertEquals("game=" + game.getPath() + "\n", header);
+        assertTrue(header.endsWith("games" + File.separator + "Song Tu\n"));
         String line = header + "Không có: game hỏi \"Audio/BGM/bgmテスト\" <30C6 30B9 30C8>\n";
         assertEquals(line, AgvnRgssConfig.filesLogOf(line, game));
         assertEquals("nothing found or missing yet", null, AgvnRgssConfig.filesLogOf(header, game));
-        assertEquals("another game's", null, AgvnRgssConfig.filesLogOf(line, new File("/storage/emulated/0/AGVN-Player/games/Song")));
+        assertEquals("another game's", null, AgvnRgssConfig.filesLogOf(line, new File(games, "Song")));
         assertEquals("no log", null, AgvnRgssConfig.filesLogOf("", game));
         assertEquals(null, AgvnRgssConfig.filesLogOf(null, game));
     }
