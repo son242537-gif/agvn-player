@@ -40,7 +40,22 @@ final class AgvnEngineLogs {
 
     /** The log files the shortcut's game engine may write. */
     static List<File> of(Shortcut shortcut) {
-        return candidates(exe(shortcut), gameDir(shortcut), shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE), profile(shortcut));
+        return candidates(exe(shortcut), gameDir(shortcut), engine(shortcut), profile(shortcut));
+    }
+
+    /**
+     * The engine the game was added with, else the one its exe's folder shows: a game given a shortcut some other way
+     * than "Thêm game" has none stored, and its Unity Player.log went unread (Female Anchor Next Door, 19/10/2026).
+     */
+    static String engine(Shortcut shortcut) {
+        return engine(shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE), exe(shortcut).getParentFile());
+    }
+
+    /** {@code stored}, else the engine {@code exeDir} shows; "" when neither says. */
+    static String engine(String stored, File exeDir) {
+        if (stored != null && !stored.isEmpty()) return stored;
+        GameExeResolver.Engine found = exeDir != null ? GameExeResolver.detectEngine(exeDir) : GameExeResolver.Engine.UNKNOWN;
+        return found == GameExeResolver.Engine.UNKNOWN ? "" : found.name();
     }
 
     /** The game's exe as a file on the phone: the 64-bit one it starts instead, if any ({@link AgvnExe64}). */

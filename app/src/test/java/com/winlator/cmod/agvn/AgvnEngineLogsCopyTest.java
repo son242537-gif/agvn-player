@@ -64,4 +64,14 @@ public class AgvnEngineLogsCopyTest {
         assertTrue(recent.exists());
         assertTrue(sessions.isDirectory());
     }
+
+    @Test
+    public void aGameWithoutAStoredEngineGetsTheOneItsFolderShows() throws Exception {
+        File unity = tmp.newFolder("unity"), plain = tmp.newFolder("plain");
+        file(unity, "UnityPlayer.dll");
+        assertEquals("UNITY", AgvnEngineLogs.engine("", unity));
+        assertEquals("stored first", "RENPY", AgvnEngineLogs.engine("RENPY", unity));
+        assertEquals("", AgvnEngineLogs.engine("", plain));
+        assertEquals("", AgvnEngineLogs.engine(null, null));
+    }
 }

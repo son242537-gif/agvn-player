@@ -58,7 +58,7 @@ public final class AgvnUnityCrashWatch {
     /** Watches the game of {@code activity} when it is a Unity game; call before Wine starts it. */
     public static void start(XServerDisplayActivity activity) {
         Shortcut s = activity.agvnShortcut();
-        if (s == null || !"UNITY".equals(s.getExtra(AgvnGameImporter.EXTRA_ENGINE))) return;
+        if (s == null || !"UNITY".equals(AgvnEngineLogs.engine(s))) return;
         AgvnUnityCrashWatch watch = new AgvnUnityCrashWatch(activity, s);
         if (watch.logs.isEmpty()) return;
         watch.timer.scheduleWithFixedDelay(watch::poll, POLL_MS, POLL_MS, TimeUnit.MILLISECONDS);

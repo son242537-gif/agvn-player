@@ -1705,3 +1705,30 @@ driver System Vulkan 1.1; Proton 9; bản 0.1.54; 19/10/2026): năm lần mở, 
   1. The Clumsy Witch Seris trên vivo V2160 (bản 0.1.55, `auto`): "Gửi nhật ký" có `wine-cuoi.txt` với các dòng
      `[error]: …` của wrapper.
   2. Hồi quy: một game chạy tốt không có dòng `[error]:` nào trong `wine-cuoi.txt`, FPS như cũ.
+
+## Bấm không ăn trong game Unity: nhật ký nói cú bấm đi đường nào (bản 0.1.55)
+
+Nhật ký Female Anchor Next Door (Unity IL2CPP 64-bit, gói GameHub có `agvncheat.dll`; itel S666LN, Helio G99 MT6789,
+Mali-G57 MC2; chuột Bluetooth "BT5.2 Mouse"; bản 0.1.54; 19/10/2026): "click không ăn". Ba phiên, game vẽ bình thường
+(cửa sổ DXVK 818×395). Lúc mở có 43 giây đứng hình (game nạp).
+
+- **Nhật ký không đủ để biết vì sao:**
+  - App bật "Chạm gửi như chuột thật, có raw input" (game dùng Unity Input System): chạm và chuột đi qua
+    `agvn-winhandler.exe` (SendInput), vì Input System chỉ đọc chuột từ raw input. Khi `agvn-winhandler.exe` chưa báo sẵn
+    sàng, khi chuột tương đối hay "Tắt chuột" đang bật, cú bấm đi bằng sự kiện X, và game không thấy. Nhật ký chỉ có dòng
+    "Chuột BT5.2 Mouse: app nhận cú bấm (app đang giữ chuột)", không nói cú bấm đi đường nào.
+  - Game được thêm bằng lối tắt riêng, không qua "Thêm game", nên app không lưu engine ("engine chưa rõ"). Vì vậy
+    `Player.log` của Unity không được lấy. Đây là nơi Unity ghi lỗi khi một cú bấm tới được game mà nút không chạy.
+- **Từ bản 0.1.55:**
+  - `su-kien.txt` ghi cú bấm đầu tiên của mỗi phiên (chạm hay chuột): "Cú bấm đầu tiên tới game qua agvn-winhandler.exe
+    (raw input)", hoặc "Cú bấm đầu tiên đi bằng sự kiện X, không có raw input: …" kèm lý do (`agvn-winhandler.exe` chưa
+    báo sẵn sàng, chuột tương đối, "Tắt chuột"). Chỉ khi chế độ raw input đang bật cho game.
+  - Game chưa lưu engine thì app lấy engine theo thư mục của file chạy (`GameExeResolver.detectEngine`) để chép nhật ký
+    engine (`Player.log` của Unity...) và để theo dõi crash của Unity. `su-kien.txt` ghi "Engine theo thư mục game: …".
+    Các cài đặt khác theo engine (chất lượng Unity, giảm RAM) vẫn chỉ áp dụng cho game thêm qua "Thêm game".
+- **Test:** `AgvnEngineLogsCopyTest.aGameWithoutAStoredEngineGetsTheOneItsFolderShows`.
+- **Thử máy:**
+  1. Female Anchor Next Door (bản 0.1.55): bấm vài lần ở màn đầu bằng chạm và bằng chuột, rồi "Gửi nhật ký". Nhật ký có
+     dòng "Cú bấm đầu tiên …" và `Player.log` của game.
+  2. Hồi quy: game Unity đã chạy tốt (như Open At Nine) vẫn nhận chạm như trước; nhật ký ghi "qua agvn-winhandler.exe
+     (raw input)".

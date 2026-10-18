@@ -38,6 +38,7 @@ public final class AgvnRawMouse {
     private final XServer xServer;
     private volatile boolean enabled;
     private int rawHeld; // buttons pressed through agvn-winhandler.exe
+    private boolean told; // the session's events say how the first press went
 
     public AgvnRawMouse(XServer xServer) {
         this.xServer = xServer;
@@ -133,12 +134,28 @@ public final class AgvnRawMouse {
         }
         WinHandler winHandler = ready();
         int flags = MouseEventFlags.getFlagFor(button, true);
+        if (!wheel && flags != 0) tell(winHandler != null);
         if (winHandler == null || flags == 0) return false; // sideways wheel clicks stay X events
         int step = !wheel ? 0 : button == Pointer.Button.BUTTON_SCROLL_UP ? WHEEL_STEP : -WHEEL_STEP;
         winHandler.agvnPointer(flags, pointer.getX(), pointer.getY(), step);
         rawHeld |= bit;
         pointer.getButtonMask().set(button.flag(), true); // what the touch code asks: held or not
         return true;
+    }
+
+    /**
+     * The first press of the session, in su-kien.txt: as raw input, or as an X event and why, which a Unity game with
+     * the Input System does not see (Female Anchor Next Door, 19/10/2026: "click không ăn", and the log could not say).
+     */
+    private void tell(boolean raw) {
+        if (!enabled || told) return;
+        told = true;
+        WinHandler winHandler = xServer.getWinHandler();
+        String why = xServer.isRelativeMouseMovement() ? "chuột tương đối đang bật"
+                : xServer.isMouseDisabled() ? "\"Tắt chuột\" đang bật"
+                : winHandler == null || !winHandler.agvnPointerReady() ? EXE + " chưa báo sẵn sàng" : "";
+        AgvnSessionLog.event(raw ? "Cú bấm đầu tiên tới game qua " + EXE + " (raw input)"
+                : "Cú bấm đầu tiên đi bằng sự kiện X, không có raw input: " + why);
     }
 
     /** agvn-winhandler.exe when this game takes touches through it now; null for X events. */

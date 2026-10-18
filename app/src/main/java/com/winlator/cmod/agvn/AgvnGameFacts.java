@@ -27,8 +27,12 @@ final class AgvnGameFacts {
     private AgvnGameFacts() {}
 
     static List<String> of(Shortcut s) {
-        List<String> facts = facts(AgvnEngineLogs.exe(s), s.getExtra(AgvnGameImporter.EXTRA_ENGINE));
+        String stored = s.getExtra(AgvnGameImporter.EXTRA_ENGINE), engine = AgvnEngineLogs.engine(s);
+        List<String> facts = facts(AgvnEngineLogs.exe(s), stored);
         facts.add(1, exeLine(s.path, AgvnExeRedirect.toUnixPath(s.path, s.container)));
+        if (stored.isEmpty() && !engine.isEmpty()) {
+            facts.add(2, "Engine theo thư mục game: " + engine + " (game không thêm qua \"Thêm game\" nên app chưa lưu engine)");
+        }
         return facts;
     }
 
