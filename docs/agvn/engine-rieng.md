@@ -522,7 +522,7 @@ Anh Sơn báo lại ngày 09/10/2026: chỉnh bộ phím ở màn "Điều khi�
   2. Game "Chạy nhẹ" đã có bộ phím riêng (✎) làm từ hồ sơ X. Sửa X ở màn "Điều khiển", mở game: thấy X vừa sửa. ✎ sửa
      thêm trong game, mở lại: thấy bộ vừa sửa trong game.
 
-## Bộ phím ảo của mỗi game: Sửa, Lưu, Tải (bản 0.1.55)
+## Bộ phím ảo của mỗi game: Sửa, Lưu, Tải (bản 0.1.56)
 
 Anh Sơn báo ngày 19/10/2026: chỉnh bộ phím ở ngoài, vào game không chọn được bộ đó, hoặc mất luôn bộ đã chỉnh. Anh muốn
 mỗi game có chỗ đặt phím ảo và chỗ tải: "set - lưu - tải".
