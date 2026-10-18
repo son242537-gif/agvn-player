@@ -4,6 +4,8 @@ package com.winlator.cmod.agvn;
 import android.content.Context;
 import android.util.Log;
 
+import com.winlator.cmod.core.FileUtils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,7 +37,8 @@ final class AgvnLiveLogs {
      * Fills {@code into}: "&lt;session&gt;/" for each running session, "app/logcat.txt", "app/thiet-bi.txt", the last
      * "Chạy nhẹ" game as {@link AgvnLightSession} keeps it ("app/chay-nhe.txt": its error, the pictures shown empty,
      * an HTML page's first messages and the files it did not find, which a busy logcat loses and a HONOR phone sends
-     * encrypted), the last run of {@code gameName} that has ended ("app/chay-nhe-lan-truoc.txt"), and "renpy/" and
+     * encrypted), the last run of {@code gameName} that has ended ("app/chay-nhe-lan-truoc.txt"), the RPG Maker files
+     * of {@code gameDir} mkxp-z found under another spelling or did not find ("app/tim-tep.txt"), and "renpy/" and
      * "godot/" for {@code gameDir}.
      */
     static void collect(Context context, File[] sessions, String gameName, File gameDir, File into) {
@@ -54,6 +57,9 @@ final class AgvnLiveLogs {
             if (light.isFile()) copy(light, new File(app, LIGHT));
             File last = AgvnLightSession.lastFile(context);
             if (gameName != null && gameName.equals(AgvnLightSession.nameIn(last))) copy(last, new File(app, LIGHT_LAST));
+            File rgssFiles = new File(new File(context.getFilesDir(), AgvnRgssFiles.RUN_DIR), AgvnRgssFiles.FILES_LOG);
+            String files = gameDir != null ? AgvnRgssConfig.filesLogOf(FileUtils.readString(rgssFiles), gameDir) : null;
+            if (files != null) write(new File(app, AgvnRgssFiles.FILES_LOG), files);
         }
         if (gameDir == null) return;
         File renpyLogs = AgvnRenpyGame.publicDir(AgvnSessionLog.root().getParentFile(), gameDir);

@@ -54,6 +54,9 @@ Anh Sơn quyết định ngày 02/10/2026: app phát hành theo **GNU GPL phiên
     các thư viện khác. Danh sách và giấy phép đầy đủ: `app/src/main/assets/agvn/mkxp-z-license.txt`, tạo bởi
     `scripts/agvn/mkxp-z/licenses.sh`. Mã nguồn: https://github.com/mkxp-z/mkxp-z; bản vá và script dựng cho Android:
     `scripts/agvn/mkxp-z`.
+  - Hai file của Ruby 3.1.3 cho `String#unicode_normalize` (`assets/agvn/mkxp-z/ruby/unicode_normalize/normalize.rb` và
+    `tables.rb`, từ bản 0.1.53): giấy phép Ruby, như Ruby trong `libmkxp-z.so`; nguyên văn giấy phép có trong
+    `mkxp-z-license.txt`. Xem `scripts/agvn/mkxp-z/README.md`.
 
 ## Vì sao chuyển sang GPL
 

@@ -28,7 +28,10 @@ final class AgvnRgssFailure {
         return context.getString(R.string.agvn_rgss_failed_message) + "\n\n" + first;
     }
 
-    /** Keeps the error where "Gửi nhật ký" in the game's ⋮ menu finds it: a session folder of AGVN-Player/logs/<game>. */
+    /**
+     * Keeps the error where "Gửi nhật ký" in the game's ⋮ menu finds it: a session folder of AGVN-Player/logs/<game>,
+     * with the files agvn_files.rb found under another spelling or did not find (AgvnRgssFiles.FILES_LOG).
+     */
     static void saveLog(String gameName, String error, AgvnRgssConfig config) {
         File dir = new File(new File(AgvnSessionLog.root(), AgvnLogFolders.safeName(gameName)),
                 new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.ROOT).format(new Date()));
@@ -36,5 +39,8 @@ final class AgvnRgssFailure {
         FileUtils.writeString(new File(dir, AgvnSessionLog.SUMMARY), "runner=rgss (mkxp-z)\nrgss=" + config.rgss + "\ngame="
                 + config.gameDir + "\nrtp=" + config.rtpDirs + "\nmissingRtp=" + config.missingRtp + "\nend=error\n");
         FileUtils.writeString(new File(dir, "loi-game.txt"), error);
+        String files = config.filesLog != null
+                ? AgvnRgssConfig.filesLogOf(FileUtils.readString(config.filesLog), config.gameDir) : null;
+        if (files != null) FileUtils.writeString(new File(dir, AgvnRgssFiles.FILES_LOG), files);
     }
 }

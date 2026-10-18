@@ -79,6 +79,19 @@ public class AgvnRgssConfigTest {
     }
 
     @Test
+    public void filesLogGoesWithItsOwnGameOnlyAndOnlyWithALine() {
+        File game = new File("/storage/emulated/0/AGVN-Player/games/Song Tu");
+        String header = AgvnRgssConfig.filesHeader(game);
+        assertEquals("game=/storage/emulated/0/AGVN-Player/games/Song Tu\n", header);
+        String line = header + "Không có: game hỏi \"Audio/BGM/bgmテスト\" <30C6 30B9 30C8>\n";
+        assertEquals(line, AgvnRgssConfig.filesLogOf(line, game));
+        assertEquals("nothing found or missing yet", null, AgvnRgssConfig.filesLogOf(header, game));
+        assertEquals("another game's", null, AgvnRgssConfig.filesLogOf(line, new File("/storage/emulated/0/AGVN-Player/games/Song")));
+        assertEquals("no log", null, AgvnRgssConfig.filesLogOf("", game));
+        assertEquals(null, AgvnRgssConfig.filesLogOf(null, game));
+    }
+
+    @Test
     public void quoteEscapesWhatJsonNeedsAndKeepsLetters() {
         assertEquals("\"a\\\"b\\\\c\\u000ad ạ ゲーム\"", AgvnRgssConfig.quote("a\"b\\c\nd ạ ゲーム"));
     }

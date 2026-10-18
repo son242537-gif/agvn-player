@@ -22,6 +22,8 @@ final class AgvnRgssConfig {
     final List<String> missingRtp = new ArrayList<>();
     /** The picture stretched over the whole screen ("Toàn màn hình cho mọi game", {@link AgvnFullscreen}). */
     boolean stretch;
+    /** agvn_files.rb's log (AgvnRgssFiles.FILES_LOG), which AgvnRgssFiles.prepare starts with {@link #filesHeader}. */
+    File filesLog;
 
     AgvnRgssConfig(File gameDir, File agvnDir, File driveC) {
         this.gameDir = gameDir;
@@ -57,6 +59,17 @@ final class AgvnRgssConfig {
         field(sb, "RTP", array(rtpDirs));
         sb.append("  \"preloadScript\": ").append(array(preloadScripts)).append("\n}\n");
         return sb.toString();
+    }
+
+    /** The first line of agvn_files.rb's log: the game it is of. */
+    static String filesHeader(File gameDir) {
+        return "game=" + gameDir.getPath() + "\n";
+    }
+
+    /** agvn_files.rb's log when it is {@code gameDir}'s and has a line after its first, else null. */
+    static String filesLogOf(String text, File gameDir) {
+        String header = filesHeader(gameDir);
+        return text != null && text.startsWith(header) && text.length() > header.length() ? text : null;
     }
 
     private static void field(StringBuilder sb, String key, String value) {

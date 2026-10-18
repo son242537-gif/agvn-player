@@ -17,21 +17,34 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Starts an RPG Maker XP/VX/VX Ace game on "Chạy nhẹ" and lays out what mkxp-z reads before it: mkxp.json, mkxp-z's
- * preload scripts (assets/agvn/mkxp-z, CC0) and the app's MIDI sound font, in files/rgss (SRCDIR).
+ * preload scripts (assets/agvn/mkxp-z, CC0), AGVN's, the Ruby files they need and the app's MIDI sound font, in
+ * files/rgss (SRCDIR).
  */
 final class AgvnRgssFiles {
     private static final String TAG = "AGVN";
+    /** files/rgss: what mkxp-z reads (SRCDIR) and what it writes for the app. */
+    static final String RUN_DIR = "rgss";
     /**
      * The preload scripts: mkxp-z's own (Ruby 1.8/1.9 names RGSS scripts use, mkxp names, Win32API stand-ins), then
-     * AGVN's agvn_fps.rb, which reports the frames the game runs per second (the HUD, "Tự sửa lỗi").
+     * AGVN's: agvn_files.rb, which opens a game's file whose name the phone writes otherwise, and agvn_fps.rb, which
+     * reports the frames the game runs per second (the HUD, "Tự sửa lỗi").
      */
-    static final String[] PRELOAD = {"ruby_classic_wrap.rb", "mkxp_wrap.rb", "win32_wrap.rb", "agvn_fps.rb"};
+    static final String[] PRELOAD = {"ruby_classic_wrap.rb", "mkxp_wrap.rb", "win32_wrap.rb", "agvn_files.rb",
+            "agvn_fps.rb"};
+    /** Ruby 3.1.3's own String#unicode_normalize (Ruby License), for agvn_files.rb: mkxp-z carries no Ruby library. */
+    static final String[] RUBY_LIB = {"unicode_normalize/normalize.rb", "unicode_normalize/tables.rb"};
+    /**
+     * agvn_files.rb's log (AGVN_RGSS_FILES_LOG): the game's files it found under the phone's spelling, and those the
+     * game's folder lacks. Its first line names the game, so "Gửi nhật ký" sends it with that game only.
+     */
+    static final String FILES_LOG = "tim-tep.txt";
     /** The game's own "skip frames when behind" ("Tự sửa lỗi" turns it on where the phone's tier did not). */
     static final String EXTRA_FRAME_SKIP = "agvnRgssFrameSkip";
     static final String SOUND_FONT = "soundfonts/wt_210k_G.sf2";
@@ -77,9 +90,16 @@ final class AgvnRgssFiles {
             if (!runDir.isDirectory() && !runDir.mkdirs()) throw new IOException("cannot create " + runDir);
             List<File> preload = new ArrayList<>();
             for (String name : PRELOAD) preload.add(copyAsset(context, "agvn/mkxp-z/" + name, new File(runDir, name), false));
+            for (String name : RUBY_LIB) {
+                File target = new File(runDir, "ruby/" + name), dir = target.getParentFile();
+                if (!dir.isDirectory() && !dir.mkdirs()) throw new IOException("cannot create " + dir);
+                copyAsset(context, "agvn/mkxp-z/ruby/" + name, target, false);
+            }
             File soundFont = copyAsset(context, SOUND_FONT, new File(runDir, new File(SOUND_FONT).getName()), true);
             AgvnRgssConfig config = new AgvnRgssConfig(gameDir, new File(SettingsFragment.DEFAULT_WINLATOR_PATH), driveC);
             config.stretch = stretch;
+            config.filesLog = new File(runDir, FILES_LOG);
+            Files.write(config.filesLog.toPath(), AgvnRgssConfig.filesHeader(gameDir).getBytes(StandardCharsets.UTF_8));
             try (OutputStream out = new FileOutputStream(new File(runDir, "mkxp.json"))) {
                 // weak and mid phones skip drawing a frame when they fall behind, rather than slowing the game down
                 boolean frameSkip = forceFrameSkip || DeviceTierManager.current(context) != DeviceTier.FLAGSHIP;

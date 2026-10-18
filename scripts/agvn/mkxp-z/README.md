@@ -10,6 +10,18 @@ Script còn chép ra hai thứ:
 - `app/src/main/assets/agvn/mkxp-z-license.txt`: giấy phép của mkxp-z và mọi thư viện nằm trong `libmkxp-z.so`. Màn
   "Giấy phép mã nguồn mở" hiện nguyên văn file này ở cuối trang.
 
+Cùng thư mục `assets/agvn/mkxp-z` còn có phần của AGVN, script này không chép và không xoá:
+- `agvn_files.rb` (từ bản 0.1.53): mở file của game khi tên file trên điện thoại viết khác tên game hỏi (dạng Unicode
+  NFC/NFD, hoa thường của chữ ngoài A–Z, dấu Nhật kiểu Shift_JIS/CP932). Ghi `tim-tep.txt`. Xem `docs/agvn/tu-sua-loi.md`,
+  "Game RPG Maker dừng ở màn tiêu đề: tên file viết khác trên điện thoại". Kiểm trên PC:
+  `ruby scripts/agvn/mkxp-z/test-agvn-files.rb` (Ruby 3.1 trở lên).
+- `ruby/unicode_normalize/normalize.rb` và `tables.rb`: nguyên văn từ Ruby 3.1.3 (thẻ `v3_1_3`, commit `1a6b1675`;
+  giấy phép Ruby, có trong `mkxp-z-license.txt`). `String#unicode_normalize` của Ruby nạp chúng khi cần; mkxp-z không
+  mang thư viện Ruby nào. SHA-256:
+  - `normalize.rb`: `089c87f05934646902828f97385aa7843a4a79e6863d90a66033fdac3b1bc4a1`
+  - `tables.rb`: `a19a5ccdc58df5ac5c21cb2068513c7c6772fd2dfcc6c2dcc06d8cb415a802eb`
+- `agvn_fps.rb`: báo số khung hình mỗi giây của game cho HUD và "Tự sửa lỗi".
+
 ## Nguồn và cách kiểm chứng (ai cũng làm lại được)
 
 | Thành phần | Nguồn | Kiểm chứng |
@@ -77,4 +89,4 @@ app kiểm SHA-256 này, nên phải commit thư viện và `pins.txt` cùng lú
   `Fonts/` thì dùng font của game.
 - **Nhạc MIDI:** FluidSynth với sound font `soundfonts/wt_210k_G.sf2` có sẵn trong app.
 - **Nhật ký:** `adb logcat -s mkxp SDL AGVN`. Lỗi làm game dừng còn được lưu vào `AGVN-Player/logs/<tên game>/<giờ>/`
-  (`loi-game.txt`, `tom-tat.txt`), để "Gửi nhật ký" gửi kèm.
+  (`loi-game.txt`, `tom-tat.txt`, và `tim-tep.txt` khi `agvn_files.rb` có ghi), để "Gửi nhật ký" gửi kèm.

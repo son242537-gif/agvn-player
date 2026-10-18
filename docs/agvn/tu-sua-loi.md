@@ -1546,7 +1546,7 @@ riêng, nên nhật ký Wine là tất cả những gì app có.
 
 - Backtrace của lỗi: `rpcrt4.dll` (phần gọi dịch vụ, RPC) ← `sechost.dll` (`OpenSCManagerW`, mở trình quản lý dịch
   vụ của Windows) ← `ThreeGals-Win64-Shipping.exe`. Lỗi nằm trong Wine chứ không phải trong game.
-- Game chạy trên Proton 10 (bản arm64ec): app 0.1.42 thêm game mới vào Proton 10. Từ 0.1.47 game mới vào Proton 9. Ở
+- Game chạy trên Proton 10 (bản arm64ec): app 0.1.42 thêm game mới vào Proton 10. Từ 0.1.45 game mới vào Proton 9. Ở
   Proton 9, `NdrClientCall2` (phần đóng gói lời gọi RPC) là mã x64 chạy qua bộ giả lập; ở Proton 10 nó là mã ARM64EC,
   nên lời gọi đi theo đường khác.
 - **Lỗi mới `wine-rpc-crash`:** dòng backtrace có `L"rpcrt4.dll"`. `"when": []`, nên app tìm cả khi game đứng màn hình
@@ -1559,3 +1559,70 @@ riêng, nên nhật ký Wine là tất cả những gì app có.
      "Wine bị lỗi khi game gọi dịch vụ của Windows", cách đầu tiên là "Chạy bằng Wine cũ (Proton 9)". Chọn xong, game
      qua được cảnh đầu và nhật ký không còn backtrace `rpcrt4.dll`. Nếu vẫn lỗi trên Proton 9, gửi nhật ký mới.
   2. Hồi quy: một game Unreal và một game Unity đang chạy tốt không bị hỏi gì sau khi chơi.
+
+## Game RPG Maker dừng ở màn tiêu đề: tên file viết khác trên điện thoại (bản 0.1.53)
+
+Báo cáo ngày 18/10/2026 (`BAO-CAO-LOI-AGVN-PLAYER-RGSS.md`: một game RPG Maker VX Ace có kèm RTP, Android 16, Mali-G57,
+mức máy YEU, bản 0.1.52). Ở "Chạy nhẹ", logo chạy xong, vào màn tiêu đề thì game dừng:
+
+```
+Script '<script âm lượng>' line N: Errno::ENOENT occurred.
+No such file or directory - Audio/BGM/bgm<6 chữ Nhật>
+  ... in `bgm_play': No such file or directory - Audio/BGM/bgm������������������ (Errno::ENOENT)
+  from Scene_Title:133:in `play_title_music'
+```
+
+Người báo đã kiểm trên PC và trong file zip chép sang máy: file có thật, tên trong dữ liệu game (`System.rvdata2`) khớp
+từng byte với tên file, dạng NFC. Trên Windows game chạy bình thường.
+
+- **mkxp-z tìm file thế nào:** lúc mở game, mkxp-z ghi lại tên mọi file trong thư mục game
+  (`FileSystem::createPathCache`): chữ A–Z hạ thành chữ thường, mọi byte khác giữ nguyên. Khi game hỏi một file,
+  mkxp-z cũng chỉ hạ A–Z ở tên đó rồi so với danh sách theo từng byte (`openRead`). Vậy tên trên máy phải giống từng byte
+  tên game hỏi, chỉ trừ hoa thường của A–Z. Tên đi thẳng từ Ruby tới PhysFS, không qua JNI hay bảng mã nào.
+- **Đã thử:** dựng lại đúng đoạn tìm file này của mkxp-z với PhysFS 3.2.0 cho Android arm64 (NDK 29, chạy bằng qemu).
+  Tên Nhật dạng NFC được tìm thấy. `ENOENT` chỉ xảy ra khi tên trên máy khác byte với tên game hỏi, ví dụ tên lưu dấu
+  tách rời khỏi chữ (NFD: `ガ` = `カ` + `゙`). Vậy nhiều khả năng tên file trên điện thoại khác tên trong dữ liệu game,
+  do công cụ chép hoặc giải nén. Nhật ký lần này không có tên file trên máy, nên chưa biết chắc.
+- **Dòng thứ hai đầy dấu `�`:** mkxp-z tạo câu lỗi dạng byte không mã (`ASCII-8BIT`). Khi ghép câu đó với dòng có tên
+  script tiếng Nhật, Ruby thay mỗi byte ngoài ASCII bằng một `�`. Tên game hỏi vẫn đúng: 18 byte là 6 chữ.
+- **Tên game hỏi và tên trên máy có thể khác nhau ở:**
+  - dấu và dấu kana viết tách (NFD) thay cho viết liền (NFC);
+  - hoa thường của chữ ngoài A–Z: Windows bỏ qua, mkxp-z thì không. Ví dụ chữ Latin có dấu, chữ toàn chiều rộng
+    `Ａ`/`ａ`, chữ Hy Lạp, chữ Nga;
+  - vài dấu tiếng Nhật mà bộ giải mã Shift_JIS và Windows (CP932) viết khác nhau: `〜`/`～`, `‖`/`∥`, `−`/`－`, `¢`/`￠`,
+    `£`/`￡`, `¬`/`￢`, `—`/`―`.
+- **Từ bản 0.1.53 (`agvn_files.rb`, script AGVN mà mkxp-z nạp trước game):** khi mkxp-z báo không có file ở
+  `Audio.bgm_play`, `bgs_play`, `me_play`, `se_play`, `Bitmap.new`, `Graphics.transition` hay `Graphics.play_movie`, app
+  tìm trong thư mục game, từng thư mục một, tên giống tên game hỏi sau khi bỏ ba khác biệt trên. Cách so: chuẩn hoá NFD,
+  hạ chữ theo Unicode, đưa các dấu Nhật về một kiểu. Tìm thấy thì app hỏi mkxp-z lại bằng tên trên máy. Kết quả được nhớ
+  trong lần chơi đó, nên file dùng nhiều (tiếng bấm nút) không phải tìm lại.
+  - Chuẩn hoá Unicode cần hai file của Ruby 3.1.3 (`lib/unicode_normalize/normalize.rb`, `tables.rb`; giấy phép Ruby).
+    mkxp-z không mang thư viện Ruby nào, nên app chép hai file này vào `files/rgss/ruby`. Thiếu chúng thì app vẫn tìm
+    được tên khác hoa thường hay khác dấu Nhật, và game vẫn mở như trước.
+  - Game không chậm thêm: chỉ khi mkxp-z không thấy file thì mới có bước tìm này.
+  - File không có thật thì game vẫn dừng với lỗi của chính nó. Hộp lỗi vẫn chỉ đúng dòng script của game, không chỉ
+    vào `agvn_files.rb`, và câu lỗi giữ nguyên chữ Nhật (UTF-8) thay vì một `�` cho mỗi byte.
+- **Nhật ký `tim-tep.txt`:** mỗi tên tìm ra theo cách trên ("Tìm ra: game hỏi …, trên máy là …") và mỗi file không có
+  ("Không có: game hỏi …; gần nhất trong <thư mục>: …", kèm 3 tên gần nhất) được ghi một lần. Chữ ngoài ASCII có kèm mã
+  Unicode (`<30AB 3099>`), tối đa 40 dòng mỗi lần chơi. Khi game dừng vì lỗi, file nằm trong thư mục phiên
+  (`AGVN-Player/logs/<game>/<giờ>/`). "Gửi nhật ký" cũng gửi kèm (`app/tim-tep.txt`) khi đó là game vừa chơi.
+- **Lỗi 2 của báo cáo ("Chạy bằng Windows" → hộp "No access to memory location."):** đây là lỗi `ERROR_NOACCESS` khi
+  `DllMain` của `RGSS301.dll` gặp lỗi truy cập bộ nhớ, như ca của bản 0.1.42 (xem "DLL ở bộ nhớ chung" ở trên). Ca đó
+  chạy Proton 10. Game thêm từ 0.1.45 vào Proton 9, nơi nguyên nhân đó không có. Nhật ký lần này không ghi bản Wine và
+  không bật nhật ký Wine, nên chưa biết nguyên nhân.
+  - Từ 0.1.53, `tom-tat.txt` của mỗi phiên Windows có dòng `Wine: …` (`proton-9.0-arm64ec` hoặc
+    `Proton-10.0-4-arm64ec-9`).
+  - Cần thêm: bật "Bật debug Wine", chạy game bằng Windows một lần, rồi "Gửi nhật ký".
+- **Test:**
+  - `scripts/agvn/mkxp-z/test-agvn-files.rb` (trên PC, Ruby 3.1 trở lên): tìm file như mkxp-z với tên NFD, chữ toàn chiều
+    rộng khác hoa thường, dấu `～`, thư mục tên Nhật, file thiếu thật, và khi không có thư viện chuẩn hoá;
+  - `AgvnRgssConfigTest.filesLogGoesWithItsOwnGameOnlyAndOnlyWithALine`.
+- **Thử máy:**
+  1. Game của báo cáo ở "Chạy nhẹ": vào màn tiêu đề và có nhạc. Nếu game vẫn dừng, gửi nhật ký: `tim-tep.txt` cho biết
+     tên file trên máy.
+  2. Một game VX Ace thử, có `Audio/BGM/bgmガイド.ogg` làm nhạc tiêu đề và `Graphics/Pictures/ゲーム.png`. Trên PC đổi tên
+     hai file sang NFD, rồi chép thư mục sang máy và chạy: có nhạc, có ảnh, `tim-tep.txt` có hai dòng "Tìm ra". Lệnh
+     PowerShell đổi tên trong thư mục game (file và thư mục sâu nhất trước):
+     `Get-ChildItem -Recurse | Sort-Object { $_.FullName.Length } -Descending | % { $n = $_.Name.Normalize([Text.NormalizationForm]::FormD); if ($n -ne $_.Name) { Rename-Item -LiteralPath $_.FullName -NewName $n } }`
+  3. Hồi quy: game RPG Maker tên file ASCII vẫn chạy như cũ, FPS không đổi, và "Gửi nhật ký" không có `tim-tep.txt`.
+  4. Một game Windows bất kỳ: `tom-tat.txt` của phiên có dòng `Wine: …` đúng với Wine của game.

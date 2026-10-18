@@ -44,7 +44,7 @@ public class AgvnRgssActivity extends SDLActivity {
     protected void onCreate(Bundle savedInstanceState) {
         String dir = getIntent().getStringExtra(EXTRA_GAME_DIR);
         String driveC = getIntent().getStringExtra(EXTRA_DRIVE_C);
-        File runDir = new File(getFilesDir(), "rgss");
+        File runDir = new File(getFilesDir(), AgvnRgssFiles.RUN_DIR);
         errorFile = new File(runDir, "error.txt");
         errorFile.delete();
         fpsFile = new File(runDir, "fps.txt");
@@ -61,6 +61,7 @@ public class AgvnRgssActivity extends SDLActivity {
         nativeSetenv("SRCDIR", runDir.getPath()); // mkxp-z reads mkxp.json there, then switches into the game folder
         nativeSetenv("AGVN_MKXPZ_ERROR_FILE", errorFile.getPath());
         nativeSetenv("AGVN_RGSS_FPS_FILE", fpsFile.getPath());
+        nativeSetenv("AGVN_RGSS_FILES_LOG", config.filesLog.getPath()); // agvn_files.rb
         AgvnLightSession.begin(this, AgvnHtmlGame.RUNNER_RGSS, config.gameDir); // "Tự sửa lỗi" reads how it ends
         tools = AgvnLightTools.attach(this, AgvnLayouts.RPG, getIntent().getStringExtra("shortcut_name"), config.gameDir, new Host());
         AgvnLightSession.started(this);
