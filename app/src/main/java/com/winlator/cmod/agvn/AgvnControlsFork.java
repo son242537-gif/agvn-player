@@ -102,7 +102,7 @@ public final class AgvnControlsFork {
     /**
      * The profile the editor may change for this game: {@code base} itself if it is the game's own copy, else a new
      * copy. The game's earlier copy stays a set of its own, loadable in every game ("Bộ phím ảo", AgvnKeySetDialog):
-     * it was written over, and players lost keys they had set up (18/10/2026). Either way the game uses it from now on.
+     * it was written over, and players lost keys they had set up (19/10/2026). Either way the game uses it from now on.
      */
     static ControlsProfile editable(XServerDisplayActivity activity, ControlsProfile base) {
         Shortcut shortcut = activity.agvnShortcut();

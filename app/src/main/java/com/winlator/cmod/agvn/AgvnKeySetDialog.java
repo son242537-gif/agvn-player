@@ -17,7 +17,7 @@ import java.util.List;
  * "Bộ phím ảo" of a game, from [🗂] on the bar of every game and the menu of a "Chạy nhẹ" game: Tải (tap a set in the
  * list: the game uses it now and at every start), Lưu (the keys on screen kept as a set with a name, listed in every
  * game, {@link AgvnKeySets}) and Sửa (the keys edited on the game screen). Players set keys up in a game's settings and
- * found them missing in the game, or lost them (18/10/2026). Android's own dialogs, as {@link AgvnLightKeyPicker}: the
+ * found them missing in the game, or lost them (19/10/2026). Android's own dialogs, as {@link AgvnLightKeyPicker}: the
  * Ren'Py and mkxp-z screens have no AppCompat theme. UI thread.
  */
 final class AgvnKeySetDialog {

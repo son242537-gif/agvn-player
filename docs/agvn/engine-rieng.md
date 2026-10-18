@@ -524,7 +524,7 @@ Anh Sơn báo lại ngày 09/10/2026: chỉnh bộ phím ở màn "Điều khi�
 
 ## Bộ phím ảo của mỗi game: Sửa, Lưu, Tải (bản 0.1.55)
 
-Anh Sơn báo ngày 18/10/2026: chỉnh bộ phím ở ngoài, vào game không chọn được bộ đó, hoặc mất luôn bộ đã chỉnh. Anh muốn
+Anh Sơn báo ngày 19/10/2026: chỉnh bộ phím ở ngoài, vào game không chọn được bộ đó, hoặc mất luôn bộ đã chỉnh. Anh muốn
 mỗi game có chỗ đặt phím ảo và chỗ tải: "set - lưu - tải".
 
 - **Vì sao không chọn được hay mất:**

@@ -15,7 +15,7 @@ import java.io.File;
  * its settings (controlsProfile in its .desktop file, {@link AgvnLightPick}), and its keys show at once. The game's own
  * keys (edited on its screen, kept in agvn-light.properties) are never dropped unseen: when the game moves to another
  * set, here or in its settings, they are kept as a set named after the game first ({@link #keep}). Before, a set picked
- * in the settings hid them for good, and the game had no list of sets (18/10/2026). UI thread.
+ * in the settings hid them for good, and the game had no list of sets (19/10/2026). UI thread.
  */
 final class AgvnLightSets implements AgvnKeySetDialog.Host {
     private static final String TAG = "AGVN";
