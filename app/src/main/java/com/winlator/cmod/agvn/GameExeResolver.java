@@ -26,7 +26,9 @@ public final class GameExeResolver {
             "ue4prereqsetup_x64.exe", "ueprereqsetup_x64.exe", "notification_helper.exe");
     /** Name parts of exes that only serve a game (launcher, setup, crash reporter, settings...), never a game of their own. */
     private static final String[] HELPERS = {"launcher", "setup", "config", "crash", "report", "update", "patch", "install",
-            "redist", "setting", "editor", "server", "tool", "helper", "physx", "dotnet", "oalinst", "nwjc", "bssndrpt"};
+            "redist", "setting", "editor", "server", "tool", "helper", "physx", "dotnet", "oalinst", "nwjc", "bssndrpt",
+            // the same in Japanese, Chinese and Korean: エンジン設定.exe beside コトネイロ.exe was a second game (20/10/2026)
+            "設定", "设置", "設置", "コンフィグ", "ランチャー", "セットアップ", "アンインストール", "启动器", "卸载", "설정"};
     /** More game exes than this in one folder: a folder of tools rather than a collection, so it stays one game. */
     static final int MAX_GAMES = 8;
 
@@ -130,7 +132,7 @@ public final class GameExeResolver {
         return main != null ? Collections.singletonList(main) : Collections.<String>emptyList();
     }
 
-    private static boolean isHelper(String lowerName) {
+    static boolean isHelper(String lowerName) {
         for (String part : HELPERS) if (lowerName.contains(part)) return true;
         return false;
     }

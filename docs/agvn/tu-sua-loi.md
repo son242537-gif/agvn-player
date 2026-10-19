@@ -1775,3 +1775,36 @@ cheat; Galaxy Z Fold4 SM-F936N, Snapdragon 8+ Gen 1, Adreno 730; Proton 9, OpenG
      qua bước nạp. `su-kien.txt` có "Rời app khi game còn đang khởi động" và, nếu game lên hình lúc anh ở ngoài, "Game
      đã lên hình khi người chơi ở ngoài app". Dòng "Giả lập 32-bit: …" có ở đầu phiên.
   2. Hồi quy: rời app khi game đã chạy, game dừng ngay. Quay lại, game chạy tiếp như trước.
+
+## DLL cheat cạnh file chạy thiếu hàm Wine cần; công cụ tên tiếng Nhật thành game riêng (bản 0.1.60)
+
+Báo cáo ngày 20/10/2026 (コトネイロ, bản có bảng cheat): game không mở được trên điện thoại.
+
+- **Vì sao:**
+  - Wine báo `unimplemented function version.dll.GetFileVersionInfoSizeW` rồi game dừng ngay khi mở.
+  - `version.dll` cạnh EXE là của bảng cheat. Nó chỉ chuyển tiếp 3 hàm game gọi tới `version.dll` của hệ thống.
+  - App nạp DLL cạnh EXE trước bản của Wine (`GameDllOverrides`: native trước). `mmdevapi`, phần âm thanh của Wine,
+    cũng dùng `version.dll`, nên nó lấy bản của cheat và thiếu `GetFileVersionInfoSizeW`. Trên Windows, `mmdevapi` không
+    gọi hàm này nên cheat vẫn chạy được trên PC.
+  - Phía game đã sửa: `version.dll` của cheat chuyển tiếp đủ 17 hàm của `version.dll` hệ thống.
+- **Từ bản 0.1.60, "Tự sửa lỗi" nhận ra lỗi này (`dll-function`):**
+  - Dấu hiệu là dòng "Unimplemented function X.dll.Y called" của Wine, hoặc của winedbg.
+  - Nếu `X.dll` nằm cạnh file chạy của game, app có nút "Dùng X.dll của Wine thay bản đi kèm game" (`dll-wine`,
+    `AgvnDllProxy`): game chạy lại với bản DLL của Wine. Cheat hoặc mod trong file đó không chạy, file của game giữ
+    nguyên.
+  - Nếu chính DLL của Wine thiếu hàm thì app không có nút này, chỉ có "Gửi nhật ký".
+  - Mỗi game chỉ được đề nghị một lần. Cách sửa này dùng chung cách của "mods-off" (`AgvnMods.withBuiltin`).
+- **Hai game trong một thư mục:**
+  - Thư mục có `コトネイロ.exe` (game) và `エンジン設定.exe` ("cài đặt engine", công cụ của hãng), nên app nhận ra 2
+    game.
+  - Tên của công cụ đi kèm (`GameExeResolver.HELPERS`) trước đây chỉ có chữ tiếng Anh: launcher, setup, config,
+    setting… Giờ có thêm 設定, 设置, 設置, コンフィグ, ランチャー, セットアップ, アンインストール, 启动器, 卸载, 설정.
+  - Công cụ PC (`tools/agvn/agvn_profile_lib.py`, `HELPER_PARTS`) cũng vậy. Bản cũ còn chọn nhầm `エンジン設定.exe` làm
+    file chạy, vì エ đứng trước コ khi xếp tên.
+- **Test:** `AgvnDoctorTest.aDllThatLacksAFunctionWineCalls`, `GameExeResolverTest.aToolNamedInAsianLanguagesIsNotASecondGame`
+  (phần dùng thư mục thật cần JVM lưu được tên Unicode: Windows, hoặc Linux với `LANG=C.UTF-8`) và
+  `tools/agvn/tests/test_toolkit.py`.
+- **Thử máy:**
+  1. Game có `version.dll` cheat cũ (3 hàm): mở game, game dừng. Về thư viện, "Tự sửa lỗi" hỏi "File version.dll thiếu
+     hàm", có nút "Dùng version.dll của Wine…". Bấm nút: game mở được, cheat không có.
+  2. Thêm thư mục コトネイロ: app chỉ nhận một game, file chạy là `コトネイロ.exe`.

@@ -108,6 +108,9 @@ final class AgvnFixApply {
             case "rgss-frameskip":
                 s.putExtra(AgvnRgssFiles.EXTRA_FRAME_SKIP, fix.to);
                 break;
+            case AgvnDllProxy.FIX:
+                s.putExtra("envVars", AgvnDllProxy.apply(s.getExtra("envVars"), fix.to));
+                break;
             default:
                 // one "Tự sửa lỗi" tries for what the player reports, or a Godot game's "Chạy nhẹ"
                 if (!AgvnRepairFixes.apply(s, fix) && !AgvnGodotGame.applyLight(s, fix)) return false;

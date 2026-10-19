@@ -34,7 +34,7 @@ final class AgvnFixes {
             "emulator-stable", "emulator-fast", "wincomponent", "wrapper-constants", "wrapper-clip", "wine-mono",
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "mods-off", "raw-mouse", "ue-wait",
-            AgvnExe64.FIX);
+            AgvnExe64.FIX, AgvnDllProxy.FIX);
     static final String SYSTEM = "System";
 
     /** A button: its fix id, its words, and what it sets ({@code to}). */
@@ -84,6 +84,8 @@ final class AgvnFixes {
         boolean light = AgvnHtmlGame.isLight(runner);
         if (light && (WINE_ONLY.contains(id) || id.startsWith("quality-") && !AgvnHtmlGame.RUNNER_RENPY.equals(runner))) return null;
         switch (id) {
+            case AgvnDllProxy.FIX: // the game's own copy of the DLL Wine named, a cheat's or a mod's
+                return AgvnDllProxy.fix(a, s, finding);
             case "run-windows":
                 return light && AgvnHtmlGame.exeExists(s.file) ? new Fix(id, a.getString(R.string.agvn_html_use_windows), AgvnHtmlGame.RUNNER_WINE) : null;
             case "rgss-frameskip":

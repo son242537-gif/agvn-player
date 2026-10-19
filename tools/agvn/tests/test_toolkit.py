@@ -85,6 +85,10 @@ class ProfileRulesTest(unittest.TestCase):
         for rel in ("AutoUpdate.exe", "CrashReporter.exe", "Game.exe", "oalinst.exe", "x.dll"):
             touch(helpers, rel)
         self.assertEqual("Game.exe", resolve_exe(helpers, detect_engine(helpers)))
+        kotone = os.path.join(self.tmp.name, "kotone")  # the engine's settings tool sorts first: エ before コ
+        for rel in ("エンジン設定.exe", "コトネイロ.exe"):
+            touch(kotone, rel)
+        self.assertEqual("コトネイロ.exe", resolve_exe(kotone, detect_engine(kotone)))
 
     def test_rejections(self):
         touch(self.tmp.name, "evil.exe")

@@ -30,7 +30,7 @@ public class AgvnDoctorTest {
             "app-settings", "send-logs", "run-windows", "rgss-frameskip", "rgss-light", "wrapper-constants", "wrapper-clip", "wine-mono",
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "godot-light",
-            "godot-light-renderer", "mods-off", "raw-mouse", "ue-wait", "exe-64"));
+            "godot-light-renderer", "mods-off", "raw-mouse", "ue-wait", "exe-64", "dll-wine"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
             "ram-saved", "live", "light", "script-error", "page-crash", "frozen", "reported"));
@@ -460,5 +460,31 @@ public class AgvnDoctorTest {
         assertEquals("a 1 ? b", AgvnProblemCatalog.fill("a {1} {missing} b", Collections.singletonMap("1", "1")));
         assertEquals("no braces", AgvnProblemCatalog.fill("no braces", Collections.emptyMap()));
         assertEquals("open {", AgvnProblemCatalog.fill("open {", Collections.emptyMap()));
+    }
+
+    /** A DLL beside the exe (a cheat's version.dll) that forwards only the game's functions: Wine's sound asked for more. */
+    @Test
+    public void aDllThatLacksAFunctionWineCalls() throws Exception {
+        AgvnProblemCatalog.Finding f = catalog.find(noStart( // kernelbase's line, then winedbg's report
+                "wine: Unimplemented function version.dll.GetFileVersionInfoSizeW called at address 7BC4B2C8 (thread 0024), starting debugger...",
+                "Unhandled exception: unimplemented function version.dll.GetFileVersionInfoSizeW called in 32-bit code (0x7bc4b2c8)."));
+        assertEquals("dll-function", f.id());
+        assertEquals("File version.dll thiếu hàm", f.title());
+        assertEquals("version.dll", f.params.get("1"));
+        assertEquals(Arrays.asList("dll-wine", "send-logs"), f.fixes());
+        assertEquals("dll-function", found(noStart("Unhandled exception: unimplemented function api-ms-win-core-path-l1-1-0.dll.PathCchCombineEx called in 64-bit code (0x0000000170033dbc).")));
+
+        File exeDir = new File(Files.createTempDirectory("agvn-dll").toFile(), "game");
+        assertTrue(exeDir.mkdirs());
+        Files.write(new File(exeDir, "Version.DLL").toPath(), new byte[1]);
+        assertEquals("version", AgvnDllProxy.dll(exeDir, "version.dll", ""));
+        assertEquals("version", AgvnDllProxy.dll(exeDir, "VERSION.dll", "WINEDLLOVERRIDES=winmm=b"));
+        assertNull("already Wine's", AgvnDllProxy.dll(exeDir, "version.dll", "WINEDLLOVERRIDES=version=b"));
+        assertNull("Wine's own DLL lacks it: nothing to switch", AgvnDllProxy.dll(exeDir, "kernel32.dll", ""));
+        assertNull(AgvnDllProxy.dll(exeDir, "../version.dll", ""));
+        assertNull(AgvnDllProxy.dll(exeDir, null, ""));
+        String env = AgvnDllProxy.apply("WINEDLLOVERRIDES=version=n,b;winmm=n,b DXVK_HUD=0", "version");
+        assertTrue(env, env.contains("winmm=n,b") && env.contains("version=b") && !env.contains("version=n"));
+        assertNull("once switched, not offered again", AgvnDllProxy.dll(exeDir, "version.dll", env));
     }
 }

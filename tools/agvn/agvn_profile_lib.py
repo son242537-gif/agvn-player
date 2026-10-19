@@ -18,7 +18,9 @@ IGNORED_EXES = {
     "ue4prereqsetup_x64.exe", "ueprereqsetup_x64.exe", "notification_helper.exe"}
 # Name parts of exes that only serve a game (launcher, setup, crash reporter, settings...), never a game of their own.
 HELPER_PARTS = ("launcher", "setup", "config", "crash", "report", "update", "patch", "install", "redist", "setting",
-                "editor", "server", "tool", "helper", "physx", "dotnet", "oalinst", "nwjc", "bssndrpt")
+                "editor", "server", "tool", "helper", "physx", "dotnet", "oalinst", "nwjc", "bssndrpt",
+                # the same in Japanese, Chinese and Korean (GameExeResolver.HELPERS)
+                "設定", "设置", "設置", "コンフィグ", "ランチャー", "セットアップ", "アンインストール", "启动器", "卸载", "설정")
 # On-screen controls layouts (AgvnLayouts.java): profile "controls" value -> bundled layout; order = ids 9000..9005.
 CONTROLS = ("pc", "vn", "rpg", "2d", "action", "mouse")
 _ENGINE_CONTROLS = {"RENPY": "vn", "KIRIKIRI": "vn", "TYRANO": "vn", "SIGLUS": "vn", "NSCRIPTER": "vn",
