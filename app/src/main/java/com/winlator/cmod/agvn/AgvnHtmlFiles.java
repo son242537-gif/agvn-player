@@ -73,19 +73,20 @@ public final class AgvnHtmlFiles {
         File file = fileFor(root, urlPath);
         byte[] empty = AgvnHtmlStandIn.bytesFor(root, urlPath, file, TRANSPARENT_PNG);
         if (empty != null) {
-            String why = file == null ? "missing" : file.length() + " bytes";
+            String why = AgvnHtmlStandIn.why(root, urlPath, file);
             Log.w("AGVN", "HTML game picture " + why + ", shown empty: " + urlPath);
             if (standIn != null) standIn.accept(decode(urlPath) + " (" + why + ")");
             return new WebResourceResponse("application/octet-stream", null, 200, "OK", CORS,
                     new ByteArrayInputStream(empty));
         }
         if (file == null) {
-            Log.w("AGVN", "HTML game file missing: " + urlPath);
+            String why = AgvnHtmlStandIn.why(root, urlPath, null);
+            Log.w("AGVN", "HTML game file missing: " + urlPath + " (" + why + ")");
             if (urlPath != null && urlPath.toLowerCase(Locale.ROOT).endsWith(".png")) {
-                if (standIn != null) standIn.accept(decode(urlPath) + " (missing)");
+                if (standIn != null) standIn.accept(decode(urlPath) + " (" + why + ")");
                 return new WebResourceResponse("image/png", null, 200, "OK", CORS, new ByteArrayInputStream(TRANSPARENT_PNG));
             }
-            if (missing != null) missing.accept(decode(urlPath == null ? "" : urlPath));
+            if (missing != null) missing.accept(decode(urlPath == null ? "" : urlPath) + " (" + why + ")");
             return new WebResourceResponse("text/plain", "UTF-8", 404, "Not Found", CORS, empty());
         }
         String mime = mimeType(file.getName());

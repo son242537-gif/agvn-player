@@ -44,6 +44,37 @@ final class AgvnHtmlStandIn {
         return key != null ? encrypt(png, key) : null;
     }
 
+    /**
+     * Why {@code urlPath} was not served as a picture, for "Gửi nhật ký": "short: 0 bytes" for a {@code file} too short,
+     * else where the search under {@code root} stopped, upper/lower case ignored: "not-found in img/system", or
+     * "no-access to img/system" when that folder cannot be listed (no storage permission). A tester's ButtonSet was
+     * shown empty while the phone had it whole, and "missing" could not tell why (19/10/2026).
+     */
+    static String why(File root, String urlPath, File file) {
+        if (file != null) return "short: " + file.length() + " bytes";
+        File dir = root;
+        String at = "";
+        for (String part : AgvnHtmlFiles.decode(urlPath == null ? "" : urlPath).split("/")) {
+            if (part.isEmpty() || part.equals(".")) continue;
+            if (part.equals("..")) return "not-found (outside the game folder)";
+            String where = at.isEmpty() ? "the game folder" : at;
+            if (!dir.isDirectory()) return "not-found (" + where + " is a file)";
+            File[] children = dir.listFiles();
+            if (children == null) return "no-access to " + where;
+            File next = null;
+            for (File c : children) if (c.getName().equalsIgnoreCase(part) && (next == null || c.getName().equals(part))) next = c;
+            if (next == null) return "not-found in " + where;
+            dir = next;
+            at = at.isEmpty() ? next.getName() : at + "/" + next.getName();
+        }
+        return "not-found (a folder)";
+    }
+
+    /** True for a told item ({@link #why}) of a system picture: windows, buttons, icons; one missing breaks the screens. */
+    static boolean systemPicture(String item) {
+        return item != null && item.toLowerCase(Locale.ROOT).startsWith("/img/system/");
+    }
+
     /** The game's key: data/System.json's "encryptionKey" (32 hex digits) as 16 bytes, or null without one. */
     static synchronized byte[] key(File root) {
         String at = root.getAbsolutePath();

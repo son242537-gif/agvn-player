@@ -87,6 +87,10 @@ final class AgvnDeviceReport {
         try {
             lines.add(AgvnInputDevices.line());
         } catch (Throwable ignored) {}
+        try { // without it, a game in shared storage may see some of its files only (an HTML game's .png_, .json)
+            lines.add("Quyền bộ nhớ: " + (AgvnFirstContainer.hasStorageAccess(ctx) ? "có Truy cập tất cả tệp"
+                    : "chưa có quyền Truy cập tất cả tệp"));
+        } catch (Throwable ignored) {}
         return lines;
     }
 

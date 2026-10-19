@@ -59,7 +59,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         host = AgvnHtmlGame.hostFor(index);
         AgvnKeepAlive.start(this, getIntent().getStringExtra("shortcut_name")); // the game keeps running in the background
         AgvnLightSession.begin(this, AgvnHtmlGame.RUNNER_HTML, AgvnLightGame.folderOf(index)); // "Tự sửa lỗi" reads its end
-        standIns = AgvnLightSession.keeper(getApplicationContext(), AgvnLightSession.STAND_IN, AgvnLightSession.STAND_INS);
+        standIns = AgvnHtmlPictureNotice.around(this, // a system picture shown empty is also told on the game screen
+                AgvnLightSession.keeper(getApplicationContext(), AgvnLightSession.STAND_IN, AgvnLightSession.STAND_INS));
         missing = AgvnLightSession.keeper(getApplicationContext(), AgvnLightSession.MISSING, AgvnLightSession.LISTED);
         boolean rpgMaker = AgvnHtmlFiles.resolve(root, "/js/rpg_core.js") != null || AgvnHtmlFiles.resolve(root, "/js/rmmz_core.js") != null;
         // an NW.js page game (AgvnNwjsGame) gets the stand-ins for require, process and nw too; Tyrano runs as before

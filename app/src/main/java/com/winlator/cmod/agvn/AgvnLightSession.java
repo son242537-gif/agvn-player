@@ -29,8 +29,8 @@ public final class AgvnLightSession {
     static final String SHORTCUT = "shortcut", CONTAINER = "container", RUNNER = "runner", NAME = "name", GAME_DIR = "gameDir",
             START = "start", PROCESS = "process", PID = "pid", STARTED = "started", ENDED = "ended", SHOWN = "shown",
             ERROR = "error", PAGE_CRASH = "pageCrash", STAND_IN = "standIn", MISSING = "missing", PAGE = "page";
-    /** Pictures named as shown empty, at most. */
-    static final int STAND_INS = 5;
+    /** Pictures named as shown empty, at most: enough for a game's system pictures past its first missing ones. */
+    static final int STAND_INS = 12;
     /** Missing files, and page messages, kept at most. */
     static final int LISTED = 8;
 

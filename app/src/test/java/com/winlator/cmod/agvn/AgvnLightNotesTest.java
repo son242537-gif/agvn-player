@@ -56,8 +56,44 @@ public class AgvnLightNotesTest {
         List<String> standIns = new ArrayList<>(), missing = new ArrayList<>();
         AgvnHtmlFiles.serve(root, "index.html", "/fonts/VN%20Font.ttf", null, standIns::add, missing::add);
         AgvnHtmlFiles.serve(root, "index.html", "/img/system/Window.png", null, standIns::add, missing::add);
-        assertEquals(Collections.singletonList("/fonts/VN Font.ttf"), missing);
-        assertEquals(Collections.singletonList("/img/system/Window.png (missing)"), standIns);
+        assertEquals(Collections.singletonList("/fonts/VN Font.ttf (not-found in the game folder)"), missing);
+        assertEquals(Collections.singletonList("/img/system/Window.png (not-found in the game folder)"), standIns);
+    }
+
+    /** Why a picture was shown empty: "missing" could not tell a file not there from one the app cannot read. */
+    @Test
+    public void aPictureShownEmptySaysWhy() throws IOException {
+        File root = tmp.newFolder("mz");
+        File system = new File(root, "img/system");
+        assertTrue(system.mkdirs());
+        Files.write(new File(system, "Window.png_").toPath(), new byte[0]);
+        Files.write(new File(root, "audio").toPath(), new byte[1]); // a file where the game has a folder
+        assertEquals("not-found in img/system", AgvnHtmlStandIn.why(root, "/IMG/System/ButtonSet.png_", null));
+        assertEquals("not-found in img", AgvnHtmlStandIn.why(root, "/img/pictures/a.png", null));
+        assertEquals("not-found in the game folder", AgvnHtmlStandIn.why(root, "/movies/a.webm", null));
+        assertEquals("not-found (audio is a file)", AgvnHtmlStandIn.why(root, "/audio/se/a.ogg", null));
+        assertEquals("short: 0 bytes", AgvnHtmlStandIn.why(root, "/img/system/Window.png_", new File(system, "Window.png_")));
+        assertEquals("not-found (outside the game folder)", AgvnHtmlStandIn.why(root, "/../x.png", null));
+        // "no-access to …" (a folder that cannot be listed) needs a phone without storage permission: tests run as root
+        assertTrue(AgvnHtmlStandIn.systemPicture("/img/system/ButtonSet.png_ (not-found in img/system)"));
+        assertTrue(AgvnHtmlStandIn.systemPicture("/Img/System/IconSet.png (short: 0 bytes)"));
+        assertTrue(!AgvnHtmlStandIn.systemPicture("/img/pictures/a.png (not-found in img/pictures)"));
+        assertTrue(!AgvnHtmlStandIn.systemPicture(null));
+    }
+
+    /** The bar's words for the first system picture shown empty. */
+    @Test
+    public void thePlayerIsToldWhichFileAndWhy() {
+        String item = "/img/system/ButtonSet.png_ (not-found in img/system)";
+        assertEquals("img/system/ButtonSet.png_", AgvnHtmlPictureNotice.file(item));
+        assertEquals("not-found in img/system", AgvnHtmlPictureNotice.why(item));
+        assertEquals("không có trong img/system", AgvnHtmlPictureNotice.reason("not-found in img/system"));
+        assertEquals("không có trong thư mục game", AgvnHtmlPictureNotice.reason("not-found in the game folder"));
+        assertEquals("app không đọc được thư mục img/system", AgvnHtmlPictureNotice.reason("no-access to img/system"));
+        assertEquals("tệp chỉ có 0 byte, không phải ảnh", AgvnHtmlPictureNotice.reason("short: 0 bytes"));
+        assertEquals("không có tệp này", AgvnHtmlPictureNotice.reason(""));
+        assertEquals("img/a (b).png", AgvnHtmlPictureNotice.file("/img/a (b).png (not-found in img)"));
+        assertEquals("", AgvnHtmlPictureNotice.why("/img/a.png"));
     }
 
     @Test

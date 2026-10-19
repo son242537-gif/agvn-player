@@ -82,6 +82,8 @@ public class AgvnHtmlCompatTest {
         assertTrue("MV only: MZ always asks for .ogg", js.contains("if (!isMz) desktopMv();"));
         // the game still fills the screen and goes quiet when the player leaves the app, as on the phone
         assertTrue(js.contains("'_defaultStretchMode'") && js.contains("'_shouldMuteOnHide'"));
+        // MZ: a narrow img/system/ButtonSet stretched, not "ButtonSet image is too small" (scripts/agvn/html runs it)
+        assertTrue(js.contains("function wideButtons()") && js.contains("SM.run = function () { wideButtons();"));
     }
 
     @Test

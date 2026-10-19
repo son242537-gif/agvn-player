@@ -21,6 +21,9 @@
  *     then, and WebView can leave the page without the focus, so every MZ game stood still on its first scene.
  *  8. Other NW.js games made of pages (the app sets __agvnNwjs first, AgvnNwjsGame) also get `nw` as NW.js has it,
  *     for scripts that call nw.Window.get() or nw.App without asking whether they run on NW.js.
+ *  9. RPG Maker MZ's touch buttons take a narrow img/system/ButtonSet (the app's empty picture for a missing or
+ *     unreadable one, an MV game's) stretched to the size they are cut from, instead of stopping the game with
+ *     "ButtonSet image is too small".
  */
 (function () {
     'use strict';
@@ -348,8 +351,15 @@
         var isMz = window.Utils && Utils.RPGMAKER_NAME === 'MZ';
         if (!isMz) desktopMv(); // before main.js starts the game: the renderer and screen size are chosen then
         if (window.__agvnStretch) stretch(window.Graphics); // "Toàn màn hình cho mọi game"
+        wideButtons(); // MZ: when its sprites are loaded; else as the game starts, once the plugins are too
+        var run = SM.run;
+        if (typeof run === 'function') SM.run = function () { wideButtons(); return run.apply(this, arguments); };
         var original = SM.catchException;
         SM.catchException = function (e) {
+            if (e && /^ButtonSet image is too small/.test(e.message) && !(window.Sprite_Button && Sprite_Button.prototype.__agvnWide)) {
+                wideButtons(); // a game that started another way: the next frame has the stretched picture
+                if (Sprite_Button.prototype.__agvnWide) return;
+            }
             if (isMinor(e)) {
                 console.warn('[AGVN] skipped game error: ' + e.message);
                 if (!isMz && typeof this.requestUpdate === 'function') this.requestUpdate();
@@ -399,6 +409,29 @@
             return c ? axis(y, c.getBoundingClientRect().top + window.pageYOffset, c.clientHeight, this._height) : 0;
         };
         if (G._canvas && typeof G._updateAllElements === 'function') G._updateAllElements();
+    }
+
+    // --- 9: MZ cuts its touch buttons (Menu, Cancel, page up/down, shown with Touch UI, on by default) from
+    // img/system/ButtonSet, 11 cells of 48 px wide, and stops the game when the picture is narrower ("Probably MV image
+    // is used"). A missing or unreadable one is served as a 1 px empty picture (AgvnHtmlStandIn), so that game stopped
+    // where a PC says "Failed to load" (19/10/2026). A narrower one is stretched to the size instead: buttons from the
+    // empty picture are clear, and the app tells the player which file it could not read. Only the engine's own check
+    // is replaced; MV has none.
+    function wideButtons() {
+        var p = window.Sprite_Button && Sprite_Button.prototype;
+        if (!p || p.__agvnWide || typeof p.checkBitmap !== 'function' || !/too small/.test(String(p.checkBitmap))) return;
+        p.__agvnWide = true;
+        var wide = null;
+        p.checkBitmap = function () {
+            var b = this.bitmap, w = this.blockWidth() * 11, h = this.blockHeight() * 2;
+            if (!b || !b.isReady() || b.width >= w || !(b.width > 0 && b.height > 0)) return;
+            if (!wide || wide.__agvnFrom !== b) { // every button shares the one ButtonSet, so one stretched copy
+                wide = new Bitmap(w, h);
+                wide.blt(b, 0, 0, b.width, b.height, 0, 0, w, h);
+                wide.__agvnFrom = b;
+            }
+            this.bitmap = wide;
+        };
     }
 
     function keepFatal(text) {

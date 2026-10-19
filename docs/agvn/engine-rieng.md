@@ -742,3 +742,57 @@ tới menu chính.
   1. Một game Ren'Py thường và một game có Live2D, mở bằng "Chạy nhẹ". Game thường vào tới menu chính, và `log.txt` có
      `Running init code` và `Interface start`. Game Live2D hiện màn lỗi hoặc hộp "Game chưa mở được" nói về Live2D.
   2. Bật "Toàn màn hình cho mọi game" rồi mở game Ren'Py thường: game vào được và phủ kín màn hình.
+
+## Game MZ dừng vì ảnh thay thế của app: "ButtonSet image is too small" (bản 0.1.58)
+
+Báo cáo ngày 19/10/2026 (bản 0.1.57): một game RPG Maker MZ chạy "Chạy nhẹ" màn đen, giữa màn hình là bảng
+`Error` "ButtonSet image is too small". Cùng thư mục game chạy được trên PC (NW.js) và trên Chrome giả lập điện thoại.
+Tệp `img/system/ButtonSet.png_` trên máy test đúng chuẩn MZ (528×96, md5 như bản PC).
+
+- **Vì sao game dừng:**
+  - MZ cắt các nút cảm ứng (Menu, Huỷ, lật trang…) từ `img/system/ButtonSet`. Ảnh phải rộng ít nhất 11 ô 48 px
+    (528 px), nếu không `Sprite_Button.checkBitmap` (`rmmz_sprites.js`) ném lỗi. Các nút này chỉ có khi Touch UI bật, mà
+    Touch UI mặc định bật trên điện thoại.
+  - Ảnh thiếu hoặc ngắn hơn 32 byte thì app trả một ảnh trong suốt 1×1, mã hoá bằng khoá của game, để game không dừng
+    (`AgvnHtmlStandIn`). Với ảnh nhân vật hay nền thì đúng ý. Riêng ảnh `ButtonSet` thì ảnh 1 px < 528 px, nên game dừng
+    ở lỗi của MZ, và lỗi gốc bị che: trên PC là "Failed to load: img/system/ButtonSet.png_".
+  - Lớp "chạy tiếp qua lỗi nhỏ" của `html-compat.js` không đỡ được lỗi này, vì đây là `Error` thường.
+- **Vì sao app coi tệp là thiếu trên máy bị lỗi:** chưa biết, vì nhật ký chỉ ghi "missing". Lỗi hiện ra đã cho biết một
+  điều: ảnh thay thế được mã hoá bằng khoá của game, tức là app đọc được `data/System.json`. Vậy nhiều khả năng app có
+  quyền bộ nhớ, và tệp ButtonSet bị thiếu hoặc hỏng trong bản chép trên máy đó (giải nén dở, chép bị ngắt, tệp 0 byte).
+- **Sửa (`html-compat.js`, mục 9):**
+  - Ảnh `ButtonSet` hẹp hơn 11 ô được kéo giãn tới đúng cỡ trước khi các nút cắt ảnh, nên game chạy tiếp. Nút vẽ từ ảnh
+    trong suốt thì không thấy, nhưng vẫn bấm được.
+  - Ảnh đúng cỡ giữ nguyên. Ảnh 0×0 cũng không làm dừng game.
+  - Chỉ thay hàm kiểm của chính engine (nhận ra qua chữ "too small"). Plugin đã thay hàm này thì giữ hàm của plugin.
+  - Hàm được thay lúc `SceneManager.run`, khi mọi script và plugin đã nạp mà chưa có nút nào. Game khởi động cách khác
+    thì lần dừng đầu tiên được đỡ trong `SceneManager.catchException`, và từ khung hình sau ảnh đã được kéo giãn.
+  - MV không có hàm này nên không đổi gì.
+- **Báo cho người chơi (`AgvnHtmlPictureNotice`):** ảnh đầu tiên trong `img/system/` bị thay (khung, nút, biểu tượng)
+  làm hiện thanh "Game thiếu ảnh giao diện" trên màn game, mỗi phiên một lần. Thanh ghi tên tệp và lý do, kèm nhắc
+  cấp quyền Truy cập tất cả tệp nếu app chưa có. Game vẫn chạy dưới thanh.
+- **Lý do trong nhật ký (`AgvnHtmlStandIn.why`):**
+  - Tệp ảnh bị thay và tệp game không tìm thấy (`chay-nhe.txt` của "Gửi nhật ký", logcat) giờ ghi kèm lý do.
+    - `not-found in img/system`: thư mục đọc được nhưng không có tệp, kể cả khi bỏ qua hoa/thường.
+    - `no-access to img/system`: không liệt kê được thư mục, thường do thiếu quyền bộ nhớ.
+    - `short: 0 bytes`: tệp có nhưng quá ngắn.
+    - `not-found (audio is a file)`: chỗ của thư mục là một tệp.
+  - Danh sách ảnh bị thay giữ tối đa 12 ảnh, trước đây là 5.
+  - `thiet-bi.txt` có dòng "Quyền bộ nhớ: có Truy cập tất cả tệp" hoặc "chưa có…".
+- **Test:**
+  - `node scripts/agvn/html/test-html-compat.js` chạy `html-compat.js` với các lớp MZ tối thiểu, `checkBitmap` đúng
+    như MZ.
+    - Ảnh 1×1, ảnh 264×48 (cỡ MV), ảnh 0×0: game không dừng, ảnh thành 528×96.
+    - Ảnh 528×96 giữ nguyên.
+    - Hàm kiểm của plugin giữ nguyên.
+    - Sprite nạp sau `SceneManager`, không có `SceneManager.run`: lần dừng đầu được đỡ.
+    - Game MV: không đổi gì.
+    - Với `html-compat.js` của 0.1.57, các ca 1×1, 264×48, 0×0 đều dừng như báo cáo.
+  - `AgvnLightNotesTest`: `aPictureShownEmptySaysWhy`, `thePlayerIsToldWhichFileAndWhy`. `AgvnHtmlCompatTest` kiểm mã
+    mục 9 có trong tệp.
+- **Thử máy:**
+  1. Game MZ chạy được: đổi tên `img/system/ButtonSet.png_` (hoặc `ButtonSet.png`) rồi mở game, Touch UI để mặc định,
+     vào bản đồ hoặc menu. Game không dừng. Thanh "Game thiếu ảnh giao diện" ghi
+     `img/system/ButtonSet.png_ (không có trong img/system)`. "Gửi nhật ký" có `… (not-found in img/system)`.
+  2. Trả lại tệp: nút hiện đúng ảnh, không có thanh.
+  3. Game MV: chạy như cũ.

@@ -402,4 +402,8 @@
     <string name="agvn_sets_overwrite">Đã có bộ phím \"%1$s\". Ghi đè bằng phím đang dùng? Game nào đang dùng bộ đó cũng đổi theo.</string>
     <string name="agvn_sets_overwrite_ok">Ghi đè</string>
     <string name="agvn_sets_kept">Phím đã sửa trước đây của game được giữ thành bộ phím \"%1$s\" (bấm 🗂 để tải lại)</string>
+    <!-- An HTML game's system picture shown empty (agvn/AgvnHtmlPictureNotice) -->
+    <string name="agvn_html_picture_title">Game thiếu ảnh giao diện</string>
+    <string name="agvn_html_picture_detail">Không đọc được %1$s (%2$s), nên một số nút hoặc khung của game có thể không hiện. Hãy kiểm tra đã chép đủ thư mục game.</string>
+    <string name="agvn_html_picture_access">App chưa có quyền Truy cập tất cả tệp: hãy cấp quyền này cho AGVN Player trong Cài đặt Android.</string>
 </resources>
