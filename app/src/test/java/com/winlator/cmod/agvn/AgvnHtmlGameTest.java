@@ -101,6 +101,17 @@ public class AgvnHtmlGameTest {
     }
 
     @Test
+    public void thePageIsToldTheGamesExeByItsOwnName() throws Exception {
+        // html-compat.js makes it process.execPath: a game picked its language by path.parse(process.execPath).name
+        File desktop = file(tmp.getRoot(), "Game.desktop",
+                "[Desktop Entry]\nExec=env WINEPREFIX=\"/x/.wine\" wine \"/sdcard/Games/X/ゲーム's.exe\"\n");
+        assertEquals("window.__agvnExe = 'ゲーム\\'s.exe';\n", AgvnHtmlGame.exeLine(desktop.getPath()));
+        assertEquals("", AgvnHtmlGame.exeLine(null));
+        assertEquals("", AgvnHtmlGame.exeLine(new File(tmp.getRoot(), "gone.desktop").getPath()));
+        assertEquals("", AgvnHtmlGame.exeLine(file(tmp.getRoot(), "NoExec.desktop", "[Desktop Entry]\nName=X\n").getPath()));
+    }
+
+    @Test
     public void mimeTypes() {
         assertEquals("application/javascript", AgvnHtmlFiles.mimeType("rpg_core.js"));
         assertEquals("audio/ogg", AgvnHtmlFiles.mimeType("Battle1.OGG"));

@@ -358,6 +358,12 @@ class HtmlCompatTest(unittest.TestCase):
         out = subprocess.run(["node", sim], capture_output=True, text=True)
         self.assertEqual(0, out.returncode, out.stdout + out.stderr)
 
+    @unittest.skipIf(shutil.which("node") is None, "node is not installed")
+    def test_a_tap_on_a_page_field_is_the_browsers(self):
+        sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_form_taps_sim.js")
+        out = subprocess.run(["node", sim], capture_output=True, text=True)
+        self.assertEqual(0, out.returncode, out.stdout + out.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

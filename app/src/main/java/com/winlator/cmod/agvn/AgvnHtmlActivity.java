@@ -68,6 +68,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         entry = index.getName();
         if (rpgMaker || nwjs) compatJs = com.winlator.cmod.core.FileUtils.readString(this, "agvn/html-compat.js");
         if (compatJs != null && nwjs) compatJs = "window.__agvnNwjs = true;\n" + compatJs;
+        if (compatJs != null) compatJs = AgvnHtmlGame.exeLine(getIntent().getStringExtra("shortcut_path")) + compatJs; // execPath
         if (compatJs != null && getIntent().getBooleanExtra(AgvnFullscreen.INTENT, false))
             compatJs = "window.__agvnStretch = true;\n" + compatJs; // "Toàn màn hình cho mọi game"
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);

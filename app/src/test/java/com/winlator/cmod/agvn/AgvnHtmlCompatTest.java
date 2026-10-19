@@ -87,6 +87,16 @@ public class AgvnHtmlCompatTest {
     }
 
     @Test
+    public void bundledCompatScriptLeavesTapsOnThePagesFieldsToTheBrowser() throws Exception {
+        // RPG Maker prevents every touchstart inside the game, so a plugin's <input> and button over it took no tap
+        // (tools/agvn/tests/html_form_taps_sim.js plays it through with the engines' own handlers)
+        String js = compatJs();
+        assertTrue(js.contains("function formTaps()") && js.contains("wideButtons(); formTaps(); return run.apply(this, arguments);"));
+        // a game's language by its exe's name: path.parse(process.execPath).name
+        assertTrue(js.contains("parse: function (p)") && js.contains("window.__agvnExe"));
+    }
+
+    @Test
     public void aSoundOrVideoIsServedInTheFormatTheGameShips() throws Exception {
         File root = tmp.getRoot();
         File bgm = touch("audio/bgm/Theme.rpgmvo");

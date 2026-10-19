@@ -2,8 +2,8 @@
  * Loaded before the game's own scripts. It fixes what breaks when a PC game runs in a phone browser:
  *  1. Plugins that call require('fs'/'path'/'nw.gui'/'os') get small stand-ins (files are read from the game folder,
  *     written files go to localStorage), and `process` is there for plugins that read it as they load (mainModule,
- *     platform, cwd(), env, on()). It is a function, not an object: RPG Maker takes typeof process === 'object' for
- *     NW.js (Utils.isNwjs), so the engine keeps its browser save functions, which 6 sends to real files.
+ *     execPath, platform, cwd(), env, on()). It is a function, not an object: RPG Maker takes typeof process ===
+ *     'object' for NW.js (Utils.isNwjs), so the engine keeps its browser save functions, which 6 sends to real files.
  *  2. Small script errors ("Cannot read property 'opacity' of undefined", "...'length'...", "x is not a function")
  *     are logged and skipped instead of stopping the game with an error screen. If they keep coming (a truly broken
  *     scene), the normal error screen is shown so the player is not stuck on a frozen picture.
@@ -24,6 +24,8 @@
  *  9. RPG Maker MZ's touch buttons take a narrow img/system/ButtonSet (the app's empty picture for a missing or
  *     unreadable one, an MV game's) stretched to the size they are cut from, instead of stopping the game with
  *     "ButtonSet image is too small".
+ * 10. A tap on a text field or button of the page (a plugin's name input laid over the game) focuses or clicks it, as a
+ *     mouse click does on a PC: RPG Maker's touch handler kept the browser from doing either.
  */
 (function () {
     'use strict';
@@ -67,7 +69,18 @@
         },
         extname: function (p) { var b = norm(p).split('/').pop(), i = b.lastIndexOf('.'); return i > 0 ? b.slice(i) : ''; },
         relative: function (from, to) { return norm(to).replace(norm(from) + '/', ''); },
-        isAbsolute: function (p) { return String(p).charAt(0) === '/'; }
+        isAbsolute: function (p) { return String(p).charAt(0) === '/'; },
+        // a game picked its language by its exe's name, path.parse(process.execPath).name, and got the default with
+        // "path.parse is not a function" (20/10/2026)
+        parse: function (p) {
+            var base = path.basename(p), ext = path.extname(p);
+            return { root: '/', dir: path.dirname(p), base: base, ext: ext, name: ext ? base.slice(0, -ext.length) : base };
+        },
+        format: function (o) {
+            o = o || {};
+            var base = o.base || (o.name || '') + (o.ext || ''), dir = o.dir || o.root || '';
+            return dir ? norm(dir + '/' + base) : base;
+        }
     };
 
     var fs = {
@@ -138,7 +151,9 @@
         proc.execArgv = [];
         proc.versions = {};
         proc.version = '';
-        proc.execPath = '/Game.exe';
+        // the game's exe by its own name (the app sets __agvnExe first), which a game may pick its language by; in the
+        // game folder, '/', as NW.js has it beside package.json
+        proc.execPath = '/' + (String(window.__agvnExe || '').split(/[\\/]/).pop() || 'Game.exe');
         proc.mainModule = { filename: '/index.html' }; // its folder, '/', is the game folder for fs and path above
         proc.cwd = function () { return '/'; };
         proc.on = proc.once = proc.off = proc.addListener = proc.removeListener = proc.removeAllListeners = chain;
@@ -353,7 +368,7 @@
         if (window.__agvnStretch) stretch(window.Graphics); // "Toàn màn hình cho mọi game"
         wideButtons(); // MZ: when its sprites are loaded; else as the game starts, once the plugins are too
         var run = SM.run;
-        if (typeof run === 'function') SM.run = function () { wideButtons(); return run.apply(this, arguments); };
+        if (typeof run === 'function') SM.run = function () { wideButtons(); formTaps(); return run.apply(this, arguments); };
         var original = SM.catchException;
         SM.catchException = function (e) {
             if (e && /^ButtonSet image is too small/.test(e.message) && !(window.Sprite_Button && Sprite_Button.prototype.__agvnWide)) {
@@ -432,6 +447,30 @@
             }
             this.bitmap = wide;
         };
+    }
+
+    // --- 10: a tap on the page's own field or button (a plugin's name or number input, <input> and "Xác nhận" over the
+    // game) is the browser's. RPG Maker's TouchInput takes every touch inside the game on the whole page and calls
+    // preventDefault, and a touch screen then gives the field no focus and the button no click: once the field's first
+    // focus was gone, neither did anything and the game waited for good (20/10/2026). A mouse click is never prevented,
+    // so a PC was fine. A touch on the game is the engine's as before. TouchInput binds its handlers as the game starts
+    // (SceneManager.run), so the one there then is wrapped, a plugin's own included.
+    var FIELD = /^(INPUT|TEXTAREA|SELECT|OPTION|BUTTON|LABEL)$/;
+
+    function onField(event) {
+        for (var n = event && event.target; n && n.nodeType === 1; n = n.parentNode) { // a <span> in a <button> too
+            if (FIELD.test(String(n.tagName).toUpperCase()) || n.isContentEditable) return true;
+        }
+        return false;
+    }
+
+    function formTaps() {
+        var T = window.TouchInput, start = T && T._onTouchStart;
+        if (typeof start !== 'function' || start.__agvnField) return;
+        T._onTouchStart = function (event) {
+            if (!onField(event)) return start.apply(this, arguments);
+        };
+        T._onTouchStart.__agvnField = true;
     }
 
     function keepFatal(text) {
