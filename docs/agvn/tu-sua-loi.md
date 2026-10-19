@@ -1732,3 +1732,46 @@ Mali-G57 MC2; chuột Bluetooth "BT5.2 Mouse"; bản 0.1.54; 19/10/2026): "click
      dòng "Cú bấm đầu tiên …" và `Player.log` của game.
   2. Hồi quy: game Unity đã chạy tốt (như Open At Nine) vẫn nhận chạm như trước; nhật ký ghi "qua agvn-winhandler.exe
      (raw input)".
+
+## Game nạp lâu bị dừng khi rời app, và game tự thoát sau khi nạp script (bản 0.1.59)
+
+Nhật ký The Agnietta (Pixel Game Maker MV: cocos2d-x 3.17.1, `mozjs-33.dll`, `libvlc`, 32-bit; bản Việt hoá có
+cheat; Galaxy Z Fold4 SM-F936N, Snapdragon 8+ Gen 1, Adreno 730; Proton 9, OpenGL qua freedreno; 0.1.57 và 0.1.58;
+19/10/2026): "crash và out". Năm phiên, không phiên nào có cửa sổ game.
+
+- **Game cần khoảng 56 giây chạy liên tục mới mở cửa sổ:** `action_log.txt` của game ghi `projectFilePath` ngay khi
+  mở, rồi 56 giây sau mới tới `InputManager Init`. Trong lúc đó FPS là 0 và một luồng bận 41–84% một nhân.
+- **Bốn phiên bị dừng trước mốc đó:** người chơi rời app khi game đang nạp. Winlator dừng các tiến trình Wine khi app
+  xuống nền (`ProcessHelper.pauseAllWineProcesses`), nên thời gian ở ngoài app không được tính. Thời gian game thật sự
+  chạy là khoảng 55, 33, 43 và 35 giây. Ba phiên kết thúc bằng vuốt tắt app. Phiên cuối (0.1.58) còn đang nạp lúc gom
+  nhật ký.
+- **Phiên còn lại tự thoát:** phiên 22:00:58 chạy được khoảng 58 giây. Game khởi tạo OpenGL (`FD725`, OpenGL 3.3 Mesa
+  26.3) và tới `# ScriptingCore Start` (máy JavaScript SpiderMonkey). Một giây sau Wine kết thúc.
+  - Không có dòng "Unhandled exception" hay báo cáo của winedbg. Wine in các dòng này dù `WINEDEBUG` đặt thế nào
+    (`AgvnWineTail`), nên game không crash theo kiểu thường. Nó tự thoát hoặc tự đóng.
+  - "Mã thoát 0" là của `wine explorer` mở game, không phải của game, nên không nói được game kết thúc thế nào.
+  - Vì sao game thoát thì nhật ký này chưa đủ để biết.
+  - Không nơi nào ghi phần 32-bit chạy bằng gì. `moi-truong.txt` được ghi trước khi bộ khởi chạy đặt `HODLL`, và logcat
+    cắt dòng biến môi trường ở khoảng 4000 ký tự, trước `HODLL`. Theo mặc định là FEXCore 2601 (logcat có
+    `fexcoreVersion in use: 2601`).
+- **Từ bản 0.1.59:**
+  - **Game đang khởi động nạp tiếp khi người chơi rời app (`AgvnLoadAway`).** "Đang khởi động" là lúc game chưa vẽ
+    khung nào (`AgvnStartupProgress`).
+    - Rời app lúc đó thì Wine không bị dừng. `su-kien.txt` ghi "Rời app khi game còn đang khởi động: game nạp tiếp…".
+    - Khi game lên hình mà người chơi vẫn ở ngoài, game dừng ngay như trước: "Game đã lên hình khi người chơi ở ngoài
+      app". Nếu sau 15 phút game vẫn chưa lên hình thì cũng dừng.
+    - Game đã lên hình thì rời app vẫn dừng ngay như trước. Ảnh thu nhỏ (picture-in-picture) không đổi.
+    - Chỉ tốn pin lúc game đang nạp ở nền, là lúc người chơi đang chờ nó.
+  - **`su-kien.txt` ghi bộ giả lập (`AgvnEmulatorNote`):** "Giả lập 32-bit: FEXCore 2601 (libwow64fex.dll)" hoặc
+    "WOWBox64 0.4.2 (wowbox64.dll)" với Wine arm64ec, và "Giả lập x86: Box64 …" với Wine x86-64.
+- **Test:** `AgvnLoadAwayTest`.
+- **Việc tiếp cho The Agnietta (thử tay):**
+  1. Bật "Bật debug Wine" rồi mở game. **Giữ app trên màn hình** ít nhất 2 phút, tới khi game lên hình hoặc tự thoát.
+     Rồi "Gửi nhật ký": Wine sẽ ghi cảnh báo và lỗi của mọi kênh lúc game thoát.
+  2. Nếu game vẫn thoát sau `ScriptingCore Start`: cài đặt game → "Giả lập 32-bit" đổi FEXCore sang WOWBox64, rồi thử
+     lại. Máy JavaScript của game tự sinh mã x86 lúc chạy, và hai bộ giả lập dịch phần mã đó khác nhau.
+- **Thử máy (0.1.59):**
+  1. Mở một game Windows nạp lâu (The Agnietta), rời app ngay khi màn còn đen, chờ 1–2 phút rồi quay lại: game đã
+     qua bước nạp. `su-kien.txt` có "Rời app khi game còn đang khởi động" và, nếu game lên hình lúc anh ở ngoài, "Game
+     đã lên hình khi người chơi ở ngoài app". Dòng "Giả lập 32-bit: …" có ở đầu phiên.
+  2. Hồi quy: rời app khi game đã chạy, game dừng ngay. Quay lại, game chạy tiếp như trước.

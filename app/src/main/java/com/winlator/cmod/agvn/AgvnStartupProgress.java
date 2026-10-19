@@ -81,6 +81,7 @@ public final class AgvnStartupProgress {
     /** Starts watching as Wine starts the game. */
     public static AgvnStartupProgress start(Activity activity, Shortcut shortcut, AgvnStatusLine line) {
         problem = 0;
+        AgvnLoadAway.back(); // nothing left to stop of a game before
         AgvnStartupProgress p = new AgvnStartupProgress(activity, line, AgvnEngineLogs.of(shortcut), shortcut.file.getPath());
         p.timer.scheduleWithFixedDelay(p::tick, TICK_MS, TICK_MS, TimeUnit.MILLISECONDS);
         return p;
@@ -108,6 +109,11 @@ public final class AgvnStartupProgress {
         problem = stringRes;
     }
 
+    /** True until the game is up or the watch gives up: a player leaving meanwhile lets it load on (AgvnLoadAway). */
+    public boolean starting() {
+        return !done;
+    }
+
     public void stop() {
         if (done) return;
         done = true;
@@ -127,6 +133,7 @@ public final class AgvnStartupProgress {
             if (up || elapsed >= MAX_MS) {
                 if (up) AgvnStartTimes.remember(activity, game, elapsed);
                 stop();
+                AgvnLoadAway.up(up); // it loaded on while the player was away: it stops now
                 return;
             }
             String last = lastLine(tail);

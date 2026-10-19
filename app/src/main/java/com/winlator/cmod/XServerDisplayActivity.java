@@ -223,6 +223,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
     private com.winlator.cmod.agvn.AgvnSlowWatch agvnSlowWatch;
     private com.winlator.cmod.agvn.AgvnStatusLine agvnStatus; // AGVN: "Bật debug Wine" is on; how a slow start goes
     private volatile com.winlator.cmod.agvn.AgvnStartupProgress agvnStartup;
+    /** AGVN: between onPause and onResume (not in picture-in-picture); UI thread. */
+    private boolean agvnAway;
     private String agvnEffectiveExePath; // AGVN: exe actually launched (Unreal bootstrap -> Shipping redirect)
     private String agvnStarter = com.winlator.cmod.agvn.AgvnRawMouse.WINLATOR_EXE; // AGVN: or agvn-winhandler.exe
     private boolean agvnClosing; // AGVN: "Thoát" waits for the game to close (AgvnGracefulExit)
@@ -893,6 +895,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
         agvnSlowWatch.start();
         if (agvnStatus != null) agvnStatus.followDebugSetting(preferences.getBoolean("enable_wine_debug", false)); // AGVN
         if (!isInPictureInPictureMode()) {
+            agvnAway = false; // AGVN: a game that loaded on while away (agvn/AgvnLoadAway) has nothing to stop
+            com.winlator.cmod.agvn.AgvnLoadAway.back();
             com.winlator.cmod.agvn.AgvnGamePause.resumed(); // AGVN: the time away is not the game's
             agvnRest(false);
             ProcessHelper.resumeAllWineProcesses();
@@ -914,9 +918,14 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 xServerView.onPause();
             }
 
-            if (!isFinishing() && !exiting.get()) com.winlator.cmod.agvn.AgvnGamePause.paused(true); // AGVN
-            ProcessHelper.pauseAllWineProcesses();
-            if (!isFinishing() && !exiting.get()) agvnRest(true);
+            agvnAway = true; // AGVN: a game still starting loads on, and stops once it is up (agvn/AgvnLoadAway)
+            boolean ending = isFinishing() || exiting.get();
+            if (ending || !com.winlator.cmod.agvn.AgvnLoadAway.keepLoading(agvnStartup != null && agvnStartup.starting(),
+                    () -> runOnUiThread(this::agvnPauseAway))) {
+                if (!ending) com.winlator.cmod.agvn.AgvnGamePause.paused(true); // AGVN
+                ProcessHelper.pauseAllWineProcesses();
+                if (!ending) agvnRest(true);
+            }
         }
 
         savePlaytimeData();
@@ -2420,6 +2429,14 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (profile == null) return;
         showInputControls(profile);
         com.winlator.cmod.agvn.AgvnControlsFork.rememberShown(shortcut, profile);
+    }
+
+    /** AGVN: the game that loaded on while the player was away is up, and the player is still away: it stops now. */
+    private void agvnPauseAway() {
+        if (!agvnAway || isFinishing() || exiting.get() || isInPictureInPictureMode()) return;
+        com.winlator.cmod.agvn.AgvnGamePause.paused(true);
+        ProcessHelper.pauseAllWineProcesses();
+        agvnRest(true);
     }
 
     /**
