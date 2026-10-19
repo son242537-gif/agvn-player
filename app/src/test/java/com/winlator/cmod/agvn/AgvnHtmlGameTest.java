@@ -105,10 +105,11 @@ public class AgvnHtmlGameTest {
         // html-compat.js makes it process.execPath: a game picked its language by path.parse(process.execPath).name
         File desktop = file(tmp.getRoot(), "Game.desktop",
                 "[Desktop Entry]\nExec=env WINEPREFIX=\"/x/.wine\" wine \"/sdcard/Games/X/ゲーム's.exe\"\n");
-        assertEquals("window.__agvnExe = 'ゲーム\\'s.exe';\n", AgvnHtmlGame.exeLine(desktop.getPath()));
-        assertEquals("", AgvnHtmlGame.exeLine(null));
-        assertEquals("", AgvnHtmlGame.exeLine(new File(tmp.getRoot(), "gone.desktop").getPath()));
-        assertEquals("", AgvnHtmlGame.exeLine(file(tmp.getRoot(), "NoExec.desktop", "[Desktop Entry]\nName=X\n").getPath()));
+        assertEquals("window.__agvnExe = 'ゲーム\\'s.exe';\n", AgvnHtmlExe.line(desktop.getPath(), null));
+        String fallback = "window.__agvnExe = 'Game.exe';\n"; // none to read, and no game folder: Game.exe, as before
+        assertEquals(fallback, AgvnHtmlExe.line(null, null));
+        assertEquals(fallback, AgvnHtmlExe.line(new File(tmp.getRoot(), "gone.desktop").getPath(), null));
+        assertEquals(fallback, AgvnHtmlExe.line(file(tmp.getRoot(), "NoExec.desktop", "[Desktop Entry]\nName=X\n").getPath(), null));
     }
 
     @Test

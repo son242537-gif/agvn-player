@@ -24,8 +24,12 @@
  *  9. RPG Maker MZ's touch buttons take a narrow img/system/ButtonSet (the app's empty picture for a missing or
  *     unreadable one, an MV game's) stretched to the size they are cut from, instead of stopping the game with
  *     "ButtonSet image is too small".
- * 10. A tap on a text field or button of the page (a plugin's name input laid over the game) focuses or clicks it, as a
- *     mouse click does on a PC: RPG Maker's touch handler kept the browser from doing either.
+ * 10. A touch on a field or button of the page (a name or number box a plugin puts over the game: <input>,
+ *     <textarea>, <select>, <button>, <label>) goes to it. RPG Maker cancelled every touch inside its picture, so once
+ *     the keyboard went the box got no focus and its OK button no click, and the game waited for ever. Touches on the
+ *     game stay the engine's. A text box that covers its own OK button on a game shrunk to fit the phone is narrowed.
+ * 11. path.parse and path.format as Node has them, and process.execPath names the game's own exe (the app sets
+ *     __agvnExe first): a game that picks its language from path.parse(process.execPath).name gets a PC's answer.
  */
 (function () {
     'use strict';
@@ -70,16 +74,20 @@
         extname: function (p) { var b = norm(p).split('/').pop(), i = b.lastIndexOf('.'); return i > 0 ? b.slice(i) : ''; },
         relative: function (from, to) { return norm(to).replace(norm(from) + '/', ''); },
         isAbsolute: function (p) { return String(p).charAt(0) === '/'; },
-        // a game picked its language by its exe's name, path.parse(process.execPath).name, and got the default with
-        // "path.parse is not a function" (20/10/2026)
+        // 11: a game picked its language by its exe's name, path.parse(process.execPath).name, and got the default with
+        // "path.parse is not a function" (20/10/2026). As Node's for '/' paths, nothing normalised; "\" counts as "/"
         parse: function (p) {
-            var base = path.basename(p), ext = path.extname(p);
-            return { root: '/', dir: path.dirname(p), base: base, ext: ext, name: ext ? base.slice(0, -ext.length) : base };
+            p = String(p).replace(/\\/g, '/');
+            var root = p.charAt(0) === '/' ? '/' : '', end = p.length;
+            while (end > root.length && p.charAt(end - 1) === '/') end--;
+            var body = p.slice(0, end), cut = body.lastIndexOf('/'), base = body.slice(cut + 1);
+            var dot = base.lastIndexOf('.'), ext = dot > 0 && base !== '..' ? base.slice(dot) : '';
+            return { root: root, dir: cut < 0 ? '' : body.slice(0, cut) || '/', base: base, ext: ext,
+                name: base.slice(0, base.length - ext.length) };
         },
         format: function (o) {
-            o = o || {};
-            var base = o.base || (o.name || '') + (o.ext || ''), dir = o.dir || o.root || '';
-            return dir ? norm(dir + '/' + base) : base;
+            var dir = o.dir || o.root || '', base = o.base || (o.name || '') + (o.ext || '');
+            return !dir ? base : dir === o.root ? dir + base : dir + '/' + base;
         }
     };
 
@@ -151,7 +159,7 @@
         proc.execArgv = [];
         proc.versions = {};
         proc.version = '';
-        // the game's exe by its own name (the app sets __agvnExe first), which a game may pick its language by; in the
+        // 11: the game's exe by its own name (the app sets __agvnExe first), which a game may pick its language by; in the
         // game folder, '/', as NW.js has it beside package.json
         proc.execPath = '/' + (String(window.__agvnExe || '').split(/[\\/]/).pop() || 'Game.exe');
         proc.mainModule = { filename: '/index.html' }; // its folder, '/', is the game folder for fs and path above
@@ -359,6 +367,7 @@
     }
 
     function patch() {
+        formTaps(); // 10: as soon as rpg_core / rmmz_core has run, if no script load told it first
         var SM = window.SceneManager, AM = window.AudioManager;
         if (!SM || SM.__agvnPatched) return !!SM;
         SM.__agvnPatched = true;
@@ -449,13 +458,13 @@
         };
     }
 
-    // --- 10: a tap on the page's own field or button (a plugin's name or number input, <input> and "Xác nhận" over the
-    // game) is the browser's. RPG Maker's TouchInput takes every touch inside the game on the whole page and calls
-    // preventDefault, and a touch screen then gives the field no focus and the button no click: once the field's first
-    // focus was gone, neither did anything and the game waited for good (20/10/2026). A mouse click is never prevented,
-    // so a PC was fine. A touch on the game is the engine's as before. TouchInput binds its handlers as the game starts
-    // (SceneManager.run), so the one there then is wrapped, a plugin's own included.
-    var FIELD = /^(INPUT|TEXTAREA|SELECT|OPTION|BUTTON|LABEL)$/;
+    // --- 10: MV and MZ take every touch on the page (TouchInput._onTouchStart, on document) and cancel one inside the
+    // game's picture (preventDefault), so the browser gave a box a plugin put over the game no focus and its OK button
+    // no click (20/10/2026). A touch on such an element is the page's now, as a mouse click is on a PC. The engine binds
+    // its handler as it starts (SceneManager.run): it is wrapped once rpg_core / rmmz_core has run, and again just
+    // before, should a plugin have replaced it. One bound before this file got to it finds such a touch outside the
+    // game's picture instead (formsLate). Touchend and mousedown cancel nothing, so they are left as they are.
+    var FIELD = /^(INPUT|TEXTAREA|SELECT|OPTION|BUTTON|LABEL)$/, formsLate = null;
 
     function onField(event) {
         for (var n = event && event.target; n && n.nodeType === 1; n = n.parentNode) { // a <span> in a <button> too
@@ -465,12 +474,74 @@
     }
 
     function formTaps() {
-        var T = window.TouchInput, start = T && T._onTouchStart;
-        if (typeof start !== 'function' || start.__agvnField) return;
-        T._onTouchStart = function (event) {
+        var T = window.TouchInput;
+        if (!T || typeof T._onTouchStart !== 'function') return false;
+        if (formsLate === null && (formsLate = typeof T._screenPressed === 'boolean')) lateForms(); // clear() has run
+        var start = T._onTouchStart;
+        if (start.__agvnField) return true;
+        T._onTouchStart = function (event) { // a field's touch: the browser gives it the focus, the keyboard or the click
             if (!onField(event)) return start.apply(this, arguments);
         };
         T._onTouchStart.__agvnField = true;
+        return true;
+    }
+
+    function lateForms() {
+        var G = window.Graphics, during = null;
+        if (!G || typeof G.isInsideCanvas !== 'function') return;
+        var inside = G.isInsideCanvas;
+        G.isInsideCanvas = function () { return during ? false : inside.apply(this, arguments); };
+        window.addEventListener('touchstart', function (ev) {
+            during = onField(ev) ? ev : null;
+            if (during) setTimeout(function () { during = null; }, 0); // also when a listener stopped it on the way
+        }, true);
+        window.addEventListener('touchstart', function () { during = null; }, false);
+        console.warn('[AGVN] the game took touches before html-compat.js: fields kept through isInsideCanvas');
+    }
+
+    // A text box a plugin places by the game's scale but sizes in fixed px covers its OK button once the game is
+    // shrunk to fit the phone (scale ~0.5). It is narrowed to end before a button on its right, from where the two
+    // are on the screen, so it is never shrunk twice; a button elsewhere, or one the plugin keeps covering, is put in
+    // front of it. Only on a shrunk game, only a box over a button of its own form, never a button's size.
+    function isText(n) {
+        var tag = n && n.tagName ? String(n.tagName).toUpperCase() : '';
+        return tag === 'TEXTAREA' || tag === 'SELECT'
+            || tag === 'INPUT' && /^(text|search|tel|url|email|password|number)$/i.test(n.type || 'text');
+    }
+
+    function fitField(f) {
+        var G = window.Graphics, box = f.form || f.parentNode;
+        if (!G || !(G._realScale < 0.95) || !box || !box.querySelectorAll || !f.getBoundingClientRect) return;
+        var all = box.querySelectorAll('button, input');
+        for (var i = 0; i < all.length; i++) {
+            var b = all[i], tag = String(b.tagName).toUpperCase();
+            if (b !== f && (tag === 'BUTTON' || /^(submit|button|reset|image)$/i.test(b.type))) unblock(f, b, G._realScale);
+        }
+    }
+
+    function unblock(f, b, scale) {
+        var r = f.getBoundingClientRect(), rb = b.getBoundingClientRect();
+        if (!r.width || !rb.width || r.right <= rb.left || rb.right <= r.left || r.bottom <= rb.top || rb.bottom <= r.top) return;
+        var css = function (e) { return window.getComputedStyle ? window.getComputedStyle(e) : {}; };
+        var room = rb.left - r.left - 2, cf = css(f), note = '';
+        if (room >= Math.max(24, 2 * r.height) && (f.__agvnFits = (f.__agvnFits || 0) + 1) <= 3) {
+            var k = f.offsetWidth > 0 ? r.width / f.offsetWidth : 1, px = function (v) { return parseFloat(v) || 0; };
+            var extra = cf.boxSizing === 'border-box' ? 0
+                : px(cf.paddingLeft) + px(cf.paddingRight) + px(cf.borderLeftWidth) + px(cf.borderRightWidth);
+            f.style.width = Math.floor(room / k - extra) + 'px';
+            note = 'narrowed to end before its button';
+        } else if (!b.__agvnFront) {
+            b.__agvnFront = true;
+            if ((css(b).position || 'static') === 'static') b.style.position = 'relative';
+            b.style.zIndex = String((parseInt(cf.zIndex, 10) || 0) + 1);
+            note = 'button put in front of it';
+        }
+        if (note && !f.__agvnNoted) console.log('[AGVN] text box over its button, ' + note + ' (game at '
+            + (f.__agvnNoted = scale.toFixed(2)) + 'x)');
+    }
+
+    function fitSoon(f) { // once the plugin has placed it
+        if (isText(f)) [60, 400].forEach(function (ms) { setTimeout(function () { fitField(f); }, ms); });
     }
 
     function keepFatal(text) {
@@ -494,6 +565,16 @@
             if (shown && !(window.SceneManager && SceneManager._scene)) keepFatal(loadError || shown);
         }, 0);
     });
+
+    // --- 10: the engine's touch handler as soon as rpg_core / rmmz_core has run (a script's load passes document
+    // first, before main.js hears of it), and a text box once it has the focus, or when the screen turns
+    if (typeof document.addEventListener === 'function') {
+        document.addEventListener('load', function scripts() {
+            if (formTaps()) document.removeEventListener('load', scripts, true);
+        }, true);
+        document.addEventListener('focusin', function (ev) { fitSoon(ev.target); }, true);
+        window.addEventListener('resize', function () { fitSoon(document.activeElement); });
+    }
 
     var tries = 0;
     var timer = setInterval(function () { if (patch() || ++tries > 2000) clearInterval(timer); }, 30);

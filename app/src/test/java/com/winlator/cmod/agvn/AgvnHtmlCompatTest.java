@@ -94,6 +94,29 @@ public class AgvnHtmlCompatTest {
         assertTrue(js.contains("function formTaps()") && js.contains("wideButtons(); formTaps(); return run.apply(this, arguments);"));
         // a game's language by its exe's name: path.parse(process.execPath).name
         assertTrue(js.contains("parse: function (p)") && js.contains("window.__agvnExe"));
+        // also before the game starts, and when it bound its handler before html-compat.js could wrap it
+        // (tools/agvn/tests/html_touch_sim.js dispatches through window, document and the field as a browser does)
+        assertTrue("as soon as rpg_core has run", js.contains("document.addEventListener('load', function scripts()"));
+        assertTrue("a handler bound before that", js.contains("G.isInsideCanvas = function () { return during ? false"));
+        // a box that covers its own OK button on a shrunk game is narrowed, never on a game at full size
+        assertTrue(js.contains("function fitField(f)") && js.contains("!(G._realScale < 0.95)"));
+    }
+
+    /** A game may pick its language by path.parse(process.execPath).name: the exe it runs as on Windows. */
+    @Test
+    public void theExeAPageGameRunsAsIsTheOneItsShortcutStarts() throws Exception {
+        File game = new File(tmp.getRoot(), "game");
+        touch("game/Game.exe");
+        touch("game/Game_E.exe");
+        touch("game/GameLauncher.exe");
+        File index = touch("game/www/index.html");
+        assertEquals("Game_E.exe", AgvnHtmlExe.name(new File(game, "Game_E.exe"), game));
+        assertEquals("the folder's main exe: Game.exe before Game_E.exe", "Game.exe", AgvnHtmlExe.name(null, game));
+        assertEquals("never a tool", "Game.exe", AgvnHtmlExe.name(new File(game, "GameLauncher.exe"), game));
+        touch("tools/Setup.exe");
+        assertEquals(AgvnHtmlExe.DEFAULT, AgvnHtmlExe.name(null, new File(tmp.getRoot(), "tools")));
+        assertEquals("an MV game's folder is the one above www/", "window.__agvnExe = 'Game.exe';\n",
+                AgvnHtmlExe.line(null, AgvnLightGame.folderOf(index)));
     }
 
     @Test

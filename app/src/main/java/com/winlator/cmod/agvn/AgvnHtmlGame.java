@@ -138,16 +138,6 @@ public final class AgvnHtmlGame {
         return null;
     }
 
-    /**
-     * The line html-compat.js takes process.execPath from: the exe of the shortcut at {@code shortcutPath} by its own
-     * name, which a game may pick its language by (path.parse(process.execPath).name). "" when there is none to read.
-     */
-    static String exeLine(String shortcutPath) {
-        File desktop = shortcutPath != null ? new File(shortcutPath) : null;
-        File exe = desktop != null && desktop.isFile() ? exeIn(desktop) : null;
-        return exe != null && !exe.getName().isEmpty() ? "window.__agvnExe = " + AgvnHtmlKeys.js(exe.getName()) + ";\n" : "";
-    }
-
     /** The "container_id:N" line launcher shortcuts rely on, or 0. */
     static int containerIdIn(File desktopFile) {
         for (String line : FileUtils.readLines(desktopFile)) {

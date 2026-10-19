@@ -364,6 +364,12 @@ class HtmlCompatTest(unittest.TestCase):
         out = subprocess.run(["node", sim], capture_output=True, text=True)
         self.assertEqual(0, out.returncode, out.stdout + out.stderr)
 
+    @unittest.skipIf(shutil.which("node") is None, "node is not installed")
+    def test_a_touch_on_a_field_over_the_game_reaches_it_however_the_game_starts(self):
+        sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_touch_sim.js")
+        out = subprocess.run(["node", sim], capture_output=True, text=True)
+        self.assertEqual(0, out.returncode, out.stdout + out.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

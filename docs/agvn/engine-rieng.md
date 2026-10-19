@@ -799,9 +799,10 @@ Tệp `img/system/ButtonSet.png_` trên máy test đúng chuẩn MZ (528×96, md
 
 ## Chạm vào ô nhập HTML của game MV/MZ không có tác dụng (bản 0.1.61)
 
-Báo cáo ngày 20/10/2026 (Android 16 / HyperOS, "Chạy nhẹ"): game có màn nhập liệu dựng bằng thẻ HTML (`<input>`,
-`<textarea>`, nút "Xác nhận") đặt đè lên khung game, như màn đặt tên nhân vật. Lúc mới hiện, ô tự có focus nên gõ được.
-Khi focus mất, chạm vào ô hay vào nút đều không có tác dụng, và game đứng chờ mãi, không lỗi. Trên PC thì chạy bình thường.
+Báo cáo ngày 20/10/2026 (Android 16 / HyperOS, "Chạy nhẹ"; bản gốc: `docs/agvn/bao-cao/2026-10-20-cham-o-nhap-html.md`):
+game có màn nhập liệu dựng bằng thẻ HTML (`<input>`, `<textarea>`, nút "Xác nhận") đặt đè lên khung game, như màn đặt
+tên nhân vật. Lúc mới hiện, ô tự có focus nên gõ được. Khi focus mất, chạm vào ô hay vào nút đều không có tác dụng, và
+game đứng chờ mãi, không lỗi. Trên PC thì chạy bình thường.
 
 - **Vì sao:**
   - `TouchInput._onTouchStart` của MV (`rpg_core.js`) và MZ (`rmmz_core.js`) gắn trên cả trang. Chạm nào trong khung
@@ -809,22 +810,38 @@ Khi focus mất, chạm vào ô hay vào nút đều không có tác dụng, và
   - Trên màn cảm ứng, `touchstart` bị chặn thì trình duyệt không chuyển focus cho ô và không gửi `click` cho nút. Ô và
     nút nằm đè lên khung game, nên không bao giờ nhận được chạm.
   - Engine không chặn chuột, nên trên PC bấm vào ô vẫn được.
+  - Plugin đặt ô theo tỉ lệ khung game (`Graphics._realScale`), nhưng bề ngang ô cố định theo px. Trên điện thoại khung
+    game thu nhỏ còn khoảng 0,5, nên ô đè lên nút bên cạnh.
 - **Sửa (`html-compat.js`, mục 10):**
   - Chạm rơi vào ô nhập hay nút của trang thì để trình duyệt xử lý. Gồm `INPUT`, `TEXTAREA`, `SELECT`, `OPTION`,
     `BUTTON`, `LABEL`, phần tử `contenteditable`, và phần tử nằm trong chúng (chữ trong nút).
   - Chạm vào khung game, hay vào ảnh hoặc khung `div` của plugin, vẫn do engine xử lý như cũ.
-  - Engine gắn hàm bắt chạm lúc `SceneManager.run` khởi động game, nên app bọc hàm lúc đó, khi mọi plugin đã nạp.
-    Plugin đã thay hàm này thì hàm của plugin được bọc luôn.
-  - Lớp phím ảo của app không cần đổi: chạm đầu tiên ngoài các phím đã được chuyển cho trang (`AgvnLightKeys`).
-- **Không làm:** báo cáo đề xuất co bề ngang và bề cao của ô theo `Graphics._realScale`, vì ô cố định theo px nên đè
-  lên nút. Chưa làm, vì không biết được plugin nào đã tự co ô. Co thêm thì ô của plugin đó nhỏ đi hai lần, mà nó
-  đang chạy tốt. Nút nằm trên ô nên vẫn chạm trúng được, và phím Enter của bàn phím cũng gửi được ô nhập nằm trong `<form>`.
-- **Phát hiện phụ:**
-  - `require('path')` thêm `parse` và `format`, giống Node.
-  - `process.execPath` là tên exe thật của game, như `/Game_EN.exe`, nằm ở thư mục game `/`. App đọc tên này từ dòng
-    `Exec=` của lối tắt (`AgvnHtmlGame.exeLine`) và đặt vào `window.__agvnExe` trước `html-compat.js`.
+  - Engine gắn hàm bắt chạm lúc `SceneManager.run` khởi động game. App bọc hàm ngay khi `rpg_core.js` / `rmmz_core.js`
+    chạy xong (sự kiện nạp của từng script đi qua `document` trước khi `main.js` biết), và bọc lại lúc `SceneManager.run`,
+    khi mọi plugin đã nạp. Plugin đã thay hàm này thì hàm của plugin được bọc luôn.
+  - Game gắn hàm sớm hơn (khởi động ngay lúc nạp script): trong lúc chạm vào ô, engine thấy điểm chạm nằm ngoài khung
+    game (`Graphics.isInsideCanvas`), nên cũng không chặn. Hai cách không chồng nhau: không chạm nào bị tính hai lần.
+  - Chỉ đổi `touchstart`. `touchend` và `mousedown` của engine không chặn gì nên để nguyên.
+  - Lớp phím ảo của app không cần đổi: chạm đầu tiên ngoài các phím đã được chuyển cho trang (`AgvnLightKeys`). Ô nằm
+    ngay dưới một phím ảo thì phím nhận chạm: ẩn phím (👁) để chạm ô.
+- **Ô đè lên nút (cũng mục 10):**
+  - Chỉ khi game bị thu nhỏ (tỉ lệ dưới 0,95), và chỉ ô chữ đè lên nút của chính form nó. Xét khi ô có focus và khi
+    màn hình xoay.
+  - Nút ở bên phải: ô được thu hẹp để kết thúc trước nút 2 px. Bề ngang tính từ vị trí thật trên màn hình, nên ô không
+    bao giờ co hai lần, và khi đã hết đè thì không đổi gì nữa.
+  - Nút ở chỗ khác, hoặc plugin cứ đặt lại bề ngang ô (sau 3 lần): nút được đưa lên trên ô.
+  - Không đổi cỡ nút. Game ở tỉ lệ đầy đủ không đổi gì. Console ghi một dòng `[AGVN] text box over its button, …`.
+  - Không co cả ô theo `Graphics._realScale` như báo cáo gợi ý: kiểu tính của trình duyệt luôn ra px, nên không biết
+    plugin nào đã tự co ô (co thêm thì ô nhỏ đi hai lần), và co chiều cao khi cỡ chữ cố định thì chữ bị cắt. App chỉ sửa
+    đúng chỗ hỏng đo được: ô đè lên nút. Ô nằm trên nút thì trước đây nút không chạm được (thử trên Chromium).
+- **Phát hiện phụ (mục 11, `AgvnHtmlExe`):**
+  - `require('path')` thêm `parse` và `format`, giống Node với đường dẫn `/` (`\` coi như `/`, như trên PC).
+  - `process.execPath` là tên exe thật của game, như `/Game_EN.exe`, nằm ở thư mục game `/`. App lấy exe mà lối tắt chạy
+    trên Windows (dòng `Exec=`), và đặt vào `window.__agvnExe` trước `html-compat.js`.
+  - Không đọc được, hoặc đó là công cụ (launcher, setup): exe chính trong thư mục game, như lúc thêm game (Game.exe trước
+    Game_E.exe). Không có exe nào: `/Game.exe` như cũ.
   - Trước đây, game chọn ngôn ngữ theo `path.parse(process.execPath).name` bị dừng ở "path.parse is not a function" và
-    rơi về ngôn ngữ mặc định. Không đọc được tên thì vẫn là `/Game.exe` như cũ.
+    rơi về ngôn ngữ mặc định.
 - **Test:**
   - `node tools/agvn/tests/html_form_taps_sim.js` chạy hàm bắt chạm đúng như MV 1.6 và MZ.
     - Chạm vào ô, vào chữ trong nút, vào ô `contenteditable` hay thẻ chữ thường: `defaultPrevented` là `false`, game không nhận.
@@ -832,10 +849,21 @@ Khi focus mất, chạm vào ô hay vào nút đều không có tác dụng, và
     - Hàm của plugin vẫn nhận mọi chạm vào game.
     - Kiểm thêm `path.parse`, `path.format` và `process.execPath`.
     - Với `html-compat.js` của 0.1.60, ca đầu trượt đúng như báo cáo.
-  - `test_toolkit.py` chạy tệp thử này.
-  - `AgvnHtmlGameTest.thePageIsToldTheGamesExeByItsOwnName`; `AgvnHtmlCompatTest` kiểm mã mục 10 có trong tệp.
+  - `node tools/agvn/tests/html_touch_sim.js` cho chạm đi qua `window`, `document` và ô như trình duyệt (bắt rồi nổi bọt):
+    - Hàm được bọc ngay sau khi `rpg_core` nạp; engine gắn hàm trước khi app bọc được: vẫn đúng, một chạm vào game là
+      một lần chạm, không hai.
+    - `path.parse` / `path.format` so với Node thật.
+    - Ô đè nút: thu hẹp một lần, nút giữ nguyên. Game tỉ lệ 1: không đổi. Nút ở đầu ô, hoặc plugin cứ đặt lại bề ngang:
+      nút được đưa lên trên.
+  - Chromium thật (Playwright, chạm giả lập; chạy trong phiên làm việc, không có trong repo): trước khi sửa, chạm ô
+    không có focus, chạm "OK" không gửi. Sau khi sửa cả hai được, ô không còn đè nút. Đúng cho MV, MZ, và khi engine gắn
+    hàm sớm.
+  - `test_toolkit.py` chạy hai tệp thử này.
+  - `AgvnHtmlGameTest.thePageIsToldTheGamesExeByItsOwnName`, `AgvnHtmlCompatTest`
+    (`theExeAPageGameRunsAsIsTheOneItsShortcutStarts`; mã mục 10, 11 có trong tệp).
 - **Thử máy:**
   1. Mở game có màn nhập tên, để bàn phím ẩn đi, rồi chạm lại vào ô: bàn phím phải lên lại. Chạm "Xác nhận": game đi tiếp.
-  2. Có cổng gỡ lỗi (Cài đặt > Nhật ký): tạo `touchstart` có `target` là ô nhập rồi `dispatchEvent`.
-     `event.defaultPrevented` phải là `false`.
-  3. Trên bản đồ và trong menu, chạm để đi và để chọn vẫn như cũ.
+  2. Ô không đè lên nút "Xác nhận"; nút chạm trúng được.
+  3. Có cổng gỡ lỗi (Cài đặt > Nhật ký): tạo `touchstart` có `target` là ô nhập rồi `dispatchEvent`.
+     `event.defaultPrevented` phải là `false`. So `getBoundingClientRect()` của ô và nút: không chồng nhau.
+  4. Trên bản đồ và trong menu, chạm để đi và để chọn vẫn như cũ, cả khi bật "Toàn màn hình cho mọi game".
