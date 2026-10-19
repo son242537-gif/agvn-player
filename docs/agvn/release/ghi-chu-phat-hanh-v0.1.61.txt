@@ -1,0 +1,6 @@
+AGVN Player v0.1.61 - agvn.io
+
+Sửa lỗi:
+- Game RPG Maker MV/MZ có ô nhập chữ hoặc số (như màn đặt tên nhân vật): chạm vào ô hay vào nút "Xác nhận" giờ có tác dụng. Trước đây, khi ô mất con trỏ thì không chạm lại được nữa, và game đứng chờ mãi.
+- Game chọn ngôn ngữ theo tên file exe giờ chọn đúng ngôn ngữ khi chạy nhẹ.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
