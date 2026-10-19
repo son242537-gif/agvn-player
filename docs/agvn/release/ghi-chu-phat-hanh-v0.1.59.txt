@@ -1,0 +1,6 @@
+AGVN Player v0.1.59 - agvn.io
+
+Sửa lỗi:
+- Game Windows nạp lâu trước khi lên hình không còn bị dừng khi bạn rời app: game nạp tiếp ở nền, và chỉ dừng khi đã lên hình mà bạn chưa quay lại. Trước đây rời app lúc game đang nạp thì game đứng yên, quay lại vẫn màn đen.
+- Nhật ký ghi bộ giả lập chạy phần 32-bit của game (FEXCore hay WOWBox64) và phiên bản của nó.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
