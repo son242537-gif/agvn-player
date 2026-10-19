@@ -1,0 +1,6 @@
+AGVN Player v0.1.60 - agvn.io
+
+Sửa lỗi:
+- Game dừng ngay khi mở vì một file DLL đi kèm (thường của bảng cheat hoặc mod, như version.dll) thiếu hàm mà Wine cần: "Tự sửa lỗi" nhận ra và đề nghị dùng bản DLL của Wine, để game chạy được (cheat hoặc mod trong file đó sẽ không chạy).
+- Thêm game không còn nhận công cụ cài đặt của game (tên tiếng Nhật, Trung, Hàn như エンジン設定.exe) thành một game riêng.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
