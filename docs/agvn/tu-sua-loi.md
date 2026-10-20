@@ -1808,3 +1808,54 @@ Báo cáo ngày 20/10/2026 (コトネイロ, bản có bảng cheat): game khôn
   1. Game có `version.dll` cheat cũ (3 hàm): mở game, game dừng. Về thư viện, "Tự sửa lỗi" hỏi "File version.dll thiếu
      hàm", có nút "Dùng version.dll của Wine…". Bấm nút: game mở được, cheat không có.
   2. Thêm thư mục コトネイロ: app chỉ nhận một game, file chạy là `コトネイロ.exe`.
+
+## App tự đóng sau vài phút chơi: "Drawable data initialized as null!" (bản 0.1.62)
+
+Nhật ký ngày 20/10/2026 (The Blood of Yidhra, Unity 2020.1, Xiaomi 23117RK66C, Adreno 750, bản 0.1.61): app tự đóng
+sau 7 phút ở phiên đầu, 5 phút ở phiên sau.
+
+- **Hiện tượng:**
+  - Cả hai phiên đều kết thúc bằng "App bị lỗi Java (CRASH)". App văng chứ không phải game, và logcat có cùng một lỗi:
+    `IllegalStateException: Drawable data initialized as null!` lúc X server của app tạo con trỏ chuột cho game
+    (`CursorRequests.createCursor` → `CursorManager.createCursor` → `new Drawable`).
+  - `Player.log` của Unity không có lỗi nào lúc đó. Game vẫn đang chạy.
+  - Ở cả hai phiên, DMA-BUF cao nhất gần như bằng nhau: 697 MB và 694 MB. Đó là dấu hiệu chạm một giới hạn cố định,
+    không phải thiếu RAM: RAM trống thấp nhất vẫn còn 1,7–1,9 GB.
+- **Vì sao:**
+  - Mỗi ảnh (pixmap) và mỗi con trỏ của game có một bộ đệm đồ hoạ Android (`AHardwareBuffer`, `Drawable.allocate`).
+  - X server của Winlator gốc không bao giờ trả bộ đệm này. Game xoá pixmap (FreePixmap) hay con trỏ (FreeCursor) thì
+    app chỉ bỏ đối tượng Java, còn bộ đệm vẫn bị giữ tới khi app đóng.
+  - Wine tạo con trỏ mới cho mỗi HCURSOR mới: 2 pixmap (ảnh và mặt nạ) cộng ảnh của con trỏ, tức 3 bộ đệm. Game này
+    đổi con trỏ liên tục, nên bộ đệm cứ tăng. Tới lúc Android từ chối cấp bộ đệm mới, `allocate` trả 0, `Drawable` ném
+    lỗi, và lỗi này không được bắt nên cả app đóng.
+- **Sửa (bản 0.1.62):**
+  - `Drawable.release()` trả bộ đệm `allocate` đã lấy (`AHardwareBuffer_release`, `drawable.c`). Nó chạy trong
+    `renderLock` và đặt `backingAHB` về 0, nên bộ vẽ nào chép ảnh sau đó sẽ thấy 0 và bỏ qua.
+  - **Pixmap:** trả bộ đệm khi game xoá pixmap (`PixmapManager.freePixmap`).
+    - Ảnh của DRI3 (khung hình của DXVK) là của `GPUImage`. Chỉ bộ đệm drawable tự lấy được trả, `GPUImage` giữ nguyên.
+    - Bộ vẽ Vulkan đã tự giữ tham chiếu riêng cho ảnh nó dùng, nên không bị ảnh hưởng.
+    - Biểu tượng cửa sổ (`Pixmap.toBitmap`, trình quản lý tác vụ đọc ở luồng riêng) giờ đọc trong `renderLock`.
+  - **Con trỏ:** X giữ con trỏ đã bị xoá khi còn cửa sổ đang hiện nó. Wine xoá con trỏ trên một kết nối khác với kết
+    nối đổi con trỏ cho cửa sổ, nên FreeCursor có thể tới trước.
+    - `AgvnUseCount` đếm số cửa sổ đang hiện con trỏ (`WindowAttributes`, cửa sổ bị huỷ). Ảnh của con trỏ được trả khi
+      con trỏ đã bị xoá và không cửa sổ nào hiện nó nữa.
+    - Bộ vẽ EGL và DisplayX giữ tham chiếu riêng (`AHardwareBuffer_acquire` trong `nativeCreateCursor`) tới khi tự gỡ
+      con trỏ (`CursorManager::removeCursor`).
+    - Bộ vẽ Vulkan chép điểm ảnh của con trỏ trong `renderLock`, và bỏ qua con trỏ đã trả ảnh.
+    - `FreeCursor` cho một con trỏ không có giờ không làm gì. Trước đây nó gây lỗi `NullPointerException` ở bộ vẽ EGL.
+  - **Không đóng app nữa:** Android không cấp bộ đệm cho yêu cầu nào (tạo pixmap, cửa sổ, con trỏ) thì game nhận lỗi
+    X `BadAlloc` cho yêu cầu đó (`Drawable.NoBuffer`, `XClientRequestHandler`), thay vì cả app đóng.
+    - `su-kien.txt` ghi "Android không cấp bộ đệm đồ hoạ cho yêu cầu X N (cỡ, số bộ đệm đang giữ)…", tối đa một dòng
+      mỗi phút (`AgvnBufferNote`).
+    - Wine thường thoát game khi nhận lỗi X không lường trước. Khi đó game đóng nhưng app vẫn mở.
+  - **Còn lại:** bộ đệm của cửa sổ vẫn chưa được trả khi cửa sổ bị huỷ hoặc đổi cỡ. Bộ vẽ EGL và DisplayX còn dùng con
+    trỏ thô tới bộ đệm này trên luồng vẽ, nên cần sửa riêng. Game ít khi tạo và huỷ cửa sổ liên tục.
+- **Test:** `AgvnBufferReleaseTest`: cách đếm của `AgvnUseCount`, và các chỗ móc trả bộ đệm trong mã nguồn (Java và
+  native). Bộ đệm là của Android nên cloud không chạy thử được.
+- **Thử máy:**
+  1. The Blood of Yidhra: chơi quá 10 phút, rê và bấm nhiều để game đổi con trỏ. App không đóng.
+     `adb shell dumpsys meminfo com.agvn.player` phần DMA-BUF (hoặc dòng RAM của `tom-tat.txt`) không tăng mãi.
+  2. Game Unity, RPG Maker, Ren'Py (Wine) khác: con trỏ, biểu tượng trong trình quản lý tác vụ, menu chuột phải vẫn
+     như cũ.
+  3. Chọn Renderer là EGL, rồi DisplayX (cài đặt game hoặc container): đổi con trỏ nhiều lần, thoát game, mở lại. App
+     không văng.

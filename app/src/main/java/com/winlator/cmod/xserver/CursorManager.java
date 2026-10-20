@@ -34,9 +34,12 @@ public class CursorManager extends XResourceManager {
     }
 
     public void freeCursor(int id) {
-        triggerOnFreeResourceListener(cursors.get(id));
-        triggerOnFreeCursor(cursors.get(id));
+        Cursor cursor = cursors.get(id);
+        if (cursor == null) return; // AGVN: no such cursor; the listeners took null for one
+        triggerOnFreeResourceListener(cursor);
+        triggerOnFreeCursor(cursor);
         cursors.remove(id);
+        cursor.free(); // AGVN: its image back to Android once no window shows it
     }
 
     private static boolean isEmptyMaskImage(Drawable maskImage) {

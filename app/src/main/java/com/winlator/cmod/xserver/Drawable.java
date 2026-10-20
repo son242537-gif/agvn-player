@@ -9,6 +9,7 @@ import com.winlator.cmod.renderer.GPUImage;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Drawable extends XResource {
     public static final int HAL_PIXEL_FORMAT_RGBA_8888 = 1;
@@ -27,6 +28,16 @@ public class Drawable extends XResource {
     private Callback<Drawable> onDestroyListener;
     private boolean offscreen = false;
     public final Object renderLock = new Object();
+    // AGVN: the buffer this drawable allocated itself, given back by release(); 0 once it is
+    private long ownBuffer;
+    private static final AtomicInteger ownBuffers = new AtomicInteger();
+
+    /** AGVN: Android gave no buffer for a new drawable; the request that asked for it gets BadAlloc. */
+    public static final class NoBuffer extends IllegalStateException {
+        NoBuffer(int width, int height) {
+            super("Drawable data initialized as null! (" + width + "x" + height + ", " + ownBuffers.get() + " buffers held)");
+        }
+    }
 
     static {
         System.loadLibrary("winlator");
@@ -40,8 +51,30 @@ public class Drawable extends XResource {
         this.format = format;
         this.backingAHB = allocate(width, height, format);
         if (this.backingAHB == 0) {
-            throw new IllegalStateException("Drawable data initialized as null!");
+            throw new NoBuffer(width, height);
         }
+        ownBuffer = backingAHB;
+        ownBuffers.incrementAndGet();
+    }
+
+    /**
+     * AGVN: gives this drawable's own buffer back to Android, once nothing draws it any more (a freed pixmap, a cursor
+     * no window shows). Upstream never did: a game that kept making cursors ran out of buffers. A renderer that keeps
+     * the picture holds its own reference; one that copies it does so under renderLock, and finds 0 after this.
+     */
+    public void release() {
+        synchronized (renderLock) {
+            if (ownBuffer == 0) return;
+            if (backingAHB == ownBuffer) backingAHB = 0;
+            releaseBuffer(ownBuffer);
+            ownBuffer = 0;
+            ownBuffers.decrementAndGet();
+        }
+    }
+
+    /** AGVN: the buffers drawables hold now, for the log. */
+    public static int ownBuffers() {
+        return ownBuffers.get();
     }
 
     public static Drawable fromBitmap(Bitmap bitmap) {
@@ -244,6 +277,8 @@ public class Drawable extends XResource {
     private static native void drawLine(short x0, short y0, short x1, short y1, int color, short lineWidth, short stride, long dstAHB);
     
     private native long allocate(int width, int height, int format);
+
+    private static native void releaseBuffer(long ahb);
 
     public native ByteBuffer lockBuffer(long ahb);
 

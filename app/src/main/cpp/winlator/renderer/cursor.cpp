@@ -8,6 +8,8 @@ void CursorManager::addCursor(int id, std::unique_ptr<struct Cursor> cursor) {
 void CursorManager::removeCursor(JNIEnv *env, Cursor *cursor) {
     env->DeleteGlobalRef(cursor->cursorObj);
     env->DeleteGlobalRef(cursor->image->drawableObj);
+    if (cursor->image->ahb) AHardwareBuffer_release(cursor->image->ahb); // AGVN: the reference nativeCreateCursor took
+    cursor->image->ahb = nullptr;
     
     {
         auto lock = cursorLock.lock();

@@ -351,6 +351,7 @@ public class VulkanXServerView extends XServerRendererView implements SurfaceHol
         nativeSetCursorVisible(nativeHandle, effVis);
         if (effVis && cd != null && cd.backingAHB != 0) {
             synchronized (cd.renderLock) {
+                if (cd.backingAHB == 0) return; // AGVN: a freed cursor gave its image back meanwhile (Drawable.release)
                 ByteBuffer pixels = cd.lockBuffer(cd.backingAHB);
                 if (pixels != null) {
                     try {

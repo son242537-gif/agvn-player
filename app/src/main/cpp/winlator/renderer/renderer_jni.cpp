@@ -317,6 +317,7 @@ Java_com_winlator_cmod_widget_XServerView_nativeCreateCursor(JNIEnv *env, jobjec
     drawable->height = env->GetShortField(drawableObj, cache.drawableHeight);
     drawable->data = nullptr;
     drawable->ahb = (AHardwareBuffer *)env->GetLongField(drawableObj, cache.drawableAHB);
+    if (drawable->ahb) AHardwareBuffer_acquire(drawable->ahb); // AGVN: ours until removeCursor; Java gives its own back
     drawable->stride = env->GetShortField(drawableObj, cache.drawableStride);
     drawable->format = env->GetIntField(drawableObj, cache.drawableFormat);
     drawable->isDirectContent = false;

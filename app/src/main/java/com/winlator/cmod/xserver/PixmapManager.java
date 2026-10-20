@@ -33,8 +33,10 @@ public class PixmapManager extends XResourceManager {
     }
 
     public void freePixmap(int id) {
-        triggerOnFreeResourceListener(pixmaps.get(id));
+        Pixmap pixmap = pixmaps.get(id);
+        triggerOnFreeResourceListener(pixmap);
         pixmaps.remove(id);
+        if (pixmap != null) pixmap.drawable.release(); // AGVN: its buffer back to Android (Drawable.release)
     }
 
     public Visual getVisualForDepth(byte depth) {

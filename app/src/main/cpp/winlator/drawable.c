@@ -511,6 +511,12 @@ Java_com_winlator_cmod_xserver_Drawable_allocate(JNIEnv *env, jclass obj, jint w
     return (jlong)hardwareBuffer;
 }
 
+// AGVN: the reference allocate() took, given back once the drawable is no longer used (Drawable.release)
+JNIEXPORT void JNICALL
+Java_com_winlator_cmod_xserver_Drawable_releaseBuffer(JNIEnv *env, jclass obj, jlong ahb) {
+    if (ahb) AHardwareBuffer_release((AHardwareBuffer *)ahb);
+}
+
 JNIEXPORT jobject JNICALL
 Java_com_winlator_cmod_xserver_Drawable_lockBuffer(JNIEnv *env, jclass obj, jlong ahb) {
     int ret;
