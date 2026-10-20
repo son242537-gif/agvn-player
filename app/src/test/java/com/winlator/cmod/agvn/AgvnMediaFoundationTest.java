@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 public class AgvnMediaFoundationTest {
+    private static final String QUIET = "-all,err+module,err+mscoree,err+system,err+sync,trace+msgbox";
     private static final String NO_MANAGER = AgvnMediaFoundation.NO_DXGI_MANAGER;
 
     @Test
@@ -76,9 +77,9 @@ public class AgvnMediaFoundationTest {
         assertEquals("warn+all,err+all,fixme+all,warn-heap,warn-file,warn-font,trace+msgbox",
                 AgvnWineDebug.spec(true, SettingsFragment.DEFAULT_WINE_DEBUG_CHANNELS));
         assertEquals("warn+all,+mfplat,+d3d11,warn-heap,warn-file,warn-font,trace+msgbox", AgvnWineDebug.spec(true, "warn, mfplat,d3d11"));
-        assertEquals("-all,err+module,err+mscoree,err+system,trace+msgbox", AgvnWineDebug.spec(false, "warn,err,fixme"));
-        assertEquals("-all,err+module,err+mscoree,err+system,trace+msgbox", AgvnWineDebug.spec(true, ""));
-        assertEquals("-all,err+module,err+mscoree,err+system,trace+msgbox", AgvnWineDebug.spec(true, " , "));
-        assertEquals("-all,err+module,err+mscoree,err+system,trace+msgbox", AgvnWineDebug.spec(true, null));
+        assertEquals(QUIET, AgvnWineDebug.spec(false, "warn,err,fixme"));
+        assertEquals("-all,err+module,err+mscoree,err+system,err+sync,trace+msgbox", AgvnWineDebug.spec(true, ""));
+        assertEquals("-all,err+module,err+mscoree,err+system,err+sync,trace+msgbox", AgvnWineDebug.spec(true, " , "));
+        assertEquals("-all,err+module,err+mscoree,err+system,err+sync,trace+msgbox", AgvnWineDebug.spec(true, null));
     }
 }

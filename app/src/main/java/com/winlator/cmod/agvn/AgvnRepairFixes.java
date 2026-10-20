@@ -28,14 +28,15 @@ import java.util.Map;
  *   <li>mods-off: the game without its mod loader, through Wine's own copy of the loader's DLL ({@link AgvnMods});</li>
  *   <li>raw-mouse: touches as a real mouse, raw input included, or back to the X server's pointer events for a game
  *   that has them so ({@link AgvnRawMouse});</li>
- *   <li>exe-64: the game's 64-bit exe instead of its 32-bit one ({@link AgvnExe64}).</li>
+ *   <li>exe-64: the game's 64-bit exe instead of its 32-bit one ({@link AgvnExe64});</li>
+ *   <li>emulator-order, esync-off: for a game stuck on a lock ({@link AgvnLockFixes}).</li>
  * </ul>
  * Pure Java except {@link #make}.
  */
 final class AgvnRepairFixes {
     static final List<String> IDS = Arrays.asList("render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off",
             "present-sync", "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "mods-off",
-            "raw-mouse", AgvnExe64.FIX);
+            "raw-mouse", AgvnExe64.FIX, AgvnLockFixes.ORDER, AgvnLockFixes.ESYNC);
     static final String CHINESE = "zh_CN.UTF-8", PULSE = "pulse-audio-gn", ALSA = "alsa";
 
     private AgvnRepairFixes() {}
@@ -87,7 +88,7 @@ final class AgvnRepairFixes {
             case AgvnExe64.FIX:
                 return AgvnExe64.fix(a, s);
             default:
-                return null;
+                return AgvnLockFixes.make(a, s, id); // a game stuck on a lock: FEX's order, esync
         }
     }
 
@@ -134,7 +135,7 @@ final class AgvnRepairFixes {
                 s.putExtra(AgvnExe64.EXTRA, fix.to);
                 return true;
             default:
-                return false;
+                return AgvnLockFixes.apply(s, fix);
         }
     }
 

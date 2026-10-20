@@ -22,7 +22,8 @@ import java.util.List;
  * than {@link #RECENT} come between two kept lines, they are kept after all: DXVK lists Vulkan extensions with
  * "extension supported : 1" under one after another, and its list read "[AGVN] ×1 dòng lặp lại" (0.1.21). The tail goes
  * into the session folder as {@value #FILE}. Mali's tiler heap running out ({@link #TILER_OOM}) is counted over the
- * whole session ({@link #tilerOoms}).
+ * whole session ({@link #tilerOoms}). A thread stuck on a lock for more than a minute adds a note
+ * ({@link AgvnLockWatch}) that no repeat hides, to the tail and to su-kien.txt.
  */
 public final class AgvnWineTail implements Callback<String> {
     static final int LINES = 300, CRASH_LINES = 200, LINE_CHARS = 1000, RECENT = 4;
@@ -36,6 +37,7 @@ public final class AgvnWineTail implements Callback<String> {
     private final ArrayDeque<String> recentKeys = new ArrayDeque<>();
     /** The first {@link #RECENT} lines counted in {@link #again}. */
     private final List<String> repeats = new ArrayList<>();
+    private final AgvnLockWatch locks = new AgvnLockWatch();
     private boolean inCrash;
     private int again, tilerOoms;
 
@@ -51,6 +53,7 @@ public final class AgvnWineTail implements Callback<String> {
         repeats.clear();
         inCrash = false;
         again = tilerOoms = 0;
+        locks.reset();
     }
 
     @Override
@@ -58,6 +61,13 @@ public final class AgvnWineTail implements Callback<String> {
         if (line == null) return;
         if (line.length() > LINE_CHARS) line = line.substring(0, LINE_CHARS);
         if (line.contains(TILER_OOM)) tilerOoms++;
+        String stuck = locks.line(line);
+        if (stuck != null) {
+            note(line);
+            note(stuck);
+            AgvnSessionLog.event(stuck.substring("[AGVN] ".length()));
+            return;
+        }
         if (!inCrash && crash.isEmpty() && AgvnCrashScan.startsCrash(line)) inCrash = true;
         if (inCrash) {
             crash.add(line);
@@ -74,6 +84,14 @@ public final class AgvnWineTail implements Callback<String> {
         keep(line);
         recentKeys.addLast(key);
         if (recentKeys.size() > RECENT) recentKeys.removeFirst();
+    }
+
+    /** Keeps {@code line} after the lines counted before it, whatever came just before. */
+    private void note(String line) {
+        for (String counted : counted()) keep(counted);
+        again = 0;
+        repeats.clear();
+        keep(line);
     }
 
     private void keep(String line) {

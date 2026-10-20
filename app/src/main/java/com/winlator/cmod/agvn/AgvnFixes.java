@@ -34,7 +34,7 @@ final class AgvnFixes {
             "emulator-stable", "emulator-fast", "wincomponent", "wrapper-constants", "wrapper-clip", "wine-mono",
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "mods-off", "raw-mouse", "ue-wait",
-            AgvnExe64.FIX, AgvnDllProxy.FIX);
+            AgvnExe64.FIX, AgvnDllProxy.FIX, AgvnLockFixes.ORDER, AgvnLockFixes.ESYNC);
     static final String SYSTEM = "System";
 
     /** A button: its fix id, its words, and what it sets ({@code to}). */

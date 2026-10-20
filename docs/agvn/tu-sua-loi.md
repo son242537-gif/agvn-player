@@ -46,6 +46,7 @@ Thư viện và Big Picture đều hỏi, tùy màn hình nào đang mở: hộp
 | Game bị tắt khi vẽ hình (OpenGL qua Zink) | Zink báo `vkCreateGraphicsPipelines failed` rồi game tự tắt; hay gặp ở GPU Mali, vì Zink thiếu vài tính năng trên đó | Game Godot: chạy bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3), bằng Direct3D 11 (ANGLE), bỏ cách vẽ đã đổi. Mọi game: đổi driver |
 | Driver đồ họa thiếu tính năng DirectX 11 | DXVK: `D3D11CoreCreateDevice: Requested feature level not supported`: driver không đủ tính năng cho mức DirectX nào game xin (vẽ khung dây, geometry shader, transform feedback...) | Đổi driver, dùng WineD3D (trừ khi OpenGL đã không chạy với driver này), gửi nhật ký. Không đổi bản DXVK: bản nào cũng cần các tính năng đó |
 | Wine lỗi khi game gọi dịch vụ của Windows (bản 0.1.52) | Wine: một lỗi truy cập bộ nhớ (`EXCEPTION_ACCESS_VIOLATION`) có khung `L"rpcrt4.dll"` trong backtrace, thường ngay sau đó game đứng màn hình đen (Unreal tự bắt lỗi, Wine không in lỗi nào của nó); tìm cả khi game không tự tắt | Chạy bằng Wine cũ (Proton 9), giả lập CPU ổn định, gửi nhật ký |
+| Game khoá chết, đứng hình (bản 0.1.63) | Wine: `err:sync:RtlpWaitForCriticalSection section … wait timed out in thread …, blocked by …` lần thứ hai cho cùng một luồng và một khoá, tức luồng đó chờ khoá hơn 1 phút. App bật sẵn kênh `err+sync` khi nhật ký Wine tắt, và ghi `[AGVN] Khoá chết: …` vào dòng cuối của Wine và `su-kien.txt` (`AgvnLockWatch`); tìm cả khi người chơi tự thoát hay vuốt tắt app. Xem "Game khoá chết khi nạp cảnh" bên dưới | Giả lập CPU giữ đúng thứ tự bộ nhớ, tắt Esync, giả lập CPU ổn định hơn, chạy bằng Wine cũ (Proton 9), chạy không có mod, gửi nhật ký |
 | Bản 32-bit của game không dùng được bộ nhớ đồ họa (bản 0.1.51) | DXVK: `DxvkMemoryAllocator: Mapping memory failed with VK_ERROR_MEMORY_MAP_FAILED`: chương trình 32-bit không nhận được bộ nhớ đồ họa với driver này (Mali), nên không có DirectX; tìm cả khi game không tự tắt | Chạy bản 64-bit của game (nếu có), đổi driver, dùng WineD3D, gửi nhật ký. Không đổi bản DXVK: bản nào cũng cần bộ nhớ đó |
 | Máy không chạy được OpenGL với driver này | Mesa: `failed to load driver: zink`: Zink không khởi động được trên driver Vulkan của game, nên game OpenGL và WineD3D không vẽ được | Dùng lại DXVK (game đang dùng WineD3D), đổi driver, gửi nhật ký. Từ đó app không đề nghị WineD3D với driver này nữa (`AgvnOpenGlCheck`, nhớ theo driver và bản app), dù game kết thúc thế nào (từ 09/10/2026, cả khi người chơi tự thoát) |
 | Không tạo được DirectX / thiếu DirectX 11 | Câu lỗi của DXVK, Unity (`InitializeEngineGraphics failed`) | Đổi bản DXVK, đổi driver (Turnip ↔ System), dùng WineD3D. "Đổi bản DXVK" chỉ hiện khi bản kia chạy được: DXVK 2.x cần Vulkan 1.3, nên với driver của máy (System) thấp hơn, lúc mở game vẫn chạy 1.10.3 và nút đó không hiện (`AgvnDxvkPick.sameAtStart`) |
@@ -329,7 +330,7 @@ lỗi: người chơi báo …, thử: …"). Trạng thái nằm cùng file c�
 | Hình có đốm đen, mảng đen, sọc hoặc sai màu | Godot: Chạy nhẹ, cách vẽ khác; tắt LRZ của Turnip; tắt nén hình UBWC; sysmem; giải nén mọi texture BCn (GPU không phải Turnip); đổi DXVK; đổi driver; để game Unity tự chọn chất lượng; WineD3D; về cấu hình gốc |
 | Màn hình đen dù game vẫn chạy | Đồng bộ khung hình; Godot: Chạy nhẹ, cách vẽ khác; sysmem; nâng Đồ họa; đổi DXVK; đổi driver; WineD3D; chạy không có mod; về cấu hình gốc |
 | Game chậm, giật, lag | Godot: Chạy nhẹ; hạ Đồ họa; DXVK chạy thẳng trên chip ARM; chế độ Gmem; để Turnip tự chọn; giả lập CPU nhanh hơn; bỏ bớt khung hình (RPG Maker); mở cài đặt Tiết kiệm pin |
-| Game đứng hình, treo | Giả lập CPU ổn định hơn; chạy không có mod; Godot: Chạy nhẹ; tắt DXVK async; Godot: cách vẽ khác; đổi DXVK; đổi driver; về cấu hình gốc |
+| Game đứng hình, treo | Giả lập CPU ổn định hơn; chạy không có mod; giả lập CPU giữ đúng thứ tự bộ nhớ; tắt Esync; Godot: Chạy nhẹ; tắt DXVK async; Godot: cách vẽ khác; đổi DXVK; đổi driver; về cấu hình gốc |
 | Game tự tắt, văng ra | Giả lập CPU ổn định hơn; để game Unity tự chọn chất lượng; chạy không có mod; Godot: Chạy nhẹ, cách vẽ khác; đổi DXVK; đổi driver; về cấu hình gốc |
 | Không có tiếng, tiếng rè hoặc lắp | Đổi giữa PulseAudio và ALSA; về cấu hình gốc |
 | Chữ lỗi, ô vuông, ký tự lạ | Chạy game bằng tiếng Nhật; bằng tiếng Trung; về cấu hình gốc |
@@ -1859,3 +1860,49 @@ sau 7 phút ở phiên đầu, 5 phút ở phiên sau.
      như cũ.
   3. Chọn Renderer là EGL, rồi DisplayX (cài đặt game hoặc container): đổi con trỏ nhiều lần, thoát game, mở lại. App
      không văng.
+
+## Game khoá chết khi nạp cảnh (bản 0.1.63)
+
+Phiếu ngày 21/10/2026 (`PHIEU-LOI-AGVN-PLAYER-UNITY-IL2CPP-KHOA-CHET-KHI-NAP-CANH.md`): game Unity 2022.3 IL2CPP (DX11),
+có gói Addressables mã hoá nạp qua `AssetBundle.LoadFromStreamAsync` với Stream giải mã viết bằng C#. App 0.1.62,
+Proton 9 arm64ec, FEXCore 2601, POCO F8 Pro. Màn tiêu đề và đoạn mở đầu chạy được; tới lúc nạp cảnh chơi chính thì màn
+hình đen mãi (FPS 0, luồng bận nhất 3% một nhân), 2/2 lần, cùng một chỗ. Cùng thư mục game chạy qua trên GameHub
+(Proton 11 arm64x, FEX `HalfBarrierTSO=0`) và trên PC.
+
+- **Nhật ký Wine:** luồng chính chờ một khoá (critical section không tên, khoá của IL2CPP) do một luồng
+  "IL2CPP Threadpool worker" vừa tạo giữ. Khoá không bao giờ được nhả; mỗi phút Wine báo
+  `RtlpWaitForCriticalSection … wait timed out in thread 00e0, blocked by 0224, retrying (60 sec)`. Ba luồng khác
+  chờ khoá thứ hai. Game không bị giết, máy còn 2,9 GB RAM trống.
+- **Cách Wine báo:** luồng chờ khoá quá 5 giây thì Wine in dòng trên, rồi in lại mỗi 60 giây khi vẫn chờ
+  (`ntdll/sync.c`). Lần đầu có thể chỉ là nạp lâu; lần thứ hai cho cùng luồng và cùng khoá nghĩa là luồng đã chờ hơn
+  65 giây.
+- **App nhận ra (`AgvnLockWatch`):**
+  - Kênh `err+sync` có trong WINEDEBUG khi nhật ký Wine tắt (`AgvnWineDebug.QUIET_SPEC`). Kênh này chỉ in khi có luồng
+    chờ khoá quá lâu hoặc khoá hỏng.
+  - Lần báo thứ hai cho cùng luồng và khoá, app ghi `[AGVN] Khoá chết: luồng … chờ khoá … hơn 1 phút, khoá do luồng …
+    giữ` vào dòng cuối của Wine (không bị gộp vào dòng lặp lại) và vào `su-kien.txt`, mỗi khoá một lần trong một phiên.
+  - "Tự sửa lỗi" có lỗi mới `deadlock` (`"when": []`): hỏi sau khi người chơi thoát game đang đứng, cả khi vuốt tắt app
+    (đọc dòng cuối Wine đã giữ lại). Một lần chờ 5 giây (nạp lâu) không bị hỏi.
+- **Cách sửa (theo thứ tự, mỗi lần một cách, cách không giúp thì trả lại; `AgvnLockFixes`):**
+  1. **Giả lập CPU giữ đúng thứ tự bộ nhớ** (`emulator-order`): `FEX_HALFBARRIERTSOENABLED=0` trong biến môi trường của
+     game. FEX mặc định đổi mã gặp truy cập bộ nhớ không thẳng hàng sang kiểu "half-barrier", và chính FEX ghi rằng
+     cách này "có thể nguy hiểm vì truy cập thẳng hàng qua cùng đoạn mã đó không còn nguyên tử". Khoá của IL2CPP đọc qua
+     đoạn mã như vậy có thể thấy giá trị cũ. GameHub chạy FEX với giá trị 0. Chỉ hiện khi FEX chạy mã của game (Wine
+     arm64ec, hoặc giả lập 32-bit là FEXCore) với TSO bật. Cái giá: mã hay đụng dữ liệu không thẳng hàng chạy chậm hơn.
+  2. **Tắt Esync** (`esync-off`): `WINEESYNC=0`. Wine chờ và khoá qua wineserver thay vì esync. Nhật ký của phiếu có hơn
+     4.000 dòng `esync:get_object Failed to retrieve fd`. Cái giá: game nhiều luồng chờ lâu hơn một chút.
+  3. Giả lập CPU ổn định hơn, chạy bằng Wine cũ (Proton 9, cho game đang chạy Proton 10), chạy không có mod, gửi
+     nhật ký.
+  - Hai cách mới cũng có trong "Game đứng hình, treo", sau giả lập CPU ổn định hơn và chạy không có mod.
+  - Không bật cho mọi game: cả hai chậm hơn, nên chỉ đề nghị khi game đã khoá chết hoặc người chơi báo đứng hình.
+- **Chưa làm:** chuyển game Proton 9 sang Proton 10 từ "Tự sửa lỗi" (cách 3 của phiếu). Đường đó cần cài Proton 10 lần
+  đầu (khoảng 1 phút, 900 MB) như thanh phim (`AgvnMovieWatch`). Proton 11 chưa có trong app.
+- **Test:** `AgvnLockWatchTest` (dòng thật của phiếu, ghi chú trong dòng cuối Wine, lỗi `deadlock` và thứ tự cách sửa,
+  biến môi trường của hai cách); `AgvnWineDebugTest`.
+- **Thử máy:**
+  1. Game của phiếu (Proton 9): vào tới lúc nạp cảnh, chờ màn hình đen hơn 1 phút. `su-kien.txt` có
+     `Khoá chết: luồng … chờ khoá …`. Thoát game: thư viện hỏi "Game bị khoá chết, đứng hình", nút đầu là "Giả lập CPU
+     giữ đúng thứ tự bộ nhớ". Bấm, mở lại: game qua được cảnh đó thì giữ; vẫn đứng thì app trả lại và mời "Tắt Esync".
+  2. `moi-truong.txt` của lần chạy sau có `FEX_HALFBARRIERTSOENABLED=0` (hoặc `WINEESYNC=0`).
+  3. Hồi quy: game Unity, Unreal, Ren'Py đang chạy tốt, thoát bình thường: không bị hỏi gì. `wine-cuoi.txt` có thể có
+     một dòng `err:sync` khi game nạp lâu, nhưng không có `[AGVN] Khoá chết`.

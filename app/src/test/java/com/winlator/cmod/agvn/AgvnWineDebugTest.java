@@ -9,6 +9,7 @@ import org.junit.Test;
 
 /** "Bật debug Wine" must not change how a game runs: no heap checking, and no flood of file and font warnings. */
 public class AgvnWineDebugTest {
+    private static final String QUIET = "-all,err+module,err+mscoree,err+system,err+sync,trace+msgbox";
     @Test
     public void warningsForEveryChannelLeaveHeapFileAndFontQuiet() {
         assertEquals("warn+all,err+all,fixme+all,warn-heap,warn-file,warn-font,trace+msgbox", AgvnWineDebug.spec(true, "warn,err,fixme"));
@@ -27,7 +28,7 @@ public class AgvnWineDebugTest {
     public void withoutWarningsForEveryChannelNothingIsAdded() {
         assertEquals("err+all,fixme+all,trace+msgbox", AgvnWineDebug.spec(true, "err,fixme"));
         assertEquals("+mfplat,trace+msgbox", AgvnWineDebug.spec(true, "mfplat"));
-        assertEquals("-all,err+module,err+mscoree,err+system,trace+msgbox", AgvnWineDebug.spec(false, "warn,err,fixme"));
+        assertEquals(QUIET, AgvnWineDebug.spec(false, "warn,err,fixme"));
     }
 
     @Test

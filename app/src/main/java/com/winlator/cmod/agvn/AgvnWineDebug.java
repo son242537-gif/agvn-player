@@ -34,10 +34,11 @@ public final class AgvnWineDebug {
     /**
      * With the log off, Wine still prints the errors "Tự sửa lỗi" reads (AgvnDoctor): a DLL the game needs and cannot
      * load (module), a .NET game without Wine Mono (mscoree), a resolution Wine refused the game (system, "Changing ...
-     * display settings returned -2", read by {@link AgvnBlackScreen}), and error boxes. They print only when that goes
-     * wrong.
+     * display settings returned -2", read by {@link AgvnBlackScreen}), a thread stuck on a lock (sync,
+     * "RtlpWaitForCriticalSection … wait timed out", read by {@link AgvnLockWatch}), and error boxes. They print only
+     * when that goes wrong.
      */
-    static final String QUIET_SPEC = "-all,err+module,err+mscoree,err+system," + MESSAGE_BOXES;
+    static final String QUIET_SPEC = "-all,err+module,err+mscoree,err+system,err+sync," + MESSAGE_BOXES;
     /**
      * GST_DEBUG with the log off: GStreamer's warnings of a movie's decoder and of winegstreamer only, which
      * {@link AgvnMovieWatch} reads (winegstreamer sets its own GST_DEBUG when Wine's gstreamer channel is on, and none

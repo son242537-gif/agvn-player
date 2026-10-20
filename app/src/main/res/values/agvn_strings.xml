@@ -370,6 +370,8 @@
     <string name="agvn_fix_render_auto">Để Turnip tự chọn chế độ dựng hình</string>
     <string name="agvn_fix_emulator_stable">Dùng giả lập CPU ổn định hơn</string>
     <string name="agvn_fix_emulator_fast">Dùng giả lập CPU nhanh hơn (có thể kém ổn định)</string>
+    <string name="agvn_fix_emulator_order">Giả lập CPU giữ đúng thứ tự bộ nhớ (chậm hơn một chút)</string>
+    <string name="agvn_fix_esync_off">Tắt Esync: Wine đồng bộ các luồng theo cách cũ (chậm hơn một chút)</string>
     <string name="agvn_fix_wincomponent">Bật thư viện Windows \"%1$s\"</string>
     <string name="agvn_fix_wine_mono">Cài .NET cho game (Wine Mono, khoảng 240 MB)</string>
     <string name="agvn_fix_power_save">Mở cài đặt Tiết kiệm pin</string>
