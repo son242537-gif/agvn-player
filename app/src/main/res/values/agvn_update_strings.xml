@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN: the other way to install the update (agvn/AgvnUpdateRetry, AgvnSessionInstall). Copyright (c) 2026 agvn.io — MIT License. -->
+<resources>
+    <string name="agvn_update_retry_title">Bản mới chưa được cài</string>
+    <string name="agvn_update_retry_session">Máy chưa cài bản mới. Nếu trình cài của máy báo lỗi (như \"Parsing failed\" hay \"APK contains no signature files\"), AGVN Player cài được theo cách khác: app tự đưa tệp đã kiểm vào Android. Android vẫn hỏi bạn trước khi cài.</string>
+    <string name="agvn_update_retry_installer">Máy chưa cài bản mới. AGVN Player có thể mở trình cài của máy để cài tệp đã kiểm. Android vẫn hỏi bạn trước khi cài.</string>
+    <string name="agvn_update_retry_now">Cài cách khác</string>
+    <string name="agvn_update_session_writing">Đang chuẩn bị cài bản mới…</string>
+</resources>

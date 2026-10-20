@@ -7,6 +7,7 @@ import com.winlator.cmod.xconnector.RequestHandler;
 import com.winlator.cmod.xconnector.XInputStream;
 import com.winlator.cmod.xconnector.XOutputStream;
 import com.winlator.cmod.xconnector.XStreamLock;
+import com.winlator.cmod.xserver.errors.BadAlloc;
 import com.winlator.cmod.xserver.errors.XRequestError;
 import com.winlator.cmod.xserver.extensions.Extension;
 import com.winlator.cmod.xserver.requests.AtomRequests;
@@ -458,6 +459,11 @@ public class XClientRequestHandler implements RequestHandler {
         catch (XRequestError e) {
             client.skipRequest();
             e.sendError(client, opcode);
+        }
+        catch (Drawable.NoBuffer e) { // AGVN: the game gets BadAlloc for it; it closed the whole app before
+            client.skipRequest();
+            new BadAlloc().sendError(client, opcode);
+            com.winlator.cmod.agvn.AgvnBufferNote.noBuffer(opcode, e.getMessage());
         }
 
         return true;

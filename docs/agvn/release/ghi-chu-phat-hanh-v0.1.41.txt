@@ -1,0 +1,6 @@
+AGVN Player v0.1.41 - agvn.io
+
+Sửa lỗi:
+- Game Windows mở lâu (như game Unreal lần đầu mở trên máy yếu): dòng "Đang khởi động" ở góc phải giờ tắt vài giây sau khi game hiện hình. Trước đây dòng này có thể đứng mãi tới 15 phút dù game đã vào menu, làm bạn tưởng game vẫn chưa mở xong.
+- Nhật ký gửi cho AGVN giờ ghi đúng số khung hình của game DirectX và Vulkan (trước đây luôn ghi 0), để AGVN biết game đang tải hay đã hiện hình khi bạn báo màn hình đen.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

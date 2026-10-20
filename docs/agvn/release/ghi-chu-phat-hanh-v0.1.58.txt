@@ -1,0 +1,7 @@
+AGVN Player v0.1.58 - agvn.io
+
+Sửa lỗi:
+- Game RPG Maker MZ thiếu hoặc không đọc được ảnh nút (img/system/ButtonSet) không còn dừng ở màn đen với lỗi "ButtonSet image is too small": game chạy tiếp, các nút cảm ứng không có hình.
+- Game HTML thiếu ảnh giao diện (thư mục img/system) thì app báo ngay trên màn game tệp nào và vì sao, kèm nhắc cấp quyền Truy cập tất cả tệp nếu app chưa có.
+- Nhật ký ghi rõ vì sao một tệp của game HTML không đọc được (không có tệp, không đọc được thư mục, tệp quá ngắn), và thông tin máy ghi app đã có quyền Truy cập tất cả tệp chưa.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

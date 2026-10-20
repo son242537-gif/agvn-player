@@ -494,8 +494,7 @@ void DisplayX::presentThreadLoop() {
         });
         
         if (stopped) {
-            printf("Stopping presentThread");
-            cache->detachEnv(env);
+            printf("Stopping presentThread"); // AGVN: no detach, this thread never attached (env is the event thread's)
             break;
         }
         

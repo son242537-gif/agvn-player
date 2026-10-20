@@ -1,0 +1,11 @@
+AGVN Player v0.1.8 - agvn.io.vn
+
+Mới:
+- Tự sửa lỗi: game không mở được, bị lỗi, bị máy tắt hay chạy chậm thì app báo "Máy của bạn đang bị..." kèm các cách sửa. Bấm một nút là app tự đổi cấu hình rồi mở lại game.
+- Có cho cả game Windows lẫn game "Chạy nhẹ" (Ren'Py, RPG Maker, game HTML), hiện cả trong Big Picture.
+- App nhận ra nhiều lỗi hay gặp: thiếu file .dll, game cần Steam hoặc .NET, game Godot đòi OpenGL 3.3, thiếu DirectX, hết RAM, file game hỏng, game không chạy ở độ phân giải thấp, game hỏng sau khi đổi cấu hình, máy tự tắt game khi chuyển app.
+- Game chậm suốt một phút: thanh trên game cho biết GPU hay CPU đang quá tải, kèm cách sửa. Bấm "Mở lại game ngay" để game mở lại với cấu hình mới (nhớ lưu game trước).
+- App nhớ cấu hình lần cuối game chạy tốt. Đổi cấu hình mà game hỏng thì bấm "Dùng lại cấu hình đã chạy được".
+- Máy đang bật Tiết kiệm pin thì app hỏi trước khi vào game: "Mở cài đặt Tiết kiệm pin" hoặc "Chơi luôn".
+- Game RPG Maker XP, VX, VX Ace "Chạy nhẹ": HUD hiện FPS. Máy chậm thì app gợi ý bỏ bớt khung hình để game giữ đúng tốc độ.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.

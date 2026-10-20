@@ -104,6 +104,7 @@ public class WindowManager extends XResourceManager {
         parent.sendEvent(Event.SUBSTRUCTURE_NOTIFY, new DestroyNotify(parent, window));
         windows.remove(window.id);
         if (window.isInputOutput()) drawableManager.removeDrawable(window.getContent().id);
+        window.attributes.dropCursor(); // AGVN: a freed cursor it showed can give its image back
         triggerOnFreeResourceListener(window);
         if (window == focusedWindow) revertFocus();
         parent.removeChild(window);

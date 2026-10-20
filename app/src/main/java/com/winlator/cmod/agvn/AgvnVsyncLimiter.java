@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.os.Build;
@@ -41,7 +41,8 @@ public final class AgvnVsyncLimiter {
     public void notePresent(int limit, boolean paced) {
         AgvnFrameStalls.Mode mode = limit <= 0 ? AgvnFrameStalls.Mode.NO_LIMIT
                 : paced ? AgvnFrameStalls.Mode.VSYNC : AgvnFrameStalls.Mode.TIMER;
-        AgvnFrameStalls.Stall stall = stalls.onFrame(System.nanoTime(), mode, limit, slots.heldCount());
+        long now = System.nanoTime();
+        AgvnFrameStalls.Stall stall = stalls.onFrame(now, AgvnGamePause.pausedNs(now), mode, limit, slots.heldCount());
         if (stall == null) return;
         Log.w(TAG, stall.english());
         AgvnSessionLog.event(stall.vietnamese());

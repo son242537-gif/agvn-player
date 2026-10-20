@@ -1,0 +1,5 @@
+AGVN Player v0.1.47 - agvn.io
+
+Sửa lỗi:
+- Game HTML chạy bằng "Chạy nhẹ" (RPG Maker MV/MZ, Tyrano): "Gửi nhật ký" giờ có thêm các lỗi trang game báo, tên các file game cần mà thư mục game không có (phông chữ, tiếng, dữ liệu) và phiên bản WebView của máy, kể cả trên máy mã hoá nhật ký hệ thống như HONOR. Gửi sau khi đã thoát game cũng có. Nhờ vậy AGVN tìm được lý do khi game vào được mà không có chữ.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

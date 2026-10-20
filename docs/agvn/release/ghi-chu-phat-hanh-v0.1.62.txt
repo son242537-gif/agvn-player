@@ -1,0 +1,7 @@
+AGVN Player v0.1.62 - agvn.io
+
+Sửa lỗi:
+- App tự đóng sau vài phút chơi ở game hay đổi con trỏ chuột (như game Unity): app giờ trả lại bộ nhớ đồ hoạ của ảnh và con trỏ mà game đã bỏ, thay vì giữ tới lúc hết.
+- Nếu điện thoại vẫn không cấp được bộ nhớ đồ hoạ, chỉ game bị đóng chứ không phải cả app.
+- Game RPG Maker MV/MZ: ô nhập chữ quá to so với màn game thu nhỏ không còn che nút "Xác nhận" bên cạnh, và chạm vào ô nhập có tác dụng ở cả game khởi động theo cách riêng.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

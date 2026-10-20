@@ -4,7 +4,7 @@
   "Cài đặt > Cập nhật ứng dụng > Kiểm tra cập nhật" (và tự kiểm tra mỗi ngày).
 
 .DESCRIPTION
-  Chạy trong C:\AGVN\ap (PowerShell). Cần: khoá ký (keystore.properties) và GitHub CLI đã đăng nhập
+  Chạy trong C:\AGVN\ap (PowerShell). Cần: Git, khoá ký (keystore.properties) và GitHub CLI đã đăng nhập
   (winget install GitHub.cli, rồi gh auth login một lần). Commit đang dựng phải đã push lên GitHub.
 
   Một kênh duy nhất: mọi máy nhận cùng một bản.
@@ -43,13 +43,16 @@ function Get-PublishedCode($url) {
 }
 
 if (-not (Test-Path gradlew.bat)) { Stop-With "Hãy chạy script trong thư mục mã nguồn (C:\AGVN\ap)." }
+# Without git the checks below would fail silently and the release would have no commit to point at
+if (-not (Get-Command git -ErrorAction SilentlyContinue)) { Stop-With "PowerShell này không thấy Git: winget install --id Git.Git -e, rồi mở PowerShell mới." }
 if (-not $DryRun) {
     if (-not (Get-Command gh -ErrorAction SilentlyContinue)) { Stop-With "Chưa có GitHub CLI: winget install GitHub.cli" }
     cmd /c "gh auth status >nul 2>&1"
     if ($LASTEXITCODE -ne 0) { Stop-With "GitHub CLI chưa đăng nhập: gh auth login" }
 }
 
-$commit = (git rev-parse HEAD).Trim()
+$commit = "$(git rev-parse HEAD)".Trim()
+if ($LASTEXITCODE -ne 0 -or $commit -notmatch '^[0-9a-f]{40}$') { Stop-With "Không đọc được commit đang dựng (git rev-parse HEAD)." }
 if (-not $DryRun -and -not (git branch -r --contains $commit)) { Stop-With "Commit $commit chưa được push lên GitHub." }
 if (git status --porcelain --untracked-files=no) { Write-Host "Chú ý: có thay đổi chưa commit, bản dựng sẽ gồm cả chúng." -ForegroundColor Yellow }
 

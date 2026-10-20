@@ -1,6 +1,7 @@
 package com.winlator.cmod.agvn;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -124,5 +125,32 @@ public class GameExeResolverTest {
         File dir = tmp.newFolder("empty");
         assertEquals(GameExeResolver.Engine.UNKNOWN, GameExeResolver.detectEngine(dir));
         assertNull(GameExeResolver.resolveExe(dir, GameExeResolver.Engine.UNKNOWN));
+    }
+
+    /** A tool named in Japanese, Chinese or Korean is not a second game: コトネイロ ships エンジン設定.exe (20/10/2026). */
+    @Test
+    public void aToolNamedInAsianLanguagesIsNotASecondGame() throws Exception {
+        assertTrue(GameExeResolver.isHelper("エンジン設定.exe"));
+        assertTrue(GameExeResolver.isHelper("游戏设置.exe") && GameExeResolver.isHelper("启动器.exe") && GameExeResolver.isHelper("게임설정.exe"));
+        assertFalse(GameExeResolver.isHelper("コトネイロ.exe") || GameExeResolver.isHelper("第一章.exe"));
+        File probe = tmp.newFolder("probe");
+        touch(new File(probe, "コ.exe"));
+        // a JVM whose file names are not Unicode (LANG=C on Linux) stores "?.exe": the folders below need Unicode names
+        org.junit.Assume.assumeTrue(java.util.Arrays.asList(probe.list()).contains("コ.exe"));
+        File dir = tmp.newFolder("kotone");
+        touch(new File(dir, "コトネイロ.exe"));
+        touch(new File(dir, "エンジン設定.exe"));
+        assertEquals(java.util.Collections.singletonList("コトネイロ.exe"),
+                GameExeResolver.gameExes(dir, GameExeResolver.Engine.UNKNOWN));
+        assertEquals("コトネイロ.exe", GameExeResolver.resolveExe(dir, GameExeResolver.Engine.UNKNOWN));
+        File zh = tmp.newFolder("zh");
+        touch(new File(zh, "游戏.exe"));
+        touch(new File(zh, "游戏设置.exe"));
+        touch(new File(zh, "启动器.exe"));
+        assertEquals(java.util.Collections.singletonList("游戏.exe"), GameExeResolver.gameExes(zh, GameExeResolver.Engine.UNKNOWN));
+        File two = tmp.newFolder("two"); // two games of a collection still are two
+        touch(new File(two, "第一章.exe"));
+        touch(new File(two, "第二章.exe"));
+        assertEquals(2, GameExeResolver.gameExes(two, GameExeResolver.Engine.UNKNOWN).size());
     }
 }

@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import java.io.File;
@@ -26,7 +26,9 @@ public final class GameExeResolver {
             "ue4prereqsetup_x64.exe", "ueprereqsetup_x64.exe", "notification_helper.exe");
     /** Name parts of exes that only serve a game (launcher, setup, crash reporter, settings...), never a game of their own. */
     private static final String[] HELPERS = {"launcher", "setup", "config", "crash", "report", "update", "patch", "install",
-            "redist", "setting", "editor", "server", "tool", "helper", "physx", "dotnet", "oalinst", "nwjc", "bssndrpt"};
+            "redist", "setting", "editor", "server", "tool", "helper", "physx", "dotnet", "oalinst", "nwjc", "bssndrpt",
+            // the same in Japanese, Chinese and Korean: エンジン設定.exe beside コトネイロ.exe was a second game (20/10/2026)
+            "設定", "设置", "設置", "コンフィグ", "ランチャー", "セットアップ", "アンインストール", "启动器", "卸载", "설정"};
     /** More game exes than this in one folder: a folder of tools rather than a collection, so it stays one game. */
     static final int MAX_GAMES = 8;
 
@@ -57,9 +59,20 @@ public final class GameExeResolver {
         if (isDir(top.get("tyrano")) || isFile(path(top, "data", "system", "config.tjs"))) return Engine.TYRANO;
         File[] renpyGame = listOrEmpty(path(top, "game"));
         if (isDir(top.get("renpy")) || anyFile(renpyGame, "", ".rpa", ".rpyc")) return Engine.RENPY;
-        if (anyFile(children, "", ".pck")) return Engine.GODOT;
+        if (anyFile(children, "", ".pck") || embedsGodot(children)) return Engine.GODOT;
         if (isFile(top.get("data.win"))) return Engine.GAMEMAKER;
         return Engine.UNKNOWN;
+    }
+
+    /** A Godot game exported as one exe ("Embed PCK"): no .pck beside it, its pack ends the exe (AgvnGodotFiles). */
+    private static boolean embedsGodot(File[] children) {
+        int read = 0;
+        for (File f : children) {
+            if (!f.isFile() || !f.getName().toLowerCase(Locale.ROOT).endsWith(".exe")) continue;
+            if (read++ == MAX_GAMES) return false; // a folder of tools, not one game
+            if (AgvnGodotFiles.version(f) != null) return true;
+        }
+        return false;
     }
 
     /** RPG Maker 2000/2003 (RPG_RT.*) or XP/VX/VX Ace (Game.ini with an RGSS dll, encrypted archive or Data/ files). */
@@ -84,6 +97,7 @@ public final class GameExeResolver {
             if (f.isFile() && n.endsWith(".exe") && !IGNORED.contains(n) && !n.startsWith("unins")) exes.add(f);
         }
         if (exes.isEmpty()) return null;
+        exes.removeIf(exe -> AgvnExe64.twin(exe) != null); // "<Name>-32.exe" sorts before its 64-bit "<Name>.exe"
         if (engine == Engine.UNITY) {
             for (File exe : exes) {
                 String base = exe.getName().substring(0, exe.getName().length() - 4);
@@ -109,8 +123,8 @@ public final class GameExeResolver {
         if (engine == Engine.UNKNOWN) {
             for (File f : listOrEmpty(gameDir)) {
                 String n = f.getName().toLowerCase(Locale.ROOT);
-                if (f.isFile() && n.endsWith(".exe") && !IGNORED.contains(n) && !n.startsWith("unins") && !isHelper(n))
-                    games.add(f.getName());
+                if (f.isFile() && n.endsWith(".exe") && !IGNORED.contains(n) && !n.startsWith("unins") && !isHelper(n)
+                        && AgvnExe64.twin(f) == null) games.add(f.getName());
             }
         }
         if (games.size() > 1 && games.size() <= MAX_GAMES) return games;
@@ -118,7 +132,7 @@ public final class GameExeResolver {
         return main != null ? Collections.singletonList(main) : Collections.<String>emptyList();
     }
 
-    private static boolean isHelper(String lowerName) {
+    static boolean isHelper(String lowerName) {
         for (String part : HELPERS) if (lowerName.contains(part)) return true;
         return false;
     }

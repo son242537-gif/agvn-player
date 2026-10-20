@@ -4,7 +4,7 @@
 # Mỗi mẫu ghi: thời gian, RAM trống (MemAvailable), PSS của app, nhiệt độ pin, trạng thái nhiệt Android,
 # thời gian GPU bận của app (dumpsys gpu --gpuwork, nếu máy hỗ trợ). FPS đọc trên HUD trong game.
 # Dùng Git Bash trên Windows hoặc terminal Linux/macOS; cần adb trong PATH và điện thoại đã bật gỡ lỗi USB.
-# Copyright (c) 2026 agvn.io.vn - MIT License.
+# Copyright (c) 2026 agvn.io - MIT License.
 set -u
 N=${1:-12}; INTERVAL=${2:-10}; OUT=${3:-do-tai.csv}; PKG=com.agvn.player
 adb get-state >/dev/null 2>&1 || { echo "Không thấy điện thoại qua adb"; exit 1; }

@@ -6,6 +6,7 @@ Quét `AGVN-Player-v0.1.0.apk` bằng `MpCmdRun -Scan -ScanType 3` (Windows 10, 
 |---|---|---|
 | `assets/proton-9.0-arm64ec.tar.zst` | Proton 9.0 arm64ec của Ludashi, SHA-256 khớp `proton_arm64ec_sha256` trong `scripts/agvn/pins.txt` | Bắt buộc cho mọi game; gửi mẫu báo nhầm cho Microsoft |
 | `assets/dxwrapper/dxvk-1.11.1-sarek.tzst` (d3d8/d3d9/d3d10core/d3d11/dxgi.dll) | DXVK bản cho GPU cũ, không phải mặc định | Đã bỏ khỏi app; cấu hình cũ tự chuyển sang DXVK 1.10.3 |
+| `assets/agvn/proton-10.0-4-arm64ec.wcp` (từ v0.1.21, chưa quét) | Proton 10.0-4 arm64ec của The412Banner/proton-wine, SHA-256 khớp `proton10_wcp_sha256` | Cùng loại file với Proton 9 nên có thể bị báo giống vậy; xử lý như Proton 9 (quyết định bên dưới) |
 
 Tên mối đe dọa: "Unknown" lần quét đầu; sau khi bỏ DXVK sarek chỉ còn Proton, báo `Trojan:Win32/Suschil!rfn` (nhận dạng heuristic).
 

@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.content.Context;
@@ -80,11 +80,18 @@ public final class AgvnQuality {
         return level.tier != null ? level.tier : DeviceTierManager.current(ctx);
     }
 
-    /** Effective values for {@code level}: AUTO follows the phone tier and game profile, a slider step is fixed. */
+    /**
+     * Effective values for {@code level}: AUTO follows the phone tier and game profile, a slider step is fixed. The
+     * screen is larger than a KiriKiri game ({@link AgvnKirikiriScreen#screenFor}).
+     */
     public static LaunchPresetResolver.Effective effective(Context ctx, Shortcut shortcut, Level level) {
-        if (level != Level.AUTO) return new LaunchPresetResolver.Effective(level.resolution, level.fps, level.texturePool);
-        DeviceTier tier = DeviceTierManager.current(ctx);
-        return LaunchPresetResolver.resolve(profileOf(shortcut), tier, DeviceTierManager.getRules(ctx).preset(tier));
+        LaunchPresetResolver.Effective eff;
+        if (level != Level.AUTO) eff = new LaunchPresetResolver.Effective(level.resolution, level.fps, level.texturePool);
+        else {
+            DeviceTier tier = DeviceTierManager.current(ctx);
+            eff = LaunchPresetResolver.resolve(profileOf(shortcut), tier, DeviceTierManager.getRules(ctx).preset(tier));
+        }
+        return new LaunchPresetResolver.Effective(AgvnKirikiriScreen.screenFor(shortcut, eff.resolution), eff.fps, eff.texturePool);
     }
 
     public static void apply(Context ctx, Shortcut shortcut, Level level) {
@@ -146,7 +153,7 @@ public final class AgvnQuality {
         return vars.toString();
     }
 
-    private static AgvnProfile profileOf(Shortcut shortcut) {
+    static AgvnProfile profileOf(Shortcut shortcut) {
         String path = shortcut.getExtra(AgvnGameImporter.EXTRA_PROFILE_PATH);
         if (!path.isEmpty()) {
             try {

@@ -2,7 +2,7 @@
 
 Mirrors app/src/main/java/com/winlator/cmod/agvn/GameExeResolver.java and AgvnProfileValidator.java.
 Keep both sides in sync; tests/test_toolkit.py and the Java unit tests validate the same example profile.
-Copyright (c) 2026 agvn.io.vn - MIT License.
+Copyright (c) 2026 agvn.io - MIT License.
 """
 import os
 import re
@@ -18,7 +18,9 @@ IGNORED_EXES = {
     "ue4prereqsetup_x64.exe", "ueprereqsetup_x64.exe", "notification_helper.exe"}
 # Name parts of exes that only serve a game (launcher, setup, crash reporter, settings...), never a game of their own.
 HELPER_PARTS = ("launcher", "setup", "config", "crash", "report", "update", "patch", "install", "redist", "setting",
-                "editor", "server", "tool", "helper", "physx", "dotnet", "oalinst", "nwjc", "bssndrpt")
+                "editor", "server", "tool", "helper", "physx", "dotnet", "oalinst", "nwjc", "bssndrpt",
+                # the same in Japanese, Chinese and Korean (GameExeResolver.HELPERS)
+                "設定", "设置", "設置", "コンフィグ", "ランチャー", "セットアップ", "アンインストール", "启动器", "卸载", "설정")
 # On-screen controls layouts (AgvnLayouts.java): profile "controls" value -> bundled layout; order = ids 9000..9005.
 CONTROLS = ("pc", "vn", "rpg", "2d", "action", "mouse")
 _ENGINE_CONTROLS = {"RENPY": "vn", "KIRIKIRI": "vn", "TYRANO": "vn", "SIGLUS": "vn", "NSCRIPTER": "vn",
@@ -80,6 +82,32 @@ def _is_rpgmaker(game_dir):
         or _any_file(_path(game_dir, "data"), "", ".rxdata", ".rvdata", ".rvdata2"))
 
 
+GODOT_MAGIC = b"GDPC"
+
+
+def _embeds_godot(game_dir, limit=8):
+    """A Godot game exported as one exe ("Embed PCK"): its pack ends the exe, then its size and "GDPC" (AgvnGodotFiles)."""
+    exes = [n for n in _children(game_dir) if n.lower().endswith(".exe") and os.path.isfile(os.path.join(game_dir, n))]
+    for n in exes[:limit]:
+        try:
+            with open(os.path.join(game_dir, n), "rb") as f:
+                length = f.seek(0, os.SEEK_END)
+                if length < 32:
+                    continue
+                f.seek(length - 12)
+                end = f.read(12)
+                size = int.from_bytes(end[:8], "little")
+                if end[8:] != GODOT_MAGIC or not 8 <= size <= length - 12:
+                    continue
+                f.seek(length - 12 - size)
+                head = f.read(20)
+                if head[:4] == GODOT_MAGIC and 2 <= int.from_bytes(head[8:12], "little") <= 9:
+                    return True
+        except OSError:
+            continue
+    return False
+
+
 def detect_engine(game_dir):
     """Same rules and order as GameExeResolver.detectEngine (Siglus before the generic *.pck Godot rule)."""
     if find_shipping(game_dir) or os.path.isdir(os.path.join(game_dir, "Engine", "Binaries")):
@@ -108,11 +136,36 @@ def detect_engine(game_dir):
         return "TYRANO"
     if _is_dir(sub("renpy")) or _any_file(sub("game"), "", ".rpa", ".rpyc"):
         return "RENPY"
-    if _any_file(game_dir, "", ".pck"):
+    if _any_file(game_dir, "", ".pck") or _embeds_godot(game_dir):
         return "GODOT"
     if _is_file(sub("data.win")):
         return "GAMEMAKER"
     return "UNKNOWN"
+
+
+def _machine(path):
+    """The machine a PE file is for (0x8664: 64-bit, 0x14c: 32-bit), or None for no PE file."""
+    try:
+        with open(path, "rb") as f:
+            dos = f.read(64)
+            if len(dos) < 64 or dos[:2] != b"MZ":
+                return None
+            f.seek(int.from_bytes(dos[0x3c:0x40], "little"))
+            nt = f.read(6)
+    except OSError:
+        return None
+    return int.from_bytes(nt[4:6], "little") if len(nt) == 6 and nt[:4] == b"PE\0\0" else None
+
+
+def has_64bit_twin(game_dir, name):
+    """True for "<Name>-32.exe" beside a 64-bit "<Name>.exe" that can start (Ren'Py 7), as AgvnExe64.twin."""
+    if len(name) <= 7 or not name.lower().endswith("-32.exe"):
+        return False
+    twin = os.path.join(game_dir, name[:-7] + name[-4:])
+    if not os.path.isfile(twin) or _machine(twin) != 0x8664:
+        return False
+    libs = [c.lower() for c in _children(os.path.join(game_dir, "lib"))]
+    return any("windows-x86_64" in c for c in libs) or not any("windows-i686" in c for c in libs)
 
 
 def resolve_exe(game_dir, engine):
@@ -125,6 +178,7 @@ def resolve_exe(game_dir, engine):
             and n.lower() not in IGNORED_EXES and not n.lower().startswith("unins")]
     if not exes:
         return None
+    exes = [n for n in exes if not has_64bit_twin(game_dir, n)]  # "<Name>-32.exe" sorts before "<Name>.exe"
     if engine == "UNITY":
         for n in exes:
             if os.path.isdir(os.path.join(game_dir, n[:-4] + "_Data")):
@@ -198,8 +252,8 @@ def validate(profile, game_dir):
     controls = profile.get("controls")
     if controls is not None and controls not in CONTROLS:
         raise ProfileError("Bộ phím (controls) phải là một trong: %s: %s" % (", ".join(CONTROLS), controls))
-    if profile.get("runner") not in (None, "html", "wine"):
-        raise ProfileError("Cách chạy (runner) phải là html hoặc wine: %s" % profile.get("runner"))
+    if profile.get("runner") not in (None, "html", "renpy", "rgss", "godot", "wine"):
+        raise ProfileError("Cách chạy (runner) phải là html, renpy, rgss, godot hoặc wine: %s" % profile.get("runner"))
     locale = profile.get("locale")
     if locale not in (None, "") and not (isinstance(locale, str) and re.match(r"^[a-z]{2}_[A-Z]{2}(\.UTF-8)?$", locale)):
         raise ProfileError("Ngôn ngữ (locale) phải có dạng ja_JP hoặc ja_JP.UTF-8: %s" % locale)

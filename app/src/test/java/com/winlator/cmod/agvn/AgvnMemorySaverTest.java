@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import static org.junit.Assert.assertEquals;
@@ -17,6 +17,7 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Arrays;
 
 public class AgvnMemorySaverTest {
     @Rule public TemporaryFolder tmp = new TemporaryFolder();
@@ -33,6 +34,32 @@ public class AgvnMemorySaverTest {
         assertEquals("dxvk.maxChunkSize=16;dxvk.trackPipelineLifetime=True", AgvnMemorySaver.dxvkOptions(Level.LOWEST));
         assertEquals("dxvk.maxChunkSize=16", AgvnMemorySaver.dxvkOptions(Level.MEDIUM));
         assertEquals("", AgvnMemorySaver.dxvkOptions(Level.HIGH));
+    }
+
+    @Test
+    public void onlyAGameThatRanOutOfRamSavesTheMost() {
+        // 0.1.17 gave Siêu nhẹ's savings to every DirectX game on a phone under 9 GB that unpacks BCn: a Mali-G615 whose
+        // player chose FLAGSHIP got them in every game. Now only a game that ran out of RAM here does (ranOut).
+        assertEquals(Level.LOWEST, AgvnMemorySaver.memoryStep(Level.HIGH, true));
+        assertEquals("the player's step", Level.HIGH, AgvnMemorySaver.memoryStep(Level.HIGH, false));
+        assertEquals(Level.MEDIUM, AgvnMemorySaver.memoryStep(Level.MEDIUM, false));
+        assertTrue(AgvnMemorySaver.unityLowestQuality(AgvnMemorySaver.memoryStep(Level.MEDIUM, true)));
+        assertFalse(AgvnMemorySaver.unityLowestQuality(AgvnMemorySaver.memoryStep(Level.HIGH, false)));
+        assertEquals(128, AgvnMemorySaver.renpyCacheMb(AgvnMemorySaver.memoryStep(Level.HIGHEST, true)));
+        Level ranOutHigh = AgvnMemorySaver.memoryStep(Level.HIGH, true);
+        assertEquals(AgvnMemorySaver.dxvkOptions(Level.LOWEST), AgvnMemorySaver.dxvkOptions(ranOutHigh));
+        assertEquals("", AgvnMemorySaver.dxvkOptions(AgvnMemorySaver.memoryStep(Level.HIGH, false)));
+        // Unreal: Siêu nhẹ's pool after running out of RAM, then a quarter of it where BCn is unpacked
+        assertEquals(96, AgvnMemorySaver.ueTexturePool(768, true, true)); // Trung bình on the Mali phone
+        assertEquals(384, AgvnMemorySaver.ueTexturePool(1024, true, false));
+        assertEquals("a game's own pool is capped too", 96, AgvnMemorySaver.ueTexturePool(0, true, true));
+        assertEquals("its step's pool, BCn's part", 256, AgvnMemorySaver.ueTexturePool(1024, false, true));
+        assertEquals(1024, AgvnMemorySaver.ueTexturePool(1024, false, false));
+        assertEquals(0, AgvnMemorySaver.ueTexturePool(0, false, true));
+        for (String id : Arrays.asList("memory", "gpu-memory", "killed-low-memory", "low-ram-end"))
+            assertTrue(id, AgvnMemorySaver.ranOutOfRam(id));
+        assertFalse(AgvnMemorySaver.ranOutOfRam("crash"));
+        assertFalse(AgvnMemorySaver.ranOut(null));
     }
 
     @Test

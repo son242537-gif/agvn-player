@@ -1,0 +1,12 @@
+AGVN Player v0.1.56 - agvn.io
+
+Mới:
+- Nút 🗂 "Bộ phím ảo" trong mọi game (game Chạy nhẹ có thêm ở menu ☰): chạm tên một bộ để tải cho game, 💾 Lưu để giữ phím đang dùng thành bộ có tên, ✎ Sửa để sửa phím. Bộ đã lưu có ở mọi game và trong cài đặt game.
+
+Sửa lỗi:
+- Bộ phím chọn ở menu bên trái trong game Windows được nhớ cho game, không về bộ cũ ở lần mở sau.
+- Sửa phím trong game không còn ghi đè bộ phím riêng đã chỉnh trước đó. Game Chạy nhẹ đổi sang bộ khác thì phím đã sửa được giữ thành bộ mang tên game.
+- Game RPG Maker MV đọc tệp ở thư mục game ngoài www (như lng.txt để chọn ngôn ngữ) không còn đứng ở màn đen.
+- Game Ren'Py có Live2D không còn tự thoát khi mở bằng Chạy nhẹ: app báo game cần Live2D và gợi ý Chạy bằng Windows.
+- Game Ren'Py bị tắt đột ngột có thêm nhật ký faulthandler.txt nói lỗi ở dòng nào của game.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

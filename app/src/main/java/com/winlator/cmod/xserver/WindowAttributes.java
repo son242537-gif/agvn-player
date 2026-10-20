@@ -57,6 +57,12 @@ public class WindowAttributes {
         return bitGravity;
     }
 
+    /** AGVN: the window is gone, and no longer shows its own cursor (Cursor.shownBy). */
+    void dropCursor() {
+        if (cursor != null) cursor.shownBy(false);
+        cursor = null;
+    }
+
     public Cursor getCursor() {
         Window parent = window.getParent();
         return cursor == null && parent != null ? parent.attributes.getCursor() : cursor;
@@ -144,7 +150,12 @@ public class WindowAttributes {
                     doNotPropagateMask = new Bitmask(inputStream.readInt());
                     break;
                 case FLAG_CURSOR:
-                    cursor = client.xServer.cursorManager.getCursor(inputStream.readInt());
+                    Cursor next = client.xServer.cursorManager.getCursor(inputStream.readInt());
+                    if (next != cursor) { // AGVN: which windows show a cursor (Cursor.shownBy)
+                        if (next != null) next.shownBy(true);
+                        if (cursor != null) cursor.shownBy(false);
+                    }
+                    cursor = next;
                     break;
                 case FLAG_BACKGROUND_PIXMAP:
                 case FLAG_BORDER_PIXMAP:

@@ -8,7 +8,7 @@ Ví dụ:
 Game đã có trong kho (cùng id) thì được thay bằng bản mới. Profile được kiểm tra bằng đúng luật của app.
 "match": các file phải có trong thư mục game; mặc định là exe của profile. Tên exe chung chung (Game.exe…)
 phải kèm thêm một file riêng của game đó. Không truy cập mạng.
-Copyright (c) 2026 agvn.io.vn - MIT License.
+Copyright (c) 2026 agvn.io - MIT License.
 """
 import argparse
 import json

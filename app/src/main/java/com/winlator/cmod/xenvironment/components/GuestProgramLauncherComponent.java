@@ -515,6 +515,9 @@ public class GuestProgramLauncherComponent extends EnvironmentComponent {
                     execEnvVars.put("HODLL", "wowbox64.dll");
             } else
                 command = imageFs.getBinDir() + "/box64 " + guestExecutable;
+            com.winlator.cmod.agvn.AgvnSessionLog.event(com.winlator.cmod.agvn.AgvnEmulatorNote.line(wineInfo.isArm64EC(), emulator, // AGVN
+                    shortcut != null ? shortcut.getExtra("fexcoreVersion", container.getFEXCoreVersion()) : container.getFEXCoreVersion(),
+                    shortcut != null ? shortcut.getExtra("box64Version", container.getBox64Version()) : container.getBox64Version()));
         }
 
         File box64File = new File(rootDir, "/usr/bin/box64");

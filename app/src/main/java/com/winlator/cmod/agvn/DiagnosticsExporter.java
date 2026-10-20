@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.app.ActivityManager;
@@ -20,22 +20,30 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
  * One-tap support bundle: /sdcard/Download/AGVN-nhat-ky-yyyyMMdd-HHmm.zip with device info, logcat,
- * the last crash and the two newest app log files. Never includes API keys or full preference dumps.
+ * the last crash, the two newest app log files and the newest game sessions ({@link #newestSessions}): the export the
+ * crash prompt makes had no game in it, though the app had closed while one played (OPPO PLE110, 16/10/2026).
+ * Never includes API keys or full preference dumps.
  */
 public final class DiagnosticsExporter {
     private static final long MAX_FILE_BYTES = 3L * 1024 * 1024;
+    /** Game sessions in the bundle, newest first, whichever games they are of. */
+    static final int SESSIONS = 3;
+    private static final Pattern SESSION_NAME = Pattern.compile("\\d{8}-\\d{6}");
     private static final String[] PREF_ALLOWLIST = {
             "box64_preset", "fexcore_preset", "use_dri3", "cursor_speed", "enable_wine_debug",
             "enable_box64_logs", "enable_winlator_logs", "high_refresh_rate_mode", "use_xr"};
@@ -80,8 +88,28 @@ public final class DiagnosticsExporter {
                 Arrays.sort(logs, (a, b) -> Long.compare(b.lastModified(), a.lastModified()));
                 for (int i = 0; i < Math.min(2, logs.length); i++) putFile(out, "logs/" + logs[i].getName(), logs[i]);
             }
+            for (File session : newestSessions(AgvnSessionLog.root(), SESSIONS)) {
+                File[] files = session.listFiles(File::isFile);
+                String at = "phien/" + session.getParentFile().getName() + "/" + session.getName() + "/";
+                if (files != null) for (File f : files) putFile(out, at + f.getName(), f);
+            }
         }
         return zip;
+    }
+
+    /**
+     * The {@code count} newest session folders under {@code root} (AGVN-Player/logs/&lt;game&gt;/&lt;yyyyMMdd-HHmmss&gt;),
+     * newest first by the time in their name, of any game.
+     */
+    static List<File> newestSessions(File root, int count) {
+        List<File> sessions = new ArrayList<>();
+        File[] games = root.listFiles(File::isDirectory);
+        for (File game : games != null ? games : new File[0]) {
+            File[] found = game.listFiles(f -> f.isDirectory() && SESSION_NAME.matcher(f.getName()).matches());
+            if (found != null) sessions.addAll(Arrays.asList(found));
+        }
+        sessions.sort((a, b) -> b.getName().compareTo(a.getName()));
+        return sessions.subList(0, Math.min(count, sessions.size()));
     }
 
     static String deviceInfo(Context ctx) {

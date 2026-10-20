@@ -1,0 +1,6 @@
+AGVN Player v0.1.48 - agvn.io
+
+Sửa lỗi:
+- App có thể tự tắt ngay khi mở một số game có tên file exe dài (nhất là tên chữ Trung, chữ Nhật): giờ game mở bình thường.
+- Khi app gặp lỗi, hộp "Xuất nhật ký để gửi AGVN?" giờ gửi kèm nhật ký các lần chơi game gần nhất, để AGVN biết game nào đang chạy lúc app tắt.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

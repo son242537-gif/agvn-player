@@ -1,0 +1,11 @@
+AGVN Player v0.1.10 - agvn.io.vn
+
+Mới:
+- Vừa màn hình: game Windows hiện khung nhỏ thì app tự phóng cho vừa màn hình, chạm vẫn trúng nút trong game. Game bị tràn ra ngoài màn hình thì app đề nghị đổi màn hình game cho vừa rồi mở lại game.
+- Nút ⛶ trên thanh ⌨ ✎ 👁 để bật hoặc tắt "Vừa màn hình" bất cứ lúc nào. App nhớ lựa chọn theo từng game.
+- Cây viết ✎ luôn ở góc trên bên trái màn hình game: chạm một cái là sửa phím ảo, cả game Windows lẫn game "Chạy nhẹ".
+- Có bản cập nhật mới thì nút "Cài đặt" và mục "Cập nhật ứng dụng" hiện chấm đỏ, kèm một thông báo trên điện thoại. Chạm vào thông báo là cập nhật được ngay.
+Sửa lỗi:
+- Game Godot tự tắt giữa chừng trên máy GPU Mali (lỗi vẽ OpenGL): app nhận ra và đề nghị cho game chạy bằng Vulkan (Godot 4) hoặc GLES2 (Godot 3). Nhật ký gửi về có thêm nhật ký riêng của game Godot.
+- Không còn bị văng app khi đang mở cài đặt của một game.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.

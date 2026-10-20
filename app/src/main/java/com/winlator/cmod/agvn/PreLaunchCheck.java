@@ -1,7 +1,8 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 
 import androidx.appcompat.app.AlertDialog;
@@ -14,8 +15,9 @@ import com.winlator.cmod.xenvironment.ImageFs;
 import java.io.File;
 
 /**
- * Runs right before a library game starts: refreshes the Unreal Engine.ini overrides, warns about game files that
- * were copied only partly ({@link AgvnGameFilesCheck}) and checks that enough RAM is free. When RAM is short the
+ * Runs right before a library game starts: refreshes the Unreal Engine.ini overrides, asks about battery saver
+ * ({@link AgvnPowerSave}), warns about game files that were copied only partly ({@link AgvnGameFilesCheck}) and
+ * checks that enough RAM is free. When RAM is short the
  * player is asked to close other apps and re-check, or to play anyway.
  * AGVN never kills other apps itself (Android 14+ only lets an app kill its own processes anyway).
  */
@@ -25,10 +27,10 @@ public final class PreLaunchCheck {
     private PreLaunchCheck() {}
 
     public static void run(Activity activity, Shortcut shortcut, Runnable launch) {
-        applyUeConfig(shortcut);
+        applyUeConfig(activity, shortcut);
         int pool = parseInt(shortcut.getExtra(AgvnGameImporter.EXTRA_TEXTURE_POOL, "0"));
         long requiredMb = RamGuard.getRequiredRamMb(pool);
-        AgvnGameFilesCheck.run(activity, shortcut, () -> check(activity, requiredMb, launch));
+        AgvnPowerSave.ask(activity, () -> AgvnGameFilesCheck.run(activity, shortcut, () -> check(activity, requiredMb, launch)));
     }
 
     private static void check(Activity activity, long requiredMb, Runnable launch) {
@@ -47,8 +49,12 @@ public final class PreLaunchCheck {
                 .show();
     }
 
-    /** Writes the profile's Engine.ini overrides and texture pool for imported Unreal games; safe to repeat. */
-    public static void applyUeConfig(Shortcut shortcut) {
+    /**
+     * Writes the profile's Engine.ini overrides and texture pool for imported Unreal games; safe to repeat. The pool is
+     * smaller where the game's Vulkan driver unpacks BCn textures, and Siêu nhẹ's for a game that ran out of RAM on
+     * this phone ({@link AgvnMemorySaver#ueTexturePool}).
+     */
+    public static void applyUeConfig(Context ctx, Shortcut shortcut) {
         try {
             if (!GameExeResolver.Engine.UNREAL.name().equals(shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE))) return;
             String profilePath = shortcut.getExtra(AgvnGameImporter.EXTRA_PROFILE_PATH);
@@ -60,13 +66,23 @@ public final class PreLaunchCheck {
             File gameDir = new File(gameDirPath);
             String exe = shortcut.path.replace("\"", "");
             String relative = exe.startsWith(gameDir.getPath() + "/") ? exe.substring(gameDir.getPath().length() + 1) : exe;
-            int pool = parseInt(shortcut.getExtra(AgvnGameImporter.EXTRA_TEXTURE_POOL, "0"));
+            boolean unpacked = unpacksBcn(ctx, shortcut);
+            int stepPool = parseInt(shortcut.getExtra(AgvnGameImporter.EXTRA_TEXTURE_POOL, "0"));
+            int pool = AgvnMemorySaver.ueTexturePool(stepPool, AgvnMemorySaver.ranOut(shortcut), unpacked);
             File wineUser = new File(shortcut.container.getRootDir(), ".wine/drive_c/users/" + ImageFs.USER);
             for (File ini : UeIniWriter.apply(wineUser, UeIniWriter.projectName(gameDir, relative), UeIniWriter.overrides(profile, pool)))
-                Log.i(TAG, "Engine.ini updated: " + ini);
+                Log.i(TAG, "Engine.ini updated (texture pool " + pool + " MB): " + ini);
         } catch (Exception e) {
             Log.w(TAG, "Engine.ini update failed", e);
         }
+    }
+
+    /** True when the game's Vulkan driver, as it will really start, unpacks BCn textures ({@link AgvnBcn#unpacked}). */
+    static boolean unpacksBcn(Context ctx, Shortcut s) {
+        String config = AgvnFixes.driverConfig(s);
+        String chosen = AgvnFixEdits.configValue(config, "version", ';');
+        String driver = DriverSafety.resolveUsable(ctx, chosen.isEmpty() ? AgvnFixes.SYSTEM : chosen);
+        return AgvnBcn.unpacked(AgvnFixEdits.configValue(config, "bcnEmulation", ';'), driver);
     }
 
     private static int parseInt(String value) {

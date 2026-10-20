@@ -1,0 +1,10 @@
+AGVN Player v0.1.29 - agvn.io
+
+Mới:
+- "Tự sửa lỗi" có thêm cách "Chạy game không có mod", cho game có mod (BepInEx, MelonLoader, UE4SS) bị đứng hình, tự tắt, màn hình đen hoặc không mở được. Mod chỉ tắt trong lần thử, file của game giữ nguyên. Không giúp được thì app bật mod lại như cũ.
+- Game "Chạy nhẹ" (RPG Maker, Ren'Py, Godot, game HTML) giờ dùng bộ phím ảo bạn chọn ở mục "Cấu hình phím ảo" trong cài đặt game. Bộ phím làm sẵn ở màn "Điều khiển" nay dùng được cho các game này.
+Sửa lỗi:
+- Chỉnh phím từ menu trong game (Điều khiển → ⚙) rồi quay lại game không còn làm mất bộ phím. Bộ phím vừa chỉnh hiện ngay và được giữ cho game đó.
+- Bộ phím đã ẩn (👁) hiện lại khi bạn chọn bộ phím cho game trong cài đặt game.
+- Nhật ký gửi về ghi rõ hơn game đang làm gì khi đứng hình: FPS, độ bận CPU và GPU trong phút cuối. Với game chưa rõ engine hoặc có mod, nhật ký ghi thêm các file trong thư mục game. Nhờ vậy AGVN tìm lỗi nhanh hơn.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

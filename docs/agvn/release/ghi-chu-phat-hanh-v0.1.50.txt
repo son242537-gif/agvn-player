@@ -1,0 +1,7 @@
+AGVN Player v0.1.50 - agvn.io
+
+Sửa lỗi:
+- "Tự sửa lỗi" không còn hỏi "Còn lỗi không?" khi game đang đứng yên để tải (như game Unity đứng ở màn hình sau logo): app chờ game vẽ lại rồi mới hỏi, nên game không bị mở lại giữa lúc đang tải. Game đứng yên 3 phút liền thì app mới hỏi.
+- "Tự sửa lỗi" không còn đề nghị đổi DXVK cho game chỉ vẽ bằng OpenGL, vì cách đó không đổi được gì cho game.
+- "Gửi nhật ký" gửi kèm cả nhật ký riêng mà game ghi cạnh file chạy của nó, để AGVN biết vì sao game tự tắt.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

@@ -1,0 +1,5 @@
+AGVN Player v0.1.54 - agvn.io
+
+Sửa lỗi:
+- Game RPG Maker XP/VX/VX Ace ở "Chạy nhẹ" dừng ở màn tiêu đề vì không thấy file nhạc hay ảnh có tên tiếng Nhật, khi công cụ giải nén trên máy đã đọc sai bảng mã của tên file (tên hiện thành chữ Trung Quốc lạ như "bgm銉曘偅銉笺儷銉"): giờ app vẫn tìm ra file theo tên gốc của nó.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

@@ -1,0 +1,17 @@
+AGVN Player v0.1.6 - agvn.io.vn
+
+Mới:
+- Game Ren'Py 8 chạy thẳng trên điện thoại, không qua Windows ("Chạy nhẹ"): nhẹ máy, mát máy và đỡ tốn pin hơn nhiều. Game Ren'Py 6, 7 vẫn chạy bằng Windows.
+- Game RPG Maker XP, VX, VX Ace cũng "Chạy nhẹ". Game cần RTP thì app tự tìm; máy thiếu RTP thì app chỉ cách chép RTP vào thư mục AGVN-Player/RTP.
+- Game đã thêm từ trước vẫn chạy bằng Windows. Muốn chuyển sang "Chạy nhẹ": vào "Thêm game", chạm vào game đó rồi bấm "Cập nhật".
+- Game "Chạy nhẹ" có bộ công cụ như game Windows: phím ảo đặt giống hệt, thanh ⌨ ✎ 👁 ☰ ở trên, menu bên trái khi bấm Quay lại, sửa vị trí phím, HUD hiện RAM, pin và nhiệt độ.
+- Thêm được bản cho điện thoại không có file .exe (như gói JoiPlay) của game RPG Maker XP/VX/VX Ace, MV/MZ, Tyrano và Ren'Py 8. App tìm game sâu thêm một cấp thư mục.
+- Ảnh bìa và icon của game Ren'Py, RPG Maker lấy từ ảnh trong chính game, không còn cùng một icon Ren'Py hay RPG Maker. Game đã thêm từ trước cũng tự đổi.
+- "Gửi nhật ký" ngay khi game đang chạy, không cần thoát game: ở thanh bên của game Windows (dưới "Xem log"), ở menu của game "Chạy nhẹ" và ở nút ⋮ trong thư viện.
+- Chạy hợp hơn trên nhiều dòng máy: app nhận đúng sức mạnh của nhiều máy hơn (Snapdragon 8 Gen 1-3, dòng 7 và 6, Dimensity, Exynos...) để chọn mức "Đồ họa" phù hợp. Máy cài mới có Vulkan đời cũ tự dùng bản DXVK chạy được.
+- Game Ren'Py, RPG Maker MV/MZ và Tyrano khi "Chạy nhẹ" giữ màn hình 60 Hz trên máy 90/120/144 Hz cho mát máy, đỡ pin. Ren'Py "Chạy nhẹ" dùng ít RAM hơn khi "Đồ họa" ở mức thấp.
+- Máy đang bật Tiết kiệm pin thì app nhắc khi mở game, vì chế độ này làm game chậm.
+Sửa lỗi:
+- Chuyển sang app khác thì game đang chạy được giữ lại, máy ít tự tắt game hơn. Nhật ký ghi rõ game bị lỗi hay thoát bình thường.
+- Mục "Bật debug Wine" không còn làm game Ren'Py 7 bị lỗi. Khi tắt mục này, góc trên bên phải game không còn hiện chữ log.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.

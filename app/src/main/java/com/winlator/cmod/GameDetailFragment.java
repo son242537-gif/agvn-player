@@ -82,12 +82,13 @@ public class GameDetailFragment extends Fragment {
                 new GameDetailCallbacks() {
                     @Override
                     public void onPlay() {
+                        reloadShortcut();
                         runShortcut();
                     }
 
                     @Override
                     public void onConfigure() {
-                        ShortcutSettingsComposeDialog.show(GameDetailFragment.this, shortcut);
+                        ShortcutSettingsComposeDialog.show(GameDetailFragment.this, reloadShortcut());
                     }
 
                     @Override
@@ -97,12 +98,12 @@ public class GameDetailFragment extends Fragment {
 
                     @Override
                     public void onSaves() {
-                        GameSavesComposeDialog.show(GameDetailFragment.this, shortcut);
+                        GameSavesComposeDialog.show(GameDetailFragment.this, reloadShortcut());
                     }
 
                     @Override
                     public void onFavorite(boolean favorite) {
-                        shortcut.putExtra("favorite", favorite ? "1" : "0");
+                        reloadShortcut().putExtra("favorite", favorite ? "1" : "0");
                         shortcut.saveData();
                     }
 
@@ -130,6 +131,12 @@ public class GameDetailFragment extends Fragment {
         } catch (Exception ignored) {}
         String renderer = shortcut.getUseDisplayX() ? "DisplayX" : shortcut.getRendererNative() ? "EGL" : "Vulkan";
         return runtime + "  •  " + renderer;
+    }
+
+    /** AGVN: the game as its file holds it now (AgvnShortcutReload): a fix put on it since this page showed is kept. */
+    private Shortcut reloadShortcut() {
+        shortcut = com.winlator.cmod.agvn.AgvnShortcutReload.of(shortcut);
+        return shortcut;
     }
 
     private void runShortcut() {

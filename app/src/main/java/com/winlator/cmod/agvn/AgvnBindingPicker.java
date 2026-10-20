@@ -1,7 +1,8 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.os.Build;
 import android.text.InputFilter;
 import android.view.View;
@@ -99,8 +100,8 @@ final class AgvnBindingPicker {
                 .create());
     }
 
-    /** Shows the dialog without bringing back the status and navigation bars over the game. */
-    static void show(Activity activity, AlertDialog dialog) {
+    /** Shows the dialog (AppCompat's, or Android's own over a "Chạy nhẹ" game) without bringing back the system bars. */
+    static void show(Activity activity, Dialog dialog) {
         Window window = dialog.getWindow();
         if (window == null) {
             dialog.show();

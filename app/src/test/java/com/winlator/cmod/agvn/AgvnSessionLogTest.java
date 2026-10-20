@@ -1,8 +1,9 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.winlator.cmod.core.EnvVars;
@@ -43,6 +44,35 @@ public class AgvnSessionLogTest {
     }
 
     @Test
+    public void dxvkOneLogsSitNextToTheExe() throws Exception {
+        // Rj01608199, 16/10/2026: DXVK 1.10.3 left Game_d3d10.log, Game_d3d11.log and Game_dxgi.log in the game folder
+        File game = tmp.newFolder("rj");
+        List<File> logs = AgvnEngineLogs.candidates(new File(game, "Game.EXE"), game, "", tmp.getRoot());
+        for (String name : new String[]{"Game_dxgi.log", "Game_d3d11.log", "Game_d3d10.log", "Game_d3d9.log"}) {
+            assertTrue(name, logs.contains(new File(game, name)));
+        }
+    }
+
+    @Test
+    public void aGamesOwnLogsBesideItsExeComeToo() throws Exception {
+        // The Agnietta (cocos2d-x), 17/10/2026: it closed by itself, and its action_log.txt and thread.log stayed behind
+        File game = tmp.newFolder("agnietta");
+        for (String name : new String[]{"action_log.txt", "thread.log", "Game_d3d11.log", "LOG.TXT", "readme.txt", "changelog.txt"}) {
+            Files.write(new File(game, name).toPath(), "x".getBytes(StandardCharsets.UTF_8));
+        }
+        List<File> logs = AgvnEngineLogs.candidates(new File(game, "Game.exe"), game, "UNKNOWN", tmp.getRoot());
+        assertTrue(logs.contains(new File(game, "action_log.txt")));
+        assertTrue(logs.contains(new File(game, "thread.log")));
+        assertFalse(logs.contains(new File(game, "readme.txt")));
+        assertFalse("a game's notes", logs.contains(new File(game, "changelog.txt")));
+        int d3d11 = 0;
+        for (File f : logs) if (f.getName().equals("Game_d3d11.log")) d3d11++;
+        assertEquals("a name already looked for is not listed twice", 1, d3d11);
+        assertTrue("DxLib's log as it is named on disk", logs.contains(new File(game, "LOG.TXT"))
+                || logs.contains(new File(game, "Log.txt")) && new File(game, "Log.txt").isFile());
+    }
+
+    @Test
     public void bigLogsKeepTheirStartAndEnd() throws Exception {
         File small = tmp.newFile("small.log");
         Files.write(small.toPath(), "short".getBytes(StandardCharsets.UTF_8));
@@ -66,6 +96,18 @@ public class AgvnSessionLogTest {
     }
 
     @Test
+    public void notesNameTheLogsAndAPlayersSwipe() throws Exception {
+        File roaming = tmp.newFolder("Roaming"), godot = new File(roaming, "PartyMe/logs/godot.log");
+        assertTrue(godot.getParentFile().mkdirs());
+        Files.write(godot.toPath(), "Godot Engine v4.3.stable.official".getBytes(StandardCharsets.UTF_8));
+        String notes = "start=1\ngame=Rebirth Pub\nlog=/g/Player.log\nlogscan=" + roaming.getPath() + "\n";
+        assertEquals(Arrays.asList(new File("/g/Player.log"), godot), AgvnSessionNotes.engineLogs(notes, 0));
+        assertFalse(AgvnSessionNotes.removedByPlayer(notes));
+        // swiped away from the recent apps: AGVN ends itself (SIGKILL), and nothing is asked about it
+        assertTrue(AgvnSessionNotes.removedByPlayer(notes + AgvnSessionNotes.REMOVED + "=1791035699000\n"));
+    }
+
+    @Test
     public void onlyGraphicsAndWineVariablesAreKept() {
         EnvVars env = new EnvVars("WRAPPER_EMULATE_BCN=0 HOME=/home/xuser DXVK_HUD=fps WINEDEBUG=-all PATH=/usr/bin");
         assertEquals("DXVK_HUD=fps\nWINEDEBUG=-all\nWRAPPER_EMULATE_BCN=0\n", AgvnSessionLog.graphicsEnv(env));
@@ -75,11 +117,11 @@ public class AgvnSessionLogTest {
     public void keepsTheFiveNewestSessions() throws Exception {
         File gameLogs = tmp.newFolder("logs");
         for (int i = 1; i <= 7; i++) new File(gameLogs, "2026100" + i + "-120000").mkdirs();
-        AgvnSessionLog.prune(gameLogs);
+        AgvnLogFolders.prune(gameLogs);
         String[] left = gameLogs.list();
         Arrays.sort(left);
         assertArrayEquals(new String[]{"20261003-120000", "20261004-120000", "20261005-120000", "20261006-120000", "20261007-120000"}, left);
-        assertEquals("A_B_ C", AgvnSessionLog.safeName("A/B: C"));
-        assertEquals("game", AgvnSessionLog.safeName("  "));
+        assertEquals("A_B_ C", AgvnLogFolders.safeName("A/B: C"));
+        assertEquals("game", AgvnLogFolders.safeName("  "));
     }
 }

@@ -1,0 +1,51 @@
+--- a/platform/android/os_android.h
++++ b/platform/android/os_android.h
+@@ -146,6 +146,7 @@
+ 	virtual String get_executable_path() const override;
+ 	virtual String get_user_data_dir(const String &p_user_dir) const override;
+ 	virtual String get_data_path() const override;
++	virtual String get_godot_dir_name() const override;
+ 	virtual String get_cache_path() const override;
+ 	virtual String get_temp_path() const override;
+ 	virtual String get_resource_dir() const override;
+--- a/platform/android/os_android.cpp
++++ b/platform/android/os_android.cpp
+@@ -48,6 +48,7 @@
+ #include "core/os/main_loop.h"
+ #include "core/os/os.h"
+ #include "core/profiling/profiling.h"
++#include "core/version.h"
+ #include "drivers/unix/dir_access_unix.h"
+ #include "drivers/unix/file_access_unix.h"
+ #include "main/main.h"
+@@ -743,6 +744,15 @@
+ 		return data_dir_cache;
+ 	}
+ 
++	// AGVN Player: a game made for Windows keeps user:// where Godot keeps it on Windows, %APPDATA%/<p_user_dir>, with
++	// %APPDATA% given in AGVN_GODOT_APPDATA (the AppData/Roaming folder of the game's Wine container). The game then
++	// shares its saves and settings with its Windows version.
++	String agvn_appdata = get_environment("AGVN_GODOT_APPDATA");
++	if (!agvn_appdata.is_empty() && !p_user_dir.is_empty()) {
++		data_dir_cache = agvn_appdata.path_join(p_user_dir);
++		return data_dir_cache;
++	}
++
+ 	String data_dir = godot_io_java->get_user_data_dir(p_user_dir);
+ 	if (!data_dir.is_empty()) {
+ 		data_dir_cache = _remove_symlink(data_dir);
+@@ -751,6 +761,14 @@
+ 	return ".";
+ }
+ 
++String OS_Android::get_godot_dir_name() const {
++	// AGVN Player: "Godot", as on Windows (OS_Windows::get_godot_dir_name), when user:// is under AGVN_GODOT_APPDATA.
++	if (!get_environment("AGVN_GODOT_APPDATA").is_empty()) {
++		return String(GODOT_VERSION_SHORT_NAME).capitalize();
++	}
++	return OS_Unix::get_godot_dir_name();
++}
++
+ String OS_Android::get_dynamic_libraries_path() const {
+ 	return get_cache_path().path_join("dynamic_libraries");
+ }

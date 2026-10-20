@@ -85,6 +85,10 @@ class ProfileRulesTest(unittest.TestCase):
         for rel in ("AutoUpdate.exe", "CrashReporter.exe", "Game.exe", "oalinst.exe", "x.dll"):
             touch(helpers, rel)
         self.assertEqual("Game.exe", resolve_exe(helpers, detect_engine(helpers)))
+        kotone = os.path.join(self.tmp.name, "kotone")  # the engine's settings tool sorts first: エ before コ
+        for rel in ("エンジン設定.exe", "コトネイロ.exe"):
+            touch(kotone, rel)
+        self.assertEqual("コトネイロ.exe", resolve_exe(kotone, detect_engine(kotone)))
 
     def test_rejections(self):
         touch(self.tmp.name, "evil.exe")
@@ -96,6 +100,13 @@ class ProfileRulesTest(unittest.TestCase):
             p.update(extra)
             with self.assertRaises(ProfileError, msg=str(extra)):
                 validate(p, self.ue)
+
+    def test_runner_values(self):
+        game = os.path.join(self.tmp.name, "RenPyGame")
+        for rel in ("MyGame.exe", "MyGame.py", "game/script.rpyc", "renpy/common/00start.rpyc"):
+            touch(game, rel)
+        for runner in ("html", "renpy", "rgss", "godot", "wine"):
+            self.assertEqual("MyGame.exe", validate({"schemaVersion": 1, "name": "g", "runner": runner}, game))
 
     def test_rejects_wine_in_path(self):
         g = os.path.join(self.tmp.name, "Red wine 2")
@@ -141,6 +152,17 @@ class EngineDetectionTest(unittest.TestCase):
         self.check("GODOT", "godot", "Game.exe", "Game.pck")
         self.assertEqual("SiglusEngine.exe", resolve_exe(siglus, "SIGLUS"))
 
+    def test_godot_in_one_exe(self):
+        # "Embed PCK": the exe, the pack ("GDPC", format, major, minor, patch...), the pack's size, "GDPC"
+        pck = struct.pack("<4s4I", b"GDPC", 3, 4, 5, 1) + bytes(76)
+        root = self.game("embedded", "readme.txt")
+        with open(os.path.join(root, "Game.exe"), "wb") as f:
+            f.write(b"MZ... the engine ..." + pck + struct.pack("<Q", len(pck)) + b"GDPC")
+        self.assertEqual("GODOT", detect_engine(root))
+        with open(os.path.join(root, "Game.exe"), "wb") as f:  # a size bigger than the file: not a pack
+            f.write(b"MZ... the engine ..." + pck + struct.pack("<Q", 1 << 40) + b"GDPC")
+        self.assertEqual("UNKNOWN", detect_engine(root))
+
     def test_rpgmaker_families(self):
         mv = self.check("RPGMAKER_MV", "mv", "Game.exe", "notification_helper.exe", "nw.dll", "www/js/rpg_core.js")
         self.assertEqual("Game.exe", resolve_exe(mv, "RPGMAKER_MV"))
@@ -167,6 +189,22 @@ class EngineDetectionTest(unittest.TestCase):
         self.check("RENPY", "renpy2", "Game.exe", "game/archive.rpa")
         self.check("RENPY", "renpy3", "Game.exe", "game/script.rpyc")
         self.check("UNKNOWN", "plain", "Game.exe", "game/readme.txt")
+
+    def test_renpy_runs_its_64bit_exe(self):
+        def pe(machine):
+            head = bytearray(0x100)
+            head[0:2], head[0x3c:0x40] = b"MZ", (0x80).to_bytes(4, "little")
+            head[0x80:0x84], head[0x84:0x86] = b"PE\0\0", machine.to_bytes(2, "little")
+            return bytes(head)
+        game = os.path.join(self.tmp.name, "adik")
+        touch(game, "BeingADIK.exe", pe(0x8664))
+        touch(game, "BeingADIK-32.exe", pe(0x14c))
+        touch(game, "game/archive.rpa")
+        for lib in ("windows-i686", "windows-x86_64"):
+            os.makedirs(os.path.join(game, "lib", lib))
+        self.assertEqual("BeingADIK.exe", resolve_exe(game, detect_engine(game)))
+        shutil.rmtree(os.path.join(game, "lib", "windows-x86_64"))
+        self.assertEqual("BeingADIK-32.exe", resolve_exe(game, "RENPY"), "no 64-bit Python beside it")
 
     def test_controls_kind(self):
         self.assertEqual(("pc", "vn", "rpg", "2d", "action", "mouse"), CONTROLS)
@@ -299,6 +337,36 @@ class HtmlCompatTest(unittest.TestCase):
     @unittest.skipIf(shutil.which("node") is None, "node is not installed")
     def test_compat_script_in_simulated_rpg_maker(self):
         sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_compat_sim.js")
+        out = subprocess.run(["node", sim], capture_output=True, text=True)
+        self.assertEqual(0, out.returncode, out.stdout + out.stderr)
+
+    @unittest.skipIf(shutil.which("node") is None, "node is not installed")
+    def test_rpg_maker_saves_are_files_as_on_a_pc(self):
+        sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_saves_sim.js")
+        out = subprocess.run(["node", sim], capture_output=True, text=True)
+        self.assertEqual(0, out.returncode, out.stdout + out.stderr)
+
+    @unittest.skipIf(shutil.which("node") is None, "node is not installed")
+    def test_rpg_maker_mz_moves_while_the_page_shows(self):
+        sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_focus_sim.js")
+        out = subprocess.run(["node", sim], capture_output=True, text=True)
+        self.assertEqual(0, out.returncode, out.stdout + out.stderr)
+
+    @unittest.skipIf(shutil.which("node") is None, "node is not installed")
+    def test_a_plugin_that_fails_as_it_loads_is_named(self):
+        sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_load_error_sim.js")
+        out = subprocess.run(["node", sim], capture_output=True, text=True)
+        self.assertEqual(0, out.returncode, out.stdout + out.stderr)
+
+    @unittest.skipIf(shutil.which("node") is None, "node is not installed")
+    def test_a_tap_on_a_page_field_is_the_browsers(self):
+        sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_form_taps_sim.js")
+        out = subprocess.run(["node", sim], capture_output=True, text=True)
+        self.assertEqual(0, out.returncode, out.stdout + out.stderr)
+
+    @unittest.skipIf(shutil.which("node") is None, "node is not installed")
+    def test_a_touch_on_a_field_over_the_game_reaches_it_however_the_game_starts(self):
+        sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_touch_sim.js")
         out = subprocess.run(["node", sim], capture_output=True, text=True)
         self.assertEqual(0, out.returncode, out.stdout + out.stderr)
 

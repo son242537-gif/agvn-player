@@ -1,0 +1,10 @@
+AGVN Player v0.1.18 - agvn.io.vn
+
+Mới:
+- Cảnh báo "Máy đang nóng" có nút "Máy bố, bố biết": bấm thì 24 giờ tới app không báo nóng nữa.
+- Hộp hỏi Tiết kiệm pin trước khi vào game: chọn "Chơi luôn" thì 24 giờ tới app không hỏi lại.
+- Máy không đủ RAM (như máy GPU Mali dưới 9 GB RAM) chạy game DirectX: app tự bật "Đồng bộ khung hình" và "Tắt Present Wait" cho lần chạy đó. Đây là cách một người chơi máy Mali đã chỉnh để vào được game Unreal bị đen màn hình. Cài đặt của game vẫn giữ nguyên.
+Sửa lỗi:
+- Game còn đen màn hình lúc mở: app chỉ đề nghị đổi sang màn hình lớn hơn khi game thật sự cần màn hình lớn hơn, không đề nghị nhầm như trước.
+- Vuốt tắt AGVN khỏi danh sách app gần đây lúc đang chơi: nhật ký lần chơi vẫn giữ các dòng báo cuối của game, giúp tìm lỗi khi bạn gửi nhật ký.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.

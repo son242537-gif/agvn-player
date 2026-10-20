@@ -4,7 +4,7 @@
 # Inputs are pinned in scripts/agvn/zink/sources.lock (Mesa by signed tag and commit, headers by SHA-256) and
 # scripts/agvn/pins.txt (imagefs); patches are in scripts/agvn/zink/patches. Nothing downloaded is used before its
 # hash is checked. Linux x86_64 only (the cloud container or WSL). See scripts/agvn/zink/README.md.
-# Copyright (c) 2026 agvn.io.vn - MIT License.
+# Copyright (c) 2026 agvn.io - MIT License.
 set -euo pipefail
 
 ROOT=$(git -C "$(dirname "$0")" rev-parse --show-toplevel)

@@ -68,6 +68,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -224,8 +225,9 @@ private class ShortcutEditorStateV2(val shortcut: Shortcut) {
     var boxPreset by mutableStateOf(shortcut.getExtra("box64Preset", container.getBox64Preset()))
 
     var controlsProfile by mutableStateOf(shortcut.getExtra("controlsProfile", "")) // AGVN: missing = automatic layout, "0" = off
-    // AGVN: no choice of its own = the environment's; the toggle then stores "1" or "0" so the game can differ
-    var fullscreen by mutableStateOf(shortcut.getExtra("fullscreenStretched", if (container.isFullscreenStretched) "1" else "0") == "1")
+    // AGVN: no choice of its own = the environment's or "Toàn màn hình cho mọi game"; the toggle then stores "1" or "0"
+    var fullscreen by mutableStateOf(shortcut.getExtra("fullscreenStretched",
+        com.winlator.cmod.agvn.AgvnFullscreen.inherited(container.manager.context, container)) == "1")
     private var inputType by mutableIntStateOf(shortcut.getExtra("inputType", container.getInputType().toString()).toIntOrNull() ?: container.getInputType())
     var exclusive by mutableStateOf(shortcut.getExtra("exclusiveXInput").let { if (it.isBlank()) container.isExclusiveXInput() else it == "1" })
     var xinput by mutableStateOf((inputType and WinHandler.FLAG_INPUT_TYPE_XINPUT.toInt()) != 0)
@@ -411,7 +413,8 @@ private class ShortcutEditorStateV2(val shortcut: Shortcut) {
 
 @Composable
 internal fun ShortcutEditorV2(fragment: Fragment, shortcut: Shortcut, close: () -> Unit) {
-    val context = fragment.requireContext()
+    // AGVN: the dialog's own context; the library can be detached while this dialog is still open
+    val context = LocalContext.current
     val state = remember(shortcut.file.path) {
         OpenGLDriverDefaults.initialize(context, shortcut.container)
         ShortcutEditorStateV2(shortcut)
@@ -486,12 +489,12 @@ internal fun ShortcutEditorV2(fragment: Fragment, shortcut: Shortcut, close: () 
 
     fun closeEditor() {
         renameShortcutV2(shortcut, state.name)
-        if (fragment is ShortcutsFragment) fragment.loadShortcutsList()
+        if (fragment is ShortcutsFragment && fragment.isAdded) fragment.loadShortcutsList()
         close()
     }
 
     fun enterContainer() {
-        val activity = fragment.requireActivity()
+        val activity = fragment.activity ?: return
         if (!XrActivity.isEnabled(context)) {
             activity.startActivity(Intent(activity, XServerDisplayActivity::class.java).putExtra("container_id", state.container.id))
         } else {
@@ -508,7 +511,7 @@ internal fun ShortcutEditorV2(fragment: Fragment, shortcut: Shortcut, close: () 
         if (target.id == state.container.id) return
         if (shortcut.cloneToContainer(target)) {
             Toast.makeText(context, "Đã chép lối tắt sang ${target.name}", Toast.LENGTH_SHORT).show()
-            if (fragment is ShortcutsFragment) fragment.loadShortcutsList()
+            if (fragment is ShortcutsFragment && fragment.isAdded) fragment.loadShortcutsList()
             close()
         }
     }
@@ -1127,7 +1130,12 @@ private fun ShortcutCategoryV2(
 
         "Điều khiển" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
-                SettingMappedChoice("Cấu hình phím ảo", s.controlsProfile, profiles) { s.controlsProfile = it; s.shortcut.putExtra(com.winlator.cmod.agvn.AgvnLayouts.EXTRA_AUTO, null); s.extra("controlsProfile", it.ifEmpty { null }) } // AGVN: player's choice; "0" = controls off, "" = automatic
+                SettingMappedChoice("Cấu hình phím ảo", s.controlsProfile, profiles) {
+                    s.controlsProfile = it
+                    s.shortcut.putExtra(com.winlator.cmod.agvn.AgvnLayouts.EXTRA_AUTO, null)
+                    if (it != "0") s.shortcut.putExtra(com.winlator.cmod.agvn.AgvnControlsFork.EXTRA_HIDDEN, null) // AGVN: picked keys show
+                    s.extra("controlsProfile", it.ifEmpty { null })
+                } // AGVN: player's choice; "0" = controls off, "" = automatic; Chạy nhẹ games too (AgvnLightPick)
                 SettingsDivider()
                 SettingToggle("Nhập độc quyền", s.exclusive) {
                     s.exclusive = it

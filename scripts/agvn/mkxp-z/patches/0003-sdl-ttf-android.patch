@@ -1,0 +1,33 @@
+AGVN Player: on Android SDL_ttf's CMake builds its Android-project shared library with its own FreeType 2.10.4,
+which clashes with mkxp-z's FreeType; build it as on other platforms.
+
+diff --git a/subprojects/packagefiles/sdl2_ttf-agvn-android.patch b/subprojects/packagefiles/sdl2_ttf-agvn-android.patch
+new file mode 100644
+index 00000000..31d531ca
+--- /dev/null
++++ b/subprojects/packagefiles/sdl2_ttf-agvn-android.patch
+@@ -0,0 +1,14 @@
++# AGVN Player: build SDL_ttf for Android as for other platforms (static, with mkxp-z's FreeType) instead of
++# its Android-project path, which builds a shared library with its own FreeType 2.10.4.
++
++--- a/CMakeLists.txt
+++++ b/CMakeLists.txt
++@@ -12,7 +12,7 @@
++ cmake_minimum_required(VERSION 3.0)
++ project(SDL_ttf C)
++ 
++-if (ANDROID)
+++if (FALSE)
++     option(TTF_WITH_HARFBUZZ "use harfbuzz to improve text shaping" OFF)
++ 
++     add_library(SDL2_ttf SHARED)
+diff --git a/subprojects/sdl2_ttf.wrap b/subprojects/sdl2_ttf.wrap
+index d2b431f4..b4b6e8be 100644
+--- a/subprojects/sdl2_ttf.wrap
++++ b/subprojects/sdl2_ttf.wrap
+@@ -6,4 +6,5 @@ directory = SDL_ttf-release-2.0.18
+ method = cmake
+ diff_files =
+     sdl2_ttf-deps.patch,
++    sdl2_ttf-agvn-android.patch,
+     end-of-diff-files.patch

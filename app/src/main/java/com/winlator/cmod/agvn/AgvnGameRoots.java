@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.content.Context;
@@ -15,7 +15,7 @@ public final class AgvnGameRoots {
     static final String PREF = "agvn_extra_game_roots";
     static final int MAX = 10;
     /** How many folder levels below a picked folder may hold a game. */
-    static final int DEPTH = 3;
+    static final int DEPTH = 4;
 
     private AgvnGameRoots() {}
 

@@ -1,0 +1,11 @@
+AGVN Player v0.1.19 - agvn.io.vn
+
+Mới:
+- Game DirectX vẫn đen màn hình sau khi mở: thanh "Màn hình game vẫn đen" đề nghị "Bật Đồng bộ khung hình". Bạn tắt lại được trong cài đặt game.
+Sửa lỗi:
+- Máy dưới 9 GB RAM có GPU Mali (hay dùng driver của máy, System): game giữ đúng mức "Đồ họa" bạn chọn, không còn bị app tự giảm chất lượng và tự bật "Đồng bộ khung hình". Chỉ game nào từng bị tắt vì hết RAM trên máy mới tự tiết kiệm RAM như "Siêu nhẹ".
+- Game có khung lớn theo màn hình (như Party Me): màn hình game không còn to thêm sau mỗi lần bấm "Đổi màn hình". App trả lại màn hình cũ và không hỏi nữa.
+- Game đứng hình rồi tự tắt không còn bị tính là chạy tốt, nên app không đề nghị lại những cách sửa đã thử.
+- Thư mục game bị đổi tên, chuyển chỗ hay xoá: app báo "Không tìm thấy file của game" thay vì báo nhầm "Game không chạy với cấu hình mới", và không phóng hộp lỗi ra cả màn hình.
+- App không còn tự tắt khi bạn tạo container rồi chuyển sang app khác.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.

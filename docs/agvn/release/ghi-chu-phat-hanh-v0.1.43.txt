@@ -1,0 +1,5 @@
+AGVN Player v0.1.43 - agvn.io
+
+Sửa lỗi:
+- Game để trong thư mục có dấu cách ở cuối tên (như "Game " do bàn phím điện thoại tự thêm dấu cách) bị đứng ở màn hình chờ, nhất là game Unity: giờ game mở được như bình thường, không cần đổi tên thư mục. Save và cài đặt của game vẫn ở chỗ cũ.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

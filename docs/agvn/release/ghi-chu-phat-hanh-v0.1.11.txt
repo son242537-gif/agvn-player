@@ -1,0 +1,8 @@
+AGVN Player v0.1.11 - agvn.io.vn
+
+Mới:
+- Game PC có nút "✕ Thoát" trên thanh ⌨ ✎ 👁 ⛶ ở mép trên màn hình. Bấm vào, app hỏi lại "Thoát game?" để không lỡ tay.
+- Game mở lâu (như game Unity trên máy yếu): dòng "Đang khởi động" cho biết lần trước game mất bao lâu mới mở xong, để bạn biết mà chờ.
+Sửa lỗi:
+- Tự vuốt tắt AGVN khỏi danh sách app gần đây thì app không còn hỏi nhầm "Máy tự tắt game khi bạn chuyển app".
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.vn.

@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
@@ -23,10 +23,19 @@ final class AgvnWarningBar {
     /** A button; every button also closes the bar. */
     static final class Choice {
         final int label;
+        final String text;
         final Runnable action;
 
         Choice(int label, Runnable action) {
             this.label = label;
+            this.text = null;
+            this.action = action;
+        }
+
+        /** A button whose words are made at run time ("Đổi Đồ họa sang Thấp (854×480)"). */
+        Choice(String text, Runnable action) {
+            this.label = 0;
+            this.text = text;
             this.action = action;
         }
     }
@@ -49,9 +58,12 @@ final class AgvnWarningBar {
         box.addView(text(activity, detail, false));
         LinearLayout buttons = new LinearLayout(activity);
         buttons.setGravity(Gravity.END);
+        if (choices.length > 2) buttons.setOrientation(LinearLayout.VERTICAL); // long fix names: one per line
         for (Choice c : choices) {
             Button b = new Button(activity, null, android.R.attr.borderlessButtonStyle);
-            b.setText(c.label);
+            b.setAllCaps(false);
+            if (c.text != null) b.setText(c.text);
+            else b.setText(c.label);
             b.setTextColor(0xFFFFD27A);
             b.setOnClickListener(v -> {
                 hide(activity);

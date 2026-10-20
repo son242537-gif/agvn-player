@@ -1,0 +1,8 @@
+AGVN Player v0.1.32 - agvn.io
+
+Sửa lỗi:
+- Bàn phím không dây và bộ thu USB (bàn phím kèm chuột) mà Android coi là cả tay cầm giờ gõ được trong game: chữ, phím mũi tên, Enter, Esc đều tới game. Trước đây game không nhận phím nào từ những bàn phím này. Tay cầm thật vẫn như cũ.
+- Mở phần gán phím cho một thiết bị vừa ngắt kết nối (bàn phím tự ngủ, rút đầu thu) không còn làm app văng: app báo thiết bị đã ngắt và đóng màn đó.
+Mới:
+- Nhật ký ghi các bàn phím, chuột, tay cầm đang nối, và phím, cú bấm chuột có tới game không, để AGVN biết lỗi nằm ở đâu khi bàn phím hay chuột "không nhận".
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

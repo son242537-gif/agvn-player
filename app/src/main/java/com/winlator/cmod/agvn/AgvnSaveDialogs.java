@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 agvn.io.vn — MIT License (see LICENSE). */
+/* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
@@ -25,7 +25,9 @@ import java.util.Locale;
 
 /**
  * "Nhập save" / "Xuất save" in the library's ⋮ menu. Zips go to AGVN-Player/Saves/&lt;game&gt;/, the folder of the
- * existing "Bản lưu game" backups. Import first saves the current saves there, so a wrong file can be undone.
+ * existing "Bản lưu game" backups. Import first saves the current saves there, so a wrong file can be undone. "Chạy
+ * nhẹ" games keep their saves where the PC game does (AgvnSaveLocations), RPG Maker MV/MZ ones too
+ * ({@link AgvnHtmlSaves}); other HTML games keep theirs in the app's browser, which this does not reach.
  */
 public final class AgvnSaveDialogs {
     private static final String TAG = "AGVN";
@@ -39,7 +41,8 @@ public final class AgvnSaveDialogs {
             int count = AgvnSaveTransfer.export(AgvnSaveLocations.find(shortcut), prefs(shortcut), shortcut.name, zip);
             if (count == 0) {
                 zip.delete();
-                return activity.getString(R.string.agvn_save_export_empty);
+                return activity.getString(rpgMakerHtml(shortcut) ? R.string.agvn_save_export_empty_html
+                        : R.string.agvn_save_export_empty);
             }
             return activity.getString(R.string.agvn_save_exported, count, readable(zip));
         });
@@ -114,9 +117,16 @@ public final class AgvnSaveDialogs {
     }
 
     private static boolean htmlRunner(Activity activity, Shortcut shortcut) {
-        if (!AgvnHtmlGame.RUNNER_HTML.equals(shortcut.getExtra(AgvnHtmlGame.EXTRA_RUNNER))) return false;
+        String runner = shortcut.getExtra(AgvnHtmlGame.EXTRA_RUNNER);
+        if (!AgvnHtmlGame.RUNNER_HTML.equals(runner) || rpgMakerHtml(shortcut)) return false;
         message(activity, activity.getString(R.string.agvn_save_html_note));
         return true;
+    }
+
+    /** An RPG Maker MV/MZ game on "Chạy nhẹ": its saves are files in its save folder, as on a PC. */
+    private static boolean rpgMakerHtml(Shortcut shortcut) {
+        return AgvnHtmlGame.RUNNER_HTML.equals(shortcut.getExtra(AgvnHtmlGame.EXTRA_RUNNER))
+                && GameExeResolver.Engine.RPGMAKER_MV.name().equals(shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE));
     }
 
     private static File newZip(Shortcut shortcut, String kind) {
@@ -126,7 +136,7 @@ public final class AgvnSaveDialogs {
         return new File(dir, dir.getName() + "_" + kind + "_" + stamp + ".zip");
     }
 
-    private static String prefsKey(Shortcut shortcut) {
+    static String prefsKey(Shortcut shortcut) {
         if (!GameExeResolver.Engine.UNITY.name().equals(shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE))) return null;
         String[] names = AgvnSaveLocations.unityNames(new File(shortcut.path.replace("\"", "")));
         return names != null ? "Software\\" + names[0] + "\\" + names[1] : null;

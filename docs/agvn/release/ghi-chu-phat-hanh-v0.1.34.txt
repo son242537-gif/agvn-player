@@ -1,0 +1,7 @@
+AGVN Player v0.1.34 - agvn.io
+
+Sửa lỗi:
+- "Tự sửa lỗi" không còn mất cách đang thử: bấm tim, chỉnh "Cấu hình" ở trang game hay bấm "Chơi" ở thư viện không còn ghi đè cách sửa app vừa đặt cho game.
+- Game mở mà không có cách đang thử (vì cài đặt game đã đổi): app không hỏi "Còn lỗi không?" về cách đó và không tính là đã thử, mà mời thử lại.
+- Game Unreal tự dừng với hộp "GameThread timed out waiting for RenderThread" (máy chậm, lần tải đầu): "Tự sửa lỗi" đề nghị cho game chờ vẽ hình lâu hơn thay vì tự dừng.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
