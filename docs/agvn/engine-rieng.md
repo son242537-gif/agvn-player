@@ -797,12 +797,19 @@ Tệp `img/system/ButtonSet.png_` trên máy test đúng chuẩn MZ (528×96, md
   2. Trả lại tệp: nút hiện đúng ảnh, không có thanh.
   3. Game MV: chạy như cũ.
 
-## Chạm vào ô nhập HTML của game MV/MZ không có tác dụng (bản 0.1.61)
+## Chạm vào ô nhập HTML của game MV/MZ không có tác dụng (bản 0.1.61 và 0.1.62)
 
 Báo cáo ngày 20/10/2026 (Android 16 / HyperOS, "Chạy nhẹ"; bản gốc: `docs/agvn/bao-cao/2026-10-20-cham-o-nhap-html.md`):
 game có màn nhập liệu dựng bằng thẻ HTML (`<input>`, `<textarea>`, nút "Xác nhận") đặt đè lên khung game, như màn đặt
 tên nhân vật. Lúc mới hiện, ô tự có focus nên gõ được. Khi focus mất, chạm vào ô hay vào nút đều không có tác dụng, và
 game đứng chờ mãi, không lỗi. Trên PC thì chạy bình thường.
+
+- **Bản nào có gì:**
+  - 0.1.61 (tag `4e0d438`): bọc hàm bắt chạm lúc `SceneManager.run`, `path.parse` / `path.format`, và `process.execPath`
+    lấy từ lối tắt.
+  - 0.1.62 (`4201b9e`): bọc ngay khi `rpg_core` / `rmmz_core` chạy xong, ô không đè nút nữa, `path.parse` giống hẳn Node,
+    và exe chính của thư mục khi lối tắt chạy một công cụ (`AgvnHtmlExe`). Phần này được đẩy lên nhánh sau khi bản
+    0.1.61 đã build, nên không có trong 0.1.61.
 
 - **Vì sao:**
   - `TouchInput._onTouchStart` của MV (`rpg_core.js`) và MZ (`rmmz_core.js`) gắn trên cả trang. Chạm nào trong khung
