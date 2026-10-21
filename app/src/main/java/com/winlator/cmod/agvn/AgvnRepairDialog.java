@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 
 import com.winlator.cmod.R;
+import com.winlator.cmod.XServerDisplayActivity;
 import com.winlator.cmod.container.Shortcut;
 
 import java.util.ArrayList;
@@ -52,6 +53,9 @@ public final class AgvnRepairDialog {
                 .setTitle(R.string.agvn_repair_pick)
                 .setItems(titles, (d, which) -> {
                     String id = problems.get(which).id;
+                    // which window covers which, as the player saw the problem (AgvnWindowList)
+                    if (a instanceof XServerDisplayActivity)
+                        AgvnWindowList.note(((XServerDisplayActivity) a).getXServer());
                     AgvnProblemCatalog.Finding f = AgvnDoctor.catalog(a).finding(id, AgvnGodotGame.params(s));
                     if (f != null) plan(a, s, f, restartGame);
                 })

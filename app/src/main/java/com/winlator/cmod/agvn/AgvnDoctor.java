@@ -172,6 +172,7 @@ public final class AgvnDoctor {
         ev.lowRamFreeMb = AgvnSessionTrack.lowRamFreeMb(nowMs, LOW_RAM_RECENT_MS);
         ev.ramSaved = AgvnMemorySaver.ranOut(s);
         ev.frozenS = AgvnSessionTrack.frozenSecondsAtEnd();
+        ev.shownS = AgvnSessionTrack.shownSecondsAtEnd();
         ev.frozenPresses = AgvnSessionTrack.pressesWithoutFrame();
         ev.tilerOoms = AgvnWineTail.get().tilerOoms();
         if (ev.lowRamFreeMb >= 0) ev.params.put("free", String.valueOf(ev.lowRamFreeMb));

@@ -1958,3 +1958,68 @@ Báo cáo ngày 21/10/2026 (`BAO-CAO-LOI-CHUNG-AGVN-PLAYER-RGSS-VXACE.md`, POCO 
   3. Một game có lỗi script thật (thêm dòng `nil.width` vào một script): hộp lỗi có nút chính "Gửi nhật ký cho AGVN",
      nút phụ "Thử chạy bằng Windows". Gửi nhật ký xong, hộp lỗi hiện lại.
   4. Hồi quy: game RPG Maker XP, VX, VX Ace đang chạy tốt bằng Chạy nhẹ vẫn chạy như trước.
+
+## Giả lập 32-bit không chạy mã của DLL đi kèm game (The Agnietta, bản 0.1.63)
+
+Nhật ký ngày 21/10/2026 (Redmi Note 9 Pro, Snapdragon 720G, Proton 9 arm64ec, FEXCore 2601, Wine debug bật). The Agnietta
+(Pixel Game Maker MV, 32-bit) nạp khoảng 80 giây, một nhân chạy 80%, lên được OpenGL (`ScriptingCore Start`) rồi văng:
+
+```
+Unhandled exception: page fault on execute access to 0x79811e80 in wow64 32-bit code (0x79811e80).
+=>0 0x79811e80 in msvcr100 (+0x1e80)
+  1 0x7994d8ea in sqlite3 (+0x6d8ea)
+0x79811e80 msvcr100+0x1e80: push %ebp
+```
+
+- **Vì sao:**
+  - Game gọi SQLite; `sqlite3.dll` gọi một hàm của `msvcr100.dll` đi kèm game.
+  - Địa chỉ đó là mã thật của `msvcr100.dll` (winedbg đọc được `push %ebp`). CPU thật chạy được mã ấy.
+  - Ngay trước đó Wine ghi `EXCEPTION_ACCESS_VIOLATION`, backtrace ở `libwow64fex.dll + 0xE9024`, cùng chỗ với lỗi
+    `RGSS301.dll` của báo cáo VX Ace. Tức là chính FEX báo lỗi: FEX chỉ dịch mã ở những trang nó được báo là chạy được
+    (`Decoder::CheckRangeExecutable` của FEXCore). Trang này nó coi là không chạy được.
+  - Vì sao trang ấy mất quyền chạy thì chưa rõ. Mọi DLL của game được Wine đọc chép vì thư mục game ở bộ nhớ chung
+    (`map_pe_header noexec file system, falling back to read`). Các DLL khác vẫn chạy.
+- **Sửa (Tự sửa lỗi, `AgvnEmulatorNoExec`):** nhận ra lỗi qua điều kiện `module-code`: game văng vì "page fault on
+  execute access" trong mã 32-bit wow64, và khung đầu của backtrace ở đúng địa chỉ đó, bên trong một module.
+  - Nếu module là thư viện C của Microsoft (msvcr*, msvcp*, vcruntime*, ucrtbase, concrt*), lỗi là
+    `emulator-noexec-crt`. Các cách sửa, theo thứ tự:
+    1. "Dùng msvcr100.dll của Wine thay bản đi kèm game" (`dll-wine`);
+    2. "Chạy phần 32-bit của game bằng WOWBox64 thay FEXCore" (`emulator-wowbox64`, đặt "Giả lập 32-bit" của game là
+       `Box64`, tức `wowbox64.dll`);
+    3. giả lập ổn định;
+    4. gửi nhật ký.
+  - Module khác (`emulator-noexec`): WOWBox64, giả lập ổn định, gửi nhật ký.
+  - Chỉ đề nghị khi lỗi này hiện, cho game đang chạy FEXCore với Wine arm64ec. Game khác không đổi gì.
+  - Giới hạn: các lần chạy tắt debug Wine (12:06 cùng ngày, và 19/10 trên Snapdragon 8+ Gen 1) cũng dừng 1–2 giây sau
+    `ScriptingCore Start`, nhưng không in báo cáo crash nào. Có thể `Game.exe` (nạp `dbghelp`) tự bắt lỗi. Khi đó app
+    không thấy dấu hiệu nào, nên chỉ nhận ra lỗi này khi Wine in báo cáo, như lần bật debug.
+- **Lần chạy chỉ hiện màn nạp không còn là "chạy tốt" (`AgvnEvidence.loadingOnly`):**
+  - Trước đây, lần 12:06 (màn nạp 5 giây rồi không vẽ gì, 110 giây sau game tự tắt) và các lần người chơi thoát sau
+    30 giây đều được lưu là cấu hình chạy tốt. Vì vậy lần văng sau bị báo nhầm "Game bị lỗi với cấu hình mới".
+  - Giờ game chỉ vẽ trong chưa tới 10 giây (từ khung đầu tới khung cuối) rồi không vẽ gì ít nhất 10 giây tới lúc tắt
+    thì lần chạy đó không được lưu là tốt.
+- **Test:** `AgvnEmulatorNoExecTest`.
+- **Thử máy:**
+  1. The Agnietta trên máy yếu (Redmi Note 9 Pro), chờ hết màn nạp (khoảng 1 phút rưỡi): game văng như cũ, Tự sửa lỗi
+     hiện "Giả lập 32-bit không chạy được mã của game" với nút dùng `msvcr100.dll` của Wine.
+  2. Bấm thử: game qua được chỗ văng, hoặc app đề nghị tiếp WOWBox64. `su-kien.txt` ghi
+     "Giả lập 32-bit: WOWBox64 …".
+  3. Hồi quy: game 32-bit đang chạy tốt bằng FEXCore không bị hỏi gì. Game văng vì lỗi khác vẫn ra "Game bị lỗi và tự
+     tắt" như trước.
+
+## Danh sách cửa sổ khi người chơi báo lỗi (To Be or Not to Be, bản 0.1.63)
+
+Nhật ký ngày 21/10/2026 (Xiaomi 25053PC47G, Adreno 825). "To Be or Not to Be" (Unity IL2CPP, cửa sổ do UniWindowController
+lo; bản Việt hoá có mod `tbntbvn.dll`, chặn nền trong suốt bằng file `KHONG-TRONG-SUOT.txt`) màn hình đen dù game vẫn
+gửi 30 khung/giây:
+
+- Game vẽ bằng DXVK vào cửa sổ 1272×694 (cửa sổ có viền, phóng to trong màn hình Wine 1288×746).
+- Từ giây thứ 20 có một cửa sổ 1×1, rồi cứ 5 giây lại có nội dung mới cho một cửa sổ to bằng cả màn hình (1288×746).
+- Lần chơi "hết chập chờn" trước đó (20:14:55) thì khác: cửa sổ game 1288×728, và cứ 5 giây game tạo lại swapchain một
+  lần (1280×720, 1296×754, rồi 1288×728). Vậy chập chờn là do cửa sổ đổi cỡ, không hẳn do LRZ.
+- App vẽ mọi cửa sổ như không trong suốt (`window.frag`, `useTexAlpha = 0`). Một cửa sổ sâu 32 bit vốn trong suốt sẽ
+  hiện thành màu đen, che game. Nhật ký chưa cho biết cửa sổ nào nằm trên cùng.
+- **Thêm (`AgvnWindowList`):** khi người chơi chọn một lỗi trong ⋮ → Tự sửa lỗi lúc game đang chạy, `su-kien.txt` ghi
+  các cửa sổ đang hiện, từ dưới lên trên: id, tên chương trình, tiêu đề, vị trí, cỡ, độ sâu màu (24 hay 32).
+- **Thử máy:** khi màn hình đen, mở ⋮ → Tự sửa lỗi → "Màn hình đen dù game vẫn chạy", rồi gửi nhật ký. Trong
+  `su-kien.txt` có dòng "Cửa sổ trên màn hình, dưới lên trên".

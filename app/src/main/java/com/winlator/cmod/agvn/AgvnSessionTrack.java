@@ -33,7 +33,7 @@ public final class AgvnSessionTrack {
     private static volatile Map<String, String> settings = Collections.emptyMap();
     private static volatile String engineCrash;
     private static volatile boolean bigSeen, wineEnded, playerQuit, exiting;
-    private static volatile long lastFrameMs, endMs, stoppedAtStartNs;
+    private static volatile long firstFrameMs, lastFrameMs, endMs, stoppedAtStartNs;
     private static final AtomicInteger pressesSinceFrame = new AtomicInteger(), framesSeen = new AtomicInteger();
     private static long lowRamAtMs, lowRamFreeMb = -1;
     private static long usedAtMs, usedMb = -1, usedBeforeMb = -1;
@@ -52,7 +52,7 @@ public final class AgvnSessionTrack {
         frames.set(0);
         bigUpdates.set(0);
         bigSeen = wineEnded = playerQuit = exiting = false;
-        lastFrameMs = endMs = 0;
+        firstFrameMs = lastFrameMs = endMs = 0;
         pressesSinceFrame.set(0);
         framesSeen.set(0);
         lowRamAtMs = 0;
@@ -94,6 +94,7 @@ public final class AgvnSessionTrack {
     }
 
     static void onFrame(long nowMs) {
+        if (firstFrameMs == 0) firstFrameMs = nowMs;
         lastFrameMs = nowMs;
         if (pressesSinceFrame.get() != 0) pressesSinceFrame.set(0);
         if (framesSeen.get() < STARTED_UPDATES) framesSeen.incrementAndGet();
@@ -134,6 +135,15 @@ public final class AgvnSessionTrack {
     static long frozenSecondsAtEnd() {
         long last = lastFrameMs, end = endMs;
         return framesSeen.get() >= STARTED_UPDATES && end >= last ? (end - last) / 1000 : -1;
+    }
+
+    /**
+     * Seconds from the game's first frame to its last, judged as {@link #frozenSecondsAtEnd}: a few for a game that
+     * showed only its loading screen, then nothing until it ended.
+     */
+    static long shownSecondsAtEnd() {
+        long first = firstFrameMs, last = lastFrameMs, end = endMs;
+        return framesSeen.get() >= STARTED_UPDATES && end >= last ? (last - first) / 1000 : -1;
     }
 
     /** Milliseconds from the game's last frame (drawn or presented) to {@code nowMs}; Long.MAX_VALUE before one. */

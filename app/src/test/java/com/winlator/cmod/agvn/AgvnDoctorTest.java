@@ -31,10 +31,10 @@ public class AgvnDoctorTest {
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "godot-light",
             "godot-light-renderer", "mods-off", "raw-mouse", "ue-wait", "exe-64", "dll-wine", "emulator-order",
-            "esync-off"));
+            "esync-off", "emulator-wowbox64"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
-            "ram-saved", "live", "light", "script-error", "page-crash", "frozen", "reported"));
+            "ram-saved", "live", "light", "script-error", "page-crash", "frozen", "reported", "module-code"));
     static AgvnProblemCatalog catalog;
 
     @BeforeClass

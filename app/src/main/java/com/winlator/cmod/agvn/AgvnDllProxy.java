@@ -24,11 +24,13 @@ final class AgvnDllProxy {
     private AgvnDllProxy() {}
 
     /**
-     * "version" of {@code named} ("version.dll", the DLL Wine named) when a file of that name is beside the game's exe
-     * in {@code exeDir} and {@code envVars} does not already load Wine's copy; else null: Wine's own DLL lacks it.
+     * "version" of {@code named} ("version.dll", the DLL Wine named, or "version", a crash's module) when a file of
+     * that name is beside the game's exe in {@code exeDir} and {@code envVars} does not already load Wine's copy; else
+     * null: Wine's own DLL lacks it.
      */
     static String dll(File exeDir, String named, String envVars) {
         String name = named != null ? named.trim().toLowerCase(Locale.ROOT) : "";
+        if (!name.isEmpty() && !name.contains(".")) name += ".dll"; // a crash's frame names it bare: "msvcr100"
         if (!name.endsWith(".dll") || name.length() <= 4 || name.contains("/") || name.contains("\\")) return null;
         name = name.substring(0, name.length() - 4);
         File[] files = exeDir != null ? exeDir.listFiles() : null;

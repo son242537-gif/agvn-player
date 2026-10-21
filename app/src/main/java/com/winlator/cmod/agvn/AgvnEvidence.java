@@ -52,6 +52,8 @@ final class AgvnEvidence {
     boolean ramSaved;
     /** Seconds from the game's last frame to its end (-1: none), and the player's presses in them. */
     long frozenS = -1;
+    /** Seconds from the game's first frame to its last (-1: none). */
+    long shownS = -1;
     int frozenPresses;
     /** Mali's tiler heap ran out this many times in the session ({@link AgvnWineTail#tilerOoms}). */
     int tilerOoms;
@@ -73,6 +75,7 @@ final class AgvnEvidence {
             case "failed": return crashed || noStart();
             case "no-start": return noStart();
             case "crash": return crashed;
+            case "module-code": return crashed && AgvnEmulatorNoExec.moduleCode(lines);
             case "ended": return crashed || endedByGame;
             case "ended-early": return endedEarly();
             case "godot-switched": return godotSwitched;
@@ -101,11 +104,21 @@ final class AgvnEvidence {
     }
 
     /**
-     * The game drew its window and ran without a crash, a freeze or its GPU running out of tiler memory again and
-     * again: its settings work and are kept (AgvnGoodConfig).
+     * The game showed frames only for a moment, then nothing for {@link #FROZEN_S} until it ended: a loading screen.
+     * The Agnietta (Pixel Game Maker MV) on a Redmi Note 9 Pro drew its loading window for 5 s, then loaded for 80 s
+     * on one core; a player who quit after 30 s, or the game that closed itself, left a run 0.1.62 kept as good, so
+     * its next crash read "Game bị lỗi với cấu hình mới" (21/10/2026).
+     */
+    boolean loadingOnly() {
+        return frozenS >= FROZEN_S && shownS >= 0 && shownS < FROZEN_S;
+    }
+
+    /**
+     * The game drew its window and ran without a crash, a freeze, its GPU running out of tiler memory again and
+     * again, or showing only its loading screen: its settings work and are kept (AgvnGoodConfig).
      */
     boolean good() {
-        return started && !crashed && killedReason < 0 && !frozeAtEnd() && tilerOoms < TILER_OOM_MANY
+        return started && !crashed && killedReason < 0 && !frozeAtEnd() && !loadingOnly() && tilerOoms < TILER_OOM_MANY
                 && (playerQuit || seconds >= GOOD_AFTER_S);
     }
 }
