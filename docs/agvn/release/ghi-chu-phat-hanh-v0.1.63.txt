@@ -1,0 +1,11 @@
+AGVN Player v0.1.63 - agvn.io
+
+Sửa lỗi:
+- Game RPG Maker VX Ace chạy bằng "Chạy nhẹ" không còn dừng với lỗi "disposed viewport" khi chuyển cảnh (hay gặp ở game có script hiệu ứng ánh sáng). Trên Windows các game này vẫn chạy bình thường, giờ trong app cũng vậy.
+- Khi script của game RPG Maker bị lỗi, hộp lỗi đề nghị "Gửi nhật ký cho AGVN" trước, còn "Thử chạy bằng Windows" là nút phụ, để không lỡ tay chuyển game sang Windows.
+- Tự sửa lỗi nhận ra game bị khoá chết, đứng hình khi nạp cảnh (như game Unity), và đề nghị các cách sửa cho bộ giả lập CPU và Wine.
+- Tự sửa lỗi nhận ra khi bộ giả lập 32-bit không chạy được mã của thư viện đi kèm game (như The Agnietta), và đề nghị dùng thư viện của Wine hoặc đổi sang WOWBox64.
+- Lần chơi chỉ hiện màn hình nạp rồi tắt không còn bị tính là "chạy tốt", nên app không còn báo nhầm "Game bị lỗi với cấu hình mới".
+- Nhật ký tìm tệp của game RPG Maker không còn ghi nhầm là thiếu những ảnh theo ngôn ngữ mà game chỉ thử trước.
+- Khi bạn báo lỗi trong lúc chơi, nhật ký ghi thêm các cửa sổ đang hiện, để tìm ra nguyên nhân màn hình đen.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
