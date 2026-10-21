@@ -1211,7 +1211,14 @@ trace:msgbox:MSGBOX_OnInit L"No access to memory location.\r\n"
   2. "Chạy bằng Wine cũ (Proton 9)", cho game đang chạy Proton 10.
   3. Gửi nhật ký.
   Như mọi cách sửa, cách nào đã thử mà không hết lỗi thì không đề nghị lại.
+- **Proton 9 cũng không nạp được (báo cáo ngày 21/10/2026, POCO F8 Pro):** SELinux cấm chạy mã từ file ở
+  `/storage/emulated` (`avc: denied { execute } … RGSS301.dll … fuse`). Wine báo `disabling no-exec because of
+  L"RGSS301.dll"`, rồi `DllMain` của `RGSS301.dll` gặp lỗi bên trong `libwow64fex.dll` (giả lập 32-bit FEXCore) và
+  `Initialization of L"RGSS301.dll" failed`. Vì vậy với game RPG Maker XP/VX/VX Ace, Chạy nhẹ là đường chính.
 - **Chưa làm:** sửa trong Wine của Proton 10 (cho ánh xạ đó chép file vào bộ nhớ như Proton 9) cần dựng lại gói Proton.
+  Chép `Game.exe` và `System/*.dll` vào bộ nhớ riêng của app rồi chạy từ đó (đề xuất của báo cáo 21/10/2026) cần giữ
+  thư mục làm việc và chỗ lưu save ở thư mục game; chưa làm vì chưa thử được trên máy. Thử WOWBox64 thay FEXCore (cài
+  đặt game → "Giả lập 32-bit") cho trường hợp `DllMain` lỗi trong FEX.
 - **Test:** `AgvnDoctorTest.aDllThatCannotRunFromSharedStorage`.
 - **Thử máy:**
   1. Game VX Ace của báo cáo, đang chạy bằng Windows (Proton 10): hộp "No access to memory location." hiện, tắt game,
@@ -1906,3 +1913,48 @@ hình đen mãi (FPS 0, luồng bận nhất 3% một nhân), 2/2 lần, cùng m
   2. `moi-truong.txt` của lần chạy sau có `FEX_HALFBARRIERTSOENABLED=0` (hoặc `WINEESYNC=0`).
   3. Hồi quy: game Unity, Unreal, Ren'Py đang chạy tốt, thoát bình thường: không bị hỏi gì. `wine-cuoi.txt` có thể có
      một dòng `err:sync` khi game nạp lâu, nhưng không có `[AGVN] Khoá chết`.
+
+## RPG Maker VX Ace: viewport đã huỷ, lỗi script và đường Windows (bản 0.1.63)
+
+Báo cáo ngày 21/10/2026 (`BAO-CAO-LOI-CHUNG-AGVN-PLAYER-RGSS-VXACE.md`, POCO F8 Pro). Một game VX Ace có script hiệu ứng
+ánh sáng bên thứ ba, chạy bằng Chạy nhẹ (mkxp-z), văng ở lần chuyển cảnh đầu với hộp lỗi
+`Script '…' line N: RGSSError occurred. disposed viewport`. Trên Windows (RGSS3 gốc) game chạy bình thường.
+
+- **Vì sao (đọc mã mkxp-z, commit ghim `095b9cc3`):**
+  - Script giữ khoảng 20 sprite hiệu ứng trong một danh sách của `$game_temp`. Khi game tạo lại `$game_temp` (ván mới,
+    tải save), không ai huỷ các sprite đó, còn viewport của `Spriteset_Map` thì đã huỷ.
+  - Mỗi khung hình, `Graphics.update` và `Graphics.transition` gọi `prepare()` của mọi sprite còn sống (tín hiệu
+    `prepareDraw`).
+  - `Sprite::prepare` hỏi `viewport->getVisible()`. Viewport đã huỷ trả lời bằng `RGSSError: disposed viewport`
+    (`aboutToAccess` → `guardDisposed`), và lỗi đó đi ra tới script của game.
+  - RGSS3 thì thôi vẽ sprite đó và không báo gì.
+  - Plane, Window, WindowVX, Tilemap không hỏi viewport khi chuẩn bị vẽ, nên chỉ Sprite có lỗi này.
+- **Sửa trong mkxp-z (`patches/0006-sprite-disposed-viewport.patch`):** sprite có viewport đã huỷ được coi là không
+  hiện. Lệnh Ruby gọi thẳng vào viewport đã huỷ (`vp.rect`, `vp.ox = …`) vẫn báo lỗi như RGSS. Viewport C++ chưa bị
+  giải phóng khi sprite còn sống, vì đối tượng Ruby của sprite giữ tham chiếu tới viewport (biến `@viewport`).
+  `libmkxp-z.so` dựng lại, SHA-256 mới ghi trong `scripts/agvn/pins.txt`.
+- **Hộp lỗi của Chạy nhẹ (`AgvnRgssFailure.ask`):**
+  - Trước đây nút chính là "Game bị lỗi? Chạy bằng Windows". Người chơi bấm như bấm OK, game chuyển hẳn sang Wine,
+    rồi kẹt ở màn đen (lỗi `RGSS301.dll` ở mục "DLL ở bộ nhớ chung" bên trên). App không tự chuyển: người chơi đã chọn
+    nút đó.
+  - Giờ lỗi script có chỗ dừng (`Script '…' line N`, hoặc dòng backtrace `:N:in`) mà không nhắc DLL (Win32API,
+    `.dll`) hay RTP còn thiếu thì:
+    - lời nhắn nói script của game dừng, và chạy bằng Windows thường cũng dừng ở cùng chỗ;
+    - nút chính là "Gửi nhật ký cho AGVN";
+    - "Thử chạy bằng Windows" là nút phụ.
+    Gửi nhật ký xong, hộp lỗi hiện lại để chọn tiếp.
+  - Lỗi khác (DLL qua Win32API, thiếu RTP, mkxp-z không mở được game) giữ "Chạy bằng Windows" làm nút chính, thêm nút
+    "Gửi nhật ký".
+- **`tim-tep.txt` (`agvn_files.rb`):** game thử ảnh có hậu tố ngôn ngữ trước (`Title_en`, `Title_`) rồi mới dùng ảnh
+  thường. Khi ảnh thường có trong thư mục, lần thử đó không còn được ghi là "Không có".
+- **Test:** `AgvnRgssFailureTest`; `ruby scripts/agvn/mkxp-z/test-agvn-files.rb` (ca `Title_en`, `Title_`,
+  `Other_en`). Bản vá mkxp-z cần thử trên máy.
+- **Thử máy:**
+  1. Game VX Ace của báo cáo, Chạy nhẹ: qua lần chuyển cảnh đầu, vào màn chơi, tải save; không có hộp
+     "disposed viewport".
+  2. Đoạn tái hiện của báo cáo (dán trước Main: `Viewport.new`, `Sprite.new(vp)`, `vp.dispose`, `Graphics.freeze`,
+     `Graphics.transition(10)`, `Graphics.update`), thêm một `Plane.new(vp)` và một `Window_Base` có `viewport = vp`:
+     không có hộp lỗi.
+  3. Một game có lỗi script thật (thêm dòng `nil.width` vào một script): hộp lỗi có nút chính "Gửi nhật ký cho AGVN",
+     nút phụ "Thử chạy bằng Windows". Gửi nhật ký xong, hộp lỗi hiện lại.
+  4. Hồi quy: game RPG Maker XP, VX, VX Ace đang chạy tốt bằng Chạy nhẹ vẫn chạy như trước.

@@ -99,7 +99,8 @@ Dir.mktmpdir('agvn-files') do |tmp|
            "Audio/BGM/\x83\x4B.ogg".b, # a name that is not UTF-8 (Shift_JIS bytes kept as they were)
            "Audio/BGM/#{FIELD_GB}.ogg", "Audio/SE/#{CUE_GB}.ogg", "Audio/BGM/#{OPEN_GB}.ogg",
            "Graphics/Pictures/\u00E3\u201A\u00AC.png", # UTF-8 "\u30AC" read as Windows-1252
-           "Audio/ME/w\uFFFD.ogg", "Audio/ME/w\uFFFD\uFFFD.ogg"] # two names a lost byte leaves open: neither is taken
+           "Audio/ME/w\uFFFD.ogg", "Audio/ME/w\uFFFD\uFFFD.ogg", # two names a lost byte leaves open: neither is taken
+           'Graphics/Titles1/Title.png'] # a game tries "Title_en" and "Title_" before it
   files.each { |f| FileUtils.mkdir_p(File.join(game, File.dirname(f))); File.write(File.join(game, f), '') }
   FakeMkxp.build(game)
   late = File.join(game, "Audio/ME/#{GA_NFD}.ogg") # on the phone, not in mkxp-z's list (made after the game started)
@@ -151,13 +152,18 @@ Dir.mktmpdir('agvn-files') do |tmp|
       e = (Audio.me_play("Audio/ME/#{GA}") rescue $!)
       check("found on the phone, still not by mkxp-z: the game's own error (#{i + 1})", e.is_a?(Errno::ENOENT) && e.message.end_with?(GA))
     end
+    %w[Title_en Title_ Other_en].each do |name|
+      e = (Bitmap.new("Graphics/Titles1/#{name}") rescue $!)
+      check("a language-suffixed picture the game tries first: its own error (#{name})", e.is_a?(Errno::ENOENT))
+    end
     e = (Bitmap.new('Graphics/Pictures/broken') rescue $!)
     check('another error passes as it was, without agvn_files.rb lines', e.is_a?(IOError) && e.backtrace.none? { |l| l.start_with?(script) })
   end
 
   text = File.read(log, encoding: 'UTF-8')
   puts text.gsub(/^/, '       | ')
-  check('the log tells each name once', text.lines.size == (NO_LIB ? 11 : 16))
+  check('the log tells each name once', text.lines.size == (NO_LIB ? 12 : 17))
+  check('a language suffix tried first is no missing file', !text.include?('Title_') && text.include?('Other_en'))
   check('the log says how a name was garbled', text.include?("UTF-8 \u0111\u1ECDc th\u00E0nh GB18030") &&
         text.include?("UTF-8 \u0111\u1ECDc th\u00E0nh Windows-1252") && text.include?("Windows-31J gi\u1EEF nguy\u00EAn byte"))
   check('the log names what the game lacks and what is near it', text.include?("Kh\u00F4ng c\u00F3: game h\u1ECFi \"Audio/BGM/#{TEST}\"") && text.include?("#{TEST}2.ogg"))

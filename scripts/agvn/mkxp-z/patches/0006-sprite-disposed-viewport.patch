@@ -1,0 +1,23 @@
+AGVN Player: a sprite whose viewport is disposed is drawn no more, as RGSS does, instead of stopping the game. Every
+frame (Graphics.update, Graphics.transition) mkxp-z prepares each live sprite, and Sprite's prepare asked its viewport
+whether it was visible; a disposed viewport answers that with RGSSError "disposed viewport". Scripts that dispose a
+viewport before its sprites are common (a light-effect script of many VX Ace games keeps ~20 sprites in a list of
+$game_temp, which a new game or a loaded save replaces), and RGSS on Windows runs them for years without a word.
+Planes, windows and tilemaps never ask their viewport while preparing, so only Sprite changes.
+
+diff --git a/src/display/sprite.cpp b/src/display/sprite.cpp
+--- a/src/display/sprite.cpp
++++ b/src/display/sprite.cpp
+@@ -618,7 +618,11 @@
+     void prepare()
+     {
+         // Skip preparations and drawing if the bitmap is disposed or the sprite or viewport is invisible
+-        if (nullOrDisposed(realBitmap) || !(*spriteVisible) || (viewport && !viewport->getVisible()))
++        // AGVN Player: or its viewport is disposed. RGSS draws such a sprite no more and says nothing;
++        // asking the disposed viewport if it is visible threw "disposed viewport" out of Graphics.update
++        // and Graphics.transition, in the many games whose scripts dispose a viewport before its sprites.
++        if (nullOrDisposed(realBitmap) || !(*spriteVisible)
++            || (viewport && (viewport->isDisposed() || !viewport->getVisible())))
+         {
+             isVisible = false;
+             return;

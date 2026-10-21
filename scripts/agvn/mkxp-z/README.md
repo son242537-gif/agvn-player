@@ -62,6 +62,11 @@ Một số nguồn không tải thẳng được trên máy cloud (chính sách 
 5. `0005-android-physfs-init`: trên Android, PhysFS coi `argv0` của `PHYSFS_init` là con trỏ `PHYSFS_AndroidInit`,
    còn `argv[0]` của SDL là chữ `"app_process"`. Vì vậy trước bản vá, mọi game văng (SIGSEGV) trước khi đọc tệp nào.
    Bản vá truyền NULL trên Android: PhysFS lấy `/` làm thư mục gốc, và mkxp-z không dùng thư mục đó.
+6. `0006-sprite-disposed-viewport` (bản 0.1.63): sprite có viewport đã huỷ thì thôi vẽ, như RGSS trên Windows.
+   Trước bản vá, mỗi khung hình mkxp-z hỏi viewport đó có hiện không, và viewport đã huỷ trả lời bằng lỗi
+   `RGSSError: disposed viewport` từ `Graphics.update` hay `Graphics.transition`. Script huỷ viewport trước sprite của
+   nó rất hay gặp (báo cáo ngày 21/10/2026: một script hiệu ứng ánh sáng của game VX Ace). Plane, Window, Tilemap không
+   hỏi viewport khi chuẩn bị vẽ, nên chỉ Sprite đổi.
 
 ## Cách chạy (Linux x86_64: máy cloud hoặc WSL)
 

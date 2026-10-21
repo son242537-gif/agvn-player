@@ -1,7 +1,6 @@
 /* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Process;
@@ -9,7 +8,6 @@ import android.util.Log;
 import android.view.InputDevice;
 import android.view.KeyEvent;
 
-import com.winlator.cmod.R;
 import com.winlator.cmod.agvn.sdl.SDLActivity;
 import com.winlator.cmod.core.FileUtils;
 
@@ -160,15 +158,7 @@ public class AgvnRgssActivity extends SDLActivity {
         AgvnLightSession.shown(this, error); // this dialog offers the fixes; the library does not ask again
         AgvnRgssFailure.saveLog(getIntent().getStringExtra("shortcut_name"), error, config);
         boolean windows = AgvnHtmlGame.hasWindowsExe(this);
-        runOnUiThread(() -> {
-            AlertDialog.Builder b = new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
-                    .setTitle(R.string.agvn_rgss_failed_title)
-                    .setMessage(AgvnRgssFailure.message(this, error, config))
-                    .setNegativeButton(R.string.agvn_close, (d, w) -> end())
-                    .setCancelable(false);
-            if (windows) b.setPositiveButton(R.string.agvn_html_use_windows, (d, w) -> switchToWindows());
-            b.show();
-        });
+        runOnUiThread(() -> AgvnRgssFailure.ask(this, error, config, windows, this::switchToWindows, this::end));
     }
 
     /** Field {@code index} of agvn_fps.rb's file ("57.9 60"), -1 when there is none yet. */

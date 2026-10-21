@@ -45,6 +45,11 @@ public final class AgvnLogShare {
 
     /** {@code gameDir}: the imported game folder (for the "Chạy nhẹ" Ren'Py logs), or null. */
     public static void share(Activity activity, String gameName, File gameDir) {
+        share(activity, gameName, gameDir, null);
+    }
+
+    /** As above; {@code after} runs once the last of its messages closes (null: nothing). */
+    public static void share(Activity activity, String gameName, File gameDir, Runnable after) {
         File[] sessions = new File(AgvnSessionLog.root(), AgvnLogFolders.safeName(gameName)).listFiles(File::isDirectory);
         Dialog working = dialog(activity, activity.getString(R.string.agvn_logs_working), null, false);
         working.setCancelable(false);
@@ -73,9 +78,12 @@ public final class AgvnLogShare {
             activity.runOnUiThread(() -> {
                 if (activity.isFinishing() || activity.isDestroyed()) return;
                 if (working.isShowing()) working.dismiss();
-                if (failed != null) dialog(activity, activity.getString(R.string.agvn_logs_error, failed), null, true).show();
-                else if (none) dialog(activity, activity.getString(R.string.agvn_logs_none), null, true).show();
-                else dialog(activity, activity.getString(R.string.agvn_logs_saved, AgvnSaveDialogs.readable(zip)), zip, true).show();
+                String text = failed != null ? activity.getString(R.string.agvn_logs_error, failed)
+                        : none ? activity.getString(R.string.agvn_logs_none)
+                        : activity.getString(R.string.agvn_logs_saved, AgvnSaveDialogs.readable(zip));
+                Dialog shown = dialog(activity, text, failed == null && !none ? zip : null, true);
+                if (after != null) shown.setOnDismissListener(d -> after.run());
+                shown.show();
             });
         }, "AgvnLogShare").start();
     }

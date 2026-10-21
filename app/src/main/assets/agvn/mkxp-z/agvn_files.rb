@@ -126,9 +126,16 @@ module AgvnFiles
       return text unless part
       dir = path.empty? ? '.' : path.join('/')
       want = AgvnNames.key(part)
+      return nil if variant?(dir, want)
       near = listing(dir).map { |n, k| [same_start(k, want), n] }.max_by(NEAR) { |c, _| c }
       near = near.empty? ? 'trống' : near.map { |_, n| AgvnNames.show(n) }.join(', ')
       "#{text}; gần nhất trong #{dir == '.' ? 'thư mục game' : AgvnNames.show(dir)}: #{near}"
+    end
+
+    # A picture tried with a language suffix first ("Title_en", "Title_") whose own file is there: no file is missing
+    def variant?(dir, want)
+      base = want[/\A(.+)_[[:alpha:]]{0,5}\z/, 1]
+      base && listing(dir).any? { |_, k| Encoding.compatible?(k, base) && (k == base || k.start_with?("#{base}.")) }
     end
 
     def same_start(a, b)
@@ -137,12 +144,13 @@ module AgvnFiles
       n
     end
 
-    # Writes the line the block makes, while the log has room
+    # Writes the line the block makes, if any, while the log has room
     def log
       file = ENV['AGVN_RGSS_FILES_LOG']
       return if file.nil? || file.empty? || @lines >= LOG_LINES
-      @lines += 1
       line = yield
+      return unless line
+      @lines += 1
       File.open(file, 'a') { |f| f.puts(line) }
     rescue StandardError
       nil
