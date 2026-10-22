@@ -68,6 +68,39 @@ public class AgvnHtmlStandInTest {
     }
 
     @Test
+    public void aPlainFileTheGameLeftIsServedForItsEncryptedName() throws IOException {
+        // Cultivator: img/system/Window.png plain, asked for as Window.rpgmvp; shown empty, every text was black
+        File root = game("{\"hasEncryptedImages\":true,\"encryptionKey\":\"" + KEY + "\"}");
+        assertTrue(new File(root, "img/system").mkdirs());
+        byte[] window = "the game's own window skin, colours and all".getBytes(StandardCharsets.UTF_8);
+        Files.write(new File(root, "img/system/Window.png").toPath(), window);
+        byte[] out = AgvnHtmlStandIn.plainFor(root, "/img/system/Window.rpgmvp", null);
+        assertNotNull(out);
+        assertArrayEquals(AgvnHtmlStandIn.HEADER, Arrays.copyOf(out, 16));
+        byte[] body = Arrays.copyOfRange(out, 16, out.length); // as Decrypter.decryptArrayBuffer does
+        byte[] key = AgvnHtmlStandIn.key(root);
+        for (int i = 0; i < 16; i++) body[i] ^= key[i];
+        assertArrayEquals("the engine reads the plain picture", window, body);
+        // MZ's .png_, and a sound (MV .rpgmvo, MZ .ogg_) the same way; a broken encrypted file gives way to it too
+        assertNotNull(AgvnHtmlStandIn.plainFor(root, "/img/system/Window.png_", null));
+        assertTrue(new File(root, "audio/se").mkdirs());
+        Files.write(new File(root, "audio/se/Cursor1.ogg").toPath(), window);
+        assertNotNull(AgvnHtmlStandIn.plainFor(root, "/audio/se/Cursor1.rpgmvo", null));
+        assertNotNull(AgvnHtmlStandIn.plainFor(root, "/audio/se/Cursor1.ogg_", null));
+        File broken = file(root, "img/system/W.rpgmvp", 0);
+        assertNotNull(AgvnHtmlStandIn.plainFor(root, "/img/system/Window.rpgmvp", broken));
+        // the game's own whole encrypted file, no plain file, a plain name, or no key: nothing in its place
+        File whole = file(root, "img/system/Window.rpgmvp", 64);
+        assertNull(AgvnHtmlStandIn.plainFor(root, "/img/system/Window.rpgmvp", whole));
+        assertNull(AgvnHtmlStandIn.plainFor(root, "/img/system/IconSet.rpgmvp", null));
+        assertNull(AgvnHtmlStandIn.plainFor(root, "/img/system/Window.png", null));
+        File noKey = game(null);
+        assertTrue(new File(noKey, "img/system").mkdirs());
+        Files.write(new File(noKey, "img/system/Window.png").toPath(), window);
+        assertNull(AgvnHtmlStandIn.plainFor(noKey, "/img/system/Window.rpgmvp", null));
+    }
+
+    @Test
     public void withoutTheGamesKeyNothingStandsIn() throws IOException {
         File noSystem = game(null);
         assertNull(AgvnHtmlStandIn.key(noSystem));

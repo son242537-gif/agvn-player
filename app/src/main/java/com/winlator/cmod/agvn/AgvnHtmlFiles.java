@@ -63,22 +63,24 @@ public final class AgvnHtmlFiles {
     /**
      * The response for URL path {@code urlPath}: the game file (its {@code entry} page, index.html or an NW.js game's
      * own, with {@code compatJs} loaded first, see assets/agvn/html-compat.js), a transparent picture for a missing .png
-     * so the game does not stop (also for a missing or broken encrypted one, {@link AgvnHtmlStandIn}), told to
-     * {@code standIn}, or 404, told to {@code missing} (a font, a data file, a sound...). Either may be null.
+     * so the game does not stop (also for a missing or broken encrypted one, {@link AgvnHtmlStandIn}, whose plain file
+     * goes instead when the game has it), told to {@code standIn}, or 404, told to {@code missing} (a font, a data
+     * file, a sound...). Either may be null.
      */
     public static WebResourceResponse serve(File root, String entry, String urlPath, String compatJs, Consumer<String> standIn,
                                             Consumer<String> missing) {
         if (COMPAT_PATH.equals(urlPath) && compatJs != null)
             return text("application/javascript", compatJs);
         File file = fileFor(root, urlPath);
-        byte[] empty = AgvnHtmlStandIn.bytesFor(root, urlPath, file, TRANSPARENT_PNG);
+        byte[] plain = AgvnHtmlStandIn.plainFor(root, urlPath, file); // its plain file, encrypted for the engine
+        byte[] empty = plain == null ? AgvnHtmlStandIn.bytesFor(root, urlPath, file, TRANSPARENT_PNG) : null;
         if (empty != null) {
             String why = AgvnHtmlStandIn.why(root, urlPath, file);
             Log.w("AGVN", "HTML game picture " + why + ", shown empty: " + urlPath);
             if (standIn != null) standIn.accept(decode(urlPath) + " (" + why + ")");
-            return new WebResourceResponse("application/octet-stream", null, 200, "OK", CORS,
-                    new ByteArrayInputStream(empty));
         }
+        if (plain != null || empty != null) return new WebResourceResponse("application/octet-stream", null, 200, "OK",
+                CORS, new ByteArrayInputStream(plain != null ? plain : empty));
         if (file == null) {
             String why = AgvnHtmlStandIn.why(root, urlPath, null);
             Log.w("AGVN", "HTML game file missing: " + urlPath + " (" + why + ")");

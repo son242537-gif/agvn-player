@@ -909,3 +909,23 @@ Nhật ký Cultivator ngày 22/10/2026 (RPG Maker MV, "Chạy nhẹ" bằng WebV
   1. Cultivator trên Mali-G610: các sự kiện trên bản đồ hiện hình thay vì ô đen.
   2. Nhật ký của trang (`chay-nhe.txt`, dòng `page=`) có dòng `AGVN: … larger than the GPU takes`, nói ảnh nào quá cỡ.
   3. Game MV/MZ khác đang chạy tốt: không có dòng đó, hình như cũ.
+
+## Ảnh khung chữ để không mã hoá, chữ đen trên nền đen (bản 0.1.65)
+
+Cultivator (RPG Maker MV, "Chạy nhẹ", 22/10/2026): chữ trong khung thoại và menu không thấy.
+
+- **Vì sao:**
+  - Game mã hoá ảnh (`hasEncryptedImages`) nhưng để `img/system/Window.png` không mã hoá. Trang hỏi
+    `Window.rpgmvp`. App chỉ tìm đúng tên đó, không thấy, nên đưa ảnh rỗng 1×1 (`AgvnHtmlStandIn`). Nhật ký ghi
+    `Window.rpgmvp … shown empty`.
+  - RPG Maker MV lấy màu chữ từ chính ảnh khung này (`Window_Base.textColor` đọc điểm ảnh). Ảnh rỗng thì mọi màu là
+    `#000000`, nên chữ đen trên nền đen.
+- **Sửa (`AgvnHtmlStandIn.plainFor`, gọi trong `AgvnHtmlFiles.serve`):**
+  - Khi tệp mã hoá thiếu, hoặc ngắn hơn 32 byte, app tìm tệp không mã hoá cùng tên: `.rpgmvp` → `.png`,
+    `.rpgmvo` → `.ogg`, `.rpgmvm` → `.m4a`; MZ: `.png_`, `.ogg_`, `.m4a_` bỏ dấu `_`.
+  - Có tệp đó thì app mã hoá nó bằng khoá của game (`data/System.json`) như RPG Maker vẫn làm: 16 byte đầu "RPGMV",
+    rồi 16 byte đầu của tệp XOR với khoá. Engine giải mã ra đúng tệp gốc.
+  - Không có tệp đó thì như trước: ảnh rỗng, và nhật ký ghi tên ảnh.
+- **Test:** `AgvnHtmlStandInTest.aPlainFileTheGameLeftIsServedForItsEncryptedName`.
+- **Thử máy:** Cultivator: chữ trong khung thoại và menu có màu như trên máy tính. Trong `chay-nhe.txt` không còn
+  dòng `Window.rpgmvp … shown empty`.

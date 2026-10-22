@@ -4,6 +4,8 @@ package com.winlator.cmod.agvn;
 import com.winlator.cmod.core.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,6 +22,9 @@ final class AgvnHtmlStandIn {
     static final byte[] HEADER = {0x52, 0x50, 0x47, 0x4D, 0x56, 0, 0, 0, 0, 0x03, 0x01, 0, 0, 0, 0, 0};
     /** The header and the 16 bytes the key hides: a shorter file cannot be a picture. */
     static final int SHORTEST = 32;
+    /** Encrypted extensions and the plain ones they stand for: MV's own, then MZ's (the plain one and "_"). */
+    private static final String[][] PLAIN = {{".rpgmvp", ".png"}, {".rpgmvo", ".ogg"}, {".rpgmvm", ".m4a"},
+            {".png_", ".png"}, {".ogg_", ".ogg"}, {".m4a_", ".m4a"}};
     private static final Pattern KEY = Pattern.compile("\"encryptionKey\"\\s*:\\s*\"([0-9a-fA-F]{32})\"");
     /** The last game folder asked about and its key (a missing picture is asked for again and again). */
     private static String keyRoot;
@@ -42,6 +47,30 @@ final class AgvnHtmlStandIn {
         if (!encryptedPicture(urlPath) || file != null && file.length() >= SHORTEST) return null;
         byte[] key = key(root);
         return key != null ? encrypt(png, key) : null;
+    }
+
+    /**
+     * The game's plain file for encrypted {@code urlPath} whose own file {@code file} is missing or shorter than
+     * {@link #SHORTEST}, encrypted with the game's key as the engine reads it; null without such a file or a key. A
+     * game may leave a file plain while it encrypts the others: Cultivator's img/system/Window.png (MV leaves
+     * Window.png plain), asked for as Window.rpgmvp, was shown empty, and MV takes its text colours from that
+     * picture, so every text was black on black (22/10/2026).
+     */
+    static byte[] plainFor(File root, String urlPath, File file) {
+        if (urlPath == null || file != null && file.length() >= SHORTEST) return null;
+        String lower = urlPath.toLowerCase(Locale.ROOT);
+        for (String[] pair : PLAIN) {
+            if (!lower.endsWith(pair[0])) continue;
+            String name = urlPath.substring(0, urlPath.length() - pair[0].length()) + pair[1];
+            File plain = AgvnHtmlFiles.fileFor(root, name);
+            byte[] key = plain != null && plain.length() > 0 ? key(root) : null;
+            try {
+                return key != null ? encrypt(Files.readAllBytes(plain.toPath()), key) : null;
+            } catch (IOException e) {
+                return null;
+            }
+        }
+        return null;
     }
 
     /**
