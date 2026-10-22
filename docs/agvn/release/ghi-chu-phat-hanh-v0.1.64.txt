@@ -1,0 +1,5 @@
+AGVN Player v0.1.64 - agvn.io
+
+Sửa lỗi:
+- Game RPG Maker MV/MZ chạy bằng "Chạy nhẹ": ảnh lớn hơn mức GPU của điện thoại nhận được (hay gặp ở máy chip Mali) không còn hiện thành ô đen. App thu nhỏ ảnh đó cho vừa trước khi vẽ, nên nhân vật và đồ vật trên bản đồ hiện đúng, chỉ kém nét hơn một chút.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
