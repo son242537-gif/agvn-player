@@ -1,0 +1,7 @@
+AGVN Player v0.1.65 - agvn.io
+
+Sửa lỗi:
+- Game RPG Maker MV/MZ chạy bằng "Chạy nhẹ": chữ không còn bị đen trên nền đen ở game để ảnh khung (Window.png) không mã hoá trong khi các ảnh khác có mã hoá. App giờ dùng được cả tệp không mã hoá của game.
+- Tự sửa lỗi nhận ra game tự tắt ngay khi vừa lên hình mà không báo lỗi (như The Agnietta), và đề nghị chạy phần 32-bit của game bằng WOWBox64 cùng các cách sửa khác. Lần chạy như vậy không còn bị tính là "chạy tốt".
+- Khi bạn tự báo "Game tự tắt" trong Tự sửa lỗi, app cũng đề nghị thử WOWBox64.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
