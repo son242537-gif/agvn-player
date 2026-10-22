@@ -54,6 +54,9 @@ final class AgvnEvidence {
     long frozenS = -1;
     /** Seconds from the game's first frame to its last (-1: none). */
     long shownS = -1;
+    /** Seconds from the start of its last stretch of frames after a long gap to its end (-1: none), presses in it. */
+    long stretchS = -1;
+    int stretchPresses;
     int frozenPresses;
     /** Mali's tiler heap ran out this many times in the session ({@link AgvnWineTail#tilerOoms}). */
     int tilerOoms;
@@ -76,6 +79,7 @@ final class AgvnEvidence {
             case "no-start": return noStart();
             case "crash": return crashed;
             case "module-code": return crashed && AgvnEmulatorNoExec.moduleCode(lines);
+            case "closed-on-start": return closedOnStart();
             case "ended": return crashed || endedByGame;
             case "ended-early": return endedEarly();
             case "godot-switched": return godotSwitched;
@@ -114,11 +118,23 @@ final class AgvnEvidence {
     }
 
     /**
+     * The game came up after a long load and closed itself within {@link #FROZEN_S}, the player pressing nothing: it
+     * failed as it started, though Wine printed no crash. The Agnietta on a Galaxy Z Fold4 (22/10/2026, Wine's log
+     * off): its loading window, 50 s of loading, its first frames, and 1 s later Wine ended. With the log on, the same
+     * moment was FEX refusing the code of msvcr100.dll ({@link AgvnEmulatorNoExec}); the game's own crash handler
+     * (it loads dbghelp) may keep Wine from saying so.
+     */
+    boolean closedOnStart() {
+        return endedByGame && !crashed && !playerQuit && stretchS >= 0 && stretchS < FROZEN_S && stretchPresses == 0;
+    }
+
+    /**
      * The game drew its window and ran without a crash, a freeze, its GPU running out of tiler memory again and
-     * again, or showing only its loading screen: its settings work and are kept (AgvnGoodConfig).
+     * again, showing only its loading screen or closing as it came up: its settings work and are kept
+     * (AgvnGoodConfig).
      */
     boolean good() {
-        return started && !crashed && killedReason < 0 && !frozeAtEnd() && !loadingOnly() && tilerOoms < TILER_OOM_MANY
-                && (playerQuit || seconds >= GOOD_AFTER_S);
+        return started && !crashed && killedReason < 0 && !frozeAtEnd() && !loadingOnly() && !closedOnStart()
+                && tilerOoms < TILER_OOM_MANY && (playerQuit || seconds >= GOOD_AFTER_S);
     }
 }

@@ -2023,3 +2023,32 @@ gửi 30 khung/giây:
   các cửa sổ đang hiện, từ dưới lên trên: id, tên chương trình, tiêu đề, vị trí, cỡ, độ sâu màu (24 hay 32).
 - **Thử máy:** khi màn hình đen, mở ⋮ → Tự sửa lỗi → "Màn hình đen dù game vẫn chạy", rồi gửi nhật ký. Trong
   `su-kien.txt` có dòng "Cửa sổ trên màn hình, dưới lên trên".
+
+## Game tự tắt ngay khi vừa lên hình, Wine không báo gì (The Agnietta, bản 0.1.65)
+
+Nhật ký ngày 22/10/2026 (Galaxy Z Fold4 SM-F936N, Snapdragon 8+ Gen 1, 0.1.64, debug Wine tắt). The Agnietta hiện cửa sổ
+nạp (6 khung trong 5 giây đầu), nạp khoảng 50 giây (một luồng bận 74–99%), rồi vẽ được 19 khung. Khoảng 1 giây sau Wine
+kết thúc với mã 0. Không có báo cáo crash nào; các lần 08:12 và 08:18 ngày 20/10 cũng y như vậy.
+
+- **Vì sao 0.1.64 không nhận ra:**
+  - Với debug Wine bật (Redmi Note 9 Pro, mục "Giả lập 32-bit không chạy mã của DLL đi kèm game" bên trên), đúng lúc
+    này Wine in báo cáo: FEX không chạy mã của `msvcr100.dll`. Tắt debug thì không có dòng nào, có thể do game tự bắt
+    lỗi. Cách nhận diện `module-code` cần báo cáo đó, nên không chạy.
+  - Lần chạy dài 61 giây, game có lên hình và tự tắt, nên còn bị lưu là "chạy tốt".
+- **Sửa (`AgvnEvidence.closedOnStart`, `AgvnSessionTrack.lastStretchSecondsAtEnd`):**
+  - App ghi lúc bắt đầu "đợt khung hình" cuối: khung đầu tiên sau ít nhất 10 giây không vẽ gì (game vừa nạp xong và
+    lên hình). App đếm số lần người chơi bấm trong đợt đó.
+  - Game tự tắt (Wine kết thúc trước khi người chơi thoát) chưa tới 10 giây sau khi đợt đó bắt đầu, người chơi chưa bấm
+    gì, và không có crash: game hỏng ngay lúc bắt đầu chạy.
+    - Lần chạy đó không còn là "chạy tốt".
+    - Tự sửa lỗi hiện "Game tự tắt ngay khi vừa lên hình", cách sửa theo thứ tự: trả cấu hình chạy tốt (nếu có đổi),
+      chạy phần 32-bit bằng WOWBox64 (chỉ game đang chạy FEXCore với Wine arm64ec), giả lập ổn định, chạy không có
+      mod, Wine cũ, gửi nhật ký.
+  - Người chơi bấm "Thoát" trong menu vừa hiện thì có bấm, nên không bị tính. Game vẽ liên tục, không có quãng 10 giây
+    không vẽ, thì không xét.
+  - Người chơi tự báo "Game tự tắt" (Tự sửa lỗi trong ⋮) giờ cũng được đề nghị WOWBox64, sau "giả lập ổn định".
+- **Test:** `AgvnEmulatorNoExecTest.aGameThatClosedAsItCameUpFailedThoughWineSaidNothing`.
+- **Thử máy:**
+  1. The Agnietta, debug Wine tắt: sau lần game tự tắt, Tự sửa lỗi hiện "Game tự tắt ngay khi vừa lên hình" với nút
+     WOWBox64. Bấm thử, mở lại game, `su-kien.txt` ghi "Giả lập 32-bit: WOWBox64 …".
+  2. Hồi quy: game chơi một lúc rồi thoát bằng menu của game không bị hỏi gì.

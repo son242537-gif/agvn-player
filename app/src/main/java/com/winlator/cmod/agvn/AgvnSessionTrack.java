@@ -26,6 +26,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class AgvnSessionTrack {
     static final int STARTED_UPDATES = 20;
+    /** Frames that follow this long without one begin a new stretch: a game that loaded, then came up. */
+    static final long STRETCH_GAP_MS = 10_000;
     static final double BIG_AREA = 0.25;
     private static final AtomicInteger frames = new AtomicInteger();
     private static final AtomicInteger bigUpdates = new AtomicInteger();
@@ -33,8 +35,9 @@ public final class AgvnSessionTrack {
     private static volatile Map<String, String> settings = Collections.emptyMap();
     private static volatile String engineCrash;
     private static volatile boolean bigSeen, wineEnded, playerQuit, exiting;
-    private static volatile long firstFrameMs, lastFrameMs, endMs, stoppedAtStartNs;
+    private static volatile long firstFrameMs, stretchMs, lastFrameMs, endMs, stoppedAtStartNs;
     private static final AtomicInteger pressesSinceFrame = new AtomicInteger(), framesSeen = new AtomicInteger();
+    private static final AtomicInteger pressesInStretch = new AtomicInteger();
     private static long lowRamAtMs, lowRamFreeMb = -1;
     private static long usedAtMs, usedMb = -1, usedBeforeMb = -1;
 
@@ -52,8 +55,9 @@ public final class AgvnSessionTrack {
         frames.set(0);
         bigUpdates.set(0);
         bigSeen = wineEnded = playerQuit = exiting = false;
-        firstFrameMs = lastFrameMs = endMs = 0;
+        firstFrameMs = stretchMs = lastFrameMs = endMs = 0;
         pressesSinceFrame.set(0);
+        pressesInStretch.set(0);
         framesSeen.set(0);
         lowRamAtMs = 0;
         lowRamFreeMb = -1;
@@ -95,6 +99,10 @@ public final class AgvnSessionTrack {
 
     static void onFrame(long nowMs) {
         if (firstFrameMs == 0) firstFrameMs = nowMs;
+        if (lastFrameMs == 0 || nowMs - lastFrameMs >= STRETCH_GAP_MS) {
+            stretchMs = nowMs;
+            pressesInStretch.set(0);
+        }
         lastFrameMs = nowMs;
         if (pressesSinceFrame.get() != 0) pressesSinceFrame.set(0);
         if (framesSeen.get() < STARTED_UPDATES) framesSeen.incrementAndGet();
@@ -103,6 +111,7 @@ public final class AgvnSessionTrack {
     /** The player pressed a key, a mouse button or the screen (AgvnInputHold.pressing). */
     static void onPress() {
         pressesSinceFrame.incrementAndGet();
+        pressesInStretch.incrementAndGet();
     }
 
     static boolean big(int width, int height, int screenWidth, int screenHeight) {
@@ -144,6 +153,20 @@ public final class AgvnSessionTrack {
     static long shownSecondsAtEnd() {
         long first = firstFrameMs, last = lastFrameMs, end = endMs;
         return framesSeen.get() >= STARTED_UPDATES && end >= last ? (last - first) / 1000 : -1;
+    }
+
+    /**
+     * Seconds from the start of the game's last stretch of frames, one that came after {@link #STRETCH_GAP_MS} without
+     * any, to its end; -1 before the end, when it showed too few frames to judge, or when it never paused that long.
+     */
+    static long lastStretchSecondsAtEnd() {
+        long first = firstFrameMs, stretch = stretchMs, last = lastFrameMs, end = endMs;
+        return framesSeen.get() >= STARTED_UPDATES && end >= last && stretch > first ? (end - stretch) / 1000 : -1;
+    }
+
+    /** Presses since the game's last stretch of frames began. */
+    static int pressesInLastStretch() {
+        return pressesInStretch.get();
     }
 
     /** Milliseconds from the game's last frame (drawn or presented) to {@code nowMs}; Long.MAX_VALUE before one. */

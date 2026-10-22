@@ -34,7 +34,8 @@ public class AgvnDoctorTest {
             "esync-off", "emulator-wowbox64"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
-            "ram-saved", "live", "light", "script-error", "page-crash", "frozen", "reported", "module-code"));
+            "ram-saved", "live", "light", "script-error", "page-crash", "frozen", "reported", "module-code",
+            "closed-on-start"));
     static AgvnProblemCatalog catalog;
 
     @BeforeClass

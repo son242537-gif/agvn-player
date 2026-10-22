@@ -114,6 +114,47 @@ public class AgvnEmulatorNoExecTest {
     }
 
     @Test
+    public void aGameThatClosedAsItCameUpFailedThoughWineSaidNothing() throws Exception {
+        // Galaxy Z Fold4, Wine's log off: the loading window, 50 s of loading, first frames, and 1 s later Wine ended
+        long start = 9_000_000;
+        AgvnSessionTrack.start(start);
+        for (int i = 0; i < AgvnSessionTrack.STARTED_UPDATES; i++) AgvnSessionTrack.onFrame(start + 2_000 + i * 150);
+        AgvnSessionTrack.onPress(); // a tap while it loaded
+        for (int i = 0; i < 19; i++) AgvnSessionTrack.onFrame(start + 57_000 + i * 50);
+        AgvnSessionTrack.noteEnd(start + 59_000);
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.started = ev.endedByGame = true;
+        ev.seconds = 61;
+        ev.frozenS = AgvnSessionTrack.frozenSecondsAtEnd();
+        ev.shownS = AgvnSessionTrack.shownSecondsAtEnd();
+        ev.stretchS = AgvnSessionTrack.lastStretchSecondsAtEnd();
+        ev.stretchPresses = AgvnSessionTrack.pressesInLastStretch();
+        assertEquals(2, ev.stretchS);
+        assertEquals(0, ev.stretchPresses);
+        assertTrue(ev.closedOnStart());
+        assertFalse("0.1.64 kept it as a good run", ev.good());
+        AgvnDoctorTest.load();
+        AgvnProblemCatalog.Finding f = AgvnDoctorTest.catalog.find(ev);
+        assertEquals("closed-on-start", f.id());
+        assertEquals(Arrays.asList("restore-good", "emulator-wowbox64", "emulator-stable", "mods-off", "wine-old",
+                "send-logs"), f.fixes());
+
+        ev.stretchPresses = 1; // the player picked "Thoát" in a menu that had just come up
+        assertFalse(ev.closedOnStart());
+        ev.stretchPresses = 0;
+        ev.stretchS = 40; // it ran 40 s before it closed
+        assertFalse(ev.closedOnStart());
+        ev.stretchS = 2;
+        ev.playerQuit = true;
+        assertFalse("the player's exit", ev.closedOnStart());
+
+        AgvnSessionTrack.start(start + 100_000); // drawing all along, never 10 s without a frame: nothing to judge
+        for (int i = 0; i < 300; i++) AgvnSessionTrack.onFrame(start + 101_000 + i * 100);
+        AgvnSessionTrack.noteEnd(start + 131_000);
+        assertEquals(-1, AgvnSessionTrack.lastStretchSecondsAtEnd());
+    }
+
+    @Test
     public void aWindowLineSaysWhereItIsAndHowDeep() {
         assertEquals("    0x1000038 \"to be or not to be.exe\" \"To Be or Not to Be\" 8,26 1272×694 sâu 32",
                 AgvnWindowList.line(1, 0x1000038, "to be or not to be.exe\0", "To Be or Not to Be", 8, 26, 1272, 694,
