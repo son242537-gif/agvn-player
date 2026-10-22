@@ -874,3 +874,38 @@ game đứng chờ mãi, không lỗi. Trên PC thì chạy bình thường.
   3. Có cổng gỡ lỗi (Cài đặt > Nhật ký): tạo `touchstart` có `target` là ô nhập rồi `dispatchEvent`.
      `event.defaultPrevented` phải là `false`. So `getBoundingClientRect()` của ô và nút: không chồng nhau.
   4. Trên bản đồ và trong menu, chạm để đi và để chọn vẫn như cũ, cả khi bật "Toàn màn hình cho mọi game".
+
+## Ảnh lớn hơn GPU cho phép thành ô đen (bản 0.1.64)
+
+Nhật ký Cultivator ngày 22/10/2026 (RPG Maker MV, "Chạy nhẹ" bằng WebView, Xiaomi 22041216G, Mali-G610 MC6). Bản đồ hiện
+đúng, nhưng nhiều sự kiện (vật, người) là ô đen 48×48. Lúc vào bản đồ, trang ghi đúng một lỗi
+`WebGL: INVALID_VALUE: texImage2D: width or height out of range (js/libs/pixi.js:541)`, rồi liên tục
+`texture bound to texture unit N is not renderable`.
+
+- **Vì sao:**
+  - WebGL chỉ nhận ảnh có cạnh không quá `MAX_TEXTURE_SIZE` của GPU. Máy tính thường nhận 16384, nhiều điện thoại chỉ
+    8192 hoặc 4096.
+  - PIXI tải ảnh lên trong `GLTexture.upload`. Ảnh vượt cỡ thì WebGL từ chối, texture đó rỗng, và sprite nào lấy hình
+    từ nó (sự kiện dùng hình ô của tileset, hay nhân vật) đều bị vẽ thành màu đen.
+  - Bản đồ vẫn đúng vì tilemap của MV tự chép ảnh tileset vào texture riêng của nó.
+  - Trên máy tính, NW.js nhận được ảnh đó nên game chạy bình thường.
+- **Sửa (`html-compat.js`, mục 12):**
+  - `texImage2D` (dạng 6 tham số, ảnh/canvas/video) và `texSubImage2D` ở toạ độ 0,0 của WebGL 1 và 2 được bọc lại.
+  - Ảnh vượt `MAX_TEXTURE_SIZE` được vẽ vào một canvas thu nhỏ vừa cỡ đó (giữ tỉ lệ) rồi mới tải lên.
+  - Toạ độ texture của PIXI là tỉ lệ trên ảnh, nên sprite vẫn lấy đúng phần của nó, chỉ kém nét hơn.
+  - Mỗi ảnh được ghi một lần vào nhật ký của trang: `AGVN: <tên ảnh> <rộng>x<cao> larger than the GPU takes (<max>),
+    drawn at …`.
+  - Ảnh vừa cỡ, và các lời gọi tự cho kích thước và dữ liệu điểm ảnh, giữ nguyên.
+- **Chưa rõ:** "không hiện chữ" trong báo cáo. Ảnh chụp vẫn có chữ trong khung thoại. Cần biết chữ nào bị mất (menu,
+  tên trên bản đồ, lựa chọn...). Nếu chữ đó vẽ vào một ảnh quá cỡ (khung chữ rất dài của plugin) thì cũng được sửa
+  theo cách trên.
+- **Test:**
+  - `node tools/agvn/tests/html_texture_sim.js`: tileset 768×12288 tải lên như PIXI, GPU nhận tối đa 8192.
+    - Ảnh đi lên là bản 512×8192, được ghi tên một lần.
+    - Lần tải lại cùng ảnh cũng được thu nhỏ.
+    - Ảnh vừa cỡ, phần ảnh đặt lệch toạ độ và dạng 9 tham số giữ nguyên.
+  - `test_toolkit.py` chạy tệp thử này; `AgvnHtmlCompatTest.bundledCompatScriptShrinksAPictureLargerThanTheGpuTakes`.
+- **Thử máy:**
+  1. Cultivator trên Mali-G610: các sự kiện trên bản đồ hiện hình thay vì ô đen.
+  2. Nhật ký của trang (`chay-nhe.txt`, dòng `page=`) có dòng `AGVN: … larger than the GPU takes`, nói ảnh nào quá cỡ.
+  3. Game MV/MZ khác đang chạy tốt: không có dòng đó, hình như cũ.

@@ -30,6 +30,8 @@
  *     game stay the engine's. A text box that covers its own OK button on a game shrunk to fit the phone is narrowed.
  * 11. path.parse and path.format as Node has them, and process.execPath names the game's own exe (the app sets
  *     __agvnExe first): a game that picks its language from path.parse(process.execPath).name gets a PC's answer.
+ * 12. A picture larger than the phone's GPU takes (WebGL's MAX_TEXTURE_SIZE: 16384 on a PC, often 8192 or 4096 on a
+ *     phone) is drawn from a copy shrunk to that size instead of black, and the console names it once.
  */
 (function () {
     'use strict';
@@ -575,6 +577,48 @@
         document.addEventListener('focusin', function (ev) { fitSoon(ev.target); }, true);
         window.addEventListener('resize', function () { fitSoon(document.activeElement); });
     }
+
+    // --- 12: WebGL refuses a picture wider or taller than MAX_TEXTURE_SIZE ("texImage2D: width or height out of
+    // range"), and every sprite drawn from it then shows black. Cultivator (RPG Maker MV, Mali-G610) showed its map's
+    // events as black squares so (22/10/2026); on a PC the same picture fits. The picture goes up as a copy shrunk to
+    // fit: the engine's texture coordinates are fractions of the picture, so each sprite still finds its part, only
+    // less sharp. A later upload of the same picture into it (texSubImage2D at 0,0) is shrunk the same way.
+    function fitTextures(proto) {
+        if (!proto || proto.__agvnFit || typeof proto.texImage2D !== 'function') return;
+        proto.__agvnFit = true;
+        var image = proto.texImage2D, sub = proto.texSubImage2D;
+        function fitted(gl, source) {
+            if (!source || typeof source !== 'object' || source.data !== undefined) return source; // not ImageData
+            var w = source.videoWidth || source.naturalWidth || source.width;
+            var h = source.videoHeight || source.naturalHeight || source.height;
+            if (!gl.__agvnMax) gl.__agvnMax = gl.getParameter(gl.MAX_TEXTURE_SIZE) || 4096;
+            var max = gl.__agvnMax;
+            if (!(w > max || h > max)) return source;
+            var scale = Math.min(max / w, max / h), copy = document.createElement('canvas');
+            copy.width = Math.max(1, Math.floor(w * scale));
+            copy.height = Math.max(1, Math.floor(h * scale));
+            copy.getContext('2d').drawImage(source, 0, 0, copy.width, copy.height);
+            if (!source.__agvnFitSaid) {
+                source.__agvnFitSaid = true;
+                console.warn('AGVN: ' + String(source.src || source.currentSrc || 'canvas').split('/').pop() + ' '
+                    + w + 'x' + h + ' larger than the GPU takes (' + max + '), drawn at ' + copy.width + 'x'
+                    + copy.height);
+            }
+            return copy;
+        }
+        proto.texImage2D = function () {
+            var a = Array.prototype.slice.call(arguments);
+            if (a.length === 6) a[5] = fitted(this, a[5]);
+            return image.apply(this, a);
+        };
+        if (typeof sub === 'function') proto.texSubImage2D = function () {
+            var a = Array.prototype.slice.call(arguments);
+            if (a.length === 7 && a[2] === 0 && a[3] === 0) a[6] = fitted(this, a[6]);
+            return sub.apply(this, a);
+        };
+    }
+    fitTextures(window.WebGLRenderingContext && window.WebGLRenderingContext.prototype);
+    fitTextures(window.WebGL2RenderingContext && window.WebGL2RenderingContext.prototype);
 
     var tries = 0;
     var timer = setInterval(function () { if (patch() || ++tries > 2000) clearInterval(timer); }, 30);

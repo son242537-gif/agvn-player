@@ -102,6 +102,16 @@ public class AgvnHtmlCompatTest {
         assertTrue(js.contains("function fitField(f)") && js.contains("!(G._realScale < 0.95)"));
     }
 
+    @Test
+    public void bundledCompatScriptShrinksAPictureLargerThanTheGpuTakes() throws Exception {
+        // Cultivator (MV, Mali-G610): "texImage2D: width or height out of range", then its events drew black
+        // (tools/agvn/tests/html_texture_sim.js uploads a 768x12288 tileset as PIXI does)
+        String js = compatJs();
+        assertTrue(js.contains("function fitTextures(proto)") && js.contains("gl.getParameter(gl.MAX_TEXTURE_SIZE)"));
+        for (String gl : new String[]{"WebGLRenderingContext", "WebGL2RenderingContext"})
+            assertTrue(gl, js.contains("fitTextures(window." + gl + " && window." + gl + ".prototype);"));
+    }
+
     /** A game may pick its language by path.parse(process.execPath).name: the exe it runs as on Windows. */
     @Test
     public void theExeAPageGameRunsAsIsTheOneItsShortcutStarts() throws Exception {
