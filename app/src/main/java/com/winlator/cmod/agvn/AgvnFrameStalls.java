@@ -15,6 +15,11 @@ final class AgvnFrameStalls {
     static final long STALL_NS = 1_000_000_000L;
     /** Held buffers are all back well within this once frames stop (3 buffers, 3 vsyncs each on 60 Hz: 150 ms). */
     static final long BACK_WITHIN_MS = 300;
+    /**
+     * A pause before the game drew this many frames is its start, most often its loading: a GameMaker game stood 45 s
+     * after its first frame (POCO, 24/10/2026), read as a stall.
+     */
+    static final int STARTING_FRAMES = 120;
 
     enum Mode { NO_LIMIT, TIMER, VSYNC }
 
@@ -31,6 +36,8 @@ final class AgvnFrameStalls {
         final long lastBackMs;
         /** Vsync limit: the longest time its thread did not run during the pause, in ms. */
         final long longestPauseMs;
+        /** It came before {@link #STARTING_FRAMES} frames: the game was starting. */
+        boolean starting;
 
         Stall(long ms, Mode mode, int limit, int held, int drained, long lastBackMs, long longestPauseMs) {
             this.ms = ms;
@@ -52,7 +59,8 @@ final class AgvnFrameStalls {
         String english() {
             String what = mode == Mode.NO_LIMIT ? "no FPS limit"
                     : "limit " + limit + " FPS, " + (mode == Mode.VSYNC ? "vsync pacing" : "timer");
-            StringBuilder s = new StringBuilder("frame stall ").append(ms).append(" ms (").append(what).append("): ");
+            StringBuilder s = new StringBuilder("frame stall ").append(ms).append(" ms")
+                    .append(starting ? " while the game starts, most often loading" : "").append(" (").append(what).append("): ");
             if (mode == Mode.VSYNC) {
                 s.append("held ").append(held).append(" game buffers when frames came back");
                 if (drained >= 0) s.append(", gave back ").append(drained).append(" when the limiter stopped");
@@ -66,7 +74,8 @@ final class AgvnFrameStalls {
         String vietnamese() {
             String what = mode == Mode.NO_LIMIT ? "không giới hạn FPS"
                     : "giới hạn " + limit + " FPS, " + (mode == Mode.VSYNC ? "khớp nhịp màn hình" : "bộ hẹn giờ");
-            StringBuilder s = new StringBuilder("Đứng hình ").append(ms).append(" ms (").append(what).append("): ");
+            StringBuilder s = new StringBuilder("Đứng hình ").append(ms).append(" ms")
+                    .append(starting ? " lúc game mới mở, thường là đang nạp" : "").append(" (").append(what).append("): ");
             if (mode == Mode.VSYNC) {
                 s.append("app còn giữ ").append(held).append(" bộ đệm của game lúc game chạy lại");
                 if (drained >= 0) s.append(", trả ").append(drained).append(" bộ đệm khi bộ giới hạn dừng");
@@ -79,7 +88,7 @@ final class AgvnFrameStalls {
     }
 
     private long lastFrameNs, lastStoppedNs, lastTickNs, lastBackNs, longestPauseNs;
-    private int drained = -1;
+    private int drained = -1, frames;
 
     /**
      * A game frame came: the pause before it, or null. {@code stoppedNs} = all the time the app kept the game stopped
@@ -91,7 +100,9 @@ final class AgvnFrameStalls {
         if (lastFrameNs != 0 && pauseNs >= STALL_NS) {
             stall = new Stall(ms(pauseNs), mode, limit, held, drained,
                     lastBackNs > lastFrameNs ? ms(lastBackNs - lastFrameNs) : -1, ms(longestPauseNs));
+            stall.starting = frames < STARTING_FRAMES;
         }
+        frames++;
         lastFrameNs = nowNs;
         lastStoppedNs = stoppedNs;
         lastBackNs = 0;

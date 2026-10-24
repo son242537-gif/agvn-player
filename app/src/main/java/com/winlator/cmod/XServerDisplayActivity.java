@@ -744,6 +744,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             Executors.newSingleThreadExecutor().execute(() -> {
                 if (shortcut != null) agvnEffectiveExePath = com.winlator.cmod.agvn.AgvnExeRedirect.effectivePath(shortcut.path, container); // AGVN
                 if (shortcut != null) agvnEffectiveExePath = com.winlator.cmod.agvn.AgvnExe64.apply(agvnEffectiveExePath, shortcut, container); // AGVN: <Name>.exe for <Name>-32.exe
+                if (shortcut != null) agvnEffectiveExePath = com.winlator.cmod.agvn.AgvnExeMain.apply(agvnEffectiveExePath, shortcut, container); // AGVN: the game's exe for its .NET launcher
                 if (shortcut != null) agvnEffectiveExePath = com.winlator.cmod.agvn.AgvnPathLink.apply(agvnEffectiveExePath, container); // AGVN: "Game " folder
                 com.winlator.cmod.agvn.AgvnGodotGame.recognize(shortcut); // AGVN: a Godot game in one exe gets Godot's settings
                 com.winlator.cmod.agvn.AgvnKirikiri.recognize(shortcut); // AGVN: a KiriKiri game's size, for the black-screen bar
@@ -1043,7 +1044,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             // AGVN: the game has ended, so its engine logs are complete (Wine's own log is written out first)
             if (debugDialog != null) debugDialog.flush();
             if (shortcut != null) com.winlator.cmod.agvn.AgvnDoctor.afterGame(this, shortcut); // AGVN: what went wrong, if anything
-            if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.finish(this, "Game kết thúc bình thường (thoát từ menu hoặc game tự đóng)");
+            if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.finish(this, com.winlator.cmod.agvn.AgvnSessionLog.closedText());
             if (shortcut != null && GameSaveManager.shouldAutoBackup(this, shortcut)) {
                 GameSaveManager.BackupResult saveResult = GameSaveManager.backup(shortcut, true);
                 if (saveResult.ok) {

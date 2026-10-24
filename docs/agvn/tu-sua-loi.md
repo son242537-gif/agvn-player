@@ -2052,3 +2052,44 @@ kết thúc với mã 0. Không có báo cáo crash nào; các lần 08:12 và 0
   1. The Agnietta, debug Wine tắt: sau lần game tự tắt, Tự sửa lỗi hiện "Game tự tắt ngay khi vừa lên hình" với nút
      WOWBox64. Bấm thử, mở lại game, `su-kien.txt` ghi "Giả lập 32-bit: WOWBox64 …".
   2. Hồi quy: game chơi một lúc rồi thoát bằng menu của game không bị hỏi gì.
+
+## Launcher .NET cạnh game GameMaker, và giới hạn FPS làm game chậm (bản 0.1.66)
+
+Báo cáo ngày 24/10/2026 (POCO, Proton 9 arm64ec, FEX 2601, Wine Mono 9.3.1). Thư mục game có hai exe: exe GameMaker
+của game, và một chương trình mở game nhỏ viết bằng .NET (`Choi Game.exe`, PE32 AnyCPU, 8 KB, không có icon). Game được
+thêm bằng chương trình .NET, vì tên nó đứng trước khi xếp. Bấm chơi thì màn hình đen khoảng 4 giây rồi về app. Nhật ký
+Wine: `Failed to load module …\libmono-2.0-x86_64.dll; status=c000007b`, rồi `Could not load Mono into this process`.
+Wine Mono không nạp được vào chương trình .NET 64-bit trên điện thoại, nên chương trình tắt ngay, mã thoát 0. Khi chọn
+thẳng exe GameMaker, game chạy, nhưng chậm một nửa: game chạy mỗi khung hình một bước (`game_get_speed` 60), mà app
+khoá 30 FPS lúc mở.
+
+- **Thêm game (`GameExeResolver`):** với engine app đã biết (GameMaker, Unity, Ren'Py...), các exe .NET (có CLR header,
+  `AgvnWineMono.isDotNet`) bị bỏ khỏi danh sách chọn nếu còn exe khác. Engine chưa biết thì giữ nguyên: game XNA, FNA,
+  MonoGame có exe chính là chương trình .NET. Bộ công cụ PC (`agvn_profile_lib.resolve_exe`) làm giống vậy.
+- **Cách sửa "Chạy file game chính" (`exe-main`, `AgvnExeMain`):** dành cho game đã thêm bằng chương trình .NET, khi
+  cạnh nó có exe mà thư mục sẽ được thêm bằng nếu thêm lúc này. Cách sửa này lưu tên exe đó vào `agvnExeMain`; lúc mở
+  game, app đổi file chạy trong lệnh mở, như `AgvnExe64`. "Tự sửa lỗi" trả lại `agvnExeMain` khi cách sửa không giúp.
+  Cách sửa này đứng đầu hai lỗi "Game cần .NET" (`dotnet`) và "Wine chưa chạy được phần .NET của game" (`dotnet-load`).
+- **Tóm tắt phiên:** game tự đóng mà chưa vẽ khung nào thì ghi "Game tự đóng trước khi hiện hình (chưa vẽ khung nào)",
+  không còn ghi "Game kết thúc bình thường" (`AgvnSessionLog.closedText`).
+- **Giới hạn FPS (`AgvnFrameLock`):**
+  - GameMaker, Wolf RPG và RPG Maker 2000 tới VX Ace chạy trên Wine mỗi khung hình một bước. Giới hạn dưới 60 FPS không
+    làm game nhẹ đi mà làm cả game chậm lại, nên các game này mở với giới hạn ít nhất 60 FPS, dù máy và mức Đồ họa là gì.
+    Game đã thêm từ trước có giới hạn dưới 60 thì được nâng lên 60 một lần, lúc mở game (`agvnFrameLockFps`), và nhật ký
+    phiên ghi lại việc đó.
+  - Người chơi vẫn đặt được giới hạn thấp hơn trong game ("Giới hạn FPS"). Thanh cảnh báo nóng không đề nghị hạ xuống
+    20 FPS cho các game này.
+- **Dòng "Đứng hình":** khi game chưa vẽ đủ 120 khung, dòng này ghi thêm "lúc game mới mở, thường là đang nạp"
+  (`AgvnFrameStalls.STARTING_FRAMES`).
+- **Chưa sửa được:** chương trình .NET 64-bit vẫn chưa chạy được, vì lỗi nằm ở chỗ Wine nạp Wine Mono x86_64
+  (`c000007b`), không nằm trong app. App chỉ tránh chọn chương trình đó và đề nghị exe khác khi có.
+- **Test:** `AgvnDotNetLauncherTest`, `AgvnFrameStallsTest.aPauseAsTheGameStartsIsItsLoading`,
+  `AgvnDoctorTest.aFileWineCannotRun`, `test_toolkit.test_gamemaker_skips_its_dotnet_launcher`.
+- **Thử máy:**
+  1. Game đã thêm bằng `Choi Game.exe`: bấm chơi, game tắt; ở thư viện, app hỏi "Wine chưa chạy được phần .NET của
+     game", cách đầu là "Chạy file game chính (…)". Chọn xong, game vào màn tiêu đề, và nhật ký có dòng "Chạy file game
+     chính".
+  2. Thêm lại thư mục đó: game được thêm bằng exe GameMaker.
+  3. Game GameMaker chạy đúng tốc độ: đồng hồ trong game và nhân vật đi như trên PC. Nhật ký phiên có dòng "Giới hạn FPS
+     lúc mở game: 30 → 60 FPS" ở lần mở đầu tiên sau khi cập nhật.
+  4. Hồi quy: một game Unity hay Unreal vẫn mở với giới hạn của máy (30 FPS).

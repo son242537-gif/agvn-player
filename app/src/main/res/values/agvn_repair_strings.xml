@@ -44,4 +44,5 @@
     <string name="agvn_fix_raw_mouse">Gửi cú chạm như chuột thật (cho game chỉ đọc chuột thật, như game Unity dùng Input System)</string>
     <string name="agvn_fix_raw_mouse_off">Gửi cú chạm như trước (như các game khác)</string>
     <string name="agvn_fix_exe64">Chạy bản 64-bit của game (%1$s) thay cho bản 32-bit</string>
+    <string name="agvn_fix_exe_main">Chạy file game chính (%1$s) thay cho chương trình mở game (.NET)</string>
 </resources>

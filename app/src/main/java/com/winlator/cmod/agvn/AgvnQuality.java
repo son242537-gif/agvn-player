@@ -91,7 +91,8 @@ public final class AgvnQuality {
             DeviceTier tier = DeviceTierManager.current(ctx);
             eff = LaunchPresetResolver.resolve(profileOf(shortcut), tier, DeviceTierManager.getRules(ctx).preset(tier));
         }
-        return new LaunchPresetResolver.Effective(AgvnKirikiriScreen.screenFor(shortcut, eff.resolution), eff.fps, eff.texturePool);
+        int fps = AgvnFrameLock.fps(shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE), eff.fps); // not to slow its time
+        return new LaunchPresetResolver.Effective(AgvnKirikiriScreen.screenFor(shortcut, eff.resolution), fps, eff.texturePool);
     }
 
     public static void apply(Context ctx, Shortcut shortcut, Level level) {
@@ -127,6 +128,7 @@ public final class AgvnQuality {
      */
     public static void upgrade(Shortcut shortcut) {
         if (shortcut == null) return;
+        if (AgvnFrameLock.upgrade(shortcut)) shortcut.saveData();
         String env = shortcut.getExtra("envVars");
         String start = startFpsFromOldCap(env, current(shortcut) == Level.HIGHEST);
         if (start.isEmpty()) return;

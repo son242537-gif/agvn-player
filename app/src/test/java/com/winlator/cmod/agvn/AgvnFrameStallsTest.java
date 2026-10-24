@@ -23,6 +23,20 @@ public class AgvnFrameStallsTest {
     }
 
     @Test
+    public void aPauseAsTheGameStartsIsItsLoading() {
+        // a GameMaker game (POCO, 24/10/2026): a first frame, then 45 s of loading under the 30 FPS timer
+        AgvnFrameStalls stalls = new AgvnFrameStalls();
+        stalls.onFrame(1000 * MS, 0, AgvnFrameStalls.Mode.TIMER, 30, 0);
+        AgvnFrameStalls.Stall stall = stalls.onFrame(46_443 * MS, 0, AgvnFrameStalls.Mode.TIMER, 30, 0);
+        assertTrue(stall.starting);
+        assertEquals("Đứng hình 45443 ms lúc game mới mở, thường là đang nạp (giới hạn 30 FPS, bộ hẹn giờ): không phải do "
+                + "giới hạn FPS giữ game", stall.vietnamese());
+        long t = 46_443;
+        for (int i = 0; i < AgvnFrameStalls.STARTING_FRAMES; i++) stalls.onFrame((t += 33) * MS, 0, AgvnFrameStalls.Mode.TIMER, 30, 0);
+        assertFalse("later, a stall", stalls.onFrame((t + 2000) * MS, 0, AgvnFrameStalls.Mode.TIMER, 30, 0).starting);
+    }
+
+    @Test
     public void aGameThatStopsByItselfUnderTheVsyncLimit() {
         // 01/10: frames came back 5090 ms later; every buffer was back on the next vsync and the thread kept running
         AgvnFrameStalls stalls = new AgvnFrameStalls();

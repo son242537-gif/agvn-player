@@ -62,7 +62,8 @@ public final class AgvnImportDialog {
         boolean hasExe = new File(gameDir, candidate.exe).isFile();
         msg.append(hasExe ? activity.getString(R.string.agvn_import_preview_exe, candidate.exe)
                 : activity.getString(R.string.agvn_import_preview_no_exe)).append('\n');
-        msg.append(activity.getString(R.string.agvn_import_preview_fps, eff.fps > 0 ? String.valueOf(eff.fps) : activity.getString(R.string.agvn_unlimited))).append('\n');
+        int fps = AgvnFrameLock.fps(candidate.engine.name(), eff.fps); // as the import writes it
+        msg.append(activity.getString(R.string.agvn_import_preview_fps, fps > 0 ? String.valueOf(fps) : activity.getString(R.string.agvn_unlimited))).append('\n');
         String screen = AgvnKirikiriScreen.larger(eff.resolution, candidate.gameSize); // as the import writes it
         msg.append(screen != null && !screen.equals(eff.resolution) ? activity.getString(R.string.agvn_import_preview_game_size, screen)
                 : activity.getString(R.string.agvn_import_preview_resolution, screen != null ? screen : activity.getString(R.string.agvn_default_value))).append('\n');

@@ -98,6 +98,8 @@ public final class GameExeResolver {
         }
         if (exes.isEmpty()) return null;
         exes.removeIf(exe -> AgvnExe64.twin(exe) != null); // "<Name>-32.exe" sorts before its 64-bit "<Name>.exe"
+        // a small .NET launcher ("Choi Game.exe") beside the exe of an engine that is no .NET one (GameMaker, 24/10/2026)
+        if (engine != Engine.UNKNOWN && exes.stream().anyMatch(e -> !AgvnWineMono.isDotNet(e))) exes.removeIf(AgvnWineMono::isDotNet);
         if (engine == Engine.UNITY) {
             for (File exe : exes) {
                 String base = exe.getName().substring(0, exe.getName().length() - 4);

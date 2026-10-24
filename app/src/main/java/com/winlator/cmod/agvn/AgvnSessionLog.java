@@ -66,7 +66,8 @@ public final class AgvnSessionLog {
             for (String fact : AgvnGameFacts.of(shortcut)) event(fact); // what runs: exe, engine, DLLs, folders, mods
             String[] notes = {AgvnMemorySaver.takeNote(), AgvnWineMono.takeNote(), AgvnRawMouse.takeNote(),
                     AgvnStarter.takeNote(), AgvnInputDevices.sessionStart(), AgvnDwriteFonts.takeNote(),
-                    AgvnExe64.takeNote(), AgvnPathLink.takeNote()};
+                    AgvnExe64.takeNote(), AgvnPathLink.takeNote(), AgvnFrameLock.takeNote(),
+                    AgvnExeMain.takeNote()};
             for (String note : notes) if (note != null) event(note);
             AgvnLogFolders.prune(gameLogs);
             AgvnLogFolders.pruneLoose(root(), System.currentTimeMillis());
@@ -93,6 +94,15 @@ public final class AgvnSessionLog {
     public static void note(String name, String text) {
         File dir = current;
         if (dir != null) write(new File(dir, name), text, false);
+    }
+
+    /**
+     * How a game that closed by itself ended, for the summary: closed normally only once it had shown frames. A .NET
+     * launcher that closed after 4 s with nothing drawn read "kết thúc bình thường" (POCO, 24/10/2026).
+     */
+    public static String closedText() {
+        return AgvnSessionTrack.showedFrames() ? "Game kết thúc bình thường (thoát từ menu hoặc game tự đóng)"
+                : "Game tự đóng trước khi hiện hình (chưa vẽ khung nào): không phải lần chạy tốt, xem su-kien.txt";
     }
 
     /** End of a game: collects the logs and writes the summary; a crash or Ren'Py error found replaces {@code how}. */

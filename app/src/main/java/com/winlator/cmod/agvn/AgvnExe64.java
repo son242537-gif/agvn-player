@@ -11,6 +11,7 @@ import com.winlator.cmod.container.Shortcut;
 import java.io.File;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 /**
  * A game that ships its exe twice: "&lt;Name&gt;.exe", 64-bit, and "&lt;Name&gt;-32.exe" for 32-bit Windows (Ren'Py 7).
@@ -86,17 +87,31 @@ public final class AgvnExe64 {
 
     static String apply(String launch, Map<String, String> drives) {
         note = null;
+        File[] picked = new File[2];
+        String to = swap(launch, drives, exe -> {
+            picked[0] = exe;
+            return picked[1] = twin(exe);
+        });
+        if (to == null) return launch;
+        note = "Chạy bản 64-bit của game: " + picked[1].getName() + " thay cho " + picked[0].getName()
+                + " (đã chọn trong Tự sửa lỗi)";
+        Log.i(TAG, "64-bit exe " + launch + " -> " + to);
+        return to;
+    }
+
+    /**
+     * {@code launch} (the exe as the launch command has it, quoted or not, with its arguments) with the exe
+     * {@code to} gives for it, a file beside it, in the same form; null when {@code to} gives null. Also for
+     * {@link AgvnExeMain}.
+     */
+    static String swap(String launch, Map<String, String> drives, UnaryOperator<File> to) {
         String[] exeAndArgs = AgvnExeRedirect.splitArgs(launch.replace("\"", "").trim());
         String from = exeAndArgs[0];
         String unix = AgvnExeRedirect.toUnixPath(from, drives);
-        File twin = unix != null ? twin(new File(unix)) : null;
+        File target = unix != null ? to.apply(new File(unix)) : null;
         int cut = Math.max(from.lastIndexOf('/'), from.lastIndexOf('\\'));
-        if (twin == null || cut < 0) return launch;
-        String to = from.substring(0, cut + 1) + twin.getName();
-        note = "Chạy bản 64-bit của game: " + twin.getName() + " thay cho " + from.substring(cut + 1)
-                + " (đã chọn trong Tự sửa lỗi)";
-        Log.i(TAG, "64-bit exe " + from + " -> " + to);
-        return "\"" + to + "\"" + exeAndArgs[1];
+        if (target == null || cut < 0) return null;
+        return "\"" + from.substring(0, cut + 1) + target.getName() + "\"" + exeAndArgs[1];
     }
 
     /** The line for the session's events, once; null when the game starts its own exe. */

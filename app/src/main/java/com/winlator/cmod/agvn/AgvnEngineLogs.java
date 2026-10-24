@@ -60,7 +60,7 @@ final class AgvnEngineLogs {
 
     /** The game's exe as a file on the phone: the 64-bit one it starts instead, if any ({@link AgvnExe64}). */
     static File exe(Shortcut shortcut) {
-        return AgvnExe64.launched(shortcut, new File(shortcut.path.replace("\"", "")));
+        return AgvnExeMain.launched(shortcut, AgvnExe64.launched(shortcut, new File(shortcut.path.replace("\"", ""))));
     }
 
     /** The game's folder: the one it was imported from, else the exe's. */

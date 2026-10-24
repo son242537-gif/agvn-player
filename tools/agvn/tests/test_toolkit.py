@@ -206,6 +206,23 @@ class EngineDetectionTest(unittest.TestCase):
         shutil.rmtree(os.path.join(game, "lib", "windows-x86_64"))
         self.assertEqual("BeingADIK-32.exe", resolve_exe(game, "RENPY"), "no 64-bit Python beside it")
 
+    def test_gamemaker_skips_its_dotnet_launcher(self):
+        def pe(clr):
+            head = bytearray(0x200)
+            head[0:2], head[0x3c:0x40] = b"MZ", (0x80).to_bytes(4, "little")
+            head[0x80:0x84], head[0x94:0x96] = b"PE\0\0", (96 + 16 * 8).to_bytes(2, "little")
+            head[0x98:0x9a], head[0x98 + 92:0x98 + 96] = (0x10b).to_bytes(2, "little"), (16).to_bytes(4, "little")
+            if clr:
+                head[0x98 + 96 + 112:0x98 + 96 + 120] = (0x2008).to_bytes(4, "little") + (0x48).to_bytes(4, "little")
+            return bytes(head)
+        game = os.path.join(self.tmp.name, "gm")
+        touch(game, "Choi Game.exe", pe(True))
+        touch(game, "TenGame.exe", pe(False))
+        touch(game, "data.win", b"FORM")
+        self.assertEqual("GAMEMAKER", detect_engine(game))
+        self.assertEqual("TenGame.exe", resolve_exe(game, "GAMEMAKER"))
+        self.assertEqual("Choi Game.exe", resolve_exe(game, "UNKNOWN"), "an engine AGVN does not know keeps its .NET exe")
+
     def test_controls_kind(self):
         self.assertEqual(("pc", "vn", "rpg", "2d", "action", "mouse"), CONTROLS)
         for engine, kind in (("RENPY", "vn"), ("KIRIKIRI", "vn"), ("TYRANO", "vn"), ("SIGLUS", "vn"), ("NSCRIPTER", "vn"),

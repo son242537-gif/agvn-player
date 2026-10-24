@@ -30,7 +30,7 @@ public class AgvnDoctorTest {
             "app-settings", "send-logs", "run-windows", "rgss-frameskip", "rgss-light", "wrapper-constants", "wrapper-clip", "wine-mono",
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "godot-light",
-            "godot-light-renderer", "mods-off", "raw-mouse", "ue-wait", "exe-64", "dll-wine", "emulator-order",
+            "godot-light-renderer", "mods-off", "raw-mouse", "ue-wait", "exe-64", "exe-main", "dll-wine", "emulator-order",
             "esync-off", "emulator-wowbox64"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
@@ -347,12 +347,14 @@ public class AgvnDoctorTest {
         // then its exe, a .NET program, with no Wine Mono yet: the first fix installs it
         assertEquals("bad-exe", found(noStart("00d0:trace:msgbox:MSGBOX_OnInit L\"Bad EXE format for \"")));
         assertEquals("dotnet", found(noStart("00e4:err:mscoree:CLRRuntimeInfo_GetRuntimeHost Wine Mono is not installed")));
-        assertEquals("wine-mono", catalog.byId("dotnet").fixes.get(0));
+        // the engine's own exe first, for a .NET launcher beside it (GameMaker, 24/10/2026); else Wine Mono
+        assertEquals(Arrays.asList("exe-main", "wine-mono", "send-logs"), catalog.byId("dotnet").fixes);
         // Wine Mono there, but Wine could not load it or mscoree.dll: installing it again would not help
         assertEquals("dotnet-load", found(noStart("0110:err:mscoree:load_mono Could not load Mono into this process")));
         assertEquals("dotnet-load", found(noStart("0024:err:module:fixup_imports_ilonly mscoree.dll not found, "
                 + "IL-only binary L\"Launcher.exe\" cannot be loaded")));
         assertFalse(catalog.byId("dotnet-load").fixes.contains("wine-mono"));
+        assertEquals(AgvnExeMain.FIX, catalog.byId("dotnet-load").fixes.get(0));
     }
 
     @Test

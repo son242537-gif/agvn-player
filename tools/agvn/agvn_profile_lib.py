@@ -157,6 +157,28 @@ def _machine(path):
     return int.from_bytes(nt[4:6], "little") if len(nt) == 6 and nt[:4] == b"PE\0\0" else None
 
 
+def is_dotnet(path):
+    """True for a .NET program: a PE file with a CLR header (data directory 14), as AgvnWineMono.isDotNet."""
+    try:
+        with open(path, "rb") as f:
+            dos = f.read(64)
+            if len(dos) < 64 or dos[:2] != b"MZ":
+                return False
+            pe = int.from_bytes(dos[0x3c:0x40], "little")
+            f.seek(pe)
+            nt = f.read(24)
+            if len(nt) < 24 or nt[:4] != b"PE\0\0":
+                return False
+            opt = f.read(int.from_bytes(nt[20:22], "little"))
+    except OSError:
+        return False
+    dirs = {0x10b: 96, 0x20b: 112}.get(int.from_bytes(opt[0:2], "little") if len(opt) >= 2 else 0)
+    entry = dirs + 14 * 8 if dirs else 0
+    if not dirs or len(opt) < entry + 8 or int.from_bytes(opt[dirs - 4:dirs], "little") <= 14:
+        return False
+    return int.from_bytes(opt[entry:entry + 4], "little") != 0 and int.from_bytes(opt[entry + 4:entry + 8], "little") != 0
+
+
 def has_64bit_twin(game_dir, name):
     """True for "<Name>-32.exe" beside a 64-bit "<Name>.exe" that can start (Ren'Py 7), as AgvnExe64.twin."""
     if len(name) <= 7 or not name.lower().endswith("-32.exe"):
@@ -179,6 +201,9 @@ def resolve_exe(game_dir, engine):
     if not exes:
         return None
     exes = [n for n in exes if not has_64bit_twin(game_dir, n)]  # "<Name>-32.exe" sorts before "<Name>.exe"
+    native = [n for n in exes if not is_dotnet(os.path.join(game_dir, n))]
+    if engine != "UNKNOWN" and native:
+        exes = native  # a small .NET launcher beside the exe of an engine that is no .NET one (GameMaker)
     if engine == "UNITY":
         for n in exes:
             if os.path.isdir(os.path.join(game_dir, n[:-4] + "_Data")):

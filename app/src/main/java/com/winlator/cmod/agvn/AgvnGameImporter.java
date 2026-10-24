@@ -188,7 +188,7 @@ public final class AgvnGameImporter {
         File exeDir = new File(c.gameDir, c.exe).getParentFile();
         String dlls = GameDllOverrides.build(GameDllOverrides.detect(exeDir), p.dllOverrides);
         shortcut.putExtra("envVars", buildEnvVars(p.env, dlls));
-        AgvnQuality.setStartFps(shortcut, eff.fps);
+        AgvnQuality.setStartFps(shortcut, AgvnFrameLock.fps(c.engine.name(), eff.fps));
         AgvnLayouts.applyImport(shortcut, AgvnLayouts.kindFor(p, c.engine));
         String screen = AgvnKirikiriScreen.larger(eff.resolution, c.gameSize); // a KiriKiri game plays in its window
         if (screen != null) shortcut.putExtra("screenSize", screen);

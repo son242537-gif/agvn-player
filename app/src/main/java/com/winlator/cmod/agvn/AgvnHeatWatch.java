@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.winlator.cmod.R;
 import com.winlator.cmod.XServerDisplayActivity;
+import com.winlator.cmod.container.Shortcut;
 import com.winlator.cmod.ui.FpsLimiterControl;
 import com.winlator.cmod.widget.XServerRendererView;
 
@@ -88,7 +89,9 @@ public final class AgvnHeatWatch {
     private void showBar(AgvnHeatRules.Reason reason, float cap, boolean charging) {
         XServerRendererView view = activity.getXServerView();
         int fps = view != null ? view.getFpsLimit() : 0;
-        boolean canLower = fps == 0 || fps > LOWER_FPS;
+        Shortcut game = activity.agvnShortcut(); // a game that runs a step per frame would slow down, not cool down
+        boolean frameLocked = game != null && AgvnFrameLock.frameLocked(game.getExtra(AgvnGameImporter.EXTRA_ENGINE));
+        boolean canLower = !frameLocked && (fps == 0 || fps > LOWER_FPS);
         boolean capped = reason == AgvnHeatRules.Reason.CPU_CAPPED;
         String title = activity.getString(capped ? R.string.agvn_heat_title_capped : R.string.agvn_heat_title_hot);
         StringBuilder detail = new StringBuilder(capped
