@@ -1,0 +1,9 @@
+AGVN Player v0.1.67 - agvn.io
+
+Sửa lỗi:
+- Game RPG Maker MZ/MV chạy nhẹ có plugin dùng Buffer hoặc mã hoá của Node (như plugin giải mã tệp cấu hình) không còn dừng ngay với lỗi "Buffer is not defined".
+- Game GameMaker, Wolf RPG và RPG Maker chạy trên Windows không còn bị chậm một nửa: các game này chạy theo khung hình, nên app không còn giới hạn chúng dưới 60 FPS. Game đã thêm trước đây được nâng lên 60 FPS ở lần mở đầu tiên.
+- Thư mục game có thêm một chương trình mở game nhỏ viết bằng .NET: app thêm game bằng file chạy chính của game, không chọn chương trình đó nữa.
+- Game đã thêm bằng chương trình .NET mà bị tắt ngay: Tự sửa lỗi đề nghị "Chạy file game chính".
+- Nhật ký không còn ghi "kết thúc bình thường" cho game tự đóng khi chưa hiện hình gì, và ghi rõ lỗi script của game chạy nhẹ.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
