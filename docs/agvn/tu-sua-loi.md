@@ -2093,3 +2093,39 @@ khoá 30 FPS lúc mở.
   3. Game GameMaker chạy đúng tốc độ: đồng hồ trong game và nhân vật đi như trên PC. Nhật ký phiên có dòng "Giới hạn FPS
      lúc mở game: 30 → 60 FPS" ở lần mở đầu tiên sau khi cập nhật.
   4. Hồi quy: một game Unity hay Unreal vẫn mở với giới hạn của máy (30 FPS).
+
+## Game HTML dùng `Buffer` và `require("crypto")` của Node (bản 0.1.67)
+
+Báo cáo ngày 26/10/2026 (POCO, RPG Maker MZ, "Chạy nhẹ"). Ngay lúc mở, game dừng ở màn đen với `ReferenceError: Buffer
+is not defined`. Một plugin của hãng đọc tệp cấu hình mã hoá cạnh `Game.exe` (chữ hex) và giải mã bằng
+`crypto.createDecipheriv("aes-256-cbc", Buffer.from(key), iv)`. Trên PC, NW.js có sẵn `Buffer` và `crypto`; trang game
+trên điện thoại thì không.
+
+- **`Buffer` toàn cục (`html-node-buffer.js`):** một `Uint8Array` như Buffer của Node.
+  - Mã hoá chữ: utf8, hex, base64, base64url, latin1 (binary), ascii, utf16le (ucs2).
+  - Hàm tĩnh: `from`, `alloc`, `allocUnsafe`, `concat`, `isBuffer`, `isEncoding`, `byteLength`, `compare`.
+  - Hàm của buffer: `toString`, `toJSON`, `equals`, `slice` (một view, như Node), `copy`, `write`, `fill`, `indexOf`,
+    `includes`, `readUInt32LE`/`writeInt16BE`... (kể cả cách viết `readUint32LE`), và `new Buffer(chuỗi, mã)` kiểu cũ.
+- **`require("crypto")` chạy đồng bộ (`html-node-hash.js`, `html-node-aes.js`, `html-node-crypto.js`):**
+  - `createCipheriv` / `createDecipheriv` cho aes-128/192/256 ở chế độ cbc, ecb, ctr, đệm PKCS#7, `setAutoPadding`.
+    Sai khoá thì báo "bad decrypt" như Node.
+  - `createCipher` / `createDecipher` (mật khẩu, qua EVP_BytesToKey MD5).
+  - `createHash` và `createHmac` cho md5, sha1, sha256.
+  - `pbkdf2Sync`, `randomBytes`, `randomUUID`, `timingSafeEqual`, `getHashes`, `getCiphers`.
+  - Tên app chưa có (aes-gcm, sha512...) thì báo "AGVN Player chưa hỗ trợ … của Node crypto".
+  - WebCrypto (`crypto.subtle`) không dùng được, vì nó chỉ trả kết quả bất đồng bộ.
+- **`html-compat.js` (mục 13):**
+  - `require("crypto")`, `require("buffer")` và `node:` ở trước tên mô-đun.
+  - `require("child_process")` ném lỗi mà plugin bắt được.
+  - Mô-đun app chưa có (như `zlib`) vẫn là đối tượng rỗng như trước, nhưng console ghi "app chưa hỗ trợ mô-đun Node:
+    zlib", và lỗi làm dừng game (`__agvnFatal`, "Tự sửa lỗi" đọc) ghi kèm tên mô-đun đó.
+  - Lỗi khi nạp script được ghi ra console kèm ngăn xếp, nên có trong logcat và nhật ký phiên. Trước đây main.js của MZ
+    chỉ hiện lỗi đó trên màn hình game.
+- `AgvnHtmlNode.before` đặt các tệp này trước `html-compat.js`, chỉ cho game RPG Maker MV/MZ và game trang NW.js.
+- **Chưa có:** `zlib` (nén, giải nén), `sha512`, aes-gcm.
+- **Test:** `tools/agvn/tests/html_node_sim.js`. Test so từng kết quả với Buffer và crypto thật của Node: mọi mã hoá
+  chữ, mọi hash, HMAC, PBKDF2, mọi chế độ AES theo cả hai chiều và theo từng mẩu, đoạn mã của plugin trong báo cáo, và
+  mô-đun còn thiếu. `test_toolkit.HtmlCompatTest.test_node_buffer_and_crypto_match_node` chạy test này.
+- **Thử máy:**
+  1. Game của báo cáo, giữ tệp cấu hình mã hoá: game qua màn tiêu đề, không còn "Buffer is not defined".
+  2. Hồi quy: một game RPG Maker MV và một game MZ thường vẫn chạy như trước.

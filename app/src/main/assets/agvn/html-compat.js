@@ -32,6 +32,9 @@
  *     __agvnExe first): a game that picks its language from path.parse(process.execPath).name gets a PC's answer.
  * 12. A picture larger than the phone's GPU takes (WebGL's MAX_TEXTURE_SIZE: 16384 on a PC, often 8192 or 4096 on a
  *     phone) is drawn from a copy shrunk to that size instead of black, and the console names it once.
+ * 13. Node's Buffer and require('crypto') (html-node-*.js, loaded first) for a plugin that decrypts its settings, and
+ *     require('child_process') as an error it can catch. A module the app has not is an empty object, as before, but
+ *     the console names it and so does the error that stops the game (5); so is an error in a script as it loads.
  */
 (function () {
     'use strict';
@@ -147,6 +150,14 @@
         Shell: { openExternal: noop, openItem: noop }, Menu: function () { return { append: noop, createMacBuiltin: noop }; },
         MenuItem: function () { return {}; }, Screen: { Init: noop, on: noop, screens: [] } };
     var modules = { fs: fs, path: path, 'nw.gui': gui, os: { platform: function () { return 'android'; }, EOL: '\n' } };
+    // 13: Node's Buffer and crypto (html-node-*.js, loaded first), and child_process for a plugin that opens a page with
+    // it: an error it can catch, since a phone runs no program
+    if (window.__agvnNodeCrypto) modules.crypto = window.__agvnNodeCrypto;
+    if (window.Buffer) modules.buffer = { Buffer: window.Buffer };
+    var noProgram = function () { throw new Error('child_process không có trên điện thoại (AGVN Player)'); };
+    modules.child_process = { execSync: noProgram, spawnSync: noProgram, execFileSync: noProgram,
+        exec: function () { var cb = arguments[arguments.length - 1]; if (typeof cb === 'function') setTimeout(function () { cb(new Error('child_process không có trên điện thoại (AGVN Player)')); }, 0); },
+        spawn: noProgram, execFile: noProgram, fork: noProgram };
 
     // `process` for plugins written for NW.js that read it as they load (path.dirname(process.mainModule.filename),
     // process.platform, process.cwd(), process.env.LOCALAPPDATA, process.on('exit', ...)): without it they stopped the
@@ -187,9 +198,13 @@
     }
 
     if (typeof window.require !== 'function') {
+        window.__agvnMissingModules = [];
         window.require = function (name) {
+            name = String(name).replace(/^node:/, '');
             if (modules[name]) return modules[name];
-            console.warn('[AGVN] require("' + name + '") is not available on the phone');
+            // 13: an empty stand-in, so a plugin that only looks goes on; the one that stops the game names it (5)
+            if (window.__agvnMissingModules.indexOf(name) < 0) window.__agvnMissingModules.push(name);
+            console.error('[AGVN] app chưa hỗ trợ mô-đun Node: ' + name + ' (require("' + name + '"))');
             return {};
         };
     }
@@ -547,7 +562,9 @@
     }
 
     function keepFatal(text) {
-        if (!window.__agvnFatal) window.__agvnFatal = String(text).slice(0, 300);
+        var missing = window.__agvnMissingModules || [];
+        if (!window.__agvnFatal) window.__agvnFatal = String(text).slice(0, 300)
+            + (missing.length ? ' · app chưa hỗ trợ mô-đun Node: ' + missing.join(', ') : '');
     }
 
     // --- 5, as the scripts load: an error in a plugin's first lines keeps RPG Maker MZ from starting (main.js shows it
@@ -559,6 +576,8 @@
         var e = ev.error;
         loadError = (e && e.name ? e.name + ': ' : '') + (e && e.message ? e.message : ev.message)
             + ' (' + String(ev.filename || '').split('/').pop() + ':' + (ev.lineno || '') + ')';
+        // in logcat and the session's logs too: MZ's main.js shows it on the game screen only (26/10/2026)
+        console.error('[AGVN] lỗi khi nạp script: ' + loadError + (e && e.stack ? '\n' + e.stack : ''));
     });
     window.addEventListener('load', function () {
         setTimeout(function () { // main.js has had the load event by then

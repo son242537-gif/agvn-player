@@ -67,6 +67,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         boolean nwjs = !rpgMaker && !new File(root, "tyrano").isDirectory() && AgvnNwjsGame.index(root) != null;
         entry = index.getName();
         if (rpgMaker || nwjs) compatJs = com.winlator.cmod.core.FileUtils.readString(this, "agvn/html-compat.js");
+        compatJs = AgvnHtmlNode.before(this, compatJs); // Node's Buffer and crypto for require
         if (compatJs != null && nwjs) compatJs = "window.__agvnNwjs = true;\n" + compatJs;
         if (compatJs != null) // process.execPath: the exe the game runs as on Windows (AgvnHtmlExe)
             compatJs = AgvnHtmlExe.line(getIntent().getStringExtra("shortcut_path"), AgvnLightGame.folderOf(index)) + compatJs;
