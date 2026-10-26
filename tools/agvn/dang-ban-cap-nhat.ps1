@@ -55,6 +55,15 @@ $commit = "$(git rev-parse HEAD)".Trim()
 if ($LASTEXITCODE -ne 0 -or $commit -notmatch '^[0-9a-f]{40}$') { Stop-With "Không đọc được commit đang dựng (git rev-parse HEAD)." }
 if (-not $DryRun -and -not (git branch -r --contains $commit)) { Stop-With "Commit $commit chưa được push lên GitHub." }
 if (git status --porcelain --untracked-files=no) { Write-Host "Chú ý: có thay đổi chưa commit, bản dựng sẽ gồm cả chúng." -ForegroundColor Yellow }
+# A new version is prepared on GitHub by a cloud session: a checkout that has not pulled it would build the old one
+if (-not $DryRun) {
+    cmd /c "git fetch --quiet origin >nul 2>&1"
+    $behind = "$(git rev-list --count 'HEAD..@{u}' 2>$null)".Trim()
+    $upstream = "$(git rev-parse --abbrev-ref '@{u}' 2>$null)".Trim()
+    if ($behind -match '^\d+$' -and [int]$behind -gt 0) {
+        Stop-With "Máy này còn thiếu $behind commit đã có trên GitHub ($upstream). Chạy: git pull, rồi chạy lại script."
+    }
+}
 
 # Version: the one in gradle.properties, so a build made with gradlew by hand has the same code and installs over it
 $props = Get-Content gradle.properties
@@ -65,7 +74,7 @@ $tag = "v$name"
 if (-not $DryRun) {
     $published = Get-PublishedCode "$Releases/latest/download/agvn-update.txt"
     if ($code -le $published) {
-        Stop-With "Bản $name (mã $code) không mới hơn bản đang đăng (mã $published). Cần tăng AGVN_VERSION_CODE và AGVN_VERSION_NAME trong gradle.properties."
+        Stop-With "Bản $name (mã $code) không mới hơn bản đang đăng (mã $published). Bản mới đã chuẩn bị trên GitHub thì: git fetch origin, git checkout <nhánh của bản đó>, git pull. Nếu chưa có: tăng AGVN_VERSION_CODE và AGVN_VERSION_NAME trong gradle.properties."
     }
     cmd /c "gh release view $tag --repo $Repo >nul 2>&1"
     if ($LASTEXITCODE -eq 0) { Stop-With "Release $tag đã có trên GitHub. Cần tăng phiên bản trong gradle.properties." }
