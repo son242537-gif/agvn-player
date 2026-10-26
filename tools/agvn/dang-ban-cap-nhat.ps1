@@ -77,7 +77,14 @@ if (-not $DryRun) {
         Stop-With "Bản $name (mã $code) không mới hơn bản đang đăng (mã $published). Bản mới đã chuẩn bị trên GitHub thì: git fetch origin, git checkout <nhánh của bản đó>, git pull. Nếu chưa có: tăng AGVN_VERSION_CODE và AGVN_VERSION_NAME trong gradle.properties."
     }
     cmd /c "gh release view $tag --repo $Repo >nul 2>&1"
-    if ($LASTEXITCODE -eq 0) { Stop-With "Release $tag đã có trên GitHub. Cần tăng phiên bản trong gradle.properties." }
+    if ($LASTEXITCODE -eq 0) {
+        # a run that stopped after "gh release create --draft" leaves a draft: phones never see one
+        $draft = "$(gh release view $tag --repo $Repo --json isDraft --jq .isDraft 2>$null)".Trim()
+        if ($draft -eq "true") {
+            Stop-With "Có bản nháp $tag còn sót từ lần chạy trước (chưa công bố, điện thoại không thấy). Xoá nó rồi chạy lại script: gh release delete $tag --repo $Repo --yes"
+        }
+        Stop-With "Release $tag đã có trên GitHub. Cần tăng phiên bản trong gradle.properties."
+    }
 }
 $defaultNotes = "docs\agvn\release\ghi-chu-phat-hanh-$tag.txt"
 if ($NotesFile) { $Notes = (Get-Content -Encoding UTF8 -Raw -ErrorAction Stop $NotesFile).Trim() }
@@ -113,7 +120,12 @@ if ($DryRun) { Write-Host "Chạy thử (-DryRun): không đăng lên GitHub."; 
 
 # A draft first, published once both files are in: phones never see agvn-update.txt pointing to a missing APK
 gh release create $tag $apk $manifest --repo $Repo --target $commit --title "AGVN Player $name" --notes-file $notesFile --draft
-if ($LASTEXITCODE -ne 0) { Stop-With "Không tạo được release $tag." }
+if ($LASTEXITCODE -ne 0) {
+    # the upload broke off: the draft this run made goes, so that the next run starts clean
+    $draft = "$(gh release view $tag --repo $Repo --json isDraft --jq .isDraft 2>$null)".Trim()
+    if ($draft -eq "true") { cmd /c "gh release delete $tag --repo $Repo --yes >nul 2>&1" }
+    Stop-With "Không tạo được release $tag (mạng chập chờn khi tải APK lên?). Chạy lại script."
+}
 gh release edit $tag --repo $Repo --draft=false --latest
 if ($LASTEXITCODE -ne 0) { Stop-With "Đã tải lên nhưng chưa công bố được release ${tag}: mở trang Releases trên GitHub và bấm Publish." }
 Write-Host "Xong: AGVN Player $name đã đăng. Trên điện thoại: Cài đặt > Cập nhật ứng dụng > Kiểm tra cập nhật." -ForegroundColor Green
