@@ -29,15 +29,24 @@ import java.util.List;
  * there at its new start, {@link AgvnGameMove}); and "Bỏ qua phim": a click on the game's window, then Esc while the
  * movie is still stuck (many games skip a movie on either). A skip that did not help is not offered to the game again
  * (extra agvnMovieSkip: 0), nor is Proton 10 to a game that failed on it; the bar still says what happened.
+ * <p>
+ * A movie that does not open at all, as it needs Steam's media converter ({@link AgvnMediaFoundation#NO_TRANSCODER}):
+ * the bar says so once a session, with the kind of stream Wine could not decode ("âm thanh MP3"), and offers to start
+ * the game again reading movies the old way, which plays it (Tenants of the Dead, black at a scene change, 26/10/2026).
  */
 public final class AgvnMovieWatch implements Callback<String> {
     private static final String TAG = "AGVN", EXTRA_SKIP = "agvnMovieSkip";
+    /** Proton's wg_source.c, before it turns to Steam's converter: the caps follow. */
+    private static final String CANNOT_DECODE = "Cannot decode caps ";
     /** How long a click or Esc gets to stop the movie before the next try. */
     private static final long STEP_MS = 2500;
 
     private final XServerDisplayActivity activity;
     private final AgvnMovieRules rules = new AgvnMovieRules();
     private final Handler handler = new Handler(Looper.getMainLooper());
+    /** The last caps Wine could not decode (Wine's output thread); whether the bar told of a movie not opened (UI). */
+    private volatile String undecoded;
+    private boolean notOpenedTold;
 
     private AgvnMovieWatch(XServerDisplayActivity activity) {
         this.activity = activity;
@@ -50,7 +59,40 @@ public final class AgvnMovieWatch implements Callback<String> {
 
     @Override
     public void call(String line) {
-        if (line != null && rules.add(line, SystemClock.uptimeMillis())) handler.post(this::found);
+        if (line == null) return;
+        if (rules.add(line, SystemClock.uptimeMillis())) handler.post(this::found);
+        int caps = line.indexOf(CANNOT_DECODE);
+        if (caps >= 0) undecoded = line.substring(caps + CANNOT_DECODE.length());
+        if (line.contains(AgvnMediaFoundation.NO_TRANSCODER)) handler.post(this::notOpened);
+    }
+
+    /** A movie that needs Steam's converter: told once a session, with "Chạy lại, đọc phim cách cũ" if not on yet. */
+    private void notOpened() {
+        if (notOpenedTold || activity.isFinishing() || activity.isDestroyed()) return;
+        notOpenedTold = true;
+        String kind = AgvnMediaFoundation.kind(undecoded);
+        AgvnSessionLog.event("Phim trong game không mở được (" + (kind != null ? kind : "định dạng Wine không tự giải mã")
+                + "): Wine cần bộ chuyển mã của Steam (protondemuxer), app không có");
+        Log.i(TAG, "movie not opened: " + undecoded);
+        Shortcut s = activity.agvnShortcut();
+        boolean old = s == null || !AgvnMediaFoundation.canReadOldWay(s);
+        String detail = activity.getString(R.string.agvn_movie_open_detail,
+                kind != null ? kind : activity.getString(R.string.agvn_movie_open_unknown))
+                + (old ? "" : "\n" + activity.getString(R.string.agvn_movie_open_old));
+        List<AgvnWarningBar.Choice> choices = new ArrayList<>();
+        if (!old) choices.add(new AgvnWarningBar.Choice(R.string.agvn_movie_open_restart, () -> readOldWay(s)));
+        choices.add(new AgvnWarningBar.Choice(old ? R.string.agvn_movie_ok : R.string.agvn_black_wait, null));
+        AgvnWarningBar.show(activity, activity.getString(R.string.agvn_movie_open_title), detail,
+                choices.toArray(new AgvnWarningBar.Choice[0]));
+    }
+
+    /** WINE_OLD_MEDIA_SOURCE=1 kept on the game, which starts again at once. */
+    private void readOldWay(Shortcut s) {
+        AgvnMediaFoundation.useOldSource(s);
+        s.saveData();
+        AgvnSessionLog.event("Người chơi chọn đọc phim bằng cách cũ của Wine (WINE_OLD_MEDIA_SOURCE=1); game mở lại");
+        AgvnDoctor.requestRelaunch(activity, s);
+        activity.agvnExit();
     }
 
     private void found() {

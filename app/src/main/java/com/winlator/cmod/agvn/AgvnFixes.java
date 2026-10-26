@@ -34,7 +34,8 @@ final class AgvnFixes {
             "emulator-stable", "emulator-fast", "wincomponent", "wrapper-constants", "wrapper-clip", "wine-mono",
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "mods-off", "raw-mouse", "ue-wait",
-            AgvnExe64.FIX, AgvnExeMain.FIX, AgvnDllProxy.FIX, AgvnLockFixes.ORDER, AgvnLockFixes.ESYNC, AgvnEmulatorNoExec.FIX);
+            AgvnExe64.FIX, AgvnExeMain.FIX, AgvnDllProxy.FIX, AgvnLockFixes.ORDER, AgvnLockFixes.ESYNC, AgvnEmulatorNoExec.FIX,
+            AgvnMediaFoundation.FIX);
     static final String SYSTEM = "System";
 
     /** A button: its fix id, its words, and what it sets ({@code to}). */
@@ -91,6 +92,8 @@ final class AgvnFixes {
             case "rgss-frameskip":
                 return AgvnHtmlGame.RUNNER_RGSS.equals(runner) && !AgvnRgssFiles.frameSkip(a, s)
                         ? new Fix(id, a.getString(R.string.agvn_fix_rgss_frameskip), "1") : null;
+            case AgvnMediaFoundation.FIX: // a movie that needs Steam's converter: Wine's old media source plays it
+                return AgvnMediaFoundation.fix(a, s);
             case "page-light": { // an Electron or NW.js game on Windows, its page in Android's own browser (AgvnElectronGame)
                 File page = light ? null : AgvnElectronGame.pageOf(AgvnEngineLogs.gameDir(s));
                 return page != null ? new Fix(id, a.getString(R.string.agvn_fix_page_light), page.getPath()) : null;

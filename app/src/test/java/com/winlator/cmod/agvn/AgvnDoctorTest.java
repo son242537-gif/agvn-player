@@ -31,11 +31,11 @@ public class AgvnDoctorTest {
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "godot-light",
             "godot-light-renderer", "mods-off", "raw-mouse", "ue-wait", "exe-64", "exe-main", "dll-wine", "emulator-order",
-            "esync-off", "emulator-wowbox64", "page-light"));
+            "esync-off", "emulator-wowbox64", "page-light", "media-old"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
             "ram-saved", "live", "light", "script-error", "page-crash", "frozen", "reported", "module-code",
-            "closed-on-start", "froze", "chromium", "helper-exe"));
+            "closed-on-start", "froze", "chromium", "helper-exe", "media-new"));
     static AgvnProblemCatalog catalog;
 
     @BeforeClass
@@ -323,6 +323,33 @@ public class AgvnDoctorTest {
         ev.changed = true;
         assertEquals("file-not-found", found(ev));
         assertEquals("only Wine's box", "no-start", found(noStart("File not found: save1.dat")));
+    }
+
+    @Test
+    public void aMovieThatNeedsSteamsConverterIsReadTheOldWay() {
+        // Tenants of the Dead (Unity 2019.4, Mali-G57, 0.1.69, 26/10/2026): black at a scene change; the player quit
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.started = true;
+        ev.playerQuit = true;
+        ev.seconds = 360;
+        ev.newMediaSource = true;
+        ev.lines.addAll(Arrays.asList(
+                "0:00:02.164378100 22842 0xb400007c7b4a32e0 ERROR                   WINE wg_source.c:449:sink_event_caps: Cannot decode caps audio/mpeg, mpegversion=(int)1, rate=(int)44100, channels=(int)2",
+                "winegstreamer: failed to create protondemuxer, are 64-bit GStreamer \"proton\" plugins installed?",
+                "0:00:02.174336062 22842 0xb400007c7b4a32e0 ERROR                   WINE wg_source.c:777:initialize_transcoding: Failed to re-initialize source 0xb400007d4b45dbb0"));
+        assertEquals("movie-transcode", found(ev));
+        assertEquals(Arrays.asList("media-old", "send-logs"), catalog.byId("movie-transcode").fixes);
+        ev.newMediaSource = false;
+        assertNull("read the old way already: asked no more", found(ev));
+        assertTrue(AgvnMediaFoundation.oldSource("1"));
+        assertTrue(AgvnMediaFoundation.oldSource(" 2 "));
+        assertFalse(AgvnMediaFoundation.oldSource("0"));
+        assertFalse("atoi(\"yes\") is 0", AgvnMediaFoundation.oldSource("yes"));
+        assertFalse(AgvnMediaFoundation.oldSource((String) null));
+        assertEquals("âm thanh MP3", AgvnMediaFoundation.kind("audio/mpeg, mpegversion=(int)1, rate=(int)44100, channels=(int)2"));
+        assertEquals("âm thanh AAC", AgvnMediaFoundation.kind("audio/mpeg, mpegversion=(int)4, rate=(int)48000"));
+        assertEquals("video/x-wmv", AgvnMediaFoundation.kind("video/x-wmv, wmvversion=(int)3"));
+        assertNull(AgvnMediaFoundation.kind(null));
     }
 
     @Test

@@ -2255,7 +2255,7 @@ WebView của Android, như đã làm với game NW.js (`AgvnNwjsGame`, Love My 
   3. Hồi quy: một game RPG Maker MV/MZ và một game NW.js vẫn chạy nhẹ như cũ, vẫn giữ save. Một game Windows khác bị
      đứng hình không thấy nút "Chạy nhẹ: chạy trang của game".
 
-## Game được thêm bằng UnityCrashHandler64.exe (bản 0.1.69)
+## Game được thêm bằng UnityCrashHandler64.exe (bản 0.1.70)
 
 Báo cáo ngày 26/10/2026 (Xiaomi 2306EPN60G, Dimensity 8200 / Mali-G610, app 0.1.68): game Unity "Succubus Kiss Nutaku
 Player - UnityCrashHandler64" mở 5 lần, lần nào cũng tự đóng sau khoảng 4 giây, chưa vẽ khung nào. Wine thoát mã 0.
@@ -2278,7 +2278,7 @@ Player - UnityCrashHandler64" mở 5 lần, lần nào cũng tự đóng sau kho
     của game" (`not-a-game`, điều kiện `helper-exe`), thay cho "Game tắt ngay". Lời giải thích: thư mục thiếu file chạy
     của game, có thể do phần mềm diệt virus xoá hoặc chép chưa đủ; cần chép lại rồi thêm lại game.
 - **Chưa rõ:** thư mục của báo cáo có `Succubus Kiss.exe` (hay tên khác) không. Nhật ký không liệt kê thư mục, vì
-  engine đã biết (Unity). Lần mở đầu tiên trên 0.1.69 sẽ cho biết: hoặc game chạy, hoặc hiện lời báo thiếu file.
+  engine đã biết (Unity). Lần mở đầu tiên trên 0.1.70 sẽ cho biết: hoặc game chạy, hoặc hiện lời báo thiếu file.
 - **Test:** `AgvnHelperExeTest`.
 - **Thử máy:**
   1. Game của báo cáo, không thêm lại: mở. Có exe chính thì game Unity lên hình, và `su-kien.txt` có dòng "Chạy file
@@ -2286,4 +2286,48 @@ Player - UnityCrashHandler64" mở 5 lần, lần nào cũng tự đóng sau kho
   2. "Chọn thư mục khác" → bấm `UnityCrashHandler64.exe` của một game Unity đầy đủ: app thêm game đó bằng exe của nó,
      tên không có đuôi "- UnityCrashHandler64".
   3. Hồi quy: game thêm bằng launcher .NET vẫn được đề nghị "Chạy file game chính" như 0.1.66.
+
+## Phim trong game không mở được: đen màn hình lúc chuyển cảnh (bản 0.1.70)
+
+Báo cáo ngày 26/10/2026 (TECNO LE6h, Mali-G57, app 0.1.69): Tenants of the Dead (Unity 2019.4, Proton 9) đen màn hình
+lúc chuyển cảnh, ở cả 3 lần chơi. Thanh "Màn hình đen" không hỏi, vì game đã hiện hình từ trước ("Màn hình đen tới giây
+173 … không hỏi").
+
+- **Nhật ký:**
+  - `Player.log`: `WindowsVideoMedia error 0xc00d36bb while reading …/resources.resource`, `Context:
+    CreateObjectFromByteStream`, `Error details: Unexpected error.` (`MF_E_UNEXPECTED`).
+  - Hai dòng `0x80004001 … Creating DXGI DeviceManager: Not implemented` trước đó là do app chủ ý tắt DXGI device manager
+    (mục `AgvnMediaFoundation` ở trên). Với chúng, Unity vẫn phát được phim bằng bộ nhớ thường.
+  - Wine: `wg_source.c:449:sink_event_caps: Cannot decode caps audio/mpeg, mpegversion=(int)1, rate=(int)44100,
+    channels=(int)2`, rồi `winegstreamer: failed to create protondemuxer, are 64-bit GStreamer "proton" plugins
+    installed?`, rồi `wg_source.c:777:initialize_transcoding: Failed to re-initialize source`.
+  - Các phim H.264 trước đó phát được (`Copying 0x151800 bytes from sample`, khung 1280×720).
+- **Vì sao (mã nguồn Proton 9, nhánh `experimental_9.0` của ValveSoftware/wine; số dòng 449 và 777 khớp nhật ký):**
+  - Cách đọc phim mới của Proton (`wg_source.c`, `check_decoding_support`) chỉ tìm bộ **giải mã** nhận đúng caps mà bộ
+    tách file đưa ra, không chèn bộ **phân tích** trước nó. MP3 trong MP4 tới dưới dạng chưa phân tích (thiếu `parsed`
+    và `layer`). `mpg123audiodec` và `avdec_mp3` của imagefs chỉ nhận MP3 đã qua `mpegaudioparse`, nên không có bộ nào
+    nhận.
+  - Proton khi đó chuyển sang bộ chuyển mã của Steam (`protondemuxer`), mà ngoài Steam không có kho phim đã chuyển mã,
+    và nó cũng không tạo được. Phim không mở, VideoPlayer của Unity chờ mãi, màn hình đen.
+  - Cách đọc phim cũ (`WINE_OLD_MEDIA_SOURCE=1`, `media_source.c` với `decodebin`) tự chèn `mpegaudioparse` trước
+    `mpg123audiodec`, nên phát được.
+  - Công tắc này có trong `winegstreamer.dll` của Proton 9 trong app. Proton 10 (`proton-10.0-4-arm64ec.wcp`) không có
+    công tắc, cũng không có cách hỏng này.
+- **Sửa (`AgvnMediaFoundation`, `AgvnMovieWatch`):**
+  - **Lúc đang chơi:** Wine in `failed to create protondemuxer` (dòng này luôn in, có bật nhật ký hay không) thì
+    `su-kien.txt` ghi "Phim trong game không mở được (âm thanh MP3): …". Thanh "Phim trong game không mở được" hiện
+    một lần mỗi phiên, kèm nút "Chạy lại, đọc phim cách cũ" (game đang chạy Proton 9 và chưa bật cách cũ). Bấm thì
+    app đặt `WINE_OLD_MEDIA_SOURCE=1` vào biến môi trường của riêng game đó, rồi game tắt và tự mở lại. Phần chơi chưa
+    lưu sẽ mất, và thanh có nói điều đó.
+  - **Sau khi thoát game:** "Tự sửa lỗi" hiện "Wine không mở được phim trong game" (`movie-transcode`, dòng
+    `failed to create protondemuxer`, điều kiện `media-new`), với cách sửa "Đọc phim bằng cách cũ của Wine"
+    (`media-old`).
+  - Game đã đọc phim cách cũ, hoặc chạy Proton 10, thì không được đề nghị.
+  - Game khác không đổi gì, vì cách cũ chỉ bật cho game có phim hỏng như vậy.
+- **Test:** `AgvnDoctorTest.aMovieThatNeedsSteamsConverterIsReadTheOldWay`, với đúng các dòng trong nhật ký này.
+- **Thử máy:**
+  1. Tenants of the Dead trên 0.1.70: chơi tới cảnh chuyển. Thanh "Phim trong game không mở được (âm thanh MP3)…" hiện
+     → bấm "Chạy lại, đọc phim cách cũ". Game mở lại; chơi tới đúng cảnh đó: phim phải phát (có tiếng), không đen.
+     `moi-truong.txt` có `WINE_OLD_MEDIA_SOURCE=1`.
+  2. Hồi quy: một game Unity khác có phim MP4 (chỉ H.264) vẫn phát phim, không có thanh, không có biến mới.
 

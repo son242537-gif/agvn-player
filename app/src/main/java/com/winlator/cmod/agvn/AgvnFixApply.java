@@ -105,6 +105,9 @@ final class AgvnFixApply {
             case "rgss-light":
                 s.putExtra(AgvnHtmlGame.EXTRA_RUNNER, fix.to); // the next start is Wine's, or mkxp-z's
                 break;
+            case AgvnMediaFoundation.FIX: // WINE_OLD_MEDIA_SOURCE=1 among the game's own variables
+                AgvnMediaFoundation.useOldSource(s);
+                break;
             case "page-light": // the next start is the page's, in Chạy nhẹ (AgvnElectronGame)
                 s.putExtra(AgvnHtmlGame.EXTRA_RUNNER, AgvnHtmlGame.RUNNER_HTML);
                 s.putExtra(AgvnHtmlGame.EXTRA_INDEX, fix.to);

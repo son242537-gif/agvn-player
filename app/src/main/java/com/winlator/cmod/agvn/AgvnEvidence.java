@@ -47,6 +47,8 @@ final class AgvnEvidence {
     boolean chromium;
     /** The game starts an exe that is never a game, with no game beside it ({@link AgvnExeMain#helperName}), {exe}. */
     boolean helperExe;
+    /** The game reads movies Proton 9's new way and can switch ({@link AgvnMediaFoundation#canReadOldWay}). */
+    boolean newMediaSource;
     long seconds;
     /** How Android ended the app, for a session found unfinished at the next start; -1 when it was not. */
     int killedReason = -1, killedImportance;
@@ -100,6 +102,7 @@ final class AgvnEvidence {
             case "froze": return frozeAtEnd() || loadingOnly();
             case "chromium": return chromium;
             case "helper-exe": return helperExe;
+            case "media-new": return newMediaSource;
             default: return false; // "live" problems are found while playing; names a newer file may add stay unmet
         }
     }

@@ -181,6 +181,7 @@ public final class AgvnDoctor {
         String helper = AgvnExeMain.helperName(s); // UnityCrashHandler64.exe started, no game beside it
         ev.helperExe = helper != null;
         if (helper != null) ev.params.put("exe", helper);
+        ev.newMediaSource = AgvnMediaFoundation.canReadOldWay(s); // as the game is now: the bar may have switched it already
         if (ev.lowRamFreeMb >= 0) ev.params.put("free", String.valueOf(ev.lowRamFreeMb));
         return ev;
     }
