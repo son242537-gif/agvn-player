@@ -3,4 +3,6 @@ AGVN Player v0.1.69 - agvn.io
 Tính năng mới:
 - Xoá nhiều game cùng lúc: giữ tay trên một game (hoặc bấm nút ⋮) và chọn "Chọn nhiều game (để xóa)". Chạm vào các game muốn xoá (hoặc bấm "Chọn tất cả"), rồi bấm "Xóa". App hỏi lại một lần trước khi xoá. Bấm X hoặc nút Quay lại để thôi chọn.
 - Chỉ game trong thư viện bị xoá. File game vẫn còn trong máy, nên có thể thêm lại sau.
+Sửa lỗi:
+- Game Electron hay NW.js đã thêm từ trước mà bị nhận nhầm là game KiriKiri (chạy bằng tiếng Nhật): app tự sửa ở lần mở tới, không cần thêm lại game.
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

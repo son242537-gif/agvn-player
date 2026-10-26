@@ -54,10 +54,7 @@ public final class GameExeResolver {
         if (isRpgMaker(top)) return Engine.RPGMAKER;
         if (anyFile(children, "", ".wolf") || anyFile(listOrEmpty(path(top, "data")), "", ".wolf")
                 || isFile(top.get("gurugurusmf4.dll"))) return Engine.WOLFRPG;
-        // a stray .xp3 or .nsa in an Electron or NW.js game is no KiriKiri or NScripter one (26/10/2026)
-        boolean chromium = isFile(top.get("chrome_100_percent.pak")) || isFile(top.get("v8_context_snapshot.bin"))
-                || isFile(top.get("package.nw")) || isFile(path(top, "resources", "app.asar"))
-                || isFile(path(top, "resources", "app", "package.json"));
+        boolean chromium = chromiumShell(top);
         if (!chromium && anyFile(children, "", ".xp3")) return Engine.KIRIKIRI;
         if (!chromium && (anyFile(children, "", ".nsa") || isFile(top.get("nscript.dat")))) return Engine.NSCRIPTER;
         if (isDir(top.get("tyrano")) || isFile(path(top, "data", "system", "config.tjs"))) return Engine.TYRANO;
@@ -66,6 +63,20 @@ public final class GameExeResolver {
         if (anyFile(children, "", ".pck") || embedsGodot(children)) return Engine.GODOT;
         if (isFile(top.get("data.win"))) return Engine.GAMEMAKER;
         return Engine.UNKNOWN;
+    }
+
+    /** Electron's or NW.js's own files in {@code gameDir}: a stray .xp3 or .nsa there is no KiriKiri or NScripter game. */
+    static boolean chromiumShell(File gameDir) {
+        Map<String, File> top = new HashMap<>();
+        for (File f : listOrEmpty(gameDir)) top.put(f.getName().toLowerCase(Locale.ROOT), f);
+        return chromiumShell(top);
+    }
+
+    /** {@code top}: the folder's entries by lower-case name. 26/10/2026: an Electron game with one .xp3 ran as KiriKiri. */
+    private static boolean chromiumShell(Map<String, File> top) {
+        return isFile(top.get("chrome_100_percent.pak")) || isFile(top.get("v8_context_snapshot.bin"))
+                || isFile(top.get("package.nw")) || isFile(path(top, "resources", "app.asar"))
+                || isFile(path(top, "resources", "app", "package.json"));
     }
 
     /** A Godot game exported as one exe ("Embed PCK"): no .pck beside it, its pack ends the exe (AgvnGodotFiles). */

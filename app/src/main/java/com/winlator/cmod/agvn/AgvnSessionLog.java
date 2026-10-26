@@ -68,7 +68,7 @@ public final class AgvnSessionLog {
             String[] notes = {AgvnMemorySaver.takeNote(), AgvnWineMono.takeNote(), AgvnRawMouse.takeNote(),
                     AgvnStarter.takeNote(), AgvnInputDevices.sessionStart(), AgvnDwriteFonts.takeNote(),
                     AgvnExe64.takeNote(), AgvnPathLink.takeNote(), AgvnFrameLock.takeNote(),
-                    AgvnExeMain.takeNote()};
+                    AgvnExeMain.takeNote(), AgvnEngineRecheck.takeNote()};
             for (String note : notes) if (note != null) event(note);
             AgvnLogFolders.prune(gameLogs);
             AgvnLogFolders.pruneLoose(root(), System.currentTimeMillis());

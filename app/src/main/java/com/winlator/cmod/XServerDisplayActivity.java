@@ -539,6 +539,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (shortcut != null) {
             shortcut.putExtra("lastRunAt", String.valueOf(System.currentTimeMillis()));
             shortcut.saveData();
+            com.winlator.cmod.agvn.AgvnEngineRecheck.atLaunch(shortcut); // AGVN: an Electron game once taken for KiriKiri
 
             graphicsDriver = shortcut.getExtra("graphicsDriver", container.getGraphicsDriver());
             graphicsDriverConfig = shortcut.getExtra("graphicsDriverConfig", container.getGraphicsDriverConfig());

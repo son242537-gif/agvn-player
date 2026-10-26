@@ -2140,7 +2140,7 @@ Báo cáo ngày 26/10/2026 (Xiaomi 2510DPC44G, app 0.1.64, Proton 9 arm64ec, FEX
   Chromium, tệp `.xp3` hay `.nsa` không còn đủ để nhận KiriKiri hay NScripter. Vỏ Chromium là một trong các tệp:
   `chrome_100_percent.pak`, `v8_context_snapshot.bin`, `package.nw`, `resources/app.asar`, `resources/app/package.json`.
   Game RPG Maker MV/MZ, Unity, Unreal và Siglus được nhận trước bước này, nên không đổi gì. Bộ công cụ PC làm giống vậy.
-  Game đã thêm từ trước vẫn giữ engine cũ: thêm lại game để app nhận lại engine.
+  Game đã thêm từ trước vẫn giữ engine cũ ở bản này; bản 0.1.69 tự sửa (xem mục dưới).
 - **Nhật ký ghi lệnh chạy (`AgvnLaunchNote`):** `moi-truong.txt` có thêm ba mục, nằm sau các biến đồ hoạ:
   - các biến môi trường mà container và Cài đặt game đặt, với giá trị Wine nhận được;
   - tham số chạy của game;
@@ -2156,3 +2156,44 @@ Báo cáo ngày 26/10/2026 (Xiaomi 2510DPC44G, app 0.1.64, Proton 9 arm64ec, FEX
   chính, không cần IPC giữa hai tiến trình).
 - **Test:** `GameExeResolverTest.aStrayXp3InAnElectronGameIsNoKiriKiri`, `AgvnSessionLogTest.theLaunchIsWrittenAsWineGotIt`,
   `test_toolkit.test_visual_novel_engines`.
+
+## Game Electron đã thêm từ trước vẫn chạy như KiriKiri (bản 0.1.69)
+
+Thử lại trên 0.1.68 (cùng máy và game của mục trên, 26/10/2026 17:22): nhật ký vẫn ghi engine KIRIKIRI và
+`LC_ALL=ja_JP.UTF-8`. Lý do: game được thêm từ trước, nên engine KiriKiri đã nằm trong lối tắt. Bản 0.1.68 chỉ sửa
+cách nhận engine lúc thêm game.
+
+- **Sửa (`AgvnEngineRecheck`, lúc mở game, trước khi app đọc cài đặt của game):** nếu engine đã lưu là KiriKiri hay
+  NScripter mà thư mục game có vỏ Chromium (`GameExeResolver.chromiumShell`, cùng các tệp như mục trên), app lưu lại
+  engine theo thư mục (thường là UNKNOWN).
+  - `LC_ALL=ja_JP.UTF-8` bị bỏ, trừ khi hồ sơ game hoặc tên game có chữ kana cũng chọn tiếng Nhật. Vùng ngôn ngữ khác
+    mà người chơi tự chọn thì giữ nguyên.
+  - Kích thước màn hình KiriKiri đã đọc cũng bị bỏ.
+  - Nhật ký phiên có dòng "Engine đã lưu KIRIKIRI sai: thư mục game là Electron/NW.js…".
+  - Game KiriKiri thật (không có vỏ Chromium) và game của engine khác không đổi gì.
+  - Bố cục phím đã đặt cho game giữ nguyên.
+- **Dòng SELinux trong log:** `avc: denied { execute } comm="Chrome_InProcGp" … D3DCompiler_47.dll dev="fuse"` là lần
+  đầu Wine thử ánh xạ DLL có quyền chạy ở bộ nhớ chung, và bị từ chối. `ntdll.so` của Proton 9 khi đó chép file vào bộ
+  nhớ thường (mục "DLL ở bộ nhớ chung" ở trên). Mọi DLL của game ở bộ nhớ chung đều qua đường này, nên nhiều khả năng
+  đây không phải nguyên nhân làm trang đứng. App chưa đổi gì cho `d3dcompiler_47`. Cách loại trừ rẻ nhất: đổi tên
+  `D3DCompiler_47.dll` cạnh exe. Khi đó app không đặt `n,b` cho nó nữa, và ANGLE dùng bản có sẵn của Wine.
+- **Trang vẫn đứng: manh mối mới.** Bỏ `--in-process-gpu` và thêm `--js-flags=--jitless` (V8 không dịch JavaScript ra
+  mã máy) thì trang qua được trang đầu, tới thanh tải. Nghi vấn: mã V8 dịch ra và các luồng của Chromium trao dữ liệu
+  với nhau theo thứ tự bộ nhớ của x86. Container AGVN mặc định dùng FEX "Intermediate", tắt TSO cho lệnh vector và
+  memcpy. Chưa thử trên máy. Nên thử, mỗi lần một cách:
+  1. "Tự sửa lỗi" → "Game đứng hình, treo": app lần lượt thử giả lập CPU ổn định hơn (TSO đủ), giữ đúng thứ tự bộ nhớ,
+     tắt Esync.
+  2. Tham số chạy `--js-flags=--single-threaded`: V8 vẫn dịch mã, nhưng không dùng luồng nền.
+  3. `--no-sandbox`.
+- **Hướng lâu dài, chưa làm:** chạy trang của game Electron bằng "Chạy nhẹ" (WebView), như game NW.js
+  (`AgvnNwjsGame`). Cocos Creator 2.4 là engine web. Cần biết trước:
+  - trang nằm trong `resources/app/` hay trong `app.asar` (cần đọc định dạng asar);
+  - `main.js` mở trang nào;
+  - trang có dùng `require` của Node (greenworks, fs) không.
+
+  Từ bản này, engine của game là UNKNOWN, nên `su-kien.txt` tự liệt kê thư mục game.
+- **Test:** `AgvnEngineRecheckTest`.
+- **Thử máy:**
+  1. Game Electron của báo cáo, không thêm lại: mở một lần. `su-kien.txt` có dòng "Engine đã lưu KIRIKIRI sai…", không
+     còn engine KIRIKIRI. `moi-truong.txt` không còn `LC_ALL=ja_JP.UTF-8`.
+  2. Hồi quy: một game KiriKiri thật vẫn ghi engine KIRIKIRI, vẫn chạy tiếng Nhật, vẫn vừa khung hình.
