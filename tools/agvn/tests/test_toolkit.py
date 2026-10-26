@@ -182,6 +182,8 @@ class EngineDetectionTest(unittest.TestCase):
     def test_visual_novel_engines(self):
         self.check("KIRIKIRI", "krkr", "game.exe", "data.xp3", "plugin/wuvorbis.dll")
         self.check("NSCRIPTER", "ons", "nscr.exe", "arc.nsa", "0.txt")
+        self.check("UNKNOWN", "electron", "Game.exe", "chrome_100_percent.pak", "resources/app.asar", "data.xp3")
+        self.check("UNKNOWN", "nwjs", "Game.exe", "package.nw", "arc.nsa")
         self.check("NSCRIPTER", "ons2", "nscr.exe", "nscript.dat")
         self.check("TYRANO", "tyrano", "Game.exe", "index.html", "tyrano/libs.js")
         self.check("TYRANO", "tyrano2", "Game.exe", "Data/System/Config.tjs")

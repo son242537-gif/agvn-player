@@ -114,6 +114,19 @@ public class AgvnSessionLogTest {
     }
 
     @Test
+    public void theLaunchIsWrittenAsWineGotIt() {
+        // an Electron game, 26/10/2026: did --disable-gpu and ELECTRON_ENABLE_LOGGING=1 reach Wine?
+        EnvVars env = new EnvVars("ELECTRON_ENABLE_LOGGING=1 WINEDEBUG=-all");
+        String note = AgvnLaunchNote.text(env, "WINEDEBUG=-all", "ELECTRON_ENABLE_LOGGING=1 NO_SUCH=1", " --disable-gpu ",
+                "wine explorer /desktop=shell,1280x720 winhandler.exe /dir F:\\Game \"Game.exe\" --disable-gpu");
+        assertTrue(note, note.contains("\nELECTRON_ENABLE_LOGGING=1\nNO_SUCH=(Wine không nhận)\nWINEDEBUG=-all\n"));
+        assertTrue(note, note.contains("# Tham số chạy của game (Cài đặt game): --disable-gpu\n"));
+        assertTrue(note, note.endsWith("\"Game.exe\" --disable-gpu\n"));
+        String none = AgvnLaunchNote.text(env, "", null, "", null);
+        assertTrue(none, none.contains("(không có)\n# Tham số chạy của game (Cài đặt game): (không có)\n# Lệnh chạy Wine: ?\n"));
+    }
+
+    @Test
     public void keepsTheFiveNewestSessions() throws Exception {
         File gameLogs = tmp.newFolder("logs");
         for (int i = 1; i <= 7; i++) new File(gameLogs, "2026100" + i + "-120000").mkdirs();

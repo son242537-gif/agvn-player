@@ -2129,3 +2129,30 @@ trên điện thoại thì không.
 - **Thử máy:**
   1. Game của báo cáo, giữ tệp cấu hình mã hoá: game qua màn tiêu đề, không còn "Buffer is not defined".
   2. Hồi quy: một game RPG Maker MV và một game MZ thường vẫn chạy như trước.
+
+## Game Electron: nhận nhầm KiriKiri, và nhật ký ghi lệnh chạy (bản 0.1.68)
+
+Báo cáo ngày 26/10/2026 (Xiaomi 2510DPC44G, app 0.1.64, Proton 9 arm64ec, FEX 2601): một game Electron 18.3
+(Chromium 100, Cocos Creator 2.4) hiện trang đầu với thanh tải 0%, rồi đứng mãi.
+
+- **Nhận nhầm KiriKiri (`GameExeResolver.detectEngine`):** thư mục game có một tệp `.xp3` lạc, nên app ghi engine
+  KIRIKIRI và chạy game bằng tiếng Nhật (`LC_ALL=ja_JP.UTF-8`, Chromium nhận `--lang=ja`). Giờ, khi thư mục có vỏ
+  Chromium, tệp `.xp3` hay `.nsa` không còn đủ để nhận KiriKiri hay NScripter. Vỏ Chromium là một trong các tệp:
+  `chrome_100_percent.pak`, `v8_context_snapshot.bin`, `package.nw`, `resources/app.asar`, `resources/app/package.json`.
+  Game RPG Maker MV/MZ, Unity, Unreal và Siglus được nhận trước bước này, nên không đổi gì. Bộ công cụ PC làm giống vậy.
+  Game đã thêm từ trước vẫn giữ engine cũ: thêm lại game để app nhận lại engine.
+- **Nhật ký ghi lệnh chạy (`AgvnLaunchNote`):** `moi-truong.txt` có thêm ba mục, nằm sau các biến đồ hoạ:
+  - các biến môi trường mà container và Cài đặt game đặt, với giá trị Wine nhận được;
+  - tham số chạy của game;
+  - lệnh chạy Wine đầy đủ.
+
+  Người chơi đã thêm `--disable-gpu` và `ELECTRON_ENABLE_LOGGING=1` mà không biết chúng có tới được Wine không: logcat
+  cắt dòng env ở khoảng 4.000 ký tự, và chưa nhật ký nào ghi lệnh chạy. Theo code, tham số và biến của Cài đặt game có
+  được đưa vào lệnh chạy; nhật ký mới giúp thấy ngay chỗ hỏng nếu có.
+- **Chưa sửa: trang Electron đứng ở thanh tải.** Tiến trình vẽ trang (`--type=renderer`) chỉ chạy vài giây rồi đứng
+  chờ, nhiều khả năng là chờ tiến trình chính qua IPC của Chromium dưới Wine và FEX. Chưa có thử nghiệm nào cho thấy cờ
+  nào giúp được, nên app chưa đổi gì cho game Electron. Các cờ nên thử, qua tham số chạy của game (giờ đã kiểm được
+  trong `moi-truong.txt`): `--no-sandbox`, `--disable-gpu-sandbox`, `--single-process` (trang chạy trong tiến trình
+  chính, không cần IPC giữa hai tiến trình).
+- **Test:** `GameExeResolverTest.aStrayXp3InAnElectronGameIsNoKiriKiri`, `AgvnSessionLogTest.theLaunchIsWrittenAsWineGotIt`,
+  `test_toolkit.test_visual_novel_engines`.

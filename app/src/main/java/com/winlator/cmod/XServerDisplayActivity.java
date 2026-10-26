@@ -1241,6 +1241,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             String guestExecutable = "wine explorer /desktop=shell," + xServer.screenInfo + " " + getWineStartCommand();
 
             guestProgramLauncherComponent.setGuestExecutable(guestExecutable);
+            com.winlator.cmod.agvn.AgvnLaunchNote.command(guestExecutable); // AGVN: in moi-truong.txt
 
             envVars.putAll(container.getEnvVars());
 

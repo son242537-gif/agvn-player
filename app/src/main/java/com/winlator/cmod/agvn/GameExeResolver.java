@@ -54,8 +54,12 @@ public final class GameExeResolver {
         if (isRpgMaker(top)) return Engine.RPGMAKER;
         if (anyFile(children, "", ".wolf") || anyFile(listOrEmpty(path(top, "data")), "", ".wolf")
                 || isFile(top.get("gurugurusmf4.dll"))) return Engine.WOLFRPG;
-        if (anyFile(children, "", ".xp3")) return Engine.KIRIKIRI;
-        if (anyFile(children, "", ".nsa") || isFile(top.get("nscript.dat"))) return Engine.NSCRIPTER;
+        // a stray .xp3 or .nsa in an Electron or NW.js game is no KiriKiri or NScripter one (26/10/2026)
+        boolean chromium = isFile(top.get("chrome_100_percent.pak")) || isFile(top.get("v8_context_snapshot.bin"))
+                || isFile(top.get("package.nw")) || isFile(path(top, "resources", "app.asar"))
+                || isFile(path(top, "resources", "app", "package.json"));
+        if (!chromium && anyFile(children, "", ".xp3")) return Engine.KIRIKIRI;
+        if (!chromium && (anyFile(children, "", ".nsa") || isFile(top.get("nscript.dat")))) return Engine.NSCRIPTER;
         if (isDir(top.get("tyrano")) || isFile(path(top, "data", "system", "config.tjs"))) return Engine.TYRANO;
         File[] renpyGame = listOrEmpty(path(top, "game"));
         if (isDir(top.get("renpy")) || anyFile(renpyGame, "", ".rpa", ".rpyc")) return Engine.RENPY;

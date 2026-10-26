@@ -61,7 +61,8 @@ public final class AgvnSessionLog {
             for (File f : AgvnEngineLogs.of(shortcut)) running.append("log=").append(f.getPath()).append('\n');
             for (File f : AgvnEngineLogs.scanned(shortcut)) running.append("logscan=").append(f.getPath()).append('\n');
             write(new File(dir, RUNNING), running.toString(), false);
-            write(new File(dir, ENV), graphicsEnv(env), false);
+            write(new File(dir, ENV), graphicsEnv(env) + AgvnLaunchNote.text(env, shortcut.container.getEnvVars(),
+                    shortcut.getExtra("envVars"), shortcut.getExtra("execArgs"), AgvnLaunchNote.takeCommand()), false);
             current = dir;
             for (String fact : AgvnGameFacts.of(shortcut)) event(fact); // what runs: exe, engine, DLLs, folders, mods
             String[] notes = {AgvnMemorySaver.takeNote(), AgvnWineMono.takeNote(), AgvnRawMouse.takeNote(),

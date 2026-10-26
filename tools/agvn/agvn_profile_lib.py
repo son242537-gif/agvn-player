@@ -128,9 +128,13 @@ def detect_engine(game_dir):
         return "RPGMAKER"
     if _any_file(game_dir, "", ".wolf") or _any_file(sub("data"), "", ".wolf") or _is_file(sub("gurugurusmf4.dll")):
         return "WOLFRPG"
-    if _any_file(game_dir, "", ".xp3"):
+    # a stray .xp3 or .nsa in an Electron or NW.js game is no KiriKiri or NScripter one
+    chromium = any(_is_file(sub(*rel)) for rel in (("chrome_100_percent.pak",), ("v8_context_snapshot.bin",),
+                                                   ("package.nw",), ("resources", "app.asar"),
+                                                   ("resources", "app", "package.json")))
+    if not chromium and _any_file(game_dir, "", ".xp3"):
         return "KIRIKIRI"
-    if _any_file(game_dir, "", ".nsa") or _is_file(sub("nscript.dat")):
+    if not chromium and (_any_file(game_dir, "", ".nsa") or _is_file(sub("nscript.dat"))):
         return "NSCRIPTER"
     if _is_dir(sub("tyrano")) or _is_file(sub("data", "system", "config.tjs")):
         return "TYRANO"

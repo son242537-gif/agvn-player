@@ -21,6 +21,25 @@ public class GameExeResolverTest {
     }
 
     @Test
+    public void aStrayXp3InAnElectronGameIsNoKiriKiri() throws Exception {
+        // an Electron 18 game with one .xp3 file was read as KiriKiri and started in Japanese (26/10/2026)
+        File electron = tmp.newFolder("electron");
+        touch(new File(electron, "Game.exe"));
+        touch(new File(electron, "chrome_100_percent.pak"));
+        touch(new File(electron, "resources/app.asar"));
+        touch(new File(electron, "data.xp3"));
+        assertEquals(GameExeResolver.Engine.UNKNOWN, GameExeResolver.detectEngine(electron));
+        File nwjs = tmp.newFolder("nwjs");
+        touch(new File(nwjs, "package.nw"));
+        touch(new File(nwjs, "arc.nsa"));
+        assertEquals(GameExeResolver.Engine.UNKNOWN, GameExeResolver.detectEngine(nwjs));
+        File krkr = tmp.newFolder("krkr");
+        touch(new File(krkr, "game.exe"));
+        touch(new File(krkr, "data.xp3"));
+        assertEquals(GameExeResolver.Engine.KIRIKIRI, GameExeResolver.detectEngine(krkr));
+    }
+
+    @Test
     public void unrealPicksShipping() throws Exception {
         File dir = tmp.newFolder("ue");
         touch(new File(dir, "Game.exe"));
