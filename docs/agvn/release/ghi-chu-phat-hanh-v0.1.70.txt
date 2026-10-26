@@ -1,0 +1,6 @@
+AGVN Player v0.1.70 - agvn.io
+
+Sửa lỗi:
+- Game đen màn hình lúc chuyển cảnh vì phim trong game không mở được (hay gặp: phim MP4 có âm thanh MP3, như Tenants of the Dead): app báo ngay khi phim lỗi và đề nghị "Chạy lại, đọc phim cách cũ"; Tự sửa lỗi cũng đề nghị cách này sau khi thoát game.
+- Game được thêm bằng chương trình báo lỗi của Unity (UnityCrashHandler64.exe) hay một chương trình phụ khác thay vì file chạy của game: app mở game thật cạnh nó. Nếu thư mục thiếu file game, Tự sửa lỗi nói rõ điều đó.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
