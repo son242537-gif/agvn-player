@@ -2331,3 +2331,38 @@ lúc chuyển cảnh, ở cả 3 lần chơi. Thanh "Màn hình đen" không h�
      `moi-truong.txt` có `WINE_OLD_MEDIA_SOURCE=1`.
   2. Hồi quy: một game Unity khác có phim MP4 (chỉ H.264) vẫn phát phim, không có thanh, không có biến mới.
 
+## Bản đồ 3D (mv3d, babylon.js) đen màn hình trong Chạy nhẹ (bản 0.1.70)
+
+Báo cáo ngày 27/10/2026 (POCO F8 Pro, Adreno 830, Android 16, WebView): một game RPG Maker MV có plugin mv3d (dựng bản
+đồ 3D bằng babylon.js) chạy tới màn tiêu đề và menu, nhưng vào bản đồ là đen toàn màn hình, không có lỗi trên màn
+hình. Bản PC (NW.js) cùng thư mục chạy bình thường.
+
+- **Nhật ký:** `BJS - … FRAGMENT SHADER ERROR: 0:438: 'sampler2DShadow' : No precision specified` (nhiều dòng), rồi
+  `AdrenoVK-0: Shader compilation failed`, `Pipeline create failed`.
+- **Vì sao:** WebGL 2 dùng GLSL ES 3.00. Ở cả hai bước (vertex và fragment), các kiểu `sampler2DShadow`,
+  `samplerCubeShadow`, `sampler2DArrayShadow`, `sampler3D`, `sampler2DArray` và các `isampler*`, `usampler*` không có
+  độ chính xác mặc định. Shader dùng chúng phải tự khai `precision … <kiểu>;`. Bản babylon.js cũ đi kèm mv3d không khai
+  cho shader đổ bóng.
+  - ANGLE trên D3D11 hay OpenGL của máy tính bỏ qua lỗi này.
+  - ANGLE trên Vulkan (WebView của Android) bắt đúng chuẩn, nên shader không biên dịch được và cảnh 3D không vẽ.
+- **Sửa (`html-shader-precision.js`, nạp trước `html-compat.js` như các script Node, `AgvnHtmlNode`):**
+  - `shaderSource` của `WebGL2RenderingContext` và `WebGLRenderingContext` được bọc lại.
+  - Shader `#version 300 es` dùng một kiểu trên (không tính trong chú thích) mà chưa khai ở đâu thì được thêm
+    `precision highp <kiểu>;`. Dòng thêm nằm sau dòng `#extension` cuối, ở phạm vi chung, không nằm trong
+    `#if`/`#ifdef` (GLSL bắt `#extension` đứng trước mọi khai báo).
+  - Shader khác giữ nguyên: đã khai, GLSL ES 1.00 (WebGL 1), không dùng kiểu nào trong số đó.
+  - Console ghi một lần: "[AGVN] Shader WebGL 2 thiếu precision cho sampler2DShadow: app đã thêm…". Số shader đã vá
+    nằm ở `window.__agvnShaderPrecision.count`.
+  - Plugin vá tạm mà người báo lỗi gắn vào game vẫn vô hại: shader đã có khai báo thì app bỏ qua.
+  - Áp dụng cho game Chạy nhẹ có `html-compat.js`: RPG Maker MV/MZ, trang NW.js, trang Electron. Game Tyrano chạy
+    không có lớp tương thích, nên chưa có.
+- **Test:** `tools/agvn/tests/html_shader_sim.js`.
+  - Shader giống babylon.js 4.x có `sampler2DShadow` ở tham số hàm; shader có `#extension` (một dòng trong `#ifdef`);
+    vertex shader không có dòng precision nào; và các shader phải để nguyên.
+  - Có `glslangValidator` thì mỗi shader được biên dịch thật ở GLSL ES 3.00. Bản gốc bị từ chối ("type requires
+    declaration of default precision qualifier"), bản đã vá biên dịch được.
+- **Thử máy:**
+  1. Game mv3d của báo cáo, gỡ plugin vá tạm: vào bản đồ thấy cảnh 3D, có bóng. `logcat` không còn
+     `No precision specified` hay `Pipeline create failed`.
+  2. Hồi quy: một game RPG Maker MZ thường (WebGL 2, không 3D) vẫn chạy như cũ.
+

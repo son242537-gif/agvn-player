@@ -9,11 +9,13 @@ import com.winlator.cmod.core.FileUtils;
  * Node's Buffer and require('crypto') for a page game written for NW.js (assets/agvn/html-node-*.js), put before
  * html-compat.js, whose require hands crypto out. A plugin of an RPG Maker MZ game decrypted its settings with
  * Buffer and crypto.createDecipheriv as it loaded, and stopped the game with "Buffer is not defined" (POCO, 26/10/2026).
+ * Also html-shader-precision.js: WebGL 2 shaders get the sampler precisions Android's WebView requires (mv3d's
+ * babylon.js drew every map black, 27/10/2026).
  */
 final class AgvnHtmlNode {
     /** In the order they need each other. */
     static final String[] SCRIPTS = {"agvn/html-node-buffer.js", "agvn/html-node-hash.js", "agvn/html-node-aes.js",
-            "agvn/html-node-crypto.js"};
+            "agvn/html-node-crypto.js", "agvn/html-shader-precision.js"};
 
     private AgvnHtmlNode() {}
 
