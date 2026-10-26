@@ -178,6 +178,9 @@ public final class AgvnDoctor {
         ev.frozenPresses = AgvnSessionTrack.pressesWithoutFrame();
         ev.tilerOoms = AgvnWineTail.get().tilerOoms();
         ev.chromium = GameExeResolver.chromiumShell(AgvnEngineLogs.gameDir(s)); // Electron, NW.js: "Chạy nhẹ" may take its page
+        String helper = AgvnExeMain.helperName(s); // UnityCrashHandler64.exe started, no game beside it
+        ev.helperExe = helper != null;
+        if (helper != null) ev.params.put("exe", helper);
         if (ev.lowRamFreeMb >= 0) ev.params.put("free", String.valueOf(ev.lowRamFreeMb));
         return ev;
     }

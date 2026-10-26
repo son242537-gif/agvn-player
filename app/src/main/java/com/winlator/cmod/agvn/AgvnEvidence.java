@@ -45,6 +45,8 @@ final class AgvnEvidence {
     boolean scriptError, pageCrash, frozen;
     /** The game folder holds Electron's or NW.js's Chromium ({@link GameExeResolver#chromiumShell}). */
     boolean chromium;
+    /** The game starts an exe that is never a game, with no game beside it ({@link AgvnExeMain#helperName}), {exe}. */
+    boolean helperExe;
     long seconds;
     /** How Android ended the app, for a session found unfinished at the next start; -1 when it was not. */
     int killedReason = -1, killedImportance;
@@ -97,6 +99,7 @@ final class AgvnEvidence {
             case "frozen": return frozen;
             case "froze": return frozeAtEnd() || loadingOnly();
             case "chromium": return chromium;
+            case "helper-exe": return helperExe;
             default: return false; // "live" problems are found while playing; names a newer file may add stay unmet
         }
     }

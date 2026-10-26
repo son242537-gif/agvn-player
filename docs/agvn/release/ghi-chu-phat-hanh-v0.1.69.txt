@@ -6,4 +6,5 @@ Tính năng mới:
 - Game Electron (trang web trong Chromium) bị đứng ở trang đầu hay thanh tải khi chạy bằng Windows: Tự sửa lỗi đề nghị "Chạy nhẹ", mở trang của game thẳng trên điện thoại, không qua Windows. Cũng có trong "Tự sửa lỗi" → "Game đứng hình, treo".
 Sửa lỗi:
 - Game Electron hay NW.js đã thêm từ trước mà bị nhận nhầm là game KiriKiri (chạy bằng tiếng Nhật): app tự sửa ở lần mở tới, không cần thêm lại game.
+- Game được thêm bằng chương trình báo lỗi của Unity (UnityCrashHandler64.exe) hay một chương trình phụ khác thay vì file chạy của game: app mở game thật cạnh nó. Nếu thư mục thiếu file game, Tự sửa lỗi nói rõ điều đó.
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

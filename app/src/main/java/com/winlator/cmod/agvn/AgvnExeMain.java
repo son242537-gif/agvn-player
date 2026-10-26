@@ -18,6 +18,11 @@ import java.util.Map;
  * engine's own exe now ({@link GameExeResolver}); one added before is offered "exe-main", which starts the exe the
  * folder would be added with today instead ({@link #EXTRA}: its name, beside the launcher). Only the command of the
  * launch changes, as with {@link AgvnExe64}: the shortcut keeps its path.
+ * <p>
+ * A game added with an exe that is never a game ({@link GameExeResolver#neverAGame}: UnityCrashHandler64.exe, a
+ * redistributable's installer, an uninstaller) starts the folder's game at once, unasked: Succubus Kiss (Unity, Mali-G610,
+ * 26/10/2026) was added by picking UnityCrashHandler64.exe in "Chọn thư mục khác", which closed after 4 s with nothing
+ * shown at each of five starts. With no such game beside it, "Tự sửa lỗi" says so ({@link #helperName}).
  */
 public final class AgvnExeMain {
     static final String EXTRA = "agvnExeMain", FIX = "exe-main";
@@ -45,7 +50,26 @@ public final class AgvnExeMain {
         return GameExeResolver.detectEngine(dir);
     }
 
-    /** The exe {@code s} starts: {@code exe}, or the one "exe-main" chose beside it. */
+    /**
+     * The game beside {@code exe} when {@code exe} is never a game: the exe its folder would be added with today
+     * ({@code engine}: the shortcut's); else null.
+     */
+    static File gameFor(File exe, String engine) {
+        File dir = exe.getParentFile();
+        if (dir == null || !GameExeResolver.neverAGame(exe.getName())) return null;
+        String name = GameExeResolver.resolveExe(dir, engine(engine, dir));
+        if (name == null || name.contains("/")) return null;
+        File game = new File(dir, name);
+        return game.isFile() ? game : null;
+    }
+
+    /** The name of the exe {@code s} starts when it is never a game and has no game beside it to start; else null. */
+    static String helperName(Shortcut s) {
+        File exe = AgvnEngineLogs.exe(s);
+        return GameExeResolver.neverAGame(exe.getName()) ? exe.getName() : null;
+    }
+
+    /** The exe {@code s} starts: {@code exe}, or the one "exe-main" chose beside it, or the game beside a helper. */
     static File launched(Shortcut s, File exe) {
         File chosen = chosen(s, exe);
         return chosen != null ? chosen : exe;
@@ -55,7 +79,8 @@ public final class AgvnExeMain {
         String name = s.getExtra(EXTRA);
         File dir = exe.getParentFile();
         File chosen = name.isEmpty() || name.contains("/") || name.contains("\\") || dir == null ? null : new File(dir, name);
-        return chosen != null && chosen.isFile() ? chosen : null;
+        if (chosen != null && chosen.isFile()) return chosen;
+        return gameFor(exe, s.getExtra(AgvnGameImporter.EXTRA_ENGINE)); // a crash handler never is the game
     }
 
     /** "Chạy file game chính (&lt;Name&gt;.exe)" for a game started with a .NET launcher beside it; else null. */
@@ -71,7 +96,7 @@ public final class AgvnExeMain {
      */
     public static String apply(String launch, Shortcut s, Container container) {
         note = null;
-        if (launch == null || s == null || container == null || s.getExtra(EXTRA).isEmpty()) return launch;
+        if (launch == null || s == null || container == null) return launch;
         try {
             return apply(launch, s, AgvnExeRedirect.driveMap(container));
         } catch (RuntimeException e) {
@@ -89,7 +114,8 @@ public final class AgvnExeMain {
         });
         if (to == null) return launch;
         note = "Chạy file game chính: " + picked[1].getName() + " thay cho " + picked[0].getName()
-                + " (chương trình .NET, đã chọn trong Tự sửa lỗi)";
+                + (GameExeResolver.neverAGame(picked[0].getName()) ? " (chương trình phụ của game, không phải game)"
+                : " (chương trình .NET, đã chọn trong Tự sửa lỗi)");
         Log.i(TAG, "main exe " + launch + " -> " + to);
         return to;
     }

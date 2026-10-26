@@ -103,6 +103,9 @@ public final class AgvnImportEntry {
         String detail = engineLabel(ctx, engine) + " · " + place(ctx, dir);
         List<String> games = hasProfile ? Collections.<String>emptyList() : GameExeResolver.gameExes(dir, engine);
         List<AgvnImportEntry> rows = new ArrayList<>();
+        // a crash handler, an installer or an uninstaller picked stands for the folder's game (Succubus Kiss, 26/10/2026:
+        // UnityCrashHandler64.exe, picked by hand, closed at once at each start)
+        if (picked != null && GameExeResolver.neverAGame(picked) && exe != null && games.size() <= 1) picked = exe;
         if (picked != null) {
             // the folder's game when it starts this exe (an Unreal folder always starts Shipping: its root exe is a bootstrap)
             boolean folderGame = games.size() <= 1 && (picked.equalsIgnoreCase(exe) || engine == GameExeResolver.Engine.UNREAL);

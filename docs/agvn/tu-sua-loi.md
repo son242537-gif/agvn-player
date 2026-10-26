@@ -2254,3 +2254,36 @@ WebView của Android, như đã làm với game NW.js (`AgvnNwjsGame`, Love My 
      có.
   3. Hồi quy: một game RPG Maker MV/MZ và một game NW.js vẫn chạy nhẹ như cũ, vẫn giữ save. Một game Windows khác bị
      đứng hình không thấy nút "Chạy nhẹ: chạy trang của game".
+
+## Game được thêm bằng UnityCrashHandler64.exe (bản 0.1.69)
+
+Báo cáo ngày 26/10/2026 (Xiaomi 2306EPN60G, Dimensity 8200 / Mali-G610, app 0.1.68): game Unity "Succubus Kiss Nutaku
+Player - UnityCrashHandler64" mở 5 lần, lần nào cũng tự đóng sau khoảng 4 giây, chưa vẽ khung nào. Wine thoát mã 0.
+
+- **Nguyên nhân:** lệnh chạy là `"UnityCrashHandler64.exe"`, chương trình báo lỗi của Unity, không phải game. Đuôi
+  "- UnityCrashHandler64" trong tên game cho thấy người chơi tự bấm file đó trong "Chọn thư mục khác"
+  (`AgvnImportEntry.forFile`). "Tự sửa lỗi" hiện "Game tắt ngay sau khi mở". "Đặt lại cấu hình" không giúp, vì cấu
+  hình không sai. Người chơi còn mở trình quản lý file của Windows (`wfm.exe`), có lẽ để tìm file game.
+- **Sửa:**
+  - **File không bao giờ là game (`GameExeResolver.neverAGame`):** `UnityCrashHandler64/32.exe`,
+    `CrashReportClient.exe`, `dxsetup.exe`, bộ cài VC++/.NET/UE prerequisites, `notification_helper.exe`,
+    `unins*.exe`. Đây cũng là danh sách mà việc chọn exe khi thêm game vốn đã bỏ qua.
+  - **Khi thêm game:** bấm một file như vậy trong "Chọn thư mục khác" thì app thêm game của thư mục đó, bằng exe chính
+    (nếu có).
+  - **Game đã thêm từ trước (`AgvnExeMain`):** lúc mở, app chạy exe chính cạnh file đó (game Unity: `<Tên>.exe` cạnh
+    `<Tên>_Data`), không cần hỏi, vì file đó không bao giờ là game. Lối tắt giữ nguyên đường dẫn. Nhật ký phiên ghi
+    "Chạy file game chính: … thay cho UnityCrashHandler64.exe (chương trình phụ của game, không phải game)". Nhật ký
+    engine (`Player.log`) cũng được tìm theo exe chính.
+  - **Không có exe chính cạnh nó:** "Tự sửa lỗi" hiện "Game đang mở bằng UnityCrashHandler64.exe, không phải file chạy
+    của game" (`not-a-game`, điều kiện `helper-exe`), thay cho "Game tắt ngay". Lời giải thích: thư mục thiếu file chạy
+    của game, có thể do phần mềm diệt virus xoá hoặc chép chưa đủ; cần chép lại rồi thêm lại game.
+- **Chưa rõ:** thư mục của báo cáo có `Succubus Kiss.exe` (hay tên khác) không. Nhật ký không liệt kê thư mục, vì
+  engine đã biết (Unity). Lần mở đầu tiên trên 0.1.69 sẽ cho biết: hoặc game chạy, hoặc hiện lời báo thiếu file.
+- **Test:** `AgvnHelperExeTest`.
+- **Thử máy:**
+  1. Game của báo cáo, không thêm lại: mở. Có exe chính thì game Unity lên hình, và `su-kien.txt` có dòng "Chạy file
+     game chính". Không có thì về thư viện, "Tự sửa lỗi" hiện "Game đang mở bằng UnityCrashHandler64.exe…".
+  2. "Chọn thư mục khác" → bấm `UnityCrashHandler64.exe` của một game Unity đầy đủ: app thêm game đó bằng exe của nó,
+     tên không có đuôi "- UnityCrashHandler64".
+  3. Hồi quy: game thêm bằng launcher .NET vẫn được đề nghị "Chạy file game chính" như 0.1.66.
+

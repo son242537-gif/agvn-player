@@ -109,7 +109,7 @@ public final class GameExeResolver {
         List<File> exes = new ArrayList<>();
         for (File f : listOrEmpty(gameDir)) {
             String n = f.getName().toLowerCase(Locale.ROOT);
-            if (f.isFile() && n.endsWith(".exe") && !IGNORED.contains(n) && !n.startsWith("unins")) exes.add(f);
+            if (f.isFile() && n.endsWith(".exe") && !neverAGame(n)) exes.add(f);
         }
         if (exes.isEmpty()) return null;
         exes.removeIf(exe -> AgvnExe64.twin(exe) != null); // "<Name>-32.exe" sorts before its 64-bit "<Name>.exe"
@@ -140,13 +140,19 @@ public final class GameExeResolver {
         if (engine == Engine.UNKNOWN) {
             for (File f : listOrEmpty(gameDir)) {
                 String n = f.getName().toLowerCase(Locale.ROOT);
-                if (f.isFile() && n.endsWith(".exe") && !IGNORED.contains(n) && !n.startsWith("unins") && !isHelper(n)
+                if (f.isFile() && n.endsWith(".exe") && !neverAGame(n) && !isHelper(n)
                         && AgvnExe64.twin(f) == null) games.add(f.getName());
             }
         }
         if (games.size() > 1 && games.size() <= MAX_GAMES) return games;
         String main = resolveExe(gameDir, engine);
         return main != null ? Collections.singletonList(main) : Collections.<String>emptyList();
+    }
+
+    /** A crash handler, an installer of Windows parts or an uninstaller ({@code name}: an exe's file name): never a game. */
+    static boolean neverAGame(String name) {
+        String n = name.toLowerCase(Locale.ROOT);
+        return IGNORED.contains(n) || n.startsWith("unins");
     }
 
     static boolean isHelper(String lowerName) {
