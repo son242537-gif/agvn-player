@@ -88,7 +88,7 @@ public final class AgvnHtmlGame {
         if (godot) return AgvnGodotLight.start(activity, from, extras);
         // an NW.js page game imported before Chạy nhẹ took such games gets it now (AgvnNwjsLight)
         String index = RUNNER_HTML.equals(runner) ? extras.get(EXTRA_INDEX) : AgvnNwjsLight.take(activity, from, extras);
-        if (index == null || !new File(index).isFile()) return false;
+        if (index == null || !AgvnElectronGame.exists(new File(index))) return false; // a page may lie in an app.asar
         Intent intent = new Intent(activity, AgvnHtmlActivity.class);
         if (from.getExtras() != null) intent.putExtras(from.getExtras());
         intent.putExtra(AgvnHtmlActivity.EXTRA_INDEX_PATH, index);
@@ -169,11 +169,13 @@ public final class AgvnHtmlGame {
 
     /**
      * Web origin host for a game, one per game folder name so each game keeps its own saves (localStorage) even when the
-     * folder moves between internal storage and the SD card. MV's "www" folder is skipped: every MV game has one.
+     * folder moves between internal storage and the SD card. MV's "www" folder is skipped: every MV game has one; so is an
+     * Electron game's resources/app(.asar), the folder above it naming the game.
      */
     static String hostFor(File index) {
-        File root = index.getParentFile();
-        if (root != null && root.getName().equalsIgnoreCase("www") && root.getParentFile() != null) root = root.getParentFile();
+        File root = index.getParentFile(), electron = AgvnElectronGame.gameDirOf(index); // not its resources/app(.asar)
+        if (electron != null) root = electron;
+        else if (root != null && root.getName().equalsIgnoreCase("www") && root.getParentFile() != null) root = root.getParentFile();
         String key = root != null ? root.getName().toLowerCase(Locale.ROOT) : "";
         return "g" + Integer.toHexString(key.hashCode()) + ".agvn.game";
     }

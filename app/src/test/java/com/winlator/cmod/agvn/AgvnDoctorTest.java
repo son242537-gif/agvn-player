@@ -31,11 +31,11 @@ public class AgvnDoctorTest {
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "godot-light",
             "godot-light-renderer", "mods-off", "raw-mouse", "ue-wait", "exe-64", "exe-main", "dll-wine", "emulator-order",
-            "esync-off", "emulator-wowbox64"));
+            "esync-off", "emulator-wowbox64", "page-light"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
             "ram-saved", "live", "light", "script-error", "page-crash", "frozen", "reported", "module-code",
-            "closed-on-start"));
+            "closed-on-start", "froze", "chromium"));
     static AgvnProblemCatalog catalog;
 
     @BeforeClass
@@ -323,6 +323,32 @@ public class AgvnDoctorTest {
         ev.changed = true;
         assertEquals("file-not-found", found(ev));
         assertEquals("only Wine's box", "no-start", found(noStart("File not found: save1.dat")));
+    }
+
+    @Test
+    public void anElectronGameStuckOnItsFirstPageGetsItsPageInChayNhe() {
+        // Electron 18 + Cocos Creator 2.4, Snapdragon 8 Elite, 0.1.68 (26/10/2026): its page and a loading bar at 0%,
+        // then no frame for the last minute, the player pressing 11 times; Wine ended with 137 as the player quit
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.started = true;
+        ev.playerQuit = true;
+        ev.seconds = 200;
+        ev.frozenS = 60;
+        ev.frozenPresses = 11;
+        ev.chromium = true;
+        assertEquals("chromium-frozen", found(ev));
+        assertEquals(Arrays.asList("page-light", "emulator-stable", "emulator-order", "esync-off", "send-logs"),
+                catalog.byId("chromium-frozen").fixes);
+        ev.frozenPresses = 0;
+        ev.shownS = 3; // its first frames only: a loading screen
+        assertEquals("chromium-frozen", found(ev));
+        ev.chromium = false;
+        assertNull("another game that froze is not told about Chromium", found(ev));
+        ev.chromium = true;
+        ev.frozenS = 2;
+        ev.shownS = 190;
+        assertNull("one that ran", found(ev));
+        assertEquals("page-light", catalog.byId("report-freeze").fixes.get(0));
     }
 
     @Test

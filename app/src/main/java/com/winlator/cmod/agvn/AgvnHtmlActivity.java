@@ -36,6 +36,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     private WebView webView;
     private File root;
     private String host;
+    /** An Electron game's page packed in app.asar is served from it ({@link AgvnElectronGame}); null for others. */
+    private AgvnHtmlAsar asar;
     /** The page the game starts on, which gets html-compat.js. */
     private String entry;
     /** assets/agvn/html-compat.js; null when unreadable (the game then runs without it). */
@@ -51,7 +53,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         File index = new File(String.valueOf(getIntent().getStringExtra(EXTRA_INDEX_PATH)));
-        if (!index.isFile()) {
+        asar = index.isFile() ? null : AgvnHtmlAsar.forPage(index);
+        if (!index.isFile() && asar == null) {
             finish();
             return;
         }
@@ -64,11 +67,14 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         missing = AgvnLightSession.keeper(getApplicationContext(), AgvnLightSession.MISSING, AgvnLightSession.LISTED);
         boolean rpgMaker = AgvnHtmlFiles.resolve(root, "/js/rpg_core.js") != null || AgvnHtmlFiles.resolve(root, "/js/rmmz_core.js") != null;
         // an NW.js page game (AgvnNwjsGame) gets the stand-ins for require, process and nw too; Tyrano runs as before
-        boolean nwjs = !rpgMaker && !new File(root, "tyrano").isDirectory() && AgvnNwjsGame.index(root) != null;
+        boolean electron = AgvnElectronGame.gameDirOf(index) != null; // and an Electron one, for require('electron') too
+        boolean nwjs = !rpgMaker && !electron && !new File(root, "tyrano").isDirectory() && AgvnNwjsGame.index(root) != null;
         entry = index.getName();
-        if (rpgMaker || nwjs) compatJs = com.winlator.cmod.core.FileUtils.readString(this, "agvn/html-compat.js");
+        if (rpgMaker || nwjs || electron) compatJs = com.winlator.cmod.core.FileUtils.readString(this, "agvn/html-compat.js");
         compatJs = AgvnHtmlNode.before(this, compatJs); // Node's Buffer and crypto for require
         if (compatJs != null && nwjs) compatJs = "window.__agvnNwjs = true;\n" + compatJs;
+        if (compatJs != null && electron) compatJs = "window.__agvnElectron = true;\n"
+                + com.winlator.cmod.core.FileUtils.readString(this, "agvn/html-electron.js") + "\n" + compatJs;
         if (compatJs != null) // process.execPath: the exe the game runs as on Windows (AgvnHtmlExe)
             compatJs = AgvnHtmlExe.line(getIntent().getStringExtra("shortcut_path"), AgvnLightGame.folderOf(index)) + compatJs;
         if (compatJs != null && getIntent().getBooleanExtra(AgvnFullscreen.INTENT, false))
@@ -131,6 +137,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
             if (!host.equals(url.getHost())) return AgvnHtmlFiles.blocked(); // no network: nothing leaves the phone
             // a HEAD only asks whether a file is there (fs.existsSync of html-compat.js): its absence is no problem
             boolean asked = "HEAD".equalsIgnoreCase(request.getMethod());
+            if (asar != null) return asar.serve(url.getEncodedPath(), entry, compatJs, asked ? null : missing);
             return AgvnHtmlFiles.serve(root, entry, url.getEncodedPath(), compatJs, asked ? null : standIns, asked ? null : missing);
         }
 

@@ -35,6 +35,8 @@
  * 13. Node's Buffer and require('crypto') (html-node-*.js, loaded first) for a plugin that decrypts its settings, and
  *     require('child_process') as an error it can catch. A module the app has not is an empty object, as before, but
  *     the console names it and so does the error that stops the game (5); so is an error in a script as it loads.
+ * 14. An Electron game's page (the app sets __agvnElectron first, AgvnElectronGame) gets require('electron'),
+ *     greenworks and steamworks.js from html-electron.js, loaded before this.
  */
 (function () {
     'use strict';
@@ -202,6 +204,9 @@
         window.require = function (name) {
             name = String(name).replace(/^node:/, '');
             if (modules[name]) return modules[name];
+            // 14: an Electron game's own (html-electron.js), by name or by a path's last part: require('./greenworks')
+            var own = window.__agvnModules, base = name.split('/').pop().replace(/\.js$/, '');
+            if (own && (own[name] || own[base])) return own[name] || own[base];
             // 13: an empty stand-in, so a plugin that only looks goes on; the one that stops the game names it (5)
             if (window.__agvnMissingModules.indexOf(name) < 0) window.__agvnMissingModules.push(name);
             console.error('[AGVN] app chưa hỗ trợ mô-đun Node: ' + name + ' (require("' + name + '"))');

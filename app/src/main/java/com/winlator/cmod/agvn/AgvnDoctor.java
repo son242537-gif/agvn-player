@@ -177,6 +177,7 @@ public final class AgvnDoctor {
         ev.stretchPresses = AgvnSessionTrack.pressesInLastStretch();
         ev.frozenPresses = AgvnSessionTrack.pressesWithoutFrame();
         ev.tilerOoms = AgvnWineTail.get().tilerOoms();
+        ev.chromium = GameExeResolver.chromiumShell(AgvnEngineLogs.gameDir(s)); // Electron, NW.js: "Chạy nhẹ" may take its page
         if (ev.lowRamFreeMb >= 0) ev.params.put("free", String.valueOf(ev.lowRamFreeMb));
         return ev;
     }

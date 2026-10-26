@@ -43,6 +43,8 @@ final class AgvnEvidence {
     boolean stopped;
     /** "Chạy nhẹ": the game reported an error, its page process died, Android found it frozen. */
     boolean scriptError, pageCrash, frozen;
+    /** The game folder holds Electron's or NW.js's Chromium ({@link GameExeResolver#chromiumShell}). */
+    boolean chromium;
     long seconds;
     /** How Android ended the app, for a session found unfinished at the next start; -1 when it was not. */
     int killedReason = -1, killedImportance;
@@ -93,6 +95,8 @@ final class AgvnEvidence {
             case "script-error": return scriptError;
             case "page-crash": return pageCrash;
             case "frozen": return frozen;
+            case "froze": return frozeAtEnd() || loadingOnly();
+            case "chromium": return chromium;
             default: return false; // "live" problems are found while playing; names a newer file may add stay unmet
         }
     }

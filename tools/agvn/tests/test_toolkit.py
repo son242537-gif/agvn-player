@@ -366,6 +366,12 @@ class HtmlCompatTest(unittest.TestCase):
         self.assertEqual(0, out.returncode, out.stdout + out.stderr)
 
     @unittest.skipIf(shutil.which("node") is None, "node is not installed")
+    def test_electron_modules_answer_without_the_main_script(self):
+        sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_electron_sim.js")
+        out = subprocess.run(["node", sim], capture_output=True, text=True)
+        self.assertEqual(0, out.returncode, out.stdout + out.stderr)
+
+    @unittest.skipIf(shutil.which("node") is None, "node is not installed")
     def test_rpg_maker_saves_are_files_as_on_a_pc(self):
         sim = os.path.join(os.path.dirname(os.path.abspath(__file__)), "html_saves_sim.js")
         out = subprocess.run(["node", sim], capture_output=True, text=True)

@@ -2185,15 +2185,72 @@ cách nhận engine lúc thêm game.
      tắt Esync.
   2. Tham số chạy `--js-flags=--single-threaded`: V8 vẫn dịch mã, nhưng không dùng luồng nền.
   3. `--no-sandbox`.
-- **Hướng lâu dài, chưa làm:** chạy trang của game Electron bằng "Chạy nhẹ" (WebView), như game NW.js
-  (`AgvnNwjsGame`). Cocos Creator 2.4 là engine web. Cần biết trước:
-  - trang nằm trong `resources/app/` hay trong `app.asar` (cần đọc định dạng asar);
-  - `main.js` mở trang nào;
-  - trang có dùng `require` của Node (greenworks, fs) không.
-
-  Từ bản này, engine của game là UNKNOWN, nên `su-kien.txt` tự liệt kê thư mục game.
+- **Chạy nhẹ cho trang của game Electron (cách sửa `page-light`):** xem mục dưới.
 - **Test:** `AgvnEngineRecheckTest`.
 - **Thử máy:**
   1. Game Electron của báo cáo, không thêm lại: mở một lần. `su-kien.txt` có dòng "Engine đã lưu KIRIKIRI sai…", không
      còn engine KIRIKIRI. `moi-truong.txt` không còn `LC_ALL=ja_JP.UTF-8`.
   2. Hồi quy: một game KiriKiri thật vẫn ghi engine KIRIKIRI, vẫn chạy tiếng Nhật, vẫn vừa khung hình.
+
+## Game Electron đứng hình: chạy trang của game bằng "Chạy nhẹ" (bản 0.1.69)
+
+Cùng báo cáo ngày 26/10/2026. Qua Windows, Chromium của Electron đứng ở trang đầu trên máy mạnh nhất đã thử, và chưa
+rõ nguyên nhân nằm ở Wine hay ở FEX. Nhưng game là một trang web (Cocos Creator 2.4), nên trang đó chạy được thẳng trong
+WebView của Android, như đã làm với game NW.js (`AgvnNwjsGame`, Love My Back, 14/10/2026).
+
+- **Tìm trang (`AgvnElectronGame`, `AgvnElectronMain`):** app của game nằm ở `resources/app/` hoặc trong
+  `resources/app.asar`.
+  - `package.json` cho biết script chính ("main", mặc định `index.js`).
+  - Trang là trang mà script đó mở bằng `loadFile(…)` hoặc `loadURL(…)`. App đọc các chuỗi trong lời gọi:
+    `path.join(__dirname, 'www', 'index.html')`, `` `file://${__dirname}/index.html` ``, `url.format({pathname: …})`.
+    Địa chỉ web (máy chủ khi làm game, `https://…`) bị bỏ qua.
+  - Không tìm được thì dùng `index.html`.
+- **Đọc `app.asar` tại chỗ (`AgvnAsar`):** không giải nén ra đĩa, vì như vậy game chiếm gấp đôi chỗ. App đọc phần đầu
+  của file (JSON liệt kê các file và vị trí của chúng), rồi đọc từng file từ đúng vị trí. Tên file được tìm không phân
+  biệt chữ hoa, chữ thường, như trên Windows. File "unpacked" được đọc từ `app.asar.unpacked/`. `AgvnHtmlAsar` phục vụ
+  trang cho WebView như `AgvnHtmlFiles` phục vụ một thư mục game.
+- **Phần Electron mà trang hay gọi (`html-electron.js`, nạp trước `html-compat.js`):** script chính của game không chạy
+  trên điện thoại, nên:
+  - `require('electron')` và `@electron/remote`: `ipcRenderer` không gửi đi đâu (`invoke()` trả về `undefined`).
+    Cửa sổ, `app`, `dialog`, `screen`, `shell` (không mở gì ra ngoài), `webFrame` và `clipboard` trả lời như một cửa
+    sổ toàn màn hình. Hàm nào không có thì không làm gì.
+  - greenworks và steamworks.js (Steam): Steam "đang chạy", chưa mở thành tựu nào, mở thành tựu chỉ trả lời "được".
+    File lưu lên Steam Cloud nằm trong trang (localStorage).
+  - `require('./lib/greenworks')` cũng nhận ra, theo phần cuối của đường dẫn.
+  - Lần đầu trang cần tiến trình chính, console ghi lại (`[AGVN] Electron: ipcRenderer.invoke("…") không chạy…`).
+    Dòng đó có trong "Gửi nhật ký".
+- **Mỗi game một chỗ lưu:** host của trang (`AgvnHtmlGame.hostFor`) và thư mục game (`AgvnLightGame.folderOf`) tính từ
+  thư mục trên `resources/`, không phải `app` hay `app.asar`, vì game Electron nào cũng có thư mục đó.
+- **Khi nào đề nghị (Tự sửa lỗi):** app không tự chuyển game Electron sang Chạy nhẹ, vì trang có thể cần tiến trình
+  chính của game.
+  - `chromium-frozen`: game Windows có Chromium (Electron hoặc NW.js, điều kiện `chromium`) mà đứng hình ở cuối lượt
+    chơi, hoặc chỉ hiện vài khung đầu rồi thôi (điều kiện `froze`). Các cách sửa:
+    1. "Chạy nhẹ" (`page-light`);
+    2. giả lập CPU ổn định hơn;
+    3. giữ đúng thứ tự bộ nhớ;
+    4. tắt Esync;
+    5. gửi nhật ký.
+  - "Game đứng hình, treo" (người chơi báo) có `page-light` đầu tiên. "Màn hình đen" và "Game tắt ngay sau khi mở"
+    cũng có `page-light`.
+  - `page-light` chỉ hiện với game có trang tìm được (Electron, hoặc NW.js đã chọn chạy bằng Windows). Game khác không
+    thấy gì mới.
+  - Chạy nhẹ mà game lỗi: như mọi game Chạy nhẹ, Tự sửa lỗi đề nghị "Chạy bằng Windows". Cách đã thử mà không giúp
+    thì không đề nghị lại.
+- **Giới hạn:**
+  - Trang nhờ tiến trình chính lưu game (`ipcRenderer.invoke("save")`) thì không lưu được.
+  - Trang dùng module gốc của Node (file `.node`) không chạy.
+  - Trang mở bằng `contextBridge` từ script preload không có các hàm preload đó.
+  - Những trường hợp này thường hiện thành lỗi script trong nhật ký Chạy nhẹ.
+- **Test:**
+  - `AgvnElectronGameTest`: asar viết đúng định dạng của công cụ asar, có file unpacked, tên khác chữ hoa; trang của
+    app đóng gói và app để rời; game chỉ có địa chỉ web.
+  - `AgvnDoctorTest.anElectronGameStuckOnItsFirstPageGetsItsPageInChayNhe`.
+  - `tools/agvn/tests/html_electron_sim.js`.
+- **Thử máy:**
+  1. Game Electron của báo cáo, chạy bằng Windows tới khi đứng ở thanh tải, rồi thoát. Thư viện hỏi "Game đứng ở trang
+     đầu hay màn hình tải", nút đầu là "Chạy nhẹ: chạy trang của game…". Bấm: game mở trong Chạy nhẹ. Ghi lại game có
+     qua được thanh tải không, có tiếng không, lưu và mở lại save được không.
+  2. Gửi nhật ký Chạy nhẹ, để xem các dòng `[AGVN] Electron:` (trang cần gì từ tiến trình chính) và lỗi script nếu
+     có.
+  3. Hồi quy: một game RPG Maker MV/MZ và một game NW.js vẫn chạy nhẹ như cũ, vẫn giữ save. Một game Windows khác bị
+     đứng hình không thấy nút "Chạy nhẹ: chạy trang của game".

@@ -35,9 +35,12 @@ final class AgvnLightGame {
 
     /**
      * The game folder of a file picked in "Chọn thư mục khác" that is not an exe: index.html, Game.ini or an RPG Maker
-     * archive. MV keeps index.html in www/, so a pick there means the folder above it.
+     * archive. MV keeps index.html in www/, so a pick there means the folder above it; an Electron game its page in
+     * resources/app(.asar), so one there means the folder above resources/.
      */
     static File folderOf(File picked) {
+        File electron = AgvnElectronGame.gameDirOf(picked); // an Electron game's page, in its resources/app(.asar)
+        if (electron != null) return electron;
         File dir = picked.getParentFile();
         if (dir != null && dir.getName().equalsIgnoreCase("www") && dir.getParentFile() != null) return dir.getParentFile();
         return dir;

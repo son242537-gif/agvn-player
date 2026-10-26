@@ -91,6 +91,10 @@ final class AgvnFixes {
             case "rgss-frameskip":
                 return AgvnHtmlGame.RUNNER_RGSS.equals(runner) && !AgvnRgssFiles.frameSkip(a, s)
                         ? new Fix(id, a.getString(R.string.agvn_fix_rgss_frameskip), "1") : null;
+            case "page-light": { // an Electron or NW.js game on Windows, its page in Android's own browser (AgvnElectronGame)
+                File page = light ? null : AgvnElectronGame.pageOf(AgvnEngineLogs.gameDir(s));
+                return page != null ? new Fix(id, a.getString(R.string.agvn_fix_page_light), page.getPath()) : null;
+            }
             case "rgss-light": { // an RPG Maker XP/VX/VX Ace game on Windows, back on mkxp-z (Chạy nhẹ needs no Wine)
                 String dir = s.getExtra(AgvnGameImporter.EXTRA_GAME_DIR);
                 return !light && !dir.isEmpty() && AgvnRgssGame.canRun(new File(dir))
