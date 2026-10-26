@@ -277,6 +277,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragmentManager.popBackStack();
             return;
         }
+        if (getOnBackPressedDispatcher().hasEnabledCallbacks()) { // AGVN: a screen that takes Back first (the library while picking games)
+            getOnBackPressedDispatcher().onBackPressed();
+            return;
+        }
         if (editInputControls) {
             agvnReturnProfile(); // AGVN: the game that opened this screen shows the profile it ends on
             super.onBackPressed();

@@ -37,6 +37,8 @@ interface LibraryCallbacks {
     fun onGridViewChanged(gridView: Boolean)
     fun onAction(shortcutPath: String, action: String)
     fun onArtworkNeeded(shortcutPath: String, kind: String)
+    /** AGVN: the games picked with "Chọn nhiều game", to remove from the library (after asking). */
+    fun onRemoveMany(shortcutPaths: List<String>)
 }
 
 class LibraryComposeController internal constructor(

@@ -2,6 +2,7 @@ package com.winlator.cmod.ui.library
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -44,6 +45,7 @@ import androidx.compose.material.icons.outlined.SportsEsports
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.BugReport
+import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.ViewList
@@ -59,6 +61,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -102,6 +105,23 @@ internal fun LibraryRoot(
     selectedShortcutPath: MutableState<String?>,
     cb: LibraryCallbacks
 ) {
+    val selection = remember { LibrarySelection() } // AGVN: "Chọn nhiều game"
+    LaunchedEffect(items) { selection.keepOnly(items.mapTo(HashSet()) { it.shortcutPath }) }
+    BackHandler(enabled = selection.active) { selection.end() }
+    CompositionLocalProvider(LocalLibrarySelection provides selection) {
+        LibraryRootBody(items, grid, query, selectedShortcutPath, cb, selection)
+    }
+}
+
+@Composable
+private fun LibraryRootBody(
+    items: List<LibraryItem>,
+    grid: Boolean,
+    query: String,
+    selectedShortcutPath: MutableState<String?>,
+    cb: LibraryCallbacks,
+    selection: LibrarySelection
+) {
     var filterName by rememberSaveable { mutableStateOf(LibraryFilter.All.name) }
     val filter = LibraryFilter.valueOf(filterName)
     val visible = remember(items, filter, query) {
@@ -124,7 +144,7 @@ internal fun LibraryRoot(
         }
     }
 
-    if (landscape && visible.isNotEmpty() && !grid) {
+    if (landscape && visible.isNotEmpty() && !grid && !selection.active) {
         var menu by remember { mutableStateOf<LibraryItem?>(null) }
         LandscapePagerCore(
             items = visible,
@@ -162,6 +182,7 @@ internal fun LibraryRoot(
             )
             Spacer(Modifier.height(7.dp))
         }
+        if (selection.active) LibrarySelectionBar(selection, visible, cb::onRemoveMany)
         Row(Modifier.padding(vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             LibraryFilter.values().forEach { option ->
                 LibraryFilterChip(option.label, option == filter) { filterName = option.name }
@@ -320,14 +341,16 @@ internal fun CompactArtworkCard(item: LibraryItem, cb: LibraryCallbacks) {
     RequestArtworkCompat(item, cb)
     var longPressMenu by remember { mutableStateOf(false) } // AGVN: long-press shows the simple menu
     if (longPressMenu) LibraryItemMenuCompat(item, cb) { longPressMenu = false }
+    val selection = LocalLibrarySelection.current
+    val picking = selection?.active == true
     Surface(
         modifier = Modifier.fillMaxWidth().height(92.dp).combinedClickable(
-            onClick = { cb.onOpen(item.shortcutPath) },
-            onLongClick = { longPressMenu = true }
+            onClick = { if (picking) selection?.toggle(item.shortcutPath) else cb.onOpen(item.shortcutPath) },
+            onLongClick = { if (picking) selection?.toggle(item.shortcutPath) else longPressMenu = true }
         ),
         shape = RoundedCornerShape(15.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        border = cardBorder(selection?.isPicked(item.shortcutPath) == true)
     ) {
         Box {
             ArtworkCompat(
@@ -357,8 +380,11 @@ internal fun CompactArtworkCard(item: LibraryItem, cb: LibraryCallbacks) {
                     Text(item.name, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(item.containerName, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
                 }
-                PlayCompat(item, cb, false)
-                MenuButtonCompat(item, cb, false)
+                if (picking) LibrarySelectionMark(selection?.isPicked(item.shortcutPath) == true)
+                else {
+                    PlayCompat(item, cb, false)
+                    MenuButtonCompat(item, cb, false)
+                }
             }
         }
     }
@@ -370,14 +396,16 @@ internal fun CoverArtworkCard(item: LibraryItem, cb: LibraryCallbacks) {
     RequestArtworkCompat(item, cb)
     var longPressMenu by remember { mutableStateOf(false) } // AGVN: long-press shows the simple menu
     if (longPressMenu) LibraryItemMenuCompat(item, cb) { longPressMenu = false }
+    val selection = LocalLibrarySelection.current
+    val picking = selection?.active == true
     Surface(
         modifier = Modifier.fillMaxWidth().combinedClickable(
-            onClick = { cb.onOpen(item.shortcutPath) },
-            onLongClick = { longPressMenu = true }
+            onClick = { if (picking) selection?.toggle(item.shortcutPath) else cb.onOpen(item.shortcutPath) },
+            onLongClick = { if (picking) selection?.toggle(item.shortcutPath) else longPressMenu = true }
         ),
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        border = cardBorder(selection?.isPicked(item.shortcutPath) == true)
     ) {
         Box(Modifier.aspectRatio(.72f)) {
             ArtworkCompat(userArtworkPath(item) ?: item.coverPath ?: item.bannerPath ?: item.iconPath, item.fallbackIcon, Modifier.fillMaxSize())
@@ -386,11 +414,20 @@ internal fun CoverArtworkCard(item: LibraryItem, cb: LibraryCallbacks) {
                 Text(item.name, color = Color.White, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(item.containerName, color = Color.White.copy(.72f), style = MaterialTheme.typography.bodySmall)
             }
-            Box(Modifier.align(Alignment.TopEnd)) { MenuButtonCompat(item, cb, true) }
-            Box(Modifier.align(Alignment.BottomEnd).padding(9.dp)) { PlayCompat(item, cb, true) }
+            if (picking) LibrarySelectionMark(selection?.isPicked(item.shortcutPath) == true, Modifier.align(Alignment.TopEnd).padding(9.dp))
+            else {
+                Box(Modifier.align(Alignment.TopEnd)) { MenuButtonCompat(item, cb, true) }
+                Box(Modifier.align(Alignment.BottomEnd).padding(9.dp)) { PlayCompat(item, cb, true) }
+            }
         }
     }
 }
+
+/** AGVN: a picked card ("Chọn nhiều game") is framed in the accent colour. */
+@Composable
+private fun cardBorder(picked: Boolean) =
+    if (picked) BorderStroke(2.5.dp, MaterialTheme.colorScheme.primary)
+    else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
 
 @Composable
 private fun RequestArtworkCompat(item: LibraryItem, cb: LibraryCallbacks) {
@@ -544,6 +581,13 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
                 LibraryActionTileCompat(Icons.Outlined.BugReport, "Gửi nhật ký", Modifier.weight(1f), horizontal = true) {
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SEND_LOGS)
+                }
+            }
+            val selection = LocalLibrarySelection.current
+            if (selection != null) {
+                LibraryActionTileCompat(Icons.Outlined.Checklist, "Chọn nhiều game (để xóa)", Modifier.fillMaxWidth().padding(top = 8.dp), horizontal = true) {
+                    close()
+                    selection.start(item.shortcutPath)
                 }
             }
             LibraryActionTileCompat(

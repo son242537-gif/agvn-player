@@ -244,6 +244,11 @@ public class ShortcutsFragment extends Fragment {
                         Shortcut shortcut = findShortcut(shortcutPath);
                         if (shortcut != null) requestArtwork(shortcut, kind);
                     }
+
+                    @Override
+                    public void onRemoveMany(@NonNull List<String> shortcutPaths) {
+                        removeShortcuts(shortcutPaths);
+                    }
                 }
         );
         libraryController = binding.getController();
@@ -772,15 +777,7 @@ public class ShortcutsFragment extends Fragment {
         }
         else if (LibraryComposeHost.ACTION_REMOVE.equals(action)) {
             ContentDialog.confirm(context, R.string.do_you_want_to_remove_this_shortcut, () -> {
-                boolean fileDeleted = shortcut.file.delete();
-                try {
-                    String basePath = shortcut.file.getPath().substring(0, shortcut.file.getPath().lastIndexOf("."));
-                    new File(basePath + ".lnk").delete();
-                    new File(basePath + ".bat").delete();
-                } catch (Exception ignored) {}
-
-                if (fileDeleted) {
-                    disableShortcutOnScreen(requireContext(), shortcut);
+                if (removeShortcut(shortcut)) {
                     loadShortcutsList();
                     Toast.makeText(context, "Đã xóa lối tắt.", Toast.LENGTH_SHORT).show();
                 }
@@ -1099,6 +1096,34 @@ public class ShortcutsFragment extends Fragment {
             shortcutManager.requestPinShortcut(buildScreenShortCut(shortcut.name, shortcut.name, shortcut.container.id,
                     shortcut.file.getPath(), Icon.createWithBitmap(bmp), shortcut.getExtra("uuid")), null);
         }
+    }
+
+    /** Deletes the game's entry (.desktop, with its .lnk and .bat) and its home-screen shortcut; its files stay. */
+    private boolean removeShortcut(Shortcut shortcut) {
+        boolean fileDeleted = shortcut.file.delete();
+        try {
+            String basePath = shortcut.file.getPath().substring(0, shortcut.file.getPath().lastIndexOf("."));
+            new File(basePath + ".lnk").delete();
+            new File(basePath + ".bat").delete();
+        } catch (Exception ignored) {}
+
+        if (fileDeleted) disableShortcutOnScreen(requireContext(), shortcut);
+        return fileDeleted;
+    }
+
+    /** AGVN: the games picked in the library ("Chọn nhiều game"), removed after one question. */
+    private void removeShortcuts(List<String> shortcutPaths) {
+        Context context = requireContext();
+        String msg = "Xóa " + shortcutPaths.size() + " game đã chọn khỏi thư viện?\nFile game vẫn còn trong máy.";
+        ContentDialog.confirm(context, msg, () -> {
+            int removed = 0;
+            for (String path : shortcutPaths) {
+                Shortcut shortcut = findShortcut(path);
+                if (shortcut != null && removeShortcut(shortcut)) removed++;
+            }
+            loadShortcutsList();
+            Toast.makeText(context, "Đã xóa " + removed + " game khỏi thư viện.", Toast.LENGTH_SHORT).show();
+        });
     }
 
     public static void disableShortcutOnScreen(Context context, Shortcut shortcut) {
