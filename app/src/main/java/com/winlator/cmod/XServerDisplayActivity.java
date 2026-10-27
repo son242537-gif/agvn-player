@@ -312,6 +312,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        com.winlator.cmod.agvn.AgvnStartContainer.fix(this); // AGVN: the container that holds the game's file now
         // AGVN: RPG Maker MV/MZ and Tyrano games set to "Chạy nhẹ" open in a WebView instead of Wine
         if (com.winlator.cmod.agvn.AgvnHtmlGame.redirect(this)) {
             finish();
