@@ -402,7 +402,8 @@ cú chạm.
   bật được ở "Tự sửa lỗi" → "Chạm, bấm không ăn". Ở đó, game đang bật cũng tắt được.
 - **Không đổi gì cho các game khác:** chỉ game bật cách này mới chạy qua `agvn-winhandler.exe` (app chép file vào
   `C:\windows` của container khi mở game). Các game khác vẫn dùng `winhandler.exe` của Winlator và sự kiện của X server
-  như trước. Chế độ chuột tương đối của Winlator vẫn như cũ.
+  như trước. Chế độ chuột tương đối của Winlator vẫn như cũ. (Từ bản 0.1.71 mọi game mở bằng `agvn-winhandler.exe`, xem
+  "Kéo ngón tay xoay camera, và bàn phím cho ô nhập chữ".)
 - **Nhật ký:** `su-kien.txt` có dòng `Chạm gửi như chuột thật, có raw input (qua agvn-winhandler.exe): …` và lý do.
 - **Chưa đo trên máy:** Wine của app (Proton 9, Proton 10) tạo `WM_INPUT` từ `SendInput` theo cách của Windows. Chế độ
   chuột tương đối của Winlator cũng dựa vào điều này. Cần thử Open At Nine để chốt.
@@ -418,7 +419,8 @@ Từ bản 0.1.37 (`AgvnStarter`). Ngày 10/10/2026, game "GAMEHUB" (Lifeguard H
 - **Cách sửa:** `agvn-winhandler.exe` đọc dòng lệnh bằng Unicode (`CommandLineToArgvW`, `ShellExecuteExW`). Game có chữ
   ngoài ASCII trong đường dẫn file chạy hay trong tham số chạy thì mở bằng chương trình này, giống game Unity có Input
   System. Cú chạm vẫn đi qua X server như trước; chỉ game cần raw input mới gửi cú chạm qua `SendInput`. Game có đường
-  dẫn không dấu không đổi gì, vẫn mở bằng `winhandler.exe` của Winlator.
+  dẫn không dấu không đổi gì, vẫn mở bằng `winhandler.exe` của Winlator. (Từ bản 0.1.71 mọi game mở bằng
+  `agvn-winhandler.exe`.)
 - **Phần Wine trên máy:** Proton 9 và Proton 10 của app dựng cho Android, luôn đặt tên file theo UTF-8 như Android:
   `ntdll.so` của hai bản không có bảng tên bảng mã của Linux (`ANSIX341968`, `EUCJP`...) và không gọi `nl_langinfo`.
   Vì vậy đường dẫn Unicode tới được đúng file, dù `LC_ALL` để trống.
@@ -2392,3 +2394,81 @@ GAMEHUB", game Python đóng gói bằng PyInstaller: `IsekaiNTRInn.exe` 13 MB v
   `HUONG-DAN-CAI-GAMEHUB.txt` để biết GameHub cài game này thế nào.
 - **Test:** `AgvnPythonGameTest`.
 
+## Kéo ngón tay xoay camera, và bàn phím cho ô nhập chữ (bản 0.1.71)
+
+Góp ý ngày 27/10/2026 của người chơi: bấm vào chỗ cần nhập chữ thì bàn phím không hiện. Ở game đi lại tự do và xoay
+góc nhìn, đè ngón tay lên màn hình rồi kéo thì camera không xoay. Game ví dụ: Romantic Escape (Unity 2022.3 IL2CPP, có
+Input System nên cú chạm đã đi qua `agvn-winhandler.exe`, Adreno 830). Sửa cho cả game Windows lẫn game "Chạy nhẹ".
+
+- **Nhật ký Wine của Romantic Escape:** `grab_clipping_window XInput2 not supported, refusing to clip to
+  (640,360)-(640,360)`. Game giấu con trỏ và giữ nó ở giữa màn hình (`CursorLockMode.Locked` của Unity), rồi đọc
+  quãng chuột đi được (raw input), không đọc chỗ con trỏ đứng.
+- **Vì sao camera không xoay:**
+  - Cú chạm gửi chỗ ngón tay đứng: chuột được dời tới đúng điểm ảnh đó. X11 của Wine từ chối kẹp con trỏ (không có
+    XInput2), nhưng wineserver vẫn giữ vùng kẹp, nên sau mỗi lần dời con trỏ lại về (640,360).
+  - Mỗi lần dời, game nhận quãng đi bằng chỗ ngón tay trừ điểm giữa màn hình, không phải quãng ngón vừa kéo. Camera
+    quay mãi về một phía hoặc không theo ngón.
+  - Game nhận chuột qua X server thì bị y như vậy: game liên tục đưa con trỏ X về một điểm (warp).
+- **Sửa: `agvn-winhandler.exe` 2** (`app/src/main/cpp/winlator/winhandler.c`):
+  - **`RC_AGVN_STATE` (mã 15):** gửi về app mỗi khi trạng thái đổi và giữ yên qua hai lần đọc (đọc 50 ms một lần), và
+    gửi lại mỗi giây.
+    - Bit 0: game giữ chuột. Con trỏ bị ẩn (`GetCursorInfo`) và bị kẹp trong một vùng nhỏ, mỗi chiều không quá 1/4 màn
+      hình (`GetClipCursor`). Unity Locked kẹp vào một điểm, chế độ chuột tương đối của SDL kẹp vào vài điểm ảnh.
+    - Không tính là giữ chuột: game giấu con trỏ để tự vẽ con trỏ riêng, kể cả khi kẹp nó trong cửa sổ (`Confined` của
+      Unity). Cú chạm ở game đó vẫn bấm đúng chỗ ngón.
+    - Bit 1: có con trỏ nhập chữ (caret) của Windows trong cửa sổ đang ở trước (`GetGUIThreadInfo`), tức đang ở trong
+      một ô chữ.
+  - **Dời tương đối:** `RC_AGVN_POINTER` có cờ `0x40000000` thì (x, y) là quãng dời, gửi bằng một `SendInput` tương
+    đối. Game nhận raw input, DirectInput và `WM_MOUSEMOVE`, còn con trỏ vẫn ở chỗ game giữ.
+  - **Tắt gia tốc chuột** (`SPI_SETMOUSE {0, 0, 0}`): Wine cũng như Windows nhân đôi một bước dời lớn hơn 6.
+  - Bản dựng bằng mingw-w64 GCC 13 (`scripts/agvn/winhandler/build-winhandler.sh`) cho đúng một file, SHA-256
+    `3352a873f4880cb6634c80782eddd180bf94da25920d4aa7c04e4bb419aba623`.
+  - **Mọi game có lối tắt mở bằng `agvn-winhandler.exe`** (`AgvnStarter`), để app biết được hai điều trên ở mọi game.
+    Cú chạm của game không cần raw input vẫn đi qua X server như trước. `winhandler.exe` của Winlator chỉ dùng khi app
+    không chép được file vào `C:\windows` của container.
+- **Sửa: app (`AgvnMouseLook`):**
+  - App coi là game giữ chuột khi `agvn-winhandler.exe` báo bit 0. App cũng coi vậy khi game đưa con trỏ X về cùng một
+    điểm từ 3 lần trở lên, mỗi lần cách lần trước không quá 0,5 giây; trạng thái này còn 1 giây sau lần cuối.
+  - Khi game giữ chuột, cú kéo ngón gửi quãng ngón vừa đi, ở cả chế độ màn hình cảm ứng lẫn touchpad (cần analog đặt
+    làm chuột cũng vậy).
+    - Game mở bằng `agvn-winhandler.exe` 2: gửi bằng `SendInput` tương đối.
+    - Game khác: dời con trỏ X từ chỗ game đang giữ nó.
+  - Lần chạm đầu của mỗi cú kéo không gửi gì, sau 0,25 giây ngón không động cũng vậy: đặt ngón ở chỗ khác thì camera
+    không giật.
+  - Nhấn và nhả nút chuột vẫn như trước. Ở chế độ màn hình cảm ứng, cú kéo vẫn giữ nút trái như mọi cú kéo.
+  - Game thả chuột ra (mở menu, hiện con trỏ) thì cú chạm lại bấm đúng chỗ ngón như trước.
+  - `su-kien.txt` ghi một lần: "Game giữ chuột (camera xoay theo chuột): kéo ngón tay gửi độ dịch chuyển của ngón qua
+    agvn-winhandler.exe (SendInput)".
+- **Sửa: bàn phím cho game Windows (`AgvnCaretKeyboard`):**
+  - Game có caret của Windows (ô nhập tên, ô của launcher) thì bàn phím Android hiện lên. Caret mất thì bàn phím app đã
+    mở cũng đóng lại.
+  - Người chơi tự đóng bàn phím thì nó đóng tới ô chữ sau.
+  - Ô chữ game tự vẽ (InputField của Unity, ô của Unreal) không có caret của Windows: vẫn dùng nút [⌨] như trước.
+  - `su-kien.txt`: "Game có ô nhập chữ (con trỏ nhập chữ của Windows): mở bàn phím Android".
+- **Sửa: bàn phím cho game "Chạy nhẹ" (`html-keyboard.js`, `AgvnPageKeyboard`):**
+  - WebView chỉ mở bàn phím khi người chơi tự chạm vào ô chữ. Ô do script đặt focus (ô nhập tên của plugin RPG Maker,
+    ô mà phần xử lý chạm của game chuyển focus tới) thì không có bàn phím.
+  - Script chạy ở mọi trang sau khi trang nạp xong. Một ô chữ nhận focus thì bàn phím lên. Không còn ô chữ nào có focus
+    thì bàn phím xuống, trừ bàn phím của [⌨] (ô của nó giữ focus lúc đó).
+    - Ô chữ: `input` kiểu text, password, search, email, number, tel, url hoặc không ghi kiểu; `textarea`;
+      `contenteditable`. Ô bị khoá hay chỉ đọc không tính.
+  - Ô người chơi không thấy thì không mở bàn phím: engine giữ focus ở một ô ẩn để đọc phím (nhỏ hơn 4×4 điểm ảnh, nằm
+    ngoài màn hình, trong suốt hay `visibility: hidden`).
+- **Chưa làm:** kéo ngón xoay camera cho game "Chạy nhẹ". Mỗi engine 3D trên web tự đọc chuột (Pointer Lock), nên chưa
+  có cách chung; cần một game cụ thể để làm.
+- **Test:**
+  - `scripts/agvn/winhandler/test/run-test.sh` chạy bằng Wine 9 trên Linux (Xvfb). Test này dùng `looker.exe`:
+    - Lần lượt: giữ chuột như Unity Locked, thả ra, hiện một ô EDIT, giấu con trỏ mà không kẹp, kẹp mà không giấu,
+      rồi giấu và kẹp trong cửa sổ.
+    - Kết quả: `STATE 1` lúc giữ chuột, `STATE 2` lúc có ô EDIT, 0 ở các lúc khác. Có đủ 20 lần `raw 7 -3`, tức không
+      bị gia tốc.
+  - `AgvnMouseLookTest`; `tools/agvn/tests/html_keyboard_sim.js`.
+- **Thử máy:**
+  1. Romantic Escape: đè ngón và kéo thì camera xoay theo ngón; nhấc ngón đặt chỗ khác thì camera không giật. Mở menu
+     của game: chạm vẫn bấm đúng nút. Để ý xem cú kéo có làm game tưởng là bấm chuột không (tự nói chuyện, tự nhặt
+     đồ), vì ở chế độ màn hình cảm ứng cú kéo vẫn giữ nút trái.
+  2. Một game Windows có ô chữ của Windows (launcher có ô nhập tên hay mã, hộp thoại hỏi tên): bàn phím tự hiện, gõ
+     được, xong thì ẩn.
+  3. Một game RPG Maker MV/MZ có plugin nhập tên: bàn phím hiện khi ô nhập tên mở.
+  4. Hồi quy: một game 2D thường (Ren'Py chạy bằng Windows, RPG Maker VX Ace, Unity 2D) mở, chạm và kéo như cũ;
+     game Unity có Input System (Open At Nine) bấm menu được; game có đường dẫn có dấu vẫn mở được.

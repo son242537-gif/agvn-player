@@ -1,5 +1,10 @@
 AGVN Player v0.1.71 - agvn.io
 
+Tính năng mới:
+- Game 3D đi lại tự do, xoay góc nhìn bằng chuột (như Romantic Escape): đè ngón tay lên màn hình rồi kéo để xoay camera.
+- Bàn phím Android tự hiện khi game có ô nhập chữ (ô nhập tên, ô của launcher) và tự ẩn khi xong. Game tự vẽ ô chữ (nhiều game Unity) thì vẫn bấm nút ⌨ như trước.
+- Game "Chạy nhẹ" (RPG Maker MV/MZ, trang HTML): bàn phím hiện khi game mở ô nhập tên.
+
 Sửa lỗi:
 - "Gửi nhật ký" có thêm nhật ký riêng mà game ghi trong thư mục logs/ cạnh file chạy, và với game Python thì ghi rõ game dùng thư viện nào (pygame, pyglet, Qt...). Nhờ vậy lỗi của game không mở được dễ tìm ra hơn.
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
