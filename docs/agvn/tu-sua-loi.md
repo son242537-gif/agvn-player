@@ -2366,3 +2366,29 @@ hình. Bản PC (NW.js) cùng thư mục chạy bình thường.
      `No precision specified` hay `Pipeline create failed`.
   2. Hồi quy: một game RPG Maker MZ thường (WebGL 2, không 3D) vẫn chạy như cũ.
 
+## Game Python không vẽ gì: nhật ký thiếu logs/ của game (bản 0.1.71)
+
+Báo cáo ngày 27/10/2026 (Xiaomi 26077PC53G, Snapdragon SM8850 / Adreno 840, app 0.1.70): Isekai NTR Inn ("VIET-HOA-CHEAT-
+GAMEHUB", game Python đóng gói bằng PyInstaller: `IsekaiNTRInn.exe` 13 MB và `_internal/`) không vào được game.
+
+- **Nhật ký có gì:**
+  - Hai lần mở, không vẽ khung nào (FPS 0 suốt phút cuối; lần hai có 3 FPS trong 5 giây đầu).
+  - Luồng bận nhất chỉ 1–2 % một nhân, tức game đứng chờ, không chạy và không sập.
+  - Wine không báo lỗi, không có hộp thoại lỗi (`trace+msgbox` bật). Wine thoát mã 137 khi người chơi thoát.
+  - OpenGL qua `freedreno`/`kgsl`: đường OpenGL mặc định cho máy dùng Turnip, `MESA_GL_VERSION_OVERRIDE=3.3`.
+  - logcat của gói chỉ có từ 14:10, còn hai lần chơi ở 09:57–10:00.
+- **Thiếu:**
+  - Lần hai, thư mục game có thêm `logs/`, nhật ký riêng của game. App chỉ chép các file log nằm ngay cạnh exe
+    (`AgvnGameDirLogs`), không vào thư mục con.
+  - "Game Python" chưa cho biết game vẽ bằng gì. pygame (SDL2), pyglet, Qt và tkinter vẽ mỗi thứ một kiểu (GDI,
+    Direct3D, OpenGL), mà lỗi thường nằm đúng ở đó.
+- **Sửa:**
+  - **`AgvnGameDirLogs`:** mọi file `.log` và `.txt` trong thư mục `logs/` hoặc `log/` cạnh exe được chép như nhật ký
+    của engine: chỉ file ghi trong phiên đó, file lớn thì cắt giữ phần đầu và phần cuối, tối đa 8 file mới nhất.
+  - **`AgvnPythonFacts`:** game PyInstaller có thêm một dòng trong `su-kien.txt`, ví dụ "Game Python: Python 3.12 ·
+    thư viện: pygame, numpy · DLL: SDL2.dll". Thông tin đọc từ tên file trong `_internal/` (PyInstaller 6) hoặc cạnh
+    exe (PyInstaller 5).
+- **Chưa biết nguyên nhân.** Cần nhật ký trong `logs/` của game (hoặc gói nhật ký từ 0.1.71), và
+  `HUONG-DAN-CAI-GAMEHUB.txt` để biết GameHub cài game này thế nào.
+- **Test:** `AgvnPythonGameTest`.
+

@@ -73,6 +73,8 @@ final class AgvnGameFacts {
         facts.addAll(mods);
         String pe = unknown ? AgvnPeFacts.describe(exe) : null;
         if (pe != null) facts.add(pe);
+        String python = pe != null && pe.contains("PyInstaller") ? AgvnPythonFacts.describe(dir) : null;
+        if (python != null) facts.add(python); // pygame, pyglet or Qt: each draws another way
         if (GameExeResolver.Engine.GODOT.name().equals(engine)) { // which Spine a Godot game was made with, if any
             String spine = AgvnGodotModules.fact(AgvnGodotLight.mainPack(exe));
             if (spine != null) facts.add(spine);
