@@ -2473,7 +2473,7 @@ Input System nên cú chạm đã đi qua `agvn-winhandler.exe`, Adreno 830). S�
   4. Hồi quy: một game 2D thường (Ren'Py chạy bằng Windows, RPG Maker VX Ace, Unity 2D) mở, chạm và kéo như cũ;
      game Unity có Input System (Open At Nine) bấm menu được; game có đường dẫn có dấu vẫn mở được.
 
-## Game Electron đứng ở Proton 9: đề nghị Wine mới (Proton 10) (bản 0.1.71)
+## Game Electron đứng ở Proton 9: đề nghị Wine mới (Proton 10) (bản 0.1.72)
 
 Báo cáo ngày 27/10/2026 (Xiaomi 2510DPC44G và POCO F8 Pro, Snapdragon 8 Elite, Adreno 830). Game Electron 18.3
 (Chromium 100) dùng Cocos Creator 2.4, có Steam qua greenworks. Từ bản 0.1.64 tới 0.1.70, chạy bằng Proton 9 thì game

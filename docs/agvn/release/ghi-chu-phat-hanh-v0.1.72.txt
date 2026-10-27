@@ -1,0 +1,6 @@
+AGVN Player v0.1.72 - agvn.io
+
+Sửa lỗi:
+- Game Electron (trang web chạy trong Chromium) đứng mãi ở trang đầu: "Tự sửa lỗi" đề nghị "Chạy bằng Wine mới (Proton 10)". Lần đầu app cài Wine mới, mất khoảng một phút.
+- Lối tắt game đặt ngoài màn hình chính vẫn mở đúng game sau khi game đã chuyển sang Wine khác.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
