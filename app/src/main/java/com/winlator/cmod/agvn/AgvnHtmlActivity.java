@@ -45,6 +45,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     /** "Chạy bằng Windows" was picked: the Wine game now owns the keep-alive notification. */
     private boolean toWindows;
     private AgvnLightTools tools;
+    /** assets/agvn/html-keyboard.js, run on each page once loaded ({@link AgvnPageKeyboard}). */
+    private String keyboardJs = "";
     /** For "Gửi nhật ký" ({@link AgvnLightSession#keeper}): the pictures shown empty, the files the page did not find. */
     private Consumer<String> standIns, missing;
 
@@ -109,6 +111,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         webView.setWebChromeClient(new AgvnHtmlConsole(logs,
                 AgvnLightSession.keeper(getApplicationContext(), AgvnLightSession.PAGE, AgvnLightSession.LISTED)));
         if (rpgMaker) webView.addJavascriptInterface(new AgvnHtmlSaves(root), AgvnHtmlSaves.NAME); // saves as on a PC
+        webView.addJavascriptInterface(new AgvnPageKeyboard(this, webView), AgvnPageKeyboard.NAME); // a field's keyboard
+        keyboardJs = AgvnPageKeyboard.script(this);
         setContentView(webView);
         hideSystemUi();
         webView.loadUrl("https://" + host + "/" + Uri.encode(index.getName()));
@@ -149,6 +153,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         @Override
         public void onPageFinished(WebView view, String url) {
             AgvnLightSession.started(AgvnHtmlActivity.this);
+            if (!keyboardJs.isEmpty()) view.evaluateJavascript(keyboardJs, null); // the keyboard for a field a script focuses
         }
 
         @Override

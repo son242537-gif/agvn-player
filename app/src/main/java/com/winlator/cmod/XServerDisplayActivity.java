@@ -736,6 +736,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             setupUI();
             setupSidebarInputControls();
             com.winlator.cmod.agvn.AgvnControlsBar.attach(this); // AGVN: ⌨ ✎ 👁 bar, after the sidebar (its first apply re-shows the controls)
+            com.winlator.cmod.agvn.AgvnCaretKeyboard.attach(this); // AGVN: the keyboard for a text field of the game
             com.winlator.cmod.agvn.AgvnSidebarLogs.attach(this); // AGVN: "Gửi nhật ký" while the game runs
             com.winlator.cmod.agvn.AgvnPowerSave.warn(this); // AGVN: battery saver slows the game
             if (controlsProfile.isEmpty()) {
