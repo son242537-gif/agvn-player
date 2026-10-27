@@ -2472,3 +2472,51 @@ Input System nên cú chạm đã đi qua `agvn-winhandler.exe`, Adreno 830). S�
   3. Một game RPG Maker MV/MZ có plugin nhập tên: bàn phím hiện khi ô nhập tên mở.
   4. Hồi quy: một game 2D thường (Ren'Py chạy bằng Windows, RPG Maker VX Ace, Unity 2D) mở, chạm và kéo như cũ;
      game Unity có Input System (Open At Nine) bấm menu được; game có đường dẫn có dấu vẫn mở được.
+
+## Game Electron đứng ở Proton 9: đề nghị Wine mới (Proton 10) (bản 0.1.71)
+
+Báo cáo ngày 27/10/2026 (Xiaomi 2510DPC44G và POCO F8 Pro, Snapdragon 8 Elite, Adreno 830). Game Electron 18.3
+(Chromium 100) dùng Cocos Creator 2.4, có Steam qua greenworks. Từ bản 0.1.64 tới 0.1.70, chạy bằng Proton 9 thì game
+đứng ở trang đầu (FPS 0, "không phản hồi" 34 phút).
+
+- **Cùng game ở chỗ khác:**
+  - GameHub (Proton 11 arm64x, FEX 20260913, DXVK 2.6): chạy, vào ván khoảng 31 FPS.
+  - Proton 10.0-4 của app: chạy, màn tiêu đề 30 FPS (bảng đo cấu hình Chromium của người báo lỗi).
+  - Cấu hình FEX hai bên gần như giống nhau. Vậy nghi phạm chính là bản Wine.
+- **Sửa (`AgvnWine10Fix`):** "Tự sửa lỗi" có thêm nút "Chạy bằng Wine mới (Proton 10)" (`wine-new`), đứng đầu ở "Game
+  đứng ở trang đầu hay màn hình tải" (`chromium-frozen`) và ở "Game đứng hình, treo" (`report-freeze`).
+  - Chỉ có cho game Electron hoặc NW.js (`GameExeResolver.chromiumShell`) đang chạy Proton 9. Game đã từ Proton 10 quay
+    về (`wine-old`, `agvnNotWine10`) thì không có nút này nữa.
+  - Đứng trước "Chạy nhẹ": Proton 10 chạy cả tiến trình chính của Electron (Steam, lưu game), còn "Chạy nhẹ" chỉ chạy
+    trang.
+  - Proton 10 đã cài thì game chuyển sang container của nó ở lần mở sau (`AgvnGameMove`).
+  - Proton 10 chưa cài (khoảng một phút, cần trống khoảng 900 MB) thì lần mở sau từ thư viện cài trước
+    (`PreLaunchCheck`), có hộp ghi phần trăm, rồi mới chuyển.
+  - Cài không được thì báo "Không cài được Wine mới…" và game mở bằng Proton 9 như trước.
+- **Mở game theo container đang giữ file của game (`AgvnStartContainer`):**
+  - Lối tắt ngoài màn hình chính ghi container và file của lúc tạo. Game đã chuyển sang Proton 10 thì file cũ bị xoá,
+    nên lối tắt mở sai Wine hoặc không mở được.
+  - Mở bằng adb với `container_id 1` cho game đang ở Proton 10 cũng chạy nhầm Proton 9.
+  - Giờ, lúc mở, container nào có file của game trên màn hình Windows (Desktop) thì game chạy ở container đó. File đã
+    mất thì app tìm file cùng tên ở Desktop của container khác. File không nằm trên Desktop nào (lệnh chạy của trình
+    quản lý file) thì giữ container đã ghi.
+- **Tham số chạy và biến môi trường (lỗi 3 của báo cáo):**
+  - Đường đi đã kiểm: "Tham số chạy" trong cài đặt game (`execArgs`) → lệnh Wine (`getWineStartCommand`) →
+    `agvn-winhandler.exe` chuyển từng tham số cho game, mỗi tham số trong ngoặc kép.
+  - `moi-truong.txt` ghi đủ biến môi trường, tham số và lệnh chạy (từ bản 0.1.68).
+  - Cần một lần chạy có đặt tham số để chốt.
+- **Chưa sửa:**
+  - **Hình lệch khi Chromium ghép hình bằng GPU** (cấu hình C/D: bỏ `--disable-gpu-compositing`). Hình lệch lên trên,
+    sang trái khoảng 100×63 điểm ảnh máy, còn chỗ chạm vẫn đúng. Bộ vẽ Vulkan đặt mỗi cửa sổ theo vị trí trong cửa sổ
+    cha (`collectWindowNodes`), và `ReparentWindow` giữ vị trí Wine gửi, nên chưa thấy chỗ sai trong mã. Cần nhật ký
+    lúc hình lệch, để có danh sách cửa sổ với vị trí và cỡ.
+  - **SELinux chặn chạy `D3DCompiler_47.dll` nằm trên bộ nhớ chung** (`avc: denied { execute } … dev="fuse"`). Chưa
+    đổi, vì với Proton 10 game đã chạy được.
+- **Test:** `AgvnStartContainerTest`; `AgvnDoctorTest` và `AgvnRepairTest` (thứ tự nút).
+- **Thử máy:**
+  1. Game Electron của báo cáo trên Proton 9, đứng ở trang đầu rồi thoát: "Tự sửa lỗi" có "Chạy bằng Wine mới (Proton
+     10)" đứng đầu. Bấm vào thì hộp cài Wine mới hiện ra (lần đầu), rồi game mở bằng Proton 10.
+  2. Lối tắt của game đó trên màn hình chính, tạo trước khi chuyển: game mở bằng Proton 10.
+  3. Hình lệch: dùng cấu hình C, khi hình lệch thì mở ⋮ → Tự sửa lỗi → "Chạm, bấm không ăn" (để `su-kien.txt` ghi danh
+     sách cửa sổ), rồi gửi nhật ký kèm ảnh chụp màn hình. Ghi rõ nút ⛶ ("Vừa màn hình") đang bật hay tắt.
+  4. Hồi quy: một game Proton 9 khác và một game Chạy nhẹ mở từ thư viện như cũ.

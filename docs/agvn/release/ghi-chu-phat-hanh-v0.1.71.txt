@@ -7,4 +7,6 @@ Tính năng mới:
 
 Sửa lỗi:
 - "Gửi nhật ký" có thêm nhật ký riêng mà game ghi trong thư mục logs/ cạnh file chạy, và với game Python thì ghi rõ game dùng thư viện nào (pygame, pyglet, Qt...). Nhờ vậy lỗi của game không mở được dễ tìm ra hơn.
+- Game Electron (trang web chạy trong Chromium) đứng mãi ở trang đầu: "Tự sửa lỗi" đề nghị "Chạy bằng Wine mới (Proton 10)". Lần đầu app cài Wine mới, mất khoảng một phút.
+- Lối tắt game đặt ngoài màn hình chính vẫn mở đúng game sau khi game đã chuyển sang Wine khác.
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
