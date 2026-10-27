@@ -74,6 +74,18 @@ final class AgvnGoodConfig {
         return keys;
     }
 
+    /**
+     * {@code good} as "Trả cấu hình chạy tốt" puts it back on a game whose settings are {@code now}: the way it reads
+     * movies is kept ({@link AgvnMediaFoundation#keepOldSource}).
+     */
+    static Map<String, String> restored(Map<String, String> good, Map<String, String> now) {
+        Map<String, String> out = new LinkedHashMap<>(good);
+        String env = AgvnMediaFoundation.keepOldSource(now.get("envVars"), good.get("envVars"));
+        if (env == null || env.isEmpty()) out.remove("envVars");
+        else out.put("envVars", env);
+        return out;
+    }
+
     /** Puts the good settings back on the game: each one it had, and none it did not. */
     static void restore(Shortcut shortcut, Map<String, String> good) {
         for (String key : KEYS) shortcut.putExtra(key, good.get(key));

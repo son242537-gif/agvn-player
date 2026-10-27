@@ -84,6 +84,21 @@ public final class AgvnMediaFoundation {
         return canReadOldWay(s) ? new AgvnFixes.Fix(FIX, a.getString(R.string.agvn_fix_media_old), "1") : null;
     }
 
+    /**
+     * {@code to}, the game's own variables a fix puts back whole ("restore-good", "reset"), with WINE_OLD_MEDIA_SOURCE
+     * kept when {@code from}, its variables now, reads movies the old way: that was picked because the game's movies
+     * did not open otherwise. Tenants of the Dead (Mali-G57, 27/10/2026): the player picked it, played 26 minutes, the
+     * game ran out of RAM, "Trả cấu hình chạy tốt" put back the settings from before that pick, and the next scene's
+     * movie stayed black again.
+     */
+    static String keepOldSource(String from, String to) {
+        EnvVars now = new EnvVars(from == null ? "" : from);
+        if (!now.has(OLD_MEDIA_SOURCE) || !oldSource(now.get(OLD_MEDIA_SOURCE))) return to;
+        EnvVars back = new EnvVars(to == null ? "" : to);
+        if (back.has(OLD_MEDIA_SOURCE) && oldSource(back.get(OLD_MEDIA_SOURCE))) return to;
+        return AgvnLockFixes.withVar(to == null ? "" : to, OLD_MEDIA_SOURCE, now.get(OLD_MEDIA_SOURCE));
+    }
+
     /** Puts WINE_OLD_MEDIA_SOURCE=1 among the game's own variables; the caller saves. */
     static void useOldSource(Shortcut s) {
         s.putExtra("envVars", AgvnLockFixes.withVar(s.getExtra("envVars"), OLD_MEDIA_SOURCE, "1"));

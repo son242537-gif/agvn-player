@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -103,9 +104,12 @@ final class AgvnFixes {
                 return !light && !dir.isEmpty() && AgvnRgssGame.canRun(new File(dir))
                         ? new Fix(id, a.getString(R.string.agvn_fix_rgss_light), AgvnHtmlGame.RUNNER_RGSS) : null;
             }
-            case "restore-good":
-                return AgvnGoodConfig.hasGood(state) && !AgvnGoodConfig.changed(AgvnGoodConfig.good(state),
-                        AgvnGoodConfig.snapshot(s)).isEmpty() ? new Fix(id, a.getString(R.string.agvn_fix_restore_good), null) : null;
+            case "restore-good": {
+                Map<String, String> now = AgvnGoodConfig.snapshot(s);
+                return AgvnGoodConfig.hasGood(state) && !AgvnGoodConfig.changed(
+                        AgvnGoodConfig.restored(AgvnGoodConfig.good(state), now), now).isEmpty()
+                        ? new Fix(id, a.getString(R.string.agvn_fix_restore_good), null) : null;
+            }
             case "reset":
                 return s.getExtra(AgvnGameImporter.EXTRA_GAME_DIR).isEmpty() ? null : new Fix(id, a.getString(R.string.agvn_fix_reset), null);
             case "quality-down":

@@ -46,7 +46,8 @@ final class AgvnFixApply {
                 open(a, new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", a.getPackageName(), null)));
                 return false;
             case "restore-good":
-                AgvnGoodConfig.restore(s, AgvnGoodConfig.good(state));
+                AgvnGoodConfig.restore(s,
+                        AgvnGoodConfig.restored(AgvnGoodConfig.good(state), AgvnGoodConfig.snapshot(s)));
                 break;
             case "reset":
                 reset(a, s);
@@ -136,16 +137,18 @@ final class AgvnFixApply {
 
     /**
      * Back to what the import gave the game: no setting of its own besides the profile's arguments, environment and
-     * locale, and "Tự động" for Đồ họa. Its controls, cover and saves stay.
+     * locale, and "Tự động" for Đồ họa. Its controls, cover and saves stay, and the way it reads movies
+     * ({@link AgvnMediaFoundation#keepOldSource}).
      */
     static void reset(Context ctx, Shortcut s) {
+        String env = s.getExtra("envVars");
         for (String key : AgvnGoodConfig.KEYS) s.putExtra(key, null);
         AgvnProfile p = AgvnQuality.profileOf(s);
         File gameDir = new File(s.getExtra(AgvnGameImporter.EXTRA_GAME_DIR));
         File exe = new File(s.path.replace("\"", ""));
         String dlls = GameDllOverrides.build(GameDllOverrides.detect(exe.getParentFile()), p.dllOverrides);
         s.putExtra("execArgs", String.join(" ", p.args));
-        s.putExtra("envVars", AgvnGameImporter.buildEnvVars(p.env, dlls));
+        s.putExtra("envVars", AgvnMediaFoundation.keepOldSource(env, AgvnGameImporter.buildEnvVars(p.env, dlls)));
         String prefix = gameDir.getPath() + "/", path = exe.getPath();
         String relative = path.startsWith(prefix) ? path.substring(prefix.length()) : exe.getName();
         s.putExtra("lc_all", AgvnLocale.forGame(p, engine(s), gameDir.getName(), relative));

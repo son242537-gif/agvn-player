@@ -2520,3 +2520,34 @@ Báo cáo ngày 27/10/2026 (Xiaomi 2510DPC44G và POCO F8 Pro, Snapdragon 8 Elit
   3. Hình lệch: dùng cấu hình C, khi hình lệch thì mở ⋮ → Tự sửa lỗi → "Chạm, bấm không ăn" (để `su-kien.txt` ghi danh
      sách cửa sổ), rồi gửi nhật ký kèm ảnh chụp màn hình. Ghi rõ nút ⛶ ("Vừa màn hình") đang bật hay tắt.
   4. Hồi quy: một game Proton 9 khác và một game Chạy nhẹ mở từ thư viện như cũ.
+
+## Cách đọc phim cũ không còn mất khi "Trả cấu hình chạy tốt" (bản 0.1.73)
+
+Báo cáo ngày 27/10/2026 (TECNO LE6h, Mali-G57, app 0.1.70): Tenants of the Dead chơi tới ngày 3 thì đen màn hình lúc
+chuyển cảnh.
+
+- **Nhật ký:**
+  - 15:07:53: người chơi bấm "Chạy lại, đọc phim cách cũ" (`WINE_OLD_MEDIA_SOURCE=1`). Phiên 15:07:57 chơi được 26 phút,
+    phim phát được.
+  - Lúc nạp cảnh ngày 3 (`Setting up 4 worker threads for Enlighten.` là dòng cuối của `Player.log`), máy chỉ còn
+    khoảng 200 MB RAM trống (app và game RSS 3,5 GB). Game tắt, Tự sửa lỗi báo `low-ram-end` và đề nghị
+    "Trả cấu hình chạy tốt".
+  - Từ phiên 15:34:54, `moi-truong.txt` không còn `WINE_OLD_MEDIA_SOURCE=1`. Phiên 15:39:38: `WindowsVideoMedia error
+    0xc00d36bb … CreateObjectFromByteStream` và `failed to create protondemuxer` như trước khi sửa. Phim không mở, màn
+    hình đen.
+- **Vì sao:** "cấu hình chạy tốt" được lưu lúc 15:06:20 (hết lỗi nhờ đổi Đồ họa), trước lúc người chơi chọn cách đọc phim
+  cũ. "Trả cấu hình chạy tốt" (`restore-good`) đặt lại toàn bộ biến môi trường của game theo bản lưu đó, nên bỏ mất
+  `WINE_OLD_MEDIA_SOURCE=1`. "Đặt lại như lúc thêm game" (`reset`) cũng vậy.
+- **Sửa (`AgvnMediaFoundation.keepOldSource`, `AgvnGoodConfig.restored`):**
+  - Hai cách sửa đặt lại toàn bộ cấu hình đó giờ giữ `WINE_OLD_MEDIA_SOURCE`, nếu game đang bật nó. Cách này chỉ được
+    bật cho game có phim không mở được, nên bỏ đi là phim lại đen.
+  - "Trả cấu hình chạy tốt" không còn được đề nghị khi chỗ khác nhau duy nhất là cách đọc phim.
+  - Thử một cách sửa rồi trả lại (`AgvnRepair.restore`) vẫn trả lại đúng như trước, kể cả khi cách sửa đang thử là
+    "Đọc phim bằng cách cũ".
+- **Hết RAM ở cảnh ngày 3:** việc này app đã xử lý từ trước. Sau lần tắt vì hết RAM, game chạy với mức tiết kiệm RAM
+  như Siêu nhẹ (`AgvnMemorySaver`, `su-kien.txt`: "Tiết kiệm RAM như Siêu nhẹ").
+- **Test:** `AgvnMediaFoundationTest.theOldMovieReaderOutlivesAWholeFixThatPredatesIt`.
+- **Thử máy:**
+  1. Tenants of the Dead: khi thanh "Phim trong game không mở được" hiện, bấm "Chạy lại, đọc phim cách cũ".
+  2. Sau một lần game tắt vì hết RAM, chọn "Trả cấu hình chạy tốt". `moi-truong.txt` của lần mở sau vẫn có
+     `WINE_OLD_MEDIA_SOURCE=1`, và phim ở cảnh chuyển ngày 3 phát được.
