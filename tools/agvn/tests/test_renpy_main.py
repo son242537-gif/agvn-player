@@ -43,6 +43,8 @@ if stretch:
     # Ren'Py's config as it imports, then a game that sets its own setting, then a reload back to the defaults
     config = types.ModuleType("renpy.config")
     sys.modules["renpy.config"] = config
+    renpy = sys.modules.setdefault("renpy", types.ModuleType("renpy"))
+    renpy.name_blacklist = set()  # what Ren'Py leaves out of its backup of its modules
     time.sleep(0.2)
     config.adjust_view_size = None
     for _ in range(40):
@@ -50,6 +52,7 @@ if stretch:
             break
         time.sleep(0.05)
     report["view"] = config.adjust_view_size(2400, 1080) if config.adjust_view_size else None
+    report["blacklist"] = sorted(renpy.name_blacklist)
     if stretch == "game":
         own = lambda w, h: (w // 2, h // 2)
         config.adjust_view_size = own
@@ -108,6 +111,8 @@ class RenpyMainTest(unittest.TestCase):
         self.assertTrue(r["game_kept"], "a game's own adjust_view_size stays")
         r = self.run_main(AGVN_RENPY_BASEDIR=self.game, AGVN_RENPY_STRETCH="0", TEST_STRETCH="1")
         self.assertIsNone(r["view"], "off: Ren'Py keeps its bars")
+        r = self.run_main(AGVN_RENPY_BASEDIR=self.game, AGVN_RENPY_STRETCH="1", TEST_STRETCH="1")
+        self.assertEqual(["renpy.config.adjust_view_size"], r["blacklist"], "never in Ren'Py's backup")
 
 
 if __name__ == "__main__":
