@@ -3,10 +3,10 @@ package com.winlator.cmod.agvn;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,14 +18,14 @@ import java.util.regex.Pattern;
  */
 final class AgvnPythonFacts {
     private static final Pattern PYTHON_DLL = Pattern.compile("python(\\d)(\\d{1,2})\\.dll");
-    /** A package (folder or .pyd) → its name in the line; first match wins. */
+    /** A package (folder or .pyd) → its name in the line; first match wins, and the line keeps this order. */
     private static final String[][] PACKAGES = {{"pygame", "pygame"}, {"pyglet", "pyglet"}, {"arcade", "arcade"},
             {"moderngl", "moderngl"}, {"opengl", "PyOpenGL"}, {"pyqt5", "PyQt5"}, {"pyqt6", "PyQt6"},
             {"pyside2", "PySide2"}, {"pyside6", "PySide6"}, {"kivy", "Kivy"}, {"panda3d", "Panda3D"}, {"ursina", "Ursina"},
             {"raylib", "raylib"}, {"pyray", "raylib"}, {"glfw", "glfw"}, {"wx", "wxPython"}, {"tkinter", "tkinter"},
             {"_tkinter", "tkinter"}, {"pygame_gui", "pygame_gui"}, {"cv2", "OpenCV"}, {"numpy", "numpy"},
             {"pyaudio", "PyAudio"}, {"sounddevice", "sounddevice"}, {"vlc", "python-vlc"}};
-    /** DLLs that say how it draws or plays. */
+    /** DLLs that say how it draws or plays, in the line's order. */
     private static final String[] DLLS = {"sdl2.dll", "sdl3.dll", "sdl2_mixer.dll", "glfw3.dll", "opengl32sw.dll",
             "libegl.dll", "d3dcompiler_47.dll", "qt5core.dll", "qt6core.dll", "tcl86t.dll", "libvlc.dll", "openal32.dll"};
 
@@ -42,26 +42,31 @@ final class AgvnPythonFacts {
         return describe(names);
     }
 
+    /**
+     * The line for these names, the same in whatever order they come: a folder's listing has none (Windows lists by
+     * name, Linux and Android as the files were written).
+     */
     static String describe(List<String> names) {
         String python = null;
-        Set<String> packages = new LinkedHashSet<>(), dlls = new LinkedHashSet<>();
+        Map<Integer, String> packages = new TreeMap<>(), dlls = new TreeMap<>();
         for (String name : names) {
             String n = name.toLowerCase(Locale.ROOT);
             Matcher m = PYTHON_DLL.matcher(n);
             if (m.matches() && python == null) python = "Python " + m.group(1) + "." + m.group(2);
             String bare = n.replaceFirst("\\.(pyd|py|pyc)$", "").replaceFirst("\\.cp\\d+-win_amd64$", "");
-            for (String[] p : PACKAGES) {
+            for (int i = 0; i < PACKAGES.length; i++) {
+                String[] p = PACKAGES[i];
                 if (bare.equals(p[0]) || bare.startsWith(p[0] + "-") && n.endsWith(".dist-info")) {
-                    packages.add(p[1]);
+                    if (!packages.containsValue(p[1])) packages.put(i, p[1]);
                     break;
                 }
             }
-            for (String d : DLLS) if (n.equals(d)) dlls.add(name);
+            for (int i = 0; i < DLLS.length; i++) if (n.equals(DLLS[i])) dlls.putIfAbsent(i, name);
         }
         if (python == null && packages.isEmpty() && dlls.isEmpty()) return null;
         StringBuilder s = new StringBuilder("Game Python: ").append(python != null ? python : "Python ?");
-        if (!packages.isEmpty()) s.append(" · thư viện: ").append(String.join(", ", packages));
-        if (!dlls.isEmpty()) s.append(" · DLL: ").append(String.join(", ", dlls));
+        if (!packages.isEmpty()) s.append(" · thư viện: ").append(String.join(", ", packages.values()));
+        if (!dlls.isEmpty()) s.append(" · DLL: ").append(String.join(", ", dlls.values()));
         return s.toString();
     }
 }

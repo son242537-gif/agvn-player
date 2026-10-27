@@ -68,4 +68,16 @@ public class AgvnPythonGameTest {
                 AgvnPythonFacts.describe(Arrays.asList("_tkinter.pyd")));
         assertNull(AgvnPythonFacts.describe(Arrays.asList("data.bin", "readme.txt")));
     }
+
+    @Test
+    public void theSameLineInWhateverOrderTheFolderLists() {
+        // Windows lists a folder by name, Linux and Android as its files were written: the test failed on a PC
+        String line = "Game Python: Python 3.12 · thư viện: pygame, numpy · DLL: SDL2.dll, SDL2_mixer.dll";
+        assertEquals(line, AgvnPythonFacts.describe(Arrays.asList("SDL2.dll", "SDL2_mixer.dll", "base_library.zip",
+                "numpy", "pygame", "python312.dll")));
+        assertEquals(line, AgvnPythonFacts.describe(Arrays.asList("python312.dll", "SDL2_mixer.dll", "pygame",
+                "numpy", "SDL2.dll", "base_library.zip")));
+        assertEquals("tkinter once", "Game Python: Python ? · thư viện: tkinter",
+                AgvnPythonFacts.describe(Arrays.asList("_tkinter.pyd", "tkinter")));
+    }
 }
