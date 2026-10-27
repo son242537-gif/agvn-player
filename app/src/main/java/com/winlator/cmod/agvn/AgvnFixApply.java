@@ -94,6 +94,9 @@ final class AgvnFixApply {
             case "wine-mono":
                 s.putExtra(AgvnWineMono.EXTRA, fix.to); // the next start unpacks it (AgvnWineMono.prepare)
                 break;
+            case AgvnWine10Fix.ID: // to Proton 10 at the next start, unpacked first if it is not yet
+                AgvnWine10Fix.apply(a, s);
+                break;
             case "wine-old": {
                 Container old = new ContainerManager(a).getContainerById(Integer.parseInt(fix.to));
                 if (old == null) return false;

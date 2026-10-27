@@ -62,9 +62,10 @@ public class AgvnRepairTest {
         assertEquals(Arrays.asList("godot-light", "godot-light-renderer", "godot-renderer", "godot-angle"),
                 catalog.byId("report-animation").fixes.subList(0, 4));
         assertEquals("godot-light", catalog.byId("report-slow").fixes.get(0));
-        // a game with mods that freezes: without them second (Rina, BepInEx, 07/10/2026); before both, an Electron or
-        // NW.js game's page in Chạy nhẹ, offered to no other game (26/10/2026)
-        assertEquals(Arrays.asList("page-light", "emulator-stable", "mods-off"), catalog.byId("report-freeze").fixes.subList(0, 3));
+        // a game with mods that freezes: without them second (Rina, BepInEx, 07/10/2026); before both, for an Electron
+        // or NW.js game only, Proton 10 (27/10/2026) and its page in Chạy nhẹ (26/10/2026)
+        assertEquals(Arrays.asList("wine-new", "page-light", "emulator-stable", "mods-off"),
+                catalog.byId("report-freeze").fixes.subList(0, 4));
         // taps a game takes no notice of: as a real mouse first (Open At Nine, Unity Input System, 08/10/2026)
         assertEquals("raw-mouse", catalog.byId("report-touch").fixes.get(0));
     }

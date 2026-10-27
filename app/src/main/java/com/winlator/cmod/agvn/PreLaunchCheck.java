@@ -15,7 +15,8 @@ import com.winlator.cmod.xenvironment.ImageFs;
 import java.io.File;
 
 /**
- * Runs right before a library game starts: refreshes the Unreal Engine.ini overrides, asks about battery saver
+ * Runs right before a library game starts: unpacks Proton 10 for a game "Tự sửa lỗi" moves there
+ * ({@link AgvnWine10Fix}), refreshes the Unreal Engine.ini overrides, asks about battery saver
  * ({@link AgvnPowerSave}), warns about game files that were copied only partly ({@link AgvnGameFilesCheck}) and
  * checks that enough RAM is free. When RAM is short the
  * player is asked to close other apps and re-check, or to play anyway.
@@ -27,6 +28,10 @@ public final class PreLaunchCheck {
     private PreLaunchCheck() {}
 
     public static void run(Activity activity, Shortcut shortcut, Runnable launch) {
+        AgvnWine10Fix.prepare(activity, shortcut, () -> checks(activity, shortcut, launch));
+    }
+
+    private static void checks(Activity activity, Shortcut shortcut, Runnable launch) {
         applyUeConfig(activity, shortcut);
         int pool = parseInt(shortcut.getExtra(AgvnGameImporter.EXTRA_TEXTURE_POOL, "0"));
         long requiredMb = RamGuard.getRequiredRamMb(pool);

@@ -31,7 +31,7 @@ public class AgvnDoctorTest {
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "godot-light",
             "godot-light-renderer", "mods-off", "raw-mouse", "ue-wait", "exe-64", "exe-main", "dll-wine", "emulator-order",
-            "esync-off", "emulator-wowbox64", "page-light", "media-old"));
+            "esync-off", "emulator-wowbox64", "page-light", "media-old", "wine-new"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
             "ram-saved", "live", "light", "script-error", "page-crash", "frozen", "reported", "module-code",
@@ -364,7 +364,8 @@ public class AgvnDoctorTest {
         ev.frozenPresses = 11;
         ev.chromium = true;
         assertEquals("chromium-frozen", found(ev));
-        assertEquals(Arrays.asList("page-light", "emulator-stable", "emulator-order", "esync-off", "send-logs"),
+        // Proton 10 first: it ran that game at 30 FPS, Steam included (27/10/2026); its page in Chạy nhẹ has no Steam
+        assertEquals(Arrays.asList("wine-new", "page-light", "emulator-stable", "emulator-order", "esync-off", "send-logs"),
                 catalog.byId("chromium-frozen").fixes);
         ev.frozenPresses = 0;
         ev.shownS = 3; // its first frames only: a loading screen
@@ -375,7 +376,7 @@ public class AgvnDoctorTest {
         ev.frozenS = 2;
         ev.shownS = 190;
         assertNull("one that ran", found(ev));
-        assertEquals("page-light", catalog.byId("report-freeze").fixes.get(0));
+        assertEquals(Arrays.asList("wine-new", "page-light"), catalog.byId("report-freeze").fixes.subList(0, 2));
     }
 
     @Test

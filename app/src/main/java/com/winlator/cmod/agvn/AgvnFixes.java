@@ -35,7 +35,7 @@ final class AgvnFixes {
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "mods-off", "raw-mouse", "ue-wait",
             AgvnExe64.FIX, AgvnExeMain.FIX, AgvnDllProxy.FIX, AgvnLockFixes.ORDER, AgvnLockFixes.ESYNC, AgvnEmulatorNoExec.FIX,
-            AgvnMediaFoundation.FIX);
+            AgvnMediaFoundation.FIX, AgvnWine10Fix.ID);
     static final String SYSTEM = "System";
 
     /** A button: its fix id, its words, and what it sets ({@code to}). */
@@ -169,6 +169,8 @@ final class AgvnFixes {
             }
             case "wine-mono":
                 return AgvnWineMono.offered(a, s) ? new Fix(id, a.getString(R.string.agvn_fix_wine_mono), "1") : null;
+            case AgvnWine10Fix.ID: // an Electron or NW.js game that froze on Proton 9
+                return AgvnWine10Fix.make(a, s);
             case "wine-old": { // a game that fails on Proton 10 goes back to Proton 9's container (AgvnWine10)
                 Container old = AgvnWine10.runs(s.container) ? AgvnWine10.find(new ContainerManager(a).getContainers(), false) : null;
                 return old != null ? new Fix(id, a.getString(R.string.agvn_fix_wine_old), String.valueOf(old.id)) : null;
