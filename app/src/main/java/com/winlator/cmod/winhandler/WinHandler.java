@@ -58,6 +58,8 @@ public class WinHandler {
     private final ArrayDeque<Runnable> actions = new ArrayDeque<>();
     private boolean initReceived = false;
     private int agvnVersion = 0; // AGVN: what agvn-winhandler.exe adds (RC_AGVN_POINTER), told with INIT
+    /** AGVN: in {@link #agvnPointer}'s flags, (x, y) is a movement (agvn-winhandler.exe 2). */
+    static final int AGVN_RELATIVE = 0x40000000;
     private boolean running = false;
     private OnGetProcessInfoListener onGetProcessInfoListener;
     private final Map<Integer, ExternalController> controllers = new HashMap<>();
@@ -242,6 +244,16 @@ public class WinHandler {
     /** AGVN: true when agvn-winhandler.exe started the game, so {@link #agvnPointer} reaches it. */
     public boolean agvnPointerReady() {
         return initReceived && agvnVersion >= 1;
+    }
+
+    /** AGVN: true when agvn-winhandler.exe 2 started the game: {@link #agvnPointerBy} reaches it, and it reports. */
+    public boolean agvnRelativeReady() {
+        return initReceived && agvnVersion >= 2;
+    }
+
+    /** AGVN: the mouse moved by (dx, dy), as one SendInput in agvn-winhandler.exe 2 (agvn/AgvnMouseLook). */
+    public void agvnPointerBy(int dx, int dy) {
+        agvnPointer(AGVN_RELATIVE, dx, dy, 0);
     }
 
     /**
@@ -544,6 +556,11 @@ public void setVibrationEnabledForSlot(int slot, boolean enabled) {
 
                 onGetProcessInfoListener.onGetProcessInfo(index, numProcesses,
                         new ProcessInfo(pid, name, memoryUsage, affinityMask, wow64Process));
+                break;
+            }
+            case RequestCodes.AGVN_STATE: { // AGVN: the game holds the cursor, shows a caret (agvn-winhandler.exe 2)
+                XServer xServer = activity.getXServer();
+                if (xServer != null) xServer.agvnMouseLook.reported(receiveData.get() & 0xff);
                 break;
             }
             case RequestCodes.GET_GAMEPAD: {

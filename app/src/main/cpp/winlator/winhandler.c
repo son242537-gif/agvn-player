@@ -35,7 +35,16 @@
 #define RC_CURSOR_POS_FEEDBACK 13
 /* AGVN: the mouse at a pixel of the screen, with its buttons; and this winhandler's version, sent after RC_INIT */
 #define RC_AGVN_POINTER 14
-#define AGVN_VERSION 1
+/* AGVN 2: what the game asks of the mouse and the keyboard, sent to the app
+   when it changes and every second: bit 0, the cursor is hidden and held in a
+   part of the screen (a camera that turns with the mouse); bit 1, a window
+   shows a text caret (a field that takes typing) */
+#define RC_AGVN_STATE 15
+#define AGVN_STATE_MOUSE_LOCKED 1
+#define AGVN_STATE_TEXT_CARET 2
+/* AGVN 2: in RC_AGVN_POINTER's flags, (x, y) is a move by that much, not a pixel */
+#define AGVN_POINTER_RELATIVE 0x40000000
+#define AGVN_VERSION 2
 
 #pragma pack(push, 1)
 typedef struct {
@@ -337,14 +346,75 @@ void handleInput(const char *buffer, int len) {
     INPUT in;
     ZeroMemory(&in, sizeof(in));
     in.type = INPUT_MOUSE;
-    /* Wine maps 0..65535 to the screen as (v * size) >> 16: rounding up
-       lands on the pixel itself */
-    in.mi.dx = w > 0 ? (LONG)(((LONGLONG)x * 65536 + w - 1) / w) : 0;
-    in.mi.dy = h > 0 ? (LONG)(((LONGLONG)y * 65536 + h - 1) / h) : 0;
     in.mi.mouseData = (DWORD)(LONG)wheel;
-    in.mi.dwFlags = (DWORD)flags | MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
+    if (flags & AGVN_POINTER_RELATIVE) {
+      /* AGVN 2: a finger's movement for a game that holds the cursor: Wine
+         gives the game that movement as raw input and as DirectInput's, while
+         the cursor stays where the game holds it */
+      in.mi.dx = x;
+      in.mi.dy = y;
+      in.mi.dwFlags = ((DWORD)flags & ~(DWORD)AGVN_POINTER_RELATIVE) | MOUSEEVENTF_MOVE;
+    } else {
+      /* Wine maps 0..65535 to the screen as (v * size) >> 16: rounding up
+         lands on the pixel itself */
+      in.mi.dx = w > 0 ? (LONG)(((LONGLONG)x * 65536 + w - 1) / w) : 0;
+      in.mi.dy = h > 0 ? (LONG)(((LONGLONG)y * 65536 + h - 1) / h) : 0;
+      in.mi.dwFlags = (DWORD)flags | MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
+    }
     SendInput(1, &in, sizeof(in));
   }
+}
+
+/* AGVN 2: RC_AGVN_STATE's bits now. The mouse is locked when the foreground
+   thread's cursor is hidden and the cursor is held in a small part of the
+   screen, a quarter of it each way at most: Unity's CursorLockMode.Locked
+   clips it to the window's centre point, SDL's relative mode to a few pixels
+   there. A game that hides the cursor to draw its own clips it to its window
+   at most (Unity's CursorLockMode.Confined), and its taps stay where the
+   finger is. The caret is the one of the foreground thread: a text field of
+   Windows (a name box, a launcher). */
+static BYTE agvnState(void) {
+  BYTE state = 0;
+  CURSORINFO cursor;
+  RECT clip;
+  GUITHREADINFO gui;
+  int w = GetSystemMetrics(SM_CXSCREEN), h = GetSystemMetrics(SM_CYSCREEN);
+  ZeroMemory(&cursor, sizeof(cursor));
+  cursor.cbSize = sizeof(cursor);
+  BOOL hidden = GetCursorInfo(&cursor) &&
+                (!(cursor.flags & CURSOR_SHOWING) || cursor.hCursor == NULL);
+  if (hidden && GetClipCursor(&clip) &&
+      (clip.right - clip.left) * 4 <= w && (clip.bottom - clip.top) * 4 <= h)
+    state |= AGVN_STATE_MOUSE_LOCKED;
+  ZeroMemory(&gui, sizeof(gui));
+  gui.cbSize = sizeof(gui);
+  if (GetGUIThreadInfo(0, &gui) && gui.hwndCaret != NULL)
+    state |= AGVN_STATE_TEXT_CARET;
+  return state;
+}
+
+/* AGVN 2: a state is told once it held for two reads in a row: a game that
+   shows the cursor and clips it in one go is never told as holding it for the
+   moment between the two calls */
+DWORD WINAPI AgvnWatchThread(LPVOID lpParam) {
+  BYTE last = 0xff, seen = 0xff;
+  DWORD lastSent = 0;
+  while (running) {
+    BYTE state = agvnState();
+    DWORD now = GetTickCount();
+    BOOL steady = state == seen;
+    seen = state;
+    if ((steady && state != last) || now - lastSent >= 1000) {
+      if (steady) last = state;
+      BYTE buffer[2] = {RC_AGVN_STATE, last};
+      if (last != 0xff)
+        sendto(sock, (const char *)buffer, 2, 0, (struct sockaddr *)&clientAddr,
+               clientAddrLen);
+      lastSent = now;
+    }
+    Sleep(50);
+  }
+  return 0;
 }
 
 DWORD WINAPI ServerThread(LPVOID lpParam) {
@@ -378,6 +448,7 @@ DWORD WINAPI ServerThread(LPVOID lpParam) {
   initBuffer[0] = RC_INIT;
   initBuffer[1] = AGVN_VERSION; /* AGVN: Winlator's app reads only the code */
   sendto(sock, initBuffer, 2, 0, (struct sockaddr *)&clientAddr, clientAddrLen);
+  CreateThread(NULL, 0, AgvnWatchThread, NULL, 0, NULL); /* AGVN 2 */
 
   char buffer[BUFFER_SIZE];
   while (running) {
@@ -507,6 +578,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     execArgs[used++] = L' ';
     execArgs[used] = 0;
   }
+
+  /* AGVN 2: no pointer acceleration, so that a finger's movement
+     (AGVN_POINTER_RELATIVE) reaches the game as it is: Wine, as Windows,
+     doubles a relative move of more than 6 counts by default */
+  int noAcceleration[3] = {0, 0, 0};
+  SystemParametersInfoW(SPI_SETMOUSE, 0, noAcceleration, 0);
 
   SHELLEXECUTEINFOW sei = {0};
   sei.cbSize = sizeof(SHELLEXECUTEINFOW);

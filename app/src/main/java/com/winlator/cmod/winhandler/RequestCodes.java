@@ -16,4 +16,5 @@ abstract class RequestCodes {
     public static final byte BRING_TO_FRONT = 12;
     public static final byte CURSOR_POS_FEEDBACK = 13;
     public static final byte AGVN_POINTER = 14; // AGVN: agvn-winhandler.exe only (AgvnRawMouse)
+    public static final byte AGVN_STATE = 15; // AGVN: from agvn-winhandler.exe 2 (AgvnMouseLook)
 }

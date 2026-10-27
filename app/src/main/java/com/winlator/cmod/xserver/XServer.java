@@ -39,6 +39,7 @@ public class XServer {
     public final Pointer pointer = new Pointer(this);
     private final com.winlator.cmod.agvn.AgvnInputHold inputHold = new com.winlator.cmod.agvn.AgvnInputHold(); // AGVN: taps the game sees
     public final com.winlator.cmod.agvn.AgvnRawMouse agvnRawMouse = new com.winlator.cmod.agvn.AgvnRawMouse(this); // AGVN: raw input
+    public final com.winlator.cmod.agvn.AgvnMouseLook agvnMouseLook = new com.winlator.cmod.agvn.AgvnMouseLook(this); // AGVN: camera drag
     public final InputDeviceManager inputDeviceManager;
     public final GrabManager grabManager;
     public final CursorLocker cursorLocker;
@@ -195,6 +196,7 @@ public class XServer {
     }
 
     public void injectPointerMove(int x, int y) {
+        if (agvnMouseLook.move(x, y)) return; // AGVN: a game that holds the cursor gets the finger's movement
         if (agvnRawMouse.move(x, y)) return; // AGVN: a game that reads raw input gets the touch as a real mouse
         try (XLock lock = lock(Lockable.WINDOW_MANAGER, Lockable.INPUT_DEVICE)) {
             pointer.setPosition(x, y);
@@ -202,6 +204,7 @@ public class XServer {
     }
 
     public void injectPointerMoveDelta(int dx, int dy) {
+        if (agvnMouseLook.moveBy(dx, dy)) return; // AGVN
         if (agvnRawMouse.move(pointer.getX() + dx, pointer.getY() + dy)) return; // AGVN
         try (XLock lock = lock(Lockable.WINDOW_MANAGER, Lockable.INPUT_DEVICE)) {
             pointer.setPosition(pointer.getX() + dx, pointer.getY() + dy);
@@ -217,6 +220,7 @@ public class XServer {
     }
 
     public void injectPointerButtonRelease(Pointer.Button buttonCode) {
+        agvnMouseLook.released(); // AGVN: the finger went up, the next drag starts anew
         // AGVN: a click shorter than two game frames can be lost, so its release may come a little later
         if (heldForGame(buttonCode) && inputHold.deferRelease(-buttonCode.code(), () -> releasePointerButton(buttonCode))) return;
         releasePointerButton(buttonCode);

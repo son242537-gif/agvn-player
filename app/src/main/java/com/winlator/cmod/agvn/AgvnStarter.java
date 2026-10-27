@@ -15,7 +15,12 @@ import java.io.File;
  * Vietnamese accents, got "File not found." (Xiaomi 23090RA98G, 10/10/2026) while GameHub opened it. AGVN's
  * agvn-winhandler.exe reads it as Unicode (CommandLineToArgvW, ShellExecuteExW), and Wine for Android (Proton 9 and 10)
  * names files in UTF-8 as the phone does, so a game whose start has letters beyond ASCII starts through it, as does a
- * game that takes touches as a real mouse ({@link AgvnRawMouse}). The others keep winhandler.exe, as before.
+ * game that takes touches as a real mouse ({@link AgvnRawMouse}).
+ * <p>
+ * From 0.1.71 every game does: agvn-winhandler.exe 2 also tells the app when the game holds the cursor (a camera that
+ * turns with the mouse, {@link AgvnMouseLook}) and when it shows a text caret (the keyboard), which no game started by
+ * winhandler.exe could. Touches still reach the others as X events, as before. winhandler.exe stays the starter only
+ * when agvn-winhandler.exe cannot be written into the container.
  */
 public final class AgvnStarter {
     private static volatile String note;
@@ -30,13 +35,12 @@ public final class AgvnStarter {
         String starter = AgvnRawMouse.prepare(context, xServer, shortcut);
         note = null;
         if (shortcut == null || AgvnRawMouse.EXE.equals(starter)) return starter;
-        String beyond = beyondAscii(launch, shortcut.getExtra("execArgs"));
-        if (beyond.isEmpty()) return starter;
         File windows = new File(shortcut.container.getRootDir(), ".wine/drive_c/windows");
         byte[] exe = FileUtils.read(context, "agvn/" + AgvnRawMouse.EXE);
         if (!AgvnRawMouse.install(exe, new File(windows, AgvnRawMouse.EXE))) return starter;
-        note = "Đường dẫn game có chữ ngoài ASCII (" + beyond + "): mở game bằng " + AgvnRawMouse.EXE
-                + ", đọc đường dẫn bằng Unicode";
+        String beyond = beyondAscii(launch, shortcut.getExtra("execArgs"));
+        if (!beyond.isEmpty()) note = "Đường dẫn game có chữ ngoài ASCII (" + beyond + "): mở game bằng "
+                + AgvnRawMouse.EXE + ", đọc đường dẫn bằng Unicode";
         return AgvnRawMouse.EXE;
     }
 

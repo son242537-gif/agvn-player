@@ -339,6 +339,7 @@ public abstract class WindowRequests {
             client.xServer.pointer.setX(localPoint[0]);
             client.xServer.pointer.setY(localPoint[1]);
         }
+        client.xServer.agvnMouseLook.warped(client.xServer.pointer.getX(), client.xServer.pointer.getY()); // AGVN
     }
 
     public static void setInputFocus(XClient client, XInputStream inputStream, XOutputStream outputStream) throws XRequestError {
