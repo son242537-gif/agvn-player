@@ -1314,7 +1314,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
                             audioDriver.equals("pulse-audio-gn")));
         }
 
-        com.winlator.cmod.agvn.AgvnMediaFoundation.apply(envVars); // AGVN: MP4 video frames in normal memory
+        com.winlator.cmod.agvn.AgvnMediaFoundation.apply(envVars, shortcut); // AGVN: MP4 video frames in normal memory, but AVPro gets its DXGI manager
         guestProgramLauncherComponent.setEnvVars(envVars);
         if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.start(shortcut, envVars); // AGVN: logs of this play session
         if (shortcut != null && debugDialog != null) com.winlator.cmod.agvn.AgvnSessionLog.addLog(debugDialog.getLogFile()); // AGVN: and Wine's own log

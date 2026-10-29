@@ -2551,3 +2551,37 @@ chuyển cảnh.
   1. Tenants of the Dead: khi thanh "Phim trong game không mở được" hiện, bấm "Chạy lại, đọc phim cách cũ".
   2. Sau một lần game tắt vì hết RAM, chọn "Trả cấu hình chạy tốt". `moi-truong.txt` của lần mở sau vẫn có
      `WINE_OLD_MEDIA_SOURCE=1`, và phim ở cảnh chuyển ngày 3 phát được.
+
+## Game Unity dùng AVPro Video không mở được phim nào (bản 0.1.73)
+
+Báo cáo ngày 30/10/2026 (POCO F8 Pro, Android 16, app 0.1.70, Proton 9 + FEXCore, DXVK): một game Unity IL2CPP phát
+phim bằng plugin AVPro Video (RenderHeads) đứng mãi ở "đang tải đệm video". Cùng thư mục trên Windows phát bình thường.
+
+- **Đo (bản thăm dò tự mở từng mẫu bằng AVPro):** H.264 High/Baseline, VP8, VP9, MPEG-4, WMV2, MJPEG, MPEG-2, Theora:
+  - Media Foundation, có giải mã phần cứng: không mẫu nào mở, AVPro không báo lỗi (`GetLastExtendedErrorCode` = 0).
+  - Media Foundation, `useHardwareDecoding = false`: không mẫu nào mở, mã lỗi `0x80004003` (`E_POINTER`).
+  - DirectShow: AVPro chỉ log "Failed to open". WinRT: game sập trong `kernelbase.dll` (gọi từ `AVProVideoWinRT.dll`).
+  - Mọi định dạng hỏng như nhau, kể cả MJPEG và WMV mà Wine tự giải được: lỗi không nằm ở codec.
+- **Vì sao:** AVPro (đường Media Foundation) phát qua Media Engine, và tự tạo DXGI device manager bằng
+  `MFCreateDXGIDeviceManager` để đưa cho Media Engine. App đặt `WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER=1` cho mọi game
+  (mục `AgvnMediaFoundation` ở trên, vì VideoPlayer của Unity). Khi đó `mfplat.dll` của Proton 9 trong app chỉ in
+  "stubbing out" và trả lỗi, không có manager (đã kiểm: chuỗi biến và "stubbing out" có trong `mfplat.dll` của
+  `proton-9.0-arm64ec`). AVPro không mở được phim nào. VideoPlayer của Unity thì tự lùi về bộ nhớ thường, nên không bị.
+- **Sửa (`AgvnMediaFoundation.avPro`, `apply(EnvVars, Shortcut)`):**
+  - Game có `AVProVideo.dll` trong `<Tên>_Data/Plugins/` (hoặc thư mục con như `x86_64/`) thì app không đặt biến đó, để
+    Wine tạo DXGI device manager như Windows.
+  - Người chơi tự tick biến đó (của container hoặc của game) thì vẫn giữ.
+  - Game khác không đổi gì.
+- **Chưa sửa:**
+  - DirectShow và WinRT. WinRT (`Windows.Media.Playback`) không có trong Wine. Game chọn WinRT vẫn sập; phần lớn game
+    để AVPro dùng Media Foundation (mặc định trên Windows).
+  - Nếu Media Engine của Wine cũng chép khung hình qua texture D3D11 hỏng như VideoPlayer từng bị, phim AVPro có thể
+    vẫn đứng. Khi đó cần nhật ký Wine với `+mfplat,+mfmediaengine,+winegstreamer`.
+- **Test:** `AgvnMediaFoundationTest.anAvProGameKeepsItsDxgiManager`.
+- **Thử máy:**
+  1. Game `NZGY-VIET-HOA-CHEAT-AGVN` có `agvn-thudo.flag`: mở, để yên ~4 phút. `moi-truong.txt` của phiên không có
+     `WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER`. `agvn-thudo.txt`: ít nhất H.264 qua Media Foundation (có giải mã phần
+     cứng) phải mở được.
+  2. Bỏ `agvn-thudo.flag`, chơi tới phim đầu: phim phát (có tiếng), không đứng ở "đang tải đệm video".
+  3. Hồi quy: một game Unity có VideoPlayer (không có AVPro) vẫn có `WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER=1` trong
+     `moi-truong.txt`, phim vẫn phát, RAM không tăng mỗi phim.
