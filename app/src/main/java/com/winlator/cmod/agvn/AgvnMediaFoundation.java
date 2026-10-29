@@ -7,8 +7,6 @@ import com.winlator.cmod.R;
 import com.winlator.cmod.container.Shortcut;
 import com.winlator.cmod.core.EnvVars;
 
-import java.io.File;
-
 /**
  * Video through Media Foundation: Unity's VideoPlayer, Unreal's WmfMedia and many visual novels' MP4 movies.
  *
@@ -33,11 +31,11 @@ import java.io.File;
  * to a game whose movie failed so ({@link AgvnMovieWatch}, game-problems.json "movie-transcode"), and only on Proton 9:
  * Proton 10's winegstreamer has neither the switch nor this way of failing.
  *
- * <p>AVPro Video (RenderHeads), a Unity plugin, plays through Media Foundation's Media Engine, which it hands a DXGI
- * device manager it creates itself. With the switch on, Wine's MFCreateDXGIDeviceManager only prints "stubbing out" and
- * fails, and AVPro opens no movie at all: no format, H.264, VP8, WMV2 or MJPEG, plays, with or without hardware decoding
- * (E_POINTER), and the game waits on "buffering" (POCO F8 Pro, 0.1.70, 30/10/2026). So a game with
- * {@link #AVPRO_DLL} gets the switch only when the player set it.
+ * <p>AVPro Video (RenderHeads), a Unity plugin, plays through Media Foundation's Media Engine. With hardware decoding,
+ * its default, it hands the engine a DXGI device manager it creates itself; with the switch on, Wine's
+ * MFCreateDXGIDeviceManager only prints "stubbing out" and fails, and no movie opened that way, while the same movies
+ * opened without hardware decoding (NZGY, POCO F8 Pro, 30/10/2026). So a game with AVPro Video ({@link AgvnAvPro})
+ * gets the switch only when the player set it. Its "file:///F:/..." URLs are {@link AgvnMfFileUrl}'s.
  */
 public final class AgvnMediaFoundation {
     static final String NO_DXGI_MANAGER = "WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER";
@@ -47,22 +45,15 @@ public final class AgvnMediaFoundation {
     static final String OLD_MEDIA_SOURCE = "WINE_OLD_MEDIA_SOURCE", FIX = "media-old";
     /** What Wine prints (always, logs on or off) when a movie needs Steam's converter: the movie then does not open. */
     static final String NO_TRANSCODER = "failed to create protondemuxer";
-    /** AVPro Video's Windows plugin, in {@code <game>_Data/Plugins/x86_64/} (or {@code Plugins/} itself). */
-    static final String AVPRO_DLL = "AVProVideo.dll";
 
     private AgvnMediaFoundation() {}
-
-    /** {@link #apply(EnvVars, boolean)} for {@code shortcut}'s game; null for none (a container's desktop). */
-    public static void apply(EnvVars env, Shortcut shortcut) {
-        apply(env, shortcut != null && avPro(AgvnEngineLogs.exe(shortcut)));
-    }
 
     /** Call on the final environment, after the container's and the game's own variables. */
     public static void apply(EnvVars env) {
         apply(env, false);
     }
 
-    /** {@code avPro}: the game plays movies with AVPro Video, which needs the DXGI device manager. */
+    /** {@code avPro}: the game plays movies with AVPro Video, which needs the DXGI device manager ({@link AgvnAvPro}). */
     static void apply(EnvVars env, boolean avPro) {
         String value = env.has(NO_DXGI_MANAGER) ? env.get(NO_DXGI_MANAGER).trim() : avPro ? "0" : "1";
         if (value.isEmpty() || value.equals("0") || value.equalsIgnoreCase("false")) env.remove(NO_DXGI_MANAGER);
@@ -72,26 +63,6 @@ public final class AgvnMediaFoundation {
             if (!env.has(NEW_MEDIA_SOURCE)) env.put(NEW_MEDIA_SOURCE, env.get(MISSPELLED_MEDIA_SOURCE));
             env.remove(MISSPELLED_MEDIA_SOURCE);
         }
-    }
-
-    /** True when a {@code *_Data/Plugins} folder beside {@code exe} holds {@link #AVPRO_DLL}, in it or one level down. */
-    static boolean avPro(File exe) {
-        File dir = exe.getParentFile();
-        File[] data = dir != null ? dir.listFiles((d, n) -> n.endsWith("_Data")) : null;
-        if (data == null) return false;
-        for (File d : data) {
-            File plugins = new File(d, "Plugins");
-            if (hasAvPro(plugins)) return true;
-            File[] sub = plugins.listFiles(File::isDirectory);
-            if (sub != null) for (File s : sub) if (hasAvPro(s)) return true;
-        }
-        return false;
-    }
-
-    private static boolean hasAvPro(File dir) {
-        String[] names = dir.list();
-        if (names != null) for (String n : names) if (n.equalsIgnoreCase(AVPRO_DLL)) return true;
-        return false;
     }
 
     /** True when the game reads movies the old way: WINE_OLD_MEDIA_SOURCE set to a number but 0, as Wine reads it. */

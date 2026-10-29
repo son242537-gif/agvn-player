@@ -1,6 +1,7 @@
 AGVN Player v0.1.73 - agvn.io
 
 Sửa lỗi:
-- Game Unity phát phim bằng AVPro Video đứng mãi ở "đang tải đệm video": app không còn tắt phần Wine mà AVPro cần để mở phim.
+- Game mở phim bằng địa chỉ "file:///" (như nhiều game Unity dùng AVPro Video) đứng mãi ở "đang tải đệm video": nay phim mở được.
+- Game Unity dùng AVPro Video: không còn sập khi plugin chọn cách phát WinRT, và cách giải mã phim bằng phần cứng có đủ phần Wine nó cần.
 - Game đã chọn "Đọc phim bằng cách cũ" vẫn giữ cách đó sau khi bấm "Trả cấu hình chạy tốt", nên phim không đen lại.
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

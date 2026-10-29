@@ -50,28 +50,6 @@ public class AgvnMediaFoundationTest {
     }
 
     @Test
-    public void anAvProGameKeepsItsDxgiManager() throws Exception {
-        // AVPro Video's Media Engine opened no movie while Wine stubbed MFCreateDXGIDeviceManager out (30/10/2026)
-        File game = Files.createTempDirectory("avpro").toFile();
-        File exe = new File(game, "NZGY.exe");
-        assertTrue(exe.createNewFile());
-        assertFalse("a Unity game without AVPro", AgvnMediaFoundation.avPro(exe));
-        File plugins = new File(game, "NZGY_Data/Plugins/x86_64");
-        assertTrue(plugins.mkdirs());
-        assertFalse(AgvnMediaFoundation.avPro(exe));
-        assertTrue(new File(plugins, "avprovideo.dll").createNewFile());
-        assertTrue(AgvnMediaFoundation.avPro(exe));
-        assertFalse("no folder", AgvnMediaFoundation.avPro(new File("NZGY.exe")));
-
-        EnvVars env = new EnvVars("WINEESYNC=1");
-        AgvnMediaFoundation.apply(env, true);
-        assertFalse(env.has(NO_MANAGER));
-        EnvVars ticked = new EnvVars(NO_MANAGER + "=1");
-        AgvnMediaFoundation.apply(ticked, true);
-        assertEquals("the player's own pick still holds", "1", ticked.get(NO_MANAGER));
-    }
-
-    @Test
     public void theMisspelledMediaSourceVariableReachesWine() throws Exception {
         EnvVars saved = new EnvVars("WINE_NEW_MEDIASOURCE=0");
         AgvnMediaFoundation.apply(saved);

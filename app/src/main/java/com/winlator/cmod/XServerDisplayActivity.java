@@ -1195,6 +1195,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 com.winlator.cmod.agvn.AgvnGamepadMode.mapToXInput(exclusiveXInput, inputType)))
             containerDataChanged = true;
         com.winlator.cmod.agvn.VcRuntimeMarker.apply(new File(container.getRootDir(), ".wine/system.reg")); // AGVN: Visual C++ 2015-2022 markers
+        if (com.winlator.cmod.agvn.AgvnMfFileUrl.apply(this, container)) containerDataChanged = true; // AGVN: "file:///F:/..." movies open
         com.winlator.cmod.agvn.AgvnFontFallback.apply(new File(container.getRootDir(), ".wine/user.reg")); // AGVN: MS Gothic etc. for Japanese games
         com.winlator.cmod.agvn.AgvnDwriteFonts.apply(new File(container.getRootDir(), ".wine"), // AGVN: DirectWrite's fonts
                 wineInfo.path != null ? new File(wineInfo.path, "share/wine/fonts") : null, imageFs.getRootDir());
@@ -1314,7 +1315,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
                             audioDriver.equals("pulse-audio-gn")));
         }
 
-        com.winlator.cmod.agvn.AgvnMediaFoundation.apply(envVars, shortcut); // AGVN: MP4 video frames in normal memory, but AVPro gets its DXGI manager
+        com.winlator.cmod.agvn.AgvnAvPro.apply(envVars, shortcut); // AGVN: MP4 video frames in normal memory; AVPro gets its DXGI manager, not its WinRT player
         guestProgramLauncherComponent.setEnvVars(envVars);
         if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.start(shortcut, envVars); // AGVN: logs of this play session
         if (shortcut != null && debugDialog != null) com.winlator.cmod.agvn.AgvnSessionLog.addLog(debugDialog.getLogFile()); // AGVN: and Wine's own log

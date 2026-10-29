@@ -1,0 +1,4 @@
+LIBRARY agvn-mfurl.dll
+EXPORTS
+    DllGetClassObject PRIVATE
+    DllCanUnloadNow PRIVATE
