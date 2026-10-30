@@ -103,6 +103,7 @@ final class AgvnEvidence {
             case "chromium": return chromium;
             case "helper-exe": return helperExe;
             case "media-new": return newMediaSource;
+            case "gpu-room": return AgvnGpuAlloc.roomLeft(lines);
             default: return false; // "live" problems are found while playing; names a newer file may add stay unmet
         }
     }

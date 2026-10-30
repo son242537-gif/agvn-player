@@ -64,6 +64,9 @@ final class AgvnFixApply {
             case "driver-other":
                 s.putExtra("graphicsDriverConfig", AgvnFixEdits.withConfigValue(AgvnFixes.driverConfig(s), "version", fix.to, ';'));
                 break;
+            case AgvnGpuAlloc.FIX:
+                s.putExtra("graphicsDriverConfig", AgvnGpuAlloc.withHidden(AgvnFixes.driverConfig(s)));
+                break;
             case "wined3d":
             case "dxvk-back":
                 s.putExtra("dxwrapper", fix.to);

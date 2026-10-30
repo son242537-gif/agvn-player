@@ -31,11 +31,11 @@ public class AgvnDoctorTest {
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "godot-light",
             "godot-light-renderer", "mods-off", "raw-mouse", "ue-wait", "exe-64", "exe-main", "dll-wine", "emulator-order",
-            "esync-off", "emulator-wowbox64", "page-light", "media-old", "wine-new"));
+            "esync-off", "emulator-wowbox64", "page-light", "media-old", "wine-new", "vk-no-shared"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
             "ram-saved", "live", "light", "script-error", "page-crash", "frozen", "reported", "module-code",
-            "closed-on-start", "froze", "chromium", "helper-exe", "media-new"));
+            "closed-on-start", "froze", "chromium", "helper-exe", "media-new", "gpu-room"));
     static AgvnProblemCatalog catalog;
 
     @BeforeClass
@@ -125,6 +125,50 @@ public class AgvnDoctorTest {
         assertEquals("its 64-bit exe first", Arrays.asList(AgvnExe64.FIX, "driver-other", "wined3d", "send-logs"), f.fixes());
         assertEquals("then a game that cannot start DirectX", AgvnExe64.FIX, catalog.finding("directx",
                 Collections.<String, String>emptyMap()).fixes().get(0));
+    }
+
+    @Test
+    public void theDriverRefusesGpuMemoryThatIsThere() {
+        // An Unreal Engine 5 game (Shipping, DX11) on a Xiaomi 2510DPC44G (Adreno 830), 30/10/2026: its shared 4 MB
+        // render target refused in every memory type with 448 MB of a 3355 MB budget used; it froze or showed
+        // "CreateTexture2D(...) failed with error E_INVALIDARG", and was read as running out of graphics memory
+        String[] refused = {"err:   DxvkMemoryAllocator: Memory allocation failed", "err:     Size:      4145152",
+                "err:     Alignment: 4096", "err:     Mem types: 0,1,2",
+                "err:   Heap  Size (MiB)  Allocated   Used        Reserved    Budget",
+                "err:    0:     8341         448         193         207        3355"};
+        AgvnEvidence froze = new AgvnEvidence();
+        froze.started = froze.playerQuit = true;
+        froze.seconds = 80;
+        froze.frozenS = 55;
+        froze.frozenPresses = 9;
+        froze.lines.addAll(Arrays.asList(refused));
+        AgvnProblemCatalog.Finding f = catalog.find(froze);
+        assertEquals("gpu-refused", f.id());
+        assertEquals(Arrays.asList("vk-no-shared", "driver-other", "dxvk-other", "send-logs"), f.fixes());
+        assertFalse("not running out of RAM", AgvnMemorySaver.ranOutOfRam(f.id()));
+
+        AgvnEvidence full = noStart(refused);
+        full.lines.set(5, "err:    0:     8341        3290        3100        3300        3355");
+        full.crashed = true;
+        assertEquals("a heap at its budget ran out", "gpu-memory", found(full));
+        assertTrue(AgvnGpuAlloc.roomLeft(Arrays.asList(refused)));
+
+        // DXVK 1.10.3's own lines (Mali's default)
+        assertTrue(AgvnGpuAlloc.roomLeft(Arrays.asList("err:   DxvkMemoryAllocator: Memory allocation failed",
+                "  Size:      4145152", "  Alignment: 4096", "  Mem flags: 0x1", "  Mem types: 0x7",
+                "err:   Heap 0: 448 MB allocated, 193 MB used, 450 MB allocated (driver), 3355 MB budget (driver), 8341 MB total",
+                "err:   DxvkMemoryAllocator: Memory allocation failed")));
+        assertFalse(AgvnGpuAlloc.roomLeft(Arrays.asList("err:   DxvkMemoryAllocator: Memory allocation failed",
+                "  Size:      67108864", "err:   Heap 0: 3200 MB allocated, 3100 MB used, 3300 MB allocated (driver), "
+                        + "3355 MB budget (driver), 8341 MB total")));
+        assertFalse("no heap listed", AgvnGpuAlloc.roomLeft(Collections.singletonList("err:   DxvkMemoryAllocator: Memory allocation failed")));
+
+        assertEquals("version=turnip26.2.0;blacklistedExtensions=VK_KHR_external_memory_fd",
+                AgvnGpuAlloc.withHidden("version=turnip26.2.0;blacklistedExtensions="));
+        assertEquals("version=System;blacklistedExtensions=VK_EXT_a,VK_KHR_external_memory_fd;gpuName=Device",
+                AgvnGpuAlloc.withHidden("version=System;blacklistedExtensions=VK_EXT_a;gpuName=Device"));
+        String once = "blacklistedExtensions=VK_KHR_external_memory_fd";
+        assertEquals(once, AgvnGpuAlloc.withHidden(once));
     }
 
     @Test

@@ -368,6 +368,11 @@
     <string name="agvn_fix_wined3d">Dùng WineD3D thay DXVK (chậm hơn, dễ chạy hơn)</string>
     <string name="agvn_fix_dxvk_back">Dùng lại DXVK (bỏ WineD3D)</string>
     <string name="agvn_fix_ue_wait">Cho game chờ vẽ hình lâu hơn, không tự dừng sau 120 giây</string>
+    <string name="agvn_gpu_refused_title">Driver đồ họa không cấp bộ nhớ cho game</string>
+    <string name="agvn_gpu_refused_detail">Game xin bộ nhớ đồ họa mà driver từ chối, dù bộ nhớ còn trống nhiều. Game có thể đứng hình hoặc tự tắt. Máy không hết bộ nhớ, nên hạ Đồ họa không giúp được.</string>
+    <string name="agvn_gpu_refused_fix">Thường là texture game đánh dấu \"chia sẻ\". Chạy lại với bộ nhớ chia sẻ của driver tắt thì game tạo texture thường. Phần chơi chưa lưu sẽ mất.</string>
+    <string name="agvn_gpu_refused_restart">Chạy lại, tắt bộ nhớ chia sẻ</string>
+    <string name="agvn_fix_vk_no_shared">Tắt bộ nhớ đồ họa chia sẻ của driver (game tạo texture thường)</string>
     <string name="agvn_fix_godot_vulkan">Cho game Godot chạy bằng Vulkan</string>
     <string name="agvn_fix_godot_gles2">Cho game Godot chạy bằng OpenGL đời cũ (GLES2)</string>
     <string name="agvn_fix_godot_angle">Cho game Godot chạy bằng Direct3D 11 (ANGLE)</string>

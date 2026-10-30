@@ -2602,3 +2602,58 @@ có video". Cùng thư mục trên Windows phát bình thường.
   3. NZGY bản Việt hoá hiện tại: phim, tiếng, phụ đề Việt vẫn chạy (DirectShow).
   4. Hồi quy: một game Unity có VideoPlayer (không có AVPro) vẫn có `WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER=1`, phim vẫn
      phát, RAM không tăng mỗi phim. Một game Unreal hoặc visual novel có phim MP4 vẫn phát.
+
+## Driver đồ họa không cấp bộ nhớ dù máy còn: game Unreal Engine 5 đứng hoặc tắt lúc mở (bản 0.1.73)
+
+Báo cáo ngày 30/10/2026 (Xiaomi 2510DPC44G, Adreno 830, Android 16, RAM 11 GB, app 0.1.70, Proton 9 + FEXCore, DXVK,
+driver qua Wrapper): một game Unreal Engine 5 (Shipping, DX11) khoảng 20 giây sau khi mở thì đen màn hình. Có lần đứng
+hẳn (FPS 0, người chơi phải thoát), có lần hiện `LowLevelFatalError [D3D11Util.cpp:294] … CreateTexture2D(...) failed
+with error E_INVALIDARG` (1000×1000, `B8G8R8A8_UNORM`, `RENDER_TARGET | SHADER_RESOURCE`). Exe gốc của hãng, không
+thêm DLL, cũng vậy.
+
+- **Nhật ký:** `DxvkMemoryAllocator: Memory allocation failed`, `Size: 4145152`, `Mem types: 0,1,2`, rồi bảng heap
+  `0: 8341 448 193 207 3355`: mới cấp 448 MB trong budget 3.355 MB. RAM trống thấp nhất 3,3 GB, không bị Android diệt,
+  máy không nóng. "Tự sửa lỗi" đọc thành "Game hết bộ nhớ đồ họa" (`gpu-memory`), nên đề nghị hạ Đồ họa và bật mức
+  tiết kiệm RAM cao nhất, vô ích. Gói nhật ký ghi "Nhật ký engine đã chép: 0 file".
+- **Vì sao (người báo đã tìm ra 31/10):** render target đó game đánh dấu chia sẻ (`D3D11_RESOURCE_MISC_SHARED`), nên
+  DXVK xin bộ nhớ xuất được (export). Driver báo có hỗ trợ nhưng từ chối mọi lần cấp loại này; texture thường thì cấp
+  bình thường.
+  - winevulkan của Proton 9 (`vulkan.c`, nhánh `proton_9.0`) chỉ báo `VK_KHR_external_memory_win32` cho game khi driver
+    có `VK_KHR_external_memory_fd`.
+  - Không có nó, DXVK 2.3.1 và 1.10.3 (`DxvkImage::canShareImage`) tạo texture chia sẻ thành texture thường, chỉ in
+    "Failed to create shared resource: VK_KHR_EXTERNAL_MEMORY_WIN32 not supported". Game không đưa texture cho chương
+    trình khác thì không thấy khác gì.
+- **Sửa:**
+  - **Nhận dạng (`AgvnGpuAlloc.roomLeft`, điều kiện `gpu-room`):** DXVK báo cấp phát hỏng trong khi mọi heap DXVK in ra
+    sau đó còn ít nhất 256 MB (và gấp 4 lần lượng xin) dưới budget. Đọc được cả bảng của DXVK 2.x lẫn dòng `Heap 0: …
+    MB budget (driver)` của DXVK 1.x. Một heap đã chạm budget thì vẫn là "hết bộ nhớ đồ họa" như cũ.
+  - **Tự sửa lỗi (`gpu-refused`):** "Driver đồ họa không cấp bộ nhớ cho game, dù máy còn", với điều kiện chỉ là
+    `gpu-room`, nên game đứng hình rồi người chơi thoát cũng được hỏi. Không tính là hết RAM, nên không bật tiết kiệm
+    RAM. Cách sửa, theo thứ tự: "Tắt bộ nhớ đồ họa chia sẻ của driver" (`vk-no-shared`: thêm `VK_KHR_external_memory_fd`
+    vào danh sách tiện ích Vulkan tắt của riêng game, tức `WRAPPER_EXTENSION_BLACKLIST`), đổi driver, đổi DXVK, gửi
+    nhật ký.
+  - **Lúc đang chơi (`AgvnGpuAllocWatch`):** thấy lỗi đó trong lúc chơi thì `su-kien.txt` ghi lại, và một thanh báo hiện
+    một lần mỗi phiên, kèm nút "Chạy lại, tắt bộ nhớ chia sẻ" (game tắt và tự mở lại; phần chưa lưu mất).
+  - **Nhật ký Unreal (`AgvnUnrealLogs`):** project được tìm từ thư mục trên `Binaries/Win64` của exe, từ các thư mục
+    của game có `Binaries`, rồi mới tới tên thư mục game. Trước đây chỉ dùng tên thư mục game, nên bản chép đổi tên thư
+    mục thì không tìm thấy log. Mỗi thư mục `Saved` (trong game và trong `%LOCALAPPDATA%\<Project>`) cho 2 log mới
+    nhất trong `Logs`, và log cùng `CrashContext.runtime-xml` của thư mục mới nhất trong `Crashes` (không lấy
+    minidump).
+- **Chưa rõ:**
+  - Driver nào bên dưới Wrapper từ chối ("Wrapper driver 26.1.99" có thể là Turnip qua Wrapper). Với driver khác, bộ nhớ
+    export có thể cấp được; vì vậy việc tắt chỉ áp cho game gặp lỗi, không áp cho mọi game.
+  - Một game gửi texture chia sẻ sang chương trình khác (hiếm: lớp phủ, trình duyệt nhúng) sẽ không thấy texture đó khi
+    đã tắt. Muốn bật lại: xoá `VK_KHR_external_memory_fd` khỏi "Tiện ích Vulkan đã tắt" của game.
+  - Game UE 5.8 khác chết khoảng 60 giây sau khi mở (báo cáo cũ) có thể cùng nguyên nhân: xem `su-kien.txt` có dòng
+    "Driver đồ họa không cấp bộ nhớ…" không.
+- **Test:** `AgvnDoctorTest.theDriverRefusesGpuMemoryThatIsThere` (đúng các dòng của báo cáo), `AgvnUnrealLogsTest`.
+- **Thử máy:**
+  1. Game UE5 của báo cáo, cấu hình cũ: khi game đứng, thanh "Driver đồ họa không cấp bộ nhớ cho game" hiện → bấm
+     "Chạy lại, tắt bộ nhớ chia sẻ". Game mở lại; `moi-truong.txt` có `WRAPPER_EXTENSION_BLACKLIST` chứa
+     `VK_KHR_external_memory_fd`; game qua được chỗ 20 giây và vẽ hình.
+  2. Không bấm thanh, thoát game: "Tự sửa lỗi" hiện "Driver đồ họa không cấp bộ nhớ cho game, dù máy còn" (không phải
+     "hết bộ nhớ đồ họa"), nút đầu là "Tắt bộ nhớ đồ họa chia sẻ…".
+  3. Gói nhật ký của game đó có `<Project>.log` và (nếu game văng) `CrashContext.runtime-xml`; dòng "Nhật ký engine đã
+     chép" không còn là 0.
+  4. Hồi quy: một game DX11 khác (Unity, UE4) chạy như cũ, `moi-truong.txt` của nó không có
+     `VK_KHR_external_memory_fd` trong danh sách tắt.

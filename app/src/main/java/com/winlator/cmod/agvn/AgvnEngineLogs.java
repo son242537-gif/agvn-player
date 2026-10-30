@@ -100,15 +100,9 @@ final class AgvnEngineLogs {
                 out.add(new File(exeDir, base + "_Data/output_log.txt")); // Unity 5 to 2017
                 break;
             }
-            case "UNREAL": {
-                if (gameDir != null) {
-                    String exePath = exe.getPath(), root = gameDir.getPath() + "/";
-                    String project = UeIniWriter.projectName(gameDir, exePath.startsWith(root) ? exePath.substring(root.length()) : exe.getName());
-                    out.add(new File(profile, "AppData/Local/" + project + "/Saved/Logs/" + project + ".log"));
-                    out.add(new File(gameDir, project + "/Saved/Logs/" + project + ".log"));
-                }
+            case "UNREAL":
+                out.addAll(AgvnUnrealLogs.files(exe, gameDir, profile)); // its Saved/Logs and Saved/Crashes
                 break;
-            }
             case "RENPY":
                 for (String name : new String[]{"log.txt", "traceback.txt", "errors.txt"}) out.add(new File(exeDir, name));
                 break;

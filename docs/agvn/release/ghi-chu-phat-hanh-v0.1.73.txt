@@ -4,4 +4,6 @@ Sửa lỗi:
 - Game mở phim bằng địa chỉ "file:///" (như nhiều game Unity dùng AVPro Video) đứng mãi ở "đang tải đệm video": nay phim mở được.
 - Game Unity dùng AVPro Video: không còn sập khi plugin chọn cách phát WinRT, và cách giải mã phim bằng phần cứng có đủ phần Wine nó cần.
 - Game đã chọn "Đọc phim bằng cách cũ" vẫn giữ cách đó sau khi bấm "Trả cấu hình chạy tốt", nên phim không đen lại.
+- Game Unreal Engine 5 đứng hình hoặc tắt lúc mở vì driver đồ họa không cấp bộ nhớ, dù máy còn: app báo ngay khi đang chơi và đề nghị "Chạy lại, tắt bộ nhớ chia sẻ"; "Tự sửa lỗi" không còn đọc nhầm thành hết bộ nhớ.
+- Gói nhật ký của game Unreal có log và báo cáo văng của game, kể cả khi thư mục game đổi tên.
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

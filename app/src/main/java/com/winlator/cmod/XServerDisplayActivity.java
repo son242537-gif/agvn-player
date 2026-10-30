@@ -513,6 +513,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         ProcessHelper.removeAllDebugCallbacks();
         ProcessHelper.addDebugCallback(com.winlator.cmod.agvn.AgvnWineTail.get()); // AGVN: a crash shows in the session summary, logs on or off
         com.winlator.cmod.agvn.AgvnMovieWatch.attach(this); // AGVN: a movie Wine cannot decode, which the game waits on
+        com.winlator.cmod.agvn.AgvnGpuAllocWatch.attach(this); // AGVN: graphics memory the driver refused, with room left
         if (enableLogs || enableWinlatorLogs) LogView.setFilename(getExecutable());
         if (enableLogs) {
             ProcessHelper.addDebugCallback(debugDialog = new DebugDialog(this));
