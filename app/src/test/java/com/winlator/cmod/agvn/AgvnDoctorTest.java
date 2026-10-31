@@ -424,6 +424,27 @@ public class AgvnDoctorTest {
     }
 
     @Test
+    public void anElectronGameThatClosesAsItStartsGetsItsPageInChayNhe() {
+        // Electron 44 on a POCO F8 Pro (31/10/2026): its page loaded, then all its processes ended after 6 s with no
+        // window and no error; agvn-winhandler.exe 3 now ends then, and Wine with it
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.endedByGame = true;
+        ev.seconds = 9;
+        ev.chromium = true;
+        assertEquals("chromium-closed", found(ev));
+        assertEquals(Arrays.asList("page-light", "wine-new", "send-logs"), catalog.byId("chromium-closed").fixes);
+        ev.chromium = false;
+        assertEquals("no-start", found(ev));
+        ev.chromium = true;
+        ev.started = true;
+        ev.seconds = 900;
+        ev.endedByGame = true;
+        assertNull("one that ran a quarter of an hour, then closed from its own menu", found(ev));
+        assertEquals("0", AgvnGameEnd.code(0));
+        assertEquals("0xC0000005 (lỗi truy cập bộ nhớ)", AgvnGameEnd.code(0xC0000005));
+    }
+
+    @Test
     public void aDllThatCannotRunFromSharedStorage() {
         // an RPG Maker VX Ace game in Download on Proton 10 + FEX (POCO F8 Pro, 14/10/2026): RGSS301.dll's DllMain hit an
         // access violation, and Game.exe showed Wine's text of ERROR_NOACCESS, whether the game window drew or not

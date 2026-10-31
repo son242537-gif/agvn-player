@@ -2688,3 +2688,55 @@ hồi chậm; cây viết ✎ ở góc trên bên trái hay bị chạm nhầm k
   2. Bấm nhanh FIRE/DODGE liên tục, giữ AIM: game nhận đủ, không kẹt phím; rung tay cầm (nếu game có) vẫn chạy.
   3. Tay cầm thật cắm vào rồi rút ra giữa chừng: game thấy tay cầm mất, không đứng hình.
   4. Không còn ✎ ở góc; "✎ Sửa" trên thanh trên cùng vẫn sửa phím; HUD nằm ở góc trên bên trái, không bị che.
+
+## Game tự tắt mà màn hình đen chờ mãi; game Electron chạy kiểu Wine (bản 0.1.74)
+
+Báo cáo ngày 31/10/2026 (POCO F8 Pro, Adreno 830, Proton 9 arm64ec + FEXCore): một game Electron 44 (có
+`resources/app.asar`, `version` ghi 44.x) mở bằng Windows thì đen màn hình. Trang của game nạp được khoảng 6 giây (đã ghi
+localStorage), rồi mọi tiến trình của game biến mất, không hộp lỗi, không dòng lỗi nào của Wine. Chỉ còn
+`agvn-winhandler.exe`, `explorer.exe /desktop=shell`, `services.exe`, `winedevice.exe`. App giữ màn hình đen, người chơi
+tưởng game đang tải. RAM trống thấp nhất 5,5 GB.
+
+- **Vì sao màn hình đen chờ mãi:** `agvn-winhandler.exe` mở game (`ShellExecuteExW`), đóng handle của nó, rồi chạy mãi
+  để nhận lệnh của app. Desktop của Wine (`explorer /desktop`) chỉ tắt khi không còn chương trình nào, mà winhandler vẫn
+  còn, nên Wine không kết thúc và app không biết game đã tắt. Dựng lại trên PC bằng Wine 9.0: chương trình thử tắt ở
+  giây thứ 2, `wine explorer /desktop=shell,800x600 agvn-winhandler.exe quick.exe` vẫn chạy ở giây thứ 40. Từ 0.1.71 mọi
+  game đều mở qua `agvn-winhandler.exe`, nên game nào tự tắt cũng vậy.
+- **Sửa (`winhandler.c`, AGVN 3; `AgvnGameEnd`):**
+  - winhandler giữ handle của game. Khi game tắt, và 3 giây liền không còn tiến trình nào ngoài các tiến trình của Wine
+    (`explorer.exe`, `services.exe`, `winedevice.exe`, `plugplay.exe`, `svchost.exe`, `rpcss.exe`, `conhost.exe`, …),
+    nó gửi mã thoát của game cho app (`RC_AGVN_GAME_ENDED`) rồi tự tắt. Wine tắt theo; app đóng màn chơi như khi game tự
+    tắt, và "Tự sửa lỗi" hỏi.
+  - Tiến trình con của game (launcher mở game, renderer của Chromium) vẫn được chờ.
+  - Mở bằng lối tắt `.lnk` (không có handle) thì chờ 15 giây rồi mới bắt đầu đếm.
+  - Màn desktop của container (`wfm.exe`) không đổi.
+  - `su-kien.txt` ghi "Game và mọi tiến trình của game đã tắt, mã thoát …"; mã văng của Windows có kèm lời giải thích,
+    ví dụ `0xC0000005 (lỗi truy cập bộ nhớ)`.
+  - Thử trên PC (Wine 9.0): game tắt ở giây 2 thì Wine tắt ở giây 7. Launcher mở game con chạy 10 giây rồi tự thoát
+    thì Wine tắt ở giây 14. App nhận đúng mã thoát (7, 0).
+- **Game Electron hay NW.js (`chromium-closed`):** tự tắt trong phút đầu thì "Tự sửa lỗi" hiện "Game tự tắt khi vừa
+  mở, không hiện gì", nút đầu là "Chạy nhẹ" (`page-light`), rồi Wine mới (Proton 10). Game như vậy chạy hơn một phút
+  rồi tự tắt (thoát từ menu của game) thì không bị hỏi.
+- **Nhật ký Electron:** game có tệp của Chromium được đặt `ELECTRON_ENABLE_LOGGING=1` (trừ khi người chơi tự đặt), để
+  Electron in log của Chromium ra đầu ra của Wine mà phiên chơi giữ lại. Chưa rõ Wine có chuyển đầu ra của một chương
+  trình Windows dạng cửa sổ vào đó không; nếu không có dòng nào, cần thử `--enable-logging=file`.
+- **"Chạy nhẹ" cho game Electron (`AgvnElectronMain`, `AgvnHtmlAsar`):** app đã đọc thẳng `app.asar` từ 0.1.70 (dữ
+  liệu bắt đầu ở `8 + uint32@4`, đúng như báo cáo). Thêm:
+  - trang mở bằng giao thức riêng của game (`win.loadURL('app://game/main.html')`, cả dạng `${…}://game/main.html`)
+    được nhận là `main.html` trong gói;
+  - tệp có trong `resources/patch/` (cùng đường dẫn) thắng tệp trong `app.asar`.
+- **Chưa làm:**
+  - Trang nạp tài nguyên bằng URL tuyệt đối `app://…` trong mã JS sẽ không tải được, vì WebView chỉ phục vụ địa chỉ
+    riêng của game. Cần nhật ký "Chạy nhẹ" của game đó để biết có cần không.
+  - Tự chọn "Chạy nhẹ" ngay khi thêm game Electron: theo luật của dự án, cách sửa chỉ đề nghị khi lỗi hiện ra.
+  - `dang-chay.txt` liệt kê mọi chỗ engine có thể ghi log (BepInEx, MelonLoader, log DXVK…) dù tệp chưa có: đó là danh
+    sách chỗ app sẽ tìm khi phiên kết thúc, vì nhiều log chỉ xuất hiện giữa phiên. Chỉ tệp có thật mới được chép.
+- **Test:** `AgvnDoctorTest.anElectronGameThatClosesAsItStartsGetsItsPageInChayNhe`,
+  `AgvnElectronGameTest.aPageOnTheAppsOwnProtocolWithItsPatchFolder`.
+- **Thử máy:**
+  1. Game Electron 44 của báo cáo, chạy Windows: khoảng 10 giây sau khi mở, màn chơi tự đóng. `su-kien.txt` có "Game và
+     mọi tiến trình của game đã tắt, mã thoát …". "Tự sửa lỗi" hiện "Game tự tắt khi vừa mở…", bấm "Chạy nhẹ": trang
+     của game mở, video và lưu chạy như bản dựng tay.
+  2. Gói nhật ký của lần chạy Windows: có dòng log Chromium nào không (`wine-cuoi.txt`).
+  3. Hồi quy: thoát một game từ menu của chính game: màn chơi đóng, về thư viện, không bị hỏi lỗi. Một game có launcher
+     (launcher mở game rồi tự thoát) vẫn chơi bình thường, không bị đóng giữa chừng. Game .NET và game Unity chạy như cũ.

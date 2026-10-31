@@ -1,6 +1,9 @@
 /* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
+import com.winlator.cmod.container.Shortcut;
+import com.winlator.cmod.core.EnvVars;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -15,10 +18,20 @@ import java.util.Locale;
  * names the main script, and the page is the one that script opens (win.loadFile / win.loadURL), else index.html.
  * Pure Java (JVM-testable).
  */
-final class AgvnElectronGame {
+public final class AgvnElectronGame {
     static final int MAX_SCRIPT = 4 << 20;
+    static final String LOGGING = "ELECTRON_ENABLE_LOGGING";
 
     private AgvnElectronGame() {}
+
+    /**
+     * An Electron or NW.js game ({@link GameExeResolver#chromiumShell}) prints Chromium's log, which the session keeps
+     * with Wine's output: an Electron 44 game whose processes all ended 6 s after it started left no reason
+     * (31/10/2026). A value the player set stays.
+     */
+    public static void logging(EnvVars env, Shortcut s) {
+        if (s != null && !env.has(LOGGING) && GameExeResolver.chromiumShell(AgvnEngineLogs.gameDir(s))) env.put(LOGGING, "1");
+    }
 
     /** The page {@code gameDir}'s Electron app opens, as a file (inside its app.asar for a packed one); null for none. */
     static File page(File gameDir) {

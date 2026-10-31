@@ -116,6 +116,29 @@ public class AgvnElectronGameTest {
     }
 
     @Test
+    public void aPageOnTheAppsOwnProtocolWithItsPatchFolder() throws Exception {
+        // Electron 44 (31/10/2026): main.cjs registers app:// and opens app://game/main.html; resources/patch/ wins
+        File game = electronGame("own-protocol");
+        Map<String, byte[]> files = new LinkedHashMap<>();
+        files.put("package.json", utf8("{\"main\": \"dist/main.cjs\"}"));
+        files.put("dist/main.cjs", utf8("protocol.handle('app', serve);\nwin.loadURL('app://game/main.html');"));
+        files.put("main.html", utf8("<html>packed</html>"));
+        files.put("js/plugins.js", utf8("packed"));
+        asar(new File(game, "resources/app.asar"), files);
+        File page = AgvnElectronGame.page(game);
+        assertEquals(new File(game, "resources/app.asar/main.html"), page);
+        assertEquals("main.html", AgvnElectronMain.pageIn("`${SCHEME}://game/main.html`"));
+
+        File patch = new File(game, "resources/patch/js");
+        assertTrue(patch.mkdirs());
+        Files.write(new File(patch, "plugins.js").toPath(), utf8("patched"));
+        AgvnHtmlAsar served = AgvnHtmlAsar.forPage(page);
+        assertEquals(new File(patch, "plugins.js"), served.patched("/JS/plugins.js"));
+        assertNull("the archive's own", served.patched("/main.html"));
+        assertNull("not above the patch folder", served.patched("/../app.asar"));
+    }
+
+    @Test
     public void thePageOfAPackedApp() throws Exception {
         File game = electronGame("packed");
         Map<String, byte[]> files = new LinkedHashMap<>();

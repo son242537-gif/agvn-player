@@ -1316,6 +1316,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
                             audioDriver.equals("pulse-audio-gn")));
         }
 
+        com.winlator.cmod.agvn.AgvnElectronGame.logging(envVars, shortcut); // AGVN: why an Electron game closed
         com.winlator.cmod.agvn.AgvnAvPro.apply(envVars, shortcut); // AGVN: MP4 video frames in normal memory; AVPro gets its DXGI manager, not its WinRT player
         guestProgramLauncherComponent.setEnvVars(envVars);
         if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.start(shortcut, envVars); // AGVN: logs of this play session

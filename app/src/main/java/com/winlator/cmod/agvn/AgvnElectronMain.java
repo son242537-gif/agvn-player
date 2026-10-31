@@ -14,6 +14,11 @@ import java.util.regex.Pattern;
 final class AgvnElectronMain {
     private static final Pattern MAIN = Pattern.compile("\"main\"\\s*:\\s*\"([^\"]*)\"");
     private static final Pattern LOAD = Pattern.compile("\\.load(File|URL)\\s*\\(");
+    /**
+     * "app://game", a protocol the main script registers (protocol.handle) to serve the app's own files, or the
+     * "://game" of `${scheme}://game/…`.
+     */
+    private static final Pattern OWN_SCHEME = Pattern.compile("^(?:[A-Za-z][A-Za-z0-9+.-]*)?://[^/]*");
 
     private AgvnElectronMain() {}
 
@@ -60,7 +65,8 @@ final class AgvnElectronMain {
     /**
      * The page path the strings in a call's arguments make, up to the first that ends in .html or .htm ("www",
      * "index.html" → "www/index.html"; `file://${__dirname}/index.html` → "index.html"), or null. Web addresses and
-     * url.format's "file:" are left out; the path may start with "../".
+     * url.format's "file:" are left out, as is the protocol and host of the app's own ("app://game/index.html" →
+     * "index.html", an Electron 44 game, 31/10/2026); the path may start with "../".
      */
     static String pageIn(String args) {
         StringBuilder page = new StringBuilder();
@@ -68,6 +74,10 @@ final class AgvnElectronMain {
             String lower = s.toLowerCase(Locale.ROOT);
             if (lower.startsWith("http:") || lower.startsWith("https:")) continue; // a web address (a dev server)
             if (lower.startsWith("file:")) s = s.substring(5);
+            else {
+                Matcher own = OWN_SCHEME.matcher(s);
+                if (own.find()) s = s.substring(own.end());
+            }
             int cut = indexOfAny(s, '?', '#');
             if (cut >= 0) s = s.substring(0, cut);
             if (s.replace("/", "").isEmpty()) continue;

@@ -44,7 +44,10 @@
 #define AGVN_STATE_TEXT_CARET 2
 /* AGVN 2: in RC_AGVN_POINTER's flags, (x, y) is a move by that much, not a pixel */
 #define AGVN_POINTER_RELATIVE 0x40000000
-#define AGVN_VERSION 2
+/* AGVN 3: the game and every process it started have ended, with the game's
+   exit code (DWORD) after the code; this winhandler then ends, and Wine with it */
+#define RC_AGVN_GAME_ENDED 16
+#define AGVN_VERSION 3
 
 #pragma pack(push, 1)
 typedef struct {
@@ -417,6 +420,66 @@ DWORD WINAPI AgvnWatchThread(LPVOID lpParam) {
   return 0;
 }
 
+/* AGVN 3: Wine's own processes, which outlive a game. Anything else still
+   running is the game's: a launcher's game, an Electron game's renderer. */
+static const char *agvnWineProcesses[] = {
+    "explorer.exe", "services.exe", "winedevice.exe", "plugplay.exe",
+    "svchost.exe", "rpcss.exe", "conhost.exe", "wineboot.exe",
+    "winemenubuilder.exe", "start.exe", "mscorsvw.exe", "tabtip.exe",
+    "winhandler.exe", "agvn-winhandler.exe"};
+static HANDLE agvnGame;
+
+/* AGVN 3: how many processes run besides Wine's own and this one */
+static int agvnGameProcesses(void) {
+  int count = 0;
+  DWORD self = GetCurrentProcessId();
+  HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+  if (hSnap == INVALID_HANDLE_VALUE)
+    return 1; /* cannot tell: the game may still run */
+  PROCESSENTRY32 pe32;
+  pe32.dwSize = sizeof(PROCESSENTRY32);
+  if (Process32First(hSnap, &pe32)) {
+    do {
+      BOOL wine = pe32.th32ProcessID == self;
+      for (size_t i = 0; !wine && i < sizeof(agvnWineProcesses) / sizeof(agvnWineProcesses[0]); i++)
+        wine = _stricmp(pe32.szExeFile, agvnWineProcesses[i]) == 0;
+      if (!wine)
+        count++;
+    } while (Process32Next(hSnap, &pe32));
+  }
+  CloseHandle(hSnap);
+  return count;
+}
+
+/* AGVN 3: winhandler outlived the game, so Wine's desktop stayed and the app
+   kept a black screen: an Electron game whose processes all ended 6 s after
+   it started looked like one still loading (31/10/2026). Once the game has
+   ended and no process of it is left for 3 s in a row, the app is told, with
+   the game's exit code, and winhandler ends. */
+DWORD WINAPI AgvnGameEndThread(LPVOID lpParam) {
+  DWORD code = 0;
+  if (agvnGame) {
+    WaitForSingleObject(agvnGame, INFINITE);
+    GetExitCodeProcess(agvnGame, &code);
+  } else {
+    Sleep(15000); /* started through another process (a shortcut): its game comes up meanwhile */
+  }
+  int quiet = 0;
+  while (running) {
+    Sleep(1000);
+    quiet = agvnGameProcesses() ? 0 : quiet + 1;
+    if (quiet < 3)
+      continue;
+    BYTE buffer[5] = {RC_AGVN_GAME_ENDED};
+    memcpy(buffer + 1, &code, sizeof(code));
+    sendto(sock, (const char *)buffer, sizeof(buffer), 0,
+           (struct sockaddr *)&clientAddr, clientAddrLen);
+    Sleep(200);
+    ExitProcess(code);
+  }
+  return 0;
+}
+
 DWORD WINAPI ServerThread(LPVOID lpParam) {
   WSADATA wsaData;
   if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -594,10 +657,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   sei.nShow = SW_SHOW;
 
   ShellExecuteExW(&sei);
-  if (sei.hProcess)
-    CloseHandle(sei.hProcess);
-
   HANDLE hThread = CreateThread(NULL, 0, ServerThread, NULL, 0, NULL);
+  /* AGVN 3: a game, not the file manager of a container's desktop */
+  if (_wcsicmp(executable, L"wfm.exe") != 0) {
+    agvnGame = sei.hProcess;
+    CreateThread(NULL, 0, AgvnGameEndThread, NULL, 0, NULL);
+  } else if (sei.hProcess) {
+    CloseHandle(sei.hProcess);
+  }
 
   if (affinity > 0) {
     handleChildProcesses(affinity);

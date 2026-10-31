@@ -1,0 +1,7 @@
+AGVN Player v0.1.74 - agvn.io
+
+Sửa lỗi:
+- Game tự tắt (kể cả khi chỉ còn màn hình đen) nay được nhận ra: app đóng màn chơi và "Tự sửa lỗi" hỏi lý do, thay vì để màn hình đen chờ mãi.
+- Game Electron hay NW.js tự tắt ngay khi mở: "Tự sửa lỗi" đề nghị "Chạy nhẹ" trước tiên. Game Electron ghi lại nhật ký của Chromium để biết vì sao tắt.
+- "Chạy nhẹ" mở được game Electron có trang riêng kiểu "app://…" và thư mục vá "resources/patch".
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

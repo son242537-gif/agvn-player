@@ -16,7 +16,9 @@ import java.util.function.Consumer;
 /**
  * Serves the page of an Electron game packed in app.asar ({@link AgvnElectronGame}) to "Chạy nhẹ", as
  * {@link AgvnHtmlFiles} serves a game folder: from the page's folder in the archive, names found ignoring case, the
- * entry page with html-compat.js first, and nothing from outside the archive (app.asar.unpacked/ aside).
+ * entry page with html-compat.js first, and nothing from outside the archive (app.asar.unpacked/ aside) but
+ * resources/patch/: a file there wins over the archive's, as the main script of an Electron 44 game served them
+ * (31/10/2026).
  */
 final class AgvnHtmlAsar {
     static final int MAX_PAGE = 16 << 20;
@@ -25,10 +27,14 @@ final class AgvnHtmlAsar {
     private final AgvnAsar asar;
     /** The page's folder in the archive, "" or "web-desktop/". */
     private final String root;
+    /** resources/patch/ beside the archive, or null. */
+    private final File patch;
 
     private AgvnHtmlAsar(AgvnAsar asar, String root) {
         this.asar = asar;
         this.root = root;
+        File dir = new File(asar.file.getParentFile(), "patch");
+        patch = dir.isDirectory() ? dir : null;
     }
 
     /** For a page inside an app.asar ({@code index}: "…/resources/app.asar/index.html"); null for any other page. */
@@ -47,9 +53,22 @@ final class AgvnHtmlAsar {
         return asar.find(root + path);
     }
 
+    /** URL path {@code urlPath} ("/res/a%20b.png", still encoded) from resources/patch/, as the page's folder is there. */
+    private String inPatch(String urlPath) {
+        String path = urlPath == null || urlPath.equals("/") ? "" : urlPath.startsWith("/") ? urlPath.substring(1) : urlPath;
+        return "/" + root + (path.isEmpty() ? "index.html" : path);
+    }
+
+    /** The file of resources/patch/ that stands for URL path {@code urlPath}, or null when it has none. */
+    File patched(String urlPath) {
+        File f = patch != null ? AgvnHtmlFiles.resolve(patch, inPatch(urlPath)) : null;
+        return f != null && f.isFile() ? f : null;
+    }
+
     /** As {@link AgvnHtmlFiles#serve}: the file, the entry page with {@code compatJs}, or 404 told to {@code missing}. */
     WebResourceResponse serve(String urlPath, String entry, String compatJs, Consumer<String> missing) {
         if (AgvnHtmlFiles.COMPAT_PATH.equals(urlPath) && compatJs != null) return text("application/javascript", compatJs);
+        if (patched(urlPath) != null) return AgvnHtmlFiles.serve(patch, entry, inPatch(urlPath), compatJs, null, missing);
         String real = find(urlPath);
         if (real == null) {
             Log.w("AGVN", "Electron game file missing: " + urlPath);

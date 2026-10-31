@@ -563,6 +563,11 @@ public void setVibrationEnabledForSlot(int slot, boolean enabled) {
                 if (xServer != null) xServer.agvnMouseLook.reported(receiveData.get() & 0xff);
                 break;
             }
+            case RequestCodes.AGVN_GAME_ENDED: { // AGVN: agvn-winhandler.exe 3 ends next, and Wine with it
+                com.winlator.cmod.agvn.AgvnSessionLog.event("Game và mọi tiến trình của game đã tắt, mã thoát "
+                        + com.winlator.cmod.agvn.AgvnGameEnd.code(receiveData.getInt()));
+                break;
+            }
             case RequestCodes.GET_GAMEPAD: {
                 break;
             }
