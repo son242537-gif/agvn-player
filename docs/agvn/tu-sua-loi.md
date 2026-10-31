@@ -2657,3 +2657,34 @@ thêm DLL, cũng vậy.
      chép" không còn là 0.
   4. Hồi quy: một game DX11 khác (Unity, UE4) chạy như cũ, `moi-truong.txt` của nó không có
      `VK_KHR_external_memory_fd` trong danh sách tắt.
+
+## Phím ảo phản hồi chậm: tay cầm ảo chiếm trọn một nhân CPU (bản 0.1.73)
+
+Báo cáo ngày 31/10/2026 (ảnh chụp một game hành động, phím ảo kiểu tay cầm FIRE/AIM/DODGE/A/B/X/Y): bấm phím ảo phản
+hồi chậm; cây viết ✎ ở góc trên bên trái hay bị chạm nhầm khi chơi.
+
+- **Đường đi của một lần bấm:** phím ảo kiểu tay cầm → `FakeInputWriter` ghi sự kiện evdev vào cuối file
+  `event<N>` → winebus của Wine đọc file đó như `/dev/input/eventN`, qua `libfakeinput.so` (nạp sẵn vào Wine,
+  `app/src/main/cpp/winlator/fakeinput.cpp`).
+- **Vì sao (mã nguồn winebus, nhánh `proton_9.0`, `bus_udev.c`):**
+  - winebus mở thiết bị ở chế độ chặn (`open(devnode, O_RDWR)`). Vòng chính gọi `poll(..., -1)`, rồi `read()` từng sự
+    kiện, trong lúc giữ khoá `udev_cs`.
+  - File thường thì `poll()` luôn báo "đọc được", kể cả khi đã đọc hết. Khi chưa có sự kiện mới, `read()` của
+    `libfakeinput.so` cứ đọc lại (0 byte), gọi `poll()` (trả về ngay), đọc lại… không lúc nào ngủ.
+  - Thử trên PC (cùng thư viện, chương trình đọc như winebus, 15 lần bấm cách nhau 200 ms): **99% một nhân CPU** khi
+    không bấm gì. Bản thân độ trễ của đường này nhỏ (0,03 ms), nhưng game, FEX và DXVK mất một nhân suốt lúc chơi, máy
+    nóng nhanh hơn. Trên máy yếu, việc đó đủ làm game chậm và phím phản hồi trễ.
+- **Sửa (`fakeinput.cpp`):** khi đã đọc hết file, `read()` ngủ chờ trên inotify của chính file đó (`IN_MODIFY`, và
+  `IN_ATTRIB`/`IN_DELETE_SELF` để biết tay cầm bị gỡ), tối đa 1 giây mỗi lần như trước. Không có inotify thì nghỉ 1 ms.
+  Thử lại trên PC: **0% CPU**, độ trễ trung bình 0,17 ms (lâu nhất 0,28 ms); xoá file thì `read()` trả `ENODEV` ngay.
+  Bản build NDK (aarch64, API 28) biên dịch sạch, không có cảnh báo mới.
+- **Cây viết ✎:** bỏ hẳn (`AgvnEditPen`). Sửa phím ngay trên game bằng "✎ Sửa" của thanh trên cùng. HUD về lại góc
+  trên bên trái.
+- **Chưa rõ:** độ trễ còn lại do game: game giới hạn 24–30 FPS thì mỗi lần bấm có thể chờ tới một khung (33–42 ms) trước
+  khi hiện ra. Chưa đo trên máy thật.
+- **Thử máy:**
+  1. Game có phím ảo kiểu tay cầm, đứng yên 1 phút không bấm: `top -H -p <pid wine>` (adb) không còn luồng nào của
+     winebus ở ~100%. Nhiệt độ và FPS so với 0.1.72 trên cùng màn chơi.
+  2. Bấm nhanh FIRE/DODGE liên tục, giữ AIM: game nhận đủ, không kẹt phím; rung tay cầm (nếu game có) vẫn chạy.
+  3. Tay cầm thật cắm vào rồi rút ra giữa chừng: game thấy tay cầm mất, không đứng hình.
+  4. Không còn ✎ ở góc; "✎ Sửa" trên thanh trên cùng vẫn sửa phím; HUD nằm ở góc trên bên trái, không bị che.

@@ -44,8 +44,9 @@ Anh Sơn quyết định ngày 02/10/2026:
       Enter.
   - **Thanh trên cùng:** ⌨ bàn phím Android, ✎ sửa phím, 👁 ẩn/hiện phím (nhớ theo từng game), ☰ menu. Thanh tự ẩn
     sau 3 giây như ở game Windows.
-  - **Cây viết ✎ ở góc trên bên trái** (anh Sơn yêu cầu 03/10/2026, `AgvnEditPen`): luôn hiện, chạm là sửa phím. Có ở
-    cả game Windows lẫn game "Chạy nhẹ". Chỉ ẩn khi đang sửa phím hoặc khi mở menu bên trái. HUD dời sang phải cây viết.
+  - **Không còn cây viết ✎ ở góc trên bên trái** (có từ 03/10/2026; anh Sơn bỏ ngày 31/10/2026 vì khi chơi game hành
+    động, ngón cái hay chạm nhầm vào nó). Sửa phím ngay trên game bằng nút ✎ của thanh trên cùng, hoặc trong menu bên
+    trái. HUD về lại góc trên bên trái.
   - **Menu bên trái** (nút Quay lại hoặc ☰): chơi tiếp, mở menu game, bàn phím, hiện phím ảo, độ mờ phím, sửa phím,
     HUD, "Gửi nhật ký", "Chạy bằng Windows" (nếu có `.exe`), thoát game. Game vẫn chạy phía sau.
   - **Sửa phím** (anh Sơn yêu cầu 03/10/2026: đổi, thêm, xoá phím như JoiPlay; `AgvnLightEditor`). Thanh công cụ giống
@@ -233,7 +234,7 @@ Anh Sơn chốt ngày 02/10/2026:
       - phím ảo hiện đúng chỗ như khi chạy Windows và bấm được; Tua (giữ) tua chữ, Lịch sử lùi lại ở Ren'Py;
       - ⌨ mở bàn phím, gõ tên được; 👁 ẩn phím, mở lại game vẫn ẩn;
       - ✎: kéo phím, － ＋, "Xong"; mở lại game thấy đúng vị trí mới;
-      - cây viết ✎ ở góc trên bên trái luôn hiện, chạm vào là sửa phím; HUD nằm bên phải cây viết, không bị che;
+      - góc trên bên trái không còn cây viết ✎ (sửa phím bằng ✎ của thanh trên cùng); HUD nằm ở góc đó;
       - ✎ "+ Nút" chọn phím A, "Phím…" đổi "Chạy" sang phím khác, "Xóa" một phím, "Xong": các phím mới bấm được
         trong game, mở lại game vẫn còn; game khác cùng loại vẫn giữ bộ phím của nó; "Mặc định" trả về như cũ;
       - game RPG Maker XP: phím OK vẫn xác nhận; thêm phím Z thì Z không phải Enter; bàn phím vẽ sẵn không có cột chuột;

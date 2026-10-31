@@ -6,4 +6,6 @@ Sửa lỗi:
 - Game đã chọn "Đọc phim bằng cách cũ" vẫn giữ cách đó sau khi bấm "Trả cấu hình chạy tốt", nên phim không đen lại.
 - Game Unreal Engine 5 đứng hình hoặc tắt lúc mở vì driver đồ họa không cấp bộ nhớ, dù máy còn: app báo ngay khi đang chơi và đề nghị "Chạy lại, tắt bộ nhớ chia sẻ"; "Tự sửa lỗi" không còn đọc nhầm thành hết bộ nhớ.
 - Gói nhật ký của game Unreal có log và báo cáo văng của game, kể cả khi thư mục game đổi tên.
+- Phím ảo kiểu tay cầm không còn làm Wine chiếm trọn một nhân CPU khi đứng yên: game nhẹ hơn, máy bớt nóng, phím phản hồi nhanh hơn.
+- Bỏ nút ✎ ở góc trên bên trái (hay bị chạm nhầm khi chơi game hành động). Sửa phím bằng "✎ Sửa" trên thanh trên cùng.
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

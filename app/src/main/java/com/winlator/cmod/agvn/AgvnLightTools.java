@@ -16,8 +16,8 @@ import java.io.File;
  * The toolkit of a "Chạy nhẹ" game, as Windows games have it: the on-screen keys of the game type
  * ({@link AgvnLightKeys}), the ⌨ ✎ 👁 ☰ bar at the top ({@link AgvnLightBar}), the menu Back opens
  * ({@link AgvnLightMenu}), moving, changing, adding and deleting keys ({@link AgvnLightEditor}) and the HUD
- * ({@link AgvnLightHud}). Each game can have a key set of its own ({@link AgvnLightPrefs#layout}); a ✎ stays in the
- * top-left corner to edit it ({@link AgvnEditPen}). [🗂] loads and saves key sets ({@link AgvnLightSets}).
+ * ({@link AgvnLightHud}). Each game can have a key set of its own ({@link AgvnLightPrefs#layout}), edited from the
+ * bar's ✎. [🗂] loads and saves key sets ({@link AgvnLightSets}).
  * The runner (Ren'Py, RPG Maker XP/VX/VX Ace, Godot, HTML) is the {@link Host}. All calls on the UI thread.
  */
 public final class AgvnLightTools {
@@ -64,7 +64,6 @@ public final class AgvnLightTools {
     private final AgvnLightMenu menu;
     private final AgvnLightSlow slow;
     private final AgvnLightEditor editor = new AgvnLightEditor(this);
-    private final AgvnEditPen pen;
     private final AgvnLightSets sets = new AgvnLightSets(this);
 
     private AgvnLightTools(Activity activity, String kind, String gameName, File gameDir, Host host) {
@@ -89,7 +88,6 @@ public final class AgvnLightTools {
         hud = new AgvnLightHud(activity, host);
         bar = new AgvnLightBar(this);
         menu = new AgvnLightMenu(this, this.gameName);
-        pen = new AgvnEditPen(activity, this::edit);
         if (prefs.hud()) hud.start();
         bar.update(keysShown());
         slow = new AgvnLightSlow(activity, host); // "Tự sửa lỗi": a game slow for a minute says why
@@ -126,14 +124,12 @@ public final class AgvnLightTools {
     void openMenu() {
         if (editor.active()) editor.finish();
         bar.suspend();
-        pen.setVisible(false); // it would sit on the menu
         menu.open(keysShown(), prefs.opacity(), prefs.hud());
     }
 
     /** The menu closed (by a choice, Back or a tap beside it). */
     void menuClosed() {
         bar.reveal();
-        pen.setVisible(!editor.active());
     }
 
     boolean keysShown() {
@@ -172,7 +168,6 @@ public final class AgvnLightTools {
         if (editor.active()) return;
         if (menu.isOpen()) menu.close();
         bar.suspend();
-        pen.setVisible(false);
         editor.start();
     }
 
@@ -189,6 +184,5 @@ public final class AgvnLightTools {
         prefs.setKeysHidden(game, false);
         bar.update(true);
         bar.reveal();
-        pen.setVisible(true);
     }
 }

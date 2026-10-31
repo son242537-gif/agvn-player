@@ -1474,7 +1474,6 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 classicHud = new FrameRating(this, graphicsDriverConfig);
                 classicHud.setVisibility(View.GONE);
                 rootView.addView(classicHud);
-                com.winlator.cmod.agvn.AgvnEditPen.clearOf(classicHud); // AGVN: beside the ✎ in the corner
                 renderer.setFrameRating(classicHud);
             } else if (hudMode == 2) {
 
@@ -1976,7 +1975,6 @@ public class XServerDisplayActivity extends AppCompatActivity {
                 classicHud = new FrameRating(this, graphicsDriverConfig);
                 classicHud.setVisibility(View.GONE);
                 rootView.addView(classicHud);
-                com.winlator.cmod.agvn.AgvnEditPen.clearOf(classicHud); // AGVN: beside the ✎ in the corner
                 renderer.setFrameRating(classicHud);
                 if (rendererAlreadyActive) {
                     frameRatingWindowId = activeRendererWindowId;

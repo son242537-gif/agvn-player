@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/inotify.h>
+#include <limits.h>
 #include <sys/syscall.h>
 #include <sys/sysmacros.h>
 #include <linux/input.h>
@@ -475,18 +476,63 @@ EXPORT int ioctl(int fd, int op, ...) {
     }
 }
 
+static void drop_watch(int fd);
+
 EXPORT int close(int fd) {
 	if (!my_close)
 		*(void **)&my_close = dlsym(RTLD_NEXT, "close");
 
 	auto controller = controller_map.find(fd);
 	if (controller != controller_map.end()) {
+	    drop_watch(fd);
 	    Logger::log("Removing controller, fd %d event %s\n", controller->first, controller->second);
 	    free((void *)controller->second);
 		controller_map.erase(fd);
 	}
 
 	return my_close(fd);
+}
+
+/*
+ * AGVN: the fake devices are regular files, which poll() always finds readable. So a blocking read() at the end of
+ * the file went round read/poll without ever sleeping until the next event came: winebus's thread took a whole CPU
+ * core for as long as the virtual gamepad existed (99% of a core on a PC test, while nothing was pressed), and it holds
+ * winebus's device lock meanwhile. Now it sleeps on an inotify watch of the file until it is written to, with a 1 ms
+ * nap if inotify cannot be had.
+ */
+static std::mutex watch_lock;
+static std::unordered_map<int, int> watch_fds; // device fd -> inotify fd watching its file
+
+/* The inotify fd that wakes a reader of device {@code fd}; *created when made by this call; -1 when none. */
+static int file_watch(int fd, bool *created) {
+    std::lock_guard<std::mutex> guard(watch_lock);
+    *created = false;
+    auto it = watch_fds.find(fd);
+    if (it != watch_fds.end()) return it->second;
+    char link[64], path[PATH_MAX];
+    snprintf(link, sizeof(link), "/proc/self/fd/%d", fd);
+    ssize_t len = readlink(link, path, sizeof(path) - 1);
+    int in = len > 0 ? inotify_init1(IN_NONBLOCK | IN_CLOEXEC) : -1;
+    if (in >= 0) {
+        path[len] = 0;
+        if (!my_inotify_add_watch)
+            *(void **)&my_inotify_add_watch = dlsym(RTLD_NEXT, "inotify_add_watch");
+        if (!my_inotify_add_watch || my_inotify_add_watch(in, path, IN_MODIFY | IN_ATTRIB | IN_DELETE_SELF | IN_MOVE_SELF) < 0) {
+            syscall(SYS_close, in);
+            in = -1;
+        }
+    }
+    watch_fds[fd] = in;
+    *created = in >= 0;
+    return in;
+}
+
+static void drop_watch(int fd) {
+    std::lock_guard<std::mutex> guard(watch_lock);
+    auto it = watch_fds.find(fd);
+    if (it == watch_fds.end()) return;
+    if (it->second >= 0) syscall(SYS_close, it->second);
+    watch_fds.erase(it);
 }
 
 EXPORT ssize_t read(int fd, void *buf, size_t count) {
@@ -513,16 +559,20 @@ EXPORT ssize_t read(int fd, void *buf, size_t count) {
             	errno = EINTR;
             	return bytes_read;
             }
-            struct pollfd pfd;
-            pfd.fd = fd;
-            pfd.events = POLLIN;
-            if (poll(&pfd, 1, 1000) > 0) {
-                // If it's a disconnected pipe, poll returns immediately with POLLHUP.
-                // We fallback to usleep to prevent a 100% CPU busy-spin loop.
-                if (pfd.revents & POLLHUP) {
-                    usleep(1000); 
+            bool created;
+            int in = file_watch(fd, &created);
+            if (in >= 0 && !created) {
+                // a write after the read above has queued an event already: no wake-up is lost
+                struct pollfd pfd;
+                pfd.fd = in;
+                pfd.events = POLLIN;
+                if (poll(&pfd, 1, 1000) > 0) {
+                    char events[1024];
+                    while (syscall(SYS_read, in, events, sizeof(events)) > 0) {}
                 }
-            }
+            } else if (in < 0) {
+                usleep(1000);
+            } // else the watch is new: read again first, for what was written before it
             bytes_read = syscall(SYS_read, fd, buf, count);
         }
         

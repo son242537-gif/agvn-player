@@ -25,8 +25,8 @@ import com.winlator.cmod.widget.InputControlsView;
  * (players swiped AGVN away instead, which reads like Android ending the game). Hidden controls are really gone
  * (View.GONE), so touches reach the game.
  * Long-press a button for its full name. The bar tucks itself away after 3 s without a tap, leaving a thin line at the
- * top edge that brings it back ({@link AgvnBarAutoHide}); it hides while the sidebar drawer is open. A ✎ stays in the
- * top-left corner all the time ({@link AgvnEditPen}).
+ * top edge that brings it back ({@link AgvnBarAutoHide}); it hides while the sidebar drawer is open. There is no ✎ in
+ * the corner any more: in action games a thumb hit it (the maintainer's ask, 31/10/2026); [✎ Sửa] on the bar edits.
  */
 public final class AgvnControlsBar {
     private static final int BG_NORMAL = AgvnBarButton.BG_NORMAL, BG_HIDDEN = AgvnBarButton.BG_HIDDEN;
@@ -36,7 +36,6 @@ public final class AgvnControlsBar {
     private final TextView eye;
     private final AgvnControlsEditor editor;
     private final AgvnBarAutoHide autoHide;
-    private final AgvnEditPen pen;
     private final AgvnControlsSets sets;
     /** Profile that was on screen before the player hid it (-1: none), shown again by [👁]. */
     private int hiddenProfileId = -1;
@@ -67,10 +66,8 @@ public final class AgvnControlsBar {
         lp.topMargin = (int) (6 * dp);
         activity.addContentView(bar, lp);
         autoHide = new AgvnBarAutoHide(activity, bar);
-        pen = new AgvnEditPen(activity, this::edit);
         editor = new AgvnControlsEditor(activity, () -> {
             autoHide.reveal();
-            pen.setVisible(true);
             updateEye();
         });
         watchDrawer();
@@ -137,7 +134,6 @@ public final class AgvnControlsBar {
         hiddenProfileId = -1;
         AgvnControlsFork.setHidden(activity.agvnShortcut(), false);
         autoHide.suspend(); // the editor has its own toolbar
-        pen.setVisible(false);
     }
 
     /** [✕ Thoát]: asked on a bar over the running game, so a stray tap costs nothing. */
@@ -169,14 +165,13 @@ public final class AgvnControlsBar {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 if (slideOffset <= 0f) { // back to closed; a drawer that never fully opened gets no onDrawerClosed
-                    if (drawerHid) { autoHide.reveal(); pen.setVisible(true); }
+                    if (drawerHid) autoHide.reveal();
                     drawerHid = false;
                     return;
                 }
                 if (editor.isActive()) editor.finish(); // opening the menu ends editing (saved)
                 if (!drawerHid) sets.refresh(); // a set saved elsewhere joins the list
                 autoHide.suspend();
-                pen.setVisible(false); // it would sit on the drawer
                 drawerHid = true;
             }
 
@@ -184,7 +179,6 @@ public final class AgvnControlsBar {
             public void onDrawerClosed(View drawerView) {
                 drawerHid = false;
                 autoHide.reveal();
-                pen.setVisible(true);
                 if (isShown()) { // the sidebar showed the controls again: do not hide them at the next launch
                     hiddenProfileId = -1;
                     AgvnControlsFork.setHidden(activity.agvnShortcut(), false);
