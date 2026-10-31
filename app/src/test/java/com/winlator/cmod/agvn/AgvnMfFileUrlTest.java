@@ -5,6 +5,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Assume;
 import org.junit.Test;
 
 import java.io.File;
@@ -19,6 +20,7 @@ public class AgvnMfFileUrlTest {
     @Test
     public void registersTheHandlerAsWineReadsIt() throws Exception {
         // the keys scripts/agvn/mfurl/run-test.sh writes with reg.exe, where Wine 9.0 put them
+        Assume.assumeTrue("rename-over needs a POSIX file system", File.separatorChar == '/');
         File dir = Files.createTempDirectory("mfurl").toFile();
         File system = new File(dir, "system.reg"), user = new File(dir, "user.reg");
         Files.write(system.toPath(), "WINE REGISTRY Version 2\n;; All keys relative to \\\\Machine\n\n#arch=win64\n"
