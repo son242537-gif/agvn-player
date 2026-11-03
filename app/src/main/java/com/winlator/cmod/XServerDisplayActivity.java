@@ -1324,7 +1324,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (shortcut != null) agvnStartup = com.winlator.cmod.agvn.AgvnStartupProgress.start(this, shortcut, agvnStatus); // AGVN: a slow start shows how it goes
         guestProgramLauncherComponent.setTerminationCallback((status) -> {
             com.winlator.cmod.agvn.AgvnSessionTrack.wineEnded(); // AGVN: the game ended by itself
-            com.winlator.cmod.agvn.AgvnSessionLog.event("Wine kết thúc, mã thoát " + status);
+            com.winlator.cmod.agvn.AgvnSessionLog.event(com.winlator.cmod.agvn.AgvnSessionTrack.wineEndText(status));
             runOnUiThread(this::exit);
         });
 

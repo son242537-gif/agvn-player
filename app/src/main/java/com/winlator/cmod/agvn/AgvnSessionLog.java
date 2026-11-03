@@ -98,12 +98,13 @@ public final class AgvnSessionLog {
     }
 
     /**
-     * How a game that closed by itself ended, for the summary: closed normally only once it had shown frames. A .NET
-     * launcher that closed after 4 s with nothing drawn read "kết thúc bình thường" (POCO, 24/10/2026).
+     * How the game ended, for the summary ({@link AgvnSessionTrack#endText}). A .NET launcher that closed after 4 s
+     * with nothing drawn read "kết thúc bình thường" (POCO, 24/10/2026), as did a game the player quit after it showed
+     * nothing for 2.5 min (03/11/2026).
      */
     public static String closedText() {
-        return AgvnSessionTrack.showedFrames() ? "Game kết thúc bình thường (thoát từ menu hoặc game tự đóng)"
-                : "Game tự đóng trước khi hiện hình (chưa vẽ khung nào): không phải lần chạy tốt, xem su-kien.txt";
+        return AgvnSessionTrack.endText(AgvnSessionTrack.playerQuit(), AgvnSessionTrack.showedFrames(),
+                AgvnSessionTrack.frozenSecondsAtEnd(), AgvnSessionTrack.seconds(System.currentTimeMillis()));
     }
 
     /** End of a game: collects the logs and writes the summary; a crash or Ren'Py error found replaces {@code how}. */

@@ -132,6 +132,31 @@ public final class AgvnSessionTrack {
         noteEnd(System.currentTimeMillis());
     }
 
+    /** The session event for Wine's end with {@code status}: 137 is SIGKILL, the app's own when the player quit. */
+    public static String wineEndText(int status) {
+        return wineEndText(status, exiting);
+    }
+
+    static String wineEndText(int status, boolean exiting) {
+        String text = "Wine kết thúc, mã thoát " + status;
+        if (status != 137) return text;
+        return text + (exiting ? " (app tắt game vì người chơi thoát)" : " (bị tắt từ bên ngoài: Android hoặc app)");
+    }
+
+    /**
+     * How the game ended, for the summary: who ended it, after how long, and whether it showed anything. A Ren'Py
+     * game whose folder had no lib/ showed nothing for 2.5 min, the player quit, and the summary read "Game kết thúc
+     * bình thường (thoát từ menu hoặc game tự đóng)" (03/11/2026). {@code frozenS}: {@link #frozenSecondsAtEnd}.
+     */
+    static String endText(boolean playerQuit, boolean showed, long frozenS, long seconds) {
+        if (!showed) return (playerQuit ? "Người chơi thoát sau " + seconds + " giây; game chưa hiện hình"
+                : "Game tự đóng trước khi hiện hình") + " (chưa vẽ khung nào): không phải lần chạy tốt, xem su-kien.txt";
+        if (!playerQuit) return "Game tự đóng sau " + seconds + " giây (người chơi thoát từ menu của game, hoặc game tự tắt)";
+        if (frozenS >= AgvnEvidence.FROZEN_S)
+            return "Người chơi thoát sau " + seconds + " giây; game không vẽ khung nào trong " + frozenS + " giây cuối";
+        return "Người chơi thoát game sau " + seconds + " giây";
+    }
+
     /** The game's end: Wine's, or the player's exit, whichever came first. */
     static void noteEnd(long nowMs) {
         if (endMs == 0) endMs = nowMs;
