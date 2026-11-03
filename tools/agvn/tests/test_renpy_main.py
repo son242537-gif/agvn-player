@@ -59,8 +59,75 @@ if stretch:
         time.sleep(1.3)
         report["game_kept"] = config.adjust_view_size is own
 
+if os.environ.get("TEST_LOG_CLOCK"):
+    # Ren'Py's package as far as log_clock needs it, its log_clock of 8.5.3, and its stdout sent to log.txt
+    pkg = os.path.join(path_to_renpy_base(), "renpy")
+    os.makedirs(pkg, exist_ok=True)
+    with open(os.path.join(pkg, "__init__.py"), "w") as f:
+        f.write(os.environ["TEST_RENPY_INIT"])
+    with open(os.path.join(pkg, "main.py"), "w") as f:
+        f.write(os.environ["TEST_RENPY_MAIN"])
+    import renpy
+
+    class ToLog:  # Ren'Py's StdioRedirector: whole lines go to log.txt
+        buffer = ""
+
+        def write(self, s):
+            lines = (self.buffer + s).split("\n")
+            renpy.log_txt.extend(lines[:-1])
+            self.buffer = lines[-1]
+
+    saved, sys.stdout = sys.stdout, ToLog()
+    import renpy.main
+    renpy.main.log_clock("Early init")
+    sys.stdout = saved
+    report["log_txt"] = renpy.log_txt
+    report["logcat"] = renpy.log.real_stdout.lines
+    report["blacklist"] = sorted(renpy.name_blacklist)
+
 with open(os.environ["TEST_REPORT"], "w") as f:
     json.dump(report, f)
+'''
+
+RENPY_INIT = r'''
+import types
+name_blacklist = set()
+android = True
+log_txt = []
+config = types.SimpleNamespace(log_to_stdout=False)
+display = types.SimpleNamespace(log=types.SimpleNamespace(write=log_txt.append),
+                                presplash=types.SimpleNamespace(pump_window=lambda: None))
+
+
+class Out:
+    def __init__(self):
+        self.lines = []
+
+    def write(self, s):
+        self.lines.append(s)
+
+
+log = types.SimpleNamespace(real_stdout=Out())
+'''
+
+RENPY_MAIN = r'''
+import time
+import renpy
+last_clock = time.time()
+
+
+def log_clock(s):
+    global last_clock
+    now = time.time()
+    s = "{} took {:.0f} ms".format(s, 1000 * (now - last_clock))
+
+    renpy.display.log.write(s)
+    if renpy.android and not renpy.config.log_to_stdout:
+        print(s)
+
+    renpy.display.presplash.pump_window()
+
+    last_clock = now
 '''
 
 
@@ -113,6 +180,15 @@ class RenpyMainTest(unittest.TestCase):
         self.assertIsNone(r["view"], "off: Ren'Py keeps its bars")
         r = self.run_main(AGVN_RENPY_BASEDIR=self.game, AGVN_RENPY_STRETCH="1", TEST_STRETCH="1")
         self.assertEqual(["renpy.config.adjust_view_size"], r["blacklist"], "never in Ren'Py's backup")
+
+    def test_each_start_time_goes_into_log_txt_once(self):
+        # Ren'Py printed it for logcat, and its stdout goes to log.txt too: every such line was there twice (03/11/2026)
+        r = self.run_main(AGVN_RENPY_BASEDIR=self.game, TEST_LOG_CLOCK="1", TEST_RENPY_INIT=RENPY_INIT,
+                          TEST_RENPY_MAIN=RENPY_MAIN)
+        self.assertEqual(1, len(r["log_txt"]), r["log_txt"])
+        self.assertRegex(r["log_txt"][0], r"^Early init took \d+ ms$")
+        self.assertEqual([r["log_txt"][0] + "\n"], r["logcat"], "still in logcat")
+        self.assertIn("renpy.main.log_clock", r["blacklist"], "never in Ren'Py's backup")
 
 
 if __name__ == "__main__":

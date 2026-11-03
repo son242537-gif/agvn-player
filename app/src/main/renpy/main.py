@@ -9,8 +9,8 @@
 #   - AGVN_RENPY_STRETCH: "1" for "Toàn màn hình cho mọi game": the game is drawn over the whole screen, without the
 #     bars Ren'Py keeps at the sides, through config.adjust_view_size (unless the game sets that itself).
 #   - ANDROID_PUBLIC: beside Ren'Py's log.txt, faulthandler.txt gets the Python lines a crash in native code came from.
-# Live2D is checked as Ren'Py meant (Live2DCheck). Then Ren'Py's renpy.py runs unchanged, in this module, so its path
-# functions are the ones Ren'Py calls.
+# Live2D is checked as Ren'Py meant, and each start time goes into log.txt once (ModuleHooks). Then Ren'Py's renpy.py
+# runs unchanged, in this module, so its path functions are the ones Ren'Py calls.
 
 import importlib.abc
 import importlib.machinery
@@ -115,11 +115,46 @@ def check_live2d(live2d):
     live2d.onetime_init = checked_init
 
 
-class Live2DCheck(importlib.abc.MetaPathFinder):
-    """Runs check_live2d on renpy.gl2.live2d as it is imported. Whatever goes wrong here, Ren'Py goes on as it is."""
+def log_once(main):
+    """
+    Ren'Py on Android writes each start time ("Early init took 51 ms" ... "Interface start took 4301 ms") into log.txt,
+    then prints it for logcat. Its print goes to log.txt too, as all of stdout does, so every one of these lines was
+    there twice (03/11/2026, every Ren'Py game). Here it goes to log.txt once and to logcat as before: Ren'Py's own
+    log_clock of 8.5.3, writing to the stdout it had before it sent stdout to log.txt instead of printing.
+    """
+    renpy = sys.modules.get("renpy")
+    blacklist = getattr(renpy, "name_blacklist", None)
+    if not isinstance(blacklist, set) or not hasattr(main, "log_clock") or not hasattr(main, "last_clock"):
+        return  # not the Ren'Py this knows: left as it is
+
+    blacklist.add("renpy.main.log_clock")  # a function of this file cannot be pickled by Ren'Py's backup
+
+    def log_clock(s):
+        now = time.time()
+        s = "{} took {:.0f} ms".format(s, 1000 * (now - main.last_clock))
+        renpy.display.log.write(s)
+        if renpy.android and not renpy.config.log_to_stdout:
+            try:
+                renpy.log.real_stdout.write(s + "\n")
+            except Exception:
+                pass
+        renpy.display.presplash.pump_window()
+        main.last_clock = now
+
+    main.log_clock = log_clock
+
+
+class ModuleHooks(importlib.abc.MetaPathFinder):
+    """
+    Runs check_live2d on renpy.gl2.live2d and log_once on renpy.main as they are imported. Whatever goes wrong here,
+    Ren'Py goes on as it is.
+    """
+
+    HOOKS = {"renpy.gl2.live2d": check_live2d, "renpy.main": log_once}
 
     def find_spec(self, name, path, target=None):
-        if name != "renpy.gl2.live2d":
+        hook = self.HOOKS.get(name)
+        if hook is None:
             return None
         spec = importlib.machinery.PathFinder.find_spec(name, path)
         if spec is None or spec.loader is None or not hasattr(spec.loader, "exec_module"):
@@ -129,9 +164,9 @@ class Live2DCheck(importlib.abc.MetaPathFinder):
         def exec_module(module):
             run(module)
             try:
-                check_live2d(module)
+                hook(module)
             except Exception as e:
-                print("AGVN: Live2D check:", e)
+                print("AGVN: " + name + ":", e)
 
         spec.loader.exec_module = exec_module
         return spec
@@ -152,7 +187,7 @@ def enable_faulthandler():
 
 
 fault_log = enable_faulthandler()
-sys.meta_path.insert(0, Live2DCheck())
+sys.meta_path.insert(0, ModuleHooks())
 quit_file = os.environ.get("AGVN_RENPY_QUIT_FILE")
 
 if os.environ.get("AGVN_RENPY_STRETCH") == "1":
