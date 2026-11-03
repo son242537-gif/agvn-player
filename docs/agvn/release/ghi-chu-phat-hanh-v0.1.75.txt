@@ -2,4 +2,8 @@ AGVN Player v0.1.75 - agvn.io
 
 Sửa lỗi:
 - Game DirectX (nhiều game Unity) đứng màn hình đen ngay sau logo, đúng lúc game đổi độ phân giải hoặc bật vsync để vào menu: "Tự sửa lỗi" nhận ra lỗi này và đề nghị "Tắt Present Wait" cho riêng game đó. Các game khác không đổi gì.
+- Game Ren'Py 8 hay RPG Maker XP/VX/VX Ace thêm vào lúc thư mục còn thiếu file (ví dụ thiếu lib/) rồi mới chép đủ: lần mở sau game tự chạy bằng "Chạy nhẹ", không cần xoá rồi thêm lại. Game bạn đã chọn "Chạy bằng Windows" vẫn giữ Windows.
+- Game Ren'Py 8 chỉ chép game/ và file .exe (không có lib/, renpy/) giờ chạy được bằng "Chạy nhẹ".
+- Game Ren'Py sắp chạy bằng Windows mà thiếu thư mục lib/ thì app báo trước khi mở, thay vì để màn hình đen mấy phút.
+- Nhật ký phiên ghi rõ ai thoát game, sau bao lâu và game có hiện hình không, thay vì luôn ghi "kết thúc bình thường". Nhật ký log.txt của game Ren'Py "Chạy nhẹ" không còn ghi mỗi dòng hai lần.
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

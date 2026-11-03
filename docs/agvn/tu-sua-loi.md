@@ -2784,3 +2784,63 @@ gốc của bản phát hành cũng y như vậy. Game không văng, chạm khô
      ghi tiếp sau đó.
   3. Nếu vẫn đen: thử "Đồng bộ khung hình", rồi gửi nhật ký.
   4. Hồi quy: vài game Unity D3D11 đã chạy được vẫn như cũ. Không game nào khác bị đổi cài đặt.
+
+## Game Ren'Py kẹt ở Windows vì thêm lúc thư mục còn thiếu file (bản 0.1.75)
+
+Báo cáo ngày 03/11/2026 (POCO F8 Pro, Snapdragon 8 Elite, Adreno 830, app 0.1.74, Proton 9 arm64ec). Game Ren'Py 8.5
+bản PC.
+
+- **Cách chạy chỉ chọn một lần, lúc thêm game.**
+  - Thư mục chép thiếu `lib/` (chỉ có `.exe`, `.py`, `game/`) nên lúc thêm không đủ điều kiện Chạy nhẹ: game nhận
+    cách chạy Wine (`agvnRunner` trống).
+  - Sau khi chép đủ `lib/` và `renpy/`, game vẫn chạy bằng Wine: nạp kịch bản 92 giây thay vì 1,5 giây, khoảng 2 phút
+    màn đen thay vì 4,3 giây, RSS 1,5 GB.
+  - Người báo lỗi chỉ biết cách xoá rồi thêm lại. Nút "Cập nhật" ở màn Thêm game có chọn lại, nhưng khó biết tới.
+- **Sửa (`AgvnLightRecheck`):** mỗi lần mở (`AgvnHtmlGame.redirect`, mọi đường mở đều qua đây, kể cả lối tắt ngoài
+  màn hình chính), game không có cách chạy riêng (`agvnRunner` trống) nhận cách chạy mà lúc thêm game nay sẽ cho.
+  - Ren'Py 8 đủ điều kiện (`useRenpy`) → Chạy nhẹ; RPG Maker XP/VX/VX Ace đủ điều kiện (`useRgss`) → mkxp-z. Lối tắt
+    được lưu lại.
+  - Godot vốn đã tự quyết lúc mở (`AgvnGodotLight`), NW.js cũng vậy (`AgvnNwjsLight`).
+  - Giữ nguyên: game người chơi đã chọn "Chạy bằng Windows" (`agvnRunner=wine`), và game có hồ sơ ghi `runner: wine`.
+  - **Thay đổi so với bản 0.1.6:** game Ren'Py 8 thêm trước bản 0.1.6 (lúc chưa có Chạy nhẹ) cũng tự chuyển ở lần mở
+    sau. Trước đây chúng giữ Windows cho tới khi người chơi bấm "Cập nhật". Muốn quay lại thì dùng "Chạy bằng Windows"
+    trong menu của game.
+- **Ren'Py 8 chép thiếu `lib/` và `renpy/` (`AgvnRenpyGame.pythonOf`):**
+  - Không có hai thư mục đó thì app đọc `game/script_version.txt`, file bản build của Ren'Py ghi phiên bản đã dựng
+    game, ví dụ `(8, 3, 7)`. Số 8 trở lên là Python 3; 6, 7 là Python 2.
+  - Chạy nhẹ mang Ren'Py 8.5.3 riêng, nên game Ren'Py 8 chỉ có `game/` vẫn chạy được.
+- **Báo trước khi mở bằng Wine (`AgvnGameFilesCheck`, `AgvnRenpyGame.hasWindowsPython`):**
+  - Game Ren'Py sắp chạy bằng Wine mà `lib/` không có thư mục Python cho Windows (`lib/py3-windows-*`,
+    `lib/py2-windows-*`, `lib/windows-*`).
+  - Khi đó `<Game>.exe` không có Python để chạy: tiến trình bận khoảng 40% một nhân, không vẽ khung nào, và màn hình
+    đen tới khi người chơi tự thoát.
+  - App hiện hộp "Game Ren'Py thiếu thư mục lib/" với hai nút "Đóng" và "Vẫn mở".
+- **Nhật ký phiên (`AgvnSessionTrack.endText`, `wineEndText`):**
+  - `tom-tat.txt` ghi ai kết thúc game và sau bao lâu: "Người chơi thoát sau 153 giây; game chưa hiện hình (chưa vẽ
+    khung nào)…", "Người chơi thoát sau N giây; game không vẽ khung nào trong M giây cuối", "Game tự đóng sau N giây…".
+  - Trước đây mọi lần thoát của một game đã có khung đều ghi "Game kết thúc bình thường (thoát từ menu hoặc game tự
+    đóng)".
+  - `su-kien.txt`: "Wine kết thúc, mã thoát 137 (app tắt game vì người chơi thoát)", hoặc "(bị tắt từ bên ngoài: Android
+    hoặc app)" khi người chơi không thoát.
+- **log.txt của Ren'Py Chạy nhẹ ghi mỗi dòng hai lần (`main.py`, `log_once`):**
+  - Từ "Early init took" tới "Interface start took", mỗi dòng có hai lần, ở mọi game Ren'Py.
+  - Ren'Py 8.5.3 trên Android (`renpy/main.py`, `log_clock`) ghi dòng vào log.txt, rồi `print` nó cho logcat. Stdout
+    của Ren'Py cũng được chép vào log.txt (`StdoutRedirector`), nên dòng đó vào log.txt lần thứ hai.
+  - Sửa: khi `renpy.main` được nạp, app thay `log_clock` bằng bản giống hệt, chỉ khác là ghi cho logcat thẳng vào stdout
+    gốc (`renpy.log.real_stdout`) thay vì `print`.
+  - Tên `renpy.main.log_clock` được thêm vào danh sách Ren'Py không sao lưu (`name_blacklist`), như móc Live2D.
+  - Không đặt `RENPY_NO_REDIRECT_STDIO`, vì như vậy log.txt mất cả lỗi và dòng in của game.
+- **Chưa làm:** mục "Cách chạy" trong cài đặt game và nút "Nhận diện lại game". Việc chọn lại tự động lúc mở và nút
+  "Cập nhật" có sẵn đã thay cho hai mục này.
+- **Test:**
+  - `AgvnRenpyGameTest` (`script_version.txt`, Python cho Windows, chọn lại cách chạy) và `AgvnSessionEndTest`.
+  - `tools/agvn/tests/test_renpy_main.py`: gói `renpy` giả có `log_clock` của 8.5.3 và stdout chép vào log. Không có
+    móc thì dòng có hai lần; có móc thì một lần, và vẫn ra logcat.
+- **Thử máy:**
+  1. Game Ren'Py 8 đã thêm lúc thiếu `lib/`, nay đã chép đủ: mở từ thư viện → vào Chạy nhẹ ngay. Nhật ký có dòng
+     "its folder now suits Chạy nhẹ".
+  2. Game Ren'Py 8 chỉ có `game/` (có `script_version.txt`) và `.exe`: thêm vào → Chạy nhẹ, game chạy được.
+  3. Game Ren'Py 7 thiếu `lib/`: mở → hộp báo thiếu `lib/`.
+  4. Game Ren'Py đã chọn "Chạy bằng Windows": vẫn chạy bằng Windows.
+  5. Một game Ren'Py Chạy nhẹ: log.txt mỗi dòng "… took … ms" chỉ có một lần. Game vẫn vào được menu, lưu và tải được
+     (bản sao lưu module của Ren'Py không hỏng như bản 0.1.56).
