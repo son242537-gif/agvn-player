@@ -2844,3 +2844,46 @@ bản PC.
   4. Game Ren'Py đã chọn "Chạy bằng Windows": vẫn chạy bằng Windows.
   5. Một game Ren'Py Chạy nhẹ: log.txt mỗi dòng "… took … ms" chỉ có một lần. Game vẫn vào được menu, lưu và tải được
      (bản sao lưu module của Ren'Py không hỏng như bản 0.1.56).
+
+## Game web không có .exe không thêm được, và tên game có dấu hai chấm (bản 0.1.75)
+
+Báo cáo ngày 03/11/2026 (POCO F8 Pro, app 0.1.74).
+
+- **Game web không kèm `.exe`:**
+  - Game web (Cocos Creator 3, PixiJS, Phaser, VN tự viết) đã bỏ bộ chạy Electron/NW.js để chơi trên điện thoại.
+    Thư mục có `index.html` và `package.json` (`"main": "index.html"`, có khối `"window"`), không có `.exe`, không có
+    dấu hiệu của RPG Maker, Tyrano hay Ren'Py.
+  - "Thêm game" báo "Không tìm thấy file .exe để chạy", dù hồ sơ ghi `"runner": "html"`.
+  - **Vì sao:** engine là `UNKNOWN`. `AgvnLightGame.canRun`, chỗ cho game Chạy nhẹ không cần `.exe`, chỉ có RPG Maker
+    MV/MZ, Tyrano, Ren'Py và RGSS. Trong khi đó `AgvnHtmlGame.indexFor` đã tìm được trang của game NW.js
+    (`AgvnNwjsGame.index`), và game có `.exe` của NW.js vẫn chạy được bằng Chạy nhẹ.
+  - **Sửa:** `canRun` nhận cả `UNKNOWN` khi `AgvnNwjsGame.index` tìm ra trang: `package.json` có `"window"` (hoặc file
+    của NW.js), `"main"` là một trang cạnh nó, và game không cần Node (`node-main`, `bg-script`, `node_modules`,
+    `.node`).
+    - Game được thêm với exe giữ chỗ `Game.exe`, không bao giờ chạy, và không có "Chạy bằng Windows".
+    - "Thêm game" tìm thấy thư mục này dù không có hồ sơ (`AgvnGameScanner.isGameDir`).
+    - Danh sách ghi loại "HTML" (`AgvnImportEntry.engineLabel`).
+  - Thư mục chỉ có `index.html` (không có `package.json`) vẫn không phải game, như trước.
+  - Người báo lỗi đang vá tạm phía game bằng một file `Game.exe` giữ chỗ cộng `"exe": "Game.exe"`. Cách đó vẫn chạy,
+    nhưng từ bản này không cần nữa.
+- **Tên game có ký tự không đặt được trong tên file:**
+  - `"name": "Tên game: Phụ đề"` làm hồ sơ bị từ chối với câu "trống, quá dài hoặc có ký tự không hợp lệ".
+  - Tên dùng làm tên file lối tắt, nên `\ / : * ? " < > |` không được có.
+  - **Sửa:** app tự làm sạch tên (`AgvnProfile.cleanName`). Dấu `:` thành " - ", ký tự khác thành dấu cách:
+    "Tên game: Phụ đề" thành "Tên game - Phụ đề", "Re:Zero" thành "Re - Zero".
+  - Tên không có ký tự nào như vậy thì giữ nguyên (chỉ bỏ dấu cách đầu cuối), nên lối tắt của game đã thêm vẫn giữ tên
+    file khi bấm "Cập nhật".
+  - Lỗi còn lại nói rõ: "Tên game (name) trống." và "Tên game (name) dài N ký tự, tối đa 80: …".
+- **Bộ công cụ PC (`tools/agvn/agvn_profile_lib.py`):** `validate` làm giống app.
+  - Có quy tắc game Chạy nhẹ không cần `.exe` (`light_can_run`, `nwjs_page`, `rgss_version`, `placeholder_exe`). Trước
+    đây bản Python báo thiếu `.exe` cho mọi game như vậy, kể cả RPG Maker MV và RGSS.
+  - Cũng làm sạch tên như app (`clean_name`).
+- **Test:**
+  - `AgvnLightGameTest` (game web không `.exe`; game cần Node vẫn không thêm được) và `AgvnProfileTest` (làm sạch tên).
+  - `test_toolkit.py`: game web, MV, VX Ace, Ren'Py 8 không `.exe` đều nhận `Game.exe`; game cần Node, trang lẻ và
+    Ren'Py 7 không `.exe` bị từ chối.
+- **Thử máy:**
+  1. Thư mục game web như báo cáo, bỏ `Game.exe` giữ chỗ và khoá `"exe"` trong hồ sơ: "Thêm game" ghi "HTML", thêm
+     được, mở bằng Chạy nhẹ.
+  2. Hồ sơ có `"name": "Tên game: Phụ đề"`: thêm được, thư viện hiện "Tên game - Phụ đề".
+  3. Hồi quy: một game RPG Maker MV có `.exe`, và một game Windows thường, thêm và "Cập nhật" như cũ.
