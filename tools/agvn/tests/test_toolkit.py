@@ -94,7 +94,7 @@ class ProfileRulesTest(unittest.TestCase):
         touch(self.tmp.name, "evil.exe")
         bad = [{"exe": "../evil.exe"}, {"exe": "C:/evil.exe"}, {"args": ["a;b"]}, {"env": {"A": "$(x)"}},
                {"resolution": "320x240"}, {"fpsLimit": 5}, {"texturePool": 9000}, {"ueEngineIni": {"[x]": {}}},
-               {"name": "a/b"}, {"schemaVersion": 2}, {"locale": "japanese"}, {"locale": "ja_JP;x"}, {"runner": "exe"}]
+               {"name": " : "}, {"name": "x" * 81}, {"schemaVersion": 2}, {"locale": "japanese"}, {"locale": "ja_JP;x"}, {"runner": "exe"}]
         for extra in bad:
             p = {"schemaVersion": 1, "name": "g"}
             p.update(extra)
@@ -113,6 +113,46 @@ class ProfileRulesTest(unittest.TestCase):
         touch(g, "game.exe")
         with self.assertRaises(ProfileError):
             validate({"schemaVersion": 1, "name": "g"}, g)
+
+    def test_a_name_a_file_cannot_have_is_made_fit_for_one(self):
+        # "Tên game: Phụ đề", the usual kind of name, was refused (03/11/2026): as AgvnProfile.cleanName
+        touch(self.ue, "MyGame.exe")
+        p = {"schemaVersion": 1, "name": "Tên game: Phụ đề"}
+        validate(p, self.ue)
+        self.assertEqual("Tên game - Phụ đề", p["name"])
+        p = {"schemaVersion": 1, "name": " -ZERO-  Two "}
+        validate(p, self.ue)
+        self.assertEqual("-ZERO-  Two", p["name"], "a name it can have stays as it is")
+
+    def test_games_chay_nhe_runs_need_no_exe(self):
+        # as AgvnLightGameTest.java: copies made for phones, and a web game without NW.js (03/11/2026)
+        root = self.tmp.name
+        web = os.path.join(root, "Web")
+        touch(web, "index.html")
+        touch(web, "package.json", b'{"name":"web","main":"index.html","window":{"width":1280}}')
+        mv = os.path.join(root, "MV")
+        touch(mv, "www/index.html")
+        touch(mv, "www/js/rpg_core.js")
+        ace = os.path.join(root, "Ace")
+        touch(ace, "Game.ini", b"[Game]\nLibrary=System\\RGSS301.dll\nRTP=RPGVXAce\n")
+        touch(ace, "Game.rgss3a")
+        renpy = os.path.join(root, "Renpy")
+        touch(renpy, "game/script.rpyc")
+        touch(renpy, "game/script_version.txt", b"(8, 3, 7)")
+        for game in (web, mv, ace, renpy):
+            self.assertEqual("Game.exe", validate({"schemaVersion": 1, "name": "g"}, game), game)
+        self.assertEqual("Game.exe", validate({"schemaVersion": 1, "name": "g", "runner": "html"}, web))
+        node = os.path.join(root, "Node")
+        touch(node, "index.html")
+        touch(node, "package.json", b'{"main":"index.html","window":{},"node-main":"boot.js"}')
+        page = os.path.join(root, "Page")
+        touch(page, "index.html")
+        renpy7 = os.path.join(root, "Renpy7")
+        touch(renpy7, "game/script.rpyc")
+        touch(renpy7, "game/script_version.txt", b"(7, 4, 11)")
+        for game in (node, page, renpy7):
+            with self.assertRaises(ProfileError, msg=game):
+                validate({"schemaVersion": 1, "name": "g"}, game)
 
     def test_shared_example_profile_is_valid(self):
         with open(os.path.join(REPO, "docs", "agvn", "agvn-profile.example.json"), encoding="utf-8") as f:

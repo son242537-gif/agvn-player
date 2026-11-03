@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * agvn-profile.json, schema v1. Declarative launch settings for one game folder; never holds runtime state.
@@ -24,6 +25,8 @@ import java.util.Map;
 public final class AgvnProfile {
     public static final String FILE_NAME = "agvn-profile.json";
     public static final int SCHEMA_VERSION = 1;
+    /** What a file name cannot have, on Windows and in Wine: \ / : * ? " < > |. */
+    static final Pattern FORBIDDEN = Pattern.compile("[\\\\/:*?\"<>|]");
 
     /** Optional overrides for weak phones (applied by device tiering). */
     public static final class Preset {
@@ -80,6 +83,19 @@ public final class AgvnProfile {
         p.name = name.length() > 80 ? name.substring(0, 80).trim() : name;
         p.simulatedTouchscreen = true;
         return p;
+    }
+
+    /**
+     * {@code name} fit for a file name, which the game's shortcut takes it for: "Tên game: Phụ đề" becomes "Tên game -
+     * Phụ đề", and the other characters a file name cannot have become spaces. A profile whose name had one was refused
+     * (03/11/2026). A name without any stays as it is, trimmed, so its shortcut keeps its file. "" for none.
+     */
+    public static String cleanName(String name) {
+        if (name == null) return "";
+        if (!FORBIDDEN.matcher(name).find()) return name.trim();
+        String clean = name.replaceAll("^\\s*:+\\s*|\\s*:+\\s*$", "").replaceAll("\\s*:+\\s*", " - ")
+                .replaceAll("[\\\\/*?\"<>|]", " ");
+        return clean.replaceAll("\\s+", " ").trim();
     }
 
     /** "Collection - game2" for game2.exe: the name of one game of a folder that holds several, or of an exe picked by hand. */

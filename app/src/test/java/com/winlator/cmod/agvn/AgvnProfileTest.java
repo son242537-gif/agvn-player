@@ -87,7 +87,27 @@ public class AgvnProfileTest {
         assertRejected(profile(",\"weakDevice\":{\"fpsLimit\":200}"), dir);
         assertRejected(profile(",\"ueEngineIni\":{\"[Evil]\":{\"a\":\"b\"}}"), dir);
         assertRejected(AgvnProfile.parse("{\"schemaVersion\":2,\"name\":\"x\"}"), dir);
-        assertRejected(AgvnProfile.parse("{\"schemaVersion\":1,\"name\":\"a/b\"}"), dir);
+        assertRejected(AgvnProfile.parse("{\"schemaVersion\":1,\"name\":\" : \"}"), dir);
+        assertRejected(profileNamed(new String(new char[81]).replace('\0', 'x')), dir);
+    }
+
+    private static AgvnProfile profileNamed(String name) throws Exception {
+        AgvnProfile p = AgvnProfile.parse("{\"schemaVersion\":1,\"name\":\"x\"}");
+        p.name = name;
+        return p;
+    }
+
+    @Test
+    public void aNameAFileCannotHaveIsMadeFitForOne() throws Exception {
+        // "Tên game: Phụ đề", the usual kind of name, was refused (03/11/2026)
+        AgvnProfile p = profileNamed("Tên game: Phụ đề");
+        AgvnProfileValidator.validate(p, ueGame());
+        assertEquals("Tên game - Phụ đề", p.name);
+        assertEquals("Re - Zero", AgvnProfile.cleanName("Re:Zero"));
+        assertEquals("a b", AgvnProfile.cleanName("a/b"));
+        assertEquals("Game", AgvnProfile.cleanName("Game:"));
+        assertEquals("a name it can have stays as it is", "-ZERO-  Two", AgvnProfile.cleanName(" -ZERO-  Two "));
+        assertEquals("", AgvnProfile.cleanName(null));
     }
 
     /** Same example file is validated by tools/agvn/tests/test_toolkit.py (Python toolkit). */

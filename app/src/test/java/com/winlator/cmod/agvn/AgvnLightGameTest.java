@@ -53,6 +53,27 @@ public class AgvnLightGameTest {
     }
 
     @Test
+    public void exeLessWebGameWithItsPackageJsonImports() throws Exception {
+        // a Cocos Creator page game without NW.js (POCO F8 Pro, 03/11/2026): "Không tìm thấy file .exe"
+        File web = tmp.newFolder("Web");
+        write(web, "index.html", "<canvas></canvas>");
+        write(web, "package.json", "{\"name\":\"web\",\"main\":\"index.html\",\"window\":{\"width\":1280}}");
+        assertEquals(GameExeResolver.Engine.UNKNOWN, GameExeResolver.detectEngine(web));
+        assertTrue(AgvnLightGame.canRun(web, GameExeResolver.Engine.UNKNOWN));
+        assertTrue("listed by \"Thêm game\" without a profile", AgvnGameScanner.isGameDir(web));
+        AgvnProfile html = AgvnProfile.defaultFor("Web");
+        html.runner = "html";
+        assertEquals("Game.exe", AgvnProfileValidator.validate(html, web));
+        assertEquals("Game.exe", AgvnProfileValidator.validate(AgvnProfile.defaultFor("Web"), web));
+
+        File node = tmp.newFolder("Node");
+        write(node, "index.html", "");
+        write(node, "package.json", "{\"main\":\"index.html\",\"window\":{},\"node-main\":\"boot.js\"}");
+        assertFalse("one that needs Node runs only on Windows, which it has no exe for",
+                AgvnLightGame.canRun(node, GameExeResolver.Engine.UNKNOWN));
+    }
+
+    @Test
     public void pickedGameFilesLeadToTheGameFolder() throws Exception {
         File mv = tmp.newFolder("MVgame");
         assertEquals(mv, AgvnLightGame.folderOf(new File(mv, "www/index.html")));

@@ -4,10 +4,12 @@ package com.winlator.cmod.agvn;
 import java.io.File;
 
 /**
- * Games "Chạy nhẹ" runs on Android itself, without Windows: RPG Maker MV/MZ and Tyrano (index.html), Ren'Py 8, and RPG
- * Maker XP/VX/VX Ace. Copies made for phones (JoiPlay packs) often come without the Windows .exe. Such a folder is still
- * a game: it is imported with a placeholder exe that is never started, and "Chạy bằng Windows" is not offered for it.
- * Pure Java (JVM-testable).
+ * Games "Chạy nhẹ" runs on Android itself, without Windows: RPG Maker MV/MZ and Tyrano (index.html), an NW.js page game
+ * ({@link AgvnNwjsGame#index}), Ren'Py 8, and RPG Maker XP/VX/VX Ace. Copies made for phones (JoiPlay packs) often come
+ * without the Windows .exe, and a web game (Cocos Creator, PixiJS, Phaser) without NW.js's: a page and its
+ * package.json, which "Thêm game" refused, "Không tìm thấy file .exe" (03/11/2026). Such a folder is still a game: it
+ * is imported with a placeholder exe that is never started, and "Chạy bằng Windows" is not offered for it. Pure Java
+ * (JVM-testable).
  */
 final class AgvnLightGame {
     private AgvnLightGame() {}
@@ -17,6 +19,7 @@ final class AgvnLightGame {
         switch (engine) {
             case RPGMAKER_MV:
             case TYRANO:
+            case UNKNOWN: // an NW.js page game: its page beside package.json
                 return AgvnHtmlGame.indexFor(dir, engine) != null;
             case RENPY:
                 return AgvnRenpyGame.canRun(dir);

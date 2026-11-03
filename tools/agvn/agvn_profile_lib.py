@@ -224,6 +224,140 @@ def resolve_exe(game_dir, engine):
     return exes[0]
 
 
+# NW.js's own files beside its exe, when package.json sets no window (AgvnNwjsGame.RUNTIME)
+NWJS_RUNTIME = ("nw.dll", "nw_elf.dll", "nw.pak", "resources.pak")
+
+
+def _read(path, limit=64 * 1024):
+    try:
+        with open(path, encoding="utf-8", errors="replace") as f:
+            return f.read(limit)
+    except OSError:
+        return None
+
+
+def _index(folder):
+    return next((os.path.join(folder, n) for n in _children(folder or "")
+                 if n.lower() == "index.html" and os.path.isfile(os.path.join(folder, n))), None) if folder else None
+
+
+def nwjs_page(game_dir):
+    """The page an NW.js page game starts on, beside its package.json (AgvnNwjsGame.index); None for any other folder."""
+    text = _read(os.path.join(game_dir, "package.json"))
+    if text is None:
+        return None
+    if not re.search(r'"window"\s*:\s*\{', text) and not any(_is_file(_path(game_dir, n)) for n in NWJS_RUNTIME):
+        return None
+    if (re.search(r'"(node-main|bg-script)"\s*:\s*"[^"]+"', text) or _is_dir(_path(game_dir, "node_modules"))
+            or _any_file(game_dir, "", ".node")):
+        return None  # it needs Node itself
+    m = re.search(r'"main"\s*:\s*"([^"]*)"', text)
+    page = (m.group(1) if m else "").strip().replace("\\", "/")
+    if page.startswith("app://"):
+        page = page[6:]
+    page = re.split(r"[?#]", page, maxsplit=1)[0]
+    while page.startswith("./"):
+        page = page[2:]
+    if not page or "/" in page or not page.lower().endswith((".html", ".htm")):
+        return None
+    found = _path(game_dir, page.lower())
+    return found if _is_file(found) else None
+
+
+def _renpy_python(game_dir):
+    """3 for Ren'Py 8, 2 for 6 and 7, 0 when the folder does not tell (AgvnRenpyGame.pythonOf)."""
+    lib = [n.lower() for n in _children(os.path.join(game_dir, "lib")) if os.path.isdir(os.path.join(game_dir, "lib", n))]
+    if any(n.startswith(("py3-", "python3")) for n in lib):
+        return 3
+    if any(n.startswith(("py2-", "python2", "pythonlib2", "windows-", "linux-", "darwin-", "mac-")) for n in lib):
+        return 2
+    renpy = os.path.join(game_dir, "renpy")
+    if os.path.isdir(os.path.join(renpy, "__pycache__")):
+        return 3
+    if _any_file(renpy, "", ".pyo", ".pyc"):
+        return 2
+    m = re.match(r"\s*\(?\s*(\d+)", _read(os.path.join(game_dir, "game", "script_version.txt")) or "")
+    major = int(m.group(1)) if m else 0
+    return 3 if major >= 8 else 2 if major in (6, 7) else 0
+
+
+def _rgss_ini(game_dir):
+    """Game.ini, else the .ini named as an exe beside it (AgvnRgssGame.readIni)."""
+    names = _children(game_dir)
+    inis = [n for n in names if n.lower().endswith(".ini") and os.path.isfile(os.path.join(game_dir, n))]
+    for n in inis:
+        if n.lower() == "game.ini":
+            return n
+    exes = {n.lower() for n in names}
+    return next((n for n in reversed(inis) if (n[:-4] + ".exe").lower() in exes), None)
+
+
+def _rgss_from(name):
+    n = (name or "").lower()
+    return 3 if n.endswith((".rgss3a", ".rvdata2")) else 2 if n.endswith((".rgss2a", ".rvdata")) else \
+        1 if n.endswith((".rgssad", ".rxdata")) else 0
+
+
+def rgss_version(game_dir):
+    """1 for XP, 2 for VX, 3 for VX Ace; 0 when the folder is not an RGSS game (AgvnRgssGame.rgssVersion)."""
+    ini = _rgss_ini(game_dir)
+    if ini is None:
+        return 0
+    values, section = {}, False
+    for line in (_read(os.path.join(game_dir, ini)) or "").splitlines():
+        line = line.strip()
+        if line.startswith("["):
+            section = line.lower() == "[game]"
+        elif section and "=" in line and line.index("=") > 0:
+            key, value = line.split("=", 1)
+            values[key.strip().lower()] = value.strip()
+    library = values.get("library", "").upper()
+    i = library.rfind("RGSS")
+    v = int(library[i + 4]) if i >= 0 and i + 4 < len(library) and library[i + 4] in "123" else 0
+    v = v or _rgss_from(values.get("scripts"))
+    execname = ini[:-4].lower()
+    for n in _children(game_dir):
+        if not v and n.lower().startswith(execname + ".") and os.path.isfile(os.path.join(game_dir, n)):
+            v = _rgss_from(n)
+    data = os.path.join(game_dir, "Data")
+    for n in _children(data):
+        if not v and os.path.isfile(os.path.join(data, n)):
+            v = _rgss_from(n)
+    return v
+
+
+def light_can_run(game_dir, engine):
+    """True when "Chạy nhẹ" runs the folder as a game of engine, with or without an .exe (AgvnLightGame.canRun)."""
+    if engine == "RPGMAKER_MV":
+        return bool(_index(_path(game_dir, "www")) or _index(game_dir))
+    if engine == "TYRANO":
+        return bool(_index(game_dir)) and os.path.isdir(os.path.join(game_dir, "tyrano"))
+    if engine == "UNKNOWN":
+        return nwjs_page(game_dir) is not None
+    if engine == "RENPY":
+        return os.path.isdir(os.path.join(game_dir, "game")) and _renpy_python(game_dir) == 3
+    if engine == "RPGMAKER":
+        return rgss_version(game_dir) != 0
+    return False
+
+
+def placeholder_exe(game_dir, engine):
+    """The exe a game without one gets: what its PC copy would have (AgvnLightGame.placeholderExe)."""
+    ini = _rgss_ini(game_dir) if engine == "RPGMAKER" else None
+    return (ini[:-4] if ini else "Game") + ".exe"
+
+
+def clean_name(name):
+    """name fit for a file name (AgvnProfile.cleanName): "Tên game: Phụ đề" becomes "Tên game - Phụ đề"."""
+    if not isinstance(name, str):
+        return ""
+    if not re.search(r'[\\/:*?"<>|]', name):
+        return name.strip()
+    clean = re.sub(r"^\s*:+\s*|\s*:+\s*$", "", name)
+    clean = re.sub(r'[\\/*?"<>|]', " ", re.sub(r"\s*:+\s*", " - ", clean))
+    return re.sub(r"\s+", " ", clean).strip()
+
+
 def controls_for(engine, profile=None):
     """Layout the app picks: the profile's "controls" when set, else by engine (like AgvnLayouts.kindFor)."""
     chosen = (profile or {}).get("controls")
@@ -259,9 +393,12 @@ def validate(profile, game_dir):
     """Same rules as the app; returns the exe (relative, '/'-separated) the app would launch."""
     if profile.get("schemaVersion") != 1:
         raise ProfileError("Phiên bản profile không được hỗ trợ (cần schemaVersion = 1).")
-    name = profile.get("name") or ""
-    if not name.strip() or len(name) > 80 or re.search(r'[\\/:*?"<>|]', name):
-        raise ProfileError("Tên game (name) trống, quá dài hoặc có ký tự không hợp lệ.")
+    name = clean_name(profile.get("name"))  # also the shortcut's file name (AgvnProfile.FORBIDDEN)
+    if not name:
+        raise ProfileError("Tên game (name) trống.")
+    if len(name) > 80:
+        raise ProfileError("Tên game (name) dài %d ký tự, tối đa 80: %s" % (len(name), name))
+    profile["name"] = name
     for arg in profile.get("args") or []:
         if not isinstance(arg, str) or not SAFE_VALUE.match(arg):
             raise ProfileError("Tham số chạy (args) có ký tự không an toàn: %s" % arg)
@@ -300,6 +437,8 @@ def validate(profile, game_dir):
     suggested = resolve_exe(game_dir, engine)
     exe = (profile.get("exe") or "").strip().replace("\\", "/")
     if not exe:
+        if not suggested and light_can_run(game_dir, engine):
+            return placeholder_exe(game_dir, engine)  # a copy made for phones: "Chạy nhẹ" runs it, never this exe
         if not suggested:
             raise ProfileError('Không tìm thấy file .exe để chạy. Hãy ghi rõ "exe" trong profile.')
         if "wine " in suggested:

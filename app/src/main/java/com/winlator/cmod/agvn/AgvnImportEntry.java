@@ -100,7 +100,7 @@ public final class AgvnImportEntry {
         }
         if (title == null) title = AgvnGameTitle.pretty(dir.getName());
         if (exe == null) exe = GameExeResolver.resolveExe(dir, engine);
-        String detail = engineLabel(ctx, engine) + " · " + place(ctx, dir);
+        String detail = engineLabel(ctx, engine, dir) + " · " + place(ctx, dir);
         List<String> games = hasProfile ? Collections.<String>emptyList() : GameExeResolver.gameExes(dir, engine);
         List<AgvnImportEntry> rows = new ArrayList<>();
         // a crash handler, an installer or an uninstaller picked stands for the folder's game (Succubus Kiss, 26/10/2026:
@@ -123,6 +123,12 @@ public final class AgvnImportEntry {
         String shown = variant != null ? AgvnProfile.variantName(title, variant) : title;
         return new AgvnImportEntry(dir, shown, detail, hasProfile, exe != null ? new File(dir, exe) : null, engine,
                 library.find(dir, variant), variant);
+    }
+
+    /** The engine's name; "HTML" for a web game "Chạy nhẹ" runs, NW.js or not, which is no Windows game. */
+    static String engineLabel(Context ctx, GameExeResolver.Engine engine, File dir) {
+        if (engine == GameExeResolver.Engine.UNKNOWN && AgvnNwjsGame.index(dir) != null) return "HTML";
+        return engineLabel(ctx, engine);
     }
 
     static String engineLabel(Context ctx, GameExeResolver.Engine engine) {

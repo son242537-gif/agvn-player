@@ -23,8 +23,11 @@ public final class AgvnProfileValidator {
     public static String validate(AgvnProfile p, File gameDir) throws AgvnProfileException {
         if (p.schemaVersion != AgvnProfile.SCHEMA_VERSION)
             throw new AgvnProfileException("Phiên bản profile " + p.schemaVersion + " không được hỗ trợ (cần schemaVersion = 1).");
-        if (p.name == null || p.name.trim().isEmpty() || p.name.length() > 80 || p.name.matches(".*[\\\\/:*?\"<>|].*"))
-            throw new AgvnProfileException("Tên game (name) trống, quá dài hoặc có ký tự không hợp lệ.");
+        String name = AgvnProfile.cleanName(p.name); // also the shortcut's file name (AgvnProfile.FORBIDDEN)
+        if (name.isEmpty()) throw new AgvnProfileException("Tên game (name) trống.");
+        if (name.length() > 80)
+            throw new AgvnProfileException("Tên game (name) dài " + name.length() + " ký tự, tối đa 80: " + name);
+        p.name = name;
 
         for (String arg : p.args) {
             if (arg == null || !SAFE_VALUE.matcher(arg).matches())
