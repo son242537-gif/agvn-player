@@ -45,6 +45,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     /** "Chạy bằng Windows" was picked: the Wine game now owns the keep-alive notification. */
     private boolean toWindows;
     private AgvnLightTools tools;
+    /** Requests to other hosts: a file of the game folder, else blocked ({@link AgvnHtmlOutside}). */
+    private final AgvnHtmlOutside outside = new AgvnHtmlOutside();
     /** assets/agvn/html-keyboard.js, run on each page once loaded ({@link AgvnPageKeyboard}). */
     private String keyboardJs = "";
     /** For "Gửi nhật ký" ({@link AgvnLightSession#keeper}): the pictures shown empty, the files the page did not find. */
@@ -107,6 +109,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         s.setAllowFileAccess(false);
         s.setAllowContentAccess(false);
         s.setTextZoom(100);
+        if (asar == null && AgvnHtmlViewport.zoomsOut(index)) s.setUseWideViewPort(true); // its scale below 1, as in Chrome
         webView.setWebViewClient(new GameClient());
         webView.setWebChromeClient(new AgvnHtmlConsole(logs,
                 AgvnLightSession.keeper(getApplicationContext(), AgvnLightSession.PAGE, AgvnLightSession.LISTED)));
@@ -138,7 +141,12 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
             Uri url = request.getUrl();
-            if (!host.equals(url.getHost())) return AgvnHtmlFiles.blocked(); // no network: nothing leaves the phone
+            if (!host.equals(url.getHost())) { // no network: nothing leaves the phone, but the game's own file it names
+                String local = asar == null ? AgvnHtmlOutside.localPath(root, url.getEncodedPath()) : null;
+                outside.note(url.getHost(), url.toString(), local, missing);
+                if (local == null) return AgvnHtmlFiles.blocked();
+                return AgvnHtmlFiles.serve(root, entry, local, compatJs, standIns, missing);
+            }
             // a HEAD only asks whether a file is there (fs.existsSync of html-compat.js): its absence is no problem
             boolean asked = "HEAD".equalsIgnoreCase(request.getMethod());
             if (asar != null) return asar.serve(url.getEncodedPath(), entry, compatJs, asked ? null : missing);
