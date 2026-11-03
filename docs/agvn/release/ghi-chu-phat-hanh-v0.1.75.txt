@@ -1,0 +1,5 @@
+AGVN Player v0.1.75 - agvn.io
+
+Sửa lỗi:
+- Game DirectX (nhiều game Unity) đứng màn hình đen ngay sau logo, đúng lúc game đổi độ phân giải hoặc bật vsync để vào menu: "Tự sửa lỗi" nhận ra lỗi này và đề nghị "Tắt Present Wait" cho riêng game đó. Các game khác không đổi gì.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

@@ -2740,3 +2740,47 @@ tưởng game đang tải. RAM trống thấp nhất 5,5 GB.
   2. Gói nhật ký của lần chạy Windows: có dòng log Chromium nào không (`wine-cuoi.txt`).
   3. Hồi quy: thoát một game từ menu của chính game: màn chơi đóng, về thư viện, không bị hỏi lỗi. Một game có launcher
      (launcher mở game rồi tự thoát) vẫn chơi bình thường, không bị đóng giữa chừng. Game .NET và game Unity chạy như cũ.
+
+## Game DirectX đứng màn đen ngay sau khi dựng lại swapchain (bản 0.1.75)
+
+Báo cáo ngày 03/11/2026 (Snapdragon 8 Elite, Adreno 830, Android 16, driver Wrapper 26.1.99, Proton 9 arm64ec, app
+0.1.74). Game Unity 2022.3 (IL2CPP, x64, D3D11 qua DXVK) hiện logo Unity, rồi đen màn hình mãi, 4/4 lần. Exe và dữ liệu
+gốc của bản phát hành cũng y như vậy. Game không văng, chạm không có tác dụng, tiến trình game dùng 0% CPU.
+
+- **Nhật ký:**
+  - `Player.log` ghi đủ các bước khởi động, rồi im hẳn ngay lúc game chuyển sang cảnh menu.
+  - `wine-cuoi.txt`: DXVK dựng swapchain `IMMEDIATE`, rồi dựng lại với `VK_PRESENT_MODE_FIFO_KHR` (game bật vsync, đặt
+    độ phân giải cho menu). Sau khối "Presenter: Actual swap chain properties" thứ hai, DXVK không ghi thêm dòng nào.
+  - Một DLL chẩn đoán của người báo lỗi cho thấy luồng chính dừng hẳn sau lúc đó: không còn lượt Update nào, không có
+    khung hình mới.
+- **Vì sao (giả thuyết, chưa đo trên máy):** DXVK 2.x chờ từng lần trình chiếu bằng `VK_KHR_present_wait`. Một luồng
+  của nó gọi `vkWaitForPresentKHR`, và luồng chính chờ luồng đó trước khi trình chiếu khung tiếp theo. Nếu Wrapper
+  không bao giờ báo xong cho swapchain vừa dựng lại, luồng chính chờ mãi với 0% CPU. `WRAPPER_DISABLE_PRESENT_WAIT=1`
+  giấu tiện ích này khỏi DXVK, nên DXVK không chờ kiểu đó nữa. DXVK 1.10.3 không dùng tiện ích này.
+- **Vì sao app chưa đề nghị gì:**
+  - Thanh báo màn hình đen (`AgvnBlackScreen`) coi một game đã hiện hình rồi mới đen là đang chuyển cảnh, nên im lặng.
+  - Điều kiện `froze` của "Tự sửa lỗi" chỉ có cách sửa cho game Electron/NW.js và game Chạy nhẹ.
+- **Sửa:**
+  - **`AgvnSwapchainStuck` (điều kiện `swapchain-last`):** DXVK dựng swapchain từ hai lần trở lên, và sau khối thuộc
+    tính của lần cuối không ghi gì nữa. Chỉ dòng của chính DXVK được tính ("info:  ", "warn:  ", "err:   "). Dòng của
+    Wine và ghi chú của app thì không.
+  - **"Game đứng hình ngay sau khi đổi chế độ hình" (`swapchain-frozen`):** khi game đứng hình (`froze`) và có dấu hiệu
+    trên. Mục này đứng sau "Game bị khoá chết" (`deadlock`), vì một khoá app đã thấy là nguyên nhân rõ hơn.
+    - Thứ tự cách sửa: "Tắt Present Wait", rồi "Đồng bộ khung hình" (bật cả hai), rồi giả lập ổn định, DXVK khác,
+      driver khác, gửi nhật ký.
+  - **"Tắt Present Wait" (`present-wait-off`, `AgvnPresentSync.noWaitOfferable`):**
+    - Chỉ bật `disablePresentWait` cho riêng game đó. Khác "Đồng bộ khung hình", nó không bắt mỗi lần trình chiếu phải
+      chờ.
+    - Chỉ có cho game dùng DXVK 2.x mà chưa tắt Present Wait.
+    - Người chơi cũng có nó khi tự báo "Game đứng hình, treo" (sau các cách đã có) và "Màn hình đen dù game vẫn chạy"
+      (trước "Đồng bộ khung hình").
+- **Chưa làm:** ép `dxgi.syncInterval = 0` qua `dxvk.conf`. Tham số chạy của game (`-screen-fullscreen 0
+  -screen-width 1280 -screen-height 720`) đã đặt được trong cài đặt game, mục "Tham số chạy".
+- **Test:** `AgvnSwapchainStuckTest` (đoạn cuối `wine-cuoi.txt` của báo cáo) và `AgvnDoctorTest`.
+- **Thử máy:**
+  1. Game của báo cáo: đen sau logo, thoát game. "Tự sửa lỗi" hiện "Game đứng hình ngay sau khi đổi chế độ hình", nút
+     đầu là "Tắt Present Wait".
+  2. Bấm nút đó: game qua logo vào được menu, chạm ăn. `wine-cuoi.txt` vẫn có khối swapchain `FIFO`, và `Player.log`
+     ghi tiếp sau đó.
+  3. Nếu vẫn đen: thử "Đồng bộ khung hình", rồi gửi nhật ký.
+  4. Hồi quy: vài game Unity D3D11 đã chạy được vẫn như cũ. Không game nào khác bị đổi cài đặt.
