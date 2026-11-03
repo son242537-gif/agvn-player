@@ -2845,7 +2845,7 @@ bản PC.
   5. Một game Ren'Py Chạy nhẹ: log.txt mỗi dòng "… took … ms" chỉ có một lần. Game vẫn vào được menu, lưu và tải được
      (bản sao lưu module của Ren'Py không hỏng như bản 0.1.56).
 
-## Game web không có .exe không thêm được, và tên game có dấu hai chấm (bản 0.1.75)
+## Game web không có .exe không thêm được, và tên game có dấu hai chấm (bản 0.1.76)
 
 Báo cáo ngày 03/11/2026 (POCO F8 Pro, app 0.1.74).
 
@@ -2887,3 +2887,45 @@ Báo cáo ngày 03/11/2026 (POCO F8 Pro, app 0.1.74).
      được, mở bằng Chạy nhẹ.
   2. Hồ sơ có `"name": "Tên game: Phụ đề"`: thêm được, thư viện hiện "Tên game - Phụ đề".
   3. Hồi quy: một game RPG Maker MV có `.exe`, và một game Windows thường, thêm và "Cập nhật" như cũ.
+
+## Game HTML lấy ảnh ở máy chủ của hãng, và trang co giãn bị lệch (bản 0.1.76)
+
+Báo cáo ngày 03/11/2026 (POCO F8 Pro, 2510×1156). Game HTML thuần: `index.html`, `package.json` kiểu NW.js, các file
+`.js` và khoảng 60.000 ảnh, không có `.exe`. Việc thêm game không có `.exe` là mục ngay trên.
+
+- **Ảnh không hiện dù có đủ trong thư mục game:**
+  - Game báo "đã tìm thấy danh mục ảnh nhưng không thấy hình". logcat không có dòng `HTML game file missing` nào cho ảnh.
+  - **Vì sao:** nhiều game web phân nhánh theo `location.protocol`. Là `file:` thì đọc ảnh cạnh trang; là `http(s):`
+    thì coi là bản web và ghép ảnh vào địa chỉ máy chủ của hãng. App phục vụ trang ở `https://<mã>.agvn.game/`, nên game
+    đi nhánh web. Mọi yêu cầu ra host khác bị app chặn (không gì ra mạng), nên ảnh lỗi mà không có dòng log nào.
+  - **Sửa (`AgvnHtmlOutside`):** yêu cầu tới host khác mà đường dẫn trỏ tới một file có trong thư mục game thì nhận file
+    đó.
+    - Thử nguyên đường dẫn trước, rồi bỏ dần các thư mục đầu (`/cdn/v2/images/a.png` → `images/a.png`), nhưng luôn giữ
+      ít nhất thư mục và tên file.
+    - Không có file như vậy thì vẫn chặn như trước.
+  - **Nhật ký:** mỗi host ghi logcat một lần: `HTML game request to <host> served from the game folder: …`, hoặc
+    `HTML game external request blocked: <url>`. Yêu cầu bị chặn còn được ghi vào danh sách file game thiếu của phiên.
+  - Không thêm khoá hồ sơ hay công tắc ("localHosts", "Ưu tiên tệp trong máy"): app vốn không cho ra mạng, nên file
+    trong máy luôn được ưu tiên.
+  - Lỗi `Failed to register a ServiceWorker` vẫn còn trong console. Nó vô hại: trang chạy không cần service worker.
+- **Trang co giãn bị lệch sang phải và tràn mép:**
+  - Trang có `<meta name="viewport" content="width=device-width, initial-scale=0.8, …">`. Tiêu đề nằm ở x≈1570 thay
+    vì 1255, dòng dài bị cắt ở mép phải.
+  - **Vì sao:** WebView của Android, khi tắt `useWideViewPort` (mặc định), xử lý trang có `initial-scale` nhỏ hơn 1
+    theo một quirk của Chromium (`PageScaleConstraintsSet::AdjustForAndroidWebViewQuirks`):
+    - bề rộng bố cục bằng bề rộng màn hình chia cho tỉ lệ đó, ở đây 1,25 lần;
+    - nhưng tỉ lệ hiện lại đặt về 1.
+    - Trang rộng 1,25 lần màn hình mà không thu nhỏ, nên tâm nằm ở 0,625 × 2510 ≈ 1569. Đúng như số đo.
+  - App không ép cỡ cửa sổ theo `package.json` như người báo nghi.
+  - **Sửa (`AgvnHtmlViewport`):** trang đầu có `initial-scale` nhỏ hơn 1 thì WebView bật `useWideViewPort`, cách Chrome
+    hiển thị trang: bố cục rộng 1,25 lần và thu nhỏ còn 0,8, vừa màn hình.
+  - Trang không đặt tỉ lệ, hoặc đặt bằng 1 (RPG Maker MV/MZ, Tyrano), không đổi gì.
+  - Cột nút của bộ phím `vn` vẫn nằm đè lên trang như mọi game. Chọn bộ phím khác hoặc ẩn phím bằng 👁.
+- **Soi trang trên máy:** WebView của Chạy nhẹ đã cho gỡ lỗi qua USB (chrome://inspect) khi bật "Bật debug Wine" hoặc
+  nhật ký Winlator trong Cài đặt. Không cần công tắc mới.
+- **Test:** `AgvnHtmlOutsideTest`: đường dẫn ngoài thành file trong game; đọc `initial-scale` của trang React,
+  RPG Maker MV và Tyrano.
+- **Thử máy:**
+  1. Game của báo cáo, tắt mạng: ảnh hiện. logcat có `served from the game folder`.
+  2. Cùng game: tiêu đề nằm giữa màn hình, chữ không tràn mép phải.
+  3. Hồi quy: một game RPG Maker MZ và một game Tyrano "Chạy nhẹ" vẫn hiện đúng khung như cũ.

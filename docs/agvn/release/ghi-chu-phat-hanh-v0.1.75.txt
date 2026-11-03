@@ -6,6 +6,4 @@ Sửa lỗi:
 - Game Ren'Py 8 chỉ chép game/ và file .exe (không có lib/, renpy/) giờ chạy được bằng "Chạy nhẹ".
 - Game Ren'Py sắp chạy bằng Windows mà thiếu thư mục lib/ thì app báo trước khi mở, thay vì để màn hình đen mấy phút.
 - Nhật ký phiên ghi rõ ai thoát game, sau bao lâu và game có hiện hình không, thay vì luôn ghi "kết thúc bình thường". Nhật ký log.txt của game Ren'Py "Chạy nhẹ" không còn ghi mỗi dòng hai lần.
-- Game web (HTML, ví dụ Cocos Creator, PixiJS, Phaser) không kèm file .exe, chỉ có index.html và package.json, giờ thêm được vào thư viện và chạy bằng "Chạy nhẹ". Danh sách "Thêm game" ghi loại "HTML" thay vì "Game Windows".
-- Tên game trong agvn-profile.json có dấu hai chấm (như "Tên game: Phụ đề") không còn làm hỏng việc thêm game: app tự đổi thành "Tên game - Phụ đề".
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

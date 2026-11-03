@@ -1,0 +1,8 @@
+AGVN Player v0.1.76 - agvn.io
+
+Sửa lỗi:
+- Game web (HTML, ví dụ Cocos Creator, PixiJS, Phaser) không kèm file .exe, chỉ có index.html và package.json, giờ thêm được vào thư viện và chạy bằng "Chạy nhẹ". Danh sách "Thêm game" ghi loại "HTML" thay vì "Game Windows".
+- Tên game trong agvn-profile.json có dấu hai chấm (như "Tên game: Phụ đề") không còn làm hỏng việc thêm game: app tự đổi thành "Tên game - Phụ đề".
+- Game HTML "Chạy nhẹ" lấy ảnh theo địa chỉ máy chủ của hãng (bản web của game): nay app lấy đúng ảnh có sẵn trong thư mục game, nên ảnh hiện ra dù máy không có mạng.
+- Game HTML co giãn theo màn hình (trang tự đặt thu nhỏ, như initial-scale=0.8) không còn bị lệch sang phải và tràn mép.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
