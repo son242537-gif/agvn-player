@@ -36,7 +36,7 @@ final class AgvnFixes {
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "mods-off", "raw-mouse", "ue-wait",
             AgvnExe64.FIX, AgvnExeMain.FIX, AgvnDllProxy.FIX, AgvnLockFixes.ORDER, AgvnLockFixes.ESYNC, AgvnEmulatorNoExec.FIX,
-            AgvnMediaFoundation.FIX, AgvnWine10Fix.ID, AgvnGpuAlloc.FIX);
+            AgvnMediaFoundation.FIX, AgvnWine10Fix.ID, AgvnGpuAlloc.FIX, AgvnPresentSync.FIX_NO_WAIT);
     static final String SYSTEM = "System";
 
     /** A button: its fix id, its words, and what it sets ({@code to}). */

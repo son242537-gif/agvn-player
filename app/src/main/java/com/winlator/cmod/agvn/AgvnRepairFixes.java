@@ -19,7 +19,8 @@ import java.util.Map;
  *   test) or without UBWC (its compressed images), known causes of flicker, black spots and wrong colours on Adreno
  *   (TU_DEBUG);</li>
  *   <li>async-off: DXVK makes a pipeline before it draws with it, so nothing shows half made (async=0);</li>
- *   <li>present-sync: "Đồng bộ khung hình" and "Tắt Present Wait" ({@link AgvnPresentSync});</li>
+ *   <li>present-sync: "Đồng bộ khung hình" and "Tắt Present Wait" ({@link AgvnPresentSync}); present-wait-off: the
+ *   second alone, for a game that froze right after DXVK made its swap chain again ({@link AgvnSwapchainStuck});</li>
  *   <li>bcn-full: the wrapper unpacks every BCn texture, for a driver that reads none (Turnip reads them);</li>
  *   <li>unity-quality-own: a Unity game keeps its own quality where Đồ họa Thấp or Siêu nhẹ set its lowest
  *   ({@link AgvnUnityQuality});</li>
@@ -37,7 +38,7 @@ import java.util.Map;
  */
 final class AgvnRepairFixes {
     static final List<String> IDS = Arrays.asList("render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off",
-            "present-sync", "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "mods-off",
+            "present-sync", AgvnPresentSync.FIX_NO_WAIT, "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "mods-off",
             "raw-mouse", AgvnExe64.FIX, AgvnLockFixes.ORDER, AgvnLockFixes.ESYNC, AgvnEmulatorNoExec.FIX,
             AgvnExeMain.FIX);
     static final String CHINESE = "zh_CN.UTF-8", PULSE = "pulse-audio-gn", ALSA = "alsa";
@@ -60,6 +61,8 @@ final class AgvnRepairFixes {
                         ? fix(a, id, R.string.agvn_fix_async_off, "0") : null;
             case "present-sync":
                 return AgvnPresentSync.offerable(s) ? fix(a, id, R.string.agvn_black_sync, "1") : null;
+            case AgvnPresentSync.FIX_NO_WAIT:
+                return AgvnPresentSync.noWaitOfferable(s) ? fix(a, id, R.string.agvn_fix_present_wait_off, "1") : null;
             case "bcn-full":
                 return AgvnFixes.dxvk(s) && !AgvnFixes.turnip(a, s)
                         && !"full".equals(AgvnFixEdits.configValue(AgvnFixes.driverConfig(s), "bcnEmulation", ';'))
@@ -116,6 +119,9 @@ final class AgvnRepairFixes {
                 return true;
             case "present-sync":
                 s.putExtra("graphicsDriverConfig", AgvnPresentSync.withBoth(AgvnFixes.driverConfig(s)));
+                return true;
+            case AgvnPresentSync.FIX_NO_WAIT:
+                s.putExtra("graphicsDriverConfig", AgvnPresentSync.withNoWait(AgvnFixes.driverConfig(s)));
                 return true;
             case "bcn-full":
                 s.putExtra("graphicsDriverConfig",

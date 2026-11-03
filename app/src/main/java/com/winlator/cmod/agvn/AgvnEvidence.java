@@ -104,6 +104,7 @@ final class AgvnEvidence {
             case "helper-exe": return helperExe;
             case "media-new": return newMediaSource;
             case "gpu-room": return AgvnGpuAlloc.roomLeft(lines);
+            case "swapchain-last": return AgvnSwapchainStuck.lastWords(lines);
             default: return false; // "live" problems are found while playing; names a newer file may add stay unmet
         }
     }

@@ -31,11 +31,13 @@ public class AgvnDoctorTest {
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "godot-light",
             "godot-light-renderer", "mods-off", "raw-mouse", "ue-wait", "exe-64", "exe-main", "dll-wine", "emulator-order",
-            "esync-off", "emulator-wowbox64", "page-light", "media-old", "wine-new", "vk-no-shared"));
+            "esync-off", "emulator-wowbox64", "page-light", "media-old", "wine-new", "vk-no-shared",
+            "present-wait-off"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
             "ram-saved", "live", "light", "script-error", "page-crash", "frozen", "reported", "module-code",
-            "closed-on-start", "froze", "chromium", "helper-exe", "media-new", "gpu-room"));
+            "closed-on-start", "froze", "chromium", "helper-exe", "media-new", "gpu-room",
+            "swapchain-last"));
     static AgvnProblemCatalog catalog;
 
     @BeforeClass
@@ -394,6 +396,27 @@ public class AgvnDoctorTest {
         assertEquals("âm thanh AAC", AgvnMediaFoundation.kind("audio/mpeg, mpegversion=(int)4, rate=(int)48000"));
         assertEquals("video/x-wmv", AgvnMediaFoundation.kind("video/x-wmv, wmvversion=(int)3"));
         assertNull(AgvnMediaFoundation.kind(null));
+    }
+
+    @Test
+    public void aGameThatFrozeRightAfterItsSwapChainWasMadeAgainIsOfferedNoPresentWait() {
+        // Unity 2022.3, D3D11, Adreno 830, 0.1.74 (03/11/2026): its logo, then black at 0% CPU, the player tapping
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.started = true;
+        ev.playerQuit = true;
+        ev.seconds = 90;
+        ev.shownS = 4;
+        ev.frozenS = 80;
+        ev.frozenPresses = 9;
+        ev.lines.addAll(AgvnSwapchainStuckTest.REPORT);
+        assertEquals("swapchain-frozen", found(ev));
+        assertEquals(Arrays.asList("present-wait-off", "present-sync"), catalog.byId("swapchain-frozen").fixes.subList(0, 2));
+        ev.lines.add(AgvnLockWatch.NOTE + " luồng chính chờ khoá");
+        assertEquals("a lock the app saw is the cause first", "deadlock", found(ev));
+        ev.lines.remove(ev.lines.size() - 1);
+        ev.frozenS = 2;
+        ev.shownS = 85;
+        assertNull("one that ran on after it", found(ev));
     }
 
     @Test

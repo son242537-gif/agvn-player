@@ -10,16 +10,28 @@ import com.winlator.cmod.container.Shortcut;
  * (Unreal) stayed black on the defaults and started with both on. The black-screen bar ({@link AgvnBlackScreen}) offers
  * them to a DirectX game that stays black, on any phone, and the game keeps them as its own settings. 0.1.18 turned
  * them on for every DirectX game on a phone short of RAM without Turnip: games that show anyway paid for another
- * game's fix. Pure Java except {@link #turnOn}.
+ * game's fix. "Tắt Present Wait" alone ({@link #noWaitOfferable}) is the first try for a game that froze right after
+ * DXVK made its swap chain again ({@link AgvnSwapchainStuck}): it changes less than "Đồng bộ khung hình", which makes
+ * each present wait. Pure Java except {@link #turnOn}.
  */
 final class AgvnPresentSync {
-    static final String SYNC = "syncFrame", NO_WAIT = "disablePresentWait";
+    static final String SYNC = "syncFrame", NO_WAIT = "disablePresentWait", FIX_NO_WAIT = "present-wait-off";
 
     private AgvnPresentSync() {}
 
     /** True when the bar can offer them: a DirectX (DXVK) game that does not have both on yet. */
     static boolean offerable(Shortcut s) {
         return s != null && AgvnFixes.dxvk(s) && !on(AgvnFixes.driverConfig(s));
+    }
+
+    /** True when "Tắt Present Wait" alone can be offered: a game on DXVK 2.x (1.x never waits) that has it off. */
+    static boolean noWaitOfferable(Shortcut s) {
+        return s != null && AgvnFixes.dxvk(s) && !AgvnFixes.dxvkVersion(s).startsWith("1.")
+                && !"1".equals(AgvnFixEdits.configValue(AgvnFixes.driverConfig(s), NO_WAIT, ';'));
+    }
+
+    static String withNoWait(String driverConfig) {
+        return AgvnFixEdits.withConfigValue(driverConfig, NO_WAIT, "1", ';');
     }
 
     /** True when the graphics driver config ({@link AgvnFixes#driverConfig}) has both on. */
