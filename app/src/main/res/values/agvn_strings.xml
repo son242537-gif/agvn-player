@@ -49,6 +49,8 @@
     <string name="agvn_broken_files_empty">• %1$s: trống</string>
     <string name="agvn_broken_files_more">… và %1$d file khác</string>
     <string name="agvn_broken_files_open_anyway">Vẫn mở</string>
+    <string name="agvn_renpy_lib_title">Game Ren\'Py thiếu thư mục lib/</string>
+    <string name="agvn_renpy_lib_message">Thư mục game không có Python của Ren\'Py cho Windows (lib/py3-windows-x86_64 với Ren\'Py 8, lib/windows-i686 với Ren\'Py 6 và 7). Chạy bằng Windows thì game chỉ đen màn hình. Hãy chép đủ thư mục game từ máy tính, cả lib/ và renpy/, rồi mở lại. Game Ren\'Py 8 chép đủ sẽ tự chạy bằng \"Chạy nhẹ\".</string>
     <string name="agvn_prelaunch_title">RAM trống chưa đủ</string>
     <string name="agvn_prelaunch_message">Game cần khoảng %1$d MB RAM trống, máy đang có %2$d MB.\n\nHãy mở danh sách ứng dụng gần đây và đóng bớt ứng dụng khác, rồi bấm \"Kiểm tra lại\". Nếu vẫn chơi, game có thể nạp chậm (khoảng 30–60 giây) hoặc bị tắt giữa chừng.</string>
     <string name="agvn_prelaunch_recheck">Kiểm tra lại</string>

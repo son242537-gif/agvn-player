@@ -18,7 +18,9 @@ import java.util.Locale;
 /**
  * Before a library game starts: tells the player when its exe, or an exe or DLL next to it or in the game folder, was
  * copied or unpacked only partly (AgvnPeCheck). Wine cannot load such a file, so the game would close at once on a
- * black screen with nothing said. The player can still start it. The files are read off the main thread.
+ * black screen with nothing said. A Ren'Py game going to Wine without the Python its launcher runs (lib/, often left
+ * out to save room) showed nothing for minutes, its process busy, and nothing was said either (03/11/2026). The player
+ * can still start it. The files are read off the main thread.
  */
 final class AgvnGameFilesCheck {
     private static final String TAG = "AGVN";
@@ -28,12 +30,27 @@ final class AgvnGameFilesCheck {
     private AgvnGameFilesCheck() {}
 
     static void run(Activity activity, Shortcut shortcut, Runnable next) {
-        if (AgvnHtmlGame.isLight(shortcut.getExtra(AgvnHtmlGame.EXTRA_RUNNER))) {
+        if (AgvnHtmlGame.isLight(AgvnLightRecheck.runner(shortcut))) {
             next.run(); // "Chạy nhẹ" runs on Android itself, not in Wine
             return;
         }
         String gameDirPath = shortcut.getExtra(AgvnGameImporter.EXTRA_GAME_DIR);
         File gameDir = gameDirPath.isEmpty() ? null : new File(gameDirPath);
+        if (gameDir != null && GameExeResolver.Engine.RENPY.name().equals(shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE))
+                && !AgvnRenpyGame.hasWindowsPython(gameDir)) {
+            Log.w(TAG, "pre-launch: Ren'Py game without lib/*windows-* in " + gameDir);
+            new AlertDialog.Builder(activity)
+                    .setTitle(R.string.agvn_renpy_lib_title)
+                    .setMessage(R.string.agvn_renpy_lib_message)
+                    .setPositiveButton(R.string.agvn_close, null)
+                    .setNeutralButton(R.string.agvn_broken_files_open_anyway, (d, w) -> scan(activity, shortcut, gameDir, next))
+                    .show();
+            return;
+        }
+        scan(activity, shortcut, gameDir, next);
+    }
+
+    private static void scan(Activity activity, Shortcut shortcut, File gameDir, Runnable next) {
         new Thread(() -> {
             List<AgvnPeCheck.Broken> broken = Collections.emptyList();
             try {

@@ -79,6 +79,7 @@ public final class AgvnHtmlGame {
         String path = from != null ? from.getStringExtra("shortcut_path") : null;
         if (path == null || path.isEmpty()) return false;
         Map<String, String> extras = readExtras(new File(path));
+        AgvnLightRecheck.atStart(activity, from, extras); // a Ren'Py 8 or RGSS game whose folder suits Chạy nhẹ only now
         AgvnFullscreen.forLight(activity, from, extras); // each runner's intent copies it from "from"
         if (RUNNER_RENPY.equals(extras.get(EXTRA_RUNNER))) return AgvnRenpyGame.start(activity, from, extras);
         if (RUNNER_RGSS.equals(extras.get(EXTRA_RUNNER))) return AgvnRgssFiles.start(activity, from, extras);

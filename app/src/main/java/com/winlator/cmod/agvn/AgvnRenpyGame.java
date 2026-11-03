@@ -4,11 +4,15 @@ package com.winlator.cmod.agvn;
 import android.app.Activity;
 import android.content.Intent;
 
+import com.winlator.cmod.core.FileUtils;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * "Chạy nhẹ" for Ren'Py: a Ren'Py 8 game (Python 3) runs on Ren'Py 8.5.3 built for Android ({@link AgvnRenpyActivity},
@@ -18,6 +22,9 @@ import java.util.Map;
  * that Wine writes too ({@link AgvnRenpyCache}). Pure Java (JVM-testable) except start().
  */
 public final class AgvnRenpyGame {
+    /** game/script_version.txt, which Ren'Py's build writes: "(8, 3, 7)", the Ren'Py the game was made with. */
+    private static final Pattern SCRIPT_VERSION = Pattern.compile("^\\s*\\(?\\s*(\\d+)");
+
     private AgvnRenpyGame() {}
 
     /** The Python of a Ren'Py game: 3 for Ren'Py 8, 2 for Ren'Py 6 and 7, 0 when its folder does not tell. */
@@ -39,7 +46,31 @@ public final class AgvnRenpyGame {
             String n = f.getName().toLowerCase(Locale.ROOT);
             if (n.endsWith(".pyo") || n.endsWith(".pyc")) return 2; // Python 2 keeps them next to the sources
         }
-        return 0;
+        // a folder copied without lib/ and renpy/ (03/11/2026): the Ren'Py its build had says it; "Chạy nhẹ" brings its own
+        int major = scriptMajor(FileUtils.readString(new File(gameDir, "game/script_version.txt")));
+        return major >= 8 ? 3 : major == 6 || major == 7 ? 2 : 0;
+    }
+
+    /** The major version in script_version.txt's {@code text} ("(8, 3, 7)" gives 8), 0 when there is none. */
+    static int scriptMajor(String text) {
+        Matcher m = text == null ? null : SCRIPT_VERSION.matcher(text);
+        if (m == null || !m.find()) return 0;
+        try {
+            return Integer.parseInt(m.group(1));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    /**
+     * True when lib/ holds the Python that Ren'Py's Windows launcher (MyGame.exe) runs: lib/py3-windows-x86_64 for
+     * Ren'Py 8, lib/py2-windows-* or lib/windows-i686 for 6 and 7. Without it the game shows nothing in Wine.
+     */
+    static boolean hasWindowsPython(File gameDir) {
+        for (File f : list(new File(gameDir, "lib"))) {
+            if (f.isDirectory() && f.getName().toLowerCase(Locale.ROOT).contains("windows-")) return true;
+        }
+        return false;
     }
 
     /** True when "Chạy nhẹ" can run the game: a Ren'Py 8 game with its game/ folder. */

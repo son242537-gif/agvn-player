@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Map;
 
@@ -100,5 +101,43 @@ public class AgvnRenpyGameTest {
         assertEquals(dir.getPath(), env.get("AGVN_RENPY_BASEDIR"));
         assertEquals("MyGame", env.get("AGVN_RENPY_NAME"));
         assertEquals(quit.getPath(), env.get("AGVN_RENPY_QUIT_FILE"));
+    }
+
+    @Test
+    public void aFolderCopiedWithoutLibAndRenpyIsToldByItsScriptVersion() throws Exception {
+        // POCO F8 Pro, 03/11/2026: only MyGame.exe, MyGame.py and game/ were copied to the phone
+        File dir = tmp.newFolder("bare");
+        for (String rel : new String[]{"game/script.rpyc", "MyGame.py", "MyGame.exe"}) touch(dir, rel);
+        assertEquals(0, AgvnRenpyGame.pythonOf(dir));
+        File version = new File(dir, "game/script_version.txt");
+        Files.write(version.toPath(), "(8, 3, 7)".getBytes(StandardCharsets.UTF_8));
+        assertEquals(3, AgvnRenpyGame.pythonOf(dir));
+        assertTrue("Chạy nhẹ brings its own Ren'Py", AgvnRenpyGame.canRun(dir));
+        assertFalse("Wine has no Python to run it", AgvnRenpyGame.hasWindowsPython(dir));
+        Files.write(version.toPath(), "(7, 4, 11)".getBytes(StandardCharsets.UTF_8));
+        assertEquals(2, AgvnRenpyGame.pythonOf(dir));
+        assertFalse(AgvnRenpyGame.canRun(dir));
+        assertEquals(8, AgvnRenpyGame.scriptMajor("(8, 5, 3)\n"));
+        assertEquals(0, AgvnRenpyGame.scriptMajor(""));
+        assertEquals(0, AgvnRenpyGame.scriptMajor(null));
+        assertTrue(AgvnRenpyGame.hasWindowsPython(game("w8", "lib/py3-windows-x86_64/")));
+        assertTrue(AgvnRenpyGame.hasWindowsPython(game("w6", "lib/windows-i686/")));
+        assertFalse("the standard library only", AgvnRenpyGame.hasWindowsPython(game("w80", "lib/python3.9/")));
+    }
+
+    @Test
+    public void aGameWithNoRunnerOfItsOwnGetsChayNheOnceItsFolderSuitsIt() throws Exception {
+        // added without lib/ (Wine, as nothing else could run it), lib/ and renpy/ copied in later (03/11/2026)
+        File later = game("later", "lib/py3-windows-x86_64/");
+        assertEquals("renpy", AgvnLightRecheck.runner("", "RENPY", null, later));
+        assertEquals("renpy", AgvnLightRecheck.runner(null, "RENPY", null, later));
+        assertEquals("the player's \"Chạy bằng Windows\" stays", "wine", AgvnLightRecheck.runner("wine", "RENPY", null, later));
+        AgvnProfile wine = AgvnProfile.defaultFor("later");
+        wine.runner = "wine";
+        assertEquals("a profile's runner stays", "", AgvnLightRecheck.runner("", "RENPY", wine, later));
+        assertEquals("Ren'Py 7 stays in Wine", "",
+                AgvnLightRecheck.runner("", "RENPY", null, game("r7", "lib/py2-windows-x86_64/")));
+        assertEquals("", AgvnLightRecheck.runner("", "UNITY", null, later));
+        assertEquals("", AgvnLightRecheck.runner("", "RENPY", null, null));
     }
 }
