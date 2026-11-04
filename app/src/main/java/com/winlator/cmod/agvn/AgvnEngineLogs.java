@@ -90,9 +90,9 @@ final class AgvnEngineLogs {
         File exeDir = exe.getParentFile();
         switch (engine) {
             case "UNITY": {
-                String[] names = AgvnSaveLocations.unityNames(exe);
-                if (names != null) {
-                    File dir = new File(profile, "AppData/LocalLow/" + names[0] + "/" + names[1]);
+                String rel = AgvnSaveLocations.unityFolder(AgvnSaveLocations.unityNames(exe));
+                if (rel != null) {
+                    File dir = new File(profile, rel);
                     out.add(new File(dir, "Player.log"));
                     out.add(new File(dir, "Player-prev.log"));
                 }

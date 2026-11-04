@@ -255,6 +255,24 @@ public class XServer {
         }
     }
 
+    /**
+     * AGVN: types {@code keysym} on {@code keycode}, a key without an XKeycode (agvn/AgvnWinKeys.SPARE): the key is
+     * mapped to it for the press, so Wine gives the game that character. Held for the game as other keys are.
+     */
+    public void agvnTypeKey(byte keycode, int keysym) {
+        int input = keycode & 0xff;
+        inputHold.pressing(input);
+        try (XLock lock = lock(Lockable.WINDOW_MANAGER, Lockable.INPUT_DEVICE)) {
+            keyboard.setKeyPress(keycode, keysym);
+        }
+        Runnable release = () -> {
+            try (XLock lock = lock(Lockable.WINDOW_MANAGER, Lockable.INPUT_DEVICE)) {
+                keyboard.setKeyRelease(keycode);
+            }
+        };
+        if (!inputHold.deferRelease(input, release)) release.run();
+    }
+
     public void injectKeyRelease(XKeycode xKeycode) {
         if (inputHold.deferRelease(xKeycode.id & 0xff, () -> releaseKey(xKeycode))) return; // AGVN: as for clicks
         releaseKey(xKeycode);

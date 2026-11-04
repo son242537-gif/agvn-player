@@ -1,20 +1,18 @@
 /* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
-import android.content.Context;
 import android.os.Build;
 import android.view.View;
 import android.view.WindowInsets;
-import android.view.inputmethod.InputMethodManager;
 
 import com.winlator.cmod.XServerDisplayActivity;
-import com.winlator.cmod.core.AppUtils;
 
 /**
  * The Android keyboard for a text field of a Windows game: up when a text caret shows in the game's window (a name
  * box, a launcher's field: agvn-winhandler.exe 2 reports it, {@link AgvnMouseLook#TEXT}), down when the caret goes, if
  * it came up so. A player who put it down keeps it down until the next field. A field the game draws itself (Unity's
- * and Unreal's) has no caret of Windows: [⌨] opens the keyboard there, as before.
+ * and Unreal's) has no caret of Windows: [⌨] opens the keyboard there. Either way the keyboard is
+ * {@link AgvnWinTyping}'s.
  */
 public final class AgvnCaretKeyboard {
     private final XServerDisplayActivity activity;
@@ -37,7 +35,7 @@ public final class AgvnCaretKeyboard {
         View decor = activity.getWindow().getDecorView();
         boolean up = imeShown(decor);
         if (caret && !up) {
-            AppUtils.showKeyboard(activity);
+            AgvnWinTyping.of(activity).show();
             raised = true;
             if (!told) {
                 told = true;
@@ -45,8 +43,7 @@ public final class AgvnCaretKeyboard {
             }
         } else if (!caret && raised) {
             raised = false;
-            InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (up && imm != null) imm.hideSoftInputFromWindow(decor.getWindowToken(), 0);
+            AgvnWinTyping.of(activity).hide();
         }
     }
 

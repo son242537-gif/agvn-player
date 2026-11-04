@@ -1603,7 +1603,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         View btSubKeyboard = findViewById(R.id.BTSubKeyboard);
         if (btSubKeyboard != null) {
             btSubKeyboard.setOnClickListener(v -> {
-                AppUtils.showKeyboard(this);
+                com.winlator.cmod.agvn.AgvnWinTyping.of(this).show(); // AGVN: a field holds the keyboard for the game
                 drawerLayout.closeDrawers();
             });
         }

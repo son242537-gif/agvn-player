@@ -48,7 +48,7 @@ public final class AgvnControlsBar {
         bar = new LinearLayout(activity);
         bar.setOrientation(LinearLayout.HORIZONTAL);
         sets = new AgvnControlsSets(activity, this::edit, () -> { hiddenProfileId = -1; updateEye(); });
-        bar.addView(barButton("⌨", 18, R.string.agvn_bar_keyboard, v -> AppUtils.showKeyboard(activity)));
+        bar.addView(barButton("⌨", 18, R.string.agvn_bar_keyboard, v -> AgvnWinTyping.of(activity).toggle()));
         bar.addView(barButton(activity.getString(R.string.agvn_bar_edit_label), 14, R.string.agvn_bar_edit, v -> edit()));
         eye = barButton(activity.getString(R.string.agvn_bar_hide_label), 14, R.string.agvn_bar_toggle, v -> toggle());
         bar.addView(eye);

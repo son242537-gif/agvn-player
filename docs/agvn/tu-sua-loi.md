@@ -3097,3 +3097,61 @@ script nào của game.
      phòng của nó)`.
   4. Hồi quy: một game VX Ace không dùng Win32API và một game có script chuột chạy như cũ, phím không bị nhảy hay
      mất.
+
+## Ô nhập tên của game Windows: bàn phím Android giữ được, gõ được chữ có dấu (bản 0.1.79)
+
+Nhật ký Body Pay OMG (Unity 2022.3, ô tên `TMP_InputField`, POCO F8 Pro, bản 0.1.77, 05/11/2026) và báo cáo cùng
+ngày: ở màn đặt tên, không gõ được chữ nào. Ô trống thì game khoá "Tiếp tục", nên người chơi kẹt.
+
+- **Nhật ký:**
+  - `su-kien.txt` không có dòng "Game có ô nhập chữ". Ô của Unity do game tự vẽ, không có con trỏ nhập chữ của
+    Windows, nên app không tự mở bàn phím (mục "bàn phím cho ô nhập chữ", bản 0.1.71).
+  - logcat: [⌨] có mở bàn phím, 4 lần (`onRequestShow … SHOW_TOGGLE_SOFT_INPUT`, `onShown`). Mỗi lần bàn phím chỉ ở
+    lại 2 tới 6 giây rồi tự ẩn (`hide(ime(), fromIme=false)`, yêu cầu đứng tên `com.google.android.inputmethod.latin`).
+    Không chữ nào tới game.
+- **Vì sao:**
+  - [⌨], mục "Bàn phím" của thanh bên và bàn phím theo con trỏ đều mở bằng `toggleSoftInput`, không có ô soạn chữ nào
+    giữ focus. Gboard ẩn bàn phím đó ở lần đổi focus kế tiếp.
+  - Thanh ⌨ ✎ 👁 tự thu gọn 3 giây sau lần chạm cuối: lần mở thứ nhất và thứ tư tắt đúng lúc đó. Hai lần kia tắt khi
+    người chơi chạm vào game (để chọn ô tên).
+  - Chữ bàn phím gửi cả chuỗi (chữ có dấu) tới mà không có ô soạn chữ thì Android chuyển thành `ACTION_MULTIPLE`, và
+    X server của app bỏ loại đó.
+- **Sửa (`AgvnWinTyping`, `AgvnWinKeys`):**
+  - Một ô nhận chữ ẩn 1×1 giữ bàn phím, như `AgvnHtmlTyping` của game HTML. [⌨], "Bàn phím" của thanh bên và bàn
+    phím theo con trỏ (`AgvnCaretKeyboard`) đều dùng ô này.
+  - Bàn phím đang lên mà một cú chạm vào game lấy mất focus thì ô lấy lại, nên người chơi chạm vào ô tên của game rồi
+    gõ được. Thanh bên hay một menu có focus thì ô không giành.
+  - Back, phím ẩn của bàn phím, hoặc [⌨] lần nữa thì bàn phím xuống. Focus về lại phím ảo (hoặc touchpad), để tay cầm
+    vẫn tới game.
+  - Chữ ô nhận được tới game qua X server:
+    - a–z, 0–9 và dấu cách bằng chính phím của chúng.
+    - Mọi chữ khác (chữ hoa, dấu câu, ă â đ ê ô ơ ư và các dấu thanh) bằng một phím mà không bàn phím nào có (keycode
+      130). Phím được gán keysym của chữ đó (`0x01000000` cộng mã Unicode, chữ Latin-1 thì chính mã của nó), nên Wine
+      gửi game đúng chữ trong `WM_CHAR`. Chữ hoa không cần Shift, nên không có Shift nào còn giữ sang chữ sau.
+    - Bàn phím ghép chữ (Telex "aw" thành "ă") thì game nhận Backspace rồi chữ mới, theo đúng những gì ô đổi.
+    - Hết chữ đang ghép thì ô xoá trắng, để Backspace của bàn phím tới game như một phím (`VK_BACK`). "Xong" và Enter
+      ra `VK_RETURN`.
+  - `su-kien.txt` ghi một lần "Bàn phím Android cho game: ô nhận chữ của app giữ bàn phím…", và một lần "Bàn phím
+    Android gửi chữ vào game" khi chữ đầu tiên đi.
+  - Chưa làm: tự mở bàn phím ở ô chữ Unity tự vẽ. Unity không tạo con trỏ nhập chữ của Windows, và trạng thái bộ gõ
+    (IME) của cửa sổ game thì `agvn-winhandler.exe` (một tiến trình khác) không đọc được. Vẫn bấm [⌨].
+- **Cùng lúc: `Player.log` của game có tên hãng kết thúc bằng dấu chấm:**
+  - App tìm `AppData/LocalLow/CheeseBugerSt./Body Pay OMG/Player.log`. Windows và Wine tạo thư mục mà bỏ dấu chấm và dấu
+    cách ở cuối tên, nên thư mục thật là `CheeseBugerSt`. "Gửi nhật ký" không có `Player.log` ("Nhật ký engine đã chép:
+    0 file"); người báo phải nhờ cheat chép ra.
+  - **Sửa (`AgvnSaveLocations.unityFolder`):** đường dẫn thư mục bỏ dấu chấm và dấu cách ở cuối tên hãng và tên game.
+    Dùng cho `Player.log` và cho thư mục save của Unity (sao lưu save). Khoá registry PlayerPrefs giữ tên gốc.
+- **Video Unity trong báo cáo (`WindowsVideoMedia error 0x80004001 … Creating DXGI DeviceManager: Not implemented`):**
+  đó là app chủ ý tắt DXGI device manager (`WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER=1`, mục `AgvnMediaFoundation`).
+  Với nó Unity phát phim bằng bộ nhớ thường; bật lại thì phim kẹt và mỗi lần thử ngốn thêm khoảng 288 MB bộ nhớ đồ hoạ
+  (bản 0.1.70). `Color primaries 0 is unknown` là cảnh báo vô hại. Không đổi gì. Nếu phim thật sự đen, cần
+  `Player.log` của lần đó.
+- **Test:** `AgvnWinKeysTest` (chữ thường, chữ hoa, chữ Việt, chữ ngoài mặt phẳng đầu, Telex "a" → "ă"),
+  `AgvnUnityFolderTest`.
+- **Thử máy:**
+  1. Body Pay OMG: tới màn đặt tên, bấm [⌨] (vạch mờ ở mép trên → ⌨). Bàn phím ở lại khi thanh tự thu gọn và khi chạm
+     vào ô tên. Gõ "Lona", rồi "Lực" (Telex): ô tên ra đúng chữ, có dấu. Backspace xoá được, "Xong" bấm được "Tiếp tục".
+  2. Back: bàn phím xuống, phím ảo và tay cầm vẫn điều khiển game.
+  3. "Gửi nhật ký": có `Player.log` của game; `su-kien.txt` có hai dòng "Bàn phím Android…".
+  4. Hồi quy: game có ô chữ của Windows (launcher hỏi tên) vẫn tự mở bàn phím, gõ được, xong thì ẩn; game HTML
+     "Chạy nhẹ" và [⌨] của nó không đổi.

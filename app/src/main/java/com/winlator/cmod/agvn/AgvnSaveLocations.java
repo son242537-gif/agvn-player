@@ -87,8 +87,8 @@ final class AgvnSaveLocations {
     static List<String> inProfile(File exe, File gameDir, String engine, List<String> discovered) {
         List<String> rels = new ArrayList<>();
         if ("UNITY".equals(engine)) {
-            String[] names = unityNames(exe);
-            if (names != null) rels.add("AppData/LocalLow/" + names[0] + "/" + names[1]);
+            String rel = unityFolder(unityNames(exe));
+            if (rel != null) rels.add(rel);
         } else if ("GODOT".equals(engine)) {
             String userDir = AgvnGodotUserDir.of(exe);
             if (userDir != null) rels.add(userDir);
@@ -104,6 +104,21 @@ final class AgvnSaveLocations {
             if (!covered) rels.add(rel);
         }
         return rels;
+    }
+
+    /**
+     * The Unity game's folder under users/xuser for {company, product}, or null: Windows, and Wine, create a folder
+     * without the dots and spaces that end its name, so "CheeseBugerSt." keeps Player.log in "CheeseBugerSt" (Body
+     * Pay OMG, 05/11/2026). The PlayerPrefs key keeps the names as they are.
+     */
+    static String unityFolder(String[] names) {
+        return names != null ? "AppData/LocalLow/" + folderName(names[0]) + "/" + folderName(names[1]) : null;
+    }
+
+    /** {@code name} as Windows names a folder made with it: without its last dots and spaces (unless that is all). */
+    static String folderName(String name) {
+        String trimmed = name.replaceAll("[. ]+$", "");
+        return trimmed.isEmpty() ? name : trimmed;
     }
 
     /** {company, product} of a Unity game from its {@code <exe>_Data/app.info}, or null. */
