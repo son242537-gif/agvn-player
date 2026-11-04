@@ -1,0 +1,8 @@
+AGVN Player v0.1.77 - agvn.io
+
+Sửa lỗi:
+- Game RPG Maker VX Ace "Chạy nhẹ" có script toàn màn hình (như Fullscreen++) không còn văng lúc mở với lỗi "NaN": app trả đúng cỡ màn hình và cửa sổ cho script đo màn hình, thay vì 0.
+- Game RPG Maker có DLL riêng đi kèm (như script ánh sáng gọi "System/KGL2.klib") không còn văng với lỗi "wrong constant name". Game vẫn chơi được; phần việc của DLL đó (như bóng sáng) có thể không hiện. Nhật ký ghi lại các hàm Windows app chưa làm được.
+- Nhờ hai sửa trên, các game này không còn hiện tiếp lỗi "stack level too deep" khi mở.
+- Hộp lỗi của game RPG Maker có danh sách dòng rất dài nay chỉ hiện các dòng đầu và cuối, đủ để biết script nào gây lỗi.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
