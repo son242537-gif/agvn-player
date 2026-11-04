@@ -181,7 +181,8 @@ Dir.mktmpdir('agvn-win32') do |dir|
   check('a stand-in that fails returns 0', raised('stand-in') { $got = failing.call("\0" * 16) }.nil? && $got == 0)
   check('and says so once', File.binread(log).scan('Win32API giả: user32!GetKeyboardState (IndexError'.b).size == 1)
   Graphics.singleton_class.send(:remove_method, :display_width)
-  check("no display size from mkxp-z: the game's own", Win32API.new('user32', 'GetSystemMetrics', 'i', 'i').call(0) == 544)
+  metrics = Win32API.new('user32', 'GetSystemMetrics', 'i', 'i')
+  check("no display size from mkxp-z: the game's own", metrics.call(0) == 544)
   Dir.chdir(__dir__)
 end
 

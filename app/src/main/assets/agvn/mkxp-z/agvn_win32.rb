@@ -7,6 +7,9 @@
 # - a function nothing stands in for returns 0, as before, and goes once to tim-tep.txt (AGVN_RGSS_FILES_LOG) as
 #   "Win32API giả: <dll>!<function>". A light script then draws no light: the game plays, without its lights;
 # - a stand-in that fails returns 0 as well, and says so on the same line;
+# - a DLL of the game itself raises instead, as on Windows when it cannot load, where the script rescues that
+#   (agvn_win32_rescue.rb): the script then does without it, its own way;
+# - a buffer a script made with DL (agvn_dl.rb) reaches the stand-ins as the string it is;
 # - Call, call's other name, takes the stand-in too: it went to mkxp-z's own call, which has no function here.
 module AgvnWin32
   LOG_LINES = 40
@@ -48,18 +51,35 @@ module AgvnWin32
       @no_native[key(dll, func)] = true if @no_native.size < KNOWN
     end
 
-    # Once for each function that returned 0 for want of a stand-in, or because its stand-in failed ({error})
-    def stood_in(dll, func, error = nil)
+    # Once for each function that returned 0 for want of a stand-in, or because its stand-in failed ({error}), or
+    # that raised ({note})
+    def stood_in(dll, func, error = nil, note = nil)
       k = key(dll, func)
       return if @logged.key?(k) || @logged.size >= LOG_LINES
       @logged[k] = true
       line = 'Win32API giả: '.b + k
       line += " (#{error.class}: #{error.message})".b if error
+      line += " (#{note})".b if note
       System.puts(line)
       file = ENV['AGVN_RGSS_FILES_LOG']
       File.open(file, 'ab') { |f| f.puts(line) } if file && !file.empty?
     rescue StandardError
       nil # never in the game's way
+    end
+
+    # A game's own DLL the phone cannot load raises as on Windows where the script rescues it (agvn_win32_rescue.rb)
+    def unloadable(dll, func, from)
+      return unless from && defined?(AgvnRescue) && AgvnRescue.game_dll?(dll)
+      return unless AgvnRescue.guarded?(from.path, from.lineno)
+      stood_in(dll, func, nil, 'không nạp được, script dùng cách dự phòng của nó')
+      raise "LoadLibrary: #{dll}"
+    end
+
+    # What a stand-in writes into: the memory behind a DL pointer or its address (agvn_dl.rb), else the argument
+    def memory(arg)
+      return arg unless defined?(DL) && DL.respond_to?(:agvn_memory)
+      return arg.agvn_memory if arg.respond_to?(:agvn_memory)
+      arg.is_a?(Integer) ? DL.agvn_memory(arg) || arg : arg
     end
 
     private
@@ -102,19 +122,22 @@ class Win32API
       return if @mkxp_wrap_impl
     end
     @mkxp_native_available = false
-    return if AgvnWin32.no_native?(dll, func)
-    begin
-      mkxp_native_initialize(dll, func, *args)
-      @mkxp_native_available = true
-    rescue StandardError
-      AgvnWin32.no_native(dll, func) # a DLL only Windows has: call returns 0
+    unless AgvnWin32.no_native?(dll, func)
+      begin
+        mkxp_native_initialize(dll, func, *args)
+        @mkxp_native_available = true
+        return
+      rescue StandardError
+        AgvnWin32.no_native(dll, func) # a DLL only Windows has: call returns 0
+      end
     end
+    AgvnWin32.unloadable(dll, func, caller_locations(1, 1)&.first)
   end
 
   def call(*args)
     if @mkxp_wrap_impl
       begin
-        r = @mkxp_wrap_impl.call(args)
+        r = @mkxp_wrap_impl.call(args.map { |a| AgvnWin32.memory(a) })
         return r if r.is_a?(Integer) || r.is_a?(String)
         return r ? 1 : 0 # what Windows returns is a number
       rescue StandardError => e

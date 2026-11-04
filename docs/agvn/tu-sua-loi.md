@@ -3006,9 +3006,7 @@ Báo cáo ngày 04/11/2026 (bản 0.1.76, "Chạy nhẹ" RGSS). Game VX Ace nạ
       cứ thấy lại `[` mà không đi tiếp.
     - JoiPlay (cũng dựa trên mkxp-z) gặp đúng lỗi này với LonaRPG. JoiPlay sửa bằng bản vá riêng cho game, tải về lúc
       mở game (`3_LonaBitmapChanger_hugememmonkeyfix.rb`, "đường vẽ ảnh riêng cho JoiPlay").
-    - **Chưa sửa:** cần mã bộ đọc JSON (file có `def next_token` trong `Data/Scripts`), `5000_LonaBitmapChanger.rb` và
-      các file JSON mà `load_settings` đọc, để tìm chỗ chạy khác. Theo luật, app sửa chỗ mkxp-z chạy khác RGSS3,
-      không sửa script của game.
+    - Đã sửa ở bản 0.1.78: xem mục ngay dưới, "Lona RPG trên Chạy nhẹ".
   - **Hộp lỗi của app:** backtrace dài hơn 20 khung chỉ hiện 10 khung đầu, dòng `… bỏ bớt N dòng ở giữa …` và 10 khung
     cuối. Khung cuối cho biết script nào bắt đầu vòng lặp. Hộp hiện tới 2.400 ký tự (trước 600). `loi-game.txt` trong
     nhật ký vẫn giữ nguyên lỗi.
@@ -3021,3 +3019,81 @@ Báo cáo ngày 04/11/2026 (bản 0.1.76, "Chạy nhẹ" RGSS). Game VX Ace nạ
   2. Một game cố tình ném lỗi lúc chạy: bấm OK thì app hỏi và đóng game, không có hộp lỗi thứ hai.
   3. Hồi quy: một game VX Ace và một game XP không dùng Win32API chạy như cũ. Một game có script chuột
      (`GetCursorPos`, `GetAsyncKeyState`) vẫn nhận chuột và phím.
+
+## Lona RPG trên Chạy nhẹ: file văn bản, DLL dự phòng và bàn phím của script (bản 0.1.78)
+
+Nhật ký và `Data/Scripts` của Lona RPG B.0.10.8.12 (Xiaomi 25062RN2DA, Adreno 610, 04/11/2026). Mục trên kể lỗi
+`stack level too deep`. Có mã của game thì thấy ba chỗ mkxp-z chạy khác RGSS3 trên Windows. App sửa cả ba, không sửa
+script nào của game.
+
+- **Đọc file văn bản (`agvn_text_files.rb`):**
+  - **Vì sao:** `LonaBitmapChanger.read_file` mở file cài đặt bằng `File.open(tên, 'r')`. Ruby trên Windows đọc chế độ
+    văn bản thì đổi `\r\n` thành `\n`, trên điện thoại thì không. 326/338 script của game xuống dòng kiểu Windows, và
+    file JSON cũng vậy.
+  - Bộ đọc JSON của game (`Data/Scripts/101_jsonEnDecoder.rb`, của game_guy) chỉ bỏ qua dấu cách, `\n` và `\t`. Gặp
+    `\r` thì `next_token` trả `TOKEN_NONE` mà không đi tiếp, `parse_array` lùi một ký tự rồi gọi `parse`, nên đọc lại
+    đúng dấu `[`. Thế là đệ quy mãi.
+  - Ruby 3.1 trên PC tái hiện y hệt: 8.455 khung, nhật ký có 8.461 dòng.
+  - **Sửa:** đọc chỉ để đọc, chế độ văn bản (`'r'`, mặc định, không có `b`), thì thành `'rt'`: chế độ văn bản của chính
+    Ruby, đổi `\r\n` thành `\n`. Áp cho `File.open`, `File.new`, `open`, `File.read`, `File.readlines`, `File.foreach`.
+    - Giữ nguyên: ghi file, đọc và ghi (`'r+'`), file nhị phân (`'rb'`, `File.binread`), chế độ ghi bằng số, và lời
+      gọi tự đặt `binmode`, `textmode` hay cách xuống dòng.
+    - `\r` lẻ (không đi với `\n`) cũng thành `\n`. Windows giữ nó, nhưng file văn bản hầu như không có.
+  - Script nạp bằng `'rb'` (như trình nạp của Lona) và `load_data` không đổi gì.
+- **DLL của game có đường dự phòng (`agvn_win32_rescue.rb`):**
+  - **Vì sao:** `BitmapChangerOptimization.load_library` thử `Data/PaletteChanger/BitmapChanger_Optimization.dll`
+    trong `begin … rescue`. Không nạp được thì nó đổi màu bằng Ruby. Lớp giả của bản 0.1.77 không bao giờ báo lỗi, nên
+    game sẽ tưởng DLL chạy được, và không đổi màu nào.
+  - Ngược lại, KHAS (`450_KHAS_LightGraphicLib.rb`) xin `System/KGL2.klib` ngoài mọi `rescue`: với nó, báo lỗi thì văng.
+  - **Sửa:** DLL của game (file có trong thư mục game, không phải DLL của RGSS) mà máy không nạp được sẽ báo lỗi
+    `RuntimeError "LoadLibrary: <dll>"`, như Windows khi DLL không nạp được. Chỉ báo khi dòng gọi `Win32API.new` nằm
+    trong một `rescue` bắt được lỗi đó (`rescue`, `rescue => e`, `rescue StandardError`, `RuntimeError`, `Exception`,
+    hay `… rescue …` cuối dòng).
+    - Chỗ khác vẫn nhận lớp giả trả 0. DLL của Windows (`user32`, `XINPUT1_3`…) luôn nhận lớp giả.
+    - App biết có `rescue` hay không bằng cách biên dịch (không chạy) mã của chính script đó, mỗi script một lần, rồi
+      đọc bảng `rescue` của nó. Mã lấy từ file trong thư mục game, hoặc từ `$RGSS_SCRIPTS` với script trong
+      `Scripts.rvdata2` (`012:Tên`).
+  - `tim-tep.txt` ghi `Win32API giả: <dll>!<hàm> (không nạp được, script dùng cách dự phòng của nó)`.
+  - Trong Lona, `4000_Mouse_Support.rb` cũng thử `System/LonaMouseWheel.dll` trong `rescue`. Giờ nó nhận `nil` như
+    trên PC thiếu DLL đó, không còn nhận DLL giả.
+- **Bàn phím của script (`agvn_dl.rb`, `agvn_win32_input.rb`):**
+  - **Vì sao:** `1000_Hime_AllKey.rb` (bàn phím đầy đủ của Cidiomar R. Dias Junior) đọc mọi phím bằng
+    `GetKeyboardState(DL::CPtr.new(DL.malloc(256), 256).to_i)`. `DL` là thư viện của Ruby 1.9 mà RGSS3 có, Ruby 3.1
+    của mkxp-z thì không (bỏ từ Ruby 2.2).
+    - Script dừng ở dòng 269 (`uninitialized constant Input::DL`, trình nạp của game hiện hộp lỗi rồi nạp tiếp), trước
+      khi kịp đặt `Input.update` và `press?` của nó.
+    - Các phím riêng của Lona (`:MZ_LINK`, `:MX_LINK`, `:S1`…`:S9`, `:MRB`, `:MLB`) vì thế không chạy. `Input::C`,
+      `Input::B`… đã thành mảng mã phím, mà `Input` của mkxp-z không nhận mảng.
+  - **Sửa `DL`:** `DL.malloc`, `DL.free`, `DL::CPtr` (`to_i`, `[]`, `[]=`, `to_s`, `to_str`, `size`, `null?`), đủ để
+    script đưa Win32API một bộ đệm theo địa chỉ.
+    - Bộ nhớ là một chuỗi Ruby. Địa chỉ là một con số chỉ các hàm giả của Win32API biết: `agvn_win32.rb` đổi nó lại
+      thành chuỗi trước khi gọi hàm giả.
+    - Một byte đọc ra kiểu `char` của C (-128 tới 127), như `DL` cũ.
+    - `DL.dlopen` báo `DL::DLError`, vì không thư viện C nào mở được trên điện thoại.
+  - **Sửa đọc phím:** các hàm giả đọc phím và chuột (`GetKeyboardState`, `GetAsyncKeyState`, `GetKeyState`,
+    `GetCursorPos`) lấy trạng thái từ `Input.update` của mkxp-z. Script thay `Input.update` thì hàm đó không còn chạy,
+    nên phím đứng yên.
+    - Giờ, nếu hai khung liền không có gì chạy `Input.update` của mkxp-z, hàm giả đầu tiên của khung tự chạy nó, một
+      lần. Game tự cập nhật `Input` thì không bao giờ bị cập nhật hai lần trong một khung.
+    - Nút chuột đọc bằng `press?` của mkxp-z, không bằng `press?` script đã thay.
+  - Còn thiếu: `ToUnicodeEx` và `MapVirtualKeyEx` (gõ chữ qua bàn phím của script) vẫn trả 0. Tay cầm của Lona đọc
+    qua XInput nên không thấy tay cầm của điện thoại. Phím ảo và bàn phím thật vẫn chạy.
+- **Chạy bằng Windows** vẫn hỏng như mục "DLL ở bộ nhớ chung": Android chặn chạy `RGSS301.dll` từ `/storage`
+  (`avc: denied { execute }`), Proton 9 cũng vậy. Với game này, Chạy nhẹ là đường chính.
+- **Test (PC, Ruby 3.1 trở lên):**
+  - `ruby scripts/agvn/mkxp-z/test-agvn-text-files.rb`: một bộ đọc tự viết có cùng điểm yếu với bộ đọc của Lona thì
+    `stack level too deep` khi không có script mới, và đọc đúng khi có.
+  - `ruby scripts/agvn/mkxp-z/test-agvn-dl-input.rb`: DLL dự phòng trong `rescue`, `rescue` cuối dòng, `rescue
+    LoadError`, DLL của Windows, script trong `$RGSS_SCRIPTS`; bộ nhớ `DL`; phím qua `GetKeyboardState`;
+    `Input.update` của mkxp-z không chạy hai lần.
+  - Các script này cũng đã được thử với chính `101_jsonEnDecoder.rb`, `1000_Hime_AllKey.rb`,
+    `5000_LonaBitmapChanger.rb`, `450_KHAS_LightGraphicLib.rb` của game (chỉ trên máy làm việc, không đưa vào repo).
+- **Thử máy:**
+  1. Lona RPG, Chạy nhẹ: qua màn "Init script list", không hộp `uninitialized constant Input::DL`, không
+     `stack level too deep`. Vào màn tiêu đề, chọn được bằng phím ảo.
+  2. Trong game: quần áo, da của Lona đổi màu như trên PC (đổi màu bằng Ruby). Chữ trong thư và hội thoại không có ô
+     vuông ở cuối dòng.
+  3. "Gửi nhật ký": `tim-tep.txt` có dòng `BitmapChanger_Optimization.dll!… (không nạp được, script dùng cách dự
+     phòng của nó)`.
+  4. Hồi quy: một game VX Ace không dùng Win32API và một game có script chuột chạy như cũ, phím không bị nhảy hay
+     mất.

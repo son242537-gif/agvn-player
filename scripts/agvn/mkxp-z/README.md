@@ -27,6 +27,12 @@ Cùng thư mục `assets/agvn/mkxp-z` còn có phần của AGVN, script này kh
   không có bản giả trả 0 và ghi một dòng `Win32API giả: <dll>!<hàm>` vào `tim-tep.txt`. Các hàm đo màn hình, cửa sổ và
   đọc `.ini` trả lời như PC có màn hình là màn điện thoại. Xem `docs/agvn/tu-sua-loi.md`, "Game RPG Maker VX Ace văng lúc
   nạp script vì Win32API". Kiểm trên PC: `ruby scripts/agvn/mkxp-z/test-agvn-win32.rb`.
+- `agvn_win32_rescue.rb`, `agvn_win32_input.rb`, `agvn_dl.rb`, `agvn_text_files.rb` (từ bản 0.1.78):
+  - DLL của game được thử trong `rescue` thì báo lỗi như Windows, để script dùng cách dự phòng của nó;
+  - phím đọc qua `GetKeyboardState` vào bộ nhớ `DL` (thư viện của Ruby 1.9 mà Ruby 3.1 không có);
+  - file văn bản đọc như Windows (`\r\n` thành `\n`).
+  Xem `docs/agvn/tu-sua-loi.md`, "Lona RPG trên Chạy nhẹ". Kiểm trên PC:
+  `ruby scripts/agvn/mkxp-z/test-agvn-text-files.rb` và `ruby scripts/agvn/mkxp-z/test-agvn-dl-input.rb`.
 
 ## Nguồn và cách kiểm chứng (ai cũng làm lại được)
 

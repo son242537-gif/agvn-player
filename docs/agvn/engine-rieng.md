@@ -200,8 +200,9 @@ Anh Sơn chốt ngày 02/10/2026:
   - **Game dừng vì lỗi:** app hiện lỗi gốc của game, gợi ý "Chạy bằng Windows". Nếu lỗi là thiếu file và máy chưa có RTP
     game cần, app chỉ chỗ chép RTP.
   - **Chữ và nhạc:** font dự phòng WenQuanYi Micro Hei đủ tiếng Việt và tiếng Nhật; nhạc MIDI qua FluidSynth với sound
-    font có sẵn trong app. Nạp sẵn 3 script của mkxp-z cho tương thích (hàm Ruby cũ, Win32API), và 3 script của AGVN
-    cho Win32API (tên DLL, đo màn hình, đọc `.ini`; bản 0.1.77).
+    font có sẵn trong app. Nạp sẵn 3 script của mkxp-z cho tương thích (hàm Ruby cũ, Win32API), và các script của AGVN
+    cho Win32API (tên DLL, đo màn hình, đọc `.ini`, bản 0.1.77; DLL dự phòng, `DL`, phím, bản 0.1.78) và cho file văn
+    bản (`\r\n` như Windows, bản 0.1.78).
   - **Nhật ký:** `adb logcat -s mkxp SDL AGVN`. Game dừng vì lỗi thì lỗi gốc và bản tóm tắt (RGSS mấy, RTP tìm được
     hay thiếu) được lưu vào `AGVN-Player/logs/<tên game>/<giờ>/`, nên "Gửi nhật ký" ở menu ⋮ của game có cả lỗi này.
   - **Ảnh bìa và icon lấy từ chính game:** `.exe` của game Ren'Py và RPG Maker thường mang icon mặc định của engine, nên
