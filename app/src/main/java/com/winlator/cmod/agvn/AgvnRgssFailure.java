@@ -21,6 +21,10 @@ final class AgvnRgssFailure {
     private static final Pattern SCRIPT = Pattern.compile("Script '[^']*' line \\d+|:\\d+:in [`']");
     /** What only Windows has: a DLL of the game called through Win32API, which Wine runs and mkxp-z cannot. */
     private static final Pattern WINDOWS_ONLY = Pattern.compile("(?i)win32api|\\.dll\\b|miniffi|dlopen|loadlibrary");
+    /** The frames of a backtrace shown at each end. */
+    static final int ENDS = 10;
+    /** How much of the error the dialog shows: the message and twice ENDS frames. */
+    private static final int SHOWN = 2400;
 
     private AgvnRgssFailure() {}
 
@@ -39,7 +43,8 @@ final class AgvnRgssFailure {
 
     /** A missing file while an RTP the game asks for is not on the phone: how to add that RTP. Else the error itself. */
     static String message(Context context, String error, AgvnRgssConfig config) {
-        String first = error.length() > 600 ? error.substring(0, 600) + "…" : error;
+        String brief = brief(error, context.getString(R.string.agvn_rgss_frames_left_out));
+        String first = brief.length() > SHOWN ? brief.substring(0, SHOWN) + "…" : brief;
         if (missingRtp(error, config)) {
             String name = config.missingRtp.get(0);
             File folder = new File(new File(SettingsFragment.DEFAULT_WINLATOR_PATH, AgvnRgssConfig.RTP_FOLDER), name);
@@ -47,6 +52,30 @@ final class AgvnRgssFailure {
         }
         int intro = scriptError(error, config) ? R.string.agvn_rgss_script_failed : R.string.agvn_rgss_failed_message;
         return context.getString(intro) + "\n\n" + first;
+    }
+
+    /**
+     * {@code error} with a long backtrace cut to its first and last {@link #ENDS} frames, a line saying how many are
+     * left out ({@code leftOut}, a format with their number) between: a SystemStackError's thousands of frames repeat
+     * the same few, and only the last ones say which script started it (report of 04/11/2026, "stack level too deep"
+     * at "(eval) line 159" and nothing else). mkxp-z writes the first frame after the message, the others each on a
+     * line starting with "\tfrom ".
+     */
+    static String brief(String error, String leftOut) {
+        String[] lines = error.split("\n", -1);
+        int from = 0;
+        while (from < lines.length && !lines[from].startsWith("\tfrom ")) from++;
+        int to = from;
+        while (to < lines.length && lines[to].startsWith("\tfrom ")) to++;
+        int left = to - from - (2 * ENDS - 1); // the first frame is the line before the first "\tfrom "
+        if (left <= 0) return error;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < lines.length; i++) {
+            if (i == from + ENDS - 1) sb.append('\t').append(String.format(leftOut, left)).append('\n');
+            if (i >= from + ENDS - 1 && i < to - ENDS) continue;
+            sb.append(lines[i]).append(i < lines.length - 1 ? "\n" : "");
+        }
+        return sb.toString();
     }
 
     /**

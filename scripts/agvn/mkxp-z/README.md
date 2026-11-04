@@ -22,6 +22,11 @@ Cùng thư mục `assets/agvn/mkxp-z` còn có phần của AGVN, script này kh
   - `normalize.rb`: `089c87f05934646902828f97385aa7843a4a79e6863d90a66033fdac3b1bc4a1`
   - `tables.rb`: `a19a5ccdc58df5ac5c21cb2068513c7c6772fd2dfcc6c2dcc06d8cb415a802eb`
 - `agvn_fps.rb`: báo số khung hình mỗi giây của game cho HUD và "Tự sửa lỗi".
+- `agvn_win32.rb`, `agvn_win32_screen.rb`, `agvn_win32_ini.rb` (từ bản 0.1.77): nạp ngay sau `win32_wrap.rb`, không
+  sửa file đó. Tên DLL viết kiểu nào (`USER32.DLL`, `System/KGL2.klib`) cũng tra được, không bao giờ làm văng game; hàm
+  không có bản giả trả 0 và ghi một dòng `Win32API giả: <dll>!<hàm>` vào `tim-tep.txt`. Các hàm đo màn hình, cửa sổ và
+  đọc `.ini` trả lời như PC có màn hình là màn điện thoại. Xem `docs/agvn/tu-sua-loi.md`, "Game RPG Maker VX Ace văng lúc
+  nạp script vì Win32API". Kiểm trên PC: `ruby scripts/agvn/mkxp-z/test-agvn-win32.rb`.
 
 ## Nguồn và cách kiểm chứng (ai cũng làm lại được)
 

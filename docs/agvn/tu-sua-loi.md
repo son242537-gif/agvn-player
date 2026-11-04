@@ -2929,3 +2929,70 @@ Báo cáo ngày 03/11/2026 (POCO F8 Pro, 2510×1156). Game HTML thuần: `index.
   1. Game của báo cáo, tắt mạng: ảnh hiện. logcat có `served from the game folder`.
   2. Cùng game: tiêu đề nằm giữa màn hình, chữ không tràn mép phải.
   3. Hồi quy: một game RPG Maker MZ và một game Tyrano "Chạy nhẹ" vẫn hiện đúng khung như cũ.
+
+## Game RPG Maker VX Ace văng lúc nạp script vì Win32API (bản 0.1.77)
+
+Báo cáo ngày 04/11/2026 (bản 0.1.76, "Chạy nhẹ" RGSS). Game VX Ace nạp script rời trong `Data/Scripts/**` bằng `eval`
+(màn "INIT SCRIPT LIST"). Bản PC chạy bình thường. Game dừng trước màn tiêu đề, với ba hộp lỗi nối nhau.
+
+- **`NaN` ở `to_i` / `ratio=` / `windowed_mode` / `load_fullscreen_settings`:**
+  - Script toàn màn hình kiểu Fullscreen++ đo màn hình và cửa sổ qua Win32API rồi chia để ra tỉ lệ phóng.
+  - **Vì sao:** `win32_wrap.rb` của mkxp-z không có `GetSystemMetrics`, `GetWindowRect`, `GetMonitorInfo`. Gọi các
+    hàm đó thì nhận 0. `GetClientRect` chỉ trả lời cửa sổ số 42, mà `FindWindow` (không có `A`) lại trả 0. `0.0 / 0` ra
+    `NaN`, và `NaN.to_i` ném `FloatDomainError`.
+  - **Sửa (`agvn_win32_screen.rb`):** trả lời như một PC có màn hình là màn điện thoại:
+    - `GetSystemMetrics` 0/1, 16/17 (và cỡ cửa sổ phóng to, cả vùng màn hình) cho cỡ màn điện thoại
+      (`Graphics.display_width/height`), xoay theo chiều của game. Viền và thanh tiêu đề (4, 5, 6, 7, 8, 32, 33, 92)
+      cho 0. `GetDeviceCaps`, `SystemParametersInfo` (vùng làm việc) và `GetMonitorInfo` cũng cho màn điện thoại.
+      `GetMonitorInfo` giữ `cbSize` game đặt.
+    - `GetClientRect` và `GetWindowRect` của mọi cửa sổ ghi `0, 0, <rộng>, <cao>` của game. Riêng cửa sổ desktop
+      (`GetDesktopWindow`) ghi cỡ màn hình.
+    - `FindWindow`, `FindWindowA`, `FindWindowEx` tìm theo lớp `RGSS Player`, hoặc theo đúng tên cửa sổ của game, thì ra
+      cửa sổ game. Tên chương trình khác (ví dụ game dò Cheat Engine) vẫn ra 0, như trên PC không mở chương trình đó.
+    - `MoveWindow`, `SetWindowPos`, `ShowWindow`, `UpdateWindow`, `SetWindowLong`, `SetWindowText`,
+      `AdjustWindowRect`… trả 1 và không làm gì: mkxp-z tự phủ kín màn điện thoại.
+    - Không dùng cỡ của game làm cỡ màn hình: game 640×480 thì Fullscreen++ coi là chế độ toàn màn hình cũ của VX và gửi
+      Alt+Enter, làm mkxp-z thoát toàn màn hình.
+  - **Cùng lúc (`agvn_win32_ini.rb`):** `GetPrivateProfileString` và `GetPrivateProfileInt` đọc `.ini` như Windows: giá
+    trị của khoá, hoặc giá trị mặc định script đưa khi thiếu file, mục hay khoá. Trước đây chúng trả 0 và để trống bộ
+    đệm, nên script nhận chuỗi rỗng chỗ PC nhận giá trị mặc định (Fullscreen++ đọc tỉ lệ cửa sổ thành 0 thay vì 1).
+    - Tên file không có thư mục (`Game.ini` thay vì `./Game.ini`) thì như Windows: tìm trong thư mục Windows, nên ra giá
+      trị mặc định.
+    - Ghi khoá (`WritePrivateProfileString`) vẫn không làm: file của game giữ nguyên.
+- **`wrong constant name System/KGL2.klib` ở `win32_wrap.rb:365`:**
+  - Script ánh sáng (kiểu KHAS) gọi `Win32API.new("System/KGL2.klib", …)`, một DLL riêng đi kèm game, tên có thư mục
+    và đuôi lạ.
+  - **Vì sao:** `win32_wrap.rb` dùng tên DLL làm tên hằng Ruby (`const_defined?`). Nó chỉ bỏ đuôi `.dll` viết thường,
+    nên `USER32.DLL` cũng hỏng.
+  - **Sửa (`agvn_win32.rb`, nạp ngay sau `win32_wrap.rb`, không sửa file của mkxp-z):**
+    - Tên DLL được chuẩn hoá: bỏ thư mục, bỏ mọi đuôi, ký tự lạ thành `_`, viết hoa chữ đầu, thêm `Dll_` nếu không bắt
+      đầu bằng chữ. Tra không phân biệt hoa thường, nên `user32`, `User32`, `user32.dll`, `USER32.DLL` là một.
+    - Tên hàm cũng thế, và như Windows: `FindWindow` tìm cả `FindWindowA`, `GetMonitorInfoA`/`W` ra `GetMonitorInfo`.
+    - Tra không bao giờ ném lỗi. Hàm không có bản giả trả 0 như trước. Lần đầu mỗi hàm được gọi, `tim-tep.txt` (có
+      trong "Gửi nhật ký") thêm một dòng `Win32API giả: <dll>!<hàm>`, tối đa 40 dòng. Script ánh sáng khi đó không vẽ
+      được bóng sáng, game vẫn chơi được.
+    - Bản giả nào lỗi (ví dụ bộ đệm game đưa quá ngắn) cũng trả 0, và ghi lỗi trên cùng dòng đó.
+    - `Call` (tên khác của `call`) cũng đi qua bản giả. Trước đây nó gọi thẳng hàm gốc của mkxp-z, vốn không có hàm nào
+      trên điện thoại.
+    - Hàm mkxp-z không nạp được thì nhớ lại, không thử nạp lại mỗi lần game tạo `Win32API` (script phím tạo mỗi khung).
+- **`Script '(eval)' line 159: SystemStackError occurred. stack level too deep`:**
+  - Hiện sau khi bấm OK ở hai lỗi trên.
+  - **Vì sao:** báo cáo đoán app chạy lại danh sách script trong cùng máy Ruby. Mã mkxp-z (commit `095b9cc3`) cho thấy
+    không phải vậy:
+    - lỗi không ai bắt thì mkxp-z hiện hộp lỗi, dừng Ruby, rồi app hỏi người chơi và đóng hẳn tiến trình `:rgss`;
+    - mkxp-z chỉ chạy lại script khi bấm F12, như RGSS trên PC.
+    - Hai hộp đầu không theo mẫu `Script '…' line …` của mkxp-z. Chúng là của trình nạp script của game: nó bắt lỗi,
+      hiện hộp rồi nạp tiếp, có lẽ nạp lại cả script vừa hỏng dở, nên `alias` chạy hai lần và tự gọi mình mãi.
+  - Sửa hai lỗi trên thì trình nạp không gặp lỗi nào, nên không nạp lại.
+  - **Hộp lỗi của app:** backtrace dài hơn 20 khung chỉ hiện 10 khung đầu, dòng `… bỏ bớt N dòng ở giữa …` và 10 khung
+    cuối. Khung cuối cho biết script nào bắt đầu vòng lặp. Hộp hiện tới 2.400 ký tự (trước 600). `loi-game.txt` trong
+    nhật ký vẫn giữ nguyên lỗi.
+- **Test:** `ruby scripts/agvn/mkxp-z/test-agvn-win32.rb` (PC, Ruby 3.1 trở lên). Chỉ nạp `win32_wrap.rb` thì ra đúng
+  `NaN` và `wrong constant name System/KGL2.klib` như báo cáo. Nạp thêm ba script của AGVN thì không văng, tỉ lệ ra 2.
+  `AgvnRgssFailureTest`: cắt backtrace 9.000 khung còn đầu và cuối.
+- **Thử máy:**
+  1. Game của báo cáo (có Fullscreen++ và `System/KGL2.klib`) vào được màn tiêu đề, không `NaN`, không
+     `stack level too deep`. "Gửi nhật ký": `tim-tep.txt` có dòng `Win32API giả: System/KGL2.klib!…`.
+  2. Một game cố tình ném lỗi lúc chạy: bấm OK thì app hỏi và đóng game, không có hộp lỗi thứ hai.
+  3. Hồi quy: một game VX Ace và một game XP không dùng Win32API chạy như cũ. Một game có script chuột
+     (`GetCursorPos`, `GetAsyncKeyState`) vẫn nhận chuột và phím.

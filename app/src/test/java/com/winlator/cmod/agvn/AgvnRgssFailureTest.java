@@ -1,6 +1,7 @@
 /* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -24,5 +25,30 @@ public class AgvnRgssFailureTest {
                 + "occurred.\n\nWin32API: cannot load user32_ex.dll", null));
         assertFalse("mkxp-z did not start the game", AgvnRgssFailure.scriptError("Unable to find Game.ini", null));
         assertFalse("nothing said", AgvnRgssFailure.scriptError("", null));
+    }
+
+    @Test
+    public void aStackTooDeepShowsTheFirstAndLastFrames() {
+        // report of 04/11/2026: "stack level too deep" at "(eval) line 159" said nothing of the script that began it
+        StringBuilder trace = new StringBuilder("Script '(eval)' line 159: SystemStackError occurred.\n\n"
+                + "stack level too deep\n\n(eval):159:in `update': stack level too deep (SystemStackError)");
+        for (int i = 0; i < 9000; i++) trace.append("\n\tfrom (eval):159:in `update'");
+        trace.append("\n\tfrom Scene_Map:12:in `update'\n\tfrom Main:3:in `<main>'");
+        String brief = AgvnRgssFailure.brief(trace.toString(), "(%d left out)");
+        String[] lines = brief.split("\n");
+        assertEquals("the message, then 10 frames, the gap, the last 10", 4 + 10 + 1 + 10, lines.length);
+        assertEquals("(eval):159:in `update': stack level too deep (SystemStackError)", lines[4]);
+        assertEquals("\t(" + (9002 - 19) + " left out)", lines[14]);
+        assertEquals("\tfrom Scene_Map:12:in `update'", lines[23]);
+        assertEquals("\tfrom Main:3:in `<main>'", lines[24]);
+    }
+
+    @Test
+    public void aShortBacktraceStaysWhole() {
+        StringBuilder trace = new StringBuilder("Script 'Window_Base' line 40: NoMethodError occurred.\n\nundefined\n\n"
+                + "Window_Base:40:in `x': undefined (NoMethodError)");
+        for (int i = 0; i < 19; i++) trace.append("\n\tfrom Scene_").append(i).append(":1:in `y'");
+        assertEquals(trace.toString(), AgvnRgssFailure.brief(trace.toString(), "(%d left out)"));
+        assertEquals("no backtrace", "Unable to find Game.ini", AgvnRgssFailure.brief("Unable to find Game.ini", "%d"));
     }
 }

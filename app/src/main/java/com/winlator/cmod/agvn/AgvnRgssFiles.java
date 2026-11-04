@@ -33,16 +33,19 @@ final class AgvnRgssFiles {
     static final String RUN_DIR = "rgss";
     /**
      * The preload scripts: mkxp-z's own (Ruby 1.8/1.9 names RGSS scripts use, mkxp names, Win32API stand-ins), then
-     * AGVN's: agvn_names.rb and agvn_files.rb, which open a game's file whose name the phone writes otherwise, and
+     * AGVN's: agvn_win32.rb, agvn_win32_screen.rb and agvn_win32_ini.rb, which find win32_wrap.rb's stand-ins by any
+     * spelling of a DLL's name, return 0 for the rest and answer what scripts measure of the screen and read of an
+     * .ini; agvn_names.rb and agvn_files.rb, which open a game's file whose name the phone writes otherwise; and
      * agvn_fps.rb, which reports the frames the game runs per second (the HUD, "Tự sửa lỗi").
      */
-    static final String[] PRELOAD = {"ruby_classic_wrap.rb", "mkxp_wrap.rb", "win32_wrap.rb", "agvn_names.rb",
-            "agvn_files.rb", "agvn_fps.rb"};
+    static final String[] PRELOAD = {"ruby_classic_wrap.rb", "mkxp_wrap.rb", "win32_wrap.rb", "agvn_win32.rb",
+            "agvn_win32_screen.rb", "agvn_win32_ini.rb", "agvn_names.rb", "agvn_files.rb", "agvn_fps.rb"};
     /** Ruby 3.1.3's own String#unicode_normalize (Ruby License), for agvn_files.rb: mkxp-z carries no Ruby library. */
     static final String[] RUBY_LIB = {"unicode_normalize/normalize.rb", "unicode_normalize/tables.rb"};
     /**
      * agvn_files.rb's log (AGVN_RGSS_FILES_LOG): the game's files it found under the phone's spelling, and those the
-     * game's folder lacks. Its first line names the game, so "Gửi nhật ký" sends it with that game only.
+     * game's folder lacks; agvn_win32.rb adds the Win32API functions that returned 0 ("Win32API giả: dll!function").
+     * Its first line names the game, so "Gửi nhật ký" sends it with that game only.
      */
     static final String FILES_LOG = "tim-tep.txt";
     /** The game's own "skip frames when behind" ("Tự sửa lỗi" turns it on where the phone's tier did not). */
