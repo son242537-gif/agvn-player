@@ -1,0 +1,7 @@
+AGVN Player v0.1.78 - agvn.io
+
+Sửa lỗi:
+- Game RPG Maker "Chạy nhẹ" đọc file chữ (như file cài đặt JSON) của game giống như trên Windows. Lona RPG không còn dừng ở màn "Init script list" với lỗi "stack level too deep", và chữ của game không còn dính ký tự lạ ở cuối dòng.
+- Game RPG Maker có DLL riêng kèm cách làm dự phòng (như phần đổi màu nhân vật của Lona RPG) nay dùng cách dự phòng đó, nên màu hiện đúng như trên PC.
+- Game RPG Maker VX Ace dùng bộ bàn phím đầy đủ của script (như Lona RPG) không còn báo lỗi "uninitialized constant Input::DL", và các phím riêng của game bấm được.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
