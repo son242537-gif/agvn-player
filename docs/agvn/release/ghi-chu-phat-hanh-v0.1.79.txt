@@ -1,0 +1,7 @@
+AGVN Player v0.1.79 - agvn.io
+
+Sửa lỗi:
+- Game Windows có ô nhập tên do game tự vẽ (như game Unity): bàn phím mở bằng nút ⌨ không còn tự tắt sau vài giây hay khi chạm vào ô tên, nên gõ được tên và qua được màn đặt tên.
+- Gõ được chữ Việt có dấu (ă, â, đ, ê, ô, ơ, ư và các dấu thanh, cả kiểu Telex) và chữ hoa vào game Windows. Backspace, Enter và nút "Xong" của bàn phím dùng được trong game.
+- "Gửi nhật ký" của game Unity có tên hãng kết thúc bằng dấu chấm nay có nhật ký Player.log của game, và sao lưu save tìm đúng thư mục save của game đó.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
