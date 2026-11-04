@@ -2982,8 +2982,33 @@ Báo cáo ngày 04/11/2026 (bản 0.1.76, "Chạy nhẹ" RGSS). Game VX Ace nạ
     - lỗi không ai bắt thì mkxp-z hiện hộp lỗi, dừng Ruby, rồi app hỏi người chơi và đóng hẳn tiến trình `:rgss`;
     - mkxp-z chỉ chạy lại script khi bấm F12, như RGSS trên PC.
     - Hai hộp đầu không theo mẫu `Script '…' line …` của mkxp-z. Chúng là của trình nạp script của game: nó bắt lỗi,
-      hiện hộp rồi nạp tiếp, có lẽ nạp lại cả script vừa hỏng dở, nên `alias` chạy hai lần và tự gọi mình mãi.
-  - Sửa hai lỗi trên thì trình nạp không gặp lỗi nào, nên không nạp lại.
+      hiện hộp rồi nạp tiếp.
+  - **Không phải `alias` chạy hai lần (nhật ký Lona RPG B.0.10.8.12, Xiaomi 25062RN2DA, 04/11/2026, chạy bằng bản
+    0.1.65):** `loi-game.txt` có đủ backtrace. Bộ đọc JSON của game (nạp bằng `eval`, nên tên là `(eval)`) gọi
+    `parse` → `parse_array` → `parse`… 4.216 tầng (8.432 khung), rồi hết 1 MB stack của Ruby ở `next_token`:
+    ```
+    (eval):159:in `next_token': stack level too deep (SystemStackError)
+    	from (eval):210:in `parse'
+    	from (eval):399:in `parse_array'
+    	from (eval):221:in `parse'
+    	… (4.216 lần cặp parse_array / parse)
+    	from (eval):73:in `decode'
+    	from Data/Scripts/Frames/RVscript/5000_LonaBitmapChanger.rb:364:in `block in load_setting_file'
+    	from Data/Scripts/Frames/RVscript/5000_LonaBitmapChanger.rb:313:in `read_file'
+    	from Data/Scripts/Frames/RVscript/5000_LonaBitmapChanger.rb:287:in `load_settings'
+    	from Data/Scripts/Frames/RVscript/5000_LonaBitmapChanger.rb:845:in `run'
+    	from Data/Scripts/Frames/Starter/Main.rb:8:in `rgss_main'
+    ```
+    - Ba lần mở (16:08, 16:13, 17:25) dừng y hệt nhau. Một file cài đặt khó mà lồng 4.216 tầng mảng. Theo mặc định,
+      stack của Ruby 3.1 (mkxp-z) và Ruby 1.9.2 (RGSS3 trên PC) chứa cùng số từ máy (128 nghìn), khung của 1.9.2
+      không nhỏ hơn. Vậy nhiều khả năng trên PC bộ đọc không đệ quy sâu như vậy, và có thứ chạy khác trên mkxp-z
+      (cách đọc file, mã hoá chuỗi, một hàm Ruby đổi nghĩa từ 1.9 lên 3.1, hay một hàm Win32API trả 0). Có lẽ bộ đọc
+      cứ thấy lại `[` mà không đi tiếp.
+    - JoiPlay (cũng dựa trên mkxp-z) gặp đúng lỗi này với LonaRPG. JoiPlay sửa bằng bản vá riêng cho game, tải về lúc
+      mở game (`3_LonaBitmapChanger_hugememmonkeyfix.rb`, "đường vẽ ảnh riêng cho JoiPlay").
+    - **Chưa sửa:** cần mã bộ đọc JSON (file có `def next_token` trong `Data/Scripts`), `5000_LonaBitmapChanger.rb` và
+      các file JSON mà `load_settings` đọc, để tìm chỗ chạy khác. Theo luật, app sửa chỗ mkxp-z chạy khác RGSS3,
+      không sửa script của game.
   - **Hộp lỗi của app:** backtrace dài hơn 20 khung chỉ hiện 10 khung đầu, dòng `… bỏ bớt N dòng ở giữa …` và 10 khung
     cuối. Khung cuối cho biết script nào bắt đầu vòng lặp. Hộp hiện tới 2.400 ký tự (trước 600). `loi-game.txt` trong
     nhật ký vẫn giữ nguyên lỗi.
