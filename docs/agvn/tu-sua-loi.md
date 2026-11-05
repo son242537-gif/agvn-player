@@ -3229,8 +3229,8 @@ Báo cáo thứ hai của game SRPG Studio, ngày 05–06/11/2026 (POCO, app 0.1
     - Có thay đổi thì `su-kien.txt` ghi "agvn-profile.json (…) đổi env/dllOverrides từ khi thêm game, nay áp: …".
   - `args`, `locale` và các mục khác của profile vẫn chỉ áp lúc thêm game. Nay có thể đặt ngôn ngữ để thử bằng `env`:
     `"LC_ALL": "ja_JP.UTF-8"`.
-- **"スクリプトエラー … Line N: Syntax error" ở dòng sau dòng cuối tệp .js:** gốc lỗi tìm ra sau bản 0.1.81, sửa ở bản
-  0.1.82 (mục dưới).
+- **"スクリプトエラー … Line N: Syntax error" ở dòng sau dòng cuối tệp .js:** gốc lỗi và cách sửa ở mục dưới, cùng bản
+  này.
   - Lỗi bản 2018 (Wine bug 45493, game SRPG Studio cần jscript gốc) đã sửa từ Wine 7.7. Proton 9 có bản sửa đó.
   - **Vì sao (đọc `game.exe` của báo cáo, 06/11/2026):**
     - Game tạo JScript bằng ProgID `jScript`; chỉ khi không được mới thử CLSID của JScript9. Trên Wine, `jScript` là
@@ -3250,8 +3250,6 @@ Báo cáo thứ hai của game SRPG Studio, ngày 05–06/11/2026 (POCO, app 0.1
     chữ Việt.
     - 5/40 tệp lỗi đúng ở dòng sau dòng cuối.
     - Cấp thêm một byte 0: 0/40 tệp lỗi. Không dùng lại vùng nhớ đã giải phóng: 0/40 tệp lỗi.
-  - **Thử được ngay (bản 0.1.81):** `"env": {"WINE_HEAP_DELAY_FREE": "1"}` trong `agvn-profile.json`. Proton 9 của app
-    có tùy chọn này: vùng nhớ vừa giải phóng chưa được dùng lại ngay. Có thể đỡ, không chắc hết.
   - Không đổi tệp .js của game sang `\uXXXX`: đó là sửa game cho vừa app. `jscript.dll` gốc là của Microsoft, app
     không kèm được.
 - **Test:** `AgvnDxvkSetTest` (thay file cũ, file thiếu, Wine x86_64, không có file của Wine), `AgvnProfileEnvTest`
@@ -3263,9 +3261,9 @@ Báo cáo thứ hai của game SRPG Studio, ngày 05–06/11/2026 (POCO, app 0.1
   3. Hồi quy: một game Direct3D 11 và một game Direct3D 9 vẫn chạy. Đổi DXVK sang 1.10.3 bằng Tự sửa lỗi rồi đổi lại:
      cả hai lần đều chạy.
 
-## Game SRPG Studio dừng ở "スクリプトエラー … Syntax error" lúc mở (bản 0.1.82)
+## Game SRPG Studio dừng ở "スクリプトエラー … Syntax error" lúc mở (bản 0.1.81)
 
-Gốc lỗi ở mục bản 0.1.81 trên: `game.exe` cấp cho script UTF-16 thiếu một byte 0 ở cuối, nên trên heap của Wine JScript
+Gốc lỗi ở mục trên: `game.exe` cấp cho script UTF-16 thiếu một byte 0 ở cuối, nên trên heap của Wine JScript
 đọc lố sang chữ cũ.
 
 - **Hướng đã chọn (người bảo trì chọn ngày 06/11/2026):** bộ chạy cho vùng nhớ xin đầy số 0 của game thêm 2 byte 0. Đây

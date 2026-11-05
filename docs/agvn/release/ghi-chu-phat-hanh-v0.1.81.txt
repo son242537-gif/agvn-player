@@ -3,4 +3,5 @@ AGVN Player v0.1.81 - agvn.io
 Sửa lỗi:
 - Game dùng Direct3D 10 (như game SRPG Studio) không còn văng lúc mở với lỗi "ゲームの起動に失敗しました。 B-Phese 2" sau khi một game khác từng đổi sang DXVK 1.10.3. Lần mở game đầu tiên trên bản này, app cài lại bộ DXVK một lần.
 - Sửa mục "env" và "dllOverrides" trong agvn-profile.json sau khi thêm game nay có tác dụng ở lần mở game kế tiếp, không cần thêm lại game. Biến môi trường do người chơi hay "Tự sửa lỗi" đặt vẫn giữ nguyên.
+- Game SRPG Studio không còn dừng lúc mở với lỗi "スクリプトエラー … Syntax error", cả bản gốc lẫn bản Việt hoá. App bù cho game chỗ đọc file script bị thiếu, không sửa file nào của game.
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

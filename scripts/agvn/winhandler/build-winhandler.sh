@@ -6,7 +6,7 @@
 # (a touch as a real mouse, raw input included) and its command line read as Unicode, and from AGVN 2 (0.1.71) its
 # RC_AGVN_STATE (the game holds the cursor, a text caret shows) and finger moves as relative mouse moves, and from AGVN 3
 # (0.1.74) RC_AGVN_GAME_ENDED: it ends, and Wine with it, once the game and its processes have ended, and from AGVN 4
-# (0.1.82) /heappad (app/src/main/cpp/agvn/heap-pad.c): a 32-bit game's zeroed heap blocks get two more zero bytes,
+# (0.1.81) /heappad (app/src/main/cpp/agvn/heap-pad.c): a 32-bit game's zeroed heap blocks get two more zero bytes,
 # for SRPG Studio's scripts. Every game starts through it (AgvnStarter); the container's winhandler.exe only when it
 # cannot be written there. Test it in Wine with scripts/agvn/winhandler/test/run-test.sh, and /heappad with
 # scripts/agvn/winhandler/test/run-heappad-test.sh.
