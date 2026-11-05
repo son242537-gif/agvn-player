@@ -1,0 +1,6 @@
+AGVN Player v0.1.80 - agvn.io
+
+Sửa lỗi:
+- Game làm bằng SRPG Studio nay có trong "Thêm game" như mọi game, dùng bộ phím RPG và giữ đúng tốc độ game. Game SRPG Studio đã thêm trước đây cũng được nhận đúng engine.
+- "Thêm game" có thêm mục "Có file .exe, app chưa nhận ra là game" cho những thư mục có file .exe mà app chưa biết engine: bấm vào là thêm được như game Windows, không cần tự tìm file .exe.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
