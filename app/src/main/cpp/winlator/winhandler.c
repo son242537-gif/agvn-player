@@ -47,7 +47,11 @@
 /* AGVN 3: the game and every process it started have ended, with the game's
    exit code (DWORD) after the code; this winhandler then ends, and Wine with it */
 #define RC_AGVN_GAME_ENDED 16
-#define AGVN_VERSION 3
+/* AGVN 4: /heappad, a 32-bit game's zeroed heap blocks get two more zero bytes
+   (app/src/main/cpp/agvn/heap-pad.c, SRPG Studio) */
+#define AGVN_VERSION 4
+BOOL agvnStartPadded(LPCWSTR exe, LPCWSTR args, LPCWSTR dir,
+                     PROCESS_INFORMATION *pi);
 
 #pragma pack(push, 1)
 typedef struct {
@@ -599,6 +603,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
      while GameHub opened it. */
   LPCWSTR directory = NULL;
   LPCWSTR executable = L"wfm.exe";
+  BOOL heapPad = FALSE; /* AGVN 4 */
 
   int argc = 0;
   LPWSTR *argv = CommandLineToArgvW(GetCommandLineW(), &argc);
@@ -614,6 +619,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       } else {
         argIdx++;
       }
+    } else if (wcscmp(argv[argIdx], L"/heappad") == 0) {
+      heapPad = TRUE;
+      argIdx++;
     } else if (wcscmp(argv[argIdx], L"/dir") == 0) {
       if (argIdx + 1 < argc) {
         directory = argv[argIdx + 1];
@@ -656,7 +664,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   sei.lpDirectory = directory;
   sei.nShow = SW_SHOW;
 
-  ShellExecuteExW(&sei);
+  /* AGVN 4: a game that needs its zeroed heap blocks padded starts paused */
+  PROCESS_INFORMATION padded = {0};
+  size_t exeLen = wcslen(executable);
+  if (heapPad && exeLen > 4 && _wcsicmp(executable + exeLen - 4, L".exe") == 0 &&
+      agvnStartPadded(executable, execArgs[0] ? execArgs : NULL, directory,
+                      &padded)) {
+    CloseHandle(padded.hThread);
+    sei.hProcess = padded.hProcess;
+  } else {
+    ShellExecuteExW(&sei);
+  }
   HANDLE hThread = CreateThread(NULL, 0, ServerThread, NULL, 0, NULL);
   /* AGVN 3: a game, not the file manager of a container's desktop */
   if (_wcsicmp(executable, L"wfm.exe") != 0) {

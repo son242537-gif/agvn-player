@@ -32,6 +32,12 @@ public final class AgvnStarter {
      * command has it), with the game's own arguments; it goes into the container when it is AGVN's.
      */
     public static String prepare(Context context, XServer xServer, Shortcut shortcut, String launch) {
+        String starter = choose(context, xServer, shortcut, launch);
+        if (shortcut == null) return starter;
+        return AgvnHeapPad.starter(starter, shortcut.getExtra(AgvnGameImporter.EXTRA_ENGINE)); // SRPG Studio
+    }
+
+    private static String choose(Context context, XServer xServer, Shortcut shortcut, String launch) {
         String starter = AgvnRawMouse.prepare(context, xServer, shortcut);
         note = null;
         if (shortcut == null || AgvnRawMouse.EXE.equals(starter)) return starter;

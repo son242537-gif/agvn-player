@@ -3229,7 +3229,8 @@ Báo cáo thứ hai của game SRPG Studio, ngày 05–06/11/2026 (POCO, app 0.1
     - Có thay đổi thì `su-kien.txt` ghi "agvn-profile.json (…) đổi env/dllOverrides từ khi thêm game, nay áp: …".
   - `args`, `locale` và các mục khác của profile vẫn chỉ áp lúc thêm game. Nay có thể đặt ngôn ngữ để thử bằng `env`:
     `"LC_ALL": "ja_JP.UTF-8"`.
-- **Chưa sửa: "スクリプトエラー … Line N: Syntax error" ở dòng sau dòng cuối tệp .js.**
+- **"スクリプトエラー … Line N: Syntax error" ở dòng sau dòng cuối tệp .js:** gốc lỗi tìm ra sau bản 0.1.81, sửa ở bản
+  0.1.82 (mục dưới).
   - Lỗi bản 2018 (Wine bug 45493, game SRPG Studio cần jscript gốc) đã sửa từ Wine 7.7. Proton 9 có bản sửa đó.
   - **Vì sao (đọc `game.exe` của báo cáo, 06/11/2026):**
     - Game tạo JScript bằng ProgID `jScript`; chỉ khi không được mới thử CLSID của JScript9. Trên Wine, `jScript` là
@@ -3251,12 +3252,6 @@ Báo cáo thứ hai của game SRPG Studio, ngày 05–06/11/2026 (POCO, app 0.1
     - Cấp thêm một byte 0: 0/40 tệp lỗi. Không dùng lại vùng nhớ đã giải phóng: 0/40 tệp lỗi.
   - **Thử được ngay (bản 0.1.81):** `"env": {"WINE_HEAP_DELAY_FREE": "1"}` trong `agvn-profile.json`. Proton 9 của app
     có tùy chọn này: vùng nhớ vừa giải phóng chưa được dùng lại ngay. Có thể đỡ, không chắc hết.
-  - Chưa chọn cách sửa hẳn. Có ba hướng:
-    - Bộ chạy `agvn-winhandler.exe` cho `HeapAlloc` có `HEAP_ZERO_MEMORY` của game SRPG Studio thêm hai byte 0, như
-      shim HeapPadAllocation của Windows.
-    - Sửa một lệnh `size + 1` thành `size + 2` trong bộ nhớ của game. Đây là sửa mã của game.
-    - Sửa heap của Wine để xoá cả phần thừa của khối. Cách này cần dựng lại ntdll của Proton 9, mà bản Proton 9 của
-      app là bản dựng sẵn, không có mã nguồn đúng bản.
   - Không đổi tệp .js của game sang `\uXXXX`: đó là sửa game cho vừa app. `jscript.dll` gốc là của Microsoft, app
     không kèm được.
 - **Test:** `AgvnDxvkSetTest` (thay file cũ, file thiếu, Wine x86_64, không có file của Wine), `AgvnProfileEnvTest`
@@ -3267,3 +3262,47 @@ Báo cáo thứ hai của game SRPG Studio, ngày 05–06/11/2026 (POCO, app 0.1
      `WINEDEBUG` trong `moi-truong.txt` là `+msgbox`. Bỏ dòng đó rồi mở lại: `WINEDEBUG` về như cài đặt.
   3. Hồi quy: một game Direct3D 11 và một game Direct3D 9 vẫn chạy. Đổi DXVK sang 1.10.3 bằng Tự sửa lỗi rồi đổi lại:
      cả hai lần đều chạy.
+
+## Game SRPG Studio dừng ở "スクリプトエラー … Syntax error" lúc mở (bản 0.1.82)
+
+Gốc lỗi ở mục bản 0.1.81 trên: `game.exe` cấp cho script UTF-16 thiếu một byte 0 ở cuối, nên trên heap của Wine JScript
+đọc lố sang chữ cũ.
+
+- **Hướng đã chọn (người bảo trì chọn ngày 06/11/2026):** bộ chạy cho vùng nhớ xin đầy số 0 của game thêm 2 byte 0. Đây
+  là cách shim HeapPadAllocation của Windows sửa chương trình lỗi kiểu này.
+  - Không đổi tệp nào của game, không sửa lệnh nào của game.
+  - Không đổi gì cho game khác.
+- **Sửa:**
+  - `agvn-winhandler.exe /heappad` (AGVN 4, `app/src/main/cpp/agvn/heap-pad.c`), cho game 32-bit:
+    - Mở game bằng `CreateProcessW` ở trạng thái tạm dừng.
+    - Viết vào game một trang nhớ mới (`heap-pad-stub.s`): một thunk cho `HeapAlloc`, và một TLS callback.
+    - Cho TLS directory của game trỏ danh sách callback sang danh sách có callback này đứng đầu, rồi chạy game.
+  - Trình nạp gọi callback sau khi đã điền bảng import, trước mã của game.
+    - Callback đổi ô `HeapAlloc` của game sang thunk, bằng `VirtualProtect` lấy qua `GetModuleHandleW` và
+      `GetProcAddress` của chính game.
+    - Thunk thêm 2 byte cho lệnh xin có `HEAP_ZERO_MEMORY`, các lệnh xin khác đi thẳng.
+  - Không sửa lệnh nào có sẵn. Trình giả lập x86 của điện thoại có thể giữ bản dịch cũ của một lệnh bị sửa từ tiến trình
+    khác, còn trang nhớ mới thì chưa được dịch lần nào.
+    - Cách thử đầu (đặt lệnh nhảy tại chỗ ở điểm vào, rồi chờ luồng tới đó) chạy được trên Wine của máy cloud, nhưng
+      bị bỏ vì lý do này.
+  - Có bước nào hỏng (game 64-bit, thiếu import, không có TLS directory, không ghi được) thì game chạy như cũ. Nhật ký
+    Wine ghi "agvn-winhandler: heap pad off: …".
+  - App thêm `/heappad` cho game có engine `SRPG_STUDIO` mở bằng `agvn-winhandler.exe` (`AgvnHeapPad`, `AgvnStarter`).
+    `su-kien.txt` ghi "Game SRPG Studio: mở bằng agvn-winhandler.exe /heappad …".
+- **`game.exe` của báo cáo:**
+  - Có TLS directory, với danh sách callback rỗng.
+  - Có import `HeapAlloc`, `GetModuleHandleW`, `GetProcAddress` của KERNEL32.
+  - Tệp chỉ được đọc, không chạy.
+- **Test:**
+  - `scripts/agvn/winhandler/test/run-heappad-test.sh` (Wine 9.0, chương trình đọc 40 script UTF-16 như `game.exe`):
+    - Qua bộ chạy có `/heappad`: 0 lỗi, nhật ký "heap pad on".
+    - Không có `/heappad`: 2 đến 5 lỗi, ở dòng sau dòng cuối.
+  - `scripts/agvn/winhandler/test/run-test.sh` của bộ chạy vẫn đạt.
+  - `AgvnHeapPadTest`.
+  - Dựng lại `agvn-winhandler.exe` hai lần ra cùng một tệp.
+- **Thử máy:**
+  1. Game SRPG Studio của báo cáo, bản gốc tiếng Anh và bản Việt hoá: qua bước nạp script, không còn "スクリプトエラー".
+     `su-kien.txt` có dòng "Game SRPG Studio: mở bằng agvn-winhandler.exe /heappad". Nhật ký Wine (bật debug) có "heap
+     pad on".
+  2. Chơi 10 phút, lưu và tải lại.
+  3. Hồi quy: một game Unity và một game RPG Maker vẫn mở như cũ. Nút chuột ảo, bàn phím, thoát game vẫn đúng.
