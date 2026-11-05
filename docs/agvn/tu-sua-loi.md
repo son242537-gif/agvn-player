@@ -3231,16 +3231,34 @@ Báo cáo thứ hai của game SRPG Studio, ngày 05–06/11/2026 (POCO, app 0.1
     `"LC_ALL": "ja_JP.UTF-8"`.
 - **Chưa sửa: "スクリプトエラー … Line N: Syntax error" ở dòng sau dòng cuối tệp .js.**
   - Lỗi bản 2018 (Wine bug 45493, game SRPG Studio cần jscript gốc) đã sửa từ Wine 7.7. Proton 9 có bản sửa đó.
-  - Mã jscript của Proton 9 chép đoạn script tới ký tự kết thúc chuỗi (`lstrlenW`), và lấy dòng in trong hộp lỗi từ
-    chính bản chép này.
-    - Vậy chữ rác của tệp nạp trước đã nằm sẵn trong chuỗi game đưa cho JScript.
-    - Tức là game tự tính sai độ dài khi đọc tệp, ở một hàm Windows mà Wine trả khác. JScript không đọc lố.
-  - Chưa biết hàm nào: cần `game.exe` (bộ chạy SRPG Studio) để xem nó đọc tệp ra sao, hoặc nhật ký Wine có kênh
-    `+loaddll,+msvcrt,+file,warn+jscript`. Kênh này nay đặt được bằng `env` của profile: `"WINEDEBUG": "…"`, kèm "Bật
-    debug Wine".
-  - Không đổi tệp .js của game sang `\uXXXX`: đó là sửa game cho vừa app. Cũng không đặt sẵn tiếng Nhật cho SRPG Studio
-    khi chưa biết nó có giúp không.
-  - `jscript.dll` gốc là của Microsoft, app không kèm được.
+  - **Vì sao (đọc `game.exe` của báo cáo, 06/11/2026):**
+    - Game tạo JScript bằng ProgID `jScript`; chỉ khi không được mới thử CLSID của JScript9. Trên Wine, `jScript` là
+      `jscript.dll` builtin.
+    - Tệp .js không được ánh xạ vào bộ nhớ (ánh xạ chỉ dùng cho `data.dts`, `runtime.rts`). Hàm đọc ở 0x4749b0:
+      - `GetFileSize`, rồi `HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, size + 1)`, rồi `ReadFile`, rồi
+        `buf[size] = 0`.
+      - Nếu `IsTextUnicode` nhận là UTF-16, bộ đệm đưa thẳng vào `ParseScriptText` (0x456480).
+    - Chuỗi UTF-16 cần hai byte 0 để kết thúc, game chỉ cấp một. Byte thứ hai là byte đầu tiên sau vùng game xin, nằm
+      trong phần thừa của khối nhớ, và giữ chữ cũ của khối trước đó.
+    - Byte này khác 0 thì JScript đọc tiếp chữ cũ, gồm tệp nạp trước hay bản chép script của jscript (cùng heap trên
+      Wine). Kết quả là lỗi ở dòng sau dòng cuối.
+    - Trên Windows byte đó có lẽ thường là 0 (heap dùng lại vùng nhớ khác Wine), nên game chạy được nhờ may.
+    - Tệp ASCII hay UTF-8 đi nhánh `MultiByteToWideChar(…, -1, …)`, có ký tự kết thúc đủ. Vì vậy đổi sang `\uXXXX`
+      rồi lưu ASCII thì hết lỗi.
+  - **Dựng lại trên Wine 9.0 (máy cloud):** một chương trình đọc tệp y như hàm trên, với 40 tệp UTF-16 có chữ Nhật,
+    chữ Việt.
+    - 5/40 tệp lỗi đúng ở dòng sau dòng cuối.
+    - Cấp thêm một byte 0: 0/40 tệp lỗi. Không dùng lại vùng nhớ đã giải phóng: 0/40 tệp lỗi.
+  - **Thử được ngay (bản 0.1.81):** `"env": {"WINE_HEAP_DELAY_FREE": "1"}` trong `agvn-profile.json`. Proton 9 của app
+    có tùy chọn này: vùng nhớ vừa giải phóng chưa được dùng lại ngay. Có thể đỡ, không chắc hết.
+  - Chưa chọn cách sửa hẳn. Có ba hướng:
+    - Bộ chạy `agvn-winhandler.exe` cho `HeapAlloc` có `HEAP_ZERO_MEMORY` của game SRPG Studio thêm hai byte 0, như
+      shim HeapPadAllocation của Windows.
+    - Sửa một lệnh `size + 1` thành `size + 2` trong bộ nhớ của game. Đây là sửa mã của game.
+    - Sửa heap của Wine để xoá cả phần thừa của khối. Cách này cần dựng lại ntdll của Proton 9, mà bản Proton 9 của
+      app là bản dựng sẵn, không có mã nguồn đúng bản.
+  - Không đổi tệp .js của game sang `\uXXXX`: đó là sửa game cho vừa app. `jscript.dll` gốc là của Microsoft, app
+    không kèm được.
 - **Test:** `AgvnDxvkSetTest` (thay file cũ, file thiếu, Wine x86_64, không có file của Wine), `AgvnProfileEnvTest`
   (thứ profile cho, thay biến, giữ biến người chơi đổi, `WINEDLLOVERRIDES` theo tên DLL, profile sửa sau cùng).
 - **Thử máy:**
