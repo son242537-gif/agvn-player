@@ -542,6 +542,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             shortcut.putExtra("lastRunAt", String.valueOf(System.currentTimeMillis()));
             shortcut.saveData();
             com.winlator.cmod.agvn.AgvnEngineRecheck.atLaunch(shortcut); // AGVN: an Electron game once taken for KiriKiri
+            com.winlator.cmod.agvn.AgvnProfileEnv.atLaunch(shortcut); // AGVN: env of agvn-profile.json edited since
 
             graphicsDriver = shortcut.getExtra("graphicsDriver", container.getGraphicsDriver());
             graphicsDriverConfig = shortcut.getExtra("graphicsDriverConfig", container.getGraphicsDriverConfig());
@@ -1150,9 +1151,12 @@ public class XServerDisplayActivity extends AppCompatActivity {
             dxwrapper = dxvkWrapper + ";" + vkd3dWrapper + ";" + ddrawrapper;
         }
 
-        if (!dxwrapper.equals(container.getExtra("dxwrapper"))) {
+        // AGVN: once more for a set an older app unpacked, which could leave DXVK 1.10.3's d3d10.dll (AgvnDxvkSet)
+        if (!dxwrapper.equals(container.getExtra("dxwrapper")) || com.winlator.cmod.agvn.AgvnDxvkSet.stale(container)) {
             extractDXWrapperFiles(dxwrapper);
             container.putExtra("dxwrapper", dxwrapper);
+            com.winlator.cmod.agvn.AgvnDxvkSet.unpacked(container, // AGVN
+                    new File(imageFs.getRootDir(), ImageFs.WINEPREFIX + "/drive_c/windows"));
             containerDataChanged = true;
         }
 
@@ -2914,6 +2918,8 @@ public class XServerDisplayActivity extends AppCompatActivity {
             String dxvkWrapper = dxwrapper.split(";")[0];
             String vkd3dWrapper = dxwrapper.split(";")[1];
             String ddrawrapper = dxwrapper.split(";")[2];
+            // AGVN: DXVK 2 has no d3d10.dll: an older set's would stay, and want its own d3d10core (AgvnDxvkSet)
+            com.winlator.cmod.agvn.AgvnDxvkSet.putWineOwnBack(windowsDir, imageFs.getWinePath(), wineInfo.isArm64EC());
 
             ContentProfile dxvkProfile = contentsManager.getProfileByEntryName(dxvkWrapper);
             if (dxvkProfile != null) {

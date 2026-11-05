@@ -152,6 +152,8 @@ final class AgvnFixApply {
         String dlls = GameDllOverrides.build(GameDllOverrides.detect(exe.getParentFile()), p.dllOverrides);
         s.putExtra("execArgs", String.join(" ", p.args));
         s.putExtra("envVars", AgvnMediaFoundation.keepOldSource(env, AgvnGameImporter.buildEnvVars(p.env, dlls)));
+        String given = AgvnProfileEnv.given(p);
+        s.putExtra(AgvnProfileEnv.EXTRA, given.isEmpty() ? null : given);
         String prefix = gameDir.getPath() + "/", path = exe.getPath();
         String relative = path.startsWith(prefix) ? path.substring(prefix.length()) : exe.getName();
         s.putExtra("lc_all", AgvnLocale.forGame(p, engine(s), gameDir.getName(), relative));

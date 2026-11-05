@@ -33,14 +33,7 @@ public final class AgvnProfileValidator {
             if (arg == null || !SAFE_VALUE.matcher(arg).matches())
                 throw new AgvnProfileException("Tham số chạy (args) có ký tự không an toàn: " + arg);
         }
-        for (Map.Entry<String, String> e : p.env.entrySet()) {
-            if (!ENV_KEY.matcher(e.getKey()).matches() || e.getValue() == null || !SAFE_VALUE.matcher(e.getValue()).matches())
-                throw new AgvnProfileException("Biến môi trường (env) không an toàn: " + e.getKey());
-        }
-        for (Map.Entry<String, String> e : p.dllOverrides.entrySet()) {
-            if (!GameDllOverrides.isValid(e.getKey(), e.getValue()))
-                throw new AgvnProfileException("dllOverrides không hợp lệ: " + e.getKey() + " (chỉ dùng n, b, n,b hoặc b,n)");
-        }
+        checkEnv(p);
         checkResolution(p.resolution);
         checkFps(p.fpsLimit);
         checkPool(p.texturePool);
@@ -97,6 +90,18 @@ public final class AgvnProfileValidator {
             return file.getCanonicalPath().startsWith(d);
         } catch (IOException e) {
             return false;
+        }
+    }
+
+    /** The env and dllOverrides rules alone (AgvnProfileEnv reads them again at each start). */
+    static void checkEnv(AgvnProfile p) throws AgvnProfileException {
+        for (Map.Entry<String, String> e : p.env.entrySet()) {
+            if (!ENV_KEY.matcher(e.getKey()).matches() || e.getValue() == null || !SAFE_VALUE.matcher(e.getValue()).matches())
+                throw new AgvnProfileException("Biến môi trường (env) không an toàn: " + e.getKey());
+        }
+        for (Map.Entry<String, String> e : p.dllOverrides.entrySet()) {
+            if (!GameDllOverrides.isValid(e.getKey(), e.getValue()))
+                throw new AgvnProfileException("dllOverrides không hợp lệ: " + e.getKey() + " (chỉ dùng n, b, n,b hoặc b,n)");
         }
     }
 

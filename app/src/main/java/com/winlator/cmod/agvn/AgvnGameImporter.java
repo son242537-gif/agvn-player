@@ -193,6 +193,8 @@ public final class AgvnGameImporter {
         File exeDir = new File(c.gameDir, c.exe).getParentFile();
         String dlls = GameDllOverrides.build(GameDllOverrides.detect(exeDir), p.dllOverrides);
         shortcut.putExtra("envVars", buildEnvVars(p.env, dlls));
+        String given = AgvnProfileEnv.given(p); // what a later edit of the profile replaces (AgvnProfileEnv)
+        shortcut.putExtra(AgvnProfileEnv.EXTRA, given.isEmpty() ? null : given);
         AgvnQuality.setStartFps(shortcut, AgvnFrameLock.fps(c.engine.name(), eff.fps));
         AgvnLayouts.applyImport(shortcut, AgvnLayouts.kindFor(p, c.engine));
         String screen = AgvnKirikiriScreen.larger(eff.resolution, c.gameSize); // a KiriKiri game plays in its window

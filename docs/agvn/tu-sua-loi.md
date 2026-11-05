@@ -3191,3 +3191,61 @@ trong "Chưa thêm", và app không báo gì. Chỉ còn cách "Tự chọn file
      mở: bộ phím RPG, chơi được bằng phím ảo và chạm.
   2. Một game C++ tự viết không có DLL: có trong "Có file .exe, app chưa nhận ra là game". Bấm vào: thêm và mở được.
   3. Hồi quy: một trình cài đặt `setup.exe` trong `Download` không có ở mục nào; các game đã có vẫn ở chỗ cũ.
+
+## Game Direct3D 10 văng vì d3d10.dll của DXVK cũ, và env của agvn-profile.json sửa sau khi thêm game (bản 0.1.81)
+
+Báo cáo thứ hai của game SRPG Studio, ngày 05–06/11/2026 (POCO, app 0.1.77, Proton 9 arm64ec, DXVK 2.3.1).
+
+- **Lỗi 1 của báo cáo** (game không có trong "Thêm game") đã sửa ở bản 0.1.80, mục trên.
+- **"ゲームの起動に失敗しました。 B-Phese 2":** Wine ghi `Call from 7BF7EC26 to unimplemented function
+  D3D10CORE.DLL.D3D10CoreCreateDevice@20, aborting`.
+  - **Vì sao (xem trong các bộ DXVK của app):**
+    - DXVK 1.10.3 có `d3d10.dll` và `d3d10_1.dll` riêng. Hai file này gọi d3d10core bằng tên `D3D10CoreCreateDevice@20`,
+      và chỉ `d3d10core.dll` của 1.10.3 có tên đó.
+    - DXVK 2.3.1 không có `d3d10.dll` hay `d3d10_1.dll`: nó chạy dưới hai file của Wine, vốn gọi tên
+      `D3D10CoreCreateDevice`. `d3d10core.dll` của 2.3.1 chỉ có tên này.
+    - Khi app giải nén 2.3.1 đè lên 1.10.3, hai file của 1.10.3 ở lại trong `system32` và `syswow64`. DXVK 1.10.3 đến từ
+      "Đổi DXVK sang bản 1.10.3" của Tự sửa lỗi, hoặc từ máy có driver chưa có Vulkan 1.3. Mọi game trong cùng container
+      đều dùng chung các file này.
+    - Game Direct3D 10 nào chạy sau đó cũng văng như vậy. Đổi `game.ini` sang vẽ phần mềm không giúp được, vì lỗi nằm
+      lúc nạp DLL.
+  - **Sửa (`AgvnDxvkSet`):**
+    - Trước khi giải nén một bộ DXVK, app chép lại `d3d10.dll` và `d3d10_1.dll` của Wine vào `system32` và `syswow64`.
+      Bộ nào có hai file này (1.10.3) sẽ đặt file của nó đè lên.
+    - Container đã có bộ DXVK từ bản cũ được giải nén lại một lần ở lần mở game đầu tiên trên bản này.
+    - Khi có file cũ bị thay, `su-kien.txt` ghi "Bộ DXVK: syswow64/d3d10.dll … của bản DXVK trước còn lại, đã thay bằng
+      bản của Wine".
+- **`env` và `dllOverrides` của `agvn-profile.json` sửa sau khi thêm game không có tác dụng:** "Thêm game" chỉ chép
+  chúng vào biến môi trường của game một lần. Sửa profile sau đó, ở thư mục game hay ở `profiles/<thư mục>`, thì
+  `moi-truong.txt` không đổi.
+  - **Sửa (`AgvnProfileEnv`):** mỗi lần mở game, app đọc lại profile nào được sửa sau cùng: bản trong thư mục game hoặc
+    bản `profiles/<thư mục>`.
+    - Thứ profile cho hôm nay thay thứ nó cho lần trước. `dllOverrides` vào `WINEDLLOVERRIDES`, theo từng tên DLL.
+    - Biến mà người chơi hay Tự sửa lỗi đặt thì giữ nguyên. Biến profile đã bỏ thì bỏ theo, trừ khi người chơi đã đổi
+      nó.
+    - Game thêm trước bản này chưa có bản ghi thứ profile đã cho, nên lần đầu app chỉ đặt thêm, không bỏ biến nào.
+    - Profile sai luật (biến hay giá trị không an toàn, `dllOverrides` không phải n, b, n,b, b,n) thì không áp. Lỗi ghi
+      vào `su-kien.txt`.
+    - Có thay đổi thì `su-kien.txt` ghi "agvn-profile.json (…) đổi env/dllOverrides từ khi thêm game, nay áp: …".
+  - `args`, `locale` và các mục khác của profile vẫn chỉ áp lúc thêm game. Nay có thể đặt ngôn ngữ để thử bằng `env`:
+    `"LC_ALL": "ja_JP.UTF-8"`.
+- **Chưa sửa: "スクリプトエラー … Line N: Syntax error" ở dòng sau dòng cuối tệp .js.**
+  - Lỗi bản 2018 (Wine bug 45493, game SRPG Studio cần jscript gốc) đã sửa từ Wine 7.7. Proton 9 có bản sửa đó.
+  - Mã jscript của Proton 9 chép đoạn script tới ký tự kết thúc chuỗi (`lstrlenW`), và lấy dòng in trong hộp lỗi từ
+    chính bản chép này.
+    - Vậy chữ rác của tệp nạp trước đã nằm sẵn trong chuỗi game đưa cho JScript.
+    - Tức là game tự tính sai độ dài khi đọc tệp, ở một hàm Windows mà Wine trả khác. JScript không đọc lố.
+  - Chưa biết hàm nào: cần `game.exe` (bộ chạy SRPG Studio) để xem nó đọc tệp ra sao, hoặc nhật ký Wine có kênh
+    `+loaddll,+msvcrt,+file,warn+jscript`. Kênh này nay đặt được bằng `env` của profile: `"WINEDEBUG": "…"`, kèm "Bật
+    debug Wine".
+  - Không đổi tệp .js của game sang `\uXXXX`: đó là sửa game cho vừa app. Cũng không đặt sẵn tiếng Nhật cho SRPG Studio
+    khi chưa biết nó có giúp không.
+  - `jscript.dll` gốc là của Microsoft, app không kèm được.
+- **Test:** `AgvnDxvkSetTest` (thay file cũ, file thiếu, Wine x86_64, không có file của Wine), `AgvnProfileEnvTest`
+  (thứ profile cho, thay biến, giữ biến người chơi đổi, `WINEDLLOVERRIDES` theo tên DLL, profile sửa sau cùng).
+- **Thử máy:**
+  1. Game SRPG Studio của báo cáo, ở container từng chạy DXVK 1.10.3: hết "B-Phese 2". `su-kien.txt` có dòng "Bộ DXVK".
+  2. Đặt `"env": {"WINEDEBUG": "+msgbox"}` trong `agvn-profile.json` của thư mục game sau khi thêm, rồi mở: dòng
+     `WINEDEBUG` trong `moi-truong.txt` là `+msgbox`. Bỏ dòng đó rồi mở lại: `WINEDEBUG` về như cài đặt.
+  3. Hồi quy: một game Direct3D 11 và một game Direct3D 9 vẫn chạy. Đổi DXVK sang 1.10.3 bằng Tự sửa lỗi rồi đổi lại:
+     cả hai lần đều chạy.
