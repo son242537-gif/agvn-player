@@ -44,7 +44,7 @@ public final class AgvnLayouts {
         switch (engine) {
             case RENPY: case KIRIKIRI: case TYRANO: case SIGLUS: case NSCRIPTER:
                 return VN;
-            case RPGMAKER: case RPGMAKER_MV: case WOLFRPG:
+            case RPGMAKER: case RPGMAKER_MV: case WOLFRPG: case SRPG_STUDIO:
                 return RPG;
             case GAMEMAKER: case GODOT:
                 return TWO_D;

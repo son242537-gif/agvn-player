@@ -33,6 +33,8 @@ public final class AgvnImportEntry {
     public final String variant;
     /** Unique per row (list key): the folder, plus the exe for a variant. */
     public final String key;
+    /** A folder with an exe no rule recognises, listed apart ({@link AgvnGameScanner.Found#unsure}). */
+    public boolean unsure;
 
     AgvnImportEntry(File dir, String title, String detail, boolean hasProfile, File exe, GameExeResolver.Engine engine,
                     AgvnLibraryIndex.Existing existing, String variant) {
@@ -50,11 +52,19 @@ public final class AgvnImportEntry {
 
     /** Scans storage (slow: call off the main thread); "Chưa thêm" games first, each group A→Z ignoring accents. */
     public static List<AgvnImportEntry> scan(Context ctx) {
-        List<File> dirs = AgvnGameImporter.listGameDirs(AgvnGameRoots.load(ctx));
+        AgvnGameScanner.Found found = AgvnGameImporter.findGameDirs(AgvnGameRoots.load(ctx));
         AgvnLibraryIndex library = new AgvnLibraryIndex(new ContainerManager(ctx).loadShortcuts());
         AgvnProfileCatalog catalog = AgvnProfileCatalog.get(ctx);
         List<AgvnImportEntry> out = new ArrayList<>();
-        for (File dir : dirs) out.addAll(build(ctx, dir, library, catalog, null));
+        for (File dir : found.games) out.addAll(build(ctx, dir, library, catalog, null));
+        String unsure = ctx.getString(R.string.agvn_add_engine_unsure);
+        for (File dir : found.unsure) {
+            AgvnImportEntry row = build(ctx, dir, library, catalog, null).get(0);
+            AgvnImportEntry shown = new AgvnImportEntry(row.dir, row.title, unsure + " · " + place(ctx, dir),
+                    row.hasProfile, row.exe, row.engine, row.existing, row.variant);
+            shown.unsure = true;
+            out.add(shown);
+        }
         Collections.sort(out, (a, b) -> {
             if ((a.existing == null) != (b.existing == null)) return a.existing == null ? -1 : 1;
             return a.sortKey.compareTo(b.sortKey);
@@ -145,6 +155,7 @@ public final class AgvnImportEntry {
             case RPGMAKER: return "RPG Maker";
             case RPGMAKER_MV: return "RPG Maker MV";
             case WOLFRPG: return "Wolf RPG";
+            case SRPG_STUDIO: return "SRPG Studio";
             default: return ctx.getString(R.string.agvn_add_engine_unknown);
         }
     }

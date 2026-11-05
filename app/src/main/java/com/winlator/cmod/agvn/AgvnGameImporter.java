@@ -66,6 +66,11 @@ public final class AgvnGameImporter {
      * download unpacked into its own folder) costs no level. Each folder is listed once.
      */
     public static List<File> listGameDirs(List<File> extraRoots) {
+        return findGameDirs(extraRoots).games;
+    }
+
+    /** {@link #listGameDirs}, with the folders that hold an exe no rule recognises ({@link AgvnGameScanner.Found}). */
+    public static AgvnGameScanner.Found findGameDirs(List<File> extraRoots) {
         List<AgvnGameScanner.Root> roots = new ArrayList<>();
         for (File extra : extraRoots) roots.add(new AgvnGameScanner.Root(extra, AgvnGameRoots.DEPTH, true));
         for (File volume : storageVolumes()) {
@@ -74,7 +79,7 @@ public final class AgvnGameImporter {
             roots.add(new AgvnGameScanner.Root(new File(volume, "Games"), 4));
             roots.add(new AgvnGameScanner.Root(volume, 3));
         }
-        return AgvnGameScanner.scan(roots);
+        return AgvnGameScanner.find(roots);
     }
 
     /** Internal storage first, then removable volumes mounted under /storage. */

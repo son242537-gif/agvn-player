@@ -18,7 +18,10 @@ import java.util.Map;
  */
 public final class GameExeResolver {
     /** Stored by name in the shortcut extra "agvnEngine": never rename or remove a value. */
-    public enum Engine { UNREAL, UNITY, GODOT, GAMEMAKER, RENPY, KIRIKIRI, TYRANO, SIGLUS, NSCRIPTER, RPGMAKER, RPGMAKER_MV, WOLFRPG, UNKNOWN }
+    public enum Engine {
+        UNREAL, UNITY, GODOT, GAMEMAKER, RENPY, KIRIKIRI, TYRANO, SIGLUS, NSCRIPTER, RPGMAKER, RPGMAKER_MV, WOLFRPG,
+        SRPG_STUDIO, UNKNOWN
+    }
 
     private static final List<String> IGNORED = Arrays.asList(
             "unitycrashhandler64.exe", "unitycrashhandler32.exe", "crashreportclient.exe", "dxsetup.exe",
@@ -54,6 +57,9 @@ public final class GameExeResolver {
         if (isRpgMaker(top)) return Engine.RPGMAKER;
         if (anyFile(children, "", ".wolf") || anyFile(listOrEmpty(path(top, "data")), "", ".wolf")
                 || isFile(top.get("gurugurusmf4.dll"))) return Engine.WOLFRPG;
+        // SRPG Studio: its data and runtime packs beside game.exe, and no DLL (report of 05/11/2026)
+        if (isFile(top.get("data.dts")) && (isFile(top.get("runtime.rts")) || isFile(top.get("environment.evs"))))
+            return Engine.SRPG_STUDIO;
         boolean chromium = chromiumShell(top);
         if (!chromium && anyFile(children, "", ".xp3")) return Engine.KIRIKIRI;
         if (!chromium && (anyFile(children, "", ".nsa") || isFile(top.get("nscript.dat")))) return Engine.NSCRIPTER;

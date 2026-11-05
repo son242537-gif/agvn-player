@@ -11,11 +11,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Finds game folders so players never have to browse: a folder counts as a game when it has agvn-profile.json,
  * GameExeResolver finds an exe to launch, or "Chạy nhẹ" can run it without one ({@link AgvnLightGame}). Search stops
- * descending once a game is found.
+ * descending once a game is found. A folder with an exe that no rule recognises is kept apart ({@link Found#unsure}):
+ * "Thêm game" lists it under its own heading, so a game of an engine the app does not know is not missed in silence.
  * Pure Java (JVM-testable); the Android roots are chosen in {@link AgvnGameImporter}.
  */
 public final class AgvnGameScanner {
@@ -44,8 +46,22 @@ public final class AgvnGameScanner {
     static final int MAX_VISITED = 5000;
     /** Folders that hold nothing but one folder ("NINJA DISGRACE/Shinobi/Shinobi.exe") passed at the depth limit. */
     static final int MAX_WRAPPERS = 2;
+    /** Files a download leaves beside an installer, which are no game's data. */
+    static final Pattern ARCHIVE = Pattern.compile("\\.(zip|rar|7z|apk|xapk|tar|gz|iso|txt|url|lnk|ini|pdf|html?)$");
 
     private AgvnGameScanner() {}
+
+    /** What a search found. */
+    public static final class Found {
+        public final List<File> games = new ArrayList<>();
+        /**
+         * Folders with an exe that may be a game of an engine no rule knows: no profile, no engine, no DLL beside the
+         * exe (SRPG Studio's game.exe before the app knew it, 05/11/2026), its exe no installer, launcher or tool, and
+         * something of the game beside it. Not the search's own folders (Download, AGVN, Games), nor a folder above a
+         * game.
+         */
+        public final List<File> unsure = new ArrayList<>();
+    }
 
     public static boolean isGameDir(File dir) {
         if (new File(dir, AgvnProfile.FILE_NAME).isFile()) return true;
@@ -63,17 +79,43 @@ public final class AgvnGameScanner {
         return false;
     }
 
+    /** A folder of an unknown engine whose exe may start a game ({@link Found#unsure}). */
+    static boolean unsure(File dir) {
+        String[] names = dir.list();
+        if (names == null) return false;
+        if (Arrays.stream(names).noneMatch(n -> n.toLowerCase(Locale.ROOT).endsWith(".exe"))) return false;
+        if (new File(dir, AgvnProfile.FILE_NAME).isFile()) return false;
+        if (GameExeResolver.detectEngine(dir) != GameExeResolver.Engine.UNKNOWN) return false;
+        String exe = GameExeResolver.resolveExe(dir, GameExeResolver.Engine.UNKNOWN);
+        if (exe == null || GameExeResolver.isHelper(exe.toLowerCase(Locale.ROOT))) return false;
+        for (String n : names) {
+            String lower = n.toLowerCase(Locale.ROOT);
+            if (!lower.endsWith(".exe") && !ARCHIVE.matcher(lower).find()) return true; // the game's data, a folder
+        }
+        return false;
+    }
+
     public static List<File> scan(List<Root> roots) {
+        return find(roots).games;
+    }
+
+    public static Found find(List<Root> roots) {
         Walk w = new Walk();
+        for (Root root : roots) if (root.dir != null) w.roots.add(canonical(root.dir));
         for (Root root : roots) {
             if (root.dir != null && root.dir.isDirectory()) walk(root.dir, root.depth, w, !root.includeSelf, 0);
         }
-        return w.games;
+        for (File game : w.found.games) {
+            String inside = canonical(game) + File.separator;
+            w.found.unsure.removeIf(dir -> inside.startsWith(canonical(dir) + File.separator));
+        }
+        return w.found;
     }
 
     /** Scan state: a folder reached again from a root with a bigger depth budget is searched again. */
     private static final class Walk {
-        final List<File> games = new ArrayList<>();
+        final Found found = new Found();
+        final Set<String> roots = new HashSet<>();
         final Map<String, Integer> budget = new HashMap<>();
         final Set<String> checked = new HashSet<>();
         int visited;
@@ -85,10 +127,13 @@ public final class AgvnGameScanner {
         Integer before = w.budget.get(key);
         if (before != null && before >= depthLeft) return;
         w.budget.put(key, depthLeft);
-        if (!isRoot && w.checked.add(key) && isGameDir(dir)) {
-            w.games.add(dir);
-            w.budget.put(key, Integer.MAX_VALUE);
-            return;
+        if (!isRoot && w.checked.add(key)) {
+            if (isGameDir(dir)) {
+                w.found.games.add(dir);
+                w.budget.put(key, Integer.MAX_VALUE);
+                return;
+            }
+            if (!w.roots.contains(key) && unsure(dir)) w.found.unsure.add(dir); // and folders below it are searched
         }
         if (depthLeft <= 0) {
             // a download unpacked into a folder of its own name: the wrapper costs no depth (a few in a row at most)

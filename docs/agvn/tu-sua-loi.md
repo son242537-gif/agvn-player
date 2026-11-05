@@ -3155,3 +3155,39 @@ ngày: ở màn đặt tên, không gõ được chữ nào. Ô trống thì gam
   3. "Gửi nhật ký": có `Player.log` của game; `su-kien.txt` có hai dòng "Bàn phím Android…".
   4. Hồi quy: game có ô chữ của Windows (launcher hỏi tên) vẫn tự mở bàn phím, gõ được, xong thì ẩn; game HTML
      "Chạy nhẹ" và [⌨] của nó không đổi.
+
+## Game SRPG Studio không có trong "Thêm game", và thư mục có .exe mà app chưa nhận ra (bản 0.1.80)
+
+Báo cáo ngày 05/11/2026 (POCO, app 0.1.77): game làm bằng SRPG Studio, chép vào `/sdcard/AGVN/<thư mục>/`, không có
+trong "Chưa thêm", và app không báo gì. Chỉ còn cách "Tự chọn file .exe (nâng cao)", mà không ai biết phải dùng nó.
+
+- **Thư mục SRPG Studio:** `game.exe` (32-bit), `game.ini`, `data.dts`, `runtime.rts`, `environment.evs`, `system.dat`,
+  `Fonts/`, `Graphics/`, `Plugin/`, `Script/`, `Save/`. Thư mục gốc không có DLL nào.
+- **Vì sao:** `AgvnGameScanner.isGameDir` nhận một thư mục engine lạ (`UNKNOWN`) chỉ khi cạnh exe có DLL. Luật này
+  để một trình cài đặt nằm trong `Download` không bị coi là game. SRPG Studio không có trong `detectEngine`, lại không
+  có DLL, nên bị bỏ qua mà không báo.
+- **Sửa:**
+  - **Engine `SRPG_STUDIO`** (`GameExeResolver.detectEngine`, và `tools/agvn/agvn_profile_lib.py`): có `data.dts`, kèm
+    `runtime.rts` hoặc `environment.evs`. Exe là `game.exe`, chạy qua Wine như game Windows.
+    - Nhãn "SRPG Studio"; bộ phím RPG (D-pad, OK, Hủy, Menu; chạm vẫn là chuột); save ở `Save/` cạnh exe (sao lưu save).
+    - Giới hạn FPS lúc mở không dưới 60 (`AgvnFrameLock`): thời gian của game đi theo khung hình như RPG Maker và Wolf
+      RPG, nên dưới 60 FPS cả game chậm theo.
+    - Game SRPG Studio đã thêm trước đây (bằng file .exe hay `agvn-profile.json`, nên lưu là game Windows không rõ
+      engine) nhận engine SRPG Studio lúc mở trên bản này (`AgvnEngineRecheck`), và chỗ save theo nó. Giới hạn FPS
+      không dưới 60 có từ lần mở kế tiếp. Bộ phím đã chọn lúc thêm game thì giữ nguyên.
+  - **Thư mục có .exe mà không luật nào nhận ra (`AgvnGameScanner.Found.unsure`):** "Thêm game" liệt kê chúng ở mục
+    riêng cuối danh sách, "Có file .exe, app chưa nhận ra là game (N)", kèm một dòng giải thích. Mỗi thư mục ghi "Game
+    Windows (chưa rõ engine)". Bấm vào thì thêm như game Windows thường.
+    - Chỉ tính thư mục có exe không phải trình cài, launcher hay công cụ (cùng danh sách tên của `GameExeResolver`), và
+      có thứ của game cạnh exe: một thư mục hay một file không phải exe, file nén, `.txt`, `.ini`, `.url`, `.lnk`,
+      `.pdf`, `.html`.
+    - Không tính chính các thư mục app tìm trong (`Download`, `AGVN`, `Games`), và thư mục có game ở bên trong (game
+      được liệt kê, không phải nó).
+    - Không nới luật nhận game: thư mục chưa nhận ra không lẫn vào "Chưa thêm".
+- **Test:** `AgvnGameScannerTest` (SRPG Studio; thư mục chưa nhận ra, trình cài, exe kèm file nén, thư mục `Download`,
+  thư mục có game bên trong), `test_toolkit.py`.
+- **Thử máy:**
+  1. Game SRPG Studio của báo cáo, không có `agvn-profile.json`: có trong "Chưa thêm", ghi "SRPG Studio · AGVN". Thêm,
+     mở: bộ phím RPG, chơi được bằng phím ảo và chạm.
+  2. Một game C++ tự viết không có DLL: có trong "Có file .exe, app chưa nhận ra là game". Bấm vào: thêm và mở được.
+  3. Hồi quy: một trình cài đặt `setup.exe` trong `Download` không có ở mục nào; các game đã có vẫn ở chỗ cũ.

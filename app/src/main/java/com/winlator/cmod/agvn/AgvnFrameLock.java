@@ -9,18 +9,19 @@ import java.util.List;
 
 /**
  * Engines that run a game's time one step per frame: GameMaker (a step per frame at the game's speed, 60 in most
- * games), Wolf RPG Editor (60) and RPG Maker 2000 to VX Ace on Wine (60, XP 40). Under an FPS limit below that speed
- * the whole game slows with it, it does not get lighter: a GameMaker game (game_get_speed 60, POCO, 24/10/2026) ran at
- * half speed under the 30 FPS start limit, its clocks, walking and timers all at half speed, and nothing said so. Such
- * a game starts with no limit below {@link #FPS}, whatever the phone or the Đồ họa step; the player can still set a
- * lower one in game ("Giới hạn FPS").
+ * games), Wolf RPG Editor (60), RPG Maker 2000 to VX Ace on Wine (60, XP 40) and SRPG Studio (60 or 30). Under an
+ * FPS limit below that speed the whole game slows with it, it does not get lighter: a GameMaker game (game_get_speed
+ * 60, POCO, 24/10/2026) ran at half speed under the 30 FPS start limit, its clocks, walking and timers all at half
+ * speed, and nothing said so. Such a game starts with no limit below {@link #FPS}, whatever the phone or the Đồ họa
+ * step; the player can still set a lower one in game ("Giới hạn FPS").
  */
 public final class AgvnFrameLock {
     static final int FPS = 60;
     /** Shortcut extra "1": a game added before this rule had its start limit raised once ({@link #upgrade}). */
     static final String EXTRA_RAISED = "agvnFrameLockFps";
     private static final List<String> ENGINES = Arrays.asList(GameExeResolver.Engine.GAMEMAKER.name(),
-            GameExeResolver.Engine.WOLFRPG.name(), GameExeResolver.Engine.RPGMAKER.name());
+            GameExeResolver.Engine.WOLFRPG.name(), GameExeResolver.Engine.RPGMAKER.name(),
+            GameExeResolver.Engine.SRPG_STUDIO.name());
     private static volatile String note;
 
     private AgvnFrameLock() {}

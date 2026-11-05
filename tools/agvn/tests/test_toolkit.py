@@ -218,6 +218,8 @@ class EngineDetectionTest(unittest.TestCase):
         self.assertEqual("Game.exe", resolve_exe(wolf, "WOLFRPG"))
         self.check("WOLFRPG", "wolf2", "Game.exe", "Data/BasicData.wolf")
         self.check("WOLFRPG", "wolf3", "Game.exe", "GuruguruSMF4.dll", "Data/BasicData/")
+        srpg = self.check("SRPG_STUDIO", "srpg", "game.exe", "game.ini", "data.dts", "runtime.rts", "Save/")
+        self.assertEqual("game.exe", resolve_exe(srpg, "SRPG_STUDIO"))
 
     def test_visual_novel_engines(self):
         self.check("KIRIKIRI", "krkr", "game.exe", "data.xp3", "plugin/wuvorbis.dll")
@@ -269,7 +271,8 @@ class EngineDetectionTest(unittest.TestCase):
         self.assertEqual(("pc", "vn", "rpg", "2d", "action", "mouse"), CONTROLS)
         for engine, kind in (("RENPY", "vn"), ("KIRIKIRI", "vn"), ("TYRANO", "vn"), ("SIGLUS", "vn"), ("NSCRIPTER", "vn"),
                              ("RPGMAKER", "rpg"), ("RPGMAKER_MV", "rpg"), ("WOLFRPG", "rpg"), ("GAMEMAKER", "2d"),
-                             ("GODOT", "2d"), ("UNREAL", "pc"), ("UNITY", "pc"), ("UNKNOWN", "pc")):
+                             ("SRPG_STUDIO", "rpg"), ("GODOT", "2d"), ("UNREAL", "pc"), ("UNITY", "pc"),
+                             ("UNKNOWN", "pc")):
             self.assertEqual(kind, controls_for(engine), engine)
         self.assertEqual("action", controls_for("RENPY", {"controls": "action"}))
         game = self.game("g", "game.exe", "data.xp3")

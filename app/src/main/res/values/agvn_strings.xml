@@ -271,9 +271,12 @@
     <string name="agvn_add_back">Quay lại</string>
     <string name="agvn_add_section_new">Chưa thêm (%1$d)</string>
     <string name="agvn_add_section_added">Đã có trong thư viện (%1$d)</string>
+    <string name="agvn_add_section_unsure">Có file .exe, app chưa nhận ra là game (%1$d)</string>
+    <string name="agvn_add_unsure_hint">App không biết engine của những thư mục này. Bấm vào thư mục nếu đúng là game: app chạy nó như game Windows.</string>
     <string name="agvn_add_added">Đã có trong thư viện</string>
     <string name="agvn_add_profile_badge">Cấu hình AGVN</string>
     <string name="agvn_add_engine_unknown">Game Windows</string>
+    <string name="agvn_add_engine_unsure">Game Windows (chưa rõ engine)</string>
     <string name="agvn_add_sd_card">Thẻ nhớ</string>
     <string name="agvn_add_empty_title">Chưa tìm thấy game nào</string>
     <string name="agvn_add_empty_body">Chép nguyên thư mục game (đã giải nén, có file .exe) từ máy tính vào Bộ nhớ trong/AGVN hoặc Download, rồi bấm \"Tìm lại\". Nếu game nằm chỗ khác, bấm \"Chọn thư mục khác\".</string>

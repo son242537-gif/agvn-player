@@ -24,7 +24,8 @@ HELPER_PARTS = ("launcher", "setup", "config", "crash", "report", "update", "pat
 # On-screen controls layouts (AgvnLayouts.java): profile "controls" value -> bundled layout; order = ids 9000..9005.
 CONTROLS = ("pc", "vn", "rpg", "2d", "action", "mouse")
 _ENGINE_CONTROLS = {"RENPY": "vn", "KIRIKIRI": "vn", "TYRANO": "vn", "SIGLUS": "vn", "NSCRIPTER": "vn",
-                    "RPGMAKER": "rpg", "RPGMAKER_MV": "rpg", "WOLFRPG": "rpg", "GAMEMAKER": "2d", "GODOT": "2d"}
+                    "RPGMAKER": "rpg", "RPGMAKER_MV": "rpg", "WOLFRPG": "rpg", "SRPG_STUDIO": "rpg", "GAMEMAKER": "2d",
+                    "GODOT": "2d"}
 
 
 class ProfileError(Exception):
@@ -128,6 +129,9 @@ def detect_engine(game_dir):
         return "RPGMAKER"
     if _any_file(game_dir, "", ".wolf") or _any_file(sub("data"), "", ".wolf") or _is_file(sub("gurugurusmf4.dll")):
         return "WOLFRPG"
+    # SRPG Studio: its data and runtime packs beside game.exe, and no DLL
+    if _is_file(sub("data.dts")) and (_is_file(sub("runtime.rts")) or _is_file(sub("environment.evs"))):
+        return "SRPG_STUDIO"
     # a stray .xp3 or .nsa in an Electron or NW.js game is no KiriKiri or NScripter one
     chromium = any(_is_file(sub(*rel)) for rel in (("chrome_100_percent.pak",), ("v8_context_snapshot.bin",),
                                                    ("package.nw",), ("resources", "app.asar"),

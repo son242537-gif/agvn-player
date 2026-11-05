@@ -34,6 +34,19 @@ public class AgvnEngineRecheckTest {
     }
 
     @Test
+    public void anSrpgStudioGameAddedAsAWindowsGameGetsItsEngine() throws Exception {
+        // report of 05/11/2026: added with agvn-profile.json before the app knew SRPG Studio
+        File srpg = tmp.newFolder("srpg");
+        for (String n : new String[]{"game.exe", "data.dts", "runtime.rts", "agvn-profile.json"}) {
+            touch(new File(srpg, n));
+        }
+        assertEquals("SRPG_STUDIO", AgvnEngineRecheck.engineNow("UNKNOWN", srpg));
+        assertEquals("SRPG_STUDIO", AgvnEngineRecheck.engineNow("", srpg));
+        assertNull("its engine now", AgvnEngineRecheck.engineNow("SRPG_STUDIO", srpg));
+        assertNull("an engine of its own stays", AgvnEngineRecheck.engineNow("UNITY", srpg));
+    }
+
+    @Test
     public void aRealKiriKiriGameKeepsItsEngine() throws Exception {
         File krkr = tmp.newFolder("krkr");
         touch(new File(krkr, "game.exe"));

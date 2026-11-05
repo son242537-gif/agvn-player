@@ -119,4 +119,50 @@ public class AgvnGameScannerTest {
         for (File g : games) names.append(g.getName()).append('|');
         assertEquals("Ace Viet hoa|MV Game|Tyrano Game|", names.toString());
     }
+
+    @Test
+    public void srpgStudioIsAGameWithoutAnyDll() throws Exception {
+        // report of 05/11/2026: an SRPG Studio folder has no DLL, and "Thêm game" left it out without a word
+        File game = tmp.newFolder("srpg");
+        for (String n : new String[]{"game.exe", "game.ini", "data.dts", "runtime.rts", "environment.evs", "system.dat",
+                "Plugin/a.js", "Save/save01.sav"}) touch(new File(game, n));
+        GameExeResolver.Engine srpg = GameExeResolver.Engine.SRPG_STUDIO;
+        assertEquals(srpg, GameExeResolver.detectEngine(game));
+        assertTrue(AgvnGameScanner.isGameDir(game));
+        assertEquals("game.exe", GameExeResolver.resolveExe(game, srpg));
+        assertEquals(AgvnLayouts.RPG, AgvnLayouts.kindFor(srpg));
+        assertTrue("its time runs per frame", AgvnFrameLock.frameLocked(srpg.name()));
+        assertEquals(new File(game, "Save"), AgvnSaveLocations.inGameFolder(game, srpg.name()).get(0).dir);
+    }
+
+    @Test
+    public void aFolderWithAnExeNoRuleKnowsIsListedApart() throws Exception {
+        File sd = tmp.newFolder("sd-unsure");
+        touch(new File(sd, "AGVN/Plain Game/Game.exe"));            // an engine of its own: no DLL beside the exe
+        touch(new File(sd, "AGVN/Plain Game/assets/level1.bin"));
+        touch(new File(sd, "AGVN/Unity Game/Game.exe"));
+        touch(new File(sd, "AGVN/Unity Game/UnityPlayer.dll"));
+        touch(new File(sd, "AGVN/Setup Only/setup.exe"));           // an installer
+        touch(new File(sd, "AGVN/Setup Only/data.bin"));
+        touch(new File(sd, "AGVN/Zip/Game.exe"));                   // an exe and archives only
+        touch(new File(sd, "AGVN/Zip/Game.zip"));
+        touch(new File(sd, "AGVN/Pack/Menu.exe"));                  // above a game: the game is listed, not it
+        touch(new File(sd, "AGVN/Pack/readme.dat"));
+        touch(new File(sd, "AGVN/Pack/Inner/Game.exe"));
+        touch(new File(sd, "AGVN/Pack/Inner/UnityPlayer.dll"));
+        touch(new File(sd, "Download/game.exe"));                   // the search's own folder
+        touch(new File(sd, "Download/video.mp4"));
+        AgvnGameScanner.Found found = AgvnGameScanner.find(Arrays.asList(
+                new AgvnGameScanner.Root(new File(sd, "AGVN"), 3),
+                new AgvnGameScanner.Root(new File(sd, "Download"), 2),
+                new AgvnGameScanner.Root(sd, 1)));
+        assertEquals("Inner|Unity Game|", names(found.games));
+        assertEquals("Plain Game|", names(found.unsure));
+    }
+
+    private static String names(List<File> dirs) {
+        StringBuilder names = new StringBuilder();
+        for (File d : dirs) names.append(d.getName()).append('|');
+        return names.toString();
+    }
 }

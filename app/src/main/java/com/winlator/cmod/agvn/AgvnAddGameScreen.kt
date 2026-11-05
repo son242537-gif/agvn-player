@@ -114,8 +114,9 @@ private fun GameList(visible: List<AgvnImportEntry>, query: String, icons: HashM
         Message(stringResource(R.string.agvn_add_no_match, query.trim()))
         return
     }
-    val fresh = visible.filter { it.existing == null }
+    val fresh = visible.filter { it.existing == null && !it.unsure }
     val added = visible.filter { it.existing != null }
+    val unsure = visible.filter { it.existing == null && it.unsure }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         if (fresh.isNotEmpty()) {
             item(key = "h-new") { SectionHeader(stringResource(R.string.agvn_add_section_new, fresh.size)) }
@@ -124,6 +125,20 @@ private fun GameList(visible: List<AgvnImportEntry>, query: String, icons: HashM
         if (added.isNotEmpty()) {
             item(key = "h-added") { SectionHeader(stringResource(R.string.agvn_add_section_added, added.size)) }
             items(added, key = { it.key }) { AgvnAddGameRow(it, icons) { onPick(it) } }
+        }
+        if (unsure.isNotEmpty()) { // an exe no rule recognises: listed, so a game of an unknown engine is not missed
+            item(key = "h-unsure") {
+                Column {
+                    SectionHeader(stringResource(R.string.agvn_add_section_unsure, unsure.size))
+                    Text(
+                        stringResource(R.string.agvn_add_unsure_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 6.dp, bottom = 2.dp)
+                    )
+                }
+            }
+            items(unsure, key = { "u-" + it.key }) { AgvnAddGameRow(it, icons) { onPick(it) } }
         }
     }
 }

@@ -69,7 +69,8 @@ final class AgvnSaveLocations {
         switch (engine) {
             case "RENPY": folder(out, gameDir, "game/saves"); break;
             case "RPGMAKER_MV": folder(out, gameDir, new File(gameDir, "www").isDirectory() ? "www/save" : "save"); break;
-            case "WOLFRPG": folder(out, gameDir, "Save"); break;
+            case "WOLFRPG":
+            case "SRPG_STUDIO": folder(out, gameDir, "Save"); break;
             case "KIRIKIRI":
             case "SIGLUS": folder(out, gameDir, "savedata"); break;
             case "RPGMAKER": out.add(new Location(gameDir, "game", RPGMAKER_SAVES)); break;
