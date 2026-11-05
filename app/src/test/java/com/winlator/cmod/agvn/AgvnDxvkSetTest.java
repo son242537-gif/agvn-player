@@ -49,13 +49,13 @@ public class AgvnDxvkSetTest {
         assertEquals("wine i386-windows d3d10", read(new File(windows, "syswow64/d3d10.dll")));
         assertEquals("wine i386-windows d3d10_1", read(new File(windows, "syswow64/d3d10_1.dll")));
         assertEquals("wine aarch64-windows d3d10_1", read(new File(windows, "system32/d3d10_1.dll")));
-        assertEquals(Collections.singletonList("syswow64/d3d10.dll"), AgvnDxvkSet.kept(back, windows));
+        assertEquals(Collections.singletonList("syswow64/d3d10.dll"), AgvnDxvkSet.kept(back));
 
         assertTrue("nothing left over the second time", AgvnDxvkSet.putBack(windows, arm, x86).isEmpty());
 
         // DXVK 1.10.3, unpacked next, puts its own back: nothing to note
         write(windows, "syswow64/d3d10.dll", "dxvk 1.10.3 d3d10, imports D3D10CoreCreateDevice@20");
-        assertTrue(AgvnDxvkSet.kept(back, windows).isEmpty());
+        assertTrue(AgvnDxvkSet.kept(back).isEmpty());
     }
 
     @Test
@@ -68,7 +68,7 @@ public class AgvnDxvkSetTest {
 
         List<File[]> back = AgvnDxvkSet.putBack(windows, new File(lib, "x86_64-windows"),
                 new File(lib, "i386-windows"));
-        assertEquals(Collections.singletonList("system32/d3d10.dll"), AgvnDxvkSet.kept(back, windows));
+        assertEquals(Collections.singletonList("system32/d3d10.dll"), AgvnDxvkSet.kept(back));
         assertEquals("no Wine copy to put back", "dxvk 1.10.3 32-bit", read(new File(windows, "syswow64/d3d10.dll")));
     }
 
@@ -80,11 +80,11 @@ public class AgvnDxvkSetTest {
         write(windows, "syswow64/d3d10.dll", "dxvk 1.10.3 d3d10");
 
         AgvnDxvkSet.putWineOwnBack(windows, wine.getPath(), true);
-        AgvnDxvkSet.noteKept(windows); // DXVK 2.3.1 unpacked: no d3d10.dll of its own
+        AgvnDxvkSet.noteKept(); // DXVK 2.3.1 unpacked: no d3d10.dll of its own
         String note = AgvnDxvkSet.takeNote();
         assertTrue(note, note.startsWith("Bộ DXVK: syswow64/d3d10.dll của bản DXVK trước còn lại"));
         assertNull("once", AgvnDxvkSet.takeNote());
-        AgvnDxvkSet.noteKept(windows);
+        AgvnDxvkSet.noteKept();
         assertNull("a set unpacked again has nothing to note", AgvnDxvkSet.takeNote());
     }
 }

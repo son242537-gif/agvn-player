@@ -1155,8 +1155,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (!dxwrapper.equals(container.getExtra("dxwrapper")) || com.winlator.cmod.agvn.AgvnDxvkSet.stale(container)) {
             extractDXWrapperFiles(dxwrapper);
             container.putExtra("dxwrapper", dxwrapper);
-            com.winlator.cmod.agvn.AgvnDxvkSet.unpacked(container, // AGVN
-                    new File(imageFs.getRootDir(), ImageFs.WINEPREFIX + "/drive_c/windows"));
+            com.winlator.cmod.agvn.AgvnDxvkSet.unpacked(container); // AGVN
             containerDataChanged = true;
         }
 

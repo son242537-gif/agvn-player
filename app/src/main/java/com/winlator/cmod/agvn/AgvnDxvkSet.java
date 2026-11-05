@@ -36,13 +36,13 @@ public final class AgvnDxvkSet {
     }
 
     /** After a set is unpacked: the container is marked, and the files the set did not put its own over are noted. */
-    public static void unpacked(Container container, File windowsDir) {
+    public static void unpacked(Container container) {
         container.putExtra(EXTRA, DONE);
-        noteKept(windowsDir);
+        noteKept();
     }
 
-    static synchronized void noteKept(File windowsDir) {
-        List<String> kept = kept(replaced, windowsDir);
+    static synchronized void noteKept() {
+        List<String> kept = kept(replaced);
         replaced.clear();
         if (!kept.isEmpty()) {
             note = "Bộ DXVK: " + String.join(", ", kept) + " của bản DXVK trước còn lại, đã thay bằng bản của Wine"
@@ -72,17 +72,15 @@ public final class AgvnDxvkSet {
     }
 
     /** Of {@code pairs}, the ones still Wine's copy ("syswow64/d3d10.dll"): the new set had none of its own. */
-    static List<String> kept(List<File[]> pairs, File windowsDir) {
+    static List<String> kept(List<File[]> pairs) {
         List<String> kept = new ArrayList<>();
-        String prefix = windowsDir.getPath() + File.separator;
         for (File[] pair : pairs) {
             try {
                 if (!same(pair[0], pair[1])) continue;
             } catch (IOException e) {
                 continue;
             }
-            String path = pair[1].getPath();
-            kept.add(path.startsWith(prefix) ? path.substring(prefix.length()) : path);
+            kept.add(pair[1].getParentFile().getName() + "/" + pair[1].getName()); // "/" on a PC's tests too
         }
         return kept;
     }
