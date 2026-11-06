@@ -164,6 +164,19 @@ public final class AgvnHtmlFiles {
                 || mimeType.equals("image/svg+xml");
     }
 
+    /**
+     * A HEAD for URL path {@code urlPath}, which html-compat.js sends for fs.existsSync: 200 when the game has the file
+     * (its other format of a pair, or its encrypted form, included), else 404. Never the empty picture a GET of a
+     * missing .png gets: a mod that used its own picture when mods/X/img/a.png existed took every picture from its
+     * folder, all 1×1, and the screen went black with no error (RPG Maker MV, 0.1.77, 06/11/2026).
+     */
+    public static WebResourceResponse head(File root, String urlPath) {
+        File file = fileFor(root, urlPath);
+        boolean there = file != null || AgvnHtmlStandIn.plainFor(root, urlPath, null) != null;
+        return new WebResourceResponse(there ? mimeType(urlPath == null ? "" : urlPath) : "text/plain", null,
+                there ? 200 : 404, there ? "OK" : "Not Found", CORS, empty());
+    }
+
     /** The file for URL path {@code urlPath} ("/img/a%20b.png") under {@code root}, or null. */
     public static File resolve(File root, String urlPath) {
         String path = decode(urlPath == null ? "" : urlPath);

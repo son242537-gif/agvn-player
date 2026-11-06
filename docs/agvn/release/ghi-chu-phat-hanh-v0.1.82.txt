@@ -1,0 +1,7 @@
+AGVN Player v0.1.82 - agvn.io
+
+Sửa lỗi:
+- "Chạy nhẹ": game RPG Maker MV hay game web NW.js có bộ nạp mod (đọc thư mục mods) nay thấy mod của nó, và không còn đen màn vì mất hết ảnh gốc.
+- "Chạy nhẹ": game dùng thư viện Node gói sẵn (như thư viện nhật ký) không còn dừng ở script đầu tiên.
+- "Chạy nhẹ": game RPG Maker MV lỗi lúc nạp script nay hiện lỗi lên màn hình, thay vì đen màn không báo gì.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

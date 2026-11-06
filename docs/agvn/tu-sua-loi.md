@@ -3304,3 +3304,50 @@ Gốc lỗi ở mục trên: `game.exe` cấp cho script UTF-16 thiếu một by
      pad on".
   2. Chơi 10 phút, lưu và tải lại.
   3. Hồi quy: một game Unity và một game RPG Maker vẫn mở như cũ. Nút chuột ảo, bàn phím, thoát game vẫn đúng.
+
+## "Chạy nhẹ": game NW.js dùng Node thật (bộ nạp mod, thư viện nhật ký) đen màn không báo lỗi (bản 0.1.82)
+
+Báo cáo ngày 06/11/2026 (POCO F8 Pro, app 0.1.77): game RPG Maker MV hay game web NW.js có dùng Node thật mở bằng
+"Chạy nhẹ" thì đen màn, không có thông báo lỗi. Người báo vá lớp giả trong game thì chạy được, và đã chỉ ra từng chỗ
+trong mã app.
+
+- **Vì sao (`html-compat.js`, `AgvnHtmlFiles`, `AgvnHtmlActivity`):**
+  1. `fs.existsSync` hỏi bằng `HEAD`, mà app trả `.png` thiếu bằng ảnh trong suốt (200) cho cả `HEAD`. Mod dùng ảnh
+     riêng khi `mods/X/img/a.png` có thì lấy mọi ảnh từ thư mục mod, toàn ảnh 1×1, màn hình gần như đen.
+  2. `fs.readdirSync` (và `readdir`) luôn trả `[]`: bộ nạp mod không thấy mod nào.
+  3. `require('process')` là `{}`: `require('process').mainModule.filename` hỏng, thư viện lùi sang
+     `new Function('…import.meta…')` và báo `SyntaxError: Cannot use 'import.meta' outside a module`.
+  4. Thư viện nhật ký pino gói webpack cần `assert`, `events`, `module`, `stream`, `string_decoder`, `tty`, `url`,
+     `util`, `worker_threads` ngay khi nạp; app chỉ có `fs`, `path`, `os`, `buffer`, `crypto`, `child_process`.
+  5. MV chạy tiếp sau lỗi nạp script, nên khi lỗi làm cảnh đầu không tới, trang đen im lặng.
+  6. `fs.statSync` luôn báo là tệp, kể cả thư mục.
+- **Sửa:**
+  - **`HEAD` (`AgvnHtmlFiles.head`, `AgvnHtmlAsar.head`):** tệp có (kể cả bản định dạng kia của cặp `.m4a`/`.ogg`, hay
+    bản mã hoá) thì 200, thiếu thì 404. Ảnh trong suốt chỉ dành cho `GET`.
+  - **`/__agvn/fs/list/<đường dẫn>` và `/__agvn/fs/stat/<đường dẫn>` (`AgvnHtmlFs`):** app trả JSON danh sách thư mục
+    (tên, là thư mục hay không) và thông tin tệp (thư mục hay tệp, cỡ, giờ sửa), tìm không phân biệt hoa thường như
+    Windows, không bao giờ ra ngoài thư mục game. Game đóng gói `app.asar` cũng có (`AgvnAsar.children`). Không có thì
+    404.
+  - **`fs` trong `html-compat.js`:** `readdirSync` (kể cả `withFileTypes`) và `statSync` (kể cả
+    `throwIfNoEntry: false`) dùng hai đường dẫn đó, cộng thêm tệp game đã ghi (localStorage). Thiếu thì ném `ENOENT`
+    như Node. `existsSync` đúng cả với thư mục. Thêm `openSync`, `writeSync` (1 và 2 ra console), `closeSync`,
+    `fsyncSync`.
+  - **`require('process')`** (cả `node:process`) là chính `process`.
+  - **Mô-đun Node mới (`html-node-modules.js`, nạp trước `html-compat.js`):** `events` (EventEmitter thật), `stream`
+    (Readable, Writable, Transform, PassThrough; Writable mặc định ghi ra console), `util` (`inherits`, `format`,
+    `promisify`, …), `assert`, `url`, `string_decoder`, `tty` (không có terminal), `worker_threads` (tạo luồng thì báo
+    lỗi bắt được), `module` (`createRequire`).
+  - **MV đen màn:** 15 giây sau sự kiện `load`, nếu `SceneManager._scene` vẫn chưa có mà đã có lỗi nạp script hay mô-đun
+    thiếu, app hiện lỗi đó trên màn hình lỗi của game (`Graphics.printError`) và giữ cho "Tự sửa lỗi". Không có lỗi nào
+    thì không hiện gì, nên game nạp chậm không bị báo nhầm.
+- **Mục 7 của báo cáo (phím ảo che danh sách lệnh):** "Chạy nhẹ" đã có nút 👁 trên thanh trên cùng để ẩn hay hiện toàn
+  bộ phím ảo, nhớ theo từng game; ✎ dời hay xoá từng phím.
+- **Chưa thử:** thư viện pino thật với các mô-đun mới (người báo cũng chưa thử: bản vá của họ thay hẳn thư viện). Nếu nó
+  vẫn dừng, "Gửi nhật ký" sẽ có dòng "[AGVN] app chưa hỗ trợ mô-đun Node: …", hay lỗi đầu tiên hiện trên màn hình.
+- **Test:** `AgvnHtmlFsTest`. Lớp giả JS chạy thử bằng Node với một thư mục game thật: `existsSync` của ảnh thiếu là
+  `false`, `readdirSync` đủ danh sách kể cả tệp game đã ghi, `statSync` phân biệt thư mục, các mô-đun mới chạy đúng.
+- **Thử máy:**
+  1. Game của báo cáo, gỡ lớp vá (trả `index.html` về bản gốc, xoá các tệp `agvn_poco*`), mở bằng "Chạy nhẹ": vào màn
+     tiêu đề đủ ảnh, có nhạc sau lần chạm đầu, mod được nạp.
+  2. Cố ý làm hỏng một script nạp đầu của một game MV: sau khoảng 15 giây màn hình hiện lỗi, không đen im lặng.
+  3. Hồi quy: một game MV và một game MZ thường (không mod) vẫn chạy, lưu và tải được; game Electron "Chạy nhẹ" vẫn mở.

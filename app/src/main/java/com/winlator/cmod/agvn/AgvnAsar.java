@@ -97,6 +97,30 @@ final class AgvnAsar {
         return f != null ? (String) f[0] : null;
     }
 
+    /**
+     * The names in folder {@code path} of the archive ("" for its top), as they are spelled there, found ignoring case
+     * and sorted so;
+     * {@code dirs} gets those that are folders. Null when the archive has no such folder.
+     */
+    java.util.List<String> children(String path, java.util.Set<String> dirs) {
+        String prefix = path.replace('\\', '/').replaceAll("^/+|/+$", "").toLowerCase(Locale.ROOT);
+        if (!prefix.isEmpty()) prefix += "/";
+        java.util.LinkedHashSet<String> names = new java.util.LinkedHashSet<>();
+        for (Map.Entry<String, Object[]> e : files.entrySet()) {
+            if (!e.getKey().startsWith(prefix)) continue;
+            String real = (String) e.getValue()[0];
+            String rest = real.substring(prefix.length());
+            int slash = rest.indexOf('/');
+            String name = slash < 0 ? rest : rest.substring(0, slash);
+            names.add(name);
+            if (slash >= 0) dirs.add(name);
+        }
+        if (names.isEmpty() && !prefix.isEmpty()) return null;
+        java.util.List<String> sorted = new java.util.ArrayList<>(names);
+        sorted.sort(String.CASE_INSENSITIVE_ORDER);
+        return sorted;
+    }
+
     long size(String realPath) {
         return (long) files.get(realPath.toLowerCase(Locale.ROOT))[2];
     }

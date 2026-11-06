@@ -147,10 +147,14 @@ public class AgvnHtmlActivity extends AppCompatActivity {
                 if (local == null) return AgvnHtmlFiles.blocked();
                 return AgvnHtmlFiles.serve(root, entry, local, compatJs, standIns, missing);
             }
-            // a HEAD only asks whether a file is there (fs.existsSync of html-compat.js): its absence is no problem
-            boolean asked = "HEAD".equalsIgnoreCase(request.getMethod());
-            if (asar != null) return asar.serve(url.getEncodedPath(), entry, compatJs, asked ? null : missing);
-            return AgvnHtmlFiles.serve(root, entry, url.getEncodedPath(), compatJs, asked ? null : standIns, asked ? null : missing);
+            String path = url.getEncodedPath();
+            if (AgvnHtmlFs.handles(path)) return asar != null ? asar.fs(path) : AgvnHtmlFs.serve(root, path); // readdirSync, statSync
+            // a HEAD only asks whether a file is there (fs.existsSync of html-compat.js): a missing one is 404, no
+            // stand-in, and its absence is no problem to report
+            if ("HEAD".equalsIgnoreCase(request.getMethod()))
+                return asar != null ? asar.head(path) : AgvnHtmlFiles.head(root, path);
+            if (asar != null) return asar.serve(path, entry, compatJs, missing);
+            return AgvnHtmlFiles.serve(root, entry, path, compatJs, standIns, missing);
         }
 
         @Override

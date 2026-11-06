@@ -37,6 +37,13 @@
  *     the console names it and so does the error that stops the game (5); so is an error in a script as it loads.
  * 14. An Electron game's page (the app sets __agvnElectron first, AgvnElectronGame) gets require('electron'),
  *     greenworks and steamworks.js from html-electron.js, loaded before this.
+ * 15. fs as a game scanning its folder needs it (an RPG Maker MV game's mod loader, 0.1.77, 06/11/2026): existsSync is
+ *     false for a missing file (the app answers a HEAD with 404, never with its empty picture) and true for a folder,
+ *     readdirSync lists a folder and statSync tells it from a file (the app's /__agvn/fs/, AgvnHtmlFs), each with the
+ *     files the game wrote (localStorage); require('process') is `process`, and events, stream, util, assert, url, tty,
+ *     string_decoder, worker_threads and module come from html-node-modules.js, loaded before this. MV, which goes on
+ *     after an error in a script as it loads, shows that error once its first scene has not come 15 s after the page
+ *     loaded, as MZ does.
  */
 (function () {
     'use strict';
@@ -98,8 +105,43 @@
         }
     };
 
+    // 15: a folder's entries or a file's facts from the app, null when the game folder has no such path
+    function fsInfo(op, p) {
+        var xhr = httpGet('/__agvn/fs/' + op + norm(p));
+        try { return xhr ? JSON.parse(xhr.responseText) : null; } catch (e) { return null; }
+    }
+
+    function noEntry(p) { var e = new Error("ENOENT: no such file or directory, '" + p + "'"); e.code = 'ENOENT'; return e; }
+
+    // the names the game wrote (localStorage) in folder p, by name: true for a folder
+    function storedIn(p) {
+        var dir = FS_PREFIX + (norm(p) === '/' ? '' : norm(p)) + '/', out = {};
+        try {
+            for (var i = 0; i < localStorage.length; i++) {
+                var key = localStorage.key(i);
+                if (key && key.indexOf(dir) === 0) {
+                    var rest = key.slice(dir.length), cut = rest.indexOf('/');
+                    out[cut < 0 ? rest : rest.slice(0, cut)] = cut >= 0;
+                }
+            }
+        } catch (e) { /* no storage */ }
+        return out;
+    }
+
+    function stats(dir, size, mtime) {
+        var when = new Date(mtime || Date.now());
+        return { isFile: function () { return !dir; }, isDirectory: function () { return dir; },
+            isSymbolicLink: function () { return false; }, size: size || 0, mtime: when, mtimeMs: when.getTime(),
+            ctime: when, birthtime: when };
+    }
+
+    var fds = {}, nextFd = 3;
+
     var fs = {
-        existsSync: function (p) { return stored(p) !== null || httpGet(p, 'HEAD') !== null; },
+        existsSync: function (p) {
+            return stored(p) !== null || httpGet(p, 'HEAD') !== null || fsInfo('stat', p) !== null
+                || Object.keys(storedIn(p)).length > 0;
+        },
         readFileSync: function (p) {
             var s = stored(p);
             if (s !== null) return s;
@@ -112,10 +154,37 @@
         },
         unlinkSync: function (p) { try { localStorage.removeItem(FS_PREFIX + norm(p)); } catch (e) { /* ignore */ } },
         mkdirSync: function () {},
-        readdirSync: function () { return []; },
-        statSync: function (p) {
-            if (!fs.existsSync(p)) { var e = new Error('ENOENT: ' + p); e.code = 'ENOENT'; throw e; }
-            return { isFile: function () { return true; }, isDirectory: function () { return false; }, size: 0, mtime: new Date() };
+        readdirSync: function (p, opts) {
+            var listed = fsInfo('list', p), written = storedIn(p), types = {};
+            if (!listed && !Object.keys(written).length) throw noEntry(p);
+            (listed || []).forEach(function (e) { types[e.name] = e.dir; });
+            Object.keys(written).forEach(function (n) { if (!(n in types)) types[n] = written[n]; });
+            return Object.keys(types).sort().map(function (n) {
+                if (!opts || !opts.withFileTypes) return n;
+                return { name: n, isFile: function () { return !types[n]; }, isDirectory: function () { return types[n]; },
+                    isSymbolicLink: function () { return false; } };
+            });
+        },
+        statSync: function (p, opts) {
+            var s = stored(p);
+            if (s !== null) return stats(false, s.length);
+            var info = fsInfo('stat', p);
+            if (info) return stats(info.dir, info.size, info.mtime);
+            if (httpGet(p, 'HEAD') !== null) return stats(false, 0); // its other format, or its encrypted form
+            if (Object.keys(storedIn(p)).length) return stats(true, 0);
+            if (opts && opts.throwIfNoEntry === false) return undefined;
+            throw noEntry(p);
+        },
+        // a file opened to write, as a logger does; 1 and 2 are the console
+        openSync: function (p) { fds[nextFd] = norm(p); return nextFd++; },
+        closeSync: function (fd) { delete fds[fd]; },
+        fsyncSync: function () {},
+        writeSync: function (fd, data) {
+            var text = String(data);
+            if (fd === 2) console.error(text.replace(/\n$/, ''));
+            else if (fd === 1) console.log(text.replace(/\n$/, ''));
+            else if (fds[fd]) fs.appendFileSync(fds[fd], text);
+            return text.length;
         },
         lstatSync: function (p) { return fs.statSync(p); },
         accessSync: function (p) { fs.statSync(p); },
@@ -132,7 +201,7 @@
         rmdirSync: function () {}
     };
     ['readFile', 'writeFile', 'unlink', 'mkdir', 'readdir', 'stat', 'lstat', 'access', 'copyFile', 'rename', 'appendFile',
-        'rm', 'rmdir'].forEach(function (name) {
+        'rm', 'rmdir', 'open', 'close', 'fsync', 'write'].forEach(function (name) {
         fs[name] = function () {
             var args = Array.prototype.slice.call(arguments), cb = args.pop();
             try { var r = fs[name + 'Sync'].apply(fs, args); if (typeof cb === 'function') cb(null, r); } catch (e) { if (typeof cb === 'function') cb(e); }
@@ -155,6 +224,8 @@
     // 13: Node's Buffer and crypto (html-node-*.js, loaded first), and child_process for a plugin that opens a page with
     // it: an error it can catch, since a phone runs no program
     if (window.__agvnNodeCrypto) modules.crypto = window.__agvnNodeCrypto;
+    var nodeModules = window.__agvnNodeModules || {}; // 15: html-node-modules.js
+    Object.keys(nodeModules).forEach(function (name) { if (!modules[name]) modules[name] = nodeModules[name]; });
     if (window.Buffer) modules.buffer = { Buffer: window.Buffer };
     var noProgram = function () { throw new Error('child_process không có trên điện thoại (AGVN Player)'); };
     modules.child_process = { execSync: noProgram, spawnSync: noProgram, execFileSync: noProgram,
@@ -189,6 +260,7 @@
         proc.stdout = proc.stderr = { write: function (s) { console.log(String(s)); return true; } };
         window.process = proc;
     }
+    modules.process = window.process; // 15: require('process').mainModule.filename, as `process` itself
 
     // --- 8: `nw` for an NW.js page game, whose scripts may use it without require('nw.gui'); package.json read on demand
     if (window.__agvnNwjs && typeof window.nw === 'undefined') {
@@ -590,6 +662,17 @@
             var shown = printer ? String(printer.innerText || printer.textContent || '').replace(/\s+/g, ' ').trim() : '';
             if (shown && !(window.SceneManager && SceneManager._scene)) keepFatal(loadError || shown);
         }, 0);
+        // 15: MV goes on after an error in a script as it loads; when that error kept its first scene from coming, the
+        // page stayed black with nothing said. Shown on its own error screen, and kept for "Tự sửa lỗi" (5)
+        setTimeout(function () {
+            var missing = window.__agvnMissingModules || [];
+            if (!window.SceneManager || SceneManager._scene || (!loadError && !missing.length)) return;
+            var text = (loadError || 'Game chưa vào được cảnh đầu')
+                + (missing.length ? ' · app chưa hỗ trợ mô-đun Node: ' + missing.join(', ') : '');
+            keepFatal(text);
+            console.error('[AGVN] game chưa vào cảnh đầu sau 15 giây: ' + text);
+            if (window.Graphics && typeof Graphics.printError === 'function') Graphics.printError('Lỗi khi nạp game', text);
+        }, 15000);
     });
 
     // --- 10: the engine's touch handler as soon as rpg_core / rmmz_core has run (a script's load passes document

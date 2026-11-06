@@ -65,6 +65,25 @@ final class AgvnHtmlAsar {
         return f != null && f.isFile() ? f : null;
     }
 
+    /** As {@link AgvnHtmlFiles#head}: 200 when resources/patch/ or the archive has the file, else 404. */
+    WebResourceResponse head(String urlPath) {
+        return patched(urlPath) != null || find(urlPath) != null ? AgvnHtmlFs.json("") : AgvnHtmlFs.missing();
+    }
+
+    /** As {@link AgvnHtmlFs#serve}, from the page's folder in the archive. */
+    WebResourceResponse fs(String urlPath) {
+        String op = AgvnHtmlFs.op(urlPath), path = AgvnHtmlFiles.decode(AgvnHtmlFs.path(urlPath));
+        String inner = (root + path.replaceAll("^/+", "")).replaceAll("/+$", "");
+        if (op.equals("stat")) {
+            String real = asar.find(inner);
+            if (real != null) return AgvnHtmlFs.json(AgvnHtmlFs.stat(false, asar.size(real), asar.file.lastModified()));
+        }
+        java.util.Set<String> dirs = new java.util.HashSet<>();
+        java.util.List<String> names = op.isEmpty() ? null : asar.children(inner, dirs);
+        if (names == null) return AgvnHtmlFs.missing();
+        return AgvnHtmlFs.json(op.equals("stat") ? AgvnHtmlFs.stat(true, 0, asar.file.lastModified()) : AgvnHtmlFs.list(names, dirs));
+    }
+
     /** As {@link AgvnHtmlFiles#serve}: the file, the entry page with {@code compatJs}, or 404 told to {@code missing}. */
     WebResourceResponse serve(String urlPath, String entry, String compatJs, Consumer<String> missing) {
         if (AgvnHtmlFiles.COMPAT_PATH.equals(urlPath) && compatJs != null) return text("application/javascript", compatJs);
