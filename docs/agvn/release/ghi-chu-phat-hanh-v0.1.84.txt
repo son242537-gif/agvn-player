@@ -4,4 +4,5 @@ Sửa lỗi:
 - "Chạy nhẹ": game RPG Maker MV hành động đánh hoặc bắn bằng chuột phải (QABS) giờ chơi được. Game như vậy có sẵn phím "Chuột phải" trong bộ phím; giữ phím là giữ chuột phải, hướng theo chỗ bạn chạm lần cuối trên màn hình trước khi giữ. Phím chuột phải bạn tự thêm cũng giữ được như vậy.
 - "Chạy nhẹ": plugin đo máy (os.cpus, os.totalmem...) không còn báo lỗi lặp lại.
 - Nhật ký ghi rõ khi một lần mở game là lần "Tự sửa lỗi" đang thử một cách sửa (ví dụ thử "Chạy bằng Windows").
+- "Chạy nhẹ" game RPG Maker XP/VX/VX Ace (như Lona RPG): game ghi được nhật ký lỗi của chính nó khi trong đó có chữ ngoài tiếng Anh, thay vì hiện bảng lỗi "\xE2 from ASCII-8BIT to UTF-8" che mất lỗi thật. "Gửi nhật ký" có thêm các tệp nhật ký mà game ghi trong thư mục của nó.
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

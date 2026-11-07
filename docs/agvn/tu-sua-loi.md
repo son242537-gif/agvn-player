@@ -3418,3 +3418,38 @@ MV chạy bằng "Chạy nhẹ".
      vừa giữ vừa đi bằng phím mũi tên được.
   2. Game của báo cáo: nhật ký trang không còn `os.cpus is not a function`.
   3. Hồi quy: game VN HTML (Tyrano), nút "Menu" vẫn mở menu.
+
+## Lona RPG: nhật ký lỗi của game không ghi được trong mkxp-z (bản 0.1.84)
+
+Ảnh chụp và gói nhật ký ngày 07/11/2026 (vivo V2507A, Mali-G925, app 0.1.82). Lona RPG B.0.10.8.12 chạy bằng "Chạy nhẹ"
+(mkxp-z), có mod LonaBigBooba+Belly.
+
+- **Màn lỗi:** `"\xE2" from ASCII-8BIT to UTF-8` ở `208_Han_Nama_ErrorLog.rb:320` (`write`, `print`, `block in save`).
+  Gọi từ `rescue in run`, dòng 405.
+  - Script ghi nhật ký lỗi của game đang ghi lại một lỗi khác của game, rồi tự hỏng khi ghi. Lỗi gốc vì thế không hiện
+    ra.
+  - logcat và gói nhật ký cũng không có lỗi gốc.
+- **Vì sao:** mkxp-z đặt UTF-8 làm bộ mã nội bộ và bên ngoài của Ruby (`binding-mri.cpp`). Ruby khi đó đổi mọi chuỗi
+  ghi ra file sang UTF-8. Một chuỗi byte (`ASCII-8BIT`) có ký tự UTF-8 như "’" (E2 80 99) không đổi được, nên `write`
+  báo lỗi. RGSS3 trên Windows (Ruby 1.9) không có bộ mã nội bộ, ghi thẳng các byte, nên cùng câu lệnh chạy được trên
+  PC.
+  - Đã tái hiện bằng Ruby 3.3 với cùng cài đặt bộ mã: đúng câu lỗi đó.
+- **Sửa (`agvn_text_files.rb`, `AgvnTextFiles::Write`):** chuỗi nào Ruby không đổi mã được khi ghi thì ghi đúng các byte
+  của nó, như Windows. `print`, `puts` và `<<` đi qua `write`, nên đều được.
+  - Chuỗi khác, file nhị phân (`"wb"`) và `Marshal.dump` vẫn như cũ.
+  - File game tự mở với bộ mã riêng (như `"w:Shift_JIS"`) vẫn báo lỗi của chính nó nếu có.
+  - Không đổi bộ mã nội bộ của cả game: việc đọc file của game có thể dựa vào nó.
+- **Lỗi gốc chưa biết.** Bản sửa này cho script ghi nhật ký lỗi chạy hết, nên game sẽ tự hiện lỗi gốc, hoặc ghi nó vào
+  file.
+  - `tim-tep.txt` có nhiều ảnh của mod (`ModScripts/_Mods/LonaBigBooba+Belly/Graphics/...`) game hỏi mà không có. Có
+    thể là cách mod kiểm file, cũng có thể là nguyên nhân.
+- **"Gửi nhật ký" của game "Chạy nhẹ" (`AgvnLiveLogs`):** thêm thư mục `game/`, gồm các file nhật ký mà game ghi cạnh
+  file của nó hoặc trong `logs/` (`AgvnGameDirLogs`), chỉ lấy file ghi từ khi lần chạy gần nhất bắt đầu. Trước đây gói chỉ
+  có file của app.
+- **Test:** `scripts/agvn/mkxp-z/test-agvn-text-files.rb` (Ruby 3.1 trở lên).
+  - Lối ghi của `Han_Nama_ErrorLog`, `puts` nhiều đối số, `<<`, file nhị phân, `Marshal.dump`, file có bộ mã riêng.
+  - Lần chạy không có script hỏng đúng như trên điện thoại.
+- **Thử máy:**
+  1. Lona RPG, làm lại việc lúc nãy: không còn bảng lỗi `\xE2`, mà là lỗi của chính game (hoặc game chạy tiếp). Chụp lại
+     bảng đó và "Gửi nhật ký".
+  2. Hồi quy: lưu và tải game RPG Maker VX Ace "Chạy nhẹ" như cũ.
