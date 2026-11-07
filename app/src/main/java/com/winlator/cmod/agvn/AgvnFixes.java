@@ -36,7 +36,8 @@ final class AgvnFixes {
             "wine-old", "dxvk-back", "render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off", "present-sync",
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "mods-off", "raw-mouse", "ue-wait",
             AgvnExe64.FIX, AgvnExeMain.FIX, AgvnDllProxy.FIX, AgvnLockFixes.ORDER, AgvnLockFixes.ESYNC, AgvnEmulatorNoExec.FIX,
-            AgvnMediaFoundation.FIX, AgvnWine10Fix.ID, AgvnGpuAlloc.FIX, AgvnPresentSync.FIX_NO_WAIT, AgvnMlangFix.FIX);
+            AgvnMediaFoundation.FIX, AgvnWine10Fix.ID, AgvnGpuAlloc.FIX, AgvnPresentSync.FIX_NO_WAIT, AgvnMlangFix.FIX,
+            AgvnRenpyWine.LIGHT, AgvnRenpyWine.ANGLE);
     static final String SYSTEM = "System";
 
     /** A button: its fix id, its words, and what it sets ({@code to}). */
@@ -106,6 +107,9 @@ final class AgvnFixes {
                 return !light && !dir.isEmpty() && AgvnRgssGame.canRun(new File(dir))
                         ? new Fix(id, a.getString(R.string.agvn_fix_rgss_light), AgvnHtmlGame.RUNNER_RGSS) : null;
             }
+            case AgvnRenpyWine.LIGHT: // a Ren'Py 6 or 7 game tried on "Chạy nhẹ" (AgvnRenpyPy2)
+            case AgvnRenpyWine.ANGLE: // Ren'Py through ANGLE for a black game
+                return AgvnRenpyWine.fix(a, s, id);
             case "restore-good": {
                 Map<String, String> now = AgvnGoodConfig.snapshot(s);
                 return AgvnGoodConfig.hasGood(state) && !AgvnGoodConfig.changed(

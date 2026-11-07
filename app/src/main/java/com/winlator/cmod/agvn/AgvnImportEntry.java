@@ -135,9 +135,14 @@ public final class AgvnImportEntry {
                 library.find(dir, variant), variant);
     }
 
-    /** The engine's name; "HTML" for a web game "Chạy nhẹ" runs, NW.js or not, which is no Windows game. */
+    /**
+     * The engine's name; "HTML" for a web game "Chạy nhẹ" runs, NW.js or not, which is no Windows game; for a Ren'Py
+     * 6/7 game, that it runs on Windows.
+     */
     static String engineLabel(Context ctx, GameExeResolver.Engine engine, File dir) {
         if (engine == GameExeResolver.Engine.UNKNOWN && AgvnNwjsGame.index(dir) != null) return "HTML";
+        // a Ren'Py 6/7 game (Python 2) runs in Wine: said before it is added (AgvnRenpyPy2)
+        if (engine == GameExeResolver.Engine.RENPY && AgvnRenpyPy2.canTry(dir)) return ctx.getString(R.string.agvn_add_engine_renpy7);
         return engineLabel(ctx, engine);
     }
 

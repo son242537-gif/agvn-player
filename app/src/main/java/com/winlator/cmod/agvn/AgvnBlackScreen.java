@@ -133,24 +133,28 @@ public final class AgvnBlackScreen {
         boolean follows = window != null && AgvnScreenGrowth.followed(s, window[2], window[3], sw, sh);
         String bigger = AgvnBlackScreenRules.bigger(screen, s.getExtra(AgvnKirikiri.EXTRA_GAME_SIZE),
                 follows ? null : window, refused);
-        boolean sync = bigger == null && AgvnPresentSync.offerable(s);
-        // still black with frame sync on (or nothing else to offer): a game on Proton 10 may want Proton 9 back
         java.util.Properties state = AgvnGoodConfig.load(activity, s);
-        AgvnFixes.Fix wineOld = bigger == null && !sync ? AgvnFixes.wineOld(activity, s, state) : null;
+        // a Ren'Py game black with OpenGL: ANGLE first (AgvnRenpyWine)
+        AgvnFixes.Fix renpy = bigger == null ? AgvnRenpyWine.blackFix(activity, s, state) : null;
+        boolean sync = bigger == null && renpy == null && AgvnPresentSync.offerable(s);
+        // still black with frame sync on (or nothing else to offer): a game on Proton 10 may want Proton 9 back
+        AgvnFixes.Fix wineOld = bigger == null && renpy == null && !sync ? AgvnFixes.wineOld(activity, s, state) : null;
         long seconds = elapsedMs / 1000;
         String frame = window != null ? window[2] + "x" + window[3] : "?";
         AgvnSessionLog.event("Màn hình đen sau " + seconds + " giây, màn hình " + screen + ", khung game " + frame
                 + (refused ? ", Wine từ chối độ phân giải game xin" : "")
                 + (bigger != null ? ": hỏi đổi sang " + bigger
+                : renpy != null ? ": hỏi cho Ren'Py vẽ bằng " + renpy.to
                 : sync ? ": hỏi bật đồng bộ khung hình"
                 : wineOld != null ? ": hỏi chạy bằng Wine cũ (Proton 9)" : ": không hỏi")
-                + (ask || bigger == null && !sync && wineOld == null ? ""
+                + (ask || bigger == null && renpy == null && !sync && wineOld == null ? ""
                 : " (không hiện thanh: game đã chọn \"Để vậy, không hỏi lại\")"));
         Log.i(TAG, "black screen after " + seconds + " s on " + screen + ", window " + frame
                 + (refused ? ", mode refused" : "") + ", offer " + (sync ? "frame sync" : bigger != null ? bigger
-                : wineOld != null ? "Proton 9" : null) + (ask ? "" : ", not asked"));
+                : renpy != null ? renpy.to : wineOld != null ? "Proton 9" : null) + (ask ? "" : ", not asked"));
         if (!ask) return; // "Để vậy, không hỏi lại"
         if (bigger != null) offerScreen(s, bigger, screen, seconds, refused);
+        else if (renpy != null) offerRenpy(s, renpy, seconds);
         else if (sync) offerSync(s, seconds);
         else if (wineOld != null) offerWineOld(s, wineOld, seconds);
     }
@@ -186,6 +190,18 @@ public final class AgvnBlackScreen {
                 + "\n" + activity.getString(R.string.agvn_doctor_lead);
         int[] seen = window;
         show(s, detail, new AgvnWarningBar.Choice(label, () -> AgvnScreenFit.resize(activity, bigger, label, seen)));
+    }
+
+    /** A Ren'Py game black in Wine: ANGLE, as "Tự sửa lỗi" tries it (kept as tried, so it is not asked again). */
+    private void offerRenpy(Shortcut s, AgvnFixes.Fix fix, long seconds) {
+        String detail = activity.getString(R.string.agvn_black_renpy_detail, seconds)
+                + "\n" + activity.getString(R.string.agvn_doctor_lead);
+        show(s, detail, new AgvnWarningBar.Choice(fix.label, () -> {
+            AgvnProblemCatalog.Finding black =
+                    AgvnDoctor.catalog(activity).finding("report-black", java.util.Collections.emptyMap());
+            if (black != null && AgvnRepair.start(activity, s, black, fix))
+                AgvnSlowBar.offerRestart(activity, s, fix.label, activity::agvnExit);
+        }));
     }
 
     /** A DirectX game black with nothing to offer for its screen: what got Support Pregnancy School to show. */

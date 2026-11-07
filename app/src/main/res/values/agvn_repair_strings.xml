@@ -47,5 +47,7 @@
     <string name="agvn_fix_raw_mouse_off">Gửi cú chạm như trước (như các game khác)</string>
     <string name="agvn_fix_exe64">Chạy bản 64-bit của game (%1$s) thay cho bản 32-bit</string>
     <string name="agvn_fix_exe_main">Chạy file game chính (%1$s) thay cho chương trình mở game (.NET)</string>
+    <string name="agvn_fix_renpy_light">Thử \"Chạy nhẹ\" (Ren\'Py 8) cho game Ren\'Py 7; file lưu riêng, chép từ bản Windows</string>
+    <string name="agvn_fix_renpy_angle">Ren\'Py vẽ bằng ANGLE (Direct3D) thay cho OpenGL</string>
     <string name="agvn_fix_gdiplus_text">Sửa lỗi vẽ chữ Việt của .NET (đặt mlang.dll đã vá cạnh file chạy của game)</string>
 </resources>

@@ -4,7 +4,8 @@
 // (RAPT) and SDK from renpy.org, checked against scripts/agvn/pins.txt, and makes from them in build/generated/agvn/renpy:
 //   jniLibs/arm64-v8a/librenpython.so   Python 3.12, Ren'Py's C modules and SDL2, built by Ren'Py
 //   java/org/libsdl, java/org/jnius     the SDL2 and pyjnius Java classes that match that library, unchanged
-//   assets/agvn/renpy8.zip              the engine the app unpacks on the first Ren'Py game: main.py (AGVN),
+//   assets/agvn/renpy8.zip              the engine the app unpacks on the first Ren'Py game: main.py and
+//                                       agvn_py2.py (AGVN: Python 2 for a Ren'Py 6/7 game on trial),
 //                                       renpy.py, renpy/ (compiled modules and common/) and lib/python3.12/
 //   assets/agvn/renpy8.txt              the version of that zip, so the app unpacks it again only when it changes
 //   assets/agvn/renpy-license.txt       Ren'Py's license and the list of libraries in librenpython.so
@@ -30,6 +31,7 @@ def renpyDownloads = new File(projectDir, "agvn-downloads")
 def renpyRapt = new File(renpyDownloads, "renpy-${renpyVersion}-rapt.zip")
 def renpySdk = new File(renpyDownloads, "renpy-${renpyVersion}-sdk.tar.bz2")
 def renpyMain = new File(projectDir, "src/main/renpy/main.py")
+def renpyPy2 = new File(projectDir, "src/main/renpy/agvn_py2.py")
 def renpyOut = layout.buildDirectory.dir("generated/agvn/renpy").get().asFile
 def renpyPins = new Properties()
 rootProject.file("scripts/agvn/pins.txt").withInputStream { renpyPins.load(it) }
@@ -67,7 +69,8 @@ tasks.register("prepareRenpy") {
     dependsOn "downloadRenpy"
     doLast {
         String stamp = "renpy=${renpyVersion} rules=${renpyRules} rapt=${renpyPins.getProperty("renpy8_rapt_sha256")} " +
-                "sdk=${renpyPins.getProperty("renpy8_sdk_sha256")} main=${renpySha256(renpyMain.bytes)}"
+                "sdk=${renpyPins.getProperty("renpy8_sdk_sha256")} main=${renpySha256(renpyMain.bytes)} " +
+                "py2=${renpySha256(renpyPy2.bytes)}"
         File stampFile = new File(renpyOut, "stamp.txt")
         if (stampFile.isFile() && stampFile.text == stamp) return
         println("Preparing Ren'Py ${renpyVersion} for the app...")
@@ -94,6 +97,7 @@ tasks.register("prepareRenpy") {
         String sdkRoot = "renpy-${renpyVersion}-sdk/"
         Map<String, byte[]> files = new TreeMap<>()
         files.put("main.py", renpyMain.bytes)
+        files.put("agvn_py2.py", renpyPy2.bytes)
         renpyArchives.tarTree(renpyArchives.bzip2(renpySdk)).matching {
             include sdkRoot + "renpy.py", sdkRoot + "LICENSE.txt", sdkRoot + "renpy/**", sdkRoot + "lib/python3.12/**"
         }.visit { FileVisitDetails d ->

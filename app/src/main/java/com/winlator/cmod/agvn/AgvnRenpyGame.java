@@ -17,7 +17,8 @@ import java.util.regex.Pattern;
 /**
  * "Chạy nhẹ" for Ren'Py: a Ren'Py 8 game (Python 3) runs on Ren'Py 8.5.3 built for Android ({@link AgvnRenpyActivity},
  * app/agvn-renpy.gradle) instead of Wine: far lighter, cooler and kinder to the battery. Ren'Py 6 and 7 games
- * (Python 2) still run in Wine. The game's files are read where they are; nothing in the game folder is changed except
+ * (Python 2) run in Wine, unless the player tries them on "Chạy nhẹ" ({@link AgvnRenpyPy2}). The game's files are read
+ * where they are; nothing in the game folder is changed except
  * what Ren'Py itself writes there on a PC (saves, cache, log) and, on the lower "Đồ họa" steps, the image cache cap
  * that Wine writes too ({@link AgvnRenpyCache}). Pure Java (JVM-testable) except start().
  */
@@ -78,10 +79,15 @@ public final class AgvnRenpyGame {
         return gameDir != null && new File(gameDir, "game").isDirectory() && pythonOf(gameDir) == 3;
     }
 
-    /** The runner at import, as AgvnHtmlGame.useHtml: "Chạy nhẹ" whenever it can run the game, unless the profile says Wine. */
+    /**
+     * The runner at import, as AgvnHtmlGame.useHtml: "Chạy nhẹ" whenever it can run the game, unless the profile says
+     * Wine; for a Ren'Py 6 or 7 game only when the profile asks for it ("runner": "renpy", {@link AgvnRenpyPy2}).
+     */
     public static boolean useRenpy(AgvnProfile profile, GameExeResolver.Engine engine, File gameDir) {
-        if (engine != GameExeResolver.Engine.RENPY || !canRun(gameDir)) return false;
-        return profile == null || profile.runner == null || !AgvnHtmlGame.RUNNER_WINE.equals(profile.runner);
+        if (engine != GameExeResolver.Engine.RENPY) return false;
+        String asked = profile != null ? profile.runner : null;
+        if (canRun(gameDir)) return !AgvnHtmlGame.RUNNER_WINE.equals(asked);
+        return AgvnHtmlGame.RUNNER_RENPY.equals(asked) && AgvnRenpyPy2.canTry(gameDir);
     }
 
     /** The game's start file name (MyGame.py next to MyGame.exe), which Ren'Py uses to find game/; else "main". */
@@ -108,9 +114,11 @@ public final class AgvnRenpyGame {
      */
     static Map<String, String> environment(File engine, File gameDir, File publicDir, String apk, File quitFile) {
         Map<String, String> env = new LinkedHashMap<>();
+        boolean py2 = pythonOf(gameDir) == 2; // on trial: its saves in the app's folder (AgvnRenpyPy2)
         env.put("ANDROID_PRIVATE", engine.getPath());
         env.put("ANDROID_PUBLIC", publicDir.getPath());
-        env.put("ANDROID_OLD_PUBLIC", gameDir.getPath());
+        env.put("ANDROID_OLD_PUBLIC", py2 ? publicDir.getPath() : gameDir.getPath());
+        if (py2) env.put("AGVN_RENPY_PY2", "1");
         env.put("ANDROID_APK", apk);
         env.put("AGVN_RENPY_BASEDIR", gameDir.getPath());
         env.put("AGVN_RENPY_NAME", scriptName(gameDir));
@@ -119,13 +127,14 @@ public final class AgvnRenpyGame {
     }
 
     /**
-     * Called by AgvnHtmlGame.redirect for a shortcut set to "Chạy nhẹ" Ren'Py. Returns false, so the game runs in Wine,
-     * when its folder moved or no longer holds a Ren'Py 8 game.
+     * Called by AgvnHtmlGame.redirect for a shortcut set to "Chạy nhẹ" Ren'Py: a Ren'Py 8 game, or a Ren'Py 6 or 7 one
+     * on trial (only the player or the profile sets that runner for it). Returns false, so the game runs in Wine, when
+     * its folder moved or no longer holds a Ren'Py game.
      */
     static boolean start(Activity activity, Intent from, Map<String, String> extras) {
         String dir = extras.get(AgvnGameImporter.EXTRA_GAME_DIR);
         File gameDir = dir != null && !dir.isEmpty() ? new File(dir) : null;
-        if (!canRun(gameDir)) return false;
+        if (!canRun(gameDir) && !AgvnRenpyPy2.canTry(gameDir)) return false;
         AgvnMemorySaver.applyRenpyLight(activity, gameDir, extras.get(AgvnQuality.EXTRA_QUALITY),
                 "1".equals(extras.get(AgvnMemorySaver.EXTRA_RAM_SHORT)));
         Intent intent = new Intent(activity, AgvnRenpyActivity.class);

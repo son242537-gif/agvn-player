@@ -109,10 +109,14 @@ final class AgvnEngineLogs {
             default:
                 break;
         }
-        out.add(new File(exeDir, "Log.txt")); // DxLib (WOLF RPG and many doujin engines) logs next to the exe
-        out.add(new File(exeDir, "BepInEx/LogOutput.log")); // mod loaders next to the exe: BepInEx (winhttp.dll),
-        out.add(new File(exeDir, "MelonLoader/Latest.log")); // MelonLoader (version.dll)
-        out.add(new File(exeDir, "ue4ss/UE4SS.log")); // and UE4SS (dwmapi.dll) of Unreal games
+        // only what the engine may have: a Ren'Py game's dang-chay.txt listed BepInEx, MelonLoader and UE4SS (07/11/2026)
+        boolean unknown = engine.isEmpty() || "UNKNOWN".equals(engine);
+        if (!"RENPY".equals(engine)) out.add(new File(exeDir, "Log.txt")); // DxLib (WOLF RPG, many doujin engines)
+        if (unknown || "UNITY".equals(engine)) { // mod loaders next to the exe: BepInEx (winhttp.dll),
+            out.add(new File(exeDir, "BepInEx/LogOutput.log"));
+            out.add(new File(exeDir, "MelonLoader/Latest.log")); // MelonLoader (version.dll)
+        }
+        if (unknown || "UNREAL".equals(engine)) out.add(new File(exeDir, "ue4ss/UE4SS.log")); // UE4SS (dwmapi.dll)
         out.add(new File(exeDir, "AGVN-cheat.log")); // AGVN's cheat (agvncheat.dll) of AGVN game packages
         // DXVK 1.x (1.10.3, the default on Mali) writes one log per DLL beside the exe, "Game_d3d11.log": its lines do
         // not reach Wine's log, so a game on it had no DXVK line in "Gửi nhật ký" (Rj01608199, 16/10/2026)

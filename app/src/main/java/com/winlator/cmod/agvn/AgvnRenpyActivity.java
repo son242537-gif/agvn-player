@@ -26,7 +26,8 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Plays a Ren'Py 8 game on "Chạy nhẹ" ({@link AgvnRenpyGame}) with Ren'Py 8.5.3 for Android, in its own process
+ * Plays a Ren'Py 8 game, or a Ren'Py 6/7 one on trial ({@link AgvnRenpyPy2}), on "Chạy nhẹ" ({@link AgvnRenpyGame})
+ * with Ren'Py 8.5.3 for Android, in its own process
  * (":renpy"): Ren'Py ends that process when the game quits, and a crash there never takes the app down. Once its first
  * screen is up, the "Chạy nhẹ" toolkit ({@link AgvnLightTools}) gives the visual novel keys of the Windows layout, the
  * ⌨ ✎ 👁 ☰ bar, the menu on Back (the game's menu, quit, "Chạy bằng Windows"...) and the HUD.
@@ -95,10 +96,13 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
         }
         File game = new File(gameDir, "game");
         File saves = new File(game, "saves");
-        if (game.isDirectory() && !saves.isDirectory() && !saves.mkdirs()) Log.w(TAG, "cannot create " + saves);
+        boolean py2 = AgvnRenpyPy2.canTry(gameDir); // Ren'Py 7 on trial: its own saves (AgvnRenpyPy2)
+        if (!py2 && game.isDirectory() && !saves.isDirectory() && !saves.mkdirs()) Log.w(TAG, "cannot create " + saves);
         if (!publicDir.isDirectory() && !publicDir.mkdirs()) Log.w(TAG, "cannot create " + publicDir);
+        int copied = py2 ? AgvnRenpyPy2.prepareSaves(gameDir, publicDir) : 0;
         quitFile.delete();
         Map<String, String> env = AgvnRenpyGame.environment(engine, gameDir, publicDir, getApplicationInfo().sourceDir, quitFile);
+        if (py2) env.put("AGVN_RENPY_PY2_SAVES", String.valueOf(copied));
         for (Map.Entry<String, String> e : env.entrySet()) nativeSetEnv(e.getKey(), e.getValue());
         // "Toàn màn hình cho mọi game" (AgvnFullscreen): main.py stretches the game over the whole screen
         nativeSetEnv("AGVN_RENPY_STRETCH", getIntent().getBooleanExtra(AgvnFullscreen.INTENT, false) ? "1" : "0");

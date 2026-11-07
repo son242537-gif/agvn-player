@@ -9,6 +9,8 @@
 #   - AGVN_RENPY_STRETCH: "1" for "Toàn màn hình cho mọi game": the game is drawn over the whole screen, without the
 #     bars Ren'Py keeps at the sides, through config.adjust_view_size (unless the game sets that itself).
 #   - ANDROID_PUBLIC: beside Ren'Py's log.txt, faulthandler.txt gets the Python lines a crash in native code came from.
+#   - AGVN_RENPY_PY2: "1" for a Ren'Py 6 or 7 game (Python 2) on trial: agvn_py2.py gives it Python 2's builtins,
+#     division and dict methods.
 # Live2D is checked as Ren'Py meant, and each start time goes into log.txt once (ModuleHooks). Then Ren'Py's renpy.py
 # runs unchanged, in this module, so its path functions are the ones Ren'Py calls.
 
@@ -187,6 +189,17 @@ def enable_faulthandler():
 
 
 fault_log = enable_faulthandler()
+
+if os.environ.get("AGVN_RENPY_PY2") == "1":
+    try:
+        here = os.path.dirname(os.path.abspath(__file__))
+        if here not in sys.path:
+            sys.path.insert(0, here)
+        import agvn_py2
+        agvn_py2.install(ModuleHooks.HOOKS)
+    except Exception as e:
+        print("AGVN: Python 2 support:", e)
+
 sys.meta_path.insert(0, ModuleHooks())
 quit_file = os.environ.get("AGVN_RENPY_QUIT_FILE")
 

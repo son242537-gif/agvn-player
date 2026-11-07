@@ -33,7 +33,7 @@ public class AgvnDoctorTest {
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "godot-light",
             "godot-light-renderer", "mods-off", "raw-mouse", "ue-wait", "exe-64", "exe-main", "dll-wine", "emulator-order",
             "esync-off", "emulator-wowbox64", "page-light", "media-old", "wine-new", "vk-no-shared",
-            "present-wait-off", "gdiplus-text"));
+            "present-wait-off", "gdiplus-text", "renpy-light", "renpy-angle"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
             "ram-saved", "live", "light", "script-error", "page-crash", "frozen", "reported", "module-code",

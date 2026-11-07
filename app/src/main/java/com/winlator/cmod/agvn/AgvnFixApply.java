@@ -127,7 +127,8 @@ final class AgvnFixApply {
                 break;
             default:
                 // one "Tự sửa lỗi" tries for what the player reports, or a Godot game's "Chạy nhẹ"
-                if (!AgvnRepairFixes.apply(s, fix) && !AgvnGodotGame.applyLight(s, fix)) return false;
+                if (!AgvnRepairFixes.apply(s, fix) && !AgvnGodotGame.applyLight(s, fix) && !AgvnRenpyWine.apply(s, fix))
+                    return false;
                 break;
         }
         s.saveData();
