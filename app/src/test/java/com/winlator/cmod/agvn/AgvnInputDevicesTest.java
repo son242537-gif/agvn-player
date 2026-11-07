@@ -36,4 +36,12 @@ public class AgvnInputDevicesTest {
         assertEquals("tay cầm", AgvnInputDevices.kinds(false, false, false, true));
         assertEquals("phím khác", AgvnInputDevices.kinds(false, false, false, false));
     }
+
+    @Test
+    public void aDeviceWithNoStickNorFaceButtonsIsNoGamepad() {
+        // uinput-xiaomi: Home, Power, Menu, Back and BTN_C, source 0x501 (07/11/2026)
+        assertFalse(AgvnGamepadCheck.controls(false, false));
+        assertTrue("a stick or a d-pad", AgvnGamepadCheck.controls(true, false));
+        assertTrue("A/B/X or an old one's button 1", AgvnGamepadCheck.controls(false, true));
+    }
 }

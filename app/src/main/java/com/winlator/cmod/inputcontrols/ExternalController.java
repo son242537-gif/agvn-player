@@ -479,7 +479,8 @@ public class ExternalController {
         int sources = device.getSources();
         // Exclude devices with SOURCE_MOUSE from being considered controllers
         return !device.isVirtual() && ((sources & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD ||
-                ((sources & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK && (sources & InputDevice.SOURCE_MOUSE) == 0));
+                ((sources & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK && (sources & InputDevice.SOURCE_MOUSE) == 0))
+                && com.winlator.cmod.agvn.AgvnGamepadCheck.hasControls(device); // AGVN: not the phone's own keys (uinput-xiaomi)
     }
 
 

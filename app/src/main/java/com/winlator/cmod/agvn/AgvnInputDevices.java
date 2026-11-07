@@ -67,8 +67,24 @@ public final class AgvnInputDevices {
         synchronized (logged) {
             logged.clear();
         }
-        List<String> found = describeAll();
-        return found.isEmpty() ? null : "Bàn phím, chuột, tay cầm đang nối: " + String.join(" · ", found);
+        List<String> found = describeAll(), notPads = notGamepads();
+        String text = found.isEmpty() ? null : "Bàn phím, chuột, tay cầm đang nối: " + String.join(" · ", found);
+        if (notPads.isEmpty()) return text;
+        return (text != null ? text + "; " : "") + "Android gọi là tay cầm nhưng không có cần, phím hướng hay nút A/B, "
+                + "nên không đưa vào game (AgvnGamepadCheck): " + String.join(", ", notPads);
+    }
+
+    /** Devices with Android's gamepad or joystick source that have no gamepad's controls, as "uinput-xiaomi (0x501)". */
+    private static List<String> notGamepads() {
+        List<String> out = new ArrayList<>();
+        for (int id : InputDevice.getDeviceIds()) {
+            InputDevice device = InputDevice.getDevice(id);
+            if (device == null || device.isVirtual() || ExternalController.isGameController(device)) continue;
+            int sources = device.getSources();
+            if (has(sources, InputDevice.SOURCE_GAMEPAD) || has(sources, InputDevice.SOURCE_JOYSTICK))
+                out.add(device.getName() + " (0x" + Integer.toHexString(sources) + ")");
+        }
+        return out;
     }
 
     /** thiet-bi.txt: the plugged-in keyboards, mice and gamepads as Android reports them. */
