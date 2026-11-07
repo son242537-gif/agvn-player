@@ -33,6 +33,10 @@ Cùng thư mục `assets/agvn/mkxp-z` còn có phần của AGVN, script này kh
   - file văn bản đọc như Windows (`\r\n` thành `\n`).
   Xem `docs/agvn/tu-sua-loi.md`, "Lona RPG trên Chạy nhẹ". Kiểm trên PC:
   `ruby scripts/agvn/mkxp-z/test-agvn-text-files.rb` và `ruby scripts/agvn/mkxp-z/test-agvn-dl-input.rb`.
+  Từ bản 0.1.84, `agvn_text_files.rb` cũng ghi một chuỗi byte ra file đúng các byte đó, như Windows.
+- `agvn_bools.rb` (từ bản 0.1.85): các thuộc tính có/không của RGSS (`Sprite#visible=`, `Window#active=`,
+  `Font#bold=`…) nhận mọi giá trị như Windows. mkxp-z chỉ nhận `true`, `false` và `nil`, còn lại báo
+  `Argument 0: Expected bool`. Kiểm trên PC: `ruby scripts/agvn/mkxp-z/test-agvn-bools.rb`.
 
 ## Nguồn và cách kiểm chứng (ai cũng làm lại được)
 
