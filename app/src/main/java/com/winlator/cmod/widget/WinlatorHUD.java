@@ -191,6 +191,7 @@ public class WinlatorHUD extends View {
     private float touchX, touchY, startX, startY;
     private boolean dragging = false;
     private long touchDownMs = 0;
+    private MotionEvent agvnDown; // AGVN: the press of a tap, given on to the game (agvn/AgvnTapThrough)
     private boolean redrawScheduled = false;
 
     private HandlerThread statsThread = null;
@@ -1140,6 +1141,8 @@ public class WinlatorHUD extends View {
                 startY = getY();
                 dragging = false;
                 touchDownMs = System.currentTimeMillis();
+                if (agvnDown != null) agvnDown.recycle();
+                agvnDown = MotionEvent.obtain(event);
                 return true;
 
             case MotionEvent.ACTION_MOVE:
@@ -1168,6 +1171,9 @@ public class WinlatorHUD extends View {
                     savePosition();
                 } else if (touchDownMs > 0
                         && System.currentTimeMillis() - touchDownMs < 300) {
+                    com.winlator.cmod.agvn.AgvnTapThrough.pass(this, agvnDown, event); // AGVN: a tap reaches the game
+                } else if (touchDownMs > 0 // AGVN: a long press turns the HUD, as a tap did
+                        && System.currentTimeMillis() - touchDownMs >= com.winlator.cmod.agvn.AgvnTapThrough.LONG_PRESS_MS) {
                     vertical = !vertical;
                     prefs.edit().putBoolean(KEY_VERT, vertical).apply();
                     requestRelayout();
