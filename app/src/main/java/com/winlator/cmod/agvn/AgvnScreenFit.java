@@ -95,7 +95,9 @@ public final class AgvnScreenFit {
         if (verdict == null) return; // suits the screen; a window that changes later is checked again
         asked = true;
         if (AgvnFitMath.OVERFLOW.equals(verdict) && AgvnScreenGrowth.undoIfFollowed(activity, rect)) return;
-        AgvnSessionLog.event("Khung game " + size(rect) + " trên màn hình " + screenW() + "x" + screenH() + ": " + verdict);
+        // where it sits too: a .NET game centred its window for a larger screen than it had (07/11/2026)
+        AgvnSessionLog.event("Khung game " + size(rect) + " tại (" + (int) rect[0] + "," + (int) rect[1] + ") trên màn hình "
+                + screenW() + "x" + screenH() + ": " + verdict);
         if (AgvnFitMath.SMALL.equals(verdict) && canDraw()) {
             set(true);
             AgvnWarningBar.show(activity, activity.getString(R.string.agvn_fit_small_title),
