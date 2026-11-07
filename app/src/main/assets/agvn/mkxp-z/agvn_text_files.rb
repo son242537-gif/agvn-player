@@ -8,6 +8,7 @@
 # lone "\r" becomes "\n" as well (Windows keeps it; text files hardly have one). Writing, reading and writing ("r+"),
 # binary files ("rb", File.binread), a mode given as a number, and a call with its own binmode, textmode or newline
 # option stay as they were.
+# A string of bytes written to a file goes there as those bytes, as on Windows (Write).
 module AgvnTextFiles
   # Options that set the mode, or the newlines, their own way: "t" would contradict them
   OWN_MODE = %i[binmode textmode flags newline universal_newline crlf_newline cr_newline lf_newline].freeze
@@ -70,11 +71,28 @@ module AgvnTextFiles
       super(name, *rest, **AgvnTextFiles.opts(opts), &block)
     end
   end
+
+  # A string of bytes ("ASCII-8BIT": read in binary, an error message holding such text) written to a file goes there
+  # as those bytes, as RGSS3's Ruby on Windows writes it. mkxp-z's Ruby converts what is written to UTF-8, its
+  # default_internal, and stopped at the first byte over 127: Lona RPG's error log (Han_Nama_ErrorLog) stopped so as it
+  # wrote down another error, "\xE2" from ASCII-8BIT to UTF-8, and that error was never shown (log of 07/11/2026).
+  # print, puts and << write through here. Only a string Ruby refused gets its bytes as UTF-8; any other stays as it is.
+  module Write
+    def write(*args)
+      args.sum do |s|
+        super(s)
+      rescue Encoding::UndefinedConversionError, Encoding::InvalidByteSequenceError
+        raise unless s.is_a?(String)
+        super(s.dup.force_encoding(Encoding::UTF_8))
+      end
+    end
+  end
 end
 
 begin
   File.prepend(AgvnTextFiles::Open)
   IO.singleton_class.prepend(AgvnTextFiles::Read)
+  IO.prepend(AgvnTextFiles::Write)
 rescue StandardError
   nil # a Ruby without them reads as before
 end

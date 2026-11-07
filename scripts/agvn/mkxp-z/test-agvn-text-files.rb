@@ -3,7 +3,9 @@
 #   ruby scripts/agvn/mkxp-z/test-agvn-text-files.rb
 # Encodings are set as mkxp-z sets them (binding-mri.cpp: UTF-8 inside and outside). A second run without the script
 # must stop as Lona RPG did on the phone (log of 04/11/2026): "stack level too deep" in a reader that skips spaces, "\n"
-# and "\t" only, and reads the same "[" again at any other character, as its JSON reader does.
+# and "\t" only, and reads the same "[" again at any other character, as its JSON reader does. And its error log, which
+# prints a string of bytes holding UTF-8 text into a file, must write it, where without the script it stopped on the
+# phone with '"\xE2" from ASCII-8BIT to UTF-8' (07/11/2026).
 require 'tmpdir'
 require 'rbconfig'
 
@@ -72,6 +74,9 @@ Dir.mktmpdir('agvn-text') do |dir|
       error
     end
     check('without agvn_text_files.rb: stack level too deep, as on the phone', e.is_a?(SystemStackError))
+    w = (File.open(File.join(dir, 'ErrorLog.txt'), 'w') { |f| f.print("Lona\xE2\x80\x99s error".b) } rescue $!)
+    check("without agvn_text_files.rb: the error log stops, as on the phone (#{w})",
+          w.is_a?(Encoding::UndefinedConversionError) && w.message.include?('\xE2'))
     exit($failures.zero? ? 0 : 1)
   end
   load File.join(ASSETS, 'agvn_text_files.rb')
@@ -108,6 +113,20 @@ Dir.mktmpdir('agvn-text') do |dir|
   bytes = "c\xFF\x82\xA0\r\n".b
   File.binwrite(out, bytes)
   check('bytes that are not UTF-8 still read', File.read(out).b == "c\xFF\x82\xA0\n".b)
+  log = File.join(dir, 'ErrorLog.txt')
+  msg = "Lona\xE2\x80\x99s error\n".b
+  File.open(log, 'w') { |f| f.print(msg) } # Han_Nama_ErrorLog's own way
+  check('a string of bytes holding UTF-8 is written as those bytes', File.binread(log) == msg)
+  File.open(log, 'w') { |f| f.puts('Backtrace:', "\xE2\x80\xA6".b, 'end') }
+  check('puts with several, one of them bytes', File.binread(log) == "Backtrace:\n\xE2\x80\xA6\nend\n".b)
+  File.open(log, 'w') { |f| f << 'a' << "\xFF\xFE".b << "Tiếng Việt" }
+  check('<<, bytes that are not UTF-8 too', File.binread(log) == "a\xFF\xFETiếng Việt".b)
+  File.open(log, 'wb') { |f| f.write("\x00\xE2".b) }
+  check('a binary file as before', File.binread(log) == "\x00\xE2".b)
+  File.open(log, 'wb') { |f| Marshal.dump(["Lona\xE2\x80\x99s".b, 'Lona'], f) }
+  check('Marshal.dump into a file', File.open(log, 'rb') { |f| Marshal.load(f) } == ["Lona\xE2\x80\x99s".b, 'Lona'])
+  sjis = (File.open(log, 'w:Shift_JIS') { |f| f.write('★…') } rescue $!)
+  check('a file the game opened in its own encoding: as before', !sjis.is_a?(Exception) || sjis.is_a?(EncodingError))
   missing = (File.open(File.join(dir, 'none.json')) rescue $!)
   check('a missing file: the game\'s own error', missing.is_a?(Errno::ENOENT))
   both = (File.open(json, 'rt', binmode: true) rescue $!)
