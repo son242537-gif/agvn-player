@@ -162,6 +162,8 @@ Anh Sơn quyết định ngày 02/10/2026:
 
   Quyết định ở đầu đợt 2.
 - **Thử máy:** 3 game Ren'Py 6 hoặc 7.
+- **Trong lúc chờ (bản 0.1.87):** game Ren'Py 6/7 chạy thử được trên chính Ren'Py 8.5.3 của app, không thêm gì vào
+  APK. Xem "Ren'Py 7 chạy thử trên Ren'Py 8" ở cuối tệp. Đợt 2 vẫn cần cho game mà cách thử này không chạy được.
 
 ## Đợt 3: RPG Maker XP/VX/VX Ace (mkxp-z)
 
@@ -932,3 +934,49 @@ Cultivator (RPG Maker MV, "Chạy nhẹ", 22/10/2026): chữ trong khung thoại
 - **Test:** `AgvnHtmlStandInTest.aPlainFileTheGameLeftIsServedForItsEncryptedName`.
 - **Thử máy:** Cultivator: chữ trong khung thoại và menu có màu như trên máy tính. Trong `chay-nhe.txt` không còn
   dòng `Window.rpgmvp … shown empty`.
+
+## Ren'Py 7 chạy thử trên Ren'Py 8 (bản 0.1.87)
+
+Báo cáo ngày 07/11/2026 (POCO, Adreno 830, app 0.1.85): một game Ren'Py 7.3.5 (2,6 GB, khoảng 12.000 câu dịch) chạy bằng
+Windows mất 13,3 s mới tới menu. Exe 32-bit phải qua FEX, CPU có lúc chỉ còn 71 % vì nóng. Game Ren'Py 8 cùng cỡ chạy
+"Chạy nhẹ" thì sẵn sàng sau khoảng 4 s.
+
+- **Thử trên PC, với Ren'Py 8.5.3 bản Linux (`scripts/agvn/renpy/run-py2-test.sh`):**
+  - Ren'Py 8.5.3 đọc được `.rpyc` của Ren'Py 7.3.5 (bộ đọc pickle của Python 2 có sẵn), và tự sửa cú pháp Python 2
+    (`print x`, `<>`, `0777`, `` `x` ``: `renpy/compat/fixes.py`).
+  - `the_question` của SDK 7.3.5, chỉ còn `.rpyc`: kiểm (lint) sạch.
+  - Bản hướng dẫn của SDK 7.3.5 (129 `.rpyc`) nạp được, trừ `testcases.rpyc` (lệnh kiểm thử, game không có). Lỗi lúc
+    chạy: `NameError: name 'file'`, rồi `'str' object has no attribute 'decode'`.
+  - Game thử viết theo kiểu Python 2, biên dịch bằng chính Ren'Py 7.3.5: Ren'Py 8 dừng ở `long`. Còn phép chia `1280 / 2`
+    thành `640.0`, mà Ren'Py đọc số thực là tỉ lệ màn hình, nên nút bị đẩy ra ngoài màn.
+- **`agvn_py2.py` (nạp khi `AGVN_RENPY_PY2=1`):**
+  - Hàm có sẵn của Python 2: `file`, `unicode`, `basestring`, `long`, `xrange`, `unichr`, `raw_input`, `reduce`,
+    `intern`, `cmp`, `execfile`.
+  - Phép chia kiểu Python 2 cho số nguyên, trong mã của game. Mã nào tự xin `from __future__ import division` thì giữ
+    phép chia của Python 3.
+  - `.decode()` của chữ trả lại chính nó. `open()`/`file()` gọi từ mã của game đọc ghi chữ như Python 2 (nhận cả bytes khi
+    ghi); mã của Ren'Py và Python vẫn dùng `open()` gốc.
+  - `iteritems`/`iterkeys`/`itervalues` cho dict của game (`RevertableDict`).
+  - Kết quả: cả ba game kiểm sạch. Game thử cho 10/10 kết quả giống Ren'Py 7.3.5.
+- **Ai bật:**
+  - Người chơi: "Tự sửa lỗi" có nút "Thử Chạy nhẹ (Ren'Py 8) cho game Ren'Py 7" ở các lỗi game chậm, màn đen, văng,
+    tắt ngay.
+  - Hoặc người làm game: `"runner": "renpy"` trong `agvn-profile.json`.
+  - App không tự chuyển. Game Ren'Py 7 đang chạy tốt bằng Windows vẫn ở đó.
+  - Lỗi khi chạy thử thì "Tự sửa lỗi" của Chạy nhẹ có "Chạy bằng Windows". "Vẫn còn lỗi" trả cách chạy cũ.
+- **File lưu riêng:** Ren'Py 8 đọc được file lưu của Ren'Py 7. Nhưng file nó ghi (pickle protocol 5), Ren'Py 7 không
+  đọc được, kể cả `persistent`.
+  - Vì vậy bản chạy thử lưu ở `AGVN-Player/renpy/<thư mục game>/game/saves` (`ANDROID_OLD_PUBLIC`).
+  - Lần đầu, app chép `game/saves` của game sang. File lưu của bản Windows không bị đụng.
+  - Chơi tiếp ở bản thử thì bản Windows không thấy phần chơi mới.
+- **Ghi vào thư mục game:**
+  - Game có `.rpy` thì Ren'Py 8 biên dịch lại và ghi đè `.rpyc`. Ren'Py 7 đọc không được thì tự biên dịch lại từ `.rpy`
+    (đã xem mã 7.3.5).
+  - `cache/screens.rpyb` cùng tên ở hai bản. Ren'Py 7 đọc lỗi thì bỏ qua và dựng lại.
+- **Chưa làm:** đóng gói Ren'Py 7.8.7 cho Android (đợt 2), cho game mà cách thử này không chạy được: mô-đun `.py`
+  Python 2 trong `game/`, hoặc mã Python 2 lạ hơn.
+- **Test:**
+  - `tools/agvn/tests/test_renpy_py2.py`.
+  - `AgvnRenpyPy2Test`.
+  - `scripts/agvn/renpy/run-py2-test.sh`: tải SDK 7.3.5 từ renpy.org, chạy ba game trên Ren'Py 8.5.3.
+

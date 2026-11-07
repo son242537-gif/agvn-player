@@ -3628,3 +3628,41 @@ vẽ chữ bằng GDI+ (`System.Drawing`).
   được. `AgvnClrHeader` đã nhận ra loại exe này. Chạy nó ở 32-bit cần sửa header của exe hoặc chạy một bản sao, nên để
   bản sau.
 - **Lỗi 9 (cụt dấu chữ hoa):** Wine cắt glyph ở mức `usWinAscent` khi GDI+ vẽ. Bản game nâng ascent của font như đã làm.
+
+## Game Ren'Py 7 chạy bằng Windows: thử Chạy nhẹ, ANGLE khi màn đen, nhật ký đúng engine (bản 0.1.87)
+
+Báo cáo ngày 07/11/2026 (POCO, Adreno 830, app 0.1.85), game Ren'Py 7.3.5. Chi tiết về Chạy nhẹ thử: `engine-rieng.md`,
+mục "Ren'Py 7 chạy thử trên Ren'Py 8".
+
+- **`renpy-light`, "Thử Chạy nhẹ (Ren'Py 8) cho game Ren'Py 7":**
+  - Có ở các lỗi game chậm (`slow*`, `report-slow`), màn đen (`report-black`), văng (`crash`) và tắt ngay khi mở
+    (`no-start`).
+  - Chỉ dành cho game Ren'Py 6/7 có thư mục `game/` (`AgvnRenpyPy2.canTry`).
+  - Nút đặt cách chạy là `renpy`. "Vẫn còn lỗi" trả lại như cũ.
+- **`renpy-angle`, "Ren'Py vẽ bằng ANGLE (Direct3D) thay cho OpenGL":**
+  - Game Ren'Py 7.3.5 của báo cáo đen màn với `gl`, hiện với `angle`.
+  - Nút đặt `RENPY_RENDERER`: `angle` cho Ren'Py tới 7.3, `angle2` từ 7.4 (đọc `game/script_version.txt`, không có thì
+    xem `lib/`).
+  - Có ở `report-black`, và thanh "Màn hình đen" hỏi nó trước "Đồng bộ khung hình" cho game Ren'Py. Bấm là bắt đầu một
+    lần thử của "Tự sửa lỗi"; không đỡ thì app trả lại và không hỏi nữa.
+  - Không bật sẵn: game Ren'Py khác vẫn hiện tốt với OpenGL.
+- **Lý do không có Chạy nhẹ:**
+  - "Thêm game" ghi "Ren'Py 7 (chạy bằng Windows; Chạy nhẹ chỉ chạy thử)".
+  - `su-kien.txt` của mỗi lần chạy bằng Windows có một dòng nói vì sao, và chỗ thử Chạy nhẹ.
+- **Nhật ký đúng engine:**
+  - `dang-chay.txt` chỉ còn liệt kê log BepInEx và MelonLoader cho game Unity, UE4SS cho game Unreal, cả ba khi chưa rõ
+    engine.
+  - `Log.txt` của DxLib không còn liệt kê cho Ren'Py (đã có `log.txt` của Ren'Py).
+  - Log DXVK vẫn liệt kê: Ren'Py vẽ bằng ANGLE thì qua DXVK.
+- **Nhận diện lại (mục 5 của báo cáo):** có từ bản 0.1.75 (`AgvnLightRecheck`).
+  - Game chưa có cách chạy riêng được xét lại mỗi lần mở.
+  - Game Ren'Py 7 không tự sang Chạy nhẹ, trừ khi profile đặt `"runner": "renpy"`.
+- **Test:** `AgvnRenpyPy2Test`, `AgvnDoctorTest` (danh sách nút).
+- **Thử máy:**
+  1. Game Ren'Py 7.3.5 của báo cáo, đang chạy bằng Windows: "Tự sửa lỗi" → "Game chạy chậm" → "Thử Chạy nhẹ".
+  2. Mở lại: game chạy trên Ren'Py 8. `AGVN-Player/renpy/<game>/log.txt` có dòng "AGVN: Ren'Py 6/7 game (Python 2)…".
+     File lưu cũ có trong menu Tải.
+  3. Chơi qua vài cảnh có menu, màn hình riêng của game, lưu và tải. Đo thời gian tới menu.
+  4. "Chạy bằng Windows": bản Windows mở bình thường, file lưu cũ còn nguyên.
+  5. Một game Ren'Py 7 khác để màn đen với `gl`: thanh "Màn hình đen" hỏi ANGLE.
+

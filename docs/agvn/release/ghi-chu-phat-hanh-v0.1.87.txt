@@ -1,0 +1,10 @@
+AGVN Player v0.1.87 - agvn.io
+
+Mới:
+- Game Ren'Py 7 (và 6) giờ có thể chạy thử bằng "Chạy nhẹ" (Ren'Py 8 của app), nhẹ và mát máy hơn chạy bằng Windows. Mở "Tự sửa lỗi" khi game chậm, đen màn hay văng, rồi chọn "Thử Chạy nhẹ". Bản chạy thử dùng một bản sao file lưu, nên file lưu của bản Windows không bị ảnh hưởng. Chạy thử bị lỗi thì chọn "Chạy bằng Windows" để quay lại.
+
+Sửa lỗi:
+- Game Ren'Py chạy bằng Windows bị đen màn: app đề nghị cho Ren'Py vẽ bằng ANGLE (Direct3D).
+- Màn "Thêm game" ghi rõ game Ren'Py 7 chạy bằng Windows.
+- Nhật ký chỉ liệt kê file log của đúng engine game đang dùng.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
