@@ -170,6 +170,7 @@
     <string name="agvn_light_other_section">Khác</string>
     <string name="agvn_light_hud">HUD: RAM, pin, nhiệt độ</string>
     <string name="agvn_light_reset">Mặc định</string>
+    <string name="agvn_light_right_button">Chuột phải</string>
     <string name="agvn_light_reset_desc">Đưa bộ phím về như ban đầu</string>
     <string name="agvn_light_reset_ask">Đưa bộ phím của game này về như ban đầu? Phím đã thêm hoặc đã đổi sẽ mất.</string>
     <string name="agvn_controls_auto">Tự động (AGVN)</string>

@@ -15,6 +15,17 @@ final class AgvnHtmlKeys {
             + "(function f(){o.n++;requestAnimationFrame(f);})();return -1;}var now=performance.now(),"
             + "v=Math.round(o.n*1000/Math.max(1,now-o.t));o.n=0;o.t=now;return v;})()";
 
+    /**
+     * Where the player last touched or moved the mouse on the page (window.__agvnPointer), for the right button of an
+     * RPG Maker game, which aims at TouchInput.x/y ({@link #rightButton}). Run once the page has loaded.
+     */
+    static final String TRACK = "(function(){if(window.__agvnTrack)return;window.__agvnTrack=1;"
+            + "function at(x,y){window.__agvnPointer={x:x,y:y};}"
+            + "function touch(e){var t=e.changedTouches&&e.changedTouches[0];if(t)at(t.clientX,t.clientY);}"
+            + "function mouse(e){at(e.clientX,e.clientY);}var o={capture:true,passive:true};"
+            + "document.addEventListener('touchstart',touch,o);document.addEventListener('touchmove',touch,o);"
+            + "document.addEventListener('mousemove',mouse,o);document.addEventListener('mousedown',mouse,o);})();";
+
     private AgvnHtmlKeys() {}
 
     /** keydown or keyup of {key, code, keyCode} ({@link AgvnLightActions#dom}) on the focused element; it bubbles up. */
@@ -36,6 +47,21 @@ final class AgvnHtmlKeys {
                 + "Object.defineProperty(e,'which',{get:function(){return n}});"
                 + "Object.defineProperty(e,'charCode',{get:function(){return e.type==='keypress'?n:0}});"
                 + "(document.activeElement||document.body||document).dispatchEvent(e);})();";
+    }
+
+    /**
+     * The right mouse button pressed ({@code down}) or let go, held as long as its key is ({@link AgvnHtmlRightButton}).
+     * On an RPG Maker page (TouchInput) it goes where the player last touched ({@link #TRACK}), unless that is no part
+     * of the game (the page's own background); elsewhere at the centre, as the click it was. contextmenu on release.
+     */
+    static String rightButton(boolean down) {
+        String events = down ? "m('mousedown',2,2);" : "m('mouseup',2,0);m('contextmenu',2,0);";
+        return "(function(){var p=window.TouchInput&&window.__agvnPointer,x=innerWidth/2,y=innerHeight/2,"
+                + "t=p&&document.elementFromPoint(p.x,p.y);"
+                + "if(t&&t!==document.body&&t!==document.documentElement){x=p.x;y=p.y;}"
+                + "else t=document.elementFromPoint(x,y);t=t||document.body;"
+                + "function m(n,b,bs){t.dispatchEvent(new MouseEvent(n,{bubbles:true,cancelable:true,view:window,"
+                + "clientX:x,clientY:y,button:b,buttons:bs}));}" + events + "})();";
     }
 
     /** A mouse action of {@link AgvnLightActions} (click or wheel) at the centre of the page; "" for anything else. */

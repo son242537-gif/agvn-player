@@ -46,6 +46,9 @@ public final class AgvnLightTools {
 
         /** The frames per second the game is made for; -1 when it has none (Ren'Py draws only when something moves). */
         int targetFps();
+
+        /** Keys the game needs beyond its key set, added while it has no key set of its own. */
+        default void addKeys(AgvnLightLayout layout) {}
     }
 
     final Activity activity;
@@ -80,6 +83,7 @@ public final class AgvnLightTools {
         boolean own = made && layout.load(prefs.layout(game)); // made from this pick, which was not saved again since
         if (!made && pick.id != AgvnLightPick.OFF) AgvnLightSets.keep(activity, prefs, game, this.gameName); // not lost
         if (!own && pick.json == null) layout.apply(prefs.positions(kind)); // else the places of AGVN 0.1.6-0.1.8
+        if (!own) host.addKeys(layout); // an HTML game's right mouse button
         if (pick.id != prefs.lastPick(game)) prefs.picked(game, pick.id);
         keys = new AgvnLightKeys(activity, layout, host::binding);
         keys.setAlpha(prefs.opacity());

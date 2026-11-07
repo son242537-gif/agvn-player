@@ -120,7 +120,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         hideSystemUi();
         webView.loadUrl("https://" + host + "/" + Uri.encode(index.getName()));
         tools = AgvnLightTools.attach(this, rpgMaker ? AgvnLayouts.RPG : AgvnLayouts.VN, getIntent().getStringExtra("shortcut_name"),
-                AgvnLightGame.folderOf(index), new AgvnHtmlHost(this, webView));
+                AgvnLightGame.folderOf(index), new AgvnHtmlHost(this, webView, root));
         webView.postDelayed(fatalPoll, AgvnHtmlConsole.FATAL_POLL_MS);
     }
 
@@ -166,6 +166,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         public void onPageFinished(WebView view, String url) {
             AgvnLightSession.started(AgvnHtmlActivity.this);
             if (!keyboardJs.isEmpty()) view.evaluateJavascript(keyboardJs, null); // the keyboard for a field a script focuses
+            view.evaluateJavascript(AgvnHtmlKeys.TRACK, null); // where the right mouse button goes
         }
 
         @Override
