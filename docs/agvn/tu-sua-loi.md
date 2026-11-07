@@ -3368,3 +3368,53 @@ Báo cáo ngày 07/11/2026 (POCO F8 Pro, app 0.1.82, mục 8 của báo cáo "Ch
 - **Test:** `AgvnHtmlStandInTest.anEncryptedSoundTooShortToDecryptIsMissing`.
 - **Thử máy:** một game MV có một `.rpgmvo` bị cắt còn vài byte: chơi tới chỗ phát tiếng đó, game không văng, chỉ thiếu
   tiếng đó; "Gửi nhật ký" có tên tệp.
+
+## Chạy nhẹ: chuột phải cho game hành động RPG Maker MV, và lớp giả os (bản 0.1.84)
+
+Báo cáo ngày 07/11/2026 (Xiaomi, Android 16, Mali-G720, WebView 156, app 0.1.82). Lỗi chung của game HTML / RPG Maker
+MV chạy bằng "Chạy nhẹ".
+
+- **Không có chuột phải:**
+  - Game MV hành động (QABS và các plugin cùng họ) gán đòn chính cho chuột phải (`mouse2`): bắn khi giữ, hướng theo
+    `TouchInput.x/y`. Ngón tay chỉ cho trang `touchstart/touchend` và chuột trái, nên đòn đó không bao giờ ra.
+  - Bộ phím của Chạy nhẹ đã có kiểu gán `MOUSE_RIGHT_BUTTON` (nút "Menu" của bộ phím VN, và người chơi tự thêm được).
+    Nhưng nó chỉ bấm-nhả một lần, ở giữa màn hình (`AgvnHtmlKeys.mouse`).
+  - **Sửa:**
+    - Phím chuột phải giữ được: nhấn là `mousedown` (button 2, buttons 2), nhả là `mouseup` kèm `contextmenu`
+      (`AgvnHtmlKeys.rightButton`, `AgvnHtmlHost.binding`).
+    - Trên trang RPG Maker (có `TouchInput`), cú bấm rơi vào chỗ người chơi chạm lần cuối trên trang
+      (`AgvnHtmlKeys.TRACK`, chạy khi trang nạp xong). Nếu chỗ đó không thuộc game (nền trang), cú bấm rơi vào giữa màn
+      hình.
+    - Trang khác vẫn bấm ở giữa như trước, nên nút "Menu" của game VN không đổi chỗ bấm.
+  - **Tự thêm phím (`AgvnHtmlRightButton`):** game có `"mouse2"` trong `js/plugins.js` nhận phím "Chuột phải" trong bộ
+    phím mặc định, ở cột phím bên phải, dưới Space.
+    - Chỉ khi game chưa có bộ phím riêng, và bộ phím chưa có phím chuột phải.
+    - Vừa giữ phím bắn vừa bấm phím di chuyển được, vì cùng một lớp phím. Nhưng trong lúc giữ, ngón chạm lên trang
+      không tới game: lớp phím đã nhận lượt chạm đó (`AgvnLightKeys`). Hướng bắn là chỗ chạm cuối trước khi giữ; muốn
+      đổi hướng thì nhả phím, chạm chỗ mới rồi giữ lại.
+  - Chưa làm cử chỉ "chạm hai ngón = chuột phải": MV vốn coi chạm hai ngón là "huỷ" (`_onCancel`).
+- **"Chạy bằng Windows" tự thử rồi game tắt:**
+  - Đó là lượt thử của "Tự sửa lỗi" sau khi người chơi báo lỗi (hoặc sau "Game báo lỗi khi Chạy nhẹ"). Lượt thử
+    chạy bằng Wine, game NW.js văng ở 22 giây (0x80000003), rồi app trả cấu hình cũ như thiết kế.
+  - Nhật ký trước đây chỉ ghi lượt thử lúc hỏi người chơi hoặc lúc game tắt. Giờ `su-kien.txt` ghi ngay khi mở
+    (`AgvnRepairAsk`): "Tự sửa lỗi: lần mở này là lần thử "…" cho lỗi người chơi báo (…); không hết lỗi thì app trả
+    cấu hình cũ".
+  - Chưa đổi tham số Chromium cho NW.js chạy bằng Wine (`--disable-gpu-sandbox`, `--in-process-gpu`…): chưa có nhật ký
+    Wine của lần văng đó.
+- **Lớp giả `os` thiếu hàm (`html-compat.js`):** plugin đo máy gọi `os.cpus()` mỗi nhịp và báo lỗi lặp lại. Giờ có
+  `cpus` (theo số nhân trình duyệt cho biết), `type`, `release`, `arch`, `hostname`, `totalmem`, `freemem` (theo
+  `navigator.deviceMemory`), `uptime`, `loadavg`, `homedir`, `tmpdir`, `endianness`, `userInfo`, `networkInterfaces`.
+  `platform` vẫn là `android`, như `process.platform`.
+- **`Utils.isNwjs()` vẫn là `false`, có chủ ý:** `process` là một hàm để RPG Maker giữ cách lưu save của trình duyệt,
+  mà app đưa thành file thật (mục 6 của `html-compat.js`). Plugin chỉ dùng khi chơi thử trên PC (QUpdate) báo lỗi lúc
+  nạp, nhưng vô hại.
+- **Test:**
+  - `AgvnHtmlRightButtonTest`: nhận `mouse2`, thêm phím một lần, không thêm vào bộ VN; phím giữ được.
+  - `tools/agvn/tests/html_compat_sim.js`: lớp giả `os`.
+  - JS của phím chuột phải đã chạy với DOM giả: bấm theo chỗ chạm trên trang RPG Maker, ở giữa khi chạm ngoài game
+    hoặc với trang khác.
+- **Thử máy:**
+  1. Game MV có QABS, bộ phím mặc định: có phím "Chuột phải". Giữ phím thì nhân vật bắn liên tục về phía chỗ vừa chạm;
+     vừa giữ vừa đi bằng phím mũi tên được.
+  2. Game của báo cáo: nhật ký trang không còn `os.cpus is not a function`.
+  3. Hồi quy: game VN HTML (Tyrano), nút "Menu" vẫn mở menu.
