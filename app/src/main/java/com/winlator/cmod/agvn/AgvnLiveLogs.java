@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  */
 final class AgvnLiveLogs {
     private static final String TAG = "AGVN";
-    static final String APP = "app", RENPY = "renpy", GODOT = "godot", LOGCAT = "logcat.txt", DEVICE = "thiet-bi.txt",
+    static final String APP = "app", RENPY = "renpy", GODOT = "godot", GAME = "game", LOGCAT = "logcat.txt", DEVICE = "thiet-bi.txt",
             LIGHT = "chay-nhe.txt", LIGHT_LAST = "chay-nhe-lan-truoc.txt";
     private static final int LOGCAT_LINES = 20000;
     private static final long LOGCAT_MAX_BYTES = 4L << 20;
@@ -38,8 +38,9 @@ final class AgvnLiveLogs {
      * "Chạy nhẹ" game as {@link AgvnLightSession} keeps it ("app/chay-nhe.txt": its error, the pictures shown empty,
      * an HTML page's first messages and the files it did not find, which a busy logcat loses and a HONOR phone sends
      * encrypted), the last run of {@code gameName} that has ended ("app/chay-nhe-lan-truoc.txt"), the RPG Maker files
-     * of {@code gameDir} mkxp-z found under another spelling or did not find ("app/tim-tep.txt"), and "renpy/" and
-     * "godot/" for {@code gameDir}.
+     * of {@code gameDir} mkxp-z found under another spelling or did not find ("app/tim-tep.txt"), "renpy/" and
+     * "godot/" for {@code gameDir}, and "game/": the logs the game writes beside its files or in logs/
+     * ({@link AgvnGameDirLogs}) since that last run began. Lona RPG's own error log was in no package (07/11/2026).
      */
     static void collect(Context context, File[] sessions, String gameName, File gameDir, File into) {
         if (sessions != null) {
@@ -50,13 +51,14 @@ final class AgvnLiveLogs {
             }
         }
         File app = new File(into, APP);
+        File last = AgvnLightSession.lastFile(context);
+        boolean lastIsThis = gameName != null && gameName.equals(AgvnLightSession.nameIn(last));
         if (app.mkdirs()) {
             logcat(new File(app, LOGCAT));
             write(new File(app, DEVICE), AgvnDeviceReport.text(context));
             File light = new File(context.getFilesDir(), AgvnLightSession.FILE);
             if (light.isFile()) copy(light, new File(app, LIGHT));
-            File last = AgvnLightSession.lastFile(context);
-            if (gameName != null && gameName.equals(AgvnLightSession.nameIn(last))) copy(last, new File(app, LIGHT_LAST));
+            if (lastIsThis) copy(last, new File(app, LIGHT_LAST));
             File rgssFiles = new File(new File(context.getFilesDir(), AgvnRgssFiles.RUN_DIR), AgvnRgssFiles.FILES_LOG);
             String files = gameDir != null ? AgvnRgssConfig.filesLogOf(FileUtils.readString(rgssFiles), gameDir) : null;
             if (files != null) write(new File(app, AgvnRgssFiles.FILES_LOG), files);
@@ -72,6 +74,19 @@ final class AgvnLiveLogs {
         File godotLog = new File(AgvnGodotLight.publicDir(AgvnSessionLog.root().getParentFile(), gameDir), "godot.log");
         File godot = new File(into, GODOT);
         if (godotLog.isFile() && godot.mkdirs()) AgvnEngineLogs.copy(Collections.singletonList(godotLog), godot, 0);
+        List<File> own = AgvnGameDirLogs.beside(gameDir);
+        long since = lastIsThis ? startOf(last) : 0;
+        File game = new File(into, GAME);
+        if (!own.isEmpty() && game.mkdirs()) AgvnEngineLogs.copy(own, game, since);
+    }
+
+    /** When the "Chạy nhẹ" run {@code last} began (ms), 0 when it does not say. */
+    private static long startOf(File last) {
+        try {
+            return Long.parseLong(AgvnPropsFile.load(last).getProperty(AgvnLightSession.START, "0").trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     /**
