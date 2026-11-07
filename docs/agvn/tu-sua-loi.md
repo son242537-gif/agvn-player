@@ -3542,3 +3542,89 @@ Gói có thêm thư mục `game/` với `error_log20261107_1757_14.txt`, và ng�
   - Lần chạy không có script hỏng đúng như trên điện thoại.
 - **Thử máy:** Lona RPG qua logo vào được bản đồ đầu tiên, ánh sáng hiện đúng. Nếu còn lỗi khác, nhật ký lỗi của game
   sẽ có trong `game/` của gói "Gửi nhật ký".
+
+## Game .NET "Chạy bằng Windows": chữ Việt làm GDI+ văng, profile, bảng thông số (bản 0.1.86)
+
+Báo cáo ngày 07/11/2026: POCO (Adreno 830), app 0.1.77, Proton 9 arm64ec, Wine Mono 9.3.1. Chín mục, cho mọi game .NET
+vẽ chữ bằng GDI+ (`System.Drawing`).
+
+### Lỗi 1: game .NET văng 0xC0000005 ở một chữ Việt đứng riêng
+
+- **Gốc (đối chiếu mã Wine 9.20: gdiplus `generate_font_link_info`, mlang `GetStrCodePages`):**
+  - Chữ Việt dựng sẵn (U+1EA0–U+1EF9: "ắ", "ệ") không nằm trong bảng mã nào. Cả 1258 cũng không, vì 1258 dùng dấu rời.
+  - Chuỗi chỉ có một chữ như vậy, hoặc kết thúc bằng nó, được tính ra 0 bảng mã. Có chữ khác theo sau thì Wine tính lại
+    từ chữ đó, nên chữ Việt giữa câu không sao. Khớp đúng hiện tượng trong báo cáo.
+  - `MapFont` với 0 bảng mã trả lỗi. gdiplus không kiểm lỗi đó, rồi đọc phải font rác → 0xC0000005.
+  - Wine 10 đã sửa: chỉ nối font khi font thiếu chữ. Nhưng Proton 10 của app cần Wine Mono bản khác 9.3.1, nên chưa
+    chuyển game .NET sang được.
+- **Sửa: `mlang.dll` của AGVN, đặt cạnh file chạy của game.**
+  - Nguồn `app/src/main/cpp/agvn/mlang-fontlink.c`, build bằng `scripts/agvn/mlang/build-mlang.sh` ra
+    `agvn-mlang32.dll`, `agvn-mlang64.dll`.
+  - Những gì nó sửa:
+    - Đoạn chữ không bảng mã nào có thì giữ font của game.
+    - Bảng mã của một chữ chỉ gồm những bảng mã thật sự có chữ đó.
+    - `MapFont` không tìm được font thì trả lại font của game.
+    - Font không khai bảng mã nào được coi như có đủ mọi bảng mã.
+  - Chữ thuộc bảng mã mà font không có (chữ Nhật trong font Latin) vẫn được nối font như Wine làm.
+  - Mọi hàm khác chuyển cho `mlang.dll` của Wine trong thư mục hệ thống.
+- **Lúc nào áp:** nút "Sửa lỗi vẽ chữ Việt của .NET" trong "Tự sửa lỗi", ở mục mới "Game .NET bị lỗi và tự tắt"
+  (`dotnet-crash`).
+  - Mục này hiện khi exe là chương trình .NET và game văng. "Văng" là có báo cáo crash của Wine, hoặc mã thoát 0xC…
+    do `agvn-winhandler.exe` báo. Trước đây mã thoát chỉ được ghi vào `su-kien.txt`, "Tự sửa lỗi" chưa đọc tới, nên game
+    văng mà Wine im lặng bị xem như tự tắt.
+  - Nút là một cài đặt của game (`agvnMlang`). Mỗi lần mở game: đang bật thì app đặt file, đã tắt thì app gỡ file của
+    AGVN. "Vẫn còn lỗi" trả cài đặt cũ như mọi nút khác.
+  - Game có `mlang.dll` riêng thì app không đụng tới, và cũng không hiện nút.
+  - File 32-bit hay 64-bit chọn theo cách Wine chạy exe (`AgvnClrHeader`). Exe PE32 "AnyCPU" chạy 64-bit.
+- **Chưa làm:** bật sẵn cho mọi game .NET.
+  - Bản sửa không làm game đang chạy tốt chạy kém đi. Nhưng đây là một DLL mới, nên chỉ đưa ra khi lỗi đã hiện.
+  - Thử máy đạt thì có thể bật mặc định.
+- **Test:**
+  - `scripts/agvn/mlang/run-test.sh`: 17 bước, so với `mlang.dll` của Wine. Bản 64-bit đạt hết trong Wine 9.0. Bản 32-bit
+    build được nhưng chưa chạy thử, vì máy build không có Wine 32-bit.
+  - `AgvnClrHeaderTest`, `AgvnGameEndTest`, `AgvnDoctorTest.aDotNetGameThatEndedWithACrashCode`.
+- **Thử máy:**
+  1. Game .NET của báo cáo, bỏ `mlang.dll` riêng của game. Lần mở đầu văng, "Tự sửa lỗi" hiện "Game .NET bị lỗi và tự tắt".
+  2. Bấm nút rồi mở lại: menu và thoại Việt hiện đủ. `su-kien.txt` có "đã đặt mlang.dll của AGVN".
+  3. Chọn "Vẫn còn lỗi": lần mở sau file đã được gỡ.
+
+### Lỗi 2: `dllOverrides` và `env` của `agvn-profile.json`
+
+- Từ bản 0.1.81, mỗi lần mở game app đọc lại `env` và `dllOverrides` (báo cáo viết trên 0.1.77).
+- Còn một chỗ sai: `"mlang": "d"` bị coi là sai luật, nên cả `env` cũng không được áp. Nay app nhận `"d"`,
+  `"disabled"` và `""` để tắt DLL. Wine đọc giá trị không có n hay b là tắt. Bản Python (`agvn_profile_lib.py`) theo cùng
+  luật.
+- `moi-truong.txt`:
+  - Biến nào lấy từ profile thì có thêm `<- agvn-profile.json: …`.
+  - Có dòng `# agvn-profile.json (env, dllOverrides) cho game: …`.
+- Profile thắng mặc định của app: `WINEDEBUG` của app đặt trước, `env` của game đặt sau.
+  - Vì vậy bật `+seh` theo từng game bằng profile được (Lỗi 5).
+
+### Lỗi 8: lớp phủ nuốt chạm
+
+- **Bảng thông số:**
+  - Chạm nhanh lên bảng FPS/CPU giờ đi xuống game ở dưới, thành một cú bấm 60 ms (`AgvnTapThrough`).
+  - Kéo để dời bảng, như cũ.
+  - Muốn đổi dọc/ngang thì giữ ngón 0,5 s.
+- **Cụm mũi tên:** profile đặt `"controls": "vn"` hoặc `"mouse"` (không có mũi tên), hoặc người chơi tắt phím ảo.
+
+### Chưa sửa, cần thêm nhật ký
+
+- **Lỗi 6 (lệch chạm):**
+  - "Hình phủ kín màn" nghĩa là "Vừa màn hình" đã vẽ cửa sổ game to ra. Chỉ một khung nhỏ so với màn hình mới được vẽ
+    như vậy, nên màn hình ảo lúc đó lớn hơn 1520×861, nhiều khả năng là 1920×1080. Khớp với việc Wine báo 1920×1080.
+  - Chạm kẹp ở góc trên-trái vùng trong của cửa sổ, ở cả hai chế độ chạm. Rất có thể game giữ con trỏ trong cửa sổ của nó,
+    rồi đọc vị trí con trỏ theo màn hình mà dùng như vị trí trong cửa sổ. Khi đó chỉ cửa sổ nằm ở (0,0) mới đúng, khớp
+    với điều người làm game đã thử.
+  - `su-kien.txt` nay ghi cả vị trí: "Khung game … tại (x,y) trên màn hình …". Cần gói nhật ký của bản game chưa dời cửa
+    sổ để chắc. Nếu đúng vậy, app có thể dời cửa sổ về (0,0) khi bật "Vừa màn hình".
+- **Lỗi 3 và 7 (mất tiêu điểm, phím ảo không tới):**
+  - App mở bàn phím Android không đổi cửa sổ được chọn trong Wine.
+  - Dòng "Game có ô nhập chữ" hiện vì trong game có một ô nhập chữ của Windows đang được chọn. Ô đó giữ phím, còn chuột
+    vẫn tới cửa sổ dưới ngón tay. Một cú chạm chọn lại cửa sổ game.
+  - Cần nhật ký để biết ô đó thuộc cửa sổ nào trước khi app tự chọn lại cửa sổ game. Chọn sai sẽ cướp phím của ô nhập
+    tên.
+- **Lỗi 4 (exe AnyCPU):** Wine chạy exe PE32 "AnyCPU" ở 64-bit, như Windows. Trên Wine arm64ec, .NET 64-bit chưa nạp
+  được. `AgvnClrHeader` đã nhận ra loại exe này. Chạy nó ở 32-bit cần sửa header của exe hoặc chạy một bản sao, nên để
+  bản sau.
+- **Lỗi 9 (cụt dấu chữ hoa):** Wine cắt glyph ở mức `usWinAscent` khi GDI+ vẽ. Bản game nâng ascent của font như đã làm.

@@ -1,0 +1,8 @@
+AGVN Player v0.1.86 - agvn.io
+
+Sửa lỗi:
+- Game .NET (C#) "Chạy bằng Windows" tắt ngay ở màn đầu có chữ Việt (mã 0xC0000005): "Tự sửa lỗi" giờ nhận ra lỗi này và có nút "Sửa lỗi vẽ chữ Việt của .NET". Nút đặt một mlang.dll đã vá cạnh file chạy của game; nếu vẫn lỗi, app tự gỡ file đó.
+- Game tắt với mã lỗi mà nhật ký Wine không ghi gì: "Tự sửa lỗi" đọc được mã thoát của game.
+- agvn-profile.json: "dllOverrides" nhận "d" (hoặc "disabled") để tắt một DLL, và không còn làm cả "env" bị bỏ qua. moi-truong.txt ghi rõ biến nào lấy từ profile.
+- Bảng thông số (FPS, CPU…) không còn nuốt cú chạm: chạm nhanh lên bảng sẽ bấm vào game bên dưới. Kéo để dời bảng, giữ ngón để đổi dọc/ngang.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
