@@ -220,7 +220,20 @@
     var gui = { Window: { get: function () { return nwWindow; } }, App: { quit: noop, argv: [], dataPath: '/' },
         Shell: { openExternal: noop, openItem: noop }, Menu: function () { return { append: noop, createMacBuiltin: noop }; },
         MenuItem: function () { return {}; }, Screen: { Init: noop, on: noop, screens: [] } };
-    var modules = { fs: fs, path: path, 'nw.gui': gui, os: { platform: function () { return 'android'; }, EOL: '\n' } };
+    // os: a plugin that measures the machine read os.cpus() and os.totalmem() as it ticked, and stopped on each
+    // "os.cpus is not a function" (07/11/2026): what the phone tells, else plain numbers
+    var nav = typeof navigator !== 'undefined' ? navigator : {};
+    var cores = Math.max(1, nav.hardwareConcurrency || 4), ram = (nav.deviceMemory || 4) * 1073741824;
+    var startedS = Date.now() / 1000;
+    var cpu = function () { return { model: 'Android', speed: 0, times: { user: 0, nice: 0, sys: 0, idle: 0, irq: 0 } }; };
+    var os = { platform: function () { return 'android'; }, EOL: '\n', type: function () { return 'Linux'; },
+        release: function () { return ''; }, arch: function () { return 'arm64'; }, hostname: function () { return 'agvn'; },
+        cpus: function () { var list = []; for (var i = 0; i < cores; i++) list.push(cpu()); return list; },
+        totalmem: function () { return ram; }, freemem: function () { return Math.round(ram / 2); },
+        uptime: function () { return Math.round(Date.now() / 1000 - startedS); }, loadavg: function () { return [0, 0, 0]; },
+        homedir: function () { return '/'; }, tmpdir: function () { return '/tmp'; }, endianness: function () { return 'LE'; },
+        userInfo: function () { return { username: 'player', homedir: '/' }; }, networkInterfaces: function () { return {}; } };
+    var modules = { fs: fs, path: path, 'nw.gui': gui, os: os };
     // 13: Node's Buffer and crypto (html-node-*.js, loaded first), and child_process for a plugin that opens a page with
     // it: an error it can catch, since a phone runs no program
     if (window.__agvnNodeCrypto) modules.crypto = window.__agvnNodeCrypto;

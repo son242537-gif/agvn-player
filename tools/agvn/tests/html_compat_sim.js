@@ -36,6 +36,14 @@ assert.strictEqual(store['agvn_fs:/data/_thu.json'], '[1]', 'the copy is written
 assert.strictEqual(ctx.process.versions.nw, undefined);
 const p = ctx.require('path');
 assert.strictEqual(p.join('/www', 'save', '../data', 'a.json'), '/www/data/a.json');
+// os as a machine-measuring plugin reads it each tick (07/11/2026: "os.cpus is not a function")
+const os = ctx.require('os');
+assert.ok(os.cpus().length >= 1 && os.cpus()[0].times.idle === 0);
+assert.ok(os.totalmem() > os.freemem() && os.freemem() > 0);
+assert.strictEqual(typeof os.type(), 'string');
+assert.strictEqual(typeof os.release(), 'string');
+assert.strictEqual(os.platform(), 'android');
+assert.ok(os.uptime() >= 0);
 assert.strictEqual(p.basename('/a/b.rpgsave', '.rpgsave'), 'b');
 const f = ctx.require('fs');
 assert.strictEqual(f.existsSync('/data/Items.json'), true);
