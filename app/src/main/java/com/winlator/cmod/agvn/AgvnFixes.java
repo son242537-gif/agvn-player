@@ -175,8 +175,8 @@ final class AgvnFixes {
             }
             case "wine-mono":
                 return AgvnWineMono.offered(a, s) ? new Fix(id, a.getString(R.string.agvn_fix_wine_mono), "1") : null;
-            case AgvnWine10Fix.ID: // an Electron or NW.js game that froze on Proton 9
-                return AgvnWine10Fix.make(a, s);
+            case AgvnWine10Fix.ID: // an Electron or NW.js game that froze on Proton 9, or Wine that did not start
+                return AgvnWine10Fix.make(a, s, finding);
             case "wine-old": { // a game that fails on Proton 10 goes back to Proton 9's container (AgvnWine10)
                 Container old = AgvnWine10.runs(s.container) ? AgvnWine10.find(new ContainerManager(a).getContainers(), false) : null;
                 return old != null ? new Fix(id, a.getString(R.string.agvn_fix_wine_old), String.valueOf(old.id)) : null;

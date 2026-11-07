@@ -71,11 +71,27 @@ public final class AgvnSessionLog {
                     AgvnExeMain.takeNote(), AgvnEngineRecheck.takeNote(), AgvnDxvkSet.takeNote(),
                     AgvnProfileEnv.takeNote(), AgvnHeapPad.takeNote()};
             for (String note : notes) if (note != null) event(note);
+            String stale = staleWine();
+            if (stale != null) event(stale);
             AgvnLogFolders.prune(gameLogs);
             AgvnLogFolders.pruneLoose(root(), System.currentTimeMillis());
         } catch (Exception e) {
             Log.w(TAG, "session log not started", e);
         }
+    }
+
+    /**
+     * Wine's processes running before this game's Wine starts, left from an earlier run, as "wineserver (1234)"; null for
+     * none. Kinjo No Hitozuma's Wine lost its wineserver at once, three starts in a row (06/11/2026): whether an old one
+     * was still there, no log said.
+     */
+    private static String staleWine() {
+        List<String> names = new ArrayList<>();
+        for (String pid : com.winlator.cmod.core.ProcessHelper.listRunningWineProcesses()) {
+            String comm = read(new File("/proc/" + pid + "/comm")).trim();
+            names.add((comm.isEmpty() ? "?" : comm) + " (" + pid + ")");
+        }
+        return names.isEmpty() ? null : "Tiến trình Wine còn chạy từ trước khi mở game: " + String.join(", ", names);
     }
 
     /** Adds a timestamped line to the running session's events (no-op without a session). */

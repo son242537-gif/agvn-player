@@ -399,6 +399,27 @@ public class AgvnDoctorTest {
     }
 
     @Test
+    public void wineThatLostItsServerAsItStartedIsNoGameProblem() {
+        // Kinjo No Hitozuma (Unity), MEIZU 20 Pro, 06/11/2026: Wine ended with 1 within a second, three starts in a row;
+        // the first was read as a screen too small (854x480), and "quality-up" and "reset" changed nothing
+        AgvnEvidence ev = noStart("esync: up and running.", "Failed to open /etc/machine-id, error No such file or directory.",
+                "wine client error:0: recvmsg: Connection reset by peer");
+        ev.engine = "UNITY";
+        ev.seconds = 1;
+        ev.smallScreen = true;
+        ev.params.put("screen", "854×480");
+        assertEquals("wine-gone", found(ev));
+        assertEquals(Arrays.asList("esync-off", "wine-new", "wine-old", "send-logs"), catalog.byId("wine-gone").fixes);
+        assertEquals("low-resolution", found(noStartSmall("esync: up and running.")));
+    }
+
+    private static AgvnEvidence noStartSmall(String... lines) {
+        AgvnEvidence ev = noStart(lines);
+        ev.smallScreen = true;
+        return ev;
+    }
+
+    @Test
     public void aGameThatFrozeRightAfterItsSwapChainWasMadeAgainIsOfferedNoPresentWait() {
         // Unity 2022.3, D3D11, Adreno 830, 0.1.74 (03/11/2026): its logo, then black at 0% CPU, the player tapping
         AgvnEvidence ev = new AgvnEvidence();
