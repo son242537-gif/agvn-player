@@ -64,6 +64,12 @@ public final class AgvnRepairAsk {
                 notOn(state);
                 return;
             }
+            // said first: a run on trial, such as "Chạy bằng Windows" for a "Chạy nhẹ" game, read as the game's own
+            // way of running (07/11/2026)
+            AgvnProblemCatalog.Finding f =
+                    AgvnDoctor.catalog(activity).finding(AgvnRepair.symptom(state), Collections.emptyMap());
+            AgvnSessionLog.event("Tự sửa lỗi: lần mở này là lần thử \"" + AgvnRepair.label(state) + "\" cho lỗi người chơi"
+                    + " báo (\"" + (f != null ? f.title() : AgvnRepair.symptom(state)) + "\"); không hết lỗi thì app trả cấu hình cũ");
         }
         long stoppedMs = (AgvnGamePause.pausedNs(System.nanoTime()) - stoppedAtStartNs) / 1_000_000L;
         long played = SystemClock.uptimeMillis() - startMs - stoppedMs;
