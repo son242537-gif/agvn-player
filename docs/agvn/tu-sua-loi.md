@@ -3351,3 +3351,20 @@ trong mã app.
      tiêu đề đủ ảnh, có nhạc sau lần chạm đầu, mod được nạp.
   2. Cố ý làm hỏng một script nạp đầu của một game MV: sau khoảng 15 giây màn hình hiện lỗi, không đen im lặng.
   3. Hồi quy: một game MV và một game MZ thường (không mod) vẫn chạy, lưu và tải được; game Electron "Chạy nhẹ" vẫn mở.
+
+## "Chạy nhẹ": tệp âm thanh mã hoá quá ngắn làm game RPG Maker văng (bản 0.1.83)
+
+Báo cáo ngày 07/11/2026 (POCO F8 Pro, app 0.1.82, mục 8 của báo cáo "Chạy nhẹ với game web đóng gói NW.js"): tệp
+`.rpgmvo` ngắn hơn 16 byte được trả nguyên, engine giải mã 16 byte sau phần đầu tệp và dừng game với
+`Invalid typed array length: 16`.
+
+- **Vì sao:** lưới đỡ tệp hỏng (`AgvnHtmlStandIn`, từ 0.1.20) chỉ có cho ảnh mã hoá (`.rpgmvp`, `.png_`): ảnh thiếu hay
+  ngắn thì app đưa ảnh rỗng đã mã hoá bằng khoá của game. Âm thanh mã hoá ngắn thì app gửi nguyên tệp.
+- **Sửa (`AgvnHtmlStandIn.shortSound`, `AgvnHtmlFiles.serve` và `head`):** âm thanh mã hoá (`.rpgmvo`, `.rpgmvm`,
+  `.ogg_`, `.m4a_`) ngắn hơn 32 byte (16 byte đầu tệp và 16 byte khoá che) được trả 404 như tệp thiếu. Nhật ký ghi
+  "HTML game sound short: N bytes, served as missing", và "Gửi nhật ký" có tên tệp. `html-compat.js` đã bỏ qua âm thanh
+  thiếu thay vì dừng game (mục 3 của tệp đó). Nếu game có bản thường (`.ogg`) bên cạnh, app vẫn mã hoá bản đó để dùng như
+  trước. `fs.existsSync` của tệp như vậy là `false`.
+- **Test:** `AgvnHtmlStandInTest.anEncryptedSoundTooShortToDecryptIsMissing`.
+- **Thử máy:** một game MV có một `.rpgmvo` bị cắt còn vài byte: chơi tới chỗ phát tiếng đó, game không văng, chỉ thiếu
+  tiếng đó; "Gửi nhật ký" có tên tệp.

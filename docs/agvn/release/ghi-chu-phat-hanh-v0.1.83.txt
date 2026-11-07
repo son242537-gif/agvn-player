@@ -1,0 +1,5 @@
+AGVN Player v0.1.83 - agvn.io
+
+Sửa lỗi:
+- "Chạy nhẹ": game RPG Maker MV/MZ có tệp âm thanh mã hoá bị hỏng (quá ngắn) không còn văng với lỗi "Invalid typed array length: 16". Tiếng đó được bỏ qua, game chạy tiếp.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

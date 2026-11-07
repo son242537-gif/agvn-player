@@ -81,6 +81,12 @@ public final class AgvnHtmlFiles {
         }
         if (plain != null || empty != null) return new WebResourceResponse("application/octet-stream", null, 200, "OK",
                 CORS, new ByteArrayInputStream(plain != null ? plain : empty));
+        if (AgvnHtmlStandIn.shortSound(urlPath, file)) { // too short to decrypt: a missing sound, which the game skips
+            String why = AgvnHtmlStandIn.why(root, urlPath, file);
+            Log.w("AGVN", "HTML game sound " + why + ", served as missing: " + urlPath);
+            if (missing != null) missing.accept(decode(urlPath) + " (" + why + ")");
+            return new WebResourceResponse("text/plain", "UTF-8", 404, "Not Found", CORS, empty());
+        }
         if (file == null) {
             String why = AgvnHtmlStandIn.why(root, urlPath, null);
             Log.w("AGVN", "HTML game file missing: " + urlPath + " (" + why + ")");
@@ -172,7 +178,8 @@ public final class AgvnHtmlFiles {
      */
     public static WebResourceResponse head(File root, String urlPath) {
         File file = fileFor(root, urlPath);
-        boolean there = file != null || AgvnHtmlStandIn.plainFor(root, urlPath, null) != null;
+        boolean there = file != null && !AgvnHtmlStandIn.shortSound(urlPath, file)
+                || AgvnHtmlStandIn.plainFor(root, urlPath, file) != null;
         return new WebResourceResponse(there ? mimeType(urlPath == null ? "" : urlPath) : "text/plain", null,
                 there ? 200 : 404, there ? "OK" : "Not Found", CORS, empty());
     }

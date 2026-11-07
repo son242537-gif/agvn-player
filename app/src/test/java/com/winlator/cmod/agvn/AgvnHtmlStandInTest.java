@@ -120,4 +120,22 @@ public class AgvnHtmlStandInTest {
         assertFalse(AgvnHtmlStandIn.encryptedPicture("/audio/se/Cursor1.rpgmvo"));
         assertFalse(AgvnHtmlStandIn.encryptedPicture(null));
     }
+
+    @Test
+    public void anEncryptedSoundTooShortToDecryptIsMissing() throws IOException {
+        // RPG Maker MV (0.1.82, 07/11/2026): a .rpgmvo under 16 bytes stopped the game with "Invalid typed array length: 16"
+        File root = game("{\"encryptionKey\":\"" + KEY + "\"}");
+        assertTrue(new File(root, "audio/se").mkdirs());
+        File broken = file(root, "audio/se/Cursor1.rpgmvo", 12);
+        File whole = file(root, "audio/se/Decision1.rpgmvo", 4000);
+        assertTrue(AgvnHtmlStandIn.shortSound("/audio/se/Cursor1.rpgmvo", broken));
+        assertTrue(AgvnHtmlStandIn.shortSound("/audio/se/Cursor1.ogg_", broken));
+        assertFalse(AgvnHtmlStandIn.shortSound("/audio/se/Decision1.rpgmvo", whole));
+        assertFalse("pictures get the empty picture instead", AgvnHtmlStandIn.shortSound("/img/pictures/a.rpgmvp", broken));
+        assertFalse("a missing one is missing anyway", AgvnHtmlStandIn.shortSound("/audio/se/Cursor1.rpgmvo", null));
+        assertTrue(AgvnHtmlStandIn.encryptedSound("/audio/bgm/Theme.M4A_"));
+        // its plain .ogg beside it still goes first, encrypted with the game's key
+        file(root, "audio/se/Cursor1.ogg", 100);
+        assertNotNull(AgvnHtmlStandIn.plainFor(root, "/audio/se/Cursor1.rpgmvo", broken));
+    }
 }

@@ -38,6 +38,21 @@ final class AgvnHtmlStandIn {
         return lower.endsWith(".rpgmvp") || lower.endsWith(".png_");
     }
 
+    /** True for the URL path of an encrypted sound (MV: .rpgmvo, .rpgmvm; MZ: .ogg_, .m4a_). */
+    static boolean encryptedSound(String urlPath) {
+        String lower = urlPath == null ? "" : urlPath.toLowerCase(Locale.ROOT);
+        return lower.endsWith(".rpgmvo") || lower.endsWith(".rpgmvm") || lower.endsWith(".ogg_") || lower.endsWith(".m4a_");
+    }
+
+    /**
+     * True when encrypted sound {@code urlPath} has a {@code file} shorter than {@link #SHORTEST}: the engine decrypts the
+     * 16 bytes after the header and stopped the game with "Invalid typed array length: 16" (RPG Maker MV, 0.1.82,
+     * 07/11/2026). It is served as missing instead, which html-compat.js skips as a missing sound.
+     */
+    static boolean shortSound(String urlPath, File file) {
+        return file != null && file.length() < SHORTEST && encryptedSound(urlPath);
+    }
+
     /**
      * The bytes to serve for encrypted picture {@code urlPath} whose file is {@code file} (null: missing): {@code png}
      * encrypted with the game's key when the file is missing or shorter than {@link #SHORTEST}; null to serve the file
