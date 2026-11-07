@@ -95,13 +95,25 @@ public class AgvnRenpyPy2Test {
     public void aRenpyGamesLogsAreItsOwn() throws Exception {
         File dir = game("logs");
         File exe = new File(dir, "MyGame.exe");
-        List<File> renpy = AgvnEngineLogs.candidates(exe, dir, "RENPY", tmp.getRoot());
-        assertTrue(renpy.contains(new File(dir, "log.txt")));
+        // names as written, case and all: on Windows File.equals ignores case, so "Log.txt" equalled Ren'Py's "log.txt"
+        List<String> renpy = names(dir, AgvnEngineLogs.candidates(exe, dir, "RENPY", tmp.getRoot()));
+        assertTrue(renpy.toString(), renpy.contains("log.txt"));
         for (String other : new String[]{"BepInEx/LogOutput.log", "MelonLoader/Latest.log", "ue4ss/UE4SS.log", "Log.txt"})
-            assertFalse(other, renpy.contains(new File(dir, other)));
-        List<File> unknown = AgvnEngineLogs.candidates(exe, dir, "", tmp.getRoot());
-        assertTrue(unknown.contains(new File(dir, "BepInEx/LogOutput.log")));
-        assertTrue(unknown.contains(new File(dir, "ue4ss/UE4SS.log")));
-        assertFalse(AgvnEngineLogs.candidates(exe, dir, "UNITY", tmp.getRoot()).contains(new File(dir, "ue4ss/UE4SS.log")));
+            assertFalse(other + " in " + renpy, renpy.contains(other));
+        List<String> unknown = names(dir, AgvnEngineLogs.candidates(exe, dir, "", tmp.getRoot()));
+        assertTrue(unknown.contains("BepInEx/LogOutput.log"));
+        assertTrue(unknown.contains("ue4ss/UE4SS.log"));
+        assertFalse(names(dir, AgvnEngineLogs.candidates(exe, dir, "UNITY", tmp.getRoot())).contains("ue4ss/UE4SS.log"));
+    }
+
+    /** {@code files} as paths under {@code dir} with "/", spelled as given. */
+    private static List<String> names(File dir, List<File> files) {
+        List<String> out = new java.util.ArrayList<>();
+        String root = dir.getPath() + File.separator;
+        for (File f : files) {
+            String path = f.getPath();
+            if (path.startsWith(root)) out.add(path.substring(root.length()).replace(File.separatorChar, '/'));
+        }
+        return out;
     }
 }
