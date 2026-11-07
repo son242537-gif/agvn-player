@@ -3453,3 +3453,65 @@ MV chạy bằng "Chạy nhẹ".
   1. Lona RPG, làm lại việc lúc nãy: không còn bảng lỗi `\xE2`, mà là lỗi của chính game (hoặc game chạy tiếp). Chụp lại
      bảng đó và "Gửi nhật ký".
   2. Hồi quy: lưu và tải game RPG Maker VX Ace "Chạy nhẹ" như cũ.
+
+## Wine dừng ngay khi vừa mở: "Wine không khởi động được" (bản 0.1.85)
+
+Gói nhật ký ngày 06/11/2026 (MEIZU 20 Pro, Snapdragon 8 Gen 2, Adreno 740, Android 16, app 0.1.82). Kinjo No Hitozuma
+(Unity, thư mục "KINJO NO HITOZUMA GAMEHUB") được mở ba lần liền, lúc 22:29:57, 22:30:00 và 22:30:02.
+
+- **Nhật ký:**
+  - Lần nào Wine cũng kết thúc với mã 1 trong khoảng một giây, chưa vẽ khung nào.
+  - `wine-cuoi.txt` chỉ có ba dòng: `esync: up and running.`, `Failed to open /etc/machine-id…` và
+    `wine client error:0: recvmsg: Connection reset by peer`.
+  - Tiến trình Wine đầu tiên mất kết nối với wineserver trước khi game kịp chạy. Không có lỗi của game, không có
+    seccomp hay SELinux trong logcat, wineserver không in gì.
+  - Thư mục tạm của Wine được xoá mỗi lần mở (`usr/tmp`), nên ít khả năng còn socket cũ.
+- **"Tự sửa lỗi" đọc sai:**
+  - Lần đầu đọc thành "Game không chạy ở độ phân giải 854×480" (`low-resolution`), hai lần sau thành "Game tắt ngay
+    sau khi mở".
+  - Người chơi bấm "quality-up" rồi "reset", đều vô ích, vì lỗi không nằm ở game.
+- **Sửa:**
+  - **Mục "Wine không khởi động được" (`wine-gone`):** game không lên (`no-start`) và log Wine có
+    `wine client error:…`. Mục này đứng trước "low-resolution" và "no-start".
+    - Thứ tự cách sửa: tắt esync (`esync-off`, esync dùng bộ nhớ chung của wineserver), "Chạy bằng Wine mới
+      (Proton 10)" (`wine-new`), "Chạy bằng Wine cũ (Proton 9)" cho game đang ở Proton 10 (`wine-old`), gửi nhật ký.
+    - Container Proton 10 có prefix và wineserver riêng. `AgvnWine10Fix` nay đề nghị Proton 10 ở mục này cho mọi
+      game, không chỉ game Electron/NW.js.
+    - Lời giải thích nói rõ lỗi không ở game; nếu mọi game đều bị thì buộc dừng app hoặc khởi động lại máy.
+  - **`su-kien.txt`:** ghi tiến trình Wine nào còn chạy từ trước lúc mở game, ví dụ "wineserver (1234)"
+    (`AgvnSessionLog.staleWine`), để biết có wineserver cũ hay không.
+- **Chưa biết nguyên nhân:** vì sao wineserver ngắt kết nối. Cần biết các game khác trên máy đó có mở được không.
+- **Test:** `AgvnDoctorTest.wineThatLostItsServerAsItStartedIsNoGameProblem` (ba dòng log của báo cáo).
+- **Thử máy:**
+  1. Trên MEIZU 20 Pro, mở game: nếu Wine vẫn dừng thì "Tự sửa lỗi" hiện "Wine không khởi động được". Thử "Tắt esync",
+     rồi "Chạy bằng Wine mới (Proton 10)".
+  2. Gửi nhật ký: `su-kien.txt` cho biết có tiến trình Wine cũ không.
+
+## Phím hệ thống của Xiaomi bị đưa vào game thành tay cầm (bản 0.1.85)
+
+Báo cáo ngày 07/11/2026 (POCO, Adreno 830, Android 16, app 0.1.77). Không cắm tay cầm nào.
+
+- **Hiện tượng:** game có chế độ điều khiển "Auto" (Unity Input System, XInput, SDL, Rewired) mở lên báo
+  `Detected Controller Type: Xbox`, khoá con trỏ (`Cursor.lockState = Locked`). Chạm vào nút của game không ăn; chỉ
+  nút IMGUI (đọc Input cũ) bấm được.
+  - `su-kien.txt` có: `Bàn phím, chuột, tay cầm đang nối: uinput-xiaomi (tay cầm; nguồn 0x501)`.
+- **Vì sao:**
+  - `uinput-xiaomi` là thiết bị ảo của hệ điều hành, chỉ có `KEY_HOME`, `KEY_POWER`, `KEY_MENU`, `KEY_BACK` và `BTN_C`.
+    Vì có `BTN_C`, Android gắn nguồn GAMEPAD (0x501).
+  - `ExternalController.isGameController` của Winlator coi mọi thiết bị có nguồn GAMEPAD là tay cầm, chỉ loại riêng
+    `uinput-fpc` theo tên. Wine vì thế thấy một tay cầm luôn cắm.
+- **Sửa (`AgvnGamepadCheck`):** một thiết bị chỉ là tay cầm khi có cần hoặc phím hướng (trục X/Y hay HAT của joystick)
+  hoặc có nút chính (A, B, X, hay nút 1 của tay cầm DirectInput đời cũ).
+  - Đây là quy tắc theo khả năng của thiết bị, không theo tên hay hãng máy. Các thiết bị khác chỉ có phím hệ thống
+    cũng bị loại như vậy.
+  - Tay cầm Bluetooth/USB và tay cầm gắn sẵn của máy chơi game Android (không phải thiết bị ngoài) có cần và nút, nên
+    vẫn dùng như cũ. Vì vậy không dùng tiêu chí `isExternal()`.
+  - `su-kien.txt` ghi thiết bị Android gọi là tay cầm mà không được đưa vào game, ví dụ `uinput-xiaomi (0x501)`.
+- **Chưa làm:**
+  - Tuỳ chọn "Tay cầm cho game thấy" trong cài đặt game.
+  - Bỏ qua lệnh khoá con trỏ khi đang chạm: game 3D xoay camera bằng chuột (`AgvnMouseLook`) cần lệnh đó.
+- **Test:** `AgvnInputDevicesTest.aDeviceWithNoStickNorFaceButtonsIsNoGamepad`.
+- **Thử máy:**
+  1. POCO/Xiaomi không cắm tay cầm: `su-kien.txt` không còn "uinput-xiaomi (tay cầm…)", mà có dòng "không đưa vào game".
+     Game Unity có chế độ Auto không khoá chuột, chạm bấm được nút.
+  2. Cắm tay cầm Bluetooth: game vẫn nhận tay cầm.
