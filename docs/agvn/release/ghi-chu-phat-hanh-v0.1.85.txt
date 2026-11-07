@@ -3,4 +3,5 @@ AGVN Player v0.1.85 - agvn.io
 Sửa lỗi:
 - Máy Xiaomi/POCO: phím hệ thống của máy (uinput-xiaomi) không còn bị đưa vào game thành một tay cầm. Game có chế độ điều khiển "Tự động" không còn tự chuyển sang tay cầm rồi khoá chuột, nên chạm lại bấm được nút của game. Tay cầm thật (Bluetooth, USB, tay cầm gắn sẵn của máy chơi game) vẫn dùng như cũ.
 - Wine dừng ngay khi vừa mở game: "Tự sửa lỗi" nói rõ lỗi nằm ở Wine chứ không ở game, và đề nghị tắt esync hoặc chạy bằng Wine mới (Proton 10), thay vì đổi độ phân giải hay cấu hình đồ hoạ.
+- "Chạy nhẹ" game RPG Maker XP/VX/VX Ace (như Lona RPG): game không còn dừng với lỗi "Argument 0: Expected bool" khi script đặt ẩn/hiện bằng một giá trị khác true/false, như bản Windows vẫn chạy được.
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

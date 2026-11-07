@@ -3515,3 +3515,30 @@ Báo cáo ngày 07/11/2026 (POCO, Adreno 830, Android 16, app 0.1.77). Không c�
   1. POCO/Xiaomi không cắm tay cầm: `su-kien.txt` không còn "uinput-xiaomi (tay cầm…)", mà có dòng "không đưa vào game".
      Game Unity có chế độ Auto không khoá chuột, chạm bấm được nút.
   2. Cắm tay cầm Bluetooth: game vẫn nhận tay cầm.
+
+## Lona RPG: "Argument 0: Expected bool" ở thư viện ánh sáng (bản 0.1.85)
+
+Gói nhật ký ngày 07/11/2026 (vivo V2507A, Mali-G925, app 0.1.84). Sau bản sửa 0.1.84, game ghi được nhật ký lỗi của nó.
+Gói có thêm thư mục `game/` với `error_log20261107_1757_14.txt`, và người chơi thấy logo của game.
+
+- **Lỗi gốc:** `TypeError: Argument 0: Expected bool` ở `460_KHAS_LightLib.rb:1334:in 'visible='`, khi dựng bản đồ
+  đầu tiên (`Spriteset_Map` → `update_ultra_graphics` → `KHAS_LightGroup#refresh`). Mod đang bật: cheatframework,
+  visuals, bellybooba.
+- **Vì sao:**
+  - Script ánh sáng KHAS gán cho `visible=` một giá trị không phải `true`/`false`.
+  - RGSS trên Windows nhận mọi giá trị theo kiểu đúng/sai của Ruby: `false` và `nil` là ẩn, còn lại là hiện.
+  - mkxp-z (`rb_get_args` kiểu "b", `rb_bool_arg`) chỉ nhận `true`, `false`, `nil`, còn lại báo `Argument 0:
+    Expected bool`. Lỗi chung cho mọi thuộc tính có/không của RGSS, không riêng Lona.
+- **Sửa (`agvn_bools.rb`, nạp trước script của game):** các setter có/không chuyển giá trị thành `true`/`false` trước
+  khi tới mkxp-z.
+  - Danh sách: `Sprite#visible=`, `#mirror=`; `Plane`, `Viewport`, `Tilemap#visible=`; `Window#visible=`,
+    `#active=`, `#pause=`, `#arrows_visible=`; `Font#bold=`, `#italic=`, `#outline=`, `#shadow=` và
+    `Font.default_*`; `Graphics.fullscreen=`. Setter nào mkxp-z không có thì bỏ qua.
+  - Lớp bọc là một chuỗi `alias` như script RGSS vẫn viết, không dùng `prepend`. Game `alias` lại `visible=` rồi định
+    nghĩa lại nó thì vẫn chạy bình thường. Với `prepend`, cách viết đó lặp vô hạn (test đã bắt được).
+- **Test:** `scripts/agvn/mkxp-z/test-agvn-bools.rb`.
+  - Lối gọi của KHAS (`visible =` một số), `nil`, `0`, chuỗi, `Window`, `Font` và `Font.default_bold=`.
+  - Game tự `alias` và định nghĩa lại `visible=`; script nạp hai lần.
+  - Lần chạy không có script hỏng đúng như trên điện thoại.
+- **Thử máy:** Lona RPG qua logo vào được bản đồ đầu tiên, ánh sáng hiện đúng. Nếu còn lỗi khác, nhật ký lỗi của game
+  sẽ có trong `game/` của gói "Gửi nhật ký".
