@@ -41,6 +41,8 @@ public class GameDllOverridesTest {
     public void validModes() {
         assertTrue(GameDllOverrides.isValid("dinput8", "n,b"));
         assertTrue(GameDllOverrides.isValid("version", ""));
+        assertTrue(GameDllOverrides.isValid("mlang", "d"));
+        assertTrue(GameDllOverrides.isValid("mlang", "disabled"));
         assertTrue(!GameDllOverrides.isValid("x;y", "n"));
         assertTrue(!GameDllOverrides.isValid("dinput8", "native"));
     }

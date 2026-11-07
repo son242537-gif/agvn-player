@@ -48,7 +48,10 @@ public final class AgvnProfile {
     public Integer texturePool;
     public Boolean simulatedTouchscreen;
     public Preset weakDevice;
-    /** Extra Wine DLL overrides, e.g. {"dinput8": "n,b"}; proxy DLLs next to the exe are detected automatically. */
+    /**
+     * Extra Wine DLL overrides, e.g. {"dinput8": "n,b"}, or "d" (also "disabled", "") to turn one off; proxy DLLs next
+     * to the exe are detected automatically.
+     */
     public Map<String, String> dllOverrides = new LinkedHashMap<>();
     /** UE Engine.ini overrides: section -> key -> value. */
     public Map<String, Map<String, String>> ueEngineIni = new LinkedHashMap<>();

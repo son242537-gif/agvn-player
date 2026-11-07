@@ -30,14 +30,23 @@ public final class AgvnLaunchNote {
 
     /**
      * The lines after the graphics variables: each variable {@code containerEnv} or {@code gameEnv} names, with the
-     * value {@code env} (what Wine got) has for it; {@code execArgs}; {@code command} ("?" when unknown).
+     * value {@code env} (what Wine got) has for it, marked when agvn-profile.json gives it ({@code profileEnv}, what
+     * AgvnProfileEnv applied); {@code execArgs}; {@code command} ("?" when unknown). A game maker could not tell
+     * whether the profile's WINEDEBUG and dllOverrides reached the game (07/11/2026).
      */
-    static String text(EnvVars env, String containerEnv, String gameEnv, String execArgs, String command) {
+    static String text(EnvVars env, String containerEnv, String gameEnv, String profileEnv, String execArgs, String command) {
         Set<String> names = new TreeSet<>();
         for (String set : new String[]{containerEnv, gameEnv}) for (String name : new EnvVars(set == null ? "" : set)) names.add(name);
+        EnvVars profile = new EnvVars(profileEnv == null ? "" : profileEnv);
         StringBuilder s = new StringBuilder("\n# Biến môi trường do container và Cài đặt game đặt, như Wine nhận:\n");
-        for (String name : names) s.append(name).append('=').append(env.has(name) ? env.get(name) : "(Wine không nhận)").append('\n');
+        for (String name : names) {
+            s.append(name).append('=').append(env.has(name) ? env.get(name) : "(Wine không nhận)");
+            if (profile.has(name)) s.append("   <- agvn-profile.json: ").append(profile.get(name));
+            s.append('\n');
+        }
         if (names.isEmpty()) s.append("(không có)\n");
+        s.append("# agvn-profile.json (env, dllOverrides) cho game: ")
+                .append(profileEnv == null || profileEnv.trim().isEmpty() ? "(không có)" : profileEnv.trim()).append('\n');
         s.append("# Tham số chạy của game (Cài đặt game): ")
                 .append(execArgs == null || execArgs.trim().isEmpty() ? "(không có)" : execArgs.trim()).append('\n');
         return s.append("# Lệnh chạy Wine: ").append(command == null || command.isEmpty() ? "?" : command).append('\n').toString();

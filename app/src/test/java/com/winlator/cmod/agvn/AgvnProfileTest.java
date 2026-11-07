@@ -132,6 +132,8 @@ public class AgvnProfileTest {
     public void validatesDllOverrides() throws Exception {
         File dir = ueGame();
         AgvnProfileValidator.validate(profile(",\"dllOverrides\":{\"dinput8\":\"n,b\"}"), dir);
+        // "d" and "disabled" turn a DLL off, as Wine reads them; a game maker's {"mlang": "d"} was refused (07/11/2026)
+        AgvnProfileValidator.validate(profile(",\"dllOverrides\":{\"mlang\":\"d\",\"winmm\":\"disabled\"}"), dir);
         assertRejected(profile(",\"dllOverrides\":{\"dinput8\":\"n;rm\"}"), dir);
         assertRejected(profile(",\"dllOverrides\":{\"a b\":\"n\"}"), dir);
     }

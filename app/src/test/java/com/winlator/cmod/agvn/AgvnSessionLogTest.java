@@ -117,13 +117,27 @@ public class AgvnSessionLogTest {
     public void theLaunchIsWrittenAsWineGotIt() {
         // an Electron game, 26/10/2026: did --disable-gpu and ELECTRON_ENABLE_LOGGING=1 reach Wine?
         EnvVars env = new EnvVars("ELECTRON_ENABLE_LOGGING=1 WINEDEBUG=-all");
-        String note = AgvnLaunchNote.text(env, "WINEDEBUG=-all", "ELECTRON_ENABLE_LOGGING=1 NO_SUCH=1", " --disable-gpu ",
+        String note = AgvnLaunchNote.text(env, "WINEDEBUG=-all", "ELECTRON_ENABLE_LOGGING=1 NO_SUCH=1", null, " --disable-gpu ",
                 "wine explorer /desktop=shell,1280x720 winhandler.exe /dir F:\\Game \"Game.exe\" --disable-gpu");
         assertTrue(note, note.contains("\nELECTRON_ENABLE_LOGGING=1\nNO_SUCH=(Wine không nhận)\nWINEDEBUG=-all\n"));
+        assertTrue(note, note.contains("# agvn-profile.json (env, dllOverrides) cho game: (không có)\n"));
         assertTrue(note, note.contains("# Tham số chạy của game (Cài đặt game): --disable-gpu\n"));
         assertTrue(note, note.endsWith("\"Game.exe\" --disable-gpu\n"));
-        String none = AgvnLaunchNote.text(env, "", null, "", null);
-        assertTrue(none, none.contains("(không có)\n# Tham số chạy của game (Cài đặt game): (không có)\n# Lệnh chạy Wine: ?\n"));
+        String none = AgvnLaunchNote.text(env, "", null, "", "", null);
+        assertTrue(none, none.contains("(không có)\n# agvn-profile.json (env, dllOverrides) cho game: (không có)\n"
+                + "# Tham số chạy của game (Cài đặt game): (không có)\n# Lệnh chạy Wine: ?\n"));
+    }
+
+    @Test
+    public void theProfilesVariablesAreMarked() {
+        // a .NET game, 07/11/2026: did the profile's WINEDEBUG and {"mlang": "d"} reach Wine?
+        EnvVars env = new EnvVars("WINEDEBUG=-all,err+module,+seh WINEDLLOVERRIDES=mlang=d;winmm=n,b");
+        String note = AgvnLaunchNote.text(env, "WINEDEBUG=-all", "WINEDEBUG=-all,err+module,+seh WINEDLLOVERRIDES=mlang=d",
+                "WINEDLLOVERRIDES=mlang=d WINEDEBUG=-all,err+module,+seh", "", "wine explorer");
+        assertTrue(note, note.contains("\nWINEDEBUG=-all,err+module,+seh   <- agvn-profile.json: -all,err+module,+seh\n"));
+        assertTrue(note, note.contains("\nWINEDLLOVERRIDES=mlang=d;winmm=n,b   <- agvn-profile.json: mlang=d\n"));
+        assertTrue(note, note.contains("# agvn-profile.json (env, dllOverrides) cho game: WINEDLLOVERRIDES=mlang=d "
+                + "WINEDEBUG=-all,err+module,+seh\n"));
     }
 
     @Test

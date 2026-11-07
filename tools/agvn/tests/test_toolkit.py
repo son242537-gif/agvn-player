@@ -154,6 +154,15 @@ class ProfileRulesTest(unittest.TestCase):
             with self.assertRaises(ProfileError, msg=game):
                 validate({"schemaVersion": 1, "name": "g"}, game)
 
+    def test_dll_overrides_can_turn_a_dll_off(self):
+        # as GameDllOverrides.MODE: "d", "disabled" and "" turn a DLL off, as Wine reads them (07/11/2026)
+        game = os.path.join(self.tmp.name, "NetGame")
+        touch(game, "Game.exe")
+        for mode in ("d", "disabled", "", "n,b"):
+            validate({"schemaVersion": 1, "name": "g", "exe": "Game.exe", "dllOverrides": {"mlang": mode}}, game)
+        with self.assertRaises(ProfileError):
+            validate({"schemaVersion": 1, "name": "g", "exe": "Game.exe", "dllOverrides": {"mlang": "native"}}, game)
+
     def test_shared_example_profile_is_valid(self):
         with open(os.path.join(REPO, "docs", "agvn", "agvn-profile.example.json"), encoding="utf-8") as f:
             example = json.load(f)

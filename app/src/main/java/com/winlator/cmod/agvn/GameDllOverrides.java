@@ -27,7 +27,11 @@ public final class GameDllOverrides {
             "d3d8", "d3d9", "d3d10", "d3d10_1", "d3d10core", "d3d11", "d3d12", "d3d12core", "dxgi", "ddraw",
             "wined3d", "opengl32", "vulkan-1", "winevulkan", "dxcore"));
     static final Pattern NAME = Pattern.compile("^[A-Za-z0-9_.-]+$");
-    static final Pattern MODE = Pattern.compile("^(n|b|n,b|b,n|)$");
+    /**
+     * A load order of Wine: native, builtin, either first, or off ("", "d", "disabled": Wine reads a value with neither
+     * n nor b as off). A game maker set {"mlang": "d"} in agvn-profile.json and the whole of env was refused (07/11/2026).
+     */
+    static final Pattern MODE = Pattern.compile("^(n|b|n,b|b,n|d|disabled|)$");
 
     private GameDllOverrides() {}
 

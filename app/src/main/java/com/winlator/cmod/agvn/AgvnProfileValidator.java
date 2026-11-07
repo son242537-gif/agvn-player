@@ -101,7 +101,8 @@ public final class AgvnProfileValidator {
         }
         for (Map.Entry<String, String> e : p.dllOverrides.entrySet()) {
             if (!GameDllOverrides.isValid(e.getKey(), e.getValue()))
-                throw new AgvnProfileException("dllOverrides không hợp lệ: " + e.getKey() + " (chỉ dùng n, b, n,b hoặc b,n)");
+                throw new AgvnProfileException("dllOverrides không hợp lệ: " + e.getKey() + " = " + e.getValue()
+                        + " (chỉ dùng n, b, n,b, b,n; \"d\" hoặc \"\" để tắt DLL)");
         }
     }
 
