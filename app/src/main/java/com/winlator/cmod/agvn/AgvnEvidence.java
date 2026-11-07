@@ -49,6 +49,8 @@ final class AgvnEvidence {
     boolean helperExe;
     /** The game reads movies Proton 9's new way and can switch ({@link AgvnMediaFoundation#canReadOldWay}). */
     boolean newMediaSource;
+    /** The game is a .NET program and ended with a crash code agvn-winhandler.exe reported ({@link AgvnMlangFix}). */
+    boolean dotNet, exitCrash;
     long seconds;
     /** How Android ended the app, for a session found unfinished at the next start; -1 when it was not. */
     int killedReason = -1, killedImportance;
@@ -103,6 +105,7 @@ final class AgvnEvidence {
             case "chromium": return chromium;
             case "helper-exe": return helperExe;
             case "media-new": return newMediaSource;
+            case "dotnet-crash": return dotNet && (crashed || exitCrash);
             case "gpu-room": return AgvnGpuAlloc.roomLeft(lines);
             case "swapchain-last": return AgvnSwapchainStuck.lastWords(lines);
             default: return false; // "live" problems are found while playing; names a newer file may add stay unmet

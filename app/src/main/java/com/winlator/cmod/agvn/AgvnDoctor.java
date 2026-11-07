@@ -182,6 +182,7 @@ public final class AgvnDoctor {
         ev.helperExe = helper != null;
         if (helper != null) ev.params.put("exe", helper);
         ev.newMediaSource = AgvnMediaFoundation.canReadOldWay(s); // as the game is now: the bar may have switched it already
+        AgvnMlangFix.evidence(ev, s, AgvnGameEnd.crashCode()); // a .NET game that ended with a crash code
         if (ev.lowRamFreeMb >= 0) ev.params.put("free", String.valueOf(ev.lowRamFreeMb));
         return ev;
     }

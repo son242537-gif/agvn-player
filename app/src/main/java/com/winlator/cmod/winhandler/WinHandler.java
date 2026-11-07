@@ -564,8 +564,7 @@ public void setVibrationEnabledForSlot(int slot, boolean enabled) {
                 break;
             }
             case RequestCodes.AGVN_GAME_ENDED: { // AGVN: agvn-winhandler.exe 3 ends next, and Wine with it
-                com.winlator.cmod.agvn.AgvnSessionLog.event("Game và mọi tiến trình của game đã tắt, mã thoát "
-                        + com.winlator.cmod.agvn.AgvnGameEnd.code(receiveData.getInt()));
+                com.winlator.cmod.agvn.AgvnGameEnd.ended(receiveData.getInt()); // its code, for the doctor too
                 break;
             }
             case RequestCodes.GET_GAMEPAD: {

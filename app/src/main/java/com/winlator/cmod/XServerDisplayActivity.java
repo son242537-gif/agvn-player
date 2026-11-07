@@ -1255,6 +1255,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
 
             if (shortcut != null) {
                 envVars.putAll(shortcut.getExtra("envVars"));
+                com.winlator.cmod.agvn.AgvnMlangFix.atLaunch(this, shortcut, agvnExePath(), container); // AGVN: .NET's Vietnamese text
                 com.winlator.cmod.agvn.GameDllOverrides.applyAtLaunch(envVars, agvnExePath(), container); // AGVN
             }
             if (dxwrapper.contains("dxvk")) com.winlator.cmod.agvn.AgvnMemorySaver.applyDxvk(this, shortcut, envVars); // AGVN

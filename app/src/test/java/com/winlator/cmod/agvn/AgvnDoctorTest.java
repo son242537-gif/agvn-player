@@ -5,6 +5,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -32,12 +33,12 @@ public class AgvnDoctorTest {
             "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "godot-light",
             "godot-light-renderer", "mods-off", "raw-mouse", "ue-wait", "exe-64", "exe-main", "dll-wine", "emulator-order",
             "esync-off", "emulator-wowbox64", "page-light", "media-old", "wine-new", "vk-no-shared",
-            "present-wait-off"));
+            "present-wait-off", "gdiplus-text"));
     private static final Set<String> CONDITIONS = new HashSet<>(Arrays.asList("failed", "no-start", "crash", "ended",
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
             "ram-saved", "live", "light", "script-error", "page-crash", "frozen", "reported", "module-code",
             "closed-on-start", "froze", "chromium", "helper-exe", "media-new", "gpu-room",
-            "swapchain-last"));
+            "swapchain-last", "dotnet-crash"));
     static AgvnProblemCatalog catalog;
 
     @BeforeClass
@@ -171,6 +172,31 @@ public class AgvnDoctorTest {
                 AgvnGpuAlloc.withHidden("version=System;blacklistedExtensions=VK_EXT_a;gpuName=Device"));
         String once = "blacklistedExtensions=VK_KHR_external_memory_fd";
         assertEquals(once, AgvnGpuAlloc.withHidden(once));
+    }
+
+    @Test
+    public void aDotNetGameThatEndedWithACrashCode() {
+        // a .NET game (GDI+, POCO F8 Pro, 07/11/2026): 0xC0000005 at its first Vietnamese menu, no line in Wine's log;
+        // agvn-winhandler.exe reported the code, and it read as a game that closed by itself
+        AgvnEvidence ev = noStart();
+        ev.dotNet = ev.exitCrash = true;
+        ev.params.put("crash", "mã thoát 0xC0000005 (lỗi truy cập bộ nhớ)");
+        AgvnProblemCatalog.Finding f = catalog.find(ev);
+        assertEquals("dotnet-crash", f.id());
+        assertEquals(AgvnMlangFix.FIX, f.fixes().get(0));
+        assertTrue(f.cause(), f.cause().contains("mã thoát 0xC0000005"));
+        AgvnEvidence wine = noStart("wine: Unhandled page fault on read access to 000000E0 at address 7B0A1234");
+        wine.crashed = wine.dotNet = true;
+        assertEquals("Wine's own crash report too", "dotnet-crash", found(wine));
+        AgvnEvidence other = noStart();
+        other.exitCrash = true;
+        assertNotEquals("not a .NET game", "dotnet-crash", found(other));
+        AgvnEvidence fine = noStart();
+        fine.dotNet = true;
+        assertNotEquals("a .NET game that just closed", "dotnet-crash", found(fine));
+        AgvnEvidence mono = noStart("err:mscoree:load_mono Could not load Mono into this process");
+        mono.dotNet = mono.exitCrash = true;
+        assertEquals("Mono's own line names it first", "dotnet-load", found(mono));
     }
 
     @Test

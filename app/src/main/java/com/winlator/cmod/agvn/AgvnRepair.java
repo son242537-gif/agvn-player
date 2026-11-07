@@ -31,12 +31,13 @@ final class AgvnRepair {
     /**
      * Settings the fixes change besides AgvnGoodConfig.KEYS: Đồ họa's texture pool, tier and FPS preset, Unity's own
      * quality, the runner of a "Chạy nhẹ" game, RPG Maker's frame skip, Godot for Android's renderer and touches as a
-     * real mouse, the 64-bit exe and the main exe. They go back too.
+     * real mouse, the 64-bit exe, the main exe and .NET's Vietnamese text (AgvnMlangFix). They go back too.
      */
     static final List<String> MORE_KEYS = Collections.unmodifiableList(Arrays.asList(
             AgvnGameImporter.EXTRA_TEXTURE_POOL, AgvnGameImporter.EXTRA_TIER, "graphicsFpsPreset",
             AgvnUnityQuality.EXTRA_OWN, AgvnHtmlGame.EXTRA_RUNNER, AgvnRgssFiles.EXTRA_FRAME_SKIP,
-            AgvnGodotLight.EXTRA_RENDERER, AgvnRawMouse.EXTRA, AgvnExe64.EXTRA, AgvnExeMain.EXTRA));
+            AgvnGodotLight.EXTRA_RENDERER, AgvnRawMouse.EXTRA, AgvnExe64.EXTRA, AgvnExeMain.EXTRA,
+            AgvnMlangFix.EXTRA));
 
     private AgvnRepair() {}
 

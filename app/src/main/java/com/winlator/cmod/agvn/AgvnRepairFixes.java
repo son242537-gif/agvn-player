@@ -32,7 +32,9 @@ import java.util.Map;
  *   <li>exe-64: the game's 64-bit exe instead of its 32-bit one ({@link AgvnExe64});</li>
  *   <li>emulator-order, esync-off: for a game stuck on a lock ({@link AgvnLockFixes});</li>
  *   <li>emulator-wowbox64: WOWBox64 instead of FEX for the 32-bit code ({@link AgvnEmulatorNoExec});</li>
- *   <li>exe-main: the engine's own exe instead of a .NET launcher beside it ({@link AgvnExeMain}).</li>
+ *   <li>exe-main: the engine's own exe instead of a .NET launcher beside it ({@link AgvnExeMain});</li>
+ *   <li>gdiplus-text: AGVN's mlang.dll beside a .NET game's exe, for Vietnamese text GDI+ crashed on
+ *   ({@link AgvnMlangFix}).</li>
  * </ul>
  * Pure Java except {@link #make}.
  */
@@ -40,7 +42,7 @@ final class AgvnRepairFixes {
     static final List<String> IDS = Arrays.asList("render-sysmem", "turnip-nolrz", "turnip-noubwc", "async-off",
             "present-sync", AgvnPresentSync.FIX_NO_WAIT, "bcn-full", "unity-quality-own", "audio-other", "locale-ja", "locale-zh", "mods-off",
             "raw-mouse", AgvnExe64.FIX, AgvnLockFixes.ORDER, AgvnLockFixes.ESYNC, AgvnEmulatorNoExec.FIX,
-            AgvnExeMain.FIX);
+            AgvnExeMain.FIX, AgvnMlangFix.FIX);
     static final String CHINESE = "zh_CN.UTF-8", PULSE = "pulse-audio-gn", ALSA = "alsa";
 
     private AgvnRepairFixes() {}
@@ -95,6 +97,8 @@ final class AgvnRepairFixes {
                 return AgvnExe64.fix(a, s);
             case AgvnExeMain.FIX:
                 return AgvnExeMain.fix(a, s);
+            case AgvnMlangFix.FIX:
+                return AgvnMlangFix.fix(a, s);
             case AgvnEmulatorNoExec.FIX:
                 return AgvnEmulatorNoExec.fix(a, s);
             default:
@@ -149,6 +153,9 @@ final class AgvnRepairFixes {
                 return true;
             case AgvnExeMain.FIX:
                 s.putExtra(AgvnExeMain.EXTRA, fix.to);
+                return true;
+            case AgvnMlangFix.FIX:
+                s.putExtra(AgvnMlangFix.EXTRA, fix.to);
                 return true;
             case AgvnEmulatorNoExec.FIX:
                 s.putExtra("emulator", fix.to);

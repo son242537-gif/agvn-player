@@ -64,6 +64,7 @@ public final class AgvnSessionTrack {
         usedAtMs = 0;
         usedMb = usedBeforeMb = -1;
         engineCrash = null;
+        AgvnGameEnd.reset();
         AgvnUnrealBox.reset();
         AgvnGamePause.reset(System.nanoTime());
         stoppedAtStartNs = AgvnGamePause.pausedNs(System.nanoTime());
