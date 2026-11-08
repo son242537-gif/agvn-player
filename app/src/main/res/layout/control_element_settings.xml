@@ -73,7 +73,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Độ mờ" />
+                android:text="@string/agvn_style_opacity" />
 
             <TextView
                 android:id="@+id/TVOpacity"
@@ -92,7 +92,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Màu giao diện" />
+            android:text="@string/agvn_ui_layout_theme_color" />
 
         <LinearLayout
             android:id="@+id/LLColorList"
@@ -255,7 +255,7 @@
                     android:id="@+id/BTRemoveIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Xóa"
+                    android:text="@string/remove"
                     android:textSize="12sp"
                     android:visibility="gone"
                     style="@style/Widget.AppCompat.Button.Borderless" />
@@ -264,7 +264,7 @@
                     android:id="@+id/BTBrowseIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Duyệt…"
+                    android:text="@string/agvn_ui_layout_browse_ellipsis"
                     android:textSize="12sp"
                     style="@style/Widget.AppCompat.Button.Borderless" />
             </LinearLayout>
@@ -286,7 +286,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Di chuyển con trỏ khi kéo" />
+                android:text="@string/agvn_ui_layout_move_cursor_on_drag" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

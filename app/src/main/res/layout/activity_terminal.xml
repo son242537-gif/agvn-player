@@ -26,12 +26,12 @@
         android:id="@+id/commandInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nhập lệnh"
+        android:hint="@string/agvn_ui_layout_enter_command"
         android:inputType="text" />
 
     <Button
         android:id="@+id/executeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Chạy" />
+        android:text="@string/run" />
 </LinearLayout>

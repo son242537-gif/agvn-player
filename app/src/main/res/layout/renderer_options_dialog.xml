@@ -23,7 +23,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Chế độ trình chiếu"
+                    android:text="@string/agvn_ui_container_present_mode"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:paddingBottom="8dp"/>
                 <Spinner
@@ -44,7 +44,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Driver dựng hình"
+                    android:text="@string/agvn_ui_container_renderer_driver"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:paddingBottom="8dp"/>
                 <Spinner
@@ -65,7 +65,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Lọc texture"
+                    android:text="@string/agvn_ui_container_texture_filter"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:paddingBottom="8dp"/>
                 <Spinner
@@ -82,7 +82,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Đổi kênh màu đỏ/xanh dương" />
+                android:text="@string/agvn_ui_container_swap_rb" />
 
         </LinearLayout>
     </ScrollView>

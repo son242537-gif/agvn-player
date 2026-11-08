@@ -145,7 +145,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:text="Độ trễ khung hình tối đa" />
+                android:text="@string/agvn_ui_container_max_frame_latency" />
 
             <ToggleButton
                 android:id="@+id/SWMaxFrameLatency"

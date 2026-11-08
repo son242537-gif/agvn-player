@@ -25,7 +25,7 @@
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="6dp"
                 android:layout_marginBottom="8dp"
-                android:text="CÀI ĐẶT ỨNG DỤNG"
+                android:text="@string/agvn_ui_layout_app_settings_header"
                 android:textColor="@color/ui_text_muted"
                 android:textSize="10sp"
                 android:textStyle="bold"
@@ -63,7 +63,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Môi trường chạy và giao diện"
+                        android:text="@string/agvn_ui_layout_settings_card_title"
                         android:textColor="@color/ui_text_primary"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -72,7 +72,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:text="Preset, đường dẫn, điều khiển và chẩn đoán"
+                        android:text="@string/agvn_ui_layout_settings_card_desc"
                         android:textColor="@color/ui_text_muted"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -114,24 +114,24 @@
                         <ImageButton
                             style="@style/ListMenuButton"
                             android:id="@+id/BTAddBox64Preset"
-                            android:tooltipText="Add"
+                            android:tooltipText="@string/add"
                             android:src="@drawable/icon_add" />
 
                         <ImageButton
                             style="@style/ListMenuButton"
                             android:id="@+id/BTEditBox64Preset"
-                            android:tooltipText="Edit"
+                            android:tooltipText="@string/edit"
                             android:src="@drawable/icon_edit" />
 
                         <ImageButton
                             style="@style/ListMenuButton"
-                            android:tooltipText="Duplicate"
+                            android:tooltipText="@string/duplicate"
                             android:id="@+id/BTDuplicateBox64Preset"
                             android:src="@drawable/icon_duplicate" />
 
                         <ImageButton
                             style="@style/ListMenuButton"
-                            android:tooltipText="Remove"
+                            android:tooltipText="@string/remove"
                             android:id="@+id/BTRemoveBox64Preset"
                             android:layout_marginRight="0dp"
                             android:src="@drawable/icon_remove" />
@@ -139,13 +139,13 @@
                         <ImageButton
                             style="@style/ListMenuButton"
                             android:id="@+id/BTExportBox64Preset"
-                            android:tooltipText="Export"
+                            android:tooltipText="@string/export"
                             android:layout_marginRight="0dp"
                             android:src="@drawable/icon_export" />
 
                         <ImageButton
                             style="@style/ListMenuButton"
-                            android:tooltipText="Import"
+                            android:tooltipText="@string/agvn_ui_app_import"
                             android:id="@+id/BTImportBox64Preset"
                             android:layout_marginRight="0dp"
                             android:src="@drawable/icon_popup_menu_download" />
@@ -198,24 +198,24 @@
                         <ImageButton
                             style="@style/ListMenuButton"
                             android:id="@+id/BTAddFEXCorePreset"
-                            android:tooltipText="Add"
+                            android:tooltipText="@string/add"
                             android:src="@drawable/icon_add" />
 
                         <ImageButton
                             style="@style/ListMenuButton"
                             android:id="@+id/BTEditFEXCorePreset"
-                            android:tooltipText="Edit"
+                            android:tooltipText="@string/edit"
                             android:src="@drawable/icon_edit" />
 
                         <ImageButton
                             style="@style/ListMenuButton"
-                            android:tooltipText="Duplicate"
+                            android:tooltipText="@string/duplicate"
                             android:id="@+id/BTDuplicateFEXCorePreset"
                             android:src="@drawable/icon_duplicate" />
 
                         <ImageButton
                             style="@style/ListMenuButton"
-                            android:tooltipText="Remove"
+                            android:tooltipText="@string/remove"
                             android:id="@+id/BTRemoveFEXCorePreset"
                             android:layout_marginRight="0dp"
                             android:src="@drawable/icon_remove" />
@@ -223,13 +223,13 @@
                         <ImageButton
                             style="@style/ListMenuButton"
                             android:id="@+id/BTExportFEXCorePreset"
-                            android:tooltipText="Export"
+                            android:tooltipText="@string/export"
                             android:layout_marginRight="0dp"
                             android:src="@drawable/icon_export" />
 
                         <ImageButton
                             style="@style/ListMenuButton"
-                            android:tooltipText="Import"
+                            android:tooltipText="@string/agvn_ui_app_import"
                             android:id="@+id/BTImportFEXCorePreset"
                             android:layout_marginRight="0dp"
                             android:src="@drawable/icon_popup_menu_download" />
@@ -298,12 +298,12 @@
                         android:id="@+id/CBDarkMode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Bật chế độ tối" />
+                        android:text="@string/agvn_ui_layout_dark_mode_on" />
                 </LinearLayout>
                 <TextView
                     android:id="@+id/TVTheme"
                     style="@style/FieldSetLabel"
-                    android:text="Giao diện" />
+                    android:text="@string/theme" />
             </FrameLayout>
 
             <!-- Shortcuts -->
@@ -314,7 +314,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Đường dẫn Winlator" />
+                        android:text="@string/agvn_ui_layout_winlator_path" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -331,13 +331,13 @@
                             android:id="@+id/BTChooseWinlatorPath"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Chọn đường dẫn" />
+                            android:text="@string/agvn_ui_layout_choose_path" />
                     </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Đường dẫn xuất lối tắt" />
+                        android:text="@string/agvn_ui_layout_shortcut_export_path" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -354,13 +354,13 @@
                             android:id="@+id/BTChooseShortcutExportPath"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Chọn đường dẫn" />
+                            android:text="@string/agvn_ui_layout_choose_path" />
                     </LinearLayout>
                 </LinearLayout>
                 <TextView
                     android:id="@+id/TVShortcutSettings"
                     style="@style/FieldSetLabel"
-                    android:text="Cài đặt đường dẫn" />
+                    android:text="@string/agvn_ui_layout_path_settings" />
             </FrameLayout>
 
 
@@ -377,7 +377,7 @@
                         android:id="@+id/CBEnableBigPictureMode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Mở chế độ màn hình lớn khi khởi động" />
+                        android:text="@string/agvn_ui_layout_big_picture_on_start" />
 
                     <FrameLayout
                         android:layout_width="match_parent"
@@ -395,7 +395,7 @@
                                     android:id="@+id/CBEnableCustomApiKey"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="Đặt khóa API SteamGrid? (Ảnh bìa)" />
+                                    android:text="@string/agvn_ui_app_settings_steamgrid_key_toggle" />
 
                                 <ImageView
                                     android:id="@+id/BTHelpApiKey"
@@ -409,14 +409,14 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:hint="Nhập khóa API tại đây"
+                                android:hint="@string/agvn_ui_layout_api_key_hint"
                                 android:visibility="gone" />
                         </LinearLayout>
 
                         <TextView
                             android:id="@+id/TVCustomApiKey"
                             style="@style/FieldSetLabel"
-                            android:text="Khóa API SteamGridDB" />
+                            android:text="@string/agvn_ui_app_settings_steamgrid_key" />
                     </FrameLayout>
 
                 </LinearLayout>
@@ -424,7 +424,7 @@
                 <TextView
                     android:id="@+id/TVBigPictureMode"
                     style="@style/FieldSetLabel"
-                    android:text="Chế độ màn hình lớn" />
+                    android:text="@string/agvn_ui_layout_big_picture_mode" />
             </FrameLayout>
 
             <FrameLayout
@@ -476,7 +476,7 @@
                         android:id="@+id/CBCursorLock"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chiếm chuột ngoài"
+                        android:text="@string/agvn_ui_layout_capture_external_mouse"
                         android:layout_marginTop="8dp" />
 
                     <!-- New Xinput Toggle Checkbox -->
@@ -484,7 +484,7 @@
                         android:id="@+id/CBXinputToggle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tắt XInput (chỉ dùng chuột/bàn phím)"
+                        android:text="@string/agvn_ui_app_settings_xinput_off"
                         android:layout_marginTop="8dp" />
 
                 </LinearLayout>
@@ -610,7 +610,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Link tải thành phần" />
+                            android:text="@string/agvn_ui_app_settings_contents_url" />
 
                         <EditText
                             android:layout_width="match_parent"

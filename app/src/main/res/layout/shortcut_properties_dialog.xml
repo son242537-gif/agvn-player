@@ -9,7 +9,7 @@
         android:id="@+id/play_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Số lần chơi: "
+        android:text="@string/agvn_ui_layout_play_count_label"
         android:textSize="16sp"
         android:paddingBottom="8dp" />
 
@@ -17,7 +17,7 @@
         android:id="@+id/playtime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Thời gian chơi: "
+        android:text="@string/agvn_ui_layout_playtime_label"
         android:textSize="16sp"
         android:paddingBottom="8dp" />
 
@@ -25,7 +25,7 @@
         android:id="@+id/reset_properties"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Đặt lại thông tin"
+        android:text="@string/agvn_ui_layout_reset_stats"
         android:textSize="16sp"
         android:paddingBottom="8dp" />
 

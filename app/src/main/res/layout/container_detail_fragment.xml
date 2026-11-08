@@ -36,17 +36,17 @@
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Chung" />
+                    android:text="@string/agvn_ui_container_cat_general" />
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Môi trường" />
+                    android:text="@string/agvn_ui_container_cat_environment" />
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Driver" />
+                    android:text="@string/agvn_ui_layout_tab_drivers" />
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
@@ -56,7 +56,7 @@
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Thành phần" />
+                    android:text="@string/agvn_ui_container_tab_components" />
 
             </com.google.android.material.tabs.TabLayout>
 
@@ -292,7 +292,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="8dp"
-                android:text="Bộ dựng hình" />
+                android:text="@string/agvn_ui_container_renderer" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -347,7 +347,7 @@
                         android:id="@+id/TVEmulator64Label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Giả lập 64-bit" />
+                        android:text="@string/agvn_ui_container_emulator_64" />
 
                     <Spinner
                         style="@style/ComboBox"
@@ -838,7 +838,7 @@
                                 android:id="@+id/CBExclusiveXInput"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Nhập độc quyền" />
+                                android:text="@string/agvn_ui_container_exclusive_input" />
                             <ImageView
                                 android:id="@+id/BTExclusiveXInputHelp"
                                 style="@style/HelpButton"

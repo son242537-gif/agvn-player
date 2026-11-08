@@ -33,7 +33,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="8dp"
-                android:contentDescription="Cài đặt"
+                android:contentDescription="@string/settings"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/IVCoverArt"
@@ -45,7 +45,7 @@
                 android:id="@+id/settingsLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cài đặt"
+                android:text="@string/settings"
                 android:background="@drawable/bg_transparent_dark"
                 android:textColor="@android:color/white"
                 android:gravity="center"
@@ -137,7 +137,7 @@
         android:id="@+id/TVGraphicsDriver"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Driver đồ họa:"
+        android:text="@string/agvn_ui_layout_graphics_driver_label"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@android:color/white"
         android:visibility="gone" />
@@ -146,7 +146,7 @@
         android:id="@+id/TVGraphicsDriverVersion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Phiên bản driver:"
+        android:text="@string/agvn_ui_layout_driver_version_label"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@android:color/white"
         android:visibility="gone" />
@@ -155,7 +155,7 @@
         android:id="@+id/TVDXWrapper"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="DX Wrapper:"
+        android:text="@string/agvn_ui_layout_dx_wrapper_label"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@android:color/white"
         android:visibility="gone" />
@@ -164,7 +164,7 @@
         android:id="@+id/TVDXWrapperConfig"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cấu hình DXVK/VKD3D:"
+        android:text="@string/agvn_ui_layout_dxvk_config_label"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@android:color/white"
         android:visibility="gone" />
@@ -173,7 +173,7 @@
         android:id="@+id/TVAudioDriver"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Driver âm thanh:"
+        android:text="@string/agvn_ui_layout_audio_driver_label"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@android:color/white"
         android:visibility="gone" />
@@ -182,7 +182,7 @@
         android:id="@+id/TVBox64Preset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Preset Box64:"
+        android:text="@string/agvn_ui_layout_box64_preset_label"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@android:color/white"
         android:visibility="gone" />
@@ -205,7 +205,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="Chưa có gì. Hãy mở môi trường chạy và tạo lối tắt để bắt đầu!"
+        android:text="@string/agvn_ui_layout_big_picture_empty"
         android:textColor="@android:color/white"
         android:textSize="18sp"
         android:visibility="gone"
@@ -234,7 +234,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginEnd="16dp"
             android:layout_marginTop="8dp"
-            android:contentDescription="Quay lại"
+            android:contentDescription="@string/agvn_add_back"
             android:focusable="true"
             android:focusableInTouchMode="true"
             />
@@ -243,7 +243,7 @@
             android:id="@+id/backLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Quay lại"
+            android:text="@string/agvn_add_back"
             android:textColor="@android:color/white"
             android:gravity="center"
             android:layout_below="@id/backButton"
@@ -276,7 +276,7 @@
                     android:id="@+id/TVSettingsLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Cài đặt"
+                    android:text="@string/settings"
                     android:textColor="@android:color/white"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -296,7 +296,7 @@
                         android:id="@+id/youtubeUrlLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Link video YouTube (không phải video nào cũng hỗ trợ):"
+                        android:text="@string/agvn_ui_layout_youtube_link_label"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
                         android:padding="8dp" />
@@ -313,7 +313,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:inputType="text"
-                            android:hint="Nhập link YouTube"
+                            android:hint="@string/agvn_ui_layout_youtube_link_hint"
                             android:background="@android:drawable/edit_text"
                             android:textColor="@android:color/black" />
 
@@ -321,7 +321,7 @@
                             android:id="@+id/loadVideoButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Đặt nhạc nền"
+                            android:text="@string/agvn_ui_layout_set_bg_music"
                             android:layout_marginStart="8dp" />
                     </LinearLayout>
 
@@ -330,7 +330,7 @@
                         android:id="@+id/selectMp3Button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chọn MP3"
+                        android:text="@string/agvn_ui_layout_choose_mp3"
                         android:layout_marginBottom="16dp" />
 
                     <!-- Reset MP3 Button -->
@@ -338,7 +338,7 @@
                         android:id="@+id/resetMp3Button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Đặt lại MP3"
+                        android:text="@string/agvn_ui_layout_reset_mp3"
                         android:layout_marginBottom="16dp" />
 
                     <!-- Music Source Selection -->
@@ -346,7 +346,7 @@
                         android:id="@+id/musicSourceLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chọn nguồn nhạc:"
+                        android:text="@string/agvn_ui_layout_music_source_label"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
                         android:padding="8dp" />
@@ -377,7 +377,7 @@
                         android:id="@+id/disableBgMusicButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tắt nhạc nền"
+                        android:text="@string/agvn_ui_library_music_off"
                         android:layout_marginTop="16dp" />
 
                 </LinearLayout>
@@ -392,7 +392,7 @@
                         android:id="@+id/themeLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Cài đặt hình nền:"
+                        android:text="@string/agvn_ui_layout_wallpaper_settings_label"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
                         android:padding="8dp" />
@@ -408,46 +408,46 @@
                             android:id="@+id/rbCustomWallpaper"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Hình nền tùy chỉnh" />
+                            android:text="@string/agvn_ui_layout_custom_wallpaper" />
 
                         <Button
                             android:id="@+id/selectWallpaperButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Chọn hình nền"
+                            android:text="@string/agvn_ui_layout_choose_wallpaper"
                             android:visibility="gone" />
 
                         <RadioButton
                             android:id="@+id/rbNoAnimation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Không có hình nền" />
+                            android:text="@string/agvn_ui_layout_no_wallpaper" />
 
 
                         <RadioButton
                             android:id="@+id/rbDefaultAnimation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Sóng" />
+                            android:text="@string/agvn_ui_layout_anim_waves" />
 
                         <RadioButton
                             android:id="@+id/rbGearAnimation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Bánh răng" />
+                            android:text="@string/agvn_ui_layout_anim_gears" />
 
                         <RadioButton
                             android:id="@+id/rbQuiltAnimation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Chăn ghép" />
+                            android:text="@string/agvn_ui_layout_anim_quilt" />
 
 
                         <RadioButton
                             android:id="@+id/rbFolderAnimation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Thư mục" />
+                            android:text="@string/agvn_ui_layout_folder" />
 
                     </RadioGroup>
 
@@ -455,13 +455,13 @@
                         android:id="@+id/selectPngFolderButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chọn thư mục ảnh động (*.png)" />
+                        android:text="@string/agvn_ui_layout_choose_png_folder" />
 
                     <TextView
                         android:id="@+id/parallaxModeLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chế độ Parallax:"
+                        android:text="@string/agvn_ui_layout_parallax_mode_label"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
                         android:padding="8dp" />
@@ -477,33 +477,33 @@
                             android:id="@+id/rbParallaxOff"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Tắt" />
+                            android:text="@string/disabled" />
 
                         <RadioButton
                             android:id="@+id/rbParallaxSlow"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Chậm" />
+                            android:text="@string/agvn_ui_layout_slow" />
 
                         <RadioButton
                             android:id="@+id/rbParallaxDefault"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Mặc định"
+                            android:text="@string/agvn_ui_container_locale_default"
                             android:checked="true" />
 
                         <RadioButton
                             android:id="@+id/rbParallaxFast"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Nhanh" />
+                            android:text="@string/agvn_ui_layout_fast" />
                     </RadioGroup>
 
                     <TextView
                         android:id="@+id/frameSpeedLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tốc độ hiệu ứng:"
+                        android:text="@string/agvn_ui_layout_animation_speed_label"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
                         android:padding="8dp" />

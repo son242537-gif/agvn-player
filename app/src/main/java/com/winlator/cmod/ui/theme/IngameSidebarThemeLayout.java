@@ -147,7 +147,7 @@ public class IngameSidebarThemeLayout extends FrameLayout {
             flattenSection(enableHud);
             flattenSection(hudStyle);
 
-            TextView resetText = findTextView(this, "Đặt lại HUD");
+            TextView resetText = findTextView(this, getContext().getString(R.string.agvn_ui_layout_hud_reset));
             View resetRow = directChildUnder(hudParent, resetText);
             insertSectionLabelBefore(resetRow, getContext().getString(R.string.agvn_ui_app_sidebar_actions));
             compactActionRow(resetRow);

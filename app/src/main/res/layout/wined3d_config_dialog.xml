@@ -68,7 +68,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Bộ dựng hình" />
+            android:text="@string/agvn_ui_container_renderer" />
 
         <Spinner
             style="@style/ComboBox"

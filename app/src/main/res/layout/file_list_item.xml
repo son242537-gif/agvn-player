@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:maxLines="2"
-                android:text="Thư mục"
+                android:text="@string/agvn_ui_layout_folder"
                 android:textSize="11sp" />
         </LinearLayout>
 

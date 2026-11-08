@@ -179,7 +179,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Hình ảnh"
+                    android:text="@string/video"
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -192,7 +192,7 @@
                     <TextView
                         android:layout_width="92dp"
                         android:layout_height="wrap_content"
-                        android:text="Giới hạn FPS"
+                        android:text="@string/agvn_ui_app_fps_limit"
                         android:textColor="#FFFFFF"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -215,7 +215,7 @@
                         android:id="@+id/SWEnableFSR"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
-                        android:text="Tăng độ phân giải"
+                        android:text="@string/agvn_ui_layout_upscaling"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                     <LinearLayout
@@ -228,7 +228,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Chế độ upscale"
+                            android:text="@string/agvn_ui_layout_upscale_mode"
                             android:textColor="#0055ff"
                             android:textSize="13sp" />
                         <Spinner
@@ -242,7 +242,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:text="Độ nét"
+                        android:text="@string/agvn_ui_layout_sharpness"
                         android:textColor="#0055ff"
                         android:textSize="13sp" />
                     <com.winlator.cmod.widget.SeekBar
@@ -270,7 +270,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Hiệu ứng hậu kỳ"
+                            android:text="@string/agvn_ui_layout_post_processing"
                             android:textColor="#0055ff"
                             android:textSize="13sp" />
                         <Spinner
@@ -311,7 +311,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:text="Hiệu ứng"
+                            android:text="@string/agvn_ui_layout_effect"
                             android:textColor="?attr/ingameSidebarOnSurfaceVariant"
                             android:textSize="12sp" />
 
@@ -334,7 +334,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Cường độ"
+                                android:text="@string/agvn_ui_layout_strength"
                                 android:textColor="?attr/ingameSidebarOnSurfaceVariant"
                                 android:textSize="13sp" />
 
@@ -369,7 +369,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Tạo khung hình"
+                        android:text="@string/agvn_ui_layout_frame_generation"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -392,7 +392,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Lưu preset"
+                        android:text="@string/agvn_ui_layout_save_preset"
                         android:textColor="#DDF6FF"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -413,7 +413,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Hiển thị và hiệu ứng"
+                    android:text="@string/agvn_ui_layout_display_and_effects"
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -431,7 +431,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Cửa sổ nổi"
+                        android:text="@string/agvn_ui_layout_floating_window"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -449,7 +449,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Bật/tắt toàn màn hình"
+                        android:text="@string/toggle_fullscreen"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -467,7 +467,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Kính lúp"
+                        android:text="@string/magnifier"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -485,7 +485,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Kéo giãn mềm"
+                        android:text="@string/agvn_ui_layout_soft_stretch"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -505,7 +505,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Điều khiển"
+                    android:text="@string/agvn_nav_controls"
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -578,7 +578,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Độ mờ phím ảo"
+                        android:text="@string/agvn_ui_layout_onscreen_keys_opacity"
                         android:textColor="#0055ff"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -604,7 +604,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Hiện bàn phím"
+                        android:text="@string/agvn_ui_layout_show_keyboard"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -622,7 +622,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Rung"
+                        android:text="@string/vibration"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                 </LinearLayout>
@@ -634,7 +634,7 @@
                     android:background="@drawable/sidebar_card"
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
-                    android:text="Chuột tương đối"
+                    android:text="@string/agvn_ui_library_relative_mouse"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp" />
                 <Switch
@@ -645,7 +645,7 @@
                     android:background="@drawable/sidebar_card"
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
-                    android:text="Tắt chuột"
+                    android:text="@string/agvn_ui_library_disable_mouse"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp" />
             </LinearLayout>
@@ -676,7 +676,7 @@
                     android:background="@drawable/sidebar_card"
                     android:paddingStart="14dp"
                     android:paddingEnd="14dp"
-                    android:text="Bật HUD"
+                    android:text="@string/agvn_ui_layout_hud_on"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp" />
                 <LinearLayout
@@ -693,7 +693,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Kiểu"
+                        android:text="@string/agvn_ui_layout_style"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp" />
                     <Spinner
@@ -718,7 +718,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Thông số HUD"
+                        android:text="@string/agvn_ui_layout_hud_stats"
                         android:textColor="#0055ff"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -782,7 +782,7 @@
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
-                            android:text="Pin/Nhiệt độ"
+                            android:text="@string/agvn_ui_layout_battery_temp"
                             android:textColor="#FFFFFF"
                             android:textSize="12sp" />
 
@@ -791,7 +791,7 @@
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
-                            android:text="Bộ dựng hình"
+                            android:text="@string/agvn_ui_app_hud_renderer"
                             android:textColor="#FFFFFF"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -817,7 +817,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Kích thước HUD"
+                        android:text="@string/agvn_ui_layout_hud_size"
                         android:textColor="#0055ff"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -832,7 +832,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Độ mờ HUD"
+                        android:text="@string/agvn_ui_layout_hud_opacity"
                         android:textColor="#0055ff"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -856,7 +856,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Đặt lại HUD"
+                        android:text="@string/agvn_ui_layout_hud_reset"
                         android:textColor="#DDF6FF"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -883,7 +883,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Xem log"
+                        android:text="@string/agvn_ui_layout_view_logs"
                         android:textColor="#DDF6FF"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -904,7 +904,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Quản lý tác vụ"
+                    android:text="@string/agvn_ui_layout_task_manager"
                     android:textColor="#FFFFFF"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -950,7 +950,7 @@
                             android:id="@+id/TVMemoryTitle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Bộ nhớ"
+                            android:text="@string/memory"
                             android:textColor="#0055ff"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -977,7 +977,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Tiến trình"
+                        android:text="@string/processes"
                         android:textColor="#FFFFFF"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -1013,7 +1013,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="+ Tác vụ mới"
+                        android:text="@string/agvn_ui_layout_new_task_plus"
                         android:textColor="#DDF6FF"
                         android:textSize="14sp"
                         android:textStyle="bold" />

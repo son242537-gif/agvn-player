@@ -154,7 +154,7 @@
                     android:id="@+id/TVWrapperVersionLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Phiên bản hiện tại:"
+                    android:text="@string/agvn_ui_layout_current_version_label"
                     android:textColor="@color/ui_text_muted"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -228,7 +228,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Bộ dựng hình"
+                android:text="@string/agvn_ui_container_renderer"
                 android:textColor="@color/ui_text_muted"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -301,7 +301,7 @@
                         android:id="@+id/TVEmulator64Label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Giả lập 64-bit"
+                        android:text="@string/agvn_ui_container_emulator_64"
                         android:textColor="@color/ui_text_muted"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -643,13 +643,13 @@
                         android:id="@+id/CBEnableRelativeMouse"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Bật chuột tương đối" />
+                        android:text="@string/agvn_ui_layout_relative_mouse_on" />
 
                     <CheckBox
                         android:id="@+id/CBDisableMouse"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tắt chuột" />
+                        android:text="@string/agvn_ui_library_disable_mouse" />
 
                     <CheckBox
                         android:id="@+id/CBTouchscreenMode"
@@ -720,7 +720,7 @@
                             android:id="@+id/CBExclusiveXInput"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Nhập độc quyền" />
+                            android:text="@string/agvn_ui_container_exclusive_input" />
                         <ImageView
                             android:id="@+id/BTExclusiveXInputHelp"
                             style="@style/HelpButton"
