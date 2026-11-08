@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2026 agvn.io — MIT License. Simplified Chinese (zh-rCN) translation of values/agvn_guide_strings.xml. -->
+<resources>
+    <string name="agvn_guide_title">使用指南</string>
+    <string name="agvn_guide_subtitle">点各项即可查看操作方法</string>
+    <string name="agvn_guide_open">查看指南</string>
+    <string name="agvn_guide_open_summary">添加游戏、玩游戏、调整画质和虚拟按键</string>
+    <string name="agvn_guide_close">关闭</string>
+
+    <string name="agvn_guide_add_title">添加游戏</string>
+    <string name="agvn_guide_add_summary">把游戏文件夹复制到手机，点 + 应用就会自动查找</string>
+    <string-array name="agvn_guide_add_steps">
+        <item>从电脑上将完整的游戏文件夹（已解压，含 .exe 文件）复制到手机，例如：内部存储/AGVN/游戏名。不要复制 .zip 文件或安装程序（setup）。</item>
+        <item>建议把游戏放在 AGVN 或 Download 文件夹中（内部存储或存储卡都可以）。不要放在 Documents 文件夹中，应用不会在那里查找。</item>
+        <item>点游戏库中的 + 按钮（或设置中的“添加游戏”）。应用会自动查找游戏并显示列表：“未添加”的游戏在上方，已在游戏库中的游戏在下方（带勾号）。在“搜索游戏”框中输入几个字即可快速筛选，无需输入变音符号。</item>
+        <item>点游戏名，然后点“导入”（已有的游戏按钮为“更新”）。应用会自动选择适合游戏和你手机的虚拟按键和画质。</item>
+        <item>游戏在别处？点“选择其他文件夹”，打开游戏所在的文件夹，然后点“扫描此文件夹”。应用会记住这个文件夹，下次继续使用。</item>
+        <item>如果应用提示没有读取存储的权限：点“授予权限”，然后开启“允许管理所有文件”（Android 11 及以上），或进入 权限 → 存储 → 允许（Android 9、10）。</item>
+    </string-array>
+
+    <string name="agvn_guide_play_title">玩游戏和退出游戏</string>
+    <string name="agvn_guide_play_summary">点 ▶ 开始玩，按返回键打开菜单</string>
+    <string-array name="agvn_guide_play_steps">
+        <item>在游戏库中，点游戏封面上的 ▶ 按钮（或点封面后点“开始游戏”）。第一次打开游戏会稍慢一些。</item>
+        <item>在游戏中，按手机的返回键（或四指同时轻点）可打开左侧菜单。</item>
+        <item>退出游戏：先存档，打开菜单后点最下方的红色电源按钮。游戏会立即关闭，不再询问。</item>
+        <item>菜单中的暂停按钮会冻结游戏。要继续玩：按手机的返回键重新打开菜单（暂停时四指轻点无法打开菜单），然后点播放按钮。</item>
+    </string-array>
+
+    <string name="agvn_guide_graphics_title">调整画质（手机发热、游戏卡顿）</string>
+    <string name="agvn_guide_graphics_summary">拖动滑块：左边更凉快，右边更好看</string>
+    <string-array name="agvn_guide_graphics_steps">
+        <item>在游戏库中，点游戏上的 ⋮，然后选择“调整画质：凉快 ↔ 好看”。</item>
+        <item>把滑块拖到左边（超轻、低），手机更凉、更流畅。拖到右边（高、极高），画面更好看，但手机更热。</item>
+        <item>带 ★ 的档位是应用为你的手机推荐的档位。想让应用自动调整，点“恢复推荐档位”。</item>
+        <item>极高档位不限制 FPS，以免覆盖游戏和作弊菜单的 FPS 设置。如果手机太热，在游戏中打开菜单，在“画面”中将“FPS 上限”设为 60。</item>
+        <item>点“保存”，然后退出游戏并重新打开即可生效。</item>
+    </string-array>
+
+    <string name="agvn_guide_controls_title">屏幕上的虚拟按键</string>
+    <string name="agvn_guide_controls_summary">在游戏中直接添加、移动、更改按键</string>
+    <string-array name="agvn_guide_controls_steps">
+        <item>游戏中顶部中间有一个小工具栏：“✎ 编辑”用于调整按键，“👁 隐藏”用于隐藏或显示按键布局，“⌨”用于打开键盘。工具栏 3 秒后自动隐藏，以免遮挡游戏，只在顶部边缘留下一条淡线：点这条线即可重新显示。</item>
+        <item>点“✎ 编辑”：拖动按钮可移动位置。点一个按钮选中它，然后用“按键…”更改按键，“－”/“＋”缩小或放大，“样式…”更改形状（圆形、方形、长方形、圆角）和透明度，“删除”移除按钮。</item>
+        <item>“+ 按钮”会显示完整的键盘和鼠标，点你想要的键即可。“+ 视角区”会添加一块滑动区域，用于在 3D 游戏中转动视角。</item>
+        <item>选择按键时勾选“按住”，该按钮就会按一次保持按住，再按一次松开（例如按住鼠标拖放）。</item>
+        <item>点“完成”保存。每个游戏的按键布局单独保存。</item>
+    </string-array>
+
+    <string name="agvn_guide_mouse_title">用手指操作鼠标</string>
+    <string name="agvn_guide_mouse_summary">轻点即点击，按住拖动即拖放</string>
+    <string-array name="agvn_guide_mouse_steps">
+        <item>单指轻点 = 在你点的位置按鼠标左键。</item>
+        <item>鼠标右键：先用一根手指点要点击的位置，再用两根手指同时轻点 = 在该位置按鼠标右键。</item>
+        <item>按住拖动 = 按住鼠标左键拖动（拖放物品、拉选框…）。</item>
+        <item>双指上下滑动可滚动鼠标滚轮（翻页）。</item>
+    </string-array>
+
+    <string name="agvn_guide_trouble_title">游戏出错或打不开</string>
+    <string name="agvn_guide_trouble_summary">降低画质、关闭其他应用、发送错误日志</string>
+    <string-array name="agvn_guide_trouble_steps">
+        <item>把画质降到“超轻”（游戏上的 ⋮，“调整画质”），然后重新打开游戏。</item>
+        <item>关闭其他正在运行的应用，让游戏有足够的内存。</item>
+        <item>检查游戏文件夹是否已完整复制，没有缺少文件。</item>
+        <item>仍然出错：进入设置，点“导出错误日志”。日志文件在 Download 文件夹中，请把它发给 AGVN 以获得帮助。</item>
+    </string-array>
+
+    <string name="agvn_guide_expert_title">进阶用户</string>
+    <string name="agvn_guide_expert_summary">下载更多 Wine、驱动，详细调整</string>
+    <string-array name="agvn_guide_expert_steps">
+        <item>应用已预装玩游戏所需的一切，你无需再下载任何东西。</item>
+        <item>如果你熟悉 Wine/驱动：进入设置，打开“高级（进阶用户）”，即可下载更多 Wine、Proton、DXVK、图形驱动，并管理运行环境。</item>
+        <item>想详细调整某个游戏：点游戏上的 ⋮，然后选择“配置”。</item>
+    </string-array>
+
+    <!-- First setup screen -->
+    <string name="agvn_setup_welcome">欢迎使用 AGVN Player</string>
+    <string name="agvn_setup_intro">应用正在自动安装玩游戏所需的一切。无需另外下载，只需约 1–2 分钟。</string>
+    <string name="agvn_setup_step_core">安装游戏运行组件</string>
+    <string name="agvn_setup_step_core_system">正在解压系统… %1$d%%</string>
+    <string name="agvn_setup_step_core_wine">正在安装 Wine/Proton…</string>
+    <string name="agvn_setup_step_core_driver">正在安装图形驱动…</string>
+    <string name="agvn_setup_step_container">准备游戏运行环境</string>
+    <string name="agvn_setup_step_access">允许读取游戏文件夹</string>
+    <string name="agvn_setup_access_why">应用需要此权限，才能自动查找你复制到手机中的游戏（内部存储或存储卡中的 AGVN、Download 文件夹）。应用不会读取你的照片或短信。</string>
+    <string name="agvn_setup_access_button">允许</string>
+    <string name="agvn_setup_access_later">以后再说</string>
+    <string name="agvn_setup_access_denied">还没有获得权限。请在刚打开的页面中开启“允许管理所有文件”。你也可以点“以后再说”，添加游戏时应用会再次询问。</string>
+    <string name="agvn_setup_access_denied_legacy">还没有获得权限。请再点一次“允许”，并在对话框中选择“允许”。如果对话框没有出现，请进入 手机设置 → 应用 → AGVN Player → 权限 → 存储 → 允许。你也可以点“以后再说”。</string>
+    <string name="agvn_setup_done">完成</string>
+    <string name="agvn_setup_failed">安装未成功。请确认手机至少有 2 GB 可用空间，然后点“重试”。</string>
+    <string name="agvn_setup_retry">重试</string>
+    <string name="agvn_setup_start">开始</string>
+    <string name="agvn_setup_guide_header">等待期间，快速了解使用方法</string>
+    <string name="agvn_setup_guide_header_done">快速了解使用方法</string>
+    <string name="agvn_setup_swipe_hint">左右滑动查看更多</string>
+</resources>

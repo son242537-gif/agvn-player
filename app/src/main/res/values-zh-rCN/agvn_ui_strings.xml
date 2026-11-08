@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="agvn_language_title">语言 · Language</string>
+    <string name="agvn_language_system">跟随手机语言</string>
+    <string name="agvn_settings_appearance">外观</string>
+    <string name="agvn_settings_game_screen">游戏画面</string>
+    <string name="agvn_settings_fullscreen_all">所有游戏全屏</string>
+    <string name="agvn_settings_fullscreen_all_summary">拉伸游戏画面铺满屏幕，两侧不再有黑边</string>
+    <string name="agvn_settings_saves">游戏存档</string>
+    <string name="agvn_settings_saves_all">为所有游戏备份存档</string>
+    <string name="agvn_settings_saves_all_summary">每次退出游戏时自动查找并备份存档</string>
+    <string name="agvn_settings_about_section">关于</string>
+    <string name="agvn_settings_about">关于</string>
+    <string name="agvn_settings_advanced_section">高级（进阶用户）</string>
+    <string name="agvn_settings_advanced_show">显示高级设置</string>
+    <string name="agvn_settings_advanced_hide">隐藏高级设置</string>
+    <string name="agvn_settings_advanced_summary">Wine、驱动、运行环境、日志…… 普通玩家无需调整。</string>
+</resources>

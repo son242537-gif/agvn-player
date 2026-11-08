@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN: Simplified Chinese (zh-rCN) translation of values/agvn_repair_strings.xml ("Tự sửa lỗi" = 自动修复). Copyright (c) 2026 agvn.io — MIT License. -->
+<resources>
+    <string name="agvn_repair_title">自动修复</string>
+    <string name="agvn_repair_pick">游戏出了什么问题？</string>
+    <string name="agvn_repair_plan">应用会依次尝试下面的方法，每次一种：游戏重新打开，你试玩一下，然后应用会问你问题是否还在。如果某种方法没用，应用会先把配置恢复原样，再试下一种。</string>
+    <string name="agvn_repair_none">应用已试完所有内置方法。游戏配置已恢复到修复前的状态。点“发送日志”让 AGVN 帮你看看。</string>
+    <string name="agvn_repair_no_fix">对于这个游戏的这个问题，应用还没有修复方法。点“发送日志”让 AGVN 帮你看看。</string>
+    <string name="agvn_repair_start">尝试方法 1：%1$s</string>
+    <string name="agvn_repair_trying">正在尝试：%1$s。游戏正在重新打开…</string>
+    <string name="agvn_repair_status">应用正在尝试修复方法：%1$s。问题还在吗？</string>
+    <string name="agvn_repair_not_run">应用已设置修复方法：%1$s，但游戏还没有用这个方法重新运行。打开游戏试试；玩一会儿后，应用会问你问题是否还在。</string>
+    <string name="agvn_repair_play">用这个方法试玩</string>
+    <string name="agvn_repair_ask_title">“%1$s”的问题还在吗？</string>
+    <string name="agvn_repair_ask_detail">应用正在尝试修复方法：%1$s。请试玩一会儿，然后告诉应用结果。</string>
+    <string name="agvn_repair_gone">已经好了</string>
+    <string name="agvn_repair_still">还有问题</string>
+    <string name="agvn_repair_later">下次再问</string>
+    <string name="agvn_repair_other">选择其他问题</string>
+    <string name="agvn_repair_kept">已保留修复方法：%1$s</string>
+    <string name="agvn_repair_done_title">已试完所有内置方法</string>
+    <string name="agvn_repair_off_title">暂时无法尝试：%1$s</string>
+    <string name="agvn_repair_off_detail">游戏没有用正在尝试的方法（%1$s）运行：开启这个方法后，游戏设置又被改过。应用不会把这个方法算作已尝试。</string>
+    <string name="agvn_repair_off_try">尝试：%1$s</string>
+    <string name="agvn_repair_undone">使用正在尝试的方法（%1$s）时，游戏在 %2$s 秒后自动关闭。应用已认定这个方法无效，并把游戏配置恢复到修复前的状态。</string>
+    <string name="agvn_bar_repair_label">🩺 自动修复</string>
+    <string name="agvn_bar_repair">自动修复：选择游戏遇到的问题</string>
+
+    <string name="agvn_fix_render_sysmem">让 Turnip 在内存中绘制整帧（sysmem）</string>
+    <string name="agvn_fix_turnip_nolrz">关闭 Turnip 的 LRZ（修复黑点、画面闪烁）</string>
+    <string name="agvn_fix_turnip_noubwc">关闭 Turnip 的 UBWC 图像压缩（修复黑块、条纹、颜色错误）</string>
+    <string name="agvn_fix_async_off">关闭 DXVK async（不再闪烁，开始时可能更卡）</string>
+    <string name="agvn_fix_bcn_full">解压所有 BCn 纹理（修复纹理发黑、画面缺失）</string>
+    <string name="agvn_fix_unity_quality_own">让 Unity 游戏自行选择画面质量</string>
+    <string name="agvn_fix_audio">将声音输出方式改为 %1$s</string>
+    <string name="agvn_fix_locale_ja">用日语运行游戏（修复日文游戏乱码）</string>
+    <string name="agvn_fix_locale_zh">用中文运行游戏（修复中文游戏乱码）</string>
+    <string name="agvn_fix_godot_light">轻量运行：直接在 Android 上运行 Godot 游戏，不经过 Wine（流畅得多）</string>
+    <string name="agvn_fix_media_old">用 Wine 的旧视频解码方式（适用于 Wine 还打不开的视频，如带 MP3 音频的 MP4 视频）</string>
+    <string name="agvn_fix_page_light">轻量运行：直接在 Android 上运行游戏页面（Electron、NW.js），不经过 Wine（流畅得多）</string>
+    <string name="agvn_fix_rgss_light">轻量运行：直接在 Android 上运行 RPG Maker 游戏，不经过 Wine（流畅得多）</string>
+    <string name="agvn_fix_godot_light_gl">让 Godot 游戏（轻量运行）用 OpenGL 绘制</string>
+    <string name="agvn_fix_godot_light_vulkan">让 Godot 游戏（轻量运行）用 Vulkan 绘制</string>
+    <string name="agvn_fix_mods_off">不加载 mod（%1$s），按原版运行游戏；游戏文件保持不变</string>
+    <string name="agvn_fix_dll_wine">用 Wine 的 %1$s 代替游戏自带的版本（该文件中的作弊或 mod 将失效；游戏文件保持不变）</string>
+    <string name="agvn_fix_raw_mouse">把触摸当作真实鼠标发送（适用于只读取真实鼠标的游戏，如使用 Input System 的 Unity 游戏）</string>
+    <string name="agvn_fix_raw_mouse_off">按之前的方式发送触摸（与其他游戏相同）</string>
+    <string name="agvn_fix_exe64">运行游戏的 64 位版本（%1$s），代替 32 位版本</string>
+    <string name="agvn_fix_exe_main">运行游戏主程序（%1$s），代替游戏启动器（.NET）</string>
+    <string name="agvn_fix_renpy_light">为 Ren\'Py 7 游戏试试“轻量运行”（Ren\'Py 8）；存档单独保存，从 Windows 版复制</string>
+    <string name="agvn_fix_renpy_angle">Ren\'Py 用 ANGLE（Direct3D）代替 OpenGL 绘制</string>
+    <string name="agvn_fix_gdiplus_text">修复 .NET 的越南文绘制错误（在游戏启动文件旁放置已修补的 mlang.dll）</string>
+</resources>

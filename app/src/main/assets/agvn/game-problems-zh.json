@@ -1,0 +1,316 @@
+{
+  "problems": {
+    "light-script-error": {
+      "title": "轻量运行时游戏报错",
+      "cause": "游戏报错：{error}。如果游戏停止或运行异常，游戏的 Windows 版通常可以运行。"
+    },
+    "light-page-crash": {
+      "title": "游戏页面中途被关闭",
+      "cause": "运行 HTML 游戏的部分（Android 的 WebView）在游戏中被关闭，通常是因为手机内存不足。"
+    },
+    "light-frozen": {
+      "title": "轻量运行时游戏卡死",
+      "cause": "游戏（{runner}）长时间没有响应，Android 已将它关闭。"
+    },
+    "light-crash": {
+      "title": "轻量运行时游戏突然关闭",
+      "cause": "游戏运行器 {runner} 出错并关闭（{crash}）。"
+    },
+    "steam": {
+      "title": "游戏需要 Steam",
+      "cause": "这个版本的游戏只能在有 Steam 时运行（缺少文件 {1}）。AGVN 无法运行 Steam，需要不依赖 Steam 的游戏版本。"
+    },
+    "missing-dll": {
+      "title": "游戏缺少文件 {1}",
+      "cause": "游戏需要文件 {1}，但找不到。通常是游戏文件夹没有复制完整，或者游戏需要一个尚未开启的 Windows 库。"
+    },
+    "bad-dll": {
+      "title": "游戏的文件 {1} 无法使用",
+      "cause": "文件 {1} 已损坏，或者是与游戏不匹配的 32 位/64 位版本。请从原版重新复制游戏文件夹。"
+    },
+    "dll-function": {
+      "title": "文件 {1} 缺少函数",
+      "cause": "有程序调用了 {1} 中的一个函数，但当前使用的 {1} 没有这个函数，所以游戏停止了。如果 {1} 在游戏启动文件旁边，它通常是作弊表或 mod 的文件，只转发游戏调用的几个函数，而 Wine 还需要其他函数。改用 Wine 的 {1}，游戏就能运行，但该文件中的作弊或 mod 将失效。"
+    },
+    "dotnet": {
+      "title": "游戏需要 .NET",
+      "cause": "游戏的启动文件或它打开的程序是用 .NET（C#）编写的。Wine 需要 .NET 运行库（Wine Mono）才能打开它，而游戏当前使用的 Wine 版本还没有。如果这个文件只是游戏启动器，并且文件夹里还有游戏主程序，“运行游戏主程序”按钮会直接打开主程序，无需 .NET。如果没有这个按钮，你也可以用主程序重新添加游戏：“添加游戏”→“手动选择 .exe 文件（高级）”。"
+    },
+    "dotnet-load": {
+      "title": "Wine 暂时无法运行游戏的 .NET 部分",
+      "cause": "游戏的启动文件或它打开的程序是用 .NET（C#）编写的，但 Wine 无法为这个程序加载 .NET 运行库（Wine Mono）：64 位 .NET 程序暂时无法在手机上运行，所以它会直接关闭，什么也不显示。如果它只是游戏启动器，并且文件夹里还有游戏主程序，“运行游戏主程序”按钮会直接打开主程序。如果没有这个按钮，请用主程序重新添加游戏：“添加游戏”→“手动选择 .exe 文件（高级）”。"
+    },
+    "godot-renderer-bad": {
+      "title": "Godot 游戏无法用更改后的绘制方式运行",
+      "cause": "应用为这个 Godot 游戏更改的绘制方式（Vulkan 或 Direct3D 11）与游戏的 Godot 版本不兼容。"
+    },
+    "godot-vulkan-crash": {
+      "title": "Godot 游戏绘制时图形驱动出错",
+      "cause": "游戏让手机的图形驱动用 Vulkan 渲染时，驱动出错了，于是 Wine 弹出“Assertion failed!”框并关闭游戏。问题不在游戏。更改 Godot 游戏的绘制方式可能避开这个错误。在 Mali GPU 手机上，问题也可能出在应用为 Mali 修复着色器的步骤。"
+    },
+    "vulkan-crash": {
+      "title": "游戏绘制时图形驱动出错",
+      "cause": "游戏让手机的图形驱动用 Vulkan 渲染时，驱动出错了，于是 Wine 弹出“Assertion failed!”框并关闭游戏。问题不在游戏：通常是当前选择的 DXVK 版本或驱动与这个 GPU 不兼容。在 Mali GPU 手机上，问题也可能出在应用为 Mali 修复着色器的步骤：可以逐个关闭这些步骤来尝试。"
+    },
+    "godot-gl-angle": {
+      "title": "Godot 游戏无法打开 OpenGL 和 Direct3D 11",
+      "cause": "这个 Godot 游戏已尝试 OpenGL 3.3 和 Direct3D 11（ANGLE），但你的手机都无法运行。"
+    },
+    "godot-opengl": {
+      "title": "Godot 游戏无法打开 OpenGL",
+      "cause": "你的手机还无法运行这个 Godot 游戏所需的 OpenGL 3.3。"
+    },
+    "godot-vulkan": {
+      "title": "Godot 游戏无法打开 Vulkan",
+      "cause": "你的手机还无法按这个 Godot 游戏需要的方式运行 Vulkan。"
+    },
+    "godot-switch-failed": {
+      "title": "更改绘制方式后 Godot 游戏自动关闭",
+      "cause": "上次应用更改了这个 Godot 游戏的绘制方式以避开错误。这次游戏打开不到一分钟就自动关闭了，说明这种绘制方式不适合你的手机。"
+    },
+    "godot-gl-crash": {
+      "title": "Godot 游戏绘制时被关闭",
+      "cause": "手机的 GPU 无法绘制游戏的某个 OpenGL 场景，所以游戏自动关闭。Zink（将 OpenGL 转为 Vulkan 的组件）在部分 GPU 上缺少一些功能，尤其是 Mali。更改 Godot 游戏的绘制方式可能避开这个错误。"
+    },
+    "wine-rpc-crash": {
+      "title": "游戏调用 Windows 服务时 Wine 出错",
+      "cause": "游戏在查询服务列表时，Wine 负责调用 Windows 服务（RPC）的部分出现内存错误。之后游戏停在黑屏然后关闭，尽管手机内存并未耗尽。这是当前 Wine 版本在 ARM 芯片上的问题，而不是游戏的问题。旧版 Wine（Proton 9）用不同的方式处理这部分。"
+    },
+    "movie-transcode": {
+      "title": "Wine 无法打开游戏中的视频",
+      "cause": "游戏播放了一段视频（通常在转场时），而 Wine 的新视频解码方式无法自行解码，最常见的是带 MP3 音频的 MP4 视频。这时 Wine 需要 Steam 的转码器，而 Steam 之外没有，所以视频打不开，游戏可能停在黑屏等视频播完。问题出在应用的 Wine，不在游戏。Wine 的旧视频解码方式能解码这类视频。"
+    },
+    "deadlock": {
+      "title": "游戏死锁，画面卡住",
+      "cause": "游戏的线程互相无限等待：一个线程持有锁不释放，主线程等这个锁超过 1 分钟，于是游戏画面卡住（通常在加载场景时，黑屏）。这不是游戏数据的问题：问题在于 CPU 模拟或 Wine 在手机上运行游戏线程的方式。下面每种修复方法都会让游戏稍慢一些，所以应用只在游戏死锁时才推荐。"
+    },
+    "swapchain-frozen": {
+      "title": "切换画面模式后游戏立即卡住",
+      "cause": "游戏刚更改了分辨率或开启了垂直同步（DXVK 重建 swapchain，通常在进入菜单时），然后不再绘制新的帧并停住：它在等屏幕报告上一帧已显示，而这个报告永远不会到来。关闭 Present Wait 后，游戏就不再等这个报告。如果还不行，“每帧同步”会让游戏用另一种方式等待每一帧。"
+    },
+    "dxvk-map-32": {
+      "title": "游戏的 32 位版本无法使用显存",
+      "cause": "游戏正在运行 32 位版本。在当前选择的图形驱动下，DXVK（将 DirectX 转为 Vulkan 的组件）无法把显存交给 32 位程序使用，所以无法创建 DirectX，游戏什么也画不出来，尽管窗口仍然打开。Ren'Py 游戏也一样：OpenGL 无法运行时，它会用 DirectX 绘制。游戏的 64 位版本（如果有）不受这个限制。更换 DXVK 版本没有帮助。"
+    },
+    "gpu-refused": {
+      "title": "图形驱动不给游戏分配显存，尽管还有空闲",
+      "cause": "DXVK（将 DirectX 转为 Vulkan 的组件）为游戏申请显存被驱动拒绝，尽管显存还有很多空闲。游戏无法继续绘制，于是卡住或自动关闭，有时会报错“CreateTexture2D … E_INVALIDARG”。最常见的情况是游戏把纹理标记为“共享”（让其他程序也能读取），而当前选择的驱动无法分配这类内存。关闭共享内存后，DXVK 会创建普通纹理，游戏照常绘制。游戏没有损坏，手机也没有耗尽内存，所以降低画质没有帮助。"
+    },
+    "dx11-features": {
+      "title": "图形驱动缺少游戏需要的 DirectX 11 功能",
+      "cause": "DXVK（将 DirectX 转为 Vulkan 的组件）无法为游戏创建 DirectX 11：当前选择的图形驱动缺少游戏需要的功能，比如线框绘制或 geometry shader。更换 DXVK 版本没有帮助。如果除了“发送日志”没有其他按钮，说明这台手机无法运行这个 DirectX 11 游戏。"
+    },
+    "dxvk-no-adapter": {
+      "title": "手机无法为游戏创建 DirectX",
+      "cause": "DXVK（将 DirectX 转为 Vulkan 的组件）找不到能与当前 DXVK 版本和驱动配合使用的 GPU。"
+    },
+    "opengl-unavailable": {
+      "title": "手机无法用这个图形驱动运行 OpenGL",
+      "cause": "Zink（将 OpenGL 转为 Vulkan 的组件）无法在当前选择的图形驱动上运行，所以 OpenGL 游戏和 WineD3D（用 OpenGL 绘制 DirectX 的方式）什么也画不出来。从现在起，应用不会再在这台手机上为这个驱动推荐 WineD3D。"
+    },
+    "d3d11-level": {
+      "title": "游戏需要 DirectX 11 {1} 级别",
+      "cause": "游戏（Unreal Engine）需要支持 DirectX 11 {1} 级别的 GPU，而当前选择的绘制方式达不到这个级别。游戏没有损坏：在当前选择的图形驱动下，DXVK（通过 Vulkan 运行 DirectX）或 WineD3D（通过 OpenGL 运行 DirectX）缺少游戏需要的功能，比如 tessellation。如果游戏正在用 WineD3D，就改回 DXVK。如果正在用 DXVK，只有换驱动才可能有帮助，因为所有 DXVK 版本都需要这些功能。如果除了“发送日志”没有其他按钮，说明这台手机暂时无法运行这个游戏。"
+    },
+    "ue-render-timeout": {
+      "title": "Unreal 游戏因等待绘制太久而自行停止",
+      "cause": "Unreal 游戏的绘制部分连续忙碌 120 秒时，游戏会自行停止（“GameThread timed out waiting for RenderThread”），通常发生在慢速手机上首次加载或构建着色器和纹理时。游戏没有损坏：让游戏等待更久，它就会继续加载，只是屏幕可能还会黑一会儿。"
+    },
+    "directx": {
+      "title": "游戏提示缺少 DirectX",
+      "cause": "在当前选择的 DXVK 版本和图形驱动下，游戏无法在你的手机上创建 DirectX。"
+    },
+    "dxvk-view": {
+      "title": "DXVK 无法读取压缩纹理，游戏关闭",
+      "cause": "在当前选择的图形驱动下，DXVK（通过 Vulkan 运行 DirectX）无法读取游戏的部分压缩纹理（BCn 类，如 DXT），所以游戏自动关闭；Unreal 游戏会报“CreateShaderResourceView … E_INVALIDARG”。对于无法直接读取 BCn 的 GPU（如 Mali），应用会解压这些纹理，但 DXVK 2.x 用新方式询问驱动，而解压组件还不能完整回答。DXVK 1.10.3 用旧方式询问，所以不会遇到这个错误。游戏没有损坏。"
+    },
+    "ue-crash-box": {
+      "title": "Unreal 游戏报错后自动关闭",
+      "cause": "Unreal 游戏弹出“… Game has crashed and will close”框，点 OK 后关闭。错误信息在这个框里，应用还读不到：截图这个框可以帮助 AGVN 了解是什么错误。通常是当前选择的 DXVK（通过 Vulkan 运行 DirectX）或图形驱动与游戏不兼容。"
+    },
+    "opengl-crash": {
+      "title": "游戏绘制时被关闭",
+      "cause": "手机的 GPU 无法绘制游戏的某个 OpenGL 场景，所以游戏自动关闭。Zink（将 OpenGL 转为 Vulkan 的组件）在部分 GPU 上缺少一些功能，尤其是 Mali。"
+    },
+    "gpu-lost": {
+      "title": "运行游戏时图形驱动出错",
+      "cause": "手机的 GPU 在绘制游戏时中途停止：驱动遇到了无法绘制的场景。"
+    },
+    "gpu-memory": {
+      "title": "游戏显存不足",
+      "cause": "游戏需要的显存比你手机剩余的多。下次打开起，应用会自动使用这个游戏最省内存的档位。"
+    },
+    "memory": {
+      "title": "游戏内存不足",
+      "cause": "游戏需要的内存比你手机剩余的多。下次打开起，应用会自动使用这个游戏最省内存的档位。"
+    },
+    "corrupt-files": {
+      "title": "游戏文件已损坏",
+      "cause": "游戏的某个文件已损坏或没有复制完。请从原版重新复制游戏文件夹。"
+    },
+    "file-not-found": {
+      "title": "找不到游戏文件",
+      "cause": "Wine 提示“File not found.”：游戏的启动文件或游戏需要的某个文件已不在原来的位置。如果你刚刚重命名、移动或删除了游戏文件夹，请重新复制该文件夹，然后把游戏重新添加到游戏库。"
+    },
+    "dll-no-access": {
+      "title": "游戏无法打开自己的 DLL 库",
+      "cause": "游戏在打开自己的某个库（DLL）时报“No access to memory location.”，然后停止，例如 RPG Maker VX Ace 的 RGSS301.dll。问题不在游戏：通常是因为游戏文件夹在手机的公共存储（Download）中，Android 不允许直接从那里的文件运行代码，而新版 Wine（Proton 10）打开该库的方式需要这个权限。RPG Maker XP/VX/VX Ace 游戏可以用“轻量运行”运行，无需 Wine；其他游戏可以试试旧版 Wine（Proton 9），它会在运行前先把库复制到内存中。"
+    },
+    "bad-exe": {
+      "title": "游戏启动文件格式不正确",
+      "cause": "Wine 提示“Bad EXE format”：打开的文件不是 Wine 能运行的 Windows 程序。文件可能已损坏或没有复制完，可能是非常老的程序（16 位或 DOS），也可能根本不是游戏的启动文件。请从原版重新复制游戏文件夹，或用正确的启动文件重新添加游戏：“添加游戏”→“手动选择 .exe 文件（高级）”。"
+    },
+    "killed-low-memory-saved": {
+      "title": "手机内存不足，游戏已被关闭",
+      "cause": "Android 在游戏过程中因你的手机内存不足而关闭了游戏，尽管游戏已在应用能为它提供的最省内存档位下运行。再降低画质也省不了多少内存。玩之前请关闭其他应用或重启手机。如果仍然发生，说明这个游戏需要的内存比你手机剩余的多。"
+    },
+    "killed-low-memory": {
+      "title": "手机内存不足，游戏已被关闭",
+      "cause": "Android 在游戏过程中因你的手机内存不足而关闭了游戏。下次打开起，应用会自动使用这个游戏最省内存的档位。"
+    },
+    "killed-background": {
+      "title": "切换应用时手机关闭了游戏",
+      "cause": "你切换到其他应用时，系统为了省电或节省内存关闭了游戏。允许 AGVN 在后台不受限制地运行，游戏就会被保留。"
+    },
+    "emulator-noexec-crt": {
+      "title": "32 位模拟器无法运行游戏的代码",
+      "cause": "游戏出错（{crash}）。32 位 CPU 模拟器认为这段代码不允许运行，尽管它是游戏自带的 {1} 库的代码，在 Windows 上运行正常。问题出在手机上的模拟器，而不是游戏数据。Wine 自带它自己的 {1}；WOWBox64 是应用内置的另一个 32 位模拟器。"
+    },
+    "emulator-noexec": {
+      "title": "32 位模拟器无法运行游戏的代码",
+      "cause": "游戏出错（{crash}）。32 位 CPU 模拟器认为游戏的这段代码不允许运行，尽管它在 Windows 上运行正常。问题出在手机上的模拟器，而不是游戏数据。WOWBox64 是应用内置的另一个 32 位模拟器。"
+    },
+    "crash-after-change": {
+      "title": "游戏在新配置下出错",
+      "cause": "上次游戏可以运行。更改配置后，游戏出错并自动关闭（{crash}）。"
+    },
+    "dotnet-crash": {
+      "title": ".NET 游戏出错并自动关闭",
+      "cause": "用 .NET（C#）编写的游戏因出错而关闭（{crash}）。在应用的 Wine 上，.NET 的文字绘制部分（GDI+）有缺陷：单独出现或位于一段文字末尾的带声调越南文字（如“ắ”“ệ”）会让游戏立即关闭，通常发生在第一个有越南文字的画面，而 Wine 日志什么也不记录。“修复 .NET 的越南文绘制错误”按钮会在游戏启动文件旁放置一个已修补的 mlang.dll；如果仍然出错，应用会自动移除这个文件。如果是你自己刚刚退出了游戏，请忽略此提示。"
+    },
+    "unity-crash": {
+      "title": "游戏出错并卡住",
+      "cause": "游戏运行时崩溃了（{crash}）。游戏引擎 Unity 会自己捕获这个错误，所以游戏通常会卡住，而不是自动关闭。如果是你自己刚刚退出了游戏，请忽略此提示。"
+    },
+    "crash": {
+      "title": "游戏出错并自动关闭",
+      "cause": "游戏运行时出错（{crash}）。"
+    },
+    "low-ram-saved": {
+      "title": "手机内存快用完时游戏自动关闭",
+      "cause": "游戏关闭时手机只剩 {free} MB 可用内存，尽管游戏已在应用能为它提供的最省内存档位下运行。再降低画质也省不了多少内存。玩之前请关闭其他应用或重启手机，并经常存档。如果仍然发生，说明这个游戏需要的内存比你手机剩余的多。如果是你自己刚刚退出了游戏，请忽略此提示。"
+    },
+    "low-ram-end": {
+      "title": "手机内存快用完时游戏自动关闭",
+      "cause": "游戏关闭时手机只剩 {free} MB 可用内存，很可能是手机内存不足而关闭了游戏。玩之前请关闭其他应用或重启手机，并经常存档。下次打开起，应用会自动使用这个游戏最省内存的档位。如果是你自己刚刚退出了游戏，请忽略此提示。"
+    },
+    "not-a-game": {
+      "title": "游戏正用 {exe} 打开，这不是游戏的启动文件",
+      "cause": "{exe} 是游戏附带的辅助程序（报错、安装库或卸载），不是游戏本身：它打开后会自行关闭，什么也不显示。游戏文件夹中没有可以代替它打开的主程序（Unity 游戏：<游戏名>.exe 位于 <游戏名>_Data 文件夹旁边）。该文件可能已被杀毒软件删除，或者文件夹没有复制完整。请从原版重新完整复制游戏文件夹，然后用“添加游戏”重新添加。"
+    },
+    "chromium-closed": {
+      "title": "游戏刚打开就自动关闭，什么也不显示",
+      "cause": "这个游戏是在 Chromium（Electron 或 NW.js）中运行的网页。用 Windows 运行时，Chromium 要依靠 Wine 和 CPU 模拟来运行，有些 Chromium 版本能打开页面，但几秒后会全部自行关闭，不报错（一个 Electron 44 游戏，骁龙 8 至尊版）。“轻量运行”会直接在手机的浏览器中打开这个页面，不经过 Windows，通常轻快得多。“轻量运行”和 Windows 的存档不通用。游戏中依赖 Electron 主进程完成的部分（Steam、通过该进程存档）可能无法运行；这时“自动修复”会改回用 Windows 运行。如果是你自己刚刚退出了游戏，请忽略此提示。"
+    },
+    "closed-on-start": {
+      "title": "游戏刚显示画面就自动关闭",
+      "cause": "游戏加载完成，刚显示画面不到 10 秒就自动关闭了，你还没有进行任何操作，也没有报错。通常是游戏刚开始运行就出错了。例如 The Agnietta：32 位 CPU 模拟器（FEXCore）无法运行游戏的一段代码，但游戏自己捕获了这个错误，所以 Wine 没有记录。如果是你自己刚刚退出了游戏，请忽略此提示。"
+    },
+    "chromium-frozen": {
+      "title": "游戏停在首页或加载画面",
+      "cause": "这个游戏是在 Chromium（Electron 或 NW.js）中运行的网页。用 Windows 运行时，Chromium 要依靠 Wine 和 CPU 模拟来运行，所以非常吃力，可能一直停在首页或加载条：无论你怎么点，画面都不变。有的 Electron 游戏在旧版 Wine（Proton 9）中卡住，但在新版 Wine（Proton 10）中可以运行，包括 Steam 部分；首次需要安装新版 Wine，约一分钟。“轻量运行”会直接在手机的浏览器中打开这个页面，不经过 Windows。游戏中依赖 Electron 主进程完成的部分（Steam、通过该进程存档）可能无法运行；这时“自动修复”会改回用 Windows 运行。"
+    },
+    "wine-gone": {
+      "title": "Wine 无法启动",
+      "cause": "Wine 刚打开就停止了，游戏还来不及运行：Wine 的核心部分（wineserver）与第一个程序断开了连接。问题不在游戏，所以更改游戏的分辨率或画质设置没有帮助。关闭 esync，或用另一个 Wine 运行（另一个运行环境，有独立的核心部分），可能会有帮助。如果所有游戏都这样，请强行停止应用或重启手机后重试。"
+    },
+    "godot-no-start": {
+      "title": "Godot 游戏打开后立即关闭",
+      "cause": "Godot 游戏在显示画面前就关闭了。最常见的原因是手机还无法运行游戏所需的 OpenGL 3.3。"
+    },
+    "low-resolution": {
+      "title": "游戏无法在 {screen} 分辨率下运行",
+      "cause": "游戏屏幕当前为 {screen}，低于“低”档（854×480）。很多游戏在屏幕这么小时拒绝运行，并提示“resolution is too low”。"
+    },
+    "no-start-after-change": {
+      "title": "游戏在新配置下无法运行",
+      "cause": "上次游戏可以运行。更改配置后，游戏一打开就关闭。"
+    },
+    "no-start": {
+      "title": "游戏打开后立即关闭",
+      "cause": "游戏在显示画面前就关闭了，没有留下应用能读取的错误。"
+    },
+    "gpu-tiler": {
+      "title": "GPU 渲染内存不足",
+      "cause": "GPU 驱动多次报告渲染内存不足（Mali：TILER_HEAP_OOM）。每次发生时，GPU 都要把一帧分成多部分绘制，所以游戏会卡顿几秒，有时黑屏。下次打开起，应用会为这个游戏使用最省内存的档位。降低画质（游戏屏幕更小）或降低游戏内的画面质量也有帮助。"
+    },
+    "slow-gpu": {
+      "title": "游戏运行缓慢{speed}",
+      "cause": "你的手机现在：GPU 已全力运行（{gpu}%），仍然来不及绘制。"
+    },
+    "slow-cpu": {
+      "title": "游戏运行缓慢{speed}",
+      "cause": "你的手机现在：CPU 过载（一个核心占用 {cpu}%），跟不上游戏。"
+    },
+    "slow": {
+      "title": "游戏运行缓慢{speed}",
+      "cause": "手机不允许应用读取 GPU 的繁忙程度。CPU 没有过载，所以很可能是 GPU 在全力运行。"
+    },
+    "slow-unknown": {
+      "title": "游戏运行缓慢{speed}",
+      "cause": "手机不告诉应用是 GPU 还是 CPU 过载。通常是 GPU，因为游戏要绘制的内容超出了手机的能力。"
+    },
+    "power-save": {
+      "title": "省电模式已开启",
+      "cause": "你的手机开启了省电模式：CPU 被降频，游戏会慢很多。"
+    },
+    "report-flicker": {
+      "title": "画面闪烁、忽隐忽现",
+      "cause": "画面闪烁通常是因为 DXVK 在渲染完成前就显示画面（async）、帧与屏幕不同步，或者 Turnip 分块绘制屏幕的方式。"
+    },
+    "report-artifacts": {
+      "title": "画面有黑点、黑块、条纹或颜色错误",
+      "cause": "黑点和黑块通常是因为图形驱动的某一步绘制出错（Turnip 的 LRZ 深度缓冲、UBWC 图像压缩或 tile 内存）、GPU 无法读取的压缩纹理，或者 DXVK 版本与驱动不兼容。"
+    },
+    "report-black": {
+      "title": "游戏仍在运行，但屏幕是黑的",
+      "cause": "游戏仍在运行（有声音、有反应），但不显示画面：通常是因为帧没有输出到屏幕、Turnip 绘制出错，或者游戏屏幕太小。"
+    },
+    "report-slow": {
+      "title": "游戏慢、卡顿、延迟",
+      "cause": "GPU 或 CPU 跟不上时，游戏就会变慢。降低画质可减轻 GPU 的负担；直接在 ARM 芯片上运行的 DXVK 和更快的 CPU 模拟可减轻 CPU 的负担。"
+    },
+    "report-freeze": {
+      "title": "游戏画面卡住、死机",
+      "cause": "游戏卡住通常是因为 CPU 模拟没有按正确顺序运行游戏代码、DXVK 的 async 渲染、DXVK 版本或驱动与游戏不兼容，或者游戏的 mod（BepInEx、MelonLoader、UE4SS）。"
+    },
+    "report-crash": {
+      "title": "游戏自动关闭、闪退",
+      "cause": "游戏闪退通常是因为 CPU 模拟、DXVK 版本或图形驱动与游戏不兼容，或者游戏的 mod。对于画质为“低”或“超轻”的 Unity 游戏，应用为游戏设置的最低画面质量也可能让游戏出错。"
+    },
+    "report-sound": {
+      "title": "没有声音、声音有杂音或断断续续",
+      "cause": "声音问题通常是因为 Wine 的声音输出方式与手机不兼容：应用会在 PulseAudio 和 ALSA 之间切换。"
+    },
+    "report-text": {
+      "title": "文字乱码、方块、奇怪字符",
+      "cause": "日文或中文游戏需要用游戏的语言运行才能正常显示文字；语言不对时，文字会变成方块或奇怪字符。"
+    },
+    "report-blurry": {
+      "title": "画面模糊、失真或太小",
+      "cause": "游戏屏幕比手机屏幕小，画面被放大，所以模糊或失真。提高画质可让游戏屏幕更大（手机会稍热一些）。"
+    },
+    "report-animation": {
+      "title": "动画、视频或特效不动",
+      "cause": "动画、视频或特效静止或不显示，通常是因为绘制方式（renderer）或图形驱动无法绘制这个效果、DXVK async 跳过了未渲染完的场景，或者低画质让游戏关闭了部分特效。Godot 游戏可以直接在 Android 上运行（轻量运行），或者更改绘制方式。"
+    },
+    "report-touch": {
+      "title": "点击、按键没反应",
+      "cause": "游戏仍在运行，但不接收触摸：按按钮、选菜单都没反应。有些游戏只读取真实鼠标（raw input），如使用 Input System 的 Unity 游戏；应用可以按这种方式发送触摸。如果只是虚拟按键没反应，请在“虚拟按键配置”中选择其他按键布局。"
+    },
+    "report-other": {
+      "title": "其他问题",
+      "cause": "应用会尝试通用方法：恢复之前能运行的配置、恢复原始配置、更稳定的 CPU 模拟、更换 DXVK 和驱动。"
+    }
+  }
+}

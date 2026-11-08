@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN: Simplified Chinese (zh-rCN) translation of values/agvn_update_strings.xml. Copyright (c) 2026 agvn.io — MIT License. -->
+<resources>
+    <string name="agvn_update_retry_title">新版本尚未安装</string>
+    <string name="agvn_update_retry_session">手机还没有安装新版本。如果手机的安装程序报错（如“Parsing failed”或“APK contains no signature files”），AGVN Player 可以换一种方式安装：由应用把已校验的文件直接交给 Android。安装前 Android 仍会询问你。</string>
+    <string name="agvn_update_retry_installer">手机还没有安装新版本。AGVN Player 可以打开手机的安装程序，安装已校验的文件。安装前 Android 仍会询问你。</string>
+    <string name="agvn_update_retry_now">换种方式安装</string>
+    <string name="agvn_update_session_writing">正在准备安装新版本…</string>
+</resources>
