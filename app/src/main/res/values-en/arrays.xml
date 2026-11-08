@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="binding_type_entries">
+        <item>Keyboard</item>
+        <item>Mouse</item>
+        <item>Controller</item>
+    </string-array>
+    <string-array name="dxvk_max_device_memory_entries">
+        <item>0 (Default)</item>
+        <item>512 MB</item>
+        <item>1024 MB</item>
+        <item>2048 MB</item>
+        <item>4096 MB</item>
+    </string-array>
+    <string-array name="device_memory_entries">
+        <item>0 (Default)</item>
+        <item>512 MB</item>
+        <item>1024 MB</item>
+        <item>2048 MB</item>
+        <item>4096 MB</item>
+        <item>8192 MB</item>
+        <item>12288 MB</item>
+        <item>16384 MB</item>
+    </string-array>
+    <string-array name="dxvk_framerate_entries">
+        <item>0 (Default)</item>
+        <item>20</item>
+        <item>30</item>
+        <item>40</item>
+        <item>50</item>
+        <item>60</item>
+        <item>70</item>
+        <item>80</item>
+        <item>90</item>
+        <item>100</item>
+        <item>110</item>
+        <item>120</item>
+    </string-array>
+    <string-array name="wincomponent_entries">
+        <item>Built-in (Wine)</item>
+        <item>Native (Windows)</item>
+    </string-array>
+    <string-array name="desktop_theme_entries">
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+    <string-array name="desktop_background_type_entries">
+        <item>Image</item>
+        <item>Solid color</item>
+    </string-array>
+    <string-array name="startup_selection_entries">
+        <item>Normal (load all services)</item>
+        <item>Essential (load only needed services)</item>
+        <item>Minimal (stop services at startup)</item>
+    </string-array>
+    <string-array name="button_options">
+        <item>A</item>
+        <item>B</item>
+        <item>X</item>
+        <item>Y</item>
+        <item>R1 (Right bumper)</item>
+        <item>R2 (Right trigger)</item>
+        <item>L1 (Left bumper)</item>
+        <item>L2 (Left trigger)</item>
+        <item>Start</item>
+        <item>Select</item>
+        <item>R3 (Right stick press)</item>
+        <item>L3 (Left stick press)</item>
+    </string-array>
+    <string-array name="touchscreenInputModesEntries">
+        <item>Touchpad</item>
+        <item>Simulated touchscreen</item>
+        <item>Direct touch</item>
+    </string-array>
+    <string-array name="transformCapturedPointerEntries">
+        <item>None</item>
+        <item>Rotate clockwise</item>
+        <item>Rotate counterclockwise</item>
+        <item>Upside down</item>
+        <item>Auto (for touchpad)</item>
+    </string-array>
+</resources>

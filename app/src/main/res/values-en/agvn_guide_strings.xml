@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2026 agvn.io — MIT License. Player guide (first setup screen + the Guide section). -->
+<resources>
+    <string name="agvn_guide_title">Guide</string>
+    <string name="agvn_guide_subtitle">Tap a topic to see how</string>
+    <string name="agvn_guide_open">View guide</string>
+    <string name="agvn_guide_open_summary">Add games, play, adjust Graphics and on-screen keys</string>
+    <string name="agvn_guide_close">Close</string>
+
+    <string name="agvn_guide_add_title">Add game</string>
+    <string name="agvn_guide_add_summary">Copy the game folder to your phone, tap + and the app finds it</string>
+    <string-array name="agvn_guide_add_steps">
+        <item>Copy the whole game folder (unzipped, with its .exe) from your computer to your phone, for example: Internal storage/AGVN/Game name. Don\'t copy .zip files or installers (setup).</item>
+        <item>Keep games in the AGVN or Download folder (in internal storage or on the SD card). Don\'t put them in Documents: the app doesn\'t look there.</item>
+        <item>Tap the + button in the library (or \"Add game\" in Settings). The app finds games and lists them: \"Not added\" games on top, games already in the library below (with a check mark). Type a few letters in \"Search games\" to filter quickly, no accents needed.</item>
+        <item>Tap the game\'s name, then tap \"Import\" (for a game already added, the button says \"Update\"). The app picks on-screen keys and Graphics that suit the game and your phone.</item>
+        <item>Game somewhere else? Tap \"Pick another folder\", open the folder with the game, then tap \"Scan this folder\". The app remembers that folder for next time.</item>
+        <item>If the app says it can\'t read storage: tap \"Grant access\", then turn on Allow access to manage all files (Android 11 and up) or go to Permissions → Storage → Allow (Android 9, 10).</item>
+    </string-array>
+
+    <string name="agvn_guide_play_title">Play and exit a game</string>
+    <string name="agvn_guide_play_summary">Tap ▶ to play, the Back button opens the menu</string>
+    <string-array name="agvn_guide_play_steps">
+        <item>In the library, tap ▶ on the game\'s cover (or tap the cover, then \"Play\"). The first start takes a little longer.</item>
+        <item>In game, press the phone\'s Back button (or tap with 4 fingers at once) to open the menu on the left.</item>
+        <item>To exit a game: save first, open the menu, then tap the red power button at the bottom. The game closes right away, without asking.</item>
+        <item>The pause button in the menu freezes the game. To keep playing: press the phone\'s Back button to open the menu again (while paused, a 4-finger tap doesn\'t open it), then tap the play button.</item>
+    </string-array>
+
+    <string name="agvn_guide_graphics_title">Adjust Graphics (hot phone, laggy game)</string>
+    <string name="agvn_guide_graphics_summary">Drag the slider: left is cooler, right is prettier</string>
+    <string-array name="agvn_guide_graphics_steps">
+        <item>In the library, tap ⋮ on the game, then pick \"Adjust Graphics: cooler ↔ prettier\".</item>
+        <item>Drag the slider left (Ultra light, Low) for a cooler, smoother phone. Drag it right (High, Very high) for a nicer picture but a hotter phone.</item>
+        <item>The level with ★ is the one the app suggests for your phone. Tap \"Back to suggested\" to let the app choose.</item>
+        <item>Very high has no FPS limit, so it doesn\'t override the FPS settings of the game and cheat menus. If the phone gets too hot, open the in-game menu, Video section, and set \"FPS limit\" to 60.</item>
+        <item>Tap \"Save\", then exit the game and open it again to apply.</item>
+    </string-array>
+
+    <string name="agvn_guide_controls_title">On-screen keys</string>
+    <string name="agvn_guide_controls_summary">Add, move and change keys right in game</string>
+    <string-array name="agvn_guide_controls_steps">
+        <item>In game there is a small bar at the top center: \"✎ Edit\" to change keys, \"👁 Hide\" to hide or show the keys, \"⌨\" to open the keyboard. The bar hides after 3 seconds so it doesn\'t cover the game, leaving a faint line at the top edge: tap that line to show it again.</item>
+        <item>Tap \"✎ Edit\": drag a button to move it. Tap a button to select it, then use \"Keys…\" to change its key, \"－\" / \"＋\" to shrink or enlarge it, \"Style…\" to change its shape (circle, square, rectangle, rounded) and opacity, \"Delete\" to remove it.</item>
+        <item>\"+ Button\" shows the full keyboard and mouse: tap the key you want. \"+ Look area\" adds a swipe area to turn the camera in 3D games.</item>
+        <item>Tick \"Hold\" when picking a key if you want the button to hold on one tap and release on the next (for example, holding the mouse to drag and drop).</item>
+        <item>Tap \"Done\" to save. Keys are saved separately for each game.</item>
+    </string-array>
+
+    <string name="agvn_guide_mouse_title">Using the mouse by touch</string>
+    <string name="agvn_guide_mouse_summary">Tap to click, touch, hold and drag to drag and drop</string>
+    <string-array name="agvn_guide_mouse_steps">
+        <item>1-finger tap = left click right where you tap.</item>
+        <item>Right click: first tap 1 finger where you want to click, then tap 2 fingers at once = right click at that spot.</item>
+        <item>Touch, hold and drag = hold the left mouse button and drag (drag items, draw a selection box…).</item>
+        <item>Swipe up or down with 2 fingers to scroll.</item>
+    </string-array>
+
+    <string name="agvn_guide_trouble_title">Game errors or won\'t open</string>
+    <string name="agvn_guide_trouble_summary">Lower Graphics, close other apps, send error logs</string>
+    <string-array name="agvn_guide_trouble_steps">
+        <item>Lower Graphics to \"Ultra light\" (⋮ on the game, \"Adjust Graphics\"), then open the game again.</item>
+        <item>Close other running apps so the game has enough RAM.</item>
+        <item>Check that the game folder was fully copied, with no missing files.</item>
+        <item>Still broken: go to Settings, tap \"Export error logs\". The log file is in the Download folder; send it to AGVN for help.</item>
+    </string-array>
+
+    <string name="agvn_guide_expert_title">For experts</string>
+    <string name="agvn_guide_expert_summary">Get more Wine versions and drivers, fine-tune settings</string>
+    <string-array name="agvn_guide_expert_steps">
+        <item>The app comes with everything needed to play: you don\'t need to download anything else.</item>
+        <item>If you know Wine/drivers: go to Settings, open \"Advanced (for experts)\" to get more Wine, Proton, DXVK and graphics drivers, and to manage environments.</item>
+        <item>To fine-tune one game: tap ⋮ on the game, then pick \"Configure\".</item>
+    </string-array>
+
+    <!-- First setup screen -->
+    <string name="agvn_setup_welcome">Welcome to AGVN Player</string>
+    <string name="agvn_setup_intro">The app is setting up everything needed to play. Nothing else to download, it takes about 1–2 minutes.</string>
+    <string name="agvn_setup_step_core">Install the game runtime</string>
+    <string name="agvn_setup_step_core_system">Unpacking the system… %1$d%%</string>
+    <string name="agvn_setup_step_core_wine">Installing Wine/Proton…</string>
+    <string name="agvn_setup_step_core_driver">Installing graphics drivers…</string>
+    <string name="agvn_setup_step_container">Preparing the game environment</string>
+    <string name="agvn_setup_step_access">Allow reading game folders</string>
+    <string name="agvn_setup_access_why">The app needs this permission to find games you copy to the phone (AGVN and Download folders, in internal storage or on the SD card). The app doesn\'t read your photos or messages.</string>
+    <string name="agvn_setup_access_button">Allow</string>
+    <string name="agvn_setup_access_later">Later</string>
+    <string name="agvn_setup_access_denied">Not allowed yet. On the screen that just opened, turn on \"Allow access to manage all files\". You can also tap \"Later\": the app will ask again when you add a game.</string>
+    <string name="agvn_setup_access_denied_legacy">Not allowed yet. Tap \"Allow\" again and pick Allow in the dialog. If no dialog shows, go to phone Settings → Apps → AGVN Player → Permissions → Storage → Allow. You can also tap \"Later\".</string>
+    <string name="agvn_setup_done">Done</string>
+    <string name="agvn_setup_failed">Setup didn\'t finish. Check that the phone has at least 2 GB free, then tap \"Try again\".</string>
+    <string name="agvn_setup_retry">Try again</string>
+    <string name="agvn_setup_start">Start</string>
+    <string name="agvn_setup_guide_header">While you wait, a quick look at how to use it</string>
+    <string name="agvn_setup_guide_header_done">Quick guide</string>
+    <string name="agvn_setup_swipe_hint">Swipe sideways for more</string>
+</resources>

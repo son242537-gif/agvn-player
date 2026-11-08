@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN: "Auto Fix" for what the player reports (agvn/AgvnRepair*), and its fixes. Copyright (c) 2026 agvn.io — MIT License. -->
+<resources>
+    <string name="agvn_repair_title">Auto Fix</string>
+    <string name="agvn_repair_pick">What\'s wrong with the game?</string>
+    <string name="agvn_repair_plan">The app will try the fixes below one at a time: the game restarts, you play a bit, then the app asks if the problem is still there. If a fix doesn\'t help, the app puts the settings back before trying the next one.</string>
+    <string name="agvn_repair_none">The app has tried every fix it has for this problem. The game\'s settings are back to how they were before. Tap \"Send logs\" so AGVN can take a look.</string>
+    <string name="agvn_repair_no_fix">The app has no fix for this problem with this game yet. Tap \"Send logs\" so AGVN can take a look.</string>
+    <string name="agvn_repair_start">Try fix 1: %1$s</string>
+    <string name="agvn_repair_trying">Trying: %1$s. Restarting the game…</string>
+    <string name="agvn_repair_status">The app is trying a fix: %1$s. Is the problem still there?</string>
+    <string name="agvn_repair_not_run">The app set a fix: %1$s, but the game hasn\'t run with it yet. Open the game to try it; play for a while and the app will ask if the problem is still there.</string>
+    <string name="agvn_repair_play">Play with this fix</string>
+    <string name="agvn_repair_ask_title">Still seeing \"%1$s\"?</string>
+    <string name="agvn_repair_ask_detail">The app is trying a fix: %1$s. Play for a while, then tell the app.</string>
+    <string name="agvn_repair_gone">It\'s fixed</string>
+    <string name="agvn_repair_still">Still broken</string>
+    <string name="agvn_repair_later">Ask next time</string>
+    <string name="agvn_repair_other">Pick another problem</string>
+    <string name="agvn_repair_kept">Kept the fix: %1$s</string>
+    <string name="agvn_repair_done_title">Tried every fix in the app</string>
+    <string name="agvn_repair_off_title">Not tried yet: %1$s</string>
+    <string name="agvn_repair_off_detail">The game didn\'t run with the fix being tried (%1$s): its settings changed after this fix was turned on. The app doesn\'t count this fix as tried.</string>
+    <string name="agvn_repair_off_try">Try: %1$s</string>
+    <string name="agvn_repair_undone">With the fix being tried (%1$s), the game closed by itself after %2$s seconds. The app counts this fix as not helping and put the game\'s settings back to how they were.</string>
+    <string name="agvn_bar_repair_label">🩺 Auto Fix</string>
+    <string name="agvn_bar_repair">Auto Fix: pick the problem the game has</string>
+
+    <string name="agvn_fix_render_sysmem">Let Turnip draw the whole frame in memory (sysmem)</string>
+    <string name="agvn_fix_turnip_nolrz">Turn off Turnip\'s LRZ (fixes black spots, flickering)</string>
+    <string name="agvn_fix_turnip_noubwc">Turn off Turnip\'s UBWC compression (fixes black patches, stripes, wrong colors)</string>
+    <string name="agvn_fix_async_off">Turn off DXVK async (no more flickering, may stutter more at first)</string>
+    <string name="agvn_fix_bcn_full">Unpack all BCn textures (fixes black or missing textures)</string>
+    <string name="agvn_fix_unity_quality_own">Let the Unity game pick its own picture quality</string>
+    <string name="agvn_fix_audio">Switch sound output to %1$s</string>
+    <string name="agvn_fix_locale_ja">Run the game in Japanese (fixes broken text in Japanese games)</string>
+    <string name="agvn_fix_locale_zh">Run the game in Chinese (fixes broken text in Chinese games)</string>
+    <string name="agvn_fix_godot_light">Lite Run: run the Godot game directly on Android, without Wine (much smoother)</string>
+    <string name="agvn_fix_media_old">Read movies Wine\'s old way (for movies Wine can\'t open, like MP4 with MP3 audio)</string>
+    <string name="agvn_fix_page_light">Lite Run: run the game\'s page (Electron, NW.js) directly on Android, without Wine (much smoother)</string>
+    <string name="agvn_fix_rgss_light">Lite Run: run the RPG Maker game directly on Android, without Wine (much smoother)</string>
+    <string name="agvn_fix_godot_light_gl">Let the Godot game (Lite Run) draw with OpenGL</string>
+    <string name="agvn_fix_godot_light_vulkan">Let the Godot game (Lite Run) draw with Vulkan</string>
+    <string name="agvn_fix_mods_off">Run the game without mods (%1$s), like the original; the game\'s files stay as they are</string>
+    <string name="agvn_fix_dll_wine">Use Wine\'s %1$s instead of the game\'s own (cheats or mods in this file won\'t work; the game\'s files stay as they are)</string>
+    <string name="agvn_fix_raw_mouse">Send touches as a real mouse (for games that only read a real mouse, like Unity games using Input System)</string>
+    <string name="agvn_fix_raw_mouse_off">Send touches as before (like other games)</string>
+    <string name="agvn_fix_exe64">Run the game\'s 64-bit version (%1$s) instead of the 32-bit one</string>
+    <string name="agvn_fix_exe_main">Run the main game file (%1$s) instead of the launcher (.NET)</string>
+    <string name="agvn_fix_renpy_light">Try \"Lite Run\" (Ren\'Py 8) for the Ren\'Py 7 game; separate saves, copied from the Windows version</string>
+    <string name="agvn_fix_renpy_angle">Ren\'Py draws with ANGLE (Direct3D) instead of OpenGL</string>
+    <string name="agvn_fix_gdiplus_text">Fix .NET\'s Vietnamese text drawing (puts a patched mlang.dll next to the game\'s exe)</string>
+</resources>

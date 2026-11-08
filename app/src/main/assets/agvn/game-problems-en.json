@@ -1,0 +1,316 @@
+{
+  "problems": {
+    "light-script-error": {
+      "title": "The game reports an error in Lite Run",
+      "cause": "The game reports an error: {error}. If the game stops or misbehaves, its Windows version usually works."
+    },
+    "light-page-crash": {
+      "title": "The game page closed midway",
+      "cause": "The part that runs HTML games (Android's WebView) closed while you were playing, usually because the phone ran out of RAM."
+    },
+    "light-frozen": {
+      "title": "The game froze in Lite Run",
+      "cause": "The game ({runner}) stopped responding for a long time, so Android closed it."
+    },
+    "light-crash": {
+      "title": "The game closed suddenly in Lite Run",
+      "cause": "The {runner} game runner hit an error and closed ({crash})."
+    },
+    "steam": {
+      "title": "The game needs Steam",
+      "cause": "This copy of the game only runs with Steam (file {1} is missing). AGVN can't run Steam, so you need a copy of the game that doesn't require Steam."
+    },
+    "missing-dll": {
+      "title": "The game is missing {1}",
+      "cause": "The game needs the file {1} but can't find it. Usually the game folder wasn't fully copied, or the game needs a Windows library that isn't turned on."
+    },
+    "bad-dll": {
+      "title": "The game's {1} can't be used",
+      "cause": "{1} is broken, or is a 32-bit/64-bit version that doesn't match the game. Copy the game folder again from the original."
+    },
+    "dll-function": {
+      "title": "{1} is missing a function",
+      "cause": "The game stopped because a program called a function in {1} that the {1} in use doesn't have. If {1} sits next to the game's exe, it is usually a cheat table or mod file that only passes on the few functions the game calls, while Wine needs others too. With Wine's {1} the game runs, but the cheats or mods in that file won't."
+    },
+    "dotnet": {
+      "title": "The game needs .NET",
+      "cause": "The game's exe, or a program it opens, is written in .NET (C#). Wine needs a .NET runtime (Wine Mono) to open it, and the Wine version this game uses doesn't have one. If that file is only a launcher and the folder still has the game's main exe, the \"Run the main game file\" button opens that file directly, without .NET. If there is no such button, you can also add the game again with its main exe: \"Add game\" → \"Pick the .exe yourself (advanced)\"."
+    },
+    "dotnet-load": {
+      "title": "Wine can't run the game's .NET part yet",
+      "cause": "The game's exe, or a program it opens, is written in .NET (C#), but Wine can't load the .NET runtime (Wine Mono) for this program: 64-bit .NET programs don't run on phones yet, so it closes right away without showing anything. If it is only a launcher and the folder still has the game's main exe, the \"Run the main game file\" button opens that file directly. If there is no such button, add the game again with its main exe: \"Add game\" → \"Pick the .exe yourself (advanced)\"."
+    },
+    "godot-renderer-bad": {
+      "title": "The Godot game can't run with the changed renderer",
+      "cause": "The renderer the app switched this Godot game to (Vulkan or Direct3D 11) doesn't suit the game's Godot version."
+    },
+    "godot-vulkan-crash": {
+      "title": "The graphics driver failed while the Godot game was drawing",
+      "cause": "The phone's graphics driver failed when the game asked it to render with Vulkan, so Wine showed an \"Assertion failed!\" box and closed the game. The problem isn't in the game. Changing the Godot game's renderer may avoid it. On phones with a Mali GPU, the problem may also be in the app's shader fix steps for Mali."
+    },
+    "vulkan-crash": {
+      "title": "The graphics driver failed while the game was drawing",
+      "cause": "The phone's graphics driver failed when the game asked it to render with Vulkan, so Wine showed an \"Assertion failed!\" box and closed the game. The problem isn't in the game: usually the chosen DXVK version or driver doesn't suit this GPU. On phones with a Mali GPU, the problem may also be in the app's shader fix steps for Mali: turn them off one at a time to test."
+    },
+    "godot-gl-angle": {
+      "title": "The Godot game can't open OpenGL or Direct3D 11",
+      "cause": "This Godot game tried both OpenGL 3.3 and Direct3D 11 (ANGLE), but your phone can't run either yet."
+    },
+    "godot-opengl": {
+      "title": "The Godot game can't open OpenGL",
+      "cause": "Your phone can't run the OpenGL 3.3 this Godot game needs yet."
+    },
+    "godot-vulkan": {
+      "title": "The Godot game can't open Vulkan",
+      "cause": "Your phone can't run Vulkan the way this Godot game needs yet."
+    },
+    "godot-switch-failed": {
+      "title": "The Godot game closed after its renderer changed",
+      "cause": "Last time the app changed this Godot game's renderer to avoid an error. This time the game closed by itself less than a minute after opening, so that renderer doesn't suit your phone."
+    },
+    "godot-gl-crash": {
+      "title": "The Godot game closed while drawing",
+      "cause": "The phone's GPU couldn't draw one of the game's OpenGL scenes, so the game closed. Zink (which turns OpenGL into Vulkan) lacks some features on some GPUs, especially Mali. Changing the Godot game's renderer may avoid this."
+    },
+    "wine-rpc-crash": {
+      "title": "Wine failed when the game called a Windows service",
+      "cause": "The game hit a memory error in the part of Wine that handles calls to Windows services (RPC), when the game asked for the list of services. After that the game sat on a black screen and closed, even though the phone wasn't out of RAM. This is a bug in the Wine version used on ARM chips, not in the game. The old Wine (Proton 9) handles this part differently."
+    },
+    "movie-transcode": {
+      "title": "Wine can't open a movie in the game",
+      "cause": "The game plays a movie (usually between scenes) that Wine's new way of reading movies can't decode by itself, most often an MP4 movie with MP3 audio. Wine then needs Steam's transcoder, which isn't there outside Steam, so the movie doesn't open and the game may sit on a black screen waiting for it to finish. The problem is in the app's Wine, not in the game. Wine's old way of reading movies can decode this kind."
+    },
+    "deadlock": {
+      "title": "The game is deadlocked and frozen",
+      "cause": "The game's threads wait for each other forever: one thread holds a lock and never releases it, and the main thread waits for that lock for over 1 minute, so the game freezes (often while loading a scene, on a black screen). This isn't a game data problem: it's in how the CPU emulator or Wine runs the game's threads on the phone. Each fix below makes the game a bit slower, so the app only offers them when the game is deadlocked."
+    },
+    "swapchain-frozen": {
+      "title": "The game froze right after changing display mode",
+      "cause": "The game just changed resolution or turned on vsync (DXVK rebuilds the swapchain, often when entering a menu), then drew no more frames and froze: it is waiting for the screen to report that the last frame was shown, and that report never comes. With Present Wait off, the game stops waiting for it. If that doesn't work, \"Frame sync\" makes the game wait for each frame another way."
+    },
+    "dxvk-map-32": {
+      "title": "The game's 32-bit version can't use graphics memory",
+      "cause": "The game is running its 32-bit version. With the chosen graphics driver, DXVK (which turns DirectX into Vulkan) can't give graphics memory to 32-bit programs, so it can't create DirectX and the game draws nothing, even though its window is open. Ren'Py games too: when OpenGL doesn't work, they draw with DirectX. The game's 64-bit version, if it has one, doesn't have this limit. Changing the DXVK version won't help."
+    },
+    "gpu-refused": {
+      "title": "The graphics driver won't give the game memory, though there's room",
+      "cause": "DXVK (which turns DirectX into Vulkan) asked for graphics memory for the game and the driver refused, even though plenty of graphics memory is free. With no way to draw, the game freezes or closes, sometimes with the error \"CreateTexture2D … E_INVALIDARG\". Most often the game marks its textures as \"shared\" (so other programs can read them), a kind of memory the chosen driver can't provide. With shared memory off, DXVK creates normal textures and the game draws as before. The game isn't broken and the phone isn't out of memory, so lowering Graphics won't help."
+    },
+    "dx11-features": {
+      "title": "The graphics driver lacks DirectX 11 features the game needs",
+      "cause": "DXVK (which turns DirectX into Vulkan) can't create DirectX 11 for the game: the chosen graphics driver lacks features the game needs, like wireframe drawing or geometry shaders. Changing the DXVK version won't help. If no button is left except \"Send logs\", this phone can't run this DirectX 11 game."
+    },
+    "dxvk-no-adapter": {
+      "title": "The phone can't create DirectX for the game",
+      "cause": "DXVK (which turns DirectX into Vulkan) can't find a GPU that works with the chosen DXVK version and driver."
+    },
+    "opengl-unavailable": {
+      "title": "The phone can't run OpenGL with this graphics driver",
+      "cause": "Zink (which turns OpenGL into Vulkan) doesn't work with the chosen graphics driver, so OpenGL games and WineD3D (DirectX drawn with OpenGL) draw nothing. From now on the app won't offer WineD3D on this phone with this driver."
+    },
+    "d3d11-level": {
+      "title": "The game needs DirectX 11 level {1}",
+      "cause": "The game (Unreal Engine) needs a GPU with DirectX 11 level {1}, and the chosen renderer doesn't reach that level. The game isn't broken: DXVK (DirectX over Vulkan) or WineD3D (DirectX over OpenGL), with the chosen graphics driver, lacks features the game needs, like tessellation. If the game runs on WineD3D, go back to DXVK. If it runs on DXVK, only another driver may help, since every DXVK version needs those features. If no button is left except \"Send logs\", this phone can't run this game yet."
+    },
+    "ue-render-timeout": {
+      "title": "The Unreal game stopped after waiting too long to draw",
+      "cause": "The Unreal game stopped itself (\"GameThread timed out waiting for RenderThread\") when its drawing part was busy for 120 seconds straight, usually while loading or building shaders and textures for the first time on a slow phone. The game isn't broken: let it wait longer and it keeps loading, though the screen may stay black for a while."
+    },
+    "directx": {
+      "title": "The game says DirectX is missing",
+      "cause": "The game can't create DirectX on your phone with the chosen DXVK version and graphics driver."
+    },
+    "dxvk-view": {
+      "title": "The game closed because DXVK can't read compressed textures",
+      "cause": "DXVK (DirectX over Vulkan) can't read some of the game's compressed textures (BCn, like DXT) with the chosen graphics driver, so the game closes; Unreal games report \"CreateShaderResourceView … E_INVALIDARG\". On GPUs that can't read BCn themselves, like Mali, the app unpacks these textures, but DXVK 2.x asks the driver in a new way that the unpacking part doesn't fully answer. DXVK 1.10.3 asks the old way, so it doesn't hit this error. The game isn't broken."
+    },
+    "ue-crash-box": {
+      "title": "The Unreal game showed an error and closed",
+      "cause": "The Unreal game showed a \"… Game has crashed and will close\" box, then closed when you tapped OK. The error text is in that box and the app can't read it: a screenshot of the box helps AGVN know what went wrong. Usually DXVK (DirectX over Vulkan) or the chosen graphics driver doesn't suit the game."
+    },
+    "opengl-crash": {
+      "title": "The game closed while drawing",
+      "cause": "The phone's GPU couldn't draw one of the game's OpenGL scenes, so the game closed. Zink (which turns OpenGL into Vulkan) lacks some features on some GPUs, especially Mali."
+    },
+    "gpu-lost": {
+      "title": "The graphics driver failed while running the game",
+      "cause": "The phone's GPU stopped midway while drawing the game: the driver hit a scene it can't draw."
+    },
+    "gpu-memory": {
+      "title": "The game ran out of graphics memory",
+      "cause": "The game needs more graphics memory than your phone has free. From the next start, the app uses this game's highest RAM saving level."
+    },
+    "memory": {
+      "title": "The game ran out of RAM",
+      "cause": "The game needs more RAM than your phone has free. From the next start, the app uses this game's highest RAM saving level."
+    },
+    "corrupt-files": {
+      "title": "The game's files are broken",
+      "cause": "One of the game's files is broken or wasn't fully copied. Copy the game folder again from the original."
+    },
+    "file-not-found": {
+      "title": "The game's files can't be found",
+      "cause": "Wine says \"File not found.\": the game's exe, or a file the game needs, is no longer where it was. If you just renamed, moved or deleted the game folder, copy that folder again, then add the game to the library again."
+    },
+    "dll-no-access": {
+      "title": "The game can't open its own DLL",
+      "cause": "The game reports \"No access to memory location.\" when opening one of its libraries (DLL), like RPG Maker VX Ace's RGSS301.dll, then stops. The problem isn't in the game: usually the game folder is in the phone's shared storage (Download), where Android doesn't allow running code straight from files, and the new Wine (Proton 10) opens that library in a way that needs this. RPG Maker XP/VX/VX Ace games run with \"Lite Run\", no Wine needed; other games can try the old Wine (Proton 9), which copies the library into memory before running it."
+    },
+    "bad-exe": {
+      "title": "The game's exe has the wrong format",
+      "cause": "Wine says \"Bad EXE format\": the file being opened isn't a Windows program Wine can run. It may be broken or not fully copied, a very old program (16-bit or DOS), or not the game's exe at all. Copy the game folder again from the original, or add the game again with its correct exe: \"Add game\" → \"Pick the .exe yourself (advanced)\"."
+    },
+    "killed-low-memory-saved": {
+      "title": "The phone ran out of RAM and closed the game",
+      "cause": "Android closed the game mid-play because your phone ran out of RAM, even though the game ran with the highest RAM saving the app can give it. Lowering Graphics further won't save much RAM. Before playing, close other apps or restart the phone. If it still happens, this game needs more RAM than your phone has free."
+    },
+    "killed-low-memory": {
+      "title": "The phone ran out of RAM and closed the game",
+      "cause": "Android closed the game mid-play because your phone ran out of RAM. From the next start, the app uses this game's highest RAM saving level."
+    },
+    "killed-background": {
+      "title": "The phone closed the game when you switched apps",
+      "cause": "When you switched to another app, the system closed the game to save battery or RAM. Let AGVN run in the background without restrictions and the game will be kept."
+    },
+    "emulator-noexec-crt": {
+      "title": "The 32-bit emulator can't run the game's code",
+      "cause": "The game crashed ({crash}). The 32-bit CPU emulator treated that code as not allowed to run, though it is code from the {1} library that comes with the game, and it runs fine on Windows. The problem is in the emulator on the phone, not in the game's data. Wine has its own {1}; WOWBox64 is another 32-bit emulator built into the app."
+    },
+    "emulator-noexec": {
+      "title": "The 32-bit emulator can't run the game's code",
+      "cause": "The game crashed ({crash}). The 32-bit CPU emulator treated that part of the game's code as not allowed to run, though it runs fine on Windows. The problem is in the emulator on the phone, not in the game's data. WOWBox64 is another 32-bit emulator built into the app."
+    },
+    "crash-after-change": {
+      "title": "The game crashes with the new settings",
+      "cause": "The game ran last time. After the settings changed, the game crashed and closed ({crash})."
+    },
+    "dotnet-crash": {
+      "title": "The .NET game crashed and closed",
+      "cause": "The game, written in .NET (C#), closed with an error ({crash}). On the app's Wine, .NET's text drawing (GDI+) has a bug: an accented Vietnamese letter standing alone or at the end of a piece of text (like \"ắ\", \"ệ\") makes the game close at once, often on the first screen with Vietnamese text, and Wine's log shows nothing. The \"Fix .NET's Vietnamese text drawing\" button puts a patched mlang.dll next to the game's exe; if it still fails, the app removes that file. If you just exited the game yourself, ignore this message."
+    },
+    "unity-crash": {
+      "title": "The game crashed and froze",
+      "cause": "The game crashed while running ({crash}). Unity, the game's engine, catches this error itself, so the game usually freezes instead of closing. If you just exited the game yourself, ignore this message."
+    },
+    "crash": {
+      "title": "The game crashed and closed",
+      "cause": "The game hit an error while running ({crash})."
+    },
+    "low-ram-saved": {
+      "title": "The game closed when the phone was almost out of RAM",
+      "cause": "The game closed when the phone had only {free} MB of RAM free, even though it ran with the highest RAM saving the app can give it. Lowering Graphics further won't save much RAM. Before playing, close other apps or restart the phone, and save often. If it still happens, this game needs more RAM than your phone has free. If you just exited the game yourself, ignore this message."
+    },
+    "low-ram-end": {
+      "title": "The game closed when the phone was almost out of RAM",
+      "cause": "The game closed when the phone had only {free} MB of RAM free, most likely because the phone ran out of RAM and closed it. Before playing, close other apps or restart the phone, and save often. From the next start, the app uses this game's highest RAM saving level. If you just exited the game yourself, ignore this message."
+    },
+    "not-a-game": {
+      "title": "The game is opening with {exe}, not the game's exe",
+      "cause": "{exe} is a helper program that comes with the game (an error reporter, a library installer or an uninstaller), not the game: it opens and closes without showing anything. The game folder has no main exe for the app to open instead (Unity games: <Game name>.exe next to the <Game name>_Data folder). That file may have been deleted by antivirus software, or the folder wasn't fully copied. Copy the full game folder again from the original, then add the game again with \"Add game\"."
+    },
+    "chromium-closed": {
+      "title": "The game closed right after opening, showing nothing",
+      "cause": "This game is a web page running in Chromium (Electron or NW.js). Through Windows, Chromium runs on Wine and a CPU emulator, and some Chromium versions open the page and then close everything after a few seconds, with no error (an Electron 44 game, Snapdragon 8 Elite). \"Lite Run\" opens that page directly in the phone's browser, without Windows, and is usually much lighter. Saves from \"Lite Run\" and from Windows aren't shared. Parts of the game handled by Electron's main process (Steam, saving through that process) may not work; then \"Auto Fix\" switches back to Run with Windows. If you just exited the game yourself, ignore this message."
+    },
+    "closed-on-start": {
+      "title": "The game closed as soon as it appeared",
+      "cause": "The game finished loading, showed its picture for less than 10 seconds, then closed by itself before you tapped anything, with no error. Usually the game crashes right as it starts running. For example The Agnietta: the 32-bit CPU emulator (FEXCore) can't run a piece of the game's code, but the game catches that error itself, so Wine doesn't log it. If you just exited the game yourself, ignore this message."
+    },
+    "chromium-frozen": {
+      "title": "The game is stuck on its first page or loading screen",
+      "cause": "This game is a web page running in Chromium (Electron or NW.js). Through Windows, Chromium runs on Wine and a CPU emulator, so it is very heavy and may stay stuck on the first page or the loading bar: the picture doesn't change when you tap. Some Electron games get stuck on the old Wine (Proton 9) but run on the new Wine (Proton 10), Steam part included; the first time, the app installs the new Wine, which takes about a minute. \"Lite Run\" opens that page directly in the phone's browser, without Windows. Parts of the game handled by Electron's main process (Steam, saving through that process) may not work; then \"Auto Fix\" switches back to Run with Windows."
+    },
+    "wine-gone": {
+      "title": "Wine can't start",
+      "cause": "Wine stopped right as it opened, before the game could run: Wine's core (wineserver) lost its connection to the first program. The problem isn't in the game, so changing the game's resolution or graphics settings won't help. Turning off esync, or running with another Wine (another environment, with its own core), may help. If every game does this, force stop the app or restart the phone, then try again."
+    },
+    "godot-no-start": {
+      "title": "The Godot game closes right after opening",
+      "cause": "The Godot game closed before showing anything. The most common cause is that the phone can't run the OpenGL 3.3 the game needs yet."
+    },
+    "low-resolution": {
+      "title": "The game won't run at {screen}",
+      "cause": "The game's screen is {screen}, smaller than the Low level (854×480). Many games refuse to run on a screen that small and say \"resolution is too low\"."
+    },
+    "no-start-after-change": {
+      "title": "The game won't run with the new settings",
+      "cause": "The game ran last time. After the settings changed, the game closes right after opening."
+    },
+    "no-start": {
+      "title": "The game closes right after opening",
+      "cause": "The game closed before showing anything and left no error the app can read."
+    },
+    "gpu-tiler": {
+      "title": "The GPU ran out of rendering memory",
+      "cause": "The GPU driver reported running out of rendering memory many times (Mali: TILER_HEAP_OOM). Each time, the GPU has to draw the frame in several parts, so the game stalls for a few seconds, sometimes with a black screen. From the next start, the app uses the highest RAM saving for this game. Lowering Graphics (a smaller game screen) or the in-game picture quality also helps."
+    },
+    "slow-gpu": {
+      "title": "The game is running slowly{speed}",
+      "cause": "Your phone's GPU is working flat out ({gpu}%) and still can't draw fast enough."
+    },
+    "slow-cpu": {
+      "title": "The game is running slowly{speed}",
+      "cause": "Your phone's CPU is overloaded (one core at {cpu}%), so it can't keep up with the game."
+    },
+    "slow": {
+      "title": "The game is running slowly{speed}",
+      "cause": "The phone doesn't let the app read how busy the GPU is. The CPU isn't overloaded, so most likely the GPU is working flat out."
+    },
+    "slow-unknown": {
+      "title": "The game is running slowly{speed}",
+      "cause": "The phone doesn't tell the app whether the GPU or the CPU is overloaded. Usually it's the GPU, since the game has to draw more than the phone can handle."
+    },
+    "power-save": {
+      "title": "Battery saver is on",
+      "cause": "Your phone has Battery saver on: the CPU is slowed down, so the game runs much slower."
+    },
+    "report-flicker": {
+      "title": "Flickering picture",
+      "cause": "Flickering usually comes from DXVK showing a frame before it is fully built (async), from frames not synced with the screen, or from the way Turnip draws the screen in parts."
+    },
+    "report-artifacts": {
+      "title": "Black spots, black patches, stripes or wrong colors",
+      "cause": "Black spots and patches usually come from the graphics driver getting a step wrong (Turnip's LRZ depth buffer, UBWC compression or tile memory), from compressed textures the GPU can't read, or from a DXVK version that doesn't suit the driver."
+    },
+    "report-black": {
+      "title": "Black screen while the game still runs",
+      "cause": "The game still runs (there is sound, it responds) but shows no picture: usually its frames don't reach the screen, Turnip draws wrong, or the game's screen is too small."
+    },
+    "report-slow": {
+      "title": "Slow, choppy, laggy game",
+      "cause": "The game is slow when the phone's GPU or CPU can't keep up. Lowering Graphics takes load off the GPU; DXVK running directly on the ARM chip and a faster CPU emulator take load off the CPU."
+    },
+    "report-freeze": {
+      "title": "The game freezes or hangs",
+      "cause": "Freezes usually come from the CPU emulator running the game's code out of order, from DXVK async rendering, from a DXVK version or driver that doesn't suit the game, or from the game's mods (BepInEx, MelonLoader, UE4SS)."
+    },
+    "report-crash": {
+      "title": "The game closes or crashes",
+      "cause": "Crashes usually come from a CPU emulator, DXVK version or graphics driver that doesn't suit the game, or from the game's mods. For Unity games at Low or Ultra light Graphics, the lowest quality level the app sets for the game may also make it fail."
+    },
+    "report-sound": {
+      "title": "No sound, crackling or stuttering sound",
+      "cause": "Sound problems usually come from Wine's sound output not suiting the phone: the app switches between PulseAudio and ALSA."
+    },
+    "report-text": {
+      "title": "Broken text, boxes, strange characters",
+      "cause": "Japanese or Chinese games need to run in the game's language to show their text; with the wrong language, text turns into boxes or strange characters."
+    },
+    "report-blurry": {
+      "title": "Blurry, pixelated or too small picture",
+      "cause": "The game's screen is smaller than the phone's screen, so the picture is stretched, blurry or pixelated. Raise Graphics for a larger game screen (the phone gets a bit warmer)."
+    },
+    "report-animation": {
+      "title": "Animations, videos or effects don't play",
+      "cause": "Animations, videos or effects that freeze or don't show usually come from a renderer or graphics driver that can't draw that effect, from DXVK async skipping scenes not built yet, or from low Graphics making the game turn off some effects. Godot games can run directly on Android (Lite Run) or switch renderer."
+    },
+    "report-touch": {
+      "title": "Taps and presses don't register",
+      "cause": "The game still runs but doesn't get taps: buttons and menus don't respond. Some games only read a real mouse (raw input), like Unity games using Input System; the app can send taps that way. If only the on-screen keys don't work, pick another key set in \"On-screen key settings\"."
+    },
+    "report-other": {
+      "title": "Other problem",
+      "cause": "The app tries the general fixes: going back to settings that worked, back to the original settings, a more stable CPU emulator, changing DXVK and the driver."
+    }
+  }
+}

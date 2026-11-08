@@ -11,7 +11,7 @@
     <string name="agvn_settings_saves_all_summary">Find and back up saves each time you quit a game</string>
     <string name="agvn_settings_about_section">ABOUT</string>
     <string name="agvn_settings_about">About</string>
-    <string name="agvn_settings_advanced_section">Advanced (for experienced users)</string>
+    <string name="agvn_settings_advanced_section">Advanced (for experts)</string>
     <string name="agvn_settings_advanced_show">Show advanced settings</string>
     <string name="agvn_settings_advanced_hide">Hide advanced settings</string>
     <string name="agvn_settings_advanced_summary">Wine, drivers, environments, logs… Most players never need these.</string>
