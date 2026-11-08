@@ -3699,3 +3699,46 @@ Báo cáo ngày 08/11/2026 (POCO, app 0.1.85). Game có các script "解像度�
   3. Không treo khi script ẩn con trỏ.
   4. Lona RPG và game có Khas vẫn chạy như trước.
 
+## Ngôn ngữ của app (bản 0.1.88)
+
+Anh Sơn yêu cầu ngày 08/11/2026: thêm tiếng Anh, Thái, Indonesia, Filipino, Trung Quốc.
+
+- **Chọn:** Cài đặt → "Ngôn ngữ · Language" (`AgvnLanguage`).
+  - Các lựa chọn: Tiếng Việt, English, ไทย, Bahasa Indonesia, Filipino, 简体中文, và "Theo ngôn ngữ của máy".
+  - Mặc định là tiếng Việt, dù máy để tiếng gì: nhiều người chơi Việt để máy tiếng Anh. Muốn mặc định theo máy thì đổi
+    `AgvnLanguage.picked`.
+- **Cách áp:** mọi activity, và cả app, nhận ngôn ngữ trong `attachBaseContext`. Nhờ vậy xoay màn hình không đổi ngôn
+  ngữ, và các màn "Chạy nhẹ" (tiến trình riêng) cũng theo.
+  - Mã thư mục: `values-en`, `values-th`, `values-in` (mã cũ Android dùng cho Indonesia), `values-tl` (Filipino; máy để
+    `fil` được đổi sang `tl`), `values-zh-rCN`.
+- **"Tự sửa lỗi":** tiêu đề và nguyên nhân đọc từ `assets/agvn/game-problems-<en|th|in|tl|zh>.json`, đè lên bản tiếng
+  Việt. Mục nào thiếu thì giữ tiếng Việt.
+- **Đã dịch:** `strings.xml`, `agvn_strings.xml`, `agvn_repair_strings.xml`, `agvn_guide_strings.xml`,
+  `agvn_update_strings.xml`, các mảng có chữ của `arrays.xml`, `agvn_ui_strings.xml`, và 78 mục "Tự sửa lỗi".
+  Các mảng chỉ có giá trị kỹ thuật (độ phân giải, tên driver) để nguyên.
+- **Thuật ngữ:**
+
+  | Tiếng Việt | English | ไทย | Indonesia | Filipino | 中文 |
+  |---|---|---|---|---|---|
+  | Chạy nhẹ | Lite Run | โหมดเบา | Mode Ringan | Magaang Takbo | 轻量运行 |
+  | Chạy bằng Windows | Run with Windows | รันด้วย Windows | Jalankan dengan Windows | Patakbuhin sa Windows | 用 Windows 运行 |
+  | Tự sửa lỗi | Auto Fix | แก้ปัญหาอัตโนมัติ | Perbaikan Otomatis | Kusang Ayos | 自动修复 |
+  | Gửi nhật ký | Send logs | ส่งล็อก | Kirim log | Ipadala ang logs | 发送日志 |
+  | Đồ họa | Graphics | กราฟิก | Grafis | Graphics | 画质 |
+  | Môi trường chạy | Environment | สภาพแวดล้อม | Lingkungan | Environment | 运行环境 |
+
+- **Kiểm:**
+  - `python3 tools/agvn/check_translations.py`: tên chuỗi, `%1$s`, dấu `\'`, số mục của mảng, `{placeholder}`.
+  - `AgvnLanguageTest`: mỗi ngôn ngữ dịch đủ 78 mục "Tự sửa lỗi" và giữ đúng chỗ điền.
+  - Bản dịch do máy làm, chưa có người bản ngữ đọc lại.
+- **Chưa làm:**
+  - Khoảng 1.400 chữ tiếng Việt viết thẳng trong mã (màn sửa game, môi trường chạy, cài thành phần, quản lý file…)
+    vẫn hiện tiếng Việt. Cần tách ra file chuỗi rồi dịch.
+  - Bảng giải thích từng mục cài đặt (`AgvnSettingHelp`) tra theo tên tiếng Việt, và nội dung vẫn là tiếng Việt.
+  - Nhật ký cho nhà phát triển (`su-kien.txt`…) giữ tiếng Việt.
+- **Thử máy:**
+  1. Cài đặt → "Ngôn ngữ · Language" → English: màn chính, Cài đặt, thêm game, "Tự sửa lỗi" hiện tiếng Anh.
+  2. Xoay máy: vẫn tiếng Anh.
+  3. Mở một game "Chạy nhẹ": thanh và menu trong game hiện tiếng Anh.
+  4. Đổi lại "Tiếng Việt" và thử "Theo ngôn ngữ của máy" với máy để tiếng Thái.
+

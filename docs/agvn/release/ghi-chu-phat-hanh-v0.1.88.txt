@@ -1,0 +1,8 @@
+AGVN Player v0.1.88 - agvn.io
+
+Mới:
+- Chọn ngôn ngữ cho app: Cài đặt → "Ngôn ngữ · Language". Có Tiếng Việt, English, ไทย (Thái), Bahasa Indonesia, Filipino, 简体中文 (Trung giản thể), hoặc theo ngôn ngữ của máy. App vẫn mặc định tiếng Việt. Một số màn nâng cao (sửa game, môi trường chạy) còn tiếng Việt, sẽ dịch ở bản sau.
+
+Sửa lỗi:
+- "Chạy nhẹ" game RPG Maker VX Ace (như Rei and the Floating City): game có script gọi hàm Windows qua DL không còn dừng ở màn tiêu đề. Đã sửa thêm: chuột CAMouse, ẩn con trỏ, màn Trạng thái báo "can't modify frozen String", và đổi chữ giữa các bảng mã.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

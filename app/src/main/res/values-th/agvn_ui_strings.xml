@@ -4,7 +4,7 @@
     <string name="agvn_language_system">ตามภาษาของโทรศัพท์</string>
     <string name="agvn_settings_appearance">หน้าตาแอป</string>
     <string name="agvn_settings_game_screen">หน้าจอเกม</string>
-    <string name="agvn_settings_fullscreen_all">เต็มจอสำหรับทุกเกม</string>
+    <string name="agvn_settings_fullscreen_all">เต็มจอทุกเกม</string>
     <string name="agvn_settings_fullscreen_all_summary">ยืดภาพเกมให้เต็มจอ ไม่มีขอบดำสองข้าง</string>
     <string name="agvn_settings_saves">เซฟเกม</string>
     <string name="agvn_settings_saves_all">สำรองเซฟของทุกเกม</string>

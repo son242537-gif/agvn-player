@@ -21,7 +21,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 RES = os.path.join(ROOT, "app", "src", "main", "res")
 ASSETS = os.path.join(ROOT, "app", "src", "main", "assets", "agvn")
 FILES = ["strings.xml", "agvn_strings.xml", "agvn_repair_strings.xml", "agvn_guide_strings.xml",
-         "agvn_update_strings.xml", "arrays.xml"]
+         "agvn_update_strings.xml", "agvn_ui_strings.xml", "arrays.xml"]
 LANGS = ["en", "th", "in", "tl", "zh-rCN"]
 FORMAT = re.compile(r"%(?:\d+\$)?[-#+ 0,(]*\d*(?:\.\d+)?[sdfxXc%]")
 PLACEHOLDER = re.compile(r"\{[A-Za-z0-9_]+\}")

@@ -32,6 +32,37 @@ public class AgvnLanguageTest {
     }
 
     @Test
+    public void everyLanguageHasEveryAutoFixText() throws Exception {
+        java.util.regex.Pattern placeholder = java.util.regex.Pattern.compile("\\{[A-Za-z0-9_]+\\}");
+        for (String lang : new String[]{"en", "th", "in", "tl", "zh"}) {
+            AgvnProblemCatalog vi = catalog(), ours = catalog();
+            try (java.io.Reader in = java.nio.file.Files.newBufferedReader(
+                    new java.io.File("src/main/assets/agvn/game-problems-" + lang + ".json").toPath())) {
+                ours.localize(in);
+            }
+            for (AgvnProblemCatalog.Problem p : vi.all()) {
+                AgvnProblemCatalog.Problem t = ours.byId(p.id);
+                assertTrue(lang + " " + p.id + " is translated", !t.title.equals(p.title) || !t.cause.equals(p.cause));
+                for (String[] pair : new String[][]{{p.title, t.title}, {p.cause, t.cause}}) {
+                    java.util.List<String> a = new java.util.ArrayList<>(), b = new java.util.ArrayList<>();
+                    for (java.util.regex.Matcher m = placeholder.matcher(pair[0]); m.find(); ) a.add(m.group());
+                    for (java.util.regex.Matcher m = placeholder.matcher(pair[1]); m.find(); ) b.add(m.group());
+                    java.util.Collections.sort(a);
+                    java.util.Collections.sort(b);
+                    assertEquals(lang + " " + p.id + " keeps its placeholders", a, b);
+                }
+            }
+        }
+    }
+
+    private static AgvnProblemCatalog catalog() throws Exception {
+        try (java.io.Reader in = java.nio.file.Files.newBufferedReader(
+                new java.io.File("src/main/assets/" + AgvnProblemCatalog.ASSET).toPath())) {
+            return AgvnProblemCatalog.parse(in);
+        }
+    }
+
+    @Test
     public void autoFixTextsComeInTheLanguageTheyHave() {
         AgvnProblemCatalog catalog = AgvnProblemCatalog.parse(new StringReader("{\"problems\": ["
                 + "{\"id\": \"crash\", \"when\": [\"crash\"], \"title\": \"Game bị lỗi\", \"cause\": \"Lỗi ({crash}).\", \"fixes\": [\"send-logs\"]},"
