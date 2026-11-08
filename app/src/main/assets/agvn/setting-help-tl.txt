@@ -1,0 +1,572 @@
+# AGVN Player: paliwanag para sa "?" sa tabi ng bawat setting (Filipino).
+# Bawat entry ay may 4 na linya:
+#   [Pangalan ng setting, sa Vietnamese, eksakto gaya ng setting-help.txt: ito ang lookup key]
+#   Là gì: ...
+#   Vì sao chỉnh: ...
+#   Chỉnh thế nào: ...
+# Huwag isalin ang [key] at ang tatlong prefix. Komento ang mga linyang nagsisimula sa "#".
+
+[Async]
+Là gì: Kino-compile ang shader (code na gumuguhit ng effects) sa background, para hindi tumigil at maghintay ang game. Gumagana lang sa DXVK na may async o gplasync sa pangalan.
+Vì sao chỉnh: Bawas stutter at lag kapag unang beses lumabas ang isang eksena o bagong effect.
+Chỉnh thế nào: Kadalasang kusang naka-on kapag pumili ka ng async na DXVK; hayaang naka-on, lalo na sa mahinang phone. Kung saglit na nawawala o kumikislap ang mga bagay o effect, o nag-e-error ang game, subukang i-off.
+
+[Biến]
+Là gì: Piliin ang environment variable na idadagdag. Ito ay linya ng setting na ipinapasa sa Wine, driver o DXVK pagbukas ng game. Piliin ang “Custom…” para i-type mismo ang pangalan.
+Vì sao chỉnh: Gamitin kapag sinabihan kang magdagdag ng isang partikular na variable para ayusin ang error o subukan ang performance.
+Chỉnh thế nào: Magdagdag lang ng variable na alam mo ang gamit. Piliin ang pangalan, pindutin ang “Idagdag”, saka i-adjust ang Value. Ang variable sa game ay papalit sa variable na may parehong pangalan sa environment.
+
+[Box64 Preset]
+Là gì: Mga nakahandang setting para sa Box64 at WOWBox64, para timbangin ang ligtas at mabilis na takbo: Katatagan, Compatibility, Intermediate, Performance (mula pinakaligtas hanggang pinakamabilis).
+Vì sao chỉnh: Palitan kapag nagka-crash, nag-hang o kakaiba ang error ng game (pumili ng mas ligtas), o kapag ayos ang takbo pero mabagal (pumili ng mas mabilis).
+Chỉnh thế nào: Default: Compatibility. May error ang game: subukan ang Katatagan. Gusto ng mas mabilis: subukan ang Intermediate, saka Performance; kapag nag-error, bumalik. Sa Unity game, gamitin ang Compatibility o Katatagan.
+
+[Bật debug Wine]
+Là gì: Ang Wine ang tumutulong magpatakbo ng Windows game sa phone. Kapag naka-on, isusulat ng Wine ang mga babala at error sa log file sa folder na AGVN-Player/logs, at may button na “Tingnan ang log” sa menu ng game.
+Vì sao chỉnh: Gamitin kapag nagka-crash, nag-hang o nag-error ang game at kailangan mong ipadala ang logs sa AGVN para matulungan ka.
+Chỉnh thế nào: Default: naka-off. I-on, laruin hanggang mag-error, lumabas, saka sa library pindutin ang ⋮ ng game → “Ipadala ang logs” (kasama ang logs ng Wine), o “I-export ang error logs” sa itaas ng Settings. Hayaan sa default ang “Debug channel ng Wine”. I-off pagkatapos dahil pinababagal ng logs ang game.
+
+[Bật DInput]
+Là gì: Ang DInput (DirectInput) ay lumang paraan ng pagbasa ng controller, karaniwan sa mga lumang PC game.
+Vì sao chỉnh: I-on kapag hindi nakikilala ng lumang game ang controller. Kapag naka-on ang Exclusive input, kusang mao-off ang XInput: sa DInput lang makikita ng game ang controller, bilang karaniwang controller at hindi Xbox controller.
+Chỉnh thế nào: Default: naka-off. Mababago lang kapag naka-on ang Exclusive input. Kung nagulo ang mga button, bumalik sa I-on ang XInput, o i-off ang Exclusive input para makita ng game ang controller sa parehong paraan.
+
+[Bật File Provider]
+Là gì: Hinahayaan kang tingnan at kopyahin ang mga file sa loob ng AGVN Player (gaya ng C drive ng virtual na Windows) gamit ang file manager ng Android (Files app).
+Vì sao chỉnh: Madaling gamitin kapag kokopya ng save, font o config file sa C drive ng game. I-off kung hindi mo ginagamit at ayaw mong makita ng ibang app ang data ng app na ito.
+Chỉnh thế nào: Default: naka-on. Mag-a-apply ang pagbabago sa susunod na pagbukas ng app. Mag-ingat sa pagbura o pag-rename ng file doon dahil puwedeng masira ang environment.
+
+[Bật log Box64]
+Là gì: Ang Box64 ay translator na nagpapatakbo ng program para sa chip ng computer (x86) sa chip ng phone (ARM). Kapag naka-on, magsusulat ang Box64 ng dagdag na impormasyon sa logs ng game.
+Vì sao chỉnh: Gamitin kapag nagka-crash o nag-hang ang game pagkabukas pa lang at kailangang makita ng AGVN ang sinasabi ng Box64.
+Chỉnh thế nào: Default: naka-off. May silbi lang kapag tumatakbo ang game sa Box64, o kapag WOWBox64 ang pinili sa “32-bit emulator”; sa FEXCore halos walang naidadagdag. I-off pagkatapos mag-report ng error.
+
+[Bật nhật ký ứng dụng]
+Là gì: Isinusulat ang logs ng app mismo (bahaging Android: graphics driver, audio, screen…) habang naglalaro, sa isang file sa folder na AGVN-Player/logs.
+Vì sao chỉnh: Nakakatulong kapag kusang nagsasara ang app, may black screen, o nasa labas ng game ang error, para mahanap ng AGVN ang sanhi.
+Chỉnh thế nào: Default: naka-off. I-on lang kapag magre-report ng error: i-on, laruin hanggang mag-error, saka pindutin ang “I-export ang error logs”. I-off pagkapadala, dahil bawat laro ay nagdadagdag ng log file na kumakain ng storage.
+
+[Bật tần số quét cao]
+Là gì: Ang refresh rate ay kung ilang beses nire-refresh ang screen bawat segundo (60, 90, 120 Hz…). Kapag naka-on, hihilingin ng app ang pinakamataas na kaya ng screen habang naglalaro.
+Vì sao chỉnh: May silbi lang kapag kaya ng game ang higit 60 FPS (frames bawat segundo) at 90 Hz pataas ang screen ng phone.
+Chỉnh thế nào: Default: naka-off. Sa mahinang phone, kadalasang 24–30 FPS lang ang game kaya hindi ito magiging mas smooth, mas malakas pa sa baterya at mas iinit. Sa mahinang phone, hayaang naka-off.
+
+[Bật XInput]
+Là gì: Ang XInput ay paraan ng pagbasa ng Xbox controller na gamit ng karamihan ng bagong PC game.
+Vì sao chỉnh: Piliin kapag sinusuportahan ng game ang Xbox controller. Kapag naka-on ang Exclusive input, kusang mao-off ang DInput, kaya sa XInput lang makikita ng game ang controller. Kapag parehong naka-off ang XInput at DInput, walang controller ang game.
+Chỉnh thế nào: Default: naka-on. Mababago lang kapag naka-on ang Exclusive input. Kung hindi nakikilala ng lumang game ang controller, lumipat sa I-on ang DInput.
+
+[Bắt chuột ngoài]
+Là gì: Kapag may external mouse ka (may wire o Bluetooth), hinahawakan ito ng app sa loob ng game: nakatago ang cursor ng Android at diretso sa game ang lahat ng galaw at click.
+Vì sao chỉnh: Mas smooth ang pag-ikot ng view sa 3D game at hindi lumalabas ang cursor. Subukang i-off kung kakaiba ang kilos ng external mouse, mahirap kontrolin o hindi pumapasok ang click.
+Chỉnh thế nào: Default: naka-on. Kung walang external mouse, walang epekto ito at pareho pa rin ang touch. Para sa lahat ng game ang setting na ito.
+
+[Bỏ qua X11]
+Là gì: Sa DisplayX lang. Kapag naka-on, ang frames ng game na iginuhit sa Vulkan (hal. sa DXVK, VKD3D) ay diretsong ipinapadala sa screen, hindi na dumadaan sa X11 layer.
+Vì sao chỉnh: Puwedeng bumaba ang delay at tumaas ang FPS sa game na Vulkan ang gamit. Kung nag-black screen, walang larawan o nag-crash ang game, i-off ito.
+Chỉnh thế nào: Default: naka-off. Para subukang pakinisin ang takbo, i-on at buksan ulit ang game; kapag may graphics error, i-off ulit. Kung hindi sigurado, hayaang naka-off.
+
+[Bộ dựng hình]
+Là gì: Paano iginuguhit ng app ang Windows sa screen ng phone. Vulkan: default, may filter para sa pag-zoom at pagpapatalas. EGL: lumang paraan na OpenGL ES. DisplayX: diretsong ibinibigay ang frames sa Android.
+Vì sao chỉnh: Palitan kapag black screen, kumikislap, mali ang kulay, o gusto mong subukan ang mas smooth na paraan sa phone mo.
+Chỉnh thế nào: Hayaan sa Vulkan. Kapag may graphics error, subukan ang EGL. Mas kaunti ang kopya sa DisplayX kaya puwedeng mas magaan, pero hindi magagamit ang Magnifier. Kapag binago ito, kusang mare-reset ang Surface format.
+
+[Bộ dựng hình Wine]
+Là gì: Paano gumuguhit ng 3D ang WineD3D: gl ay gumagamit ng OpenGL (sa OpenGL driver ng app), vulkan ay diretsong gumagamit ng Vulkan driver. May epekto lang kapag WineD3D ang DX Wrapper.
+Vì sao chỉnh: Palitan kapag mabagal, may graphics error o hindi nagbubukas ang game na gumagamit ng WineD3D.
+Chỉnh thế nào: Default: gl, bagay sa pinakamaraming game. Subukan ang vulkan kapag nag-error ang gl; kulang pa ang features ng vulkan renderer ng WineD3D kaya puwedeng magka-graphics error ang lumang game. Kapag nag-error, bumalik sa gl.
+
+[Bộ dựng hình WineD3D]
+Là gì: Paano gumuguhit ang WineD3D: gl ay gumagamit ng OpenGL, vulkan ay diretsong gumagamit ng Vulkan driver, gdi ay ino-off ang 3D at 2D lang ang iginuguhit. May epekto lang kapag WineD3D ang DX Wrapper.
+Vì sao chỉnh: Palitan kapag mabagal, may graphics error o hindi nagbubukas ang game na gumagamit ng WineD3D.
+Chỉnh thế nào: Default: gl, bagay sa pinakamaraming game. Subukan ang vulkan kapag nag-error ang gl; puwedeng magka-graphics error ang lumang game sa vulkan. Piliin lang ang gdi para sa 2D game, dahil hindi tatakbo ang 3D game.
+
+[Bộ nhớ thiết bị tối đa]
+Là gì: Laki ng graphics memory (VRAM, sa MB) na sinasabi sa game. Ang 0 ay ang totoong laki sa phone. Iisang RAM ang gamit ng phone, kaya numero lang ito na nakikita ng game.
+Vì sao chỉnh: May game na pumipili ng kalidad ng graphics batay sa VRAM, o nagsasabing kulang ang video memory at ayaw tumakbo.
+Chỉnh thế nào: Hayaan sa 0 (default). Kulang daw ang video memory: subukan ang 2048 o 4096. Hindi nakakatipid ng totoong RAM ang pagbaba nito (nasukat sa totoong phone), may silbi lang sa game na pumipili ng magaang setting batay sa VRAM.
+
+[Bộ nhớ video]
+Là gì: Laki ng graphics memory (VRAM), sa MB, na sinasabi ng WineD3D sa game. Numero lang ito para sa game, hindi ito nagrereserba ng totoong RAM.
+Vì sao chỉnh: Palitan kapag sabi ng game sa WineD3D ay kulang ang graphics memory, ayaw magpapili ng mataas na graphics, o ayaw tumakbo.
+Chỉnh thế nào: Default: 2048. Kulang daw ang graphics memory: subukan ang 4096. Hindi nakakabawas ng RAM ang pagbaba nito, at baka sabihin pa ng DirectX 8/9 game na ubos na ang memory. Sa mahinang phone: hayaan sa 2048.
+
+[Bộ nhớ video (MB)]
+Là gì: Laki ng graphics memory (VRAM), sa MB, na sinasabi ng WineD3D sa game. Numero lang ito para sa game, hindi ito nagrereserba ng totoong RAM.
+Vì sao chỉnh: Palitan kapag sabi ng game sa WineD3D ay kulang ang graphics memory, ayaw magpapili ng mataas na graphics, o ayaw tumakbo.
+Chỉnh thế nào: Default: 2048. Kulang daw ang graphics memory: subukan ang 4096. Hindi nakakabawas ng RAM ang pagbaba nito, at baka sabihin pa ng DirectX 8/9 game na ubos na ang memory. Sa mahinang phone: hayaan sa 2048.
+
+[Bộ đệm Async]
+Là gì: Sine-save sa storage ng phone ang mga na-compile na shader (code na gumuguhit ng effects) para magamit ulit sa susunod. Sa DXVK gplasync lang.
+Vì sao chỉnh: Mas kaunting stutter sa susunod na laro, mas smooth pagbalik sa dating eksena.
+Chỉnh thế nào: Kusang naka-on kapag pinili mo ang gplasync; hayaang naka-on. Gumagamit ng kaunting dagdag na storage. Kung may graphics error ang game matapos magpalit ng driver o DXVK: subukang i-off.
+
+[Bộ đệm giả lập BCN]
+Là gì: Sine-save sa storage ng phone ang mga na-decompress na BCn texture (compressed na larawan ng surface na pang-PC), para magamit ulit sa susunod at hindi na i-decompress ulit.
+Vì sao chỉnh: Mas mabilis mag-load sa susunod na laro, mas kaunting lag pagpasok sa level.
+Chỉnh thế nào: Hayaang naka-off (default). May epekto lang kapag CPU ang nagde-decompress ng texture (Mali na phone, o driver na hindi Turnip). I-on kung mabagal mag-load ang game; gumagamit ng dagdag na storage.
+
+[Bộ đệm shader Async]
+Là gì: Sine-save sa internal storage ang mga shader na ginawa ng DXVK para magamit ulit sa susunod na laro at hindi na gawin mula umpisa. May epekto lang sa DXVK na may gplasync sa pangalan.
+Vì sao chỉnh: I-on para bawasan ang stutter mula sa ikalawang laro pataas.
+Chỉnh thế nào: Default: naka-off. Magandang i-on kasabay ng Shader Async kapag gamit ang 2.3.1-arm64ec-gplasync. Gumagamit ng kaunting dagdag na storage. Kung nag-error ang game matapos i-on, i-off.
+
+[Chia sẻ bộ nhớ tạm Android với Wine]
+Là gì: Ang clipboard ang nagtatago ng text na kakakopya mo. Kapag naka-on, mape-paste sa game ang text na kinopya sa phone, at mape-paste sa ibang app ang text na kinopya sa game.
+Vì sao chỉnh: Madali kapag magpe-paste ng pangalan o activation code sa game, o kokopya ng text mula sa game papunta sa translation app (kung pinapayagan ng game ang pagkopya).
+Chỉnh thế nào: Default: naka-off. Text lang ang naibabahagi, hindi larawan. I-off kapag hindi kailangan para hindi mabasa ng game ang kinopya mo, gaya ng password.
+
+[Chuột tương đối]
+Là gì: Ipinapadala sa game ang galaw ng mouse bilang “gaano kalayo gumalaw” sa halip na posisyon ng cursor. Para sa external mouse at sa pag-swipe na parang touchpad.
+Vì sao chỉnh: I-on sa 3D game na mouse ang pang-ikot ng view (shooter, 3D RPG) kapag ayaw umikot, paputol-putol umikot, o naiipit sa gilid ng screen ang view.
+Chỉnh thế nào: Default: naka-off. Sa visual novel at game na puro menu, hayaang naka-off. Puwede itong i-on/i-off agad sa menu ng game (switch na “Relative mouse”) para mabilis masubukan.
+
+[Chế độ dựng hình]
+Là gì: Lumalabas lang sa Turnip driver (Snapdragon na phone, Adreno GPU). Paano gumuguhit ang GPU: Sysmem ay diretso sa RAM; Gmem ay hinahati ang larawan sa maliliit na tile at gumuguhit sa mabilis na memory ng GPU.
+Vì sao chỉnh: Palitan kapag may graphics error ang game (kumikislap, may guhit, itim na bahagi, sirang larawan) o para subukan kung alin ang mas mataas ang FPS.
+Chỉnh thế nào: Hayaan sa None (ang driver ang pipili). Kapag may graphics error, subukan ang Sysmem. Autotuner Profiled: sinusukat ng driver at pinipili ang mas mabilis, puwedeng magbago-bago ang FPS. Subukan lang ang Gmem kapag hindi gumana ang iba.
+
+[Chế độ hiệu năng]
+Là gì: Sa DisplayX lang. Sinasabihan ang Android na kailangang makasabay sa refresh rate ang thread na nagpapadala ng frames, para pataasin ng system ang CPU kapag kailangan.
+Vì sao chỉnh: Mas pantay ang paglabas ng frames, mas kaunting stutter. Kapalit nito, puwedeng mas uminit ang phone at mas malakas sa baterya.
+Chỉnh thế nào: Default: naka-on. Kung mabilis uminit o maubos ang baterya, subukang i-off. Kailangan ng Android 13 pataas; sa mas lumang phone, pareho lang naka-on man o naka-off.
+
+[Chế độ khởi động]
+Là gì: Pumipili ng mga background service ng Windows (sa Wine) na bubuksan kapag binuksan ang game o ang environment.
+Vì sao chỉnh: Puwedeng gumaan nang kaunti ang startup kapag in-off ang ilang service, pero may game at installer na kailangan ang mga ito para tumakbo nang tama.
+Chỉnh thế nào: Hayaan sa Mahalaga lang (default): naka-off ang Plug and Play at RPC para gumaan. Normal: lahat ng service gaya ng orihinal na Wine, piliin kapag nag-error sa service ang game o installer. Minimal: mas marami pang naka-off, pati ang pag-install ng .msi.
+
+[Chế độ trình chiếu]
+Là gì: Paano inilalabas ng app ang larawan ng game sa screen kapag Vulkan ang Renderer ng display. Ang fifo ay naghihintay sa refresh ng screen; ang mailbox ay laging ipinapakita ang pinakabagong frame.
+Vì sao chỉnh: Palitan kapag may delay ang kontrol o hindi pantay ang paglabas ng larawan.
+Chỉnh thế nào: Hayaan sa fifo (default, stable). Para mas mabilis ang response, subukan ang mailbox; kung hindi ito suportado ng phone, kusang gagamitin ang fifo. Sa mahinang phone, hayaan sa fifo.
+
+[Chế độ trình chiếu của driver]
+Là gì: Paano ipinapadala ng game ang frames sa screen sa Vulkan (DXVK, VKD3D, Zink). mailbox: pinakabagong frame. fifo: hinihintay ang refresh ng screen. immediate: walang hintay. relaxed: gaya ng fifo, pero agad ipinapakita ang nahuling frame.
+Vì sao chỉnh: Palitan kapag kumikislap, kumukurap, napupunit nang pahalang (tearing) o nag-i-stutter ang larawan.
+Chỉnh thế nào: Hayaan sa mailbox (default). Kapag kumikislap o kumukurap, lalo na sa OpenGL game na dumadaan sa Zink: subukan ang fifo. Puwedeng magdulot ng tearing ang immediate at relaxed, subukan lang kapag kailangan.
+
+[Chế độ vẽ ngoài màn hình]
+Là gì: Paano iginuguhit ng WineD3D ang pansamantalang larawan na hindi pa lumalabas sa screen: fbo (bagong paraan) o backbuffer (lumang paraan). May epekto lang sa WineD3D na gl ang renderer.
+Vì sao chỉnh: Palitan lang kapag black screen o may graphics error ang game sa WineD3D at hindi naayos ng ibang paraan.
+Chỉnh thế nào: Default: fbo, hayaan ito. Subukan lang ang backbuffer kapag nasubukan na ang lahat; kung lumala, ibalik sa fbo. Buksan ulit ang game para mag-apply.
+
+[Chọn nhân CPU]
+Là gì: Ang mga CPU core na puwedeng gamitin ng game (CPU0, CPU1…). Ang puting kahon ay core na napili.
+Vì sao chỉnh: Kapag sa malalakas na core lang ang game, puwedeng mas pantay ang takbo sa ilang phone. Kapag masyadong kaunti ang napili, babagal ang game.
+Chỉnh thế nào: Hayaang piliin lahat (default). Para sumubok, malalakas na core lang ang iwan, kadalasan ang malalaking numero (hal. CPU4–CPU7). Kung walang napiling core, lahat ang gagamitin ng game.
+
+[Chọn nhân CPU (ứng dụng 32-bit)]
+Là gì: Pumipili ng CPU core para sa 32-bit na program sa environment na ito. Hindi para sa game na binuksan mula sa library: gamit ng game ang “Pumili ng CPU core” sa Config ng game.
+Vì sao chỉnh: Kailangan lang kapag sinabihan, hal. napakalumang 32-bit game na nag-e-error kapag maraming core, o para panatilihin ang program sa ilang core lang.
+Chỉnh thế nào: Hayaan ang nakahandang pagpili. I-tap ang CPU0, CPU1… para i-on/i-off; ang puting kahon ay core na napili. Kung tinanggal lahat, kusang gagamitin ng app ang huling kalahati ng mga core (hal. CPU4–CPU7 sa 8-core na phone).
+
+[CSMT]
+Là gì: Pinapagawa ng CSMT sa WineD3D ang mga drawing command sa hiwalay na CPU thread, kasabay ng game. May epekto lang kapag WineD3D ang DX Wrapper.
+Vì sao chỉnh: Subukang i-off kapag nagka-crash, nag-hang, kumikislap o may graphics error ang game sa WineD3D. Kapag naka-on, kadalasang mas mabilis ang game.
+Chỉnh thế nào: Default: naka-on, hayaang naka-on. I-off lang kapag may error ang game at gumanda ito matapos i-off; puwedeng bumaba ang FPS kapag naka-off. Buksan ulit ang game para mag-apply.
+
+[Cấu hình phím ảo]
+Là gì: Pumipili ng set ng on-screen button para sa game na ito. Ang “Auto (AGVN)” ay pumipili batay sa uri ng game: visual novel, RPG, 2D o keyboard ng computer. Sa “Naka-off ang on-screen keys”, walang button na lalabas.
+Vì sao chỉnh: Palitan kapag hindi bagay sa game ang kusang napiling set, may kulang na key, o gusto mo lang ng direktang touch o controller.
+Chỉnh thế nào: Hayaan sa “Auto (AGVN)”. Kapag pumili ka ng isang set, hindi na ito papalitan ng app. Para ilipat, magdagdag o magpalit ng button, pindutin ang “✎ I-edit” sa game; hiwalay na nase-save ang set para sa game na ito.
+
+[Cập nhật ứng dụng]
+Là gì: Maghanap at mag-install ng bagong AGVN Player sa loob mismo ng app, walang computer. Version info at installer file lang ang dina-download mula sa GitHub page ng AGVN, at walang ipinapadalang data ng phone.
+Vì sao chỉnh: Inaayos ng bagong bersyon ang mga error at pinapaganda ang takbo ng game. Hindi nagagalaw ang game, save at settings matapos mag-update.
+Chỉnh thế nào: I-tap ito, piliin ang Tingnan kung may update. Kung may bago, pindutin ang I-update, hintaying matapos ang download, saka pindutin ang Update sa dialog ng Android. Ilang daang MB ang file, kaya gumamit ng Wi-Fi.
+
+[DDraw Wrapper]
+Là gì: Converter para sa napakalumang game na gumagamit ng DirectDraw o Direct3D 7 pababa. May epekto lang kapag DXVK+VKD3D ang DX Wrapper. Ang none at wined3d ay gumagamit ng sariling DirectDraw ng Wine.
+Vì sao chỉnh: Palitan kapag black screen, mali ang kulay, nag-i-stutter, mabagal o hindi makapasok ang napakalumang game.
+Chỉnh thế nào: Default: none. May error ang lumang 2D game: subukan ang cnc-ddraw. May graphics error ang lumang 3D game (DirectX 7): subukan ang dd7to9 o D7VK 2.2 (kung mayroon). Buksan ulit ang game para mag-apply.
+
+[Direct3D]
+Là gì: Mga dagdag na library ng DirectX (d3dx9, d3dx10, d3dx11, d3dcompiler) na kailangan ng maraming DirectX 9–11 game. Hindi ito DXVK; ang DXVK ay pinipili sa DX Wrapper.
+Vì sao chỉnh: Ang Orihinal (Windows) ay totoong library ng Microsoft kaya kadalasang mas tama ang takbo. Ang Kasama na (Wine) ay gawa ng Wine, kulang pa ang features, at puwedeng magdulot ng graphics error o crash.
+Chỉnh thế nào: Hayaan sa Orihinal (Windows) (default). Subukan lang ang Kasama na (Wine) kapag nagka-crash ang game pagbukas pa lang at hindi gumana ang ibang paraan. Pagkapalit, buksan ulit ang game.
+
+[DirectMusic]
+Là gì: Ang DirectMusic library, gamit ng ilang lumang game para sa background music.
+Vì sao chỉnh: Hindi pa kumpleto ang Kasama na (Wine), kaya may lumang game na nawawalan ng background music o nagka-crash habang tumutugtog.
+Chỉnh thế nào: Hayaan sa Kasama na (Wine) (default). Kung walang background music o nagka-crash habang tumutugtog ang lumang game, subukan ang Orihinal (Windows); kung hindi gumanda, ibalik sa dati.
+
+[DirectPlay]
+Là gì: Library para sa paglalaro sa network (LAN, online) ng mga lumang Windows game.
+Vì sao chỉnh: Kailangan lang kapag nag-error sa DirectPlay ang lumang game o nagka-crash pagpasok sa multiplayer. Kadalasang hindi ito kailangan sa single-player na game.
+Chỉnh thế nào: Hayaan sa Kasama na (Wine) (default). Subukan lang ang Orihinal (Windows) kapag may error ang game na may kinalaman sa DirectPlay.
+
+[DirectShow]
+Là gì: Ang DirectShow video library, gamit ng game para sa intro video at mga cutscene.
+Vì sao chỉnh: Palitan kapag itim, hindi tumatakbo o nag-hang ang video sa game, o nagka-crash ang game habang may video.
+Chỉnh thế nào: Hayaan sa Kasama na (Wine) (default). Kapag may error ang video, subukan ang Orihinal (Windows); kung hindi gumanda, ibalik sa Kasama na (Wine).
+
+[DirectSound]
+Là gì: Ang DirectSound audio library na gamit ng maraming lumang Windows game para sa tunog.
+Vì sao chỉnh: Palitan kapag walang tunog, may garalgal, o nagka-crash habang may tunog ang lumang game, at hindi naayos ng pagpapalit ng Audio driver.
+Chỉnh thế nào: Hayaan sa Kasama na (Wine) (default). Kapag may error sa tunog ang lumang game, subukan ang Orihinal (Windows); kung hindi gumanda, ibalik sa Kasama na (Wine).
+
+[Driver dựng hình]
+Là gì: Ang Vulkan driver na gamit ng app para iguhit ang game sa screen (kapag Vulkan ang Renderer ng display). Hindi ito ang driver na gamit ng game; nasa setting na Vulkan driver iyon.
+Vì sao chỉnh: Palitan kapag black screen, kumikislap, o kusang nagsasara ang app pagbukas ng game kapag Vulkan ang Renderer ng display.
+Chỉnh thế nào: Hayaan sa System (default). Kapag may graphics error, subukan ang ibang driver sa listahan (Snapdragon na phone lang ang may dagdag na pagpipilian), o gawing EGL ang Renderer ng display.
+
+[Driver OpenGL]
+Là gì: Driver para sa game na OpenGL (isang graphics standard) ang gamit, at para sa WineD3D kapag gl ang Renderer ng Wine. Pinapatakbo ng Zink ang OpenGL sa Vulkan driver; ang Freedreno ay OpenGL driver para sa Adreno GPU.
+Vì sao chỉnh: Palitan kapag black screen, kumikislap, mali ang kulay, kusang nagsasara, o kulang daw ang OpenGL version ng OpenGL game mo.
+Chỉnh thế nào: Sa Adreno GPU (Snapdragon) lang tumatakbo ang Freedreno at OpenGL 3.3 ang sinasabi nito; tumatakbo ang Zink sa lahat ng phone. May graphics error, black screen o kusang nagsasara ang OpenGL game: subukan ang isa pa. MediaTek na phone: Zink.
+
+[Driver Vulkan]
+Là gì: Ang pangunahing graphics driver na gamit ng game (sa DXVK, VKD3D, Zink). Ang turnip26.2.0 ay open source na driver para sa Adreno GPU, ang v863 ay driver ng Qualcomm, ang System ay driver na kasama na ng phone.
+Vì sao chỉnh: Palitan kapag black screen ang game, walang 3D na larawan, kusang nagsasara pagbukas, may graphics error o mababa ang FPS.
+Chỉnh thế nào: Snapdragon na phone: hayaan sa turnip26.2.0 (default). Hindi Snapdragon: gamitin ang System. Kung hindi gumana ang napili mong driver, kusang magpapalit ang app ng ibang driver pagbukas ng game. Ang may nakasulat na Download ay dina-download kapag pinili.
+
+[Driver âm thanh]
+Là gì: Paano inilalabas ang tunog ng game sa speaker ng phone. Ang PulseAudio-GN ay bagong PulseAudio na mababa ang delay; ang PulseAudio ay luma; ang ALSA ay simpleng audio path na kasama na sa app.
+Vì sao chỉnh: Palitan kapag walang tunog, may garalgal o kaluskos, may delay ang tunog, o nag-hang ang game pagsimula ng tunog.
+Chỉnh thế nào: Hayaan sa PulseAudio-GN (default). Walang tunog o may garalgal: subukan ang PulseAudio, saka ALSA. Bawat palit, buksan ulit ang game para masubukan.
+
+[Driver đồ họa]
+Là gì: OpenGL driver para sa game na OpenGL ang gamit at para sa WineD3D kapag gl ang pagguhit. Ang Wrapper ay Zink: pinapatakbo ang OpenGL sa Vulkan driver ng phone.
+Vì sao chỉnh: Palitan lang kapag may error ang OpenGL game at alam mong ibang driver ang kailangan.
+Chỉnh thế nào: Wrapper lang ang nasa screen na ito, hayaan ito. Ang Vulkan driver ay pinipili sa Bersyon ng graphics driver.
+
+[DX Wrapper]
+Là gì: Translator na ginagawang kaya ng phone ang DirectX graphics ng Windows game. Ang DXVK+VKD3D ay nagta-translate sa Vulkan; ang WineD3D ay translator na kasama na ng Wine.
+Vì sao chỉnh: Palitan kapag black screen, may graphics error, kusang nagsasara pagbukas o sobrang bagal ang DirectX game mo.
+Chỉnh thế nào: Hayaan sa DXVK+VKD3D (default, kadalasang mas mabilis). May graphics error o hindi nagbubukas ang lumang game (DirectX 9 pababa): subukan ang WineD3D.
+
+[DXVK HUD]
+Là gì: Ginagawa ng DXVK na Vulkan (paraan ng pagguhit na naiintindihan ng phone) ang DirectX graphics command ng Windows game. Kapag naka-on, ipapakita ng DXVK sa kaliwang itaas: FPS, GPU, driver, GPU usage.
+Vì sao chỉnh: Gamitin sa paghahanap ng graphics error: tingnan kung dumadaan sa DXVK ang game at ilang FPS (frames bawat segundo) ito.
+Chỉnh thế nào: Default: naka-off. Lalabas lang kapag DXVK+VKD3D ang “DX Wrapper” at DirectX 9 hanggang 11 ang game. Sa normal na laro, i-off; para makita ang FPS, gamitin ang HUD.
+
+[Dùng tiện ích DRI3]
+Là gì: Tinutulungan ng DRI3 na ilipat ang bawat frame mula sa graphics chip (GPU) diretso sa screen ng game. Kapag naka-off, kailangang kopyahin sa processor (CPU) ang larawan kaya mas mabagal.
+Vì sao chỉnh: Subukan lang i-off kapag black screen, kumikislap, may guhit o nagka-crash ang game sa mismong pagsimula ng larawan, at hindi naayos ng ibang graphics setting.
+Chỉnh thế nào: Default: naka-on at hayaang naka-on, lalo na sa mahinang phone. Para sa lahat ng game ang setting na ito. Kung na-off mo at hindi naayos ang error, i-on agad ulit.
+
+[Dùng tích hợp OpenXR]
+Là gì: Lumalabas lang ito sa Meta Quest VR headset. Kapag naka-on, bubukas ang game at environment sa VR mode, kontrolado ng controller ng headset.
+Vì sao chỉnh: I-off kung gusto mong maglaro sa normal na flat window sa headset, o kung may graphics o control error sa VR mode.
+Chỉnh thế nào: Default: naka-on. Sa phone, hindi ito lumalabas at walang epekto.
+
+[FEXCore Preset]
+Là gì: Balanse ng bilis at katumpakan ng FEXCore. Katatagan: pinakaligtas, pinakamabagal. Performance: pinakamabilis, pinakamadaling mag-error.
+Vì sao chỉnh: Palitan kapag kusang nagsasara o random na nag-hang ang game, may error sa physics, o gusto mo ng dagdag na FPS sa game na mabigat sa CPU.
+Chỉnh thế nào: Hayaan sa Intermediate (default). Kusang nagsasara o random na nag-hang: subukan ang Compatibility, saka Katatagan. Ayos ang takbo pero mabagal: subukan ang Performance; kapag nag-error, bumalik.
+
+[Ghi đè di chuyển chuột]
+Là gì: Paano hinihila ng Wine ang mouse cursor pabalik sa gitna ng screen para sa game na nagbabasa ng mouse sa DirectInput (kadalasang lumang 3D game): disable, enable o force.
+Vì sao chỉnh: Palitan kapag naiipit sa gilid ng screen ang pag-ikot ng camera gamit ang mouse, o laging hinihila pabalik sa gitna ang cursor.
+Chỉnh thế nào: Hayaan sa disable (default). Naiipit ang camera: subukan ang enable, saka force. Hinihila sa gitna ang cursor: ibalik sa disable.
+
+[Giao diện desktop]
+Là gì: Kulay ng mga window, button at dialog na pang-Windows sa environment: Madilim o Maliwanag. Hindi nito binabago ang larawan sa loob ng game.
+Vì sao chỉnh: Palitan kapag mahirap basahin ang text sa installer, error dialog o settings window ng game (madilim na text sa madilim na background).
+Chỉnh thế nào: Default: Madilim. Kapag mahirap basahin ang dialog, piliin ang Maliwanag. Mag-a-apply sa susunod na pagbukas.
+
+[Giá trị]
+Là gì: Ang value ng environment variable sa linyang ito. Depende sa variable, pipili ka sa listahan, magche-check ng ilang item, o magta-type ng text o numero.
+Vì sao chỉnh: Palitan kapag sinabihan kang i-adjust ang isang variable para ayusin ang error sa graphics o tunog, o subukan ang performance.
+Chỉnh thế nào: Huwag gumamit ng space, kusang tatanggalin ito ng app. Paghiwalayin ng comma ang maraming item. Kung hindi sigurado, burahin ang variable gamit ang trash button. Buksan ulit ang game para mag-apply.
+
+[Giả lập 32-bit]
+Là gì: Pumipili ng emulator na magpapatakbo ng 32-bit na Windows game at program sa chip ng phone. Laging FEXCore ang gamit ng 64-bit na game.
+Vì sao chỉnh: Palitan kapag kusang nagsasara, nag-hang, nag-e-error o mabagal ang 32-bit na game.
+Chỉnh thế nào: Hayaan sa FEXCore (default). May error o mabagal ang 32-bit na game: subukan ang WOWBox64 (lalabas din ang Bersyon ng WOWBox64 at Box64 Preset). Kung hindi gumanda, bumalik sa FEXCore.
+
+[Giả lập 64-bit]
+Là gì: Ipinapakita ang emulator na nagpapatakbo ng 64-bit na program: FEXCore sa Wine/Proton arm64ec, Box64 sa ibang Wine. Pang-tingin lang ito.
+Vì sao chỉnh: Hindi kailangang baguhin: kusa itong sumusunod sa bersyon ng Wine/Proton ng environment.
+Chỉnh thế nào: Para gumamit ng ibang 64-bit emulator, gumawa ng environment na may ibang Wine/Proton. Ang bersyon at preset ng emulator ay nasa mga setting sa ibaba.
+
+[Giả lập BCN]
+Là gì: Ang BCn ay paraan ng pag-compress ng texture (larawan ng surface) sa PC game na hindi nababasa ng maraming phone GPU, lalo na ang Mali. Dito pinipili kung iko-convert ng app ang mga texture na iyon.
+Vì sao chỉnh: Palitan kapag itim, violet, malabo o nawawala ang texture, o kusang nagsasara ang game habang naglo-load ng level.
+Chỉnh thế nào: Hindi ito kailangan ng Snapdragon na may Turnip driver: kusa itong ino-off ng app dahil nababasa ng Turnip ang BCn. Ibang driver at Mali: hayaan sa auto (default); full: lahat kino-convert, pinakasigurado pero mabigat sa CPU at RAM; none: off.
+
+[Giả lập màn hình cảm ứng]
+Là gì: Kung saan ka mag-tap, left click doon para sa game; tap, idiin at i-drag ay pag-drag gamit ang left click. Kapag naka-off, nagiging touchpad ang screen: mag-swipe para igalaw ang cursor, mag-tap para mag-click.
+Vì sao chỉnh: Bagay na bagay sa visual novel at game na puro menu: direktang i-tap ang pagpipilian. I-off kung kailangan ng game na itapat ang mouse nang walang click (para lumabas ang paliwanag) o umikot ang view.
+Chỉnh thế nào: Kadalasang naka-on na sa game na in-import sa AGVN; sa visual novel, hayaan ito. Sa parehong mode, ang tap ng 2 daliri nang sabay ay right click.
+
+[Giới hạn FPS]
+Là gì: Mahigpit na FPS limit ng DXVK, para sa DirectX 8–11 game. Ang 0 ay walang limit.
+Vì sao chỉnh: Gamitin kapag sobrang bilis ng game o may error sa physics kapag mataas ang FPS.
+Chỉnh thế nào: Hayaan sa 0 (default). Para hindi uminit ang phone, sa menu ng game, sa Video, gawing 30 o 20 ang Limit ng FPS: 60, 30 at 20 FPS lang ang pantay sa 60 Hz na screen. Lagyan lang ng numero dito kapag nag-e-error ang game sa mataas na FPS: naka-lock ito at hindi mataasan sa game.
+
+[Gửi mọi buffer]
+Là gì: Kapag DisplayX lang ang Renderer ng display. Kapag naka-on, isa-isang ipinapakita ng Android ang lahat ng frame na ipinadala ng game, hindi nilalaktawan ang luma para tumalon sa pinakabago.
+Vì sao chỉnh: Puwedeng mas pantay ang galaw kapag paputol-putol ang larawan kahit ayos ang FPS. Kapalit nito, puwedeng bahagyang ma-delay ang kontrol.
+Chỉnh thế nào: Hayaang naka-off (default): inuuna ang pinakabagong frame kaya kaunti ang delay. I-on para subukan kung paputol-putol ang larawan; kung mas na-delay, i-off ulit. May epekto lang sa Android 12 pataas.
+
+[Hiệu ứng làm nét]
+Là gì: Nagdadagdag ng sharpening filter sa larawan ng game. Pinapalinaw ng CAS ang detalye nang natural; pinapatalas ng DLS ang liwanag, kasama ang slider na “Bawasan ang noise sa sharpening” para mabawasan ang butil.
+Vì sao chỉnh: Nakakatulong kapag ibinaba mo ang resolution para gumaan at lumabo ang larawan. I-slide ang “Antas ng sharpening” para taasan o babaan ang talas.
+Chỉnh thế nào: Default: None. Sa mahinang phone, hayaan sa None dahil dagdag na trabaho sa GPU ang sharpening. Para sumubok, piliin ang CAS sa katamtamang antas. Kung walang nagbago, hindi tinatanggap ng game ang effect, kaya ibalik sa None.
+
+[HUD]
+Là gì: Ang HUD ay maliit na panel ng impormasyon sa ibabaw ng game. Classic: FPS (frames bawat segundo), pangalan ng GPU, RAM. Modern: dagdag ang CPU at GPU usage, temperatura, baterya, graph.
+Vì sao chỉnh: I-on para makita kung smooth ang game (FPS), kung mainit ang phone o malapit nang maubos ang RAM, lalo na kapag sinusubukan ang bagong graphics setting.
+Chỉnh thế nào: Sa normal na laro, piliin ang Naka-off; para mag-check, piliin ang Classic para simple. Sa game na ito lang ang pagpiling ito. Sa loob ng game, puwede ring i-on/i-off gamit ang switch na “I-on ang HUD” sa menu.
+
+[HUD Winlator]
+Là gì: Maliit na panel ng impormasyon sa screen habang naglalaro. Classic: FPS, pangalan ng GPU, RAM. Modern: dagdag ang CPU/GPU usage, temperatura, baterya.
+Vì sao chỉnh: I-on para makita ang FPS habang sumusubok ng config, o para hanapin kung bakit nag-i-stutter ang game o umiinit ang phone.
+Chỉnh thế nào: Sa normal na laro, hayaan sa Naka-off. Mabilis na tingin sa FPS: Classic. Para makita rin ang temperatura at baterya: Modern. Para sa mga game sa environment na ito na walang sariling HUD na napili.
+
+[Hình nền desktop]
+Là gì: Background ng emulated na Windows screen, sa likod ng window ng game: Larawan o Iisang kulay.
+Vì sao chỉnh: Pang-dekorasyon lang. Lumalabas ito kapag direktang binuksan ang Windows screen ng environment; kapag naglalaro ng game mula sa library, kadalasang nakatago ito.
+Chỉnh thế nào: Piliin ang Larawan, saka pindutin ang Piliin o Palitan para gamitin ang sarili mong larawan. Para simple, piliin ang Iisang kulay.
+
+[Kiểu giả lập BCN]
+Là gì: Paano dine-decompress ang BCn texture (compressed na larawan ng surface na pang-PC) kapag auto o full ang BCn emulation: compute ay gumagamit ng GPU, software ay gumagamit ng CPU.
+Vì sao chỉnh: Palitan kapag mabagal mag-load ang game, nag-i-stutter pagpasok sa bagong level, o may error ang texture.
+Chỉnh thế nào: Hayaan sa compute (default). Sa Snapdragon na phone (Adreno GPU), hindi gumagamit ng compute ang app kaya walang epekto ito. Mali na phone: kapag may error ang texture o kusang nagsasara ang game, subukan ang software.
+
+[Kéo giãn toàn màn hình]
+Là gì: Ini-stretch ang larawan ng game para mapuno ang screen ng phone, walang itim na gilid.
+Vì sao chỉnh: I-on kapag gusto mong punong-puno ang screen. Kung iba ang ratio ng resolution sa ratio ng screen, lalapad o mababaluktot ang larawan.
+Chỉnh thế nào: Default: naka-off (tamang ratio). Para punuin ang screen nang hindi nababaluktot, pumili ng Resolution na kapareho ng ratio ng phone, hal. 1280x576 (20:9). Ang game na walang sariling setting dito ay susunod sa pinili sa environment.
+
+[Loại tài nguyên]
+Là gì: Paano humihingi ang driver ng memory na sabay binabasa at sinusulatan ng CPU at GPU. Ang auto ay isa-isang sinusubukan ang dmabuf, ahb, opaque hanggang gumana.
+Vì sao chỉnh: Palitan lang kapag kusang nagsasara ang game mo pagbukas o habang naglo-load, o may error sa graphics memory.
+Chỉnh thế nào: Hayaan sa auto (default). Kung may error na gaya ng nasa itaas, subukan isa-isa ang dmabuf, ahb, opaque; kung hindi gumanda, ibalik sa auto.
+
+[Lưu game]
+Là gì: Ino-on ang pag-back up ng saves (progress sa laro) para sa game na ito lang. Hinahanap ng app ang save folder sa virtual na Windows drive at itinatago ang kopya sa folder na AGVN-Player/Saves.
+Vì sao chỉnh: Magandang i-on bago burahin ang game, i-install ulit ang app, palitan ang environment o sumubok ng kakaibang setting, para hindi mawala ang progress.
+Chỉnh thế nào: Pindutin ang “I-back up ngayon” para mag-back up, “Ibalik” para ibalik ang pinakabagong backup sa ibabaw ng kasalukuyang save. Kung sa mismong folder ng game nagse-save ang game (gaya ng maraming RPG Maker game), hindi ito naba-back up dito.
+
+[Lọc texture]
+Là gì: Paano pinapalaki ang larawan ng game para magkasya sa screen ng phone. Hindi nito binabago ang kalidad ng texture sa game. Bilinear at Pinakamalapit na punto lang ang nasa EGL na Renderer ng display.
+Vì sao chỉnh: Palitan kapag malabo o butil-butil ang larawan, o gusto mong mas matalas ito sa mababang resolution.
+Chỉnh thế nào: Hayaan sa Bilinear (makinis, default). Pixel art na 2D game: Pinakamalapit na punto. Mahinang phone sa mababang resolution: subukan ang Snapdragon Super Resolution para mas matalas. Dagdag na trabaho sa GPU ang mga sharpening filter at Pagandahin ang kulay.
+
+[MIDI SoundFont]
+Là gì: Set ng tunog ng instrumento para sa MIDI music. Maraming lumang game, gaya ng RPG Maker 2000/2003, ang gumagamit ng MIDI music.
+Vì sao chỉnh: Kapag Naka-off, walang background music ang game na MIDI ang gamit. Magpalit ng ibang set para mabago ang kalidad ng tunog.
+Chỉnh thế nào: Walang background music ang game: piliin ang wt_210k_G.sf2 (kasama na). Hindi MIDI ang game: hayaan sa Naka-off. Kapag pinili sa settings ng game, sa game na iyon lang; kapag sa environment, sa lahat ng game na walang sariling pili.
+
+[Môi trường chạy]
+Là gì: Ang Environment ay sariling virtual na Windows, may Wine/Proton (tumutulong magpatakbo ng Windows game), driver at settings. Ipinapakita rito kung saang environment tumatakbo ang game.
+Vì sao chỉnh: Palitan kapag hindi tumatakbo o madalas mag-error ang game sa kasalukuyang Wine/Proton, o gusto mo ng hiwalay na settings para sa game na ito nang hindi naaapektuhan ang ibang game.
+Chỉnh thế nào: Kapag pumili ng ibang environment, kokopyahin doon ang game at maiiwan ang luma. Hindi kusang sumasama ang saves: i-back up, saka ibalik sa bago. Kung iisa lang ang environment, pindutin ang + para gumawa ng bago.
+
+[Mở chế độ Big Picture khi khởi động]
+Là gì: Ang Big Picture ay malaking screen para pumili ng game, ini-scroll ayon sa cover, bagay sa TV o controller. Kapag naka-on, diretso ka roon tuwing bubuksan ang app.
+Vì sao chỉnh: I-on kung naglalaro ka sa TV, malaking screen o kadalasang controller ang gamit. May background music ang screen na ito at kusang nagda-download ng cover sa internet kapag wala pang cover ang game.
+Chỉnh thế nào: Default: naka-off; sa mahinang phone, hayaang naka-off para gumaan. Habang nasa Big Picture, pindutin ang Back para bumalik sa normal na screen. Puwedeng i-off ang background music sa settings ng Big Picture.
+
+[Mở trình duyệt Android từ Wine]
+Là gì: Kapag nagbukas ang game ng web page (button ng homepage, forum, suporta sa gumawa…), bubuksan ito sa browser ng phone mo.
+Vì sao chỉnh: I-on kung kailangan mong magbukas ng web page mula sa game, hal. guide page o page ng update ng game.
+Chỉnh thế nào: Default: naka-off. Kapag naka-on, lilipat ka sa browser kapag nagbukas ng page ang game at pansamantalang hihinto ang game; bumalik sa app para ituloy.
+
+[Mức tính năng VKD3D]
+Là gì: Ang DirectX 12 feature level na sinasabi ng VKD3D sa game. May epekto lang kapag hindi None ang Bersyon ng VKD3D.
+Vì sao chỉnh: Palitan kapag sabi ng DirectX 12 game ay hindi suportado ang feature level, hindi ito nagbubukas o kusang nagsasara pagpasok.
+Chỉnh thế nào: Hayaan sa 12_1 (default). Mas mataas ang hinihingi ng game: subukan ang 12_2. Kusang nagsasara pagbukas: subukan ang 12_0 o 11_1. Hindi pinapansin ng VKD3D ang 10_x at 9_x.
+
+[Ngôn ngữ vùng (LC_ALL)]
+Là gì: Ang wika at rehiyon na sinasabi ng emulated na Windows sa game. Ito ang nagtatakda ng character encoding, napakahalaga sa lumang Japanese at Chinese game.
+Vì sao chỉnh: Kapag mali ang rehiyon, puwedeng magulo ang text o pangalan ng file, o mag-crash ang Japanese game (KiriKiri, Siglus, NScripter, Wolf RPG…). Kadalasang tama pa rin ang isinaling bersyon kapag naka-ja_JP.
+Chỉnh thế nào: Kapag nagdagdag ng game, kusang pinipili ng app ang ja_JP sa Japanese game. Magulo ang text o nag-crash: ja_JP sa Japanese game, zh_CN o zh_TW sa Chinese game. Kung walang error, hayaan ito.
+
+[Nhập độc quyền]
+Là gì: Kapag naka-on, isang uri ng controller ang pipiliin mo para sa game: XInput o DInput; kapag parehong naka-off, walang controller ang game. Kapag naka-off ito, nakikita ng game ang controller sa parehong uri. Para sa totoo at virtual na controller, hindi sa mouse at keyboard.
+Vì sao chỉnh: I-on para hindi madoble ang controller sa game (isang button, dalawang utos). May DInput game, gaya ng Rayman Origins o NFS Most Wanted 2005, na kailangang naka-off ito.
+Chỉnh thế nào: Default: naka-on, XInput ang gamit. Kung hindi nakikilala ng lumang game ang controller: i-on ang setting na I-on ang DInput. Kung ayaw pa rin, i-off ang Exclusive input.
+
+[Phiên bản Box64]
+Là gì: Isinasalin ng Box64 ang code ng computer program (x86-64) sa code ng chip ng phone (ARM) para patakbuhin ang Wine at game. Lumalabas lang ito kapag hindi arm64ec ang Wine/Proton.
+Vì sao chỉnh: Palitan kapag nagka-crash, nag-hang, mabagal o kakaiba ang error ng game, o kapag sinabihan kang gumamit ng partikular na bersyon ng Box64.
+Chỉnh thế nào: Default: 0.4.2 (naka-install na). Kailangan ng internet ang may nakasulat na “Download”. Kung lumala ang game matapos magpalit, ibalik sa 0.4.2. Sa mahinang phone: hayaan sa default.
+
+[Phiên bản DXVK]
+Là gì: Ang DXVK na nagta-translate ng DirectX 8–11 sa Vulkan. Ang may arm64ec ay diretsong tumatakbo sa chip ng phone para sa 64-bit na game; ang may async o gplasync ay nagko-compile ng shader (code ng effects) sa background.
+Vì sao chỉnh: Palitan kapag may graphics error, kusang nagsasara pagbukas, o madalas mag-stutter ang game sa bagong effect.
+Chỉnh thế nào: Default: 2.3.1 (Mali na phone: 1.10.3). Mali na phone o lumang driver: gamitin ang 1.10.3. Kapag VKD3D ang gamit, kailangan ang 2.x. Mahinang phone, 64-bit na game: puwede mong subukan ang arm64ec; kapag nag-error, bumalik.
+
+[Phiên bản FEXCore]
+Là gì: Ang FEXCore, emulator na nagpapatakbo ng computer code (x86) ng game sa chip ng phone. Para sa 64-bit na game, at sa 32-bit na game kapag FEXCore ang pinili.
+Vì sao chỉnh: Palitan kapag kusang nagsasara, nag-hang o mali ang takbo ng game at hindi naayos ng pagpapalit ng FEXCore Preset.
+Chỉnh thế nào: Hayaan sa 2601 (kasama na, default). Sumubok lang ng iba kapag may error ang game; kailangan ng internet ang may nakasulat na Download. Kung lumala, bumalik sa 2601.
+
+[Phiên bản VKD3D]
+Là gì: Ang VKD3D-Proton ay nagta-translate ng DirectX 12 sa Vulkan. Sa None, hindi ito ginagamit, kaya DirectX 12 lang na kasama ng Wine ang natitira, na napakalimitado.
+Vì sao chỉnh: Kailangan ito ng DirectX 12 game; kapag None, kadalasang hindi tatakbo ang DirectX 12 game.
+Chỉnh thế nào: Hindi DirectX 12 ang game: hayaan sa None (default). DirectX 12 game: piliin ang 2.14.1, kapag nag-error subukan ang 2.8; dapat 2.x ang DXVK. Napakabigat ng DirectX 12 game, mahirap patakbuhin nang smooth sa mahinang phone.
+
+[Phiên bản Vulkan]
+Là gì: Ang Vulkan version (graphics standard na gamit ng DXVK, VKD3D, Zink) na sinasabi sa game. Numero lang ang binabago nito, hindi nito pinalalakas o pinahihina ang driver.
+Vì sao chỉnh: Bihirang kailangang baguhin. Hayaan sa default kung walang error ang game.
+Chỉnh thế nào: Hayaan sa 1.3 (default). Kailangan ng DXVK 2.x at VKD3D ang 1.3: kapag ibinaba sa 1.2 o 1.1, hindi sila tatakbo. Subukan lang ibaba kapag DXVK 1.10.3 o WineD3D ang gamit ng game at may error pa rin.
+
+[Phiên bản WOWBox64]
+Là gì: Ang WOWBox64 ay Box64 na nagpapatakbo ng 32-bit na program (kadalasang lumang game) sa Wine/Proton arm64ec. Ginagamit lang kapag WOWBox64 ang “32-bit emulator”.
+Vì sao chỉnh: Palitan kapag nagka-crash, nag-hang, mabagal o kakaiba ang error ng 32-bit na game, o kapag sinabihan kang gumamit ng partikular na bersyon.
+Chỉnh thế nào: Default: 0.4.2 (naka-install na). Kailangan ng internet ang may nakasulat na “Download”. Kung lumala ang game matapos magpalit, ibalik sa 0.4.2.
+
+[Preset Box64]
+Là gì: Mga nakahandang setting para sa Box64 at WOWBox64, para timbangin ang ligtas at mabilis na takbo: Katatagan, Compatibility, Intermediate, Performance (mula pinakaligtas hanggang pinakamabilis).
+Vì sao chỉnh: Palitan kapag nagka-crash, nag-hang o kakaiba ang error ng game (pumili ng mas ligtas), o kapag ayos ang takbo pero mabagal (pumili ng mas mabilis).
+Chỉnh thế nào: Default: Compatibility. May error ang game: subukan ang Katatagan. Gusto ng mas mabilis: subukan ang Intermediate, saka Performance; kapag nag-error, bumalik. Sa Unity game, gamitin ang Compatibility o Katatagan.
+
+[Preset FEXCore]
+Là gì: Mga nakahandang setting para sa FEXCore, para timbangin ang ligtas at mabilis na takbo: Katatagan, Compatibility, Intermediate, Performance (mula pinakaligtas hanggang pinakamabilis).
+Vì sao chỉnh: Palitan kapag nagka-crash, nag-hang o kakaiba ang error ng game (pumili ng mas ligtas), o kapag ayos ang takbo pero mabagal (pumili ng mas mabilis).
+Chỉnh thế nào: Default: Intermediate. May error ang game, lalo na ang game na maraming thread: subukan ang Compatibility, saka Katatagan. Gusto ng mas mabilis: subukan ang Performance; kapag nag-error, bumalik sa Intermediate.
+
+[Processor Affinity (32-bit apps)]
+Là gì: Pumipili ng CPU core para sa 32-bit na Windows program na tumatakbo sa environment na ito.
+Vì sao chỉnh: Kung may sariling core na napili ang game sa Pumili ng CPU core, iyon din ang gagamitin ng 32-bit na program; kung wala, ito ang gagamitin. Bihirang kailangang baguhin.
+Chỉnh thế nào: Hayaan sa default. Para sumubok, malalakas na core lang ang iwan, kadalasan ang malalaking numero (hal. CPU4–CPU7).
+
+[Renderer]
+Là gì: Paano iginuguhit ng app ang larawan ng game sa screen ng phone: Vulkan (default) o EGL, ang klasikong paraan gamit ang OpenGL ES.
+Vì sao chỉnh: Palitan kapag black screen, kumikislap, sira ang larawan o agad nagsasara ang app pagbukas ng game.
+Chỉnh thế nào: Default: Vulkan (may filter gaya ng Snapdragon Super Resolution). May display error: subukan ang EGL; Bilinear at Pinakamalapit na punto lang ang filter ng EGL. Buksan ulit ang game para mag-apply.
+
+[Toàn màn hình cho mọi game]
+Là gì: Ini-stretch ang larawan ng lahat ng game para mapuno ang screen ng phone, walang itim na gilid, para sa Windows game at sa Magaang Takbo na game.
+Vì sao chỉnh: I-on kapag gusto mong punong-puno ang screen. Mas mahaba ang screen ng phone kaysa sa frame ng game, kaya bahagyang lalapad ang larawan (medyo tataba ang mga karakter).
+Chỉnh thế nào: Default: naka-off (tamang ratio). Ang game na may sariling pili sa "I-stretch sa buong screen" sa settings ng game ay susunod sa pili nito. Mag-a-apply sa susunod na pagbukas ng game.
+
+[Sao lưu bản lưu cho mọi game]
+Là gì: Kapag naka-on, tuwing nagsasara ang game, kusang hahanapin at iko-compress ng app ang saves nito sa folder na AGVN-Player/Saves/<pangalan ng game>/ sa storage ng phone.
+Vì sao chỉnh: I-on para hindi mawala ang progress kapag nag-error ang game, nabura ang data o in-install ulit ang app.
+Chỉnh thế nào: Default: naka-off. Nai-back up lang ang game na nahanapan ng app ng sariling save folder. Isang pinakabagong auto backup ang itinatago sa bawat game; para magtago ng higit pa, pindutin ang “I-back up ngayon” sa Mga save ng game.
+
+[Shader Async]
+Là gì: Pinapagawa sa DXVK ang shader (maliit na program na gumagawa ng visual effect) sa background para hindi tumigil at maghintay ang game. May epekto lang sa DXVK na may async o gplasync sa pangalan.
+Vì sao chỉnh: I-on kapag nag-i-stutter ang game tuwing may bagong eksena, bagay o effect.
+Chỉnh thế nào: Default: naka-off. I-on para subukan kung nag-i-stutter ang game; kapalit nito, puwedeng bahagyang mahuli ang paglabas ng bagay o effect. Kung may kulang o kumikislap ang larawan, i-off. Buksan ulit ang game para mag-apply.
+
+[Tiện ích Vulkan đã tắt]
+Là gì: Listahan ng Vulkan extension (dagdag na feature ng graphics driver) na itinatago ng app, para hindi magamit ng game, DXVK, VKD3D at Zink. Pinaghihiwalay ng comma ang mga pangalan.
+Vì sao chỉnh: Gamitin kapag ang isang extension ng driver ay nagpapa-crash sa game, nagpapa-black screen o nagdudulot ng graphics error; kapag itinago ito, ibang paraan ang gagamitin ng game.
+Chỉnh thế nào: Default: walang laman. Punan lang kapag sinabihan, i-type nang tama ang pangalan (nagsisimula sa VK_). Tatanggalin ang mga space. Kung lumala ang game, burahin ulit. Buksan ulit ang game para mag-apply.
+
+[Trình chiếu chính xác]
+Là gì: Kapag DisplayX lang ang Renderer ng display. Kapag naka-on, bawat frame ay itinatapat sa eksaktong isang refresh ng screen, batay sa timestamp na ibinibigay ng Android.
+Vì sao chỉnh: Puwedeng mas pantay ang paglabas ng frames kapag hindi mababa ang FPS pero may bahagyang stutter pa rin.
+Chỉnh thế nào: Hayaang naka-off (default). I-on para subukan kung may bahagyang stutter; kung walang pagbabago o mas na-delay, i-off ulit. May epekto lang sa Android 13 pataas; nilalaktawan ito sa mas lumang phone.
+
+[Trình chiếu theo tần số quét]
+Là gì: Sa DisplayX lang. Naka-on: pinagsasama ang frames at ipinapadala sa screen ayon sa refresh rate ng phone. Naka-off: ipinapadala agad pagkatapos iguhit ng game.
+Vì sao chỉnh: I-on para pantay ang paglabas ng larawan ayon sa screen. Kapag naka-off, puwedeng bumaba ang delay ng kontrol, pero puwedeng hindi pantay ang larawan.
+Chỉnh thế nào: Default: naka-on. Kung may delay ang kontrol, subukang i-off; kung nag-i-stutter o kumikislap ang larawan, i-on ulit.
+
+[Tên]
+Là gì: Pangalan ng environment o ng game (lumalabas sa library). Sa kahong Magdagdag ng environment variable, ito ang pangalan ng variable na ita-type mo.
+Vì sao chỉnh: Tumutulong ang pangalan na makilala ang mga game at environment, hindi nito binabago ang takbo ng game. Pero dapat tama ang pagkaka-type ng pangalan ng variable para gumana ito.
+Chỉnh thế nào: Hindi puwede sa pangalan ng game ang \ / : * ? " < > | (magiging _). Kapag pinalitan ang pangalan ng game, nasa folder na may lumang pangalan pa rin ang mga lumang backup. Walang space ang pangalan ng variable, hal. DXVK_HUD.
+
+[Tên GPU]
+Là gì: Pangalan ng graphics card na nakikita ng game. Ang Device ay totoong pangalan ng GPU ng phone; pumili ng ibang pangalan para magkunwaring graphics card ng computer (pati vendor ID at device ID).
+Vì sao chỉnh: May game na ayaw tumakbo, nagsasabing hindi suportado ang graphics card, o maling setting ang pinipili kapag nakita ang GPU ng phone.
+Chỉnh thế nào: Hayaan sa Device (default). Kapag sabi ng game ay hindi suportado ang graphics card: subukan ang NVIDIA GeForce GTX 1060. Hindi nito pinalalakas ang phone.
+
+[Tính shader chính xác]
+Là gì: Kapag naka-on, hihilingin ng WineD3D sa driver na huwag gamitin ang mabilis pero tantiyang pagkalkula ng shader (maliit na program na gumagawa ng visual effect). May epekto lang sa WineD3D na gl ang renderer.
+Vì sao chỉnh: Bihirang kailangang baguhin. Sa OpenGL driver ng app (Zink, Freedreno), halos walang pagbabago sa bilis o larawan.
+Chỉnh thế nào: Default: naka-on. Hayaan ito kung normal ang takbo ng game. Kung na-off mo at walang pagbabago o lumala ang larawan, i-on ulit.
+
+[Tạm dừng game khi ứng dụng chạy nền]
+Là gì: Kapag umalis ka sa app (bumalik sa home screen, nagbukas ng ibang app o pinatay ang screen), tuluyang ipo-pause ang game para hindi tumakbo sa background.
+Vì sao chỉnh: Tipid sa baterya at hindi gaanong umiinit ang phone kapag pansamantala kang umalis sa game; pagbalik sa app, tuloy ang game.
+Chỉnh thế nào: Hayaang naka-on (default). Sa bersyong ito, laging naka-pause ang game kapag umalis ka sa app, naka-on man o naka-off ang switch. Para tuloy pa rin ang game habang may ibang ginagawa, gamitin ang “Floating window” sa menu ng game.
+
+[Tắt chuột]
+Là gì: Hindi na makokontrol ng tap at swipe sa screen ang mouse sa game. Gumagana pa rin nang normal ang on-screen keys, controller at external mouse.
+Vì sao chỉnh: I-on kapag puro on-screen keys o controller ang gamit mo at madalas kang may aksidenteng tap na nagpapagala sa cursor o maling click.
+Chỉnh thế nào: Default: naka-off. Kapag naka-on, hindi na mabubuksan ang menu sa tap ng 4 na daliri, kaya gamitin ang Back button. Puwedeng i-on/i-off agad sa menu ng game (switch na “I-off ang mouse”).
+
+[Tắt Present Wait]
+Là gì: Ino-off ang present wait feature ng driver. Hinahayaan nito ang game (sa DXVK 2.x, VKD3D) na maghintay hanggang talagang lumabas sa screen ang frame para itugma ang timing.
+Vì sao chỉnh: Sa ilang driver, puwede itong magpa-freeze o magpa-hang sa game, o magdulot ng regular na stutter.
+Chỉnh thế nào: Hayaang naka-off (default). Kung nagfi-freeze o nag-hang ang game habang naglalaro, o may regular na stutter: subukang i-on; kung hindi gumanda, i-off ulit. Walang epekto sa DXVK 1.10.3.
+
+[Tắt XInput]
+Là gì: Kapag naka-on, walang controller na nakikilala ang game na ito (totoong controller o controller button sa on-screen keys), mouse at keyboard lang. Gumagana pa rin ang on-screen key na naka-assign sa key o mouse.
+Vì sao chỉnh: Para sa pagkakataong ginugulo ng controller ang mga key ng game na ito o kusang tumatakbo ang karakter.
+Chỉnh thế nào: Hayaang naka-off (default). I-on lang kapag nag-e-error ang game na ito dahil sa controller. Para i-off ang controller sa lahat ng game, gamitin ang I-off ang XInput (mouse/keyboard lang) sa Settings. Pagkapalit, buksan ulit ang game.
+
+[Tắt XInput (chỉ dùng chuột/bàn phím)]
+Là gì: Kapag naka-on, walang controller na nakikilala ang lahat ng game (totoong controller o controller button sa on-screen keys), mouse at keyboard lang. Gumagana pa rin ang on-screen key na naka-assign sa key o mouse.
+Vì sao chỉnh: Para sa pagkakataong ginugulo ng controller (totoong controller o controller button sa on-screen keys) ang mga key ng game o kusang tumatakbo ang karakter.
+Chỉnh thế nào: Hayaang naka-off (default). Para i-off lang sa isang game, gamitin ang I-off ang XInput sa settings ng game na iyon. Pagkapalit, buksan ulit ang game.
+
+[Tự động sao lưu]
+Là gì: Tuwing nagsasara ang game, kusang bina-back up ng app ang save folder ng game. Laging pinapalitan ng bagong auto backup ang luma, at hindi nagagalaw ang mga backup na ikaw mismo ang gumawa.
+Vì sao chỉnh: I-on para hindi mo na kailangang tandaang mag-back up, kung sakaling masira ang save o aksidente mong mabura ang game.
+Chỉnh thế nào: Gumagana lang kapag nahanap na ng app ang sariling save folder (tingnan ang “Mga lokasyon ng save ng game”). Lumabas gamit ang power button sa menu ng game, huwag i-swipe pasara ang app. Kapag naka-on ang “I-back up ang saves ng lahat ng game”, laging naka-on ito.
+
+[Visual C++ 2010]
+Là gì: Ang Visual C++ 2010 runtime library (msvcp100, msvcr100) na kailangan ng maraming game at tool para mabuksan.
+Vì sao chỉnh: Tinutulungan ng Orihinal (Windows) na tumakbo nang stable ang game na nangangailangan ng Visual C++ 2010. Kulang minsan ang features ng gawa ng Wine, kaya nag-e-error o nagka-crash ang game pagbukas.
+Chỉnh thế nào: Hayaan sa Orihinal (Windows) (default). Huwag palitan ng Kasama na (Wine), maliban kung may sariling gabay para sa game na iyon.
+
+[Vẽ ngoài màn hình]
+Là gì: Paano iginuguhit ng WineD3D ang pansamantalang larawan na hindi pa lumalabas sa screen: fbo (bagong paraan) o backbuffer (lumang paraan). May epekto lang sa WineD3D na gl ang renderer.
+Vì sao chỉnh: Palitan lang kapag black screen o may graphics error ang game sa WineD3D at hindi naayos ng ibang paraan.
+Chỉnh thế nào: Default: fbo, hayaan ito. Subukan lang ang backbuffer kapag nasubukan na ang lahat; kung lumala, ibalik sa fbo. Buksan ulit ang game para mag-apply.
+
+[Wine / Proton]
+Là gì: Ang Wine/Proton na nagpapatakbo ng Windows game. Ang arm64ec ay diretsong pinapatakbo ang Wine sa chip ng phone at x86 code lang ng game ang ine-emulate; ang x86_64 ay ine-emulate ang lahat sa Box64.
+Vì sao chỉnh: Bawat bersyon ay bagay sa iba't ibang game. Palitan kapag hindi nagbubukas o nagka-crash ang game at hindi naayos ng ibang setting.
+Chỉnh thế nào: Gamitin ang Proton 9 arm64ec (kasama na, kadalasang mas mabilis). Mapipili lang kapag gumagawa ng bagong environment; ang may nakasulat na Download ay kailangang i-download muna. Kapag may error ang game, gumawa ng bagong environment na may ibang bersyon.
+
+[XAudio]
+Là gì: Ang XAudio2, X3DAudio, XACT audio library (bersyon 2.0 hanggang 2.7) na gamit ng maraming DirectX 9–11 game para sa tunog.
+Vì sao chỉnh: Palitan kapag walang tunog, may garalgal, umuulit ang tunog, o nagka-crash ang game habang may tunog.
+Chỉnh thế nào: Hayaan sa Kasama na (Wine) (default). Kapag may error sa tunog, subukan ang Orihinal (Windows). Hindi apektado nito ang bagong game na XAudio 2.8/2.9 ang gamit.
+
+[Đặt khóa API SteamGrid? (Ảnh bìa)]
+Là gì: Hinahayaan kang ilagay ang sarili mong key para sa SteamGridDB, isang cover art service. Ang API key ay personal na code para payagan ang app na mag-download ng larawan mula sa service na iyon.
+Vì sao chỉnh: Kusang nagda-download ng cover mula sa SteamGridDB ang Big Picture mode gamit ang sariling key ng app. Kailangan lang ng sariling key kapag hindi ma-download ang cover mula roon.
+Chỉnh thế nào: Default: naka-off, kadalasang hindi kailangan. I-on, i-paste ang key sa kahong “SteamGridDB API key”, pindutin ang I-save; kapag in-off ulit, mabubura ang naka-save na key. Gawa na sa phone ang cover sa library, hindi gamit ang key na ito.
+
+[Định dạng bề mặt]
+Là gì: Ayos ng color channel ng frame (RGBA o BGRA) na gamit ng game at app sa pagpapasa ng larawan.
+Vì sao chỉnh: Kapag mali ang format, puwedeng magkapalit ang kulay, hal. nagiging asul ang pula, o nagiging asul ang balat ng tao.
+Chỉnh thế nào: Hayaan sa default: BGRA sa Vulkan at EGL, RGBA sa DisplayX (kusang itinatakda kapag pinalitan ang Renderer ng display). Kapag magkapalit ang kulay, piliin ang isa pa.
+
+[Đồng bộ cấu trúc CPU]
+Là gì: Kapag naka-on, sasabihin ng Wine sa game ang eksaktong CPU core na pinili mo sa Pumili ng CPU core, sa halip na lahat ng core ng phone.
+Vì sao chỉnh: Kung nagbawas ka ng core pero akala pa rin ng game ay kumpleto, puwedeng hatiin nito ang trabaho sa sobrang daming thread at mag-stutter. I-on para hatiin ng game ang trabaho ayon sa totoong bilang ng core na gamit.
+Chỉnh thế nào: Default: naka-off. I-on lang kapag nagbawas ka ng core sa Pumili ng CPU core. Kung bumagal o nag-error ang game, i-off ulit.
+
+[Đồng bộ khung hình]
+Là gì: Pinaghihintay ang game hanggang matapos iguhit ng GPU ang bawat frame bago ito ipadala sa screen.
+Vì sao chỉnh: Puwedeng maayos ang pagkislap, itim na kurap o sirang frame; kapalit nito, bababa ang FPS.
+Chỉnh thế nào: Hayaang naka-off (default). I-on lang kapag kumikislap o may error ang larawan at hindi naayos ng pagpapalit ng Present mode ng driver. Sa mahinang phone, hayaang naka-off dahil kumakain ito ng FPS.
+
+[Đổi kênh màu đỏ/xanh dương]
+Là gì: Pinagpapalit ang pula at asul sa larawan ng game kapag Vulkan ang pagguhit.
+Vì sao chỉnh: Gamitin lang kapag magkapalit ang kulay ng game, hal. asul ang balat ng tao, asul ang apoy.
+Chỉnh thế nào: Default: naka-off. I-on lang para subukan kapag magkapalit ang kulay. Kung hindi nagbago ang kulay, i-off ulit at subukang palitan ang “Surface format” (RGBA/BGRA) sa Video ng environment.
+
+[Độ phân giải]
+Là gì: Laki ng emulated na Windows screen kung saan gumuguhit ang game, saka ito pinapalaki para magkasya sa screen ng phone.
+Vì sao chỉnh: Mas mababa: mas magaan at mas malamig ang phone (pero hindi dodoble ang bilis), mas malabo ang larawan. Mas mataas: mas matalas pero mas mabigat at mas mainit.
+Chỉnh thế nào: Mahinang phone: 854x480 (16:9); mid-range: 960x544 (16:9); malakas na phone: 1280x720 (16:9). May sariling antas ang game na idinagdag sa app, at binabago rin ito ng I-adjust ang Graphics sa library. Piliin ang Custom para mag-type mismo.
+
+[Độ phân giải tùy chỉnh]
+Là gì: Kahon para i-type mismo ang resolution, lumalabas kapag pinili mo ang Custom sa Resolution.
+Vì sao chỉnh: Gamitin kapag kailangan ang laking wala sa listahan, hal. para tumugma sa ratio ng screen ng phone o para lalo pang bawasan sa mahinang phone.
+Chỉnh thế nào: I-type bilang LAPADxTAAS, hal. 1024x576; puwede ang maliit o malaking x, bawat panig mula 200 hanggang 7680. Kapag mali ang na-type, mananatili ang lumang resolution. Sa mahinang phone, manatili sa mga 854x480 hanggang 960x544.
+
+[Độ trễ khung hình tối đa]
+Là gì: Kapag naka-on, hanggang 1 frame lang ang puwedeng ihanda nang maaga ng game sa DXVK (DirectX 10/11 game).
+Vì sao chỉnh: Binabawasan ang delay mula sa pagpindot mo hanggang sa pagtugon ng larawan, bagay sa action game.
+Chỉnh thế nào: Hayaang naka-off (default). I-on kung may delay ang kontrol; kapag bumaba ang FPS o lumala ang stutter, i-off ulit. Sa mahinang phone, hayaang naka-off.
+
+[Ẩn thanh tải khi mở game]
+Là gì: Tinatanggal ang loading screen na “Nagsisimula…” (pangalan ng game, cover, progress bar) pagbukas ng game, at ang loading screen paglabas sa game.
+Vì sao chỉnh: I-on kung madalas maipit ang game sa screen na “Nagsisimula…”: kapag walang loading screen, mabubuksan mo pa rin ang menu ng game gamit ang Back button para lumabas.
+Chỉnh thế nào: Default: naka-off. Hindi nito pinabibilis ang pagbukas ng game. Habang naglo-load ang game, puwedeng makakita ka ng black screen nang ilang segundo, normal iyon.

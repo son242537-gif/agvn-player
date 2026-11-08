@@ -1,0 +1,572 @@
+# AGVN Player: penjelasan untuk tombol "?" di samping tiap pengaturan (Bahasa Indonesia).
+# Terjemahan dari setting-help.txt. Tiap entri berisi 4 baris:
+#   [Nama pengaturan dalam bahasa Vietnam, persis seperti di setting-help.txt: ini kunci pencarian]
+#   Là gì: ...
+#   Vì sao chỉnh: ...
+#   Chỉnh thế nào: ...
+# Baris yang diawali "#" adalah catatan. Awalan baris dan baris [...] jangan diterjemahkan.
+
+[Async]
+Là gì: Mengompilasi shader (kode efek gambar) di latar belakang, bukan membuat game berhenti menunggu. Hanya berlaku untuk versi DXVK yang bernama async atau gplasync.
+Vì sao chỉnh: Mengurangi patah-patah saat pertama kali bertemu adegan atau efek baru.
+Chỉnh thế nào: Biasanya aktif sendiri saat Anda memilih DXVK async; sebaiknya biarkan aktif, terutama di ponsel lemah. Jika objek atau efek sesaat hilang, berkedip, atau game error, coba matikan.
+
+[Biến]
+Là gì: Pilih variabel lingkungan yang ingin ditambahkan. Variabel lingkungan adalah baris pengaturan yang dikirim ke Wine, driver, atau DXVK saat game dibuka. Pilih “Kustom…” untuk mengetik nama sendiri.
+Vì sao chỉnh: Dipakai saat Anda diminta menambahkan variabel tertentu untuk memperbaiki error atau menguji performa.
+Chỉnh thế nào: Tambahkan hanya variabel yang Anda tahu fungsinya. Pilih nama lalu ketuk “Tambah”, kemudian atur Nilai. Variabel di game menimpa variabel bernama sama dari lingkungan.
+
+[Box64 Preset]
+Là gì: Set pengaturan siap pakai untuk Box64 dan WOWBox64, menyeimbangkan aman dan cepat: Stabil, Kompatibel, Menengah, Performa (dari paling aman ke paling cepat).
+Vì sao chỉnh: Ganti saat game crash, macet, atau error aneh (pilih yang lebih aman), atau saat game lancar tapi lambat (pilih yang lebih cepat).
+Chỉnh thế nào: Default: Kompatibel. Game error: coba Stabil. Ingin lebih cepat: coba Menengah lalu Performa; jika error, kembali. Game Unity sebaiknya pakai Kompatibel atau Stabil.
+
+[Bật debug Wine]
+Là gì: Wine adalah bagian yang membuat game Windows berjalan di ponsel. Aktifkan ini agar Wine mencatat peringatan dan error ke file log di folder AGVN-Player/logs, plus tombol “Lihat log” di menu game.
+Vì sao chỉnh: Dipakai saat game crash, macet, atau menampilkan error dan Anda perlu mengirim log ke AGVN untuk dibantu.
+Chỉnh thế nào: Default mati. Aktifkan, buka game sampai error, keluar, lalu di Pustaka ketuk ⋮ pada game itu → “Kirim log” (termasuk log Wine), atau ketuk “Ekspor log error” di atas Pengaturan. “Kanal debug Wine” biarkan default. Lalu matikan lagi karena log membuat game lebih lambat.
+
+[Bật DInput]
+Là gì: DInput (DirectInput) adalah cara lama membaca kontroler, sering dipakai game PC lawas.
+Vì sao chỉnh: Aktifkan saat game lama tidak mengenali kontroler. Saat Input eksklusif aktif, mengaktifkan DInput otomatis mematikan XInput: game hanya melihat kontroler lewat DInput, sebagai kontroler biasa, bukan kontroler Xbox.
+Chỉnh thế nào: Default mati. Hanya bisa diubah saat Input eksklusif aktif. Jika tombol kacau, kembali ke Aktifkan XInput, atau matikan Input eksklusif agar game melihat kontroler lewat kedua cara.
+
+[Bật File Provider]
+Là gì: Memungkinkan Anda melihat dan menyalin file di dalam AGVN Player (seperti drive C komputer Windows virtual) dengan pengelola file Android (aplikasi Files).
+Vì sao chỉnh: Berguna untuk menyalin save, font, atau file konfigurasi ke drive C game. Matikan jika tidak dipakai dan Anda tidak ingin aplikasi lain melihat data aplikasi ini.
+Chỉnh thế nào: Default aktif. Perubahan berlaku saat aplikasi dibuka berikutnya. Hati-hati menghapus atau mengganti nama file di sana karena bisa merusak lingkungan.
+
+[Bật log Box64]
+Là gì: Box64 adalah penerjemah yang membuat program untuk chip komputer (x86) berjalan di chip ponsel (ARM). Aktifkan ini agar Box64 menulis info tambahan ke log game.
+Vì sao chỉnh: Dipakai saat game crash atau macet tepat saat dibuka dan AGVN perlu melihat laporan Box64.
+Chỉnh thế nào: Default mati. Hanya berguna saat game berjalan dengan Box64, atau saat WOWBox64 dipilih di “Emulator 32-bit”; dengan FEXCore hampir tidak menambah apa pun. Setelah mengirim laporan error, matikan.
+
+[Bật nhật ký ứng dụng]
+Là gì: Mencatat log aplikasi itu sendiri (bagian Android: driver grafis, audio, layar…) selama bermain ke sebuah file di folder AGVN-Player/logs.
+Vì sao chỉnh: Berguna saat aplikasi tertutup sendiri, layar hitam, atau error terjadi di luar game, agar AGVN bisa menemukan penyebabnya.
+Chỉnh thế nào: Default mati. Aktifkan hanya saat perlu melaporkan error: aktifkan, main sampai error, lalu ketuk “Ekspor log error”. Setelah dikirim, matikan, karena tiap sesi main menambah satu file log yang memakan memori ponsel.
+
+[Bật tần số quét cao]
+Là gì: Refresh rate adalah berapa kali layar diperbarui per detik (60, 90, 120 Hz…). Jika aktif, saat bermain aplikasi meminta level tertinggi yang didukung layar.
+Vì sao chỉnh: Hanya berguna jika game bisa berjalan di atas 60 FPS (frame per detik) dan ponsel punya layar 90 Hz ke atas.
+Chỉnh thế nào: Default mati. Di ponsel lemah game biasanya hanya 24–30 FPS, jadi mengaktifkannya tidak membuat lebih lancar, malah boros baterai dan ponsel lebih panas. Ponsel lemah sebaiknya biarkan mati.
+
+[Bật XInput]
+Là gì: XInput adalah cara membaca kontroler Xbox yang dipakai sebagian besar game PC baru.
+Vì sao chỉnh: Pilih saat game mendukung kontroler Xbox. Saat Input eksklusif aktif, mengaktifkan XInput otomatis mematikan DInput, jadi game hanya melihat kontroler lewat XInput. Jika XInput dan DInput sama-sama mati, game tidak mengenali kontroler.
+Chỉnh thế nào: Default aktif. Hanya bisa diubah saat Input eksklusif aktif. Jika game lama tidak mengenali kontroler, pindah ke Aktifkan DInput.
+
+[Bắt chuột ngoài]
+Là gì: Saat Anda memakai mouse eksternal (kabel atau Bluetooth), aplikasi menahan mouse di dalam game: kursor Android disembunyikan, semua gerakan dan tombol mouse langsung masuk ke game.
+Vì sao chỉnh: Membuat putaran kamera di game 3D lebih mulus dan kursor tidak keluar dari game. Coba matikan jika mouse eksternal berperilaku aneh, sulit dikendalikan, atau klik tidak terbaca.
+Chỉnh thế nào: Default aktif. Jika tidak memakai mouse eksternal, ini tidak berpengaruh, layar sentuh tetap seperti biasa. Berlaku untuk semua game.
+
+[Bỏ qua X11]
+Là gì: Hanya ada di DisplayX. Jika aktif, frame game yang digambar dengan Vulkan (misalnya lewat DXVK, VKD3D) dikirim langsung ke layar, tanpa melewati lapisan perantara X11.
+Vì sao chỉnh: Bisa mengurangi latensi dan menaikkan FPS untuk game yang digambar dengan Vulkan. Jika game layar hitam, tidak menampilkan gambar, atau crash, matikan.
+Chỉnh thế nào: Default mati. Ingin mencoba agar lebih lancar, aktifkan lalu buka ulang game; jika gambar rusak, matikan lagi. Jika ragu, biarkan mati.
+
+[Bộ dựng hình]
+Là gì: Cara aplikasi menggambar layar Windows ke layar ponsel. Vulkan: default, ada filter perbesar dan penajaman. EGL: cara OpenGL ES lama. DisplayX: menyerahkan frame langsung ke Android.
+Vì sao chỉnh: Ganti saat layar hitam, berkedip, warna salah, atau Anda ingin mencoba cara yang lebih lancar di ponsel Anda.
+Chỉnh thế nào: Biarkan Vulkan. Jika gambar rusak, coba EGL. DisplayX melewati langkah penyalinan jadi bisa lebih ringan, tapi kaca pembesar tidak bisa dipakai. Mengubah ini otomatis mengatur ulang Format permukaan.
+
+[Bộ dựng hình Wine]
+Là gì: Memilih cara WineD3D menggambar 3D: gl memakai OpenGL (lewat driver OpenGL aplikasi), vulkan langsung memakai driver Vulkan. Hanya berlaku jika DX Wrapper adalah WineD3D.
+Vì sao chỉnh: Ganti saat game yang memakai WineD3D lambat, gambarnya rusak, atau tidak bisa dibuka.
+Chỉnh thế nào: Default: gl, cocok untuk paling banyak game. Coba vulkan jika gl error; perender vulkan WineD3D masih kurang fitur sehingga gambar game lama bisa rusak. Jika error, kembali ke gl.
+
+[Bộ dựng hình WineD3D]
+Là gì: Memilih cara WineD3D menggambar: gl memakai OpenGL, vulkan langsung memakai driver Vulkan, gdi mematikan 3D sepenuhnya dan hanya menggambar 2D. Hanya berlaku jika DX Wrapper adalah WineD3D.
+Vì sao chỉnh: Ganti saat game yang memakai WineD3D lambat, gambarnya rusak, atau tidak bisa dibuka.
+Chỉnh thế nào: Default: gl, cocok untuk paling banyak game. Coba vulkan jika gl error; gambar game lama bisa rusak dengan vulkan. Pilih gdi hanya untuk game 2D, karena game 3D tidak akan jalan.
+
+[Bộ nhớ thiết bị tối đa]
+Là gì: Jumlah memori grafis (VRAM, dalam MB) yang dilaporkan ke game. 0 berarti dilaporkan apa adanya. Ponsel memakai RAM bersama, jadi ini hanya angka yang dilihat game.
+Vì sao chỉnh: Ada game yang memilih kualitas gambar sesuai VRAM, atau melaporkan kurang memori video lalu tidak mau jalan.
+Chỉnh thế nào: Sebaiknya biarkan 0 (default). Jika game melaporkan kurang memori video: coba 2048 atau 4096. Menurunkan angka ini tidak menghemat RAM sungguhan (sudah diukur di ponsel asli), hanya berguna untuk game yang memilih level ringan sesuai VRAM.
+
+[Bộ nhớ video]
+Là gì: Jumlah memori grafis (VRAM), dalam MB, yang dilaporkan WineD3D ke game. Ini hanya angka untuk game, tidak memesan RAM sungguhan.
+Vì sao chỉnh: Ganti saat game yang memakai WineD3D melaporkan kurang memori grafis, tidak mengizinkan grafis tinggi, atau tidak mau jalan.
+Chỉnh thế nào: Default: 2048. Jika game melaporkan kurang memori grafis: coba 4096. Menurunkan angka ini tidak menghemat RAM, malah game DirectX 8/9 bisa melaporkan memori habis. Ponsel lemah: biarkan 2048.
+
+[Bộ nhớ video (MB)]
+Là gì: Jumlah memori grafis (VRAM), dalam MB, yang dilaporkan WineD3D ke game. Ini hanya angka untuk game, tidak memesan RAM sungguhan.
+Vì sao chỉnh: Ganti saat game yang memakai WineD3D melaporkan kurang memori grafis, tidak mengizinkan grafis tinggi, atau tidak mau jalan.
+Chỉnh thế nào: Default: 2048. Jika game melaporkan kurang memori grafis: coba 4096. Menurunkan angka ini tidak menghemat RAM, malah game DirectX 8/9 bisa melaporkan memori habis. Ponsel lemah: biarkan 2048.
+
+[Bộ đệm Async]
+Là gì: Menyimpan shader (kode efek gambar) yang sudah dikompilasi ke memori ponsel agar dipakai lagi di sesi berikutnya. Hanya ada di DXVK gplasync.
+Vì sao chỉnh: Sesi berikutnya lebih jarang tersendat, adegan lama lebih lancar saat didatangi lagi.
+Chỉnh thế nào: Aktif sendiri saat Anda memilih versi gplasync; sebaiknya biarkan aktif. Memakai sedikit ruang penyimpanan tambahan. Jika gambar game rusak setelah ganti driver atau DXVK: coba matikan.
+
+[Bộ đệm giả lập BCN]
+Là gì: Menyimpan texture BCn (gambar permukaan terkompresi ala PC) yang sudah didekompres ke memori ponsel agar dipakai lagi, tanpa dekompres ulang.
+Vì sao chỉnh: Membuat sesi berikutnya memuat lebih cepat dan lebih jarang tersendat saat masuk level.
+Chỉnh thế nào: Biarkan mati (default). Hanya berlaku saat aplikasi mendekompres texture dengan CPU (ponsel Mali, atau driver selain Turnip). Aktifkan jika game lambat memuat; memakai ruang penyimpanan tambahan.
+
+[Bộ đệm shader Async]
+Là gì: Menyimpan shader yang sudah dibuat DXVK ke memori internal agar dipakai lagi di sesi berikutnya, tanpa membuat ulang dari awal. Hanya berlaku untuk versi DXVK bernama gplasync.
+Vì sao chỉnh: Aktifkan untuk mengurangi patah-patah mulai sesi main kedua.
+Chỉnh thế nào: Default: mati. Sebaiknya aktifkan bersama Shader Async saat memakai versi 2.3.1-arm64ec-gplasync. Memakai sedikit ruang penyimpanan tambahan. Jika game error setelah diaktifkan, matikan.
+
+[Chia sẻ bộ nhớ tạm Android với Wine]
+Là gì: Clipboard adalah tempat menyimpan teks yang baru Anda salin. Jika aktif, teks yang disalin di ponsel bisa ditempel ke game, dan teks yang disalin di game bisa ditempel di aplikasi lain.
+Vì sao chỉnh: Berguna untuk menempel nama atau kode aktivasi ke game, atau menyalin teks game ke aplikasi penerjemah (jika game mengizinkan salin teks).
+Chỉnh thế nào: Default mati. Hanya berbagi teks, bukan gambar. Matikan jika tidak perlu agar game tidak bisa membaca apa yang Anda salin, seperti kata sandi.
+
+[Chuột tương đối]
+Là gì: Mengirim gerakan mouse ke game sebagai “bergeser seberapa jauh”, bukan posisi kursor. Berlaku untuk mouse eksternal dan usapan gaya touchpad.
+Vì sao chỉnh: Aktifkan untuk game 3D yang memutar kamera dengan mouse (tembak-menembak, RPG 3D) saat kamera tidak berputar, berputar patah-patah, atau tersangkut di tepi layar.
+Chỉnh thế nào: Default mati. Visual novel dan game menu sebaiknya biarkan mati. Bisa diaktifkan/dimatikan langsung di menu game (sakelar “Mouse relatif”) untuk mencoba cepat.
+
+[Chế độ dựng hình]
+Là gì: Hanya tampil dengan driver Turnip (ponsel chip Snapdragon, GPU Adreno). Memilih cara GPU menggambar: Sysmem langsung ke RAM; Gmem membagi gambar jadi petak kecil dan menggambar di memori cepat GPU.
+Vì sao chỉnh: Ganti saat gambar game rusak (berkedip, bergaris, bercak hitam, pecah) atau ingin mencoba cara yang FPS-nya lebih tinggi.
+Chỉnh thế nào: Biarkan None (driver memilih sendiri). Jika gambar rusak, coba Sysmem. Autotuner Profiled: driver mengukur sendiri lalu memilih yang lebih cepat, FPS bisa naik turun. Coba Gmem hanya jika cara lain tidak cocok.
+
+[Chế độ hiệu năng]
+Là gì: Hanya ada di DisplayX. Memberi tahu Android bahwa alur pengiriman frame harus mengejar refresh rate, agar sistem menaikkan clock CPU saat perlu.
+Vì sao chỉnh: Membuat frame keluar lebih rata, lebih jarang tersendat. Sebagai gantinya ponsel bisa lebih hangat dan lebih boros baterai.
+Chỉnh thế nào: Default aktif. Jika ponsel cepat panas atau baterai cepat habis, coba matikan. Butuh Android 13 ke atas; di ponsel yang lebih lama, aktif atau mati sama saja.
+
+[Chế độ khởi động]
+Là gì: Memilih layanan latar Windows (di Wine) yang dinyalakan saat membuka game atau lingkungan.
+Vì sao chỉnh: Mematikan sebagian layanan bisa membuat mulai sedikit lebih ringan, tapi beberapa game dan installer butuh layanan ini agar berjalan benar.
+Chỉnh thế nào: Biarkan Penting (default): mematikan layanan Plug and Play dan RPC agar ringan. Normal: menyalakan semua layanan seperti Wine asli, pilih saat game atau installer melaporkan error layanan. Minimal mematikan lebih banyak layanan, termasuk pemasangan .msi.
+
+[Chế độ trình chiếu]
+Là gì: Cara aplikasi menampilkan gambar game ke layar saat Perender adalah Vulkan. fifo menunggu tepat irama refresh layar; mailbox selalu menampilkan frame terbaru.
+Vì sao chỉnh: Ganti saat kontrol terasa terlambat atau gambar tampil tidak rata.
+Chỉnh thế nào: Sebaiknya biarkan fifo (default, stabil). Ingin kontrol lebih responsif, coba mailbox; ponsel yang tidak mendukung mailbox otomatis memakai fifo. Ponsel lemah biarkan fifo.
+
+[Chế độ trình chiếu của driver]
+Là gì: Cara game mengirim frame ke layar lewat Vulkan (DXVK, VKD3D, Zink). mailbox: tampilkan frame terbaru. fifo: tunggu irama layar. immediate: tidak menunggu. relaxed: seperti fifo, frame telat langsung tampil.
+Vì sao chỉnh: Ganti saat gambar berkedip, berkilat, robek horizontal, atau patah-patah.
+Chỉnh thế nào: Sebaiknya biarkan mailbox (default). Jika gambar berkedip atau berkilat, terutama game OpenGL lewat Zink: coba fifo. immediate dan relaxed bisa membuat gambar robek, coba hanya jika perlu.
+
+[Chế độ vẽ ngoài màn hình]
+Là gì: Cara WineD3D menggambar gambar sementara yang belum tampil di layar: fbo (cara baru) atau backbuffer (cara lama). Hanya berlaku saat memakai WineD3D dengan perender gl.
+Vì sao chỉnh: Ganti hanya saat game dengan WineD3D layar hitam atau gambarnya rusak dan cara lain tidak berhasil.
+Chỉnh thế nào: Default: fbo, sebaiknya tetap. Coba backbuffer hanya setelah semua cara lain dicoba; jika lebih buruk, pilih lagi fbo. Buka ulang game untuk menerapkan.
+
+[Chọn nhân CPU]
+Là gì: Inti CPU yang boleh dipakai game (CPU0, CPU1…). Kotak putih adalah inti yang sedang dipilih.
+Vì sao chỉnh: Menahan game di inti yang kuat bisa membuat game berjalan lebih stabil di beberapa ponsel. Memilih terlalu sedikit inti membuat game lambat.
+Chỉnh thế nào: Biarkan semua terpilih (default). Ingin mencoba, sisakan hanya inti kuat, biasanya nomor besar (misalnya CPU4–CPU7). Jika tidak ada inti yang dipilih, game memakai semuanya.
+
+[Chọn nhân CPU (ứng dụng 32-bit)]
+Là gì: Memilih inti CPU untuk program 32-bit di lingkungan ini. Tidak berlaku untuk game yang dibuka dari Pustaka: game memakai “Pilih inti CPU” di Pengaturan game.
+Vì sao chỉnh: Hanya perlu jika diminta, misalnya game 32-bit sangat lama error saat memakai banyak inti, atau ingin menahan program di inti tertentu.
+Chỉnh thế nào: Sebaiknya biarkan pilihan yang ada. Ketuk CPU0, CPU1… untuk memilih/melepas; kotak putih adalah inti terpilih. Jika semua dilepas, aplikasi otomatis memakai separuh inti terakhir (misalnya CPU4–CPU7 di ponsel 8 inti).
+
+[CSMT]
+Là gì: CSMT membuat WineD3D memproses perintah gambar di thread CPU terpisah, berjalan bersamaan dengan game. Hanya berlaku jika DX Wrapper adalah WineD3D.
+Vì sao chỉnh: Coba matikan saat game dengan WineD3D crash, macet, berkedip, atau gambarnya rusak. Jika aktif, game biasanya lebih cepat.
+Chỉnh thế nào: Default: aktif, sebaiknya tetap aktif. Matikan hanya jika game error dan membaik setelah dimatikan; mematikannya bisa menurunkan FPS. Buka ulang game untuk menerapkan.
+
+[Cấu hình phím ảo]
+Là gì: Memilih set tombol layar untuk game ini. “Otomatis (AGVN)” memilih sesuai jenis game: visual novel, RPG, 2D, atau keyboard komputer. “Tombol layar mati” tidak menampilkan tombol apa pun.
+Vì sao chỉnh: Ganti saat set tombol pilihan otomatis tidak cocok dengan game, kurang tombol yang diperlukan, atau Anda hanya ingin sentuh langsung atau pakai kontroler.
+Chỉnh thế nào: Sebaiknya biarkan “Otomatis (AGVN)”. Jika memilih set tertentu, aplikasi tidak menggantinya lagi. Untuk memindah, menambah, atau mengubah tombol, di dalam game ketuk “✎ Ubah”; set tombol disimpan khusus untuk game ini.
+
+[Cập nhật ứng dụng]
+Là gì: Mencari dan memasang versi baru AGVN Player langsung di aplikasi, tanpa komputer. Aplikasi hanya mengunduh info versi dan file instalasi dari halaman GitHub AGVN, tidak mengirim data apa pun dari ponsel.
+Vì sao chỉnh: Versi baru memperbaiki error dan membuat game berjalan lebih baik. Game, save, dan pengaturan tetap utuh setelah pembaruan.
+Chỉnh thế nào: Ketuk, lalu pilih Periksa pembaruan. Jika ada versi baru, ketuk Perbarui, tunggu unduhan selesai, lalu ketuk Perbarui di dialog Android. Ukuran file beberapa ratus MB, sebaiknya pakai Wi-Fi.
+
+[DDraw Wrapper]
+Là gì: Penerjemah untuk game sangat lama yang memakai DirectDraw atau Direct3D 7 ke bawah. Hanya berlaku jika DX Wrapper adalah DXVK+VKD3D. none dan wined3d memakai DirectDraw bawaan Wine.
+Vì sao chỉnh: Ganti saat game sangat lama layar hitam, warna salah, patah-patah, lambat, atau tidak bisa masuk.
+Chỉnh thế nào: Default: none. Game 2D lama error: coba cnc-ddraw. Game 3D lama (DirectX 7) gambarnya rusak: coba dd7to9 atau D7VK 2.2 (jika ada). Buka ulang game untuk menerapkan.
+
+[Direct3D]
+Là gì: Komponen tambahan DirectX (d3dx9, d3dx10, d3dx11, d3dcompiler) yang dibutuhkan banyak game DirectX 9–11. Ini bukan DXVK; DXVK dipilih di DX Wrapper.
+Vì sao chỉnh: Versi Asli (Windows) adalah komponen asli Microsoft jadi biasanya berjalan lebih tepat. Versi Bawaan (Wine) dibuat sendiri oleh Wine, masih kurang fungsi, bisa membuat gambar game rusak atau crash.
+Chỉnh thế nào: Biarkan Asli (Windows) (default). Coba Bawaan (Wine) hanya jika game crash tepat saat dibuka dan cara lain tidak berhasil. Setelah mengganti, buka ulang game.
+
+[DirectMusic]
+Là gì: Komponen musik DirectMusic, dipakai beberapa game lama untuk memutar musik latar.
+Vì sao chỉnh: Versi Bawaan (Wine) belum lengkap, jadi beberapa game lama kehilangan musik latar atau crash saat memutar musik.
+Chỉnh thế nào: Biarkan Bawaan (Wine) (default). Jika game lama tidak ada musik latar atau crash saat memutar musik, coba Asli (Windows); jika tidak membaik, kembalikan seperti semula.
+
+[DirectPlay]
+Là gì: Komponen main lewat jaringan (LAN, online) untuk game Windows lama.
+Vì sao chỉnh: Hanya perlu saat game lama melaporkan error DirectPlay atau crash saat masuk mode main jaringan. Game main sendiri biasanya tidak butuh.
+Chỉnh thế nào: Biarkan Bawaan (Wine) (default). Coba Asli (Windows) hanya jika game melaporkan error terkait DirectPlay.
+
+[DirectShow]
+Là gì: Komponen pemutar video DirectShow, dipakai game untuk menampilkan video pembuka dan cuplikan film di dalam game.
+Vì sao chỉnh: Ganti saat video di dalam game hitam, tidak berjalan, macet, atau game crash saat memutar video.
+Chỉnh thế nào: Biarkan Bawaan (Wine) (default). Jika video error, coba Asli (Windows); jika tidak membaik, pilih lagi Bawaan (Wine).
+
+[DirectSound]
+Là gì: Komponen audio DirectSound yang dipakai banyak game Windows lama untuk memutar suara.
+Vì sao chỉnh: Ganti saat game lama tidak bersuara, suaranya kresek, atau crash saat memutar suara, dan mengganti Driver audio tidak membantu.
+Chỉnh thế nào: Biarkan Bawaan (Wine) (default). Jika suara game lama error, coba Asli (Windows); jika tidak membaik, pilih lagi Bawaan (Wine).
+
+[Driver dựng hình]
+Là gì: Driver Vulkan yang dipakai aplikasi untuk menggambar game ke layar (saat Perender adalah Vulkan). Ini bukan driver yang dipakai game; yang itu ada di Driver Vulkan.
+Vì sao chỉnh: Ganti saat Anda mendapat layar hitam, gambar berkedip, atau aplikasi tertutup sendiri saat membuka game dengan Perender Vulkan.
+Chỉnh thế nào: Sebaiknya biarkan Sistem (default). Jika gambar rusak, coba driver lain di daftar (hanya ponsel Snapdragon yang punya pilihan lain), atau ganti Perender ke EGL.
+
+[Driver OpenGL]
+Là gì: Driver untuk game yang memakai OpenGL (sebuah standar grafis), dan untuk WineD3D saat Perender Wine adalah gl. Zink menjalankan OpenGL di atas driver Vulkan; Freedreno adalah driver OpenGL khusus GPU Adreno.
+Vì sao chỉnh: Ganti saat game OpenGL Anda layar hitam, berkedip, warnanya salah, tertutup sendiri, atau melaporkan versi OpenGL kurang.
+Chỉnh thế nào: Freedreno hanya berjalan di GPU Adreno (ponsel Snapdragon) dan melaporkan OpenGL 3.3; Zink berjalan di semua ponsel. Jika game OpenGL gambarnya rusak, layar hitam, atau tertutup sendiri: coba pilihan yang lain. Ponsel MediaTek: pilih Zink.
+
+[Driver Vulkan]
+Là gì: Driver grafis utama yang dipakai game (lewat DXVK, VKD3D, Zink). turnip26.2.0 adalah driver open source untuk GPU Adreno, v863 adalah driver Qualcomm, System adalah driver bawaan ponsel.
+Vì sao chỉnh: Ganti saat game Anda layar hitam, tidak menampilkan 3D, tertutup sendiri saat dibuka, gambarnya rusak, atau FPS rendah.
+Chỉnh thế nào: Ponsel Snapdragon: biarkan turnip26.2.0 (default). Ponsel selain Snapdragon: pakai System. Jika driver pilihan Anda tidak bisa berjalan, aplikasi otomatis beralih ke driver lain saat membuka game. Pilihan bertanda Unduh akan diunduh saat dipilih.
+
+[Driver âm thanh]
+Là gì: Cara mengirim suara game ke speaker ponsel. PulseAudio-GN adalah PulseAudio versi baru, latensi rendah; PulseAudio adalah versi lama; ALSA adalah jalur suara ringkas bawaan aplikasi.
+Vì sao chỉnh: Ganti saat game tidak bersuara, suaranya kresek, putus-putus, terlambat, atau game macet saat mulai memutar suara.
+Chỉnh thế nào: Biarkan PulseAudio-GN (default). Jika suara hilang atau kresek: coba PulseAudio, lalu ALSA. Setiap kali mengganti, buka ulang game untuk mengecek.
+
+[Driver đồ họa]
+Là gì: Driver OpenGL untuk game yang memakai OpenGL dan untuk WineD3D saat menggambar dengan gl. Wrapper berarti Zink: OpenGL dijalankan di atas driver Vulkan ponsel.
+Vì sao chỉnh: Hanya perlu diganti saat game OpenGL error dan Anda tahu perlu driver lain.
+Chỉnh thế nào: Di layar ini hanya ada Wrapper, biarkan saja. Driver Vulkan dipilih di Versi driver.
+
+[DX Wrapper]
+Là gì: Penerjemah grafis DirectX game Windows ke bentuk yang bisa dijalankan ponsel. DXVK+VKD3D menerjemahkan ke Vulkan; WineD3D adalah penerjemah bawaan Wine.
+Vì sao chỉnh: Ganti saat game DirectX Anda layar hitam, gambarnya rusak, tertutup sendiri saat dibuka, atau terlalu lambat.
+Chỉnh thế nào: Sebaiknya biarkan DXVK+VKD3D (default, biasanya lebih cepat). Game lama (DirectX 9 ke bawah) gambarnya rusak atau tidak bisa dibuka: coba WineD3D.
+
+[DXVK HUD]
+Là gì: DXVK mengubah perintah grafis DirectX game Windows ke Vulkan (cara menggambar yang dimengerti ponsel). Aktifkan ini agar DXVK tampil di pojok kiri atas: FPS, GPU, driver, pemakaian GPU.
+Vì sao chỉnh: Dipakai saat mencari masalah grafis: melihat apakah game berjalan lewat DXVK dan berapa FPS-nya (frame per detik).
+Chỉnh thế nào: Default mati. Hanya tampil jika “DX Wrapper” adalah DXVK+VKD3D dan game memakai DirectX 9 sampai 11. Untuk main biasa sebaiknya matikan; untuk melihat FPS, pakai HUD.
+
+[Dùng tiện ích DRI3]
+Là gì: DRI3 membantu memindahkan tiap frame dari chip grafis (GPU) langsung ke layar game. Jika mati, gambar harus disalin lewat prosesor (CPU) sehingga lebih lambat.
+Vì sao chỉnh: Coba matikan hanya saat game layar hitam, berkedip, bergaris, atau crash tepat saat mulai menampilkan gambar, dan mengubah pengaturan grafis lain tidak membantu.
+Chỉnh thế nào: Default aktif dan sebaiknya tetap aktif, terutama di ponsel lemah. Berlaku untuk semua game. Jika dimatikan tidak membantu, segera aktifkan lagi.
+
+[Dùng tích hợp OpenXR]
+Là gì: Ini hanya tampil di headset VR Meta Quest. Jika aktif, game dan lingkungan dibuka dalam mode VR, dikendalikan dengan kontroler headset.
+Vì sao chỉnh: Matikan jika Anda ingin main di jendela datar biasa di headset, atau mode VR gambarnya rusak atau kontrolnya error.
+Chỉnh thế nào: Default aktif. Di ponsel, ini tidak tampil dan tidak berpengaruh.
+
+[FEXCore Preset]
+Là gì: Tingkat keseimbangan antara kecepatan dan ketepatan FEXCore. Stabil: paling aman, paling lambat. Performa: paling cepat, paling mudah error.
+Vì sao chỉnh: Ganti saat game tertutup sendiri atau macet secara acak, fisikanya error, atau saat Anda ingin menambah FPS untuk game yang berat di CPU.
+Chỉnh thế nào: Sebaiknya biarkan Menengah (default). Game tertutup sendiri atau macet acak: coba Kompatibel lalu Stabil. Game lancar tapi lambat: coba Performa; jika error, kembali.
+
+[Ghi đè di chuyển chuột]
+Là gì: Cara Wine menarik kursor mouse ke tengah layar untuk game yang membaca mouse lewat DirectInput (biasanya game 3D lama): disable, enable, atau force.
+Vì sao chỉnh: Ganti saat memutar kamera dengan mouse tersangkut di tepi layar, atau kursor terus tertarik ke tengah layar.
+Chỉnh thế nào: Biarkan disable (default). Kamera tersangkut: coba enable, lalu force. Kursor tertarik ke tengah: pilih lagi disable.
+
+[Giao diện desktop]
+Là gì: Warna jendela, tombol, dan dialog bergaya Windows di lingkungan: Gelap atau Terang. Tidak mengubah gambar di dalam game.
+Vì sao chỉnh: Ganti saat teks di installer, dialog error, atau jendela pengaturan game sulit dibaca (teks gelap di latar gelap).
+Chỉnh thế nào: Default Gelap. Jika dialog sulit dibaca, pilih Terang. Berlaku mulai dibuka berikutnya.
+
+[Giá trị]
+Là gì: Nilai variabel lingkungan di baris ini. Tergantung variabelnya, Anda memilih dari daftar, mencentang beberapa item, atau mengetik huruf dan angka.
+Vì sao chỉnh: Ganti saat diminta mengatur sebuah variabel untuk memperbaiki gambar, suara, atau menguji performa.
+Chỉnh thế nào: Jangan pakai spasi, aplikasi akan membuangnya. Beberapa item dipisah dengan koma. Jika ragu, hapus variabel dengan tombol tempat sampah. Buka ulang game untuk menerapkan.
+
+[Giả lập 32-bit]
+Là gì: Memilih emulator yang menjalankan game dan program Windows 32-bit di chip ponsel. Game 64-bit selalu berjalan dengan FEXCore.
+Vì sao chỉnh: Ganti saat game 32-bit tertutup sendiri, macet, error, atau lambat.
+Chỉnh thế nào: Sebaiknya biarkan FEXCore (default). Game 32-bit error atau lambat: coba WOWBox64 (akan muncul juga Versi WOWBox64 dan Preset Box64). Jika tidak membaik, kembali ke FEXCore.
+
+[Giả lập 64-bit]
+Là gì: Menunjukkan emulator yang menjalankan program 64-bit: FEXCore dengan Wine/Proton arm64ec, Box64 dengan versi Wine lain. Ini hanya untuk dilihat.
+Vì sao chỉnh: Tidak perlu diubah: ini berganti sendiri sesuai versi Wine/Proton lingkungan.
+Chỉnh thế nào: Untuk memakai emulator 64-bit lain, buat lingkungan dengan versi Wine/Proton lain. Versi dan preset emulator diatur di bagian di bawah.
+
+[Giả lập BCN]
+Là gì: BCn adalah jenis kompresi texture (gambar permukaan) game PC yang tidak bisa dibaca banyak GPU ponsel, terutama Mali. Ini menentukan apakah aplikasi mengonversi texture tersebut.
+Vì sao chỉnh: Ganti saat texture tampak hitam, ungu, buram, hilang, atau game tertutup sendiri saat memuat level.
+Chỉnh thế nào: Ponsel Snapdragon dengan driver Turnip tidak perlu ini: aplikasi mematikannya karena Turnip bisa membaca BCn sendiri. Driver lain dan ponsel Mali: biarkan auto (default); full mengonversi semua texture, paling pasti tapi boros CPU dan RAM; none: mati.
+
+[Giả lập màn hình cảm ứng]
+Là gì: Di mana pun Anda sentuh, game menerimanya sebagai klik kiri di titik itu; sentuh tahan lalu geser berarti menahan klik kiri untuk menyeret. Jika mati, layar menjadi touchpad: usap untuk menggerakkan kursor, sentuh untuk klik.
+Vì sao chỉnh: Sangat cocok untuk visual novel dan game menu: sentuh langsung pilihannya. Matikan jika game butuh mengarahkan mouse tanpa klik (untuk menampilkan keterangan) atau memutar kamera.
+Chỉnh thế nào: Game yang ditambahkan lewat AGVN biasanya sudah aktif; visual novel sebaiknya biarkan. Di kedua mode, sentuh 2 jari bersamaan berarti klik kanan.
+
+[Giới hạn FPS]
+Là gì: Batas FPS tetap dari DXVK, untuk game DirectX 8–11. 0 berarti tanpa batas.
+Vì sao chỉnh: Dipakai saat game berjalan terlalu cepat atau fisikanya error saat FPS tinggi.
+Chỉnh thế nào: Biarkan 0 (default). Agar ponsel tidak panas, buka menu di dalam game, bagian Gambar, atur Batas FPS 30 atau 20: layar 60 Hz hanya menampilkan rata 60, 30, dan 20 FPS. Isi angka di sini hanya jika game error saat FPS tinggi: batas ini terkunci, tak bisa dinaikkan di game.
+
+[Gửi mọi buffer]
+Là gì: Hanya ada saat Perender adalah DisplayX. Jika aktif, Android menampilkan semua frame yang dikirim game secara berurutan, tidak membuang frame lama untuk melompat ke frame terbaru.
+Vì sao chỉnh: Bisa membuat gerakan lebih rata saat gambar tersendat meski FPS stabil. Sebagai gantinya, kontrol bisa sedikit lebih terlambat.
+Chỉnh thế nào: Biarkan mati (default): frame terbaru diutamakan jadi latensi rendah. Coba aktifkan jika gambar tersendat; jika terasa lebih terlambat, matikan lagi. Hanya berlaku di Android 12 ke atas.
+
+[Hiệu ứng làm nét]
+Là gì: Menambah filter penajaman pada gambar game. CAS memperjelas detail tapi tetap alami; DLS menajamkan kecerahan, disertai slider “Kurangi noise saat menajamkan” untuk mengurangi bintik.
+Vì sao chỉnh: Berguna saat Anda menurunkan resolusi agar ringan dan gambar jadi buram. Geser slider “Tingkat penajaman” untuk menambah atau mengurangi ketajaman.
+Chỉnh thế nào: Default None. Ponsel lemah sebaiknya biarkan None karena penajaman memakai tenaga GPU tambahan. Ingin mencoba, pilih CAS dengan tingkat sedang. Jika aktif tapi gambar tidak berubah, game itu tidak menerima efek, biarkan None.
+
+[HUD]
+Là gì: HUD adalah panel info kecil yang tampil di atas game. Klasik: FPS (frame per detik), nama GPU, RAM. Modern: ditambah pemakaian CPU dan GPU, suhu, baterai, grafik.
+Vì sao chỉnh: Aktifkan saat ingin melihat apakah game lancar (FPS), ponsel panas, atau RAM hampir habis, terutama saat mencoba pengaturan grafis baru.
+Chỉnh thế nào: Main biasa pilih Nonaktif; untuk mengecek, pilih Klasik yang ringkas. Pilihan ini hanya berlaku untuk game ini. Di dalam game juga bisa diaktifkan/dimatikan dengan sakelar “Aktifkan HUD” di menu.
+
+[HUD Winlator]
+Là gì: Panel info kecil yang tampil di layar saat bermain. Klasik: FPS, nama GPU, RAM. Modern: ditambah pemakaian CPU/GPU, suhu, baterai.
+Vì sao chỉnh: Aktifkan untuk melihat FPS saat mencoba konfigurasi, atau mencari penyebab game tersendat dan ponsel panas.
+Chỉnh thế nào: Main biasa sebaiknya biarkan Nonaktif. Lihat FPS sekilas: pilih Klasik. Lihat juga suhu dan baterai: pilih Modern. Berlaku untuk game di lingkungan ini yang belum memilih HUD sendiri.
+
+[Hình nền desktop]
+Là gì: Latar layar Windows emulasi, di belakang jendela game: Gambar atau Warna polos.
+Vì sao chỉnh: Hanya hiasan. Latar ini tampil saat Anda langsung membuka layar Windows lingkungan; saat main game dari Pustaka, latar biasanya tersembunyi.
+Chỉnh thế nào: Pilih Gambar lalu ketuk Pilih atau Ganti untuk memakai foto Anda. Ingin sederhana, pilih Warna polos.
+
+[Kiểu giả lập BCN]
+Là gì: Cara mendekompres texture BCn (gambar permukaan terkompresi ala PC) saat Emulasi BCn adalah auto atau full: compute memakai GPU, software memakai CPU.
+Vì sao chỉnh: Ganti saat game lambat memuat, tersendat saat masuk level baru, atau texture rusak.
+Chỉnh thế nào: Sebaiknya biarkan compute (default). Di ponsel Snapdragon (GPU Adreno) aplikasi tidak memakai compute jadi ini tidak berpengaruh. Ponsel Mali: jika texture rusak atau game tertutup sendiri, coba software.
+
+[Kéo giãn toàn màn hình]
+Là gì: Merentangkan gambar game hingga memenuhi layar ponsel, tanpa garis hitam di kedua sisi.
+Vì sao chỉnh: Aktifkan jika ingin gambar sebesar layar. Jika rasio resolusi berbeda dengan rasio layar, gambar akan melebar atau melar.
+Chỉnh thế nào: Default mati (rasio tetap). Agar penuh tanpa melar, pilih Resolusi dengan rasio yang sama dengan ponsel, misalnya 1280x576 (20:9). Game yang belum mengatur ini sendiri mengikuti pilihan lingkungan.
+
+[Loại tài nguyên]
+Là gì: Cara driver meminta area memori yang dibaca dan ditulis bersama oleh CPU dan GPU. auto mencoba berurutan dmabuf, ahb, opaque sampai berhasil.
+Vì sao chỉnh: Ganti hanya saat game Anda tertutup sendiri saat dibuka atau memuat, atau melaporkan error memori grafis.
+Chỉnh thế nào: Sebaiknya biarkan auto (default). Jika game error seperti di atas, coba berurutan dmabuf, ahb, opaque; jika tidak membaik, kembalikan ke auto.
+
+[Lưu game]
+Là gì: Mengaktifkan pencadangan save (progres main) khusus untuk game ini. Aplikasi mencari folder save di drive Windows virtual dan menyimpan salinannya ke folder AGVN-Player/Saves.
+Vì sao chỉnh: Sebaiknya aktifkan sebelum menghapus game, memasang ulang aplikasi, mengganti lingkungan, atau mencoba pengaturan aneh, agar progres tidak hilang.
+Chỉnh thế nào: Ketuk “Cadangkan sekarang” untuk menyimpan, “Pulihkan” untuk menyalin cadangan terbaru menimpa save sekarang. Game yang menyimpan save langsung di folder game (seperti banyak game RPG Maker) tidak dicadangkan oleh ini.
+
+[Lọc texture]
+Là gì: Cara memperbesar gambar game agar pas di layar ponsel. Tidak mengubah kualitas gambar permukaan (texture) di dalam game. Perender EGL hanya punya Bilinear dan Titik terdekat.
+Vì sao chỉnh: Atur saat gambar terlihat buram, pecah-pecah, atau Anda ingin gambar lebih tajam saat main di resolusi rendah.
+Chỉnh thế nào: Sebaiknya biarkan Bilinear (halus, default). Game 2D piksel: Titik terdekat. Ponsel lemah main di resolusi rendah: coba Snapdragon Super Resolution agar lebih tajam. Jenis penajaman dan Tingkatkan warna memakai GPU tambahan.
+
+[MIDI SoundFont]
+Là gì: Set suara alat musik untuk memutar musik MIDI. Banyak game lama, seperti game RPG Maker 2000/2003, memakai musik MIDI.
+Vì sao chỉnh: Jika Nonaktif, game yang memakai musik MIDI tidak akan punya musik latar. Ganti ke set lain untuk mengubah kualitas suara musik.
+Chỉnh thế nào: Game tanpa musik latar: pilih wt_210k_G.sf2 (sudah tersedia). Game yang tidak memakai MIDI: biarkan Nonaktif. Memilih di pengaturan game hanya mengubah game itu; memilih di lingkungan mengubah game yang belum memilih sendiri.
+
+[Môi trường chạy]
+Là gì: Lingkungan adalah komputer Windows virtual tersendiri, berisi versi Wine/Proton (bagian yang menjalankan game Windows), driver, dan pengaturan. Ini menunjukkan game sedang berjalan di lingkungan mana.
+Vì sao chỉnh: Ganti saat game tidak jalan atau sering error dengan versi Wine/Proton sekarang, atau saat Anda ingin pengaturan khusus untuk game ini tanpa memengaruhi game lain.
+Chỉnh thế nào: Memilih lingkungan lain akan menyalin game ke sana, salinan lama tetap ada. Save tidak ikut otomatis: cadangkan lalu pulihkan di salinan baru. Jika hanya ada satu lingkungan, ketuk + untuk membuat lagi.
+
+[Mở chế độ Big Picture khi khởi động]
+Là gì: Big Picture adalah layar pilih game berukuran besar, digulir per sampul, cocok untuk TV atau kontroler. Jika aktif, setiap kali aplikasi dibuka akan langsung masuk ke layar itu.
+Vì sao chỉnh: Aktifkan jika Anda main di TV, layar besar, atau lebih sering memakai kontroler. Layar ini punya musik latar dan otomatis mengunduh sampul lewat internet jika game belum punya sampul.
+Chỉnh thế nào: Default mati; ponsel lemah sebaiknya biarkan mati agar ringan. Saat di Big Picture, tekan tombol Kembali untuk ke layar biasa. Musik latar bisa dimatikan di pengaturan Big Picture.
+
+[Mở trình duyệt Android từ Wine]
+Là gì: Saat game membuka halaman web (tombol beranda, forum, dukung pembuat game…), halaman itu dibuka dengan browser di ponsel Anda.
+Vì sao chỉnh: Aktifkan jika Anda perlu membuka halaman web dari dalam game, misalnya halaman panduan atau halaman unduhan pembaruan game.
+Chỉnh thế nào: Default mati. Jika aktif, saat game membuka halaman web Anda akan dipindah ke browser dan game berhenti sementara; kembali ke aplikasi untuk lanjut main.
+
+[Mức tính năng VKD3D]
+Là gì: Level fitur DirectX 12 yang dilaporkan VKD3D ke game. Hanya berlaku jika Versi VKD3D bukan None.
+Vì sao chỉnh: Ganti saat game DirectX 12 melaporkan level fitur tidak didukung, tidak bisa dibuka, atau tertutup sendiri saat masuk.
+Chỉnh thế nào: Sebaiknya biarkan 12_1 (default). Game meminta level lebih tinggi: coba 12_2. Tertutup sendiri saat dibuka: coba 12_0 atau 11_1. VKD3D mengabaikan level 10_x dan 9_x.
+
+[Ngôn ngữ vùng (LC_ALL)]
+Là gì: Bahasa dan wilayah yang dilaporkan Windows emulasi ke game. Ini menentukan pengodean huruf, sangat penting untuk game lama Jepang dan Tiongkok.
+Vì sao chỉnh: Jika wilayah salah, game Jepang (KiriKiri, Siglus, NScripter, Wolf RPG…) bisa salah huruf, salah nama file, atau crash. Patch terjemahan biasanya tetap tampil benar dengan ja_JP.
+Chỉnh thế nào: Saat menambah game, aplikasi otomatis memilih ja_JP untuk game Jepang. Huruf rusak atau crash: game Jepang pilih ja_JP, game Tiongkok pilih zh_CN atau zh_TW. Jika tidak ada error, biarkan saja.
+
+[Nhập độc quyền]
+Là gì: Jika aktif, Anda memilih satu cara kontroler untuk game: XInput atau DInput; jika keduanya mati, game tidak mengenali kontroler. Jika mati, game melihat kontroler lewat kedua cara. Berlaku untuk kontroler asli dan virtual, tidak memengaruhi mouse dan keyboard.
+Vì sao chỉnh: Aktifkan agar game tidak mengenali kontroler dua kali (satu tombol jadi dua perintah). Beberapa game DInput, seperti Rayman Origins atau NFS Most Wanted 2005, perlu ini dimatikan.
+Chỉnh thế nào: Default aktif, memakai XInput. Game lama tidak mengenali kontroler: nyalakan “Aktifkan DInput”. Jika masih tidak bisa, matikan Input eksklusif.
+
+[Phiên bản Box64]
+Là gì: Box64 menerjemahkan kode program komputer (x86-64) ke kode chip ponsel (ARM) untuk menjalankan Wine dan game. Ini hanya ada jika Wine/Proton bukan versi arm64ec.
+Vì sao chỉnh: Ganti saat game crash, macet, lambat, atau error aneh, atau saat diminta memakai versi Box64 tertentu.
+Chỉnh thế nào: Default: 0.4.2 (terpasang). Versi bertanda “Unduh” perlu internet untuk diunduh. Jika setelah diganti game makin error, pilih lagi 0.4.2. Ponsel lemah: biarkan default.
+
+[Phiên bản DXVK]
+Là gì: Versi DXVK yang menerjemahkan DirectX 8–11 ke Vulkan. Versi arm64ec berjalan langsung di chip ponsel untuk game 64-bit; versi async atau gplasync mengompilasi shader (kode efek) di latar belakang.
+Vì sao chỉnh: Ganti saat gambar game rusak, tertutup sendiri saat dibuka, atau sering tersendat saat ada efek baru.
+Chỉnh thế nào: Default 2.3.1 (ponsel Mali: 1.10.3). Ponsel Mali atau driver lama: pakai 1.10.3. Untuk VKD3D perlu versi 2.x. Ponsel lemah, game 64-bit: Anda bisa mencoba versi arm64ec; jika error, kembali.
+
+[Phiên bản FEXCore]
+Là gì: Versi FEXCore, emulator yang menjalankan kode komputer (x86) game di chip ponsel. Dipakai untuk game 64-bit, dan game 32-bit saat FEXCore dipilih.
+Vì sao chỉnh: Ganti saat game tertutup sendiri, macet, atau berjalan salah dan mengganti Preset FEXCore tidak membantu.
+Chỉnh thế nào: Sebaiknya biarkan 2601 (versi bawaan, default). Coba versi lain hanya jika game error; versi bertanda Unduh perlu internet untuk diunduh. Jika makin error, kembali ke 2601.
+
+[Phiên bản VKD3D]
+Là gì: VKD3D-Proton menerjemahkan DirectX 12 ke Vulkan. None berarti tidak dipakai, hanya tersisa DirectX 12 bawaan Wine yang sangat terbatas.
+Vì sao chỉnh: Game DirectX 12 butuh ini; jika None, game DirectX 12 biasanya tidak bisa jalan.
+Chỉnh thế nào: Game bukan DirectX 12: biarkan None (default). Game DirectX 12: pilih 2.14.1, jika error coba 2.8; DXVK harus versi 2.x. Game DirectX 12 sangat berat, ponsel lemah sulit menjalankannya dengan lancar.
+
+[Phiên bản Vulkan]
+Là gì: Nomor versi Vulkan (standar grafis yang dipakai DXVK, VKD3D, Zink) yang dilaporkan ke game. Ini hanya mengubah angka yang dilaporkan, tidak membuat driver lebih kuat atau lebih lemah.
+Vì sao chỉnh: Jarang perlu diganti. Biarkan default jika game tidak error.
+Chỉnh thế nào: Biarkan 1.3 (default). DXVK 2.x dan VKD3D butuh 1.3: jika diturunkan ke 1.2 atau 1.1, keduanya tidak jalan. Coba turunkan hanya jika game memakai DXVK 1.10.3 atau WineD3D dan masih error.
+
+[Phiên bản WOWBox64]
+Là gì: WOWBox64 adalah versi Box64 yang menjalankan program 32-bit (biasanya game lama) di Wine/Proton arm64ec. Hanya dipakai jika “Emulator 32-bit” adalah WOWBox64.
+Vì sao chỉnh: Ganti saat game 32-bit crash, macet, lambat, atau error aneh, atau saat diminta memakai versi tertentu.
+Chỉnh thế nào: Default: 0.4.2 (terpasang). Versi bertanda “Unduh” perlu internet untuk diunduh. Jika setelah diganti game makin error, pilih lagi 0.4.2.
+
+[Preset Box64]
+Là gì: Set pengaturan siap pakai untuk Box64 dan WOWBox64, menyeimbangkan aman dan cepat: Stabil, Kompatibel, Menengah, Performa (dari paling aman ke paling cepat).
+Vì sao chỉnh: Ganti saat game crash, macet, atau error aneh (pilih yang lebih aman), atau saat game lancar tapi lambat (pilih yang lebih cepat).
+Chỉnh thế nào: Default: Kompatibel. Game error: coba Stabil. Ingin lebih cepat: coba Menengah lalu Performa; jika error, kembali. Game Unity sebaiknya pakai Kompatibel atau Stabil.
+
+[Preset FEXCore]
+Là gì: Set pengaturan siap pakai untuk FEXCore, menyeimbangkan aman dan cepat: Stabil, Kompatibel, Menengah, Performa (dari paling aman ke paling cepat).
+Vì sao chỉnh: Ganti saat game crash, macet, atau error aneh (pilih yang lebih aman), atau saat game lancar tapi lambat (pilih yang lebih cepat).
+Chỉnh thế nào: Default: Menengah. Game error, terutama game yang memakai banyak thread: coba Kompatibel lalu Stabil. Ingin lebih cepat: coba Performa; jika error, kembali ke Menengah.
+
+[Processor Affinity (32-bit apps)]
+Là gì: Memilih inti CPU untuk program Windows 32-bit yang berjalan di lingkungan ini.
+Vì sao chỉnh: Jika game sudah memilih inti sendiri di Pilih inti CPU, inti itu dipakai juga untuk program 32-bit; jika belum, dipakai pilihan ini. Jarang perlu diganti.
+Chỉnh thế nào: Biarkan seperti default. Jika ingin mencoba, sisakan hanya inti kuat, biasanya nomor besar (misalnya CPU4–CPU7).
+
+[Renderer]
+Là gì: Cara aplikasi menggambar game ke layar ponsel: Vulkan (default) atau EGL, cara klasik dengan OpenGL ES.
+Vì sao chỉnh: Ganti saat layar hitam, berkedip, gambar rusak, atau aplikasi langsung keluar saat membuka game.
+Chỉnh thế nào: Default: Vulkan (ada filter seperti Snapdragon Super Resolution). Jika tampilan error: coba EGL; EGL hanya punya filter Bilinear dan Titik terdekat. Buka ulang game untuk menerapkan.
+
+[Toàn màn hình cho mọi game]
+Là gì: Merentangkan gambar semua game hingga memenuhi layar ponsel, tanpa garis hitam di kedua sisi, untuk game Windows maupun game Mode Ringan.
+Vì sao chỉnh: Aktifkan jika ingin gambar game sebesar layar. Layar ponsel lebih panjang dari bingkai game, jadi gambar akan sedikit melebar (karakter tampak sedikit lebih gemuk).
+Chỉnh thế nào: Default mati (rasio tetap). Game yang sudah memilih sendiri "Regangkan ke layar penuh" di Pengaturan game akan mengikuti pilihannya. Berlaku mulai game dibuka berikutnya.
+
+[Sao lưu bản lưu cho mọi game]
+Là gì: Jika aktif, setiap kali game ditutup, aplikasi otomatis mencari dan mengompres save game ke folder AGVN-Player/Saves/<nama game>/ di memori ponsel.
+Vì sao chỉnh: Aktifkan agar progres tidak hilang saat game error, data terhapus tanpa sengaja, atau aplikasi dipasang ulang.
+Chỉnh thế nào: Default: mati. Hanya bisa mencadangkan game yang folder save-nya ditemukan aplikasi. Tiap game menyimpan satu cadangan otomatis terbaru; untuk menyimpan lebih banyak, ketuk “Cadangkan sekarang” di Save game.
+
+[Shader Async]
+Là gì: Membuat DXVK membangun shader (potongan program pembuat efek gambar) di latar belakang agar game tidak perlu berhenti menunggu. Hanya berlaku untuk versi DXVK bernama async atau gplasync.
+Vì sao chỉnh: Aktifkan saat game tersendat setiap kali bertemu adegan, objek, atau efek baru.
+Chỉnh thế nào: Default: mati. Coba aktifkan jika game tersendat; sebagai gantinya, objek atau efek bisa muncul sedikit terlambat. Jika gambar ada yang hilang atau berkedip, matikan. Buka ulang game untuk menerapkan.
+
+[Tiện ích Vulkan đã tắt]
+Là gì: Daftar ekstensi Vulkan (fitur tambahan driver grafis) yang disembunyikan aplikasi, agar game serta DXVK, VKD3D, dan Zink tidak memakainya. Nama dipisah dengan koma.
+Vì sao chỉnh: Dipakai saat sebuah ekstensi driver membuat game crash, layar hitam, atau gambar rusak; jika disembunyikan, game harus memakai cara lain.
+Chỉnh thế nào: Default: kosong. Isi hanya jika diminta, ketik nama yang tepat (diawali VK_). Spasi akan dibuang. Jika game makin error, kosongkan lagi. Buka ulang game untuk menerapkan.
+
+[Trình chiếu chính xác]
+Là gì: Hanya ada saat Perender adalah DisplayX. Jika aktif, tiap frame dipasangkan tepat dengan satu irama refresh layar, sesuai penanda waktu dari Android.
+Vì sao chỉnh: Bisa membuat frame tampil lebih rata saat FPS tidak rendah tapi gambar masih sedikit tersendat.
+Chỉnh thế nào: Biarkan mati (default). Coba aktifkan jika gambar sedikit tersendat; jika tidak ada bedanya atau terasa lebih terlambat, matikan lagi. Hanya berlaku di Android 13 ke atas, ponsel yang lebih lama mengabaikannya.
+
+[Trình chiếu theo tần số quét]
+Là gì: Hanya ada di DisplayX. Aktif: frame dikumpulkan dan dikirim ke layar mengikuti irama refresh rate ponsel. Mati: frame dikirim begitu game selesai menggambar.
+Vì sao chỉnh: Aktifkan agar gambar keluar rata mengikuti layar. Mematikannya bisa mengurangi latensi kontrol, tapi gambar bisa keluar tidak rata.
+Chỉnh thế nào: Default aktif. Jika kontrol terasa terlambat, coba matikan; jika gambar tersendat atau berkedip, aktifkan lagi.
+
+[Tên]
+Là gì: Nama lingkungan atau game (tampil di Pustaka). Di kotak tambah variabel lingkungan, ini adalah nama variabel yang Anda ketik sendiri.
+Vì sao chỉnh: Nama membantu Anda membedakan game dan lingkungan, tidak mengubah cara game berjalan. Khusus nama variabel, harus diketik tepat agar variabel berfungsi.
+Chỉnh thế nào: Nama game tidak boleh memakai \ / : * ? " < > | (akan menjadi _). Jika nama game diganti, cadangan lama tetap ada di folder bernama lama. Nama variabel ditulis tanpa spasi, misalnya DXVK_HUD.
+
+[Tên GPU]
+Là gì: Nama kartu grafis yang dilihat game. Device adalah nama GPU asli ponsel; pilih nama lain untuk menyamar sebagai kartu grafis komputer (kode vendor dan kode kartu juga ikut berubah).
+Vì sao chỉnh: Ada game yang tidak mau jalan, melaporkan kartu grafis tidak didukung, atau memilih pengaturan yang salah saat melihat GPU ponsel.
+Chỉnh thế nào: Sebaiknya biarkan Device (default). Jika game melaporkan kartu grafis tidak didukung: coba NVIDIA GeForce GTX 1060. Ini tidak membuat ponsel lebih kuat.
+
+[Tính shader chính xác]
+Là gì: Jika aktif, WineD3D meminta driver tidak memakai cara hitung shader (potongan program pembuat efek gambar) yang cepat tapi kurang tepat. Hanya berlaku saat memakai WineD3D dengan perender gl.
+Vì sao chỉnh: Jarang perlu diganti. Dengan driver OpenGL aplikasi (Zink, Freedreno), ini hampir tidak mengubah kecepatan atau gambar.
+Chỉnh thế nào: Default: aktif. Biarkan jika game berjalan normal. Jika dimatikan tidak ada bedanya atau gambar makin rusak, aktifkan lagi.
+
+[Tạm dừng game khi ứng dụng chạy nền]
+Là gì: Saat Anda meninggalkan aplikasi (ke layar utama, membuka aplikasi lain, atau mematikan layar), game dijeda penuh agar tidak berjalan di latar belakang.
+Vì sao chỉnh: Menghemat baterai dan ponsel tidak terlalu panas saat Anda meninggalkan game sebentar; kembali ke aplikasi, game lanjut berjalan.
+Chỉnh thế nào: Sebaiknya biarkan aktif (default). Di versi ini game selalu dijeda saat Anda meninggalkan aplikasi, apa pun posisi sakelarnya. Agar game tetap berjalan saat Anda melakukan hal lain, pakai “Jendela mengambang” di menu game.
+
+[Tắt chuột]
+Là gì: Sentuhan dan usapan di layar tidak lagi mengendalikan mouse di game. Tombol layar, kontroler, dan mouse eksternal tetap berfungsi normal.
+Vì sao chỉnh: Aktifkan saat Anda main sepenuhnya dengan tombol layar atau kontroler dan sering tak sengaja menyentuh sehingga kursor bergerak liar atau salah klik.
+Chỉnh thế nào: Default mati. Jika aktif, sentuhan 4 jari tidak lagi membuka menu, pakai tombol Kembali. Bisa diaktifkan/dimatikan langsung di menu game (sakelar “Matikan mouse”).
+
+[Tắt Present Wait]
+Là gì: Mematikan fitur present wait dari driver. Fitur ini membuat game (lewat DXVK 2.x, VKD3D) menunggu sampai frame benar-benar tampil di layar untuk mengatur irama.
+Vì sao chỉnh: Dengan beberapa driver, fitur ini bisa membuat game membeku, macet, atau tersendat berulang-ulang.
+Chỉnh thế nào: Biarkan mati (default). Jika game membeku atau macet saat dimainkan, atau tersendat berulang: coba aktifkan; jika tidak membaik, matikan lagi. Tidak berpengaruh pada DXVK 1.10.3.
+
+[Tắt XInput]
+Là gì: Jika aktif, game ini tidak mengenali kontroler apa pun (kontroler asli atau tombol kontroler di tombol layar), hanya mouse dan keyboard. Tombol layar yang dipetakan ke tombol keyboard atau mouse tetap bisa dipakai.
+Vì sao chỉnh: Untuk saat kontroler membuat tombol game ini kacau atau karakter berjalan sendiri.
+Chỉnh thế nào: Biarkan mati (default). Aktifkan hanya jika game ini error karena kontroler. Untuk mematikan kontroler di semua game, pakai Matikan XInput (hanya mouse/keyboard) di Pengaturan. Setelah mengganti, buka ulang game.
+
+[Tắt XInput (chỉ dùng chuột/bàn phím)]
+Là gì: Jika aktif, semua game tidak mengenali kontroler apa pun (kontroler asli atau tombol kontroler di tombol layar), hanya mouse dan keyboard. Tombol layar yang dipetakan ke tombol keyboard atau mouse tetap bisa dipakai.
+Vì sao chỉnh: Untuk saat kontroler (kontroler asli atau tombol kontroler di tombol layar) membuat tombol game kacau atau karakter berjalan sendiri.
+Chỉnh thế nào: Biarkan mati (default). Jika hanya ingin mematikan untuk satu game, pakai Matikan XInput di pengaturan game itu. Setelah mengganti, buka ulang game.
+
+[Tự động sao lưu]
+Là gì: Setiap kali game ditutup, aplikasi otomatis mencadangkan folder save game. Cadangan otomatis baru selalu menggantikan cadangan otomatis lama, tanpa menyentuh cadangan yang Anda buat sendiri.
+Vì sao chỉnh: Aktifkan agar tidak perlu ingat mencadangkan, berjaga-jaga jika save rusak atau Anda tak sengaja menghapus game.
+Chỉnh thế nào: Hanya berjalan jika aplikasi sudah menemukan folder save game (lihat “Lokasi save game”). Keluar dengan tombol daya di menu game, jangan usap untuk menutup aplikasi. Jika “Cadangkan save semua game” aktif, ini selalu aktif.
+
+[Visual C++ 2010]
+Là gì: Komponen runtime Visual C++ 2010 (msvcp100, msvcr100) yang dibutuhkan banyak game dan alat agar bisa dibuka.
+Vì sao chỉnh: Versi Asli (Windows) membuat game yang butuh Visual C++ 2010 berjalan stabil. Versi Wine kadang kurang fungsi, membuat game melaporkan error atau crash saat dibuka.
+Chỉnh thế nào: Biarkan Asli (Windows) (default). Jangan ganti ke Bawaan (Wine), kecuali ada petunjuk khusus untuk game itu.
+
+[Vẽ ngoài màn hình]
+Là gì: Cara WineD3D menggambar gambar sementara yang belum tampil di layar: fbo (cara baru) atau backbuffer (cara lama). Hanya berlaku saat memakai WineD3D dengan perender gl.
+Vì sao chỉnh: Ganti hanya saat game dengan WineD3D layar hitam atau gambarnya rusak dan cara lain tidak berhasil.
+Chỉnh thế nào: Default: fbo, sebaiknya tetap. Coba backbuffer hanya setelah semua cara lain dicoba; jika lebih buruk, pilih lagi fbo. Buka ulang game untuk menerapkan.
+
+[Wine / Proton]
+Là gì: Versi Wine/Proton untuk menjalankan game Windows. Versi arm64ec menjalankan Wine langsung di chip ponsel, hanya mengemulasi kode x86 game; versi x86_64 mengemulasi semuanya lewat Box64.
+Vì sao chỉnh: Tiap versi cocok untuk game yang berbeda. Ganti saat game tidak bisa dibuka atau crash dan mengubah pengaturan lain tidak membantu.
+Chỉnh thế nào: Sebaiknya pakai Proton 9 arm64ec (sudah tersedia, biasanya lebih cepat). Hanya bisa dipilih saat membuat lingkungan baru; versi bertanda Download harus diunduh dulu. Jika game error, coba buat lingkungan baru dengan versi lain.
+
+[XAudio]
+Là gì: Komponen audio XAudio2, X3DAudio, XACT (versi 2.0 sampai 2.7) yang dipakai banyak game DirectX 9–11 untuk memutar suara.
+Vì sao chỉnh: Ganti saat game tidak bersuara, suaranya kresek, suara berulang, atau game crash saat memutar suara.
+Chỉnh thế nào: Biarkan Bawaan (Wine) (default). Jika suara error, coba Asli (Windows). Game baru yang memakai XAudio 2.8/2.9 tidak terpengaruh oleh ini.
+
+[Đặt khóa API SteamGrid? (Ảnh bìa)]
+Là gì: Memungkinkan Anda memasukkan kunci sendiri untuk layanan sampul SteamGridDB. Kunci API adalah kode pribadi agar aplikasi diizinkan mengunduh gambar dari layanan itu.
+Vì sao chỉnh: Mode Big Picture otomatis mengunduh sampul dari SteamGridDB dengan kunci bawaan aplikasi. Kunci sendiri hanya perlu jika sampul dari sana tidak bisa diunduh.
+Chỉnh thế nào: Default mati, biasanya tidak perlu diaktifkan. Aktifkan lalu tempel kunci ke kolom “Kunci API SteamGridDB”, ketuk Simpan; mematikannya akan menghapus kunci tersimpan. Sampul di Pustaka dibuat di ponsel, tidak memakai kunci ini.
+
+[Định dạng bề mặt]
+Là gì: Urutan kanal warna frame (RGBA atau BGRA) yang dipakai game dan aplikasi untuk bertukar gambar.
+Vì sao chỉnh: Format yang salah bisa membuat warna tertukar, misalnya merah jadi biru, kulit orang jadi kebiruan.
+Chỉnh thế nào: Biarkan default: BGRA untuk Vulkan dan EGL, RGBA untuk DisplayX (diatur otomatis saat mengganti Perender). Jika warna tertukar, pilih nilai yang lain.
+
+[Đồng bộ cấu trúc CPU]
+Là gì: Jika aktif, Wine memberi tahu game tepat inti CPU yang Anda pilih di Pilih inti CPU, bukan semua inti ponsel.
+Vì sao chỉnh: Jika inti sudah dikurangi tapi game masih mengira semua inti ada, game bisa membagi kerja ke terlalu banyak thread dan tersendat. Aktifkan agar game membagi kerja sesuai jumlah inti yang dipakai.
+Chỉnh thế nào: Default mati. Aktifkan hanya jika sudah mengurangi inti di Pilih inti CPU. Jika game lebih lambat atau error, matikan lagi.
+
+[Đồng bộ khung hình]
+Là gì: Membuat game menunggu GPU selesai menggambar tiap frame sebelum mengirimnya ke layar.
+Vì sao chỉnh: Bisa memperbaiki gambar berkedip, kilatan hitam, atau frame rusak; sebagai gantinya FPS turun.
+Chỉnh thế nào: Biarkan mati (default). Aktifkan hanya jika gambar berkedip atau rusak dan mengganti Mode presentasi driver tidak membantu. Ponsel lemah sebaiknya biarkan mati karena memakan FPS.
+
+[Đổi kênh màu đỏ/xanh dương]
+Là gì: Menukar warna merah dan biru di gambar game saat menggambar dengan Vulkan.
+Vì sao chỉnh: Hanya dipakai saat warna game tertukar, misalnya kulit orang jadi biru, api berwarna biru.
+Chỉnh thế nào: Default: mati. Aktifkan hanya saat warna tertukar. Jika warna tidak berubah, matikan lagi dan coba ganti “Format permukaan” (RGBA/BGRA) di bagian Gambar pada lingkungan.
+
+[Độ phân giải]
+Là gì: Ukuran layar Windows emulasi tempat game menggambar, lalu diperbesar agar pas di layar ponsel.
+Vì sao chỉnh: Lebih rendah berarti lebih ringan dan ponsel lebih dingin (tapi tidak dua kali lebih cepat), gambar lebih buram. Lebih tinggi berarti lebih tajam tapi lebih berat dan panas.
+Chỉnh thế nào: Ponsel lemah: 854x480 (16:9); menengah: 960x544 (16:9); kuat: 1280x720 (16:9). Game yang ditambahkan lewat aplikasi sudah punya level sendiri, Atur grafis di Pustaka juga mengubahnya. Pilih Custom untuk mengetik sendiri.
+
+[Độ phân giải tùy chỉnh]
+Là gì: Kolom untuk mengetik resolusi sendiri, tampil saat Anda memilih Custom di Resolusi.
+Vì sao chỉnh: Dipakai saat butuh ukuran yang tidak ada di daftar, misalnya mencocokkan rasio layar ponsel atau menurunkan lagi untuk ponsel lemah.
+Chỉnh thế nào: Ketik dalam bentuk LEBARxTINGGI, misalnya 1024x576; huruf x kecil atau besar sama saja, tiap sisi dari 200 sampai 7680. Jika salah ketik, aplikasi memakai resolusi lama. Ponsel lemah sebaiknya sekitar 854x480 sampai 960x544.
+
+[Độ trễ khung hình tối đa]
+Là gì: Jika aktif, DXVK hanya membolehkan game menyiapkan paling banyak 1 frame lebih dulu (game DirectX 10/11).
+Vì sao chỉnh: Mengurangi jeda antara saat Anda menekan dan saat gambar merespons, cocok untuk game aksi.
+Chỉnh thế nào: Biarkan mati (default). Aktifkan jika kontrol terasa terlambat; jika FPS turun atau makin tersendat, matikan lagi. Ponsel lemah sebaiknya biarkan mati.
+
+[Ẩn thanh tải khi mở game]
+Là gì: Menghilangkan layar tunggu “Memulai…” (nama game, sampul, bilah progres) saat membuka game, dan layar tunggu saat keluar dari game.
+Vì sao chỉnh: Aktifkan jika game sering tersangkut di layar “Memulai…”: tanpa layar tunggu, Anda tetap bisa membuka menu game dengan tombol Kembali untuk keluar.
+Chỉnh thế nào: Default mati. Mengaktifkannya tidak membuat game terbuka lebih cepat. Saat game memuat, Anda mungkin melihat layar hitam beberapa detik, itu normal.
