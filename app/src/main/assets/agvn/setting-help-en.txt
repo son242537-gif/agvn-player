@@ -1,0 +1,573 @@
+# AGVN Player: English help for the "?" next to each setting (translation of setting-help.txt).
+# Each entry has 4 lines:
+#   [Setting name, the Vietnamese lookup key from setting-help.txt; do not translate it]
+#   Là gì: ...
+#   Vì sao chỉnh: ...
+#   Chỉnh thế nào: ...
+# Keep the three Vietnamese line prefixes as they are; only the text after them is translated.
+# Lines starting with "#" are comments. An entry missing one of the three lines shows no "?" button.
+
+[Async]
+Là gì: Compiles shaders (the code that draws effects) in the background instead of making the game wait. Only works with DXVK versions that have async or gplasync in the name.
+Vì sao chỉnh: Cuts stutter the first time a new scene or effect shows up.
+Chỉnh thế nào: Usually turns on by itself when you pick an async DXVK version; keep it on, especially on weak phones. If objects or effects briefly vanish, flicker, or the game breaks, try turning it off.
+
+[Biến]
+Là gì: Pick the environment variable to add. An environment variable is a setting line sent to Wine, the driver or DXVK when the game opens. Pick “Custom…” to type the name yourself.
+Vì sao chỉnh: Use it when you are told to add a specific variable to fix a problem or test performance.
+Chỉnh thế nào: Only add variables you know the purpose of. Pick a name, tap “Add”, then set the Value. A variable set in the game overrides the environment's variable with the same name.
+
+[Box64 Preset]
+Là gì: Ready-made settings for Box64 and WOWBox64 that balance safety and speed: Stability, Compatibility, Intermediate, Performance (from safest to fastest).
+Vì sao chỉnh: Change it when the game crashes, freezes or acts strange (pick a safer level), or when it runs fine but slowly (pick a faster level).
+Chỉnh thế nào: Default: Compatibility. Game has problems: try Stability. Want more speed: try Intermediate, then Performance; go back if problems show up. Unity games should stay on Compatibility or Stability.
+
+[Bật debug Wine]
+Là gì: Wine is the part that lets Windows games run on your phone. Turn this on so Wine writes warnings and errors to a log file in the AGVN-Player/logs folder, with a “View log” button in the game menu.
+Vì sao chỉnh: Use it when a game crashes, freezes or shows an error and you need to send the log to AGVN for help.
+Chỉnh thế nào: Off by default. Turn it on, play until the error, exit, then in the library tap ⋮ on the game → “Send logs” (Wine log included), or tap “Export error logs” at the top of Settings. Leave “Wine debug channel” as is. Turn it off after, as logging slows games.
+
+[Bật DInput]
+Là gì: DInput (DirectInput) is an older way of reading controllers, common in older PC games.
+Vì sao chỉnh: Turn it on when an old game doesn't detect your controller. With Exclusive input on, turning on DInput turns XInput off: the game only sees the controller through DInput, as a regular controller, not an Xbox one.
+Chỉnh thế nào: Off by default. You can only change it while Exclusive input is on. If buttons get mixed up, go back to Turn on XInput, or turn off Exclusive input so the game sees the controller both ways.
+
+[Bật File Provider]
+Là gì: Lets you browse and copy files inside AGVN Player (like the virtual Windows PC's drive C) with Android's file manager (the Files app).
+Vì sao chỉnh: Handy for copying saves, fonts or config files into a game's drive C. Turn it off if you don't use it and don't want other apps to see the app's data.
+Chỉnh thế nào: On by default. Changes take effect the next time you open the app. Be careful deleting or renaming files there, as it can break the environment.
+
+[Bật log Box64]
+Là gì: Box64 is a translator that lets programs made for computer chips (x86) run on phone chips (ARM). Turn this on so Box64 writes extra info to the game log.
+Vì sao chỉnh: Use it when a game crashes or freezes right at launch and AGVN needs to see what Box64 reports.
+Chỉnh thế nào: Off by default. Only useful when the game runs with Box64, or when WOWBox64 is picked under “32-bit emulator”; with FEXCore it adds almost nothing. Turn it off once you've sent the report.
+
+[Bật nhật ký ứng dụng]
+Là gì: Records the app's own log (the Android side: graphics driver, sound, display…) while you play, into a file in the AGVN-Player/logs folder.
+Vì sao chỉnh: Helpful when the app closes by itself, the screen goes black, or the problem is outside the game, so AGVN can find the cause.
+Chỉnh thế nào: Off by default. Only turn it on to report a problem: turn it on, play until the error, then tap “Export error logs”. Turn it off after sending, since each play session adds another log file that uses phone storage.
+
+[Bật tần số quét cao]
+Là gì: Refresh rate is how many times per second the screen updates (60, 90, 120 Hz…). With this on, the app asks for the highest rate your screen supports while you play.
+Vì sao chỉnh: Only helps when the game runs above 60 FPS (frames per second) and your phone has a 90 Hz or higher screen.
+Chỉnh thế nào: Off by default. On weak phones games usually run at only 24–30 FPS, so turning it on won't make them smoother; it just uses more battery and heats the phone more. Keep it off on weak phones.
+
+[Bật XInput]
+Là gì: XInput is the Xbox controller method most newer PC games use.
+Vì sao chỉnh: Pick it when the game supports Xbox controllers. With Exclusive input on, turning on XInput turns DInput off, so the game only sees the controller through XInput. With both XInput and DInput off, the game won't detect the controller.
+Chỉnh thế nào: On by default. You can only change it while Exclusive input is on. If an old game doesn't detect the controller, switch to Turn on DInput.
+
+[Bắt chuột ngoài]
+Là gì: When you use an external mouse (wired or Bluetooth), the app keeps it inside the game: the Android pointer hides, and every movement and click goes straight to the game.
+Vì sao chỉnh: Makes camera turning smooth in 3D games and keeps the pointer from leaving the game. Try turning it off if your external mouse acts strangely, is hard to control, or clicks don't register.
+Chỉnh thế nào: On by default. Without an external mouse this setting changes nothing, and touch works as before. It applies to every game.
+
+[Bỏ qua X11]
+Là gì: Only with DisplayX. When on, game frames drawn with Vulkan (for example through DXVK, VKD3D) go straight to the screen, skipping the X11 middle layer.
+Vì sao chỉnh: Can lower lag and raise FPS for games that draw with Vulkan. If the game shows a black screen, no picture, or crashes, turn it off.
+Chỉnh thế nào: Off by default. To try for smoother play, turn it on and reopen the game; if the picture breaks, turn it off again. Not sure? Leave it off.
+
+[Bộ dựng hình]
+Là gì: How the app draws the Windows picture on your phone screen. Vulkan: the default, with upscaling and sharpening filters. EGL: the older OpenGL ES way. DisplayX: hands frames straight to Android.
+Vì sao chỉnh: Change it for a black screen, flicker, wrong colors, or to try a smoother option on your phone.
+Chỉnh thế nào: Keep Vulkan. If the picture is broken, try EGL. DisplayX skips a copy step so it may be lighter, but the magnifier doesn't work with it. Changing this resets Surface format automatically.
+
+[Bộ dựng hình Wine]
+Là gì: Picks how WineD3D draws 3D: gl uses OpenGL (through the app's OpenGL driver), vulkan uses the Vulkan driver directly. Only works when DX Wrapper is WineD3D.
+Vì sao chỉnh: Change it when a game using WineD3D runs slowly, shows broken graphics or won't open.
+Chỉnh thế nào: Default: gl, which suits the most games. Try vulkan if gl has problems; WineD3D's vulkan renderer still lacks features, so older games may show broken graphics. Go back to gl if it gets worse.
+
+[Bộ dựng hình WineD3D]
+Là gì: Picks how WineD3D draws: gl uses OpenGL, vulkan uses the Vulkan driver directly, gdi turns 3D off completely and only draws 2D. Only works when DX Wrapper is WineD3D.
+Vì sao chỉnh: Change it when a game using WineD3D runs slowly, shows broken graphics or won't open.
+Chỉnh thế nào: Default: gl, which suits the most games. Try vulkan if gl has problems; older games may show broken graphics with vulkan. Only pick gdi for 2D games, since 3D games won't run.
+
+[Bộ nhớ thiết bị tối đa]
+Là gì: The amount of graphics memory (VRAM, in MB) reported to the game. 0 reports what the phone really has. Phones share RAM, so this is just the number the game sees.
+Vì sao chỉnh: Some games pick picture quality based on VRAM, or say there isn't enough video memory and refuse to run.
+Chỉnh thế nào: Keep it at 0 (default). If the game says there isn't enough video memory, try 2048 or 4096. Lowering this does not save real RAM (measured on real phones); it only helps games that pick lighter settings based on VRAM.
+
+[Bộ nhớ video]
+Là gì: The amount of graphics memory (VRAM), in MB, that WineD3D reports to the game. It's only a number for the game; no real RAM is reserved.
+Vì sao chỉnh: Change it when a game using WineD3D says there isn't enough graphics memory, won't let you pick high graphics settings, or won't run.
+Chỉnh thế nào: Default: 2048. If the game says there isn't enough graphics memory, try 4096. Lowering it doesn't save RAM, and DirectX 8/9 games may even report running out of memory. Weak phones: just keep 2048.
+
+[Bộ nhớ video (MB)]
+Là gì: The amount of graphics memory (VRAM), in MB, that WineD3D reports to the game. It's only a number for the game; no real RAM is reserved.
+Vì sao chỉnh: Change it when a game using WineD3D says there isn't enough graphics memory, won't let you pick high graphics settings, or won't run.
+Chỉnh thế nào: Default: 2048. If the game says there isn't enough graphics memory, try 4096. Lowering it doesn't save RAM, and DirectX 8/9 games may even report running out of memory. Weak phones: just keep 2048.
+
+[Bộ đệm Async]
+Là gì: Saves compiled shaders (the code that draws effects) to phone storage so the next session can reuse them. Only with DXVK gplasync versions.
+Vì sao chỉnh: Less stutter next time, and scenes you've already seen run smoother.
+Chỉnh thế nào: Turns on by itself when you pick a gplasync version; keep it on. Uses a little extra storage. If graphics break after changing the driver or DXVK, try turning it off.
+
+[Bộ đệm giả lập BCN]
+Là gì: Saves decoded BCn textures (PC-style compressed surface images) to phone storage so they can be reused next time without decoding them again.
+Vì sao chỉnh: Helps the next session load faster, with less stutter when entering a level.
+Chỉnh thế nào: Just leave it off (default). Only works when the app decodes textures on the CPU (Mali phones, or drivers other than Turnip). Turn it on if the game loads slowly; it uses extra storage.
+
+[Bộ đệm shader Async]
+Là gì: Saves the shaders DXVK has built to internal storage so the next session can reuse them instead of building them again. Only works with DXVK versions that have gplasync in the name.
+Vì sao chỉnh: Turn it on for less stutter from your second session onward.
+Chỉnh thế nào: Default: off. Best turned on together with Shader Async when using 2.3.1-arm64ec-gplasync. Uses a little extra storage. If the game breaks after turning it on, turn it off.
+
+[Chia sẻ bộ nhớ tạm Android với Wine]
+Là gì: The clipboard holds the text you just copied. With this on, text copied on your phone can be pasted into the game, and text copied in the game can be pasted into other apps.
+Vì sao chỉnh: Handy for pasting names or activation codes into a game, or copying game text into a translation app (if the game lets you copy text).
+Chỉnh thế nào: Off by default. Only text is shared, not images. Turn it off when you don't need it, so games can't read what you've copied, such as passwords.
+
+[Chuột tương đối]
+Là gì: Sends mouse movement to the game as “how far it moved” instead of the pointer's position. Applies to external mice and to touchpad-style swiping.
+Vì sao chỉnh: Turn it on for 3D games where you turn the camera with the mouse (shooters, 3D RPGs) when the camera won't turn, turns jerkily, or gets stuck at the screen edge.
+Chỉnh thế nào: Off by default. Keep it off for visual novels and menu-based games. You can toggle it right in the game menu (the “Relative mouse” switch) to test quickly.
+
+[Chế độ dựng hình]
+Là gì: Only shown with the Turnip driver (Snapdragon phones, Adreno GPU). Picks how the GPU draws: Sysmem draws straight into RAM; Gmem splits the picture into small tiles and draws them in the GPU's fast memory.
+Vì sao chỉnh: Change it when the game shows broken graphics (flicker, stripes, black patches, garbled picture) or to see which option gives higher FPS.
+Chỉnh thế nào: Keep None (the driver decides). If graphics break, try Sysmem. Autotuner Profiled: the driver measures and picks the faster way, so FPS may vary. Only try Gmem when the others don't work.
+
+[Chế độ hiệu năng]
+Là gì: Only with DisplayX. Tells Android that the thread sending frames must keep up with the refresh rate, so the system raises CPU speed when needed.
+Vì sao chỉnh: Keeps frames steady, with less stutter. In exchange, the phone may get warmer and use more battery.
+Chỉnh thế nào: On by default. If the phone heats up fast or drains battery, try turning it off. Needs Android 13 or newer; on older phones, on or off makes no difference.
+
+[Chế độ khởi động]
+Là gì: Picks which Windows background services (inside Wine) start when you open a game or environment.
+Vì sao chỉnh: Turning off some services can make startup a bit lighter, but some games and installers need these services to work right.
+Chỉnh thế nào: Keep Essential (default): it turns off the Plug and Play and RPC services to stay light. Normal: starts all services like stock Wine; pick it when a game or installer reports a service error. Minimal turns off even more, including .msi installs.
+
+[Chế độ trình chiếu]
+Là gì: How the app puts the game picture on screen when Renderer is Vulkan. fifo waits for the screen's refresh beat; mailbox always shows the newest frame.
+Vì sao chỉnh: Change it when controls feel laggy or the picture appears unevenly.
+Chỉnh thế nào: Keep fifo (default, stable). For more responsive controls, try mailbox; phones that don't support mailbox fall back to fifo. On weak phones, just keep fifo.
+
+[Chế độ trình chiếu của driver]
+Là gì: How the game sends frames to the screen through Vulkan (DXVK, VKD3D, Zink). mailbox: shows the newest frame. fifo: waits for the screen. immediate: doesn't wait. relaxed: like fifo, but late frames show right away.
+Vì sao chỉnh: Change it when the picture flickers, flashes, tears horizontally or stutters.
+Chỉnh thế nào: Keep mailbox (default). If the picture flickers or flashes, especially in OpenGL games running through Zink: try fifo. immediate and relaxed can cause tearing, so only try them when needed.
+
+[Chế độ vẽ ngoài màn hình]
+Là gì: How WineD3D draws temporary images that aren't on screen yet: fbo (newer way) or backbuffer (older way). Only works when using WineD3D with the gl renderer.
+Vì sao chỉnh: Only change it when a game using WineD3D has a black screen or broken graphics that nothing else fixes.
+Chỉnh thế nào: Default: fbo; keep it. Only try backbuffer after everything else; if it's worse, pick fbo again. Reopen the game to apply.
+
+[Chọn nhân CPU]
+Là gì: The CPU cores the game is allowed to run on (CPU0, CPU1…). White boxes are the selected cores.
+Vì sao chỉnh: Keeping the game on the strong cores can make it run more evenly on some phones. Picking too few cores slows the game down.
+Chỉnh thế nào: Keep all selected (default). To experiment, keep only the strong cores, usually the higher numbers (for example CPU4–CPU7). If no core is selected, the game uses them all.
+
+[Chọn nhân CPU (ứng dụng 32-bit)]
+Là gì: Picks the CPU cores (processing cores) for 32-bit programs in this environment. Doesn't apply to games opened from the library: those use “CPU cores” in the game's Configuration.
+Vì sao chỉnh: Only needed when you're told to, for example a very old 32-bit game that breaks on many cores, or to keep programs on certain cores.
+Chỉnh thế nào: Best to keep the current selection. Tap CPU0, CPU1… to turn them on or off; white boxes are selected cores. If you deselect all, the app uses the back half of the cores (for example CPU4–CPU7 on an 8-core phone).
+
+[CSMT]
+Là gì: CSMT lets WineD3D process draw commands on a separate CPU thread, in parallel with the game. Only works when DX Wrapper is WineD3D.
+Vì sao chỉnh: Try turning it off when a game using WineD3D crashes, freezes, flickers or shows broken graphics. When it's on, games usually run faster.
+Chỉnh thế nào: Default: on; keep it on. Only turn it off if the game has problems and gets better without it; turning it off may lower FPS. Reopen the game to apply.
+
+[Cấu hình phím ảo]
+Là gì: Picks the set of on-screen buttons for this game. “Auto (AGVN)” picks by game type: visual novel, RPG, 2D or PC keyboard. “No on-screen keys” shows no buttons.
+Vì sao chỉnh: Change it when the auto-picked set doesn't fit the game, lacks keys you need, or you just want to tap directly or use a controller.
+Chỉnh thế nào: Best to keep “Auto (AGVN)”. If you pick a specific set, the app won't change it anymore. To move, add or change buttons, tap “✎ Edit” in the game; the key set is saved for this game only.
+
+[Cập nhật ứng dụng]
+Là gì: Finds and installs new AGVN Player versions right in the app, no computer needed. The app only downloads version info and the install file from AGVN's GitHub page, and sends nothing about your phone.
+Vì sao chỉnh: New versions fix bugs and help games run better. Your games, saves and settings stay the same after updating.
+Chỉnh thế nào: Tap it and pick Check for updates. If there's a new version, tap Update, wait for the download, then tap Update in Android's dialog. The file is a few hundred MB, so use Wi-Fi.
+
+[DDraw Wrapper]
+Là gì: A converter for very old games that use DirectDraw or Direct3D 7 or older. Only works when DX Wrapper is DXVK+VKD3D. none and wined3d use Wine's built-in DirectDraw.
+Vì sao chỉnh: Change it when a very old game has a black screen, wrong colors, stutters, runs slowly or won't start.
+Chỉnh thế nào: Default: none. Old 2D game with problems: try cnc-ddraw. Old 3D game (DirectX 7) with broken graphics: try dd7to9 or D7VK 2.2 (if listed). Reopen the game to apply.
+
+[Direct3D]
+Là gì: DirectX helper libraries (d3dx9, d3dx10, d3dx11, d3dcompiler) that many DirectX 9–11 games need. This isn't DXVK; DXVK is picked under DX Wrapper.
+Vì sao chỉnh: Native (Windows) is Microsoft's real library, so it usually works better. Built-in (Wine) is written by Wine and still lacks features, which can break graphics or crash games.
+Chỉnh thế nào: Keep Native (Windows) (default). Only try Built-in (Wine) when the game crashes right at launch and nothing else works. Reopen the game after changing it.
+
+[DirectMusic]
+Là gì: The DirectMusic music library, which some older games use to play background music.
+Vì sao chỉnh: The Built-in (Wine) version is incomplete, so some old games lose their background music or crash when music plays.
+Chỉnh thế nào: Keep Built-in (Wine) (default). If an old game has no background music or crashes when music plays, try Native (Windows); if that doesn't help, switch back.
+
+[DirectPlay]
+Là gì: The network play library (LAN, online) of older Windows games.
+Vì sao chỉnh: Only needed when an old game shows a DirectPlay error or crashes when entering multiplayer. Single-player games usually don't need it.
+Chỉnh thế nào: Keep Built-in (Wine) (default). Only try Native (Windows) when the game shows a DirectPlay-related error.
+
+[DirectShow]
+Là gì: The DirectShow video library, which games use to play intro videos and cutscenes.
+Vì sao chỉnh: Change it when in-game videos are black, don't play, freeze, or the game crashes during a video.
+Chỉnh thế nào: Keep Built-in (Wine) (default). If videos break, try Native (Windows); if that doesn't help, pick Built-in (Wine) again.
+
+[DirectSound]
+Là gì: The DirectSound audio library that many older Windows games use for sound.
+Vì sao chỉnh: Change it when an old game has no sound, crackling sound, or crashes when playing audio, and changing Audio driver didn't help.
+Chỉnh thế nào: Keep Built-in (Wine) (default). If an old game has sound problems, try Native (Windows); if that doesn't help, pick Built-in (Wine) again.
+
+[Driver dựng hình]
+Là gì: The Vulkan driver the app uses to draw the game picture on screen (when Renderer is Vulkan). This isn't the driver the game uses; that one is the Vulkan driver setting.
+Vì sao chỉnh: Change it when you get a black screen, flickering, or the app closes right when opening a game with the Vulkan renderer.
+Chỉnh thế nào: Keep System (default). If graphics break, try another driver in the list (only Snapdragon phones have extra options), or switch Renderer to EGL.
+
+[Driver OpenGL]
+Là gì: The driver for games that use OpenGL (a graphics standard), and for WineD3D when Wine renderer is gl. Zink runs OpenGL on the Vulkan driver; Freedreno is an OpenGL driver just for Adreno GPUs.
+Vì sao chỉnh: Change it when your OpenGL game shows a black screen, flickers, has wrong colors, closes by itself, or says its OpenGL version is too old.
+Chỉnh thế nào: Freedreno only runs on Adreno GPUs (Snapdragon phones) and reports OpenGL 3.3; Zink runs on every phone. If an OpenGL game has broken graphics, a black screen or closes by itself: try the other option. MediaTek phones: pick Zink.
+
+[Driver Vulkan]
+Là gì: The main graphics driver the game uses (through DXVK, VKD3D, Zink). turnip26.2.0 is an open-source driver for Adreno GPUs, v863 is Qualcomm's driver, System is the phone's built-in driver.
+Vì sao chỉnh: Change it when your game shows a black screen, no 3D picture, closes at launch, has broken graphics or low FPS.
+Chỉnh thế nào: Snapdragon phones: keep turnip26.2.0 (default). Other phones: use System. If the driver you picked can't run, the app switches to another one when the game opens. Entries marked Download are downloaded when you pick them.
+
+[Driver âm thanh]
+Là gì: How the game's sound gets to your phone speaker. PulseAudio-GN is the newer, low-latency PulseAudio; PulseAudio is the old version; ALSA is a simple sound path built into the app.
+Vì sao chỉnh: Change it when the game has no sound, crackling or popping sound, delayed sound, or freezes when sound starts.
+Chỉnh thế nào: Keep PulseAudio-GN (default). No sound or crackling: try PulseAudio, then ALSA. After each change, reopen the game to check.
+
+[Driver đồ họa]
+Là gì: The OpenGL driver for games that use OpenGL and for WineD3D when drawing with gl. Wrapper means Zink: OpenGL runs on the phone's Vulkan driver.
+Vì sao chỉnh: Only change it when an OpenGL game has problems and you know it needs a different driver.
+Chỉnh thế nào: This screen only has Wrapper, so leave it as is. The Vulkan driver is picked under Graphics driver version.
+
+[DX Wrapper]
+Là gì: Translates a Windows game's DirectX graphics into something your phone can run. DXVK+VKD3D translates to Vulkan; WineD3D is Wine's built-in translator.
+Vì sao chỉnh: Change it when your DirectX game shows a black screen, broken graphics, closes at launch or runs too slowly.
+Chỉnh thế nào: Keep DXVK+VKD3D (default, usually faster). If an old game (DirectX 9 or older) has broken graphics or won't open: try WineD3D.
+
+[DXVK HUD]
+Là gì: DXVK turns a Windows game's DirectX graphics commands into Vulkan (the graphics language your phone understands). Turn this on to have DXVK show FPS, GPU, driver and GPU usage in the top left.
+Vì sao chỉnh: Use it to track down graphics problems: see whether the game runs through DXVK and how many FPS (frames per second) it gets.
+Chỉnh thế nào: Off by default. Only shows when “DX Wrapper” is DXVK+VKD3D and the game uses DirectX 9 to 11. Keep it off for normal play; to see FPS, use the HUD setting.
+
+[Dùng tiện ích DRI3]
+Là gì: DRI3 sends each frame from the graphics chip (GPU) straight to the game screen. When off, frames must be copied through the processor (CPU), which is slower.
+Vì sao chỉnh: Only try turning it off when the game has a black screen, flickers, shows stripes or crashes right when the picture starts, and other graphics settings didn't help.
+Chỉnh thế nào: On by default; keep it on, especially on weak phones. This setting applies to every game. If turning it off doesn't fix the problem, turn it back on right away.
+
+[Dùng tích hợp OpenXR]
+Là gì: This setting only shows on Meta Quest VR headsets. When on, games and environments open in VR mode, controlled with the headset's controllers.
+Vì sao chỉnh: Turn it off if you want to play in a normal flat window on the headset, or if VR mode has broken graphics or controls.
+Chỉnh thế nào: On by default. On phones this setting doesn't show and has no effect.
+
+[FEXCore Preset]
+Là gì: The balance between speed and accuracy for FEXCore. Stability: safest, slowest. Performance: fastest, most likely to break.
+Vì sao chỉnh: Change it when the game closes or freezes at random, has physics glitches, or when you want more FPS in CPU-heavy games.
+Chỉnh thế nào: Keep Intermediate (default). If the game closes or freezes at random: try Compatibility, then Stability. If it runs fine but slowly: try Performance, and go back if problems show up.
+
+[Ghi đè di chuyển chuột]
+Là gì: How Wine pulls the mouse pointer back to the screen center for games that read the mouse through DirectInput (usually old 3D games): disable, enable or force.
+Vì sao chỉnh: Change it when turning the camera with the mouse gets stuck at the screen edge, or the pointer keeps jumping back to the center.
+Chỉnh thế nào: Keep disable (default). If the camera gets stuck: try enable, then force. If the pointer keeps jumping to the center: pick disable again.
+
+[Giao diện desktop]
+Là gì: The color of the Windows-style windows, buttons and dialogs in the environment: Dark or Light. It doesn't change the picture inside the game.
+Vì sao chỉnh: Change it when text in an installer, an error dialog or a game's settings window is hard to read (dark text on a dark background).
+Chỉnh thế nào: Dark by default. If dialogs are hard to read, pick Light. Takes effect the next time you open it.
+
+[Giá trị]
+Là gì: The value of the environment variable on this line. Depending on the variable, you pick from a list, tick several items, or type text or numbers.
+Vì sao chỉnh: Change it when you're told to adjust a variable to fix graphics or sound problems, or to test performance.
+Chỉnh thế nào: Don't use spaces; the app removes them. Separate multiple items with commas. Not sure? Delete the variable with the trash button. Reopen the game to apply.
+
+[Giả lập 32-bit]
+Là gì: Picks the emulator that runs 32-bit Windows games and programs on your phone's chip. 64-bit games always run with FEXCore.
+Vì sao chỉnh: Change it when a 32-bit game closes by itself, freezes, has errors or runs slowly.
+Chỉnh thế nào: Keep FEXCore (default). If a 32-bit game has problems or is slow: try WOWBox64 (WOWBox64 version and Box64 preset will appear). If that doesn't help, go back to FEXCore.
+
+[Giả lập 64-bit]
+Là gì: Shows which emulator runs 64-bit programs: FEXCore with Wine/Proton arm64ec, Box64 with other Wine versions. This is view-only.
+Vì sao chỉnh: Nothing to change: it follows the environment's Wine/Proton version automatically.
+Chỉnh thế nào: To use a different 64-bit emulator, create an environment with a different Wine/Proton version. The emulator's version and preset are set in the settings below.
+
+[Giả lập BCN]
+Là gì: BCn is a PC game texture (surface image) compression format that many phone GPUs, especially Mali, can't read. This setting decides whether the app converts those textures.
+Vì sao chỉnh: Change it when textures look black, purple or blurry, go missing, or the game closes while loading a level.
+Chỉnh thế nào: Snapdragon phones with the Turnip driver don't need it: the app turns it off, as Turnip reads BCn itself. Other drivers and Mali phones: keep auto (default); full converts every texture, safest but uses more CPU and RAM; none: off.
+
+[Giả lập màn hình cảm ứng]
+Là gì: Wherever you tap, the game gets a left click right there; tap, hold and drag holds the left button to drag. When off, the screen becomes a touchpad: swipe to move the pointer, tap to click.
+Vì sao chỉnh: Great for visual novels and menu-based games: tap choices directly. Turn it off if the game needs hovering without clicking (to show tooltips) or camera turning.
+Chỉnh thế nào: Games added through AGVN usually have it on already; keep it that way for visual novels. In both modes, a two-finger tap is a right click.
+
+[Giới hạn FPS]
+Là gì: DXVK's hard FPS limit, for DirectX 8–11 games. 0 means no limit.
+Vì sao chỉnh: Use it when a game runs too fast or has physics glitches at high FPS.
+Chỉnh thế nào: Keep 0 (default). For a cooler phone, open the in-game menu, Video section, and set FPS limit to 30 or 20: a 60 Hz screen only shows 60, 30 and 20 FPS evenly. Only set a number here if the game breaks at high FPS: it's a hard lock you can't raise in game.
+
+[Gửi mọi buffer]
+Là gì: Only when Renderer is DisplayX. When on, Android shows every frame the game sends, in order, instead of dropping old frames to jump to the newest one.
+Vì sao chỉnh: Can make motion smoother when the picture stutters even though FPS is fine. In exchange, controls may lag a little more.
+Chỉnh thế nào: Just leave it off (default): the newest frame comes first, so there's less lag. Try turning it on if the picture stutters; if it feels laggier, turn it off again. Only works on Android 12 or newer.
+
+[Hiệu ứng làm nét]
+Là gì: Adds a sharpening filter to the game picture. CAS brings out detail while staying natural; DLS sharpens brightness and comes with a “Denoise when sharpening” slider to reduce grain.
+Vì sao chỉnh: Helpful when you lower the resolution to lighten the load and the picture looks blurry. Drag the “Sharpening level” slider to raise or lower sharpness.
+Chỉnh thế nào: None by default. On weak phones keep None, since sharpening costs extra GPU power. To try it, pick CAS at a moderate level. If the picture doesn't change, that game doesn't take the effect; keep None.
+
+[HUD]
+Là gì: The HUD is a small stats panel shown over the game. Classic: FPS (frames per second), GPU name, RAM. Modern: adds CPU and GPU usage, temperature, battery and graphs.
+Vì sao chỉnh: Turn it on to see whether the game is smooth (FPS) and whether the phone is hot or running low on RAM, especially when trying new graphics settings.
+Chỉnh thế nào: For normal play pick Off; to check things, Classic keeps it compact. This choice only applies to this game. You can also toggle it in game with the “Turn on HUD” switch in the menu.
+
+[HUD Winlator]
+Là gì: A small stats panel shown on screen while you play. Classic: FPS, GPU name, RAM. Modern: adds CPU/GPU usage, temperature and battery.
+Vì sao chỉnh: Turn it on to see FPS while trying settings, or to find out why a game stutters or the phone gets hot.
+Chỉnh thế nào: For normal play keep Off. Quick FPS check: pick Classic. For temperature and battery too: pick Modern. Applies to games in this environment that don't have their own HUD choice.
+
+[Hình nền desktop]
+Là gì: The background of the emulated Windows desktop, behind the game window: Image or Solid color.
+Vì sao chỉnh: Just for looks. It shows when you open the environment's Windows desktop directly; when you play a game from the library, it's usually hidden.
+Chỉnh thế nào: Pick Image, then tap Select or Change to use your own picture. For something simple, pick Solid color.
+
+[Kiểu giả lập BCN]
+Là gì: How BCn textures (PC-style compressed surface images) are decoded when BCn emulation is auto or full: compute uses the GPU, software uses the CPU.
+Vì sao chỉnh: Change it when the game loads slowly, stutters when entering a new level, or textures are broken.
+Chỉnh thế nào: Keep compute (default). On Snapdragon phones (Adreno GPU) the app doesn't use compute, so this setting has no effect. Mali phones: if textures break or the game closes by itself, try software.
+
+[Kéo giãn toàn màn hình]
+Là gì: Stretches the game picture to fill the phone screen, removing the black bars on the sides.
+Vì sao chỉnh: Turn it on for a picture that fills the whole screen. If the resolution's aspect ratio differs from the screen's, the picture will look wide or distorted.
+Chỉnh thế nào: Off by default (keeps the right proportions). To fill the screen without distortion, pick a Resolution with your phone's aspect ratio, for example 1280x576 (20:9). Games without their own choice here follow the environment's setting.
+
+[Loại tài nguyên]
+Là gì: How the driver requests memory that both the CPU and GPU read and write. auto tries dmabuf, ahb, opaque in turn until one works.
+Vì sao chỉnh: Only change it when your game closes at launch or while loading, or reports a graphics memory error.
+Chỉnh thế nào: Keep auto (default). If the game has the problems above, try dmabuf, ahb, opaque in turn; if nothing helps, go back to auto.
+
+[Lưu game]
+Là gì: Turns on save (game progress) backup for this game only. The app finds the save folder on the virtual Windows drive and stores a copy in the AGVN-Player/Saves folder.
+Vì sao chỉnh: Turn it on before deleting the game, reinstalling the app, changing environments or trying unusual settings, so you don't lose progress.
+Chỉnh thế nào: Tap “Back up now” to save a copy, or “Restore” to copy the newest backup over your current save. Games that keep saves inside the game folder (like many RPG Maker games) aren't backed up by this.
+
+[Lọc texture]
+Là gì: How the game picture is scaled to fit your phone screen. It doesn't change texture quality inside the game. The EGL renderer only has Bilinear and Nearest neighbor.
+Vì sao chỉnh: Change it when the picture looks blurry or grainy, or you want a sharper picture at low resolution.
+Chỉnh thế nào: Keep Bilinear (smooth, default). Pixel-art 2D games: Nearest neighbor. Weak phones at low resolution: try Snapdragon Super Resolution for a sharper picture. The sharpening options and Color boost cost extra GPU.
+
+[MIDI SoundFont]
+Là gì: A set of instrument sounds used to play MIDI music. Many old games, like RPG Maker 2000/2003 games, use MIDI music.
+Vì sao chỉnh: With Off, games that use MIDI music have no background music. Pick a different set to change how the music sounds.
+Chỉnh thế nào: Game missing background music: pick wt_210k_G.sf2 (built in). Games without MIDI: keep Off. Picking it in Game settings changes it for that game only; picking it in the environment changes it for games without their own choice.
+
+[Môi trường chạy]
+Là gì: An environment is a separate virtual Windows PC with its own Wine/Proton version (what runs Windows games), drivers and settings. This shows which environment the game runs in.
+Vì sao chỉnh: Change it when the game won't run or keeps breaking with the current Wine/Proton version, or when you want separate settings for this game without affecting others.
+Chỉnh thế nào: Picking another environment copies the game there; the old copy stays. Saves don't move by themselves: back them up, then restore them in the new copy. If there's only one environment, tap + to create another.
+
+[Mở chế độ Big Picture khi khởi động]
+Là gì: Big Picture is a large game picker you browse by cover art, great for TVs or controllers. With this on, the app goes straight to it every time it opens.
+Vì sao chỉnh: Turn it on if you play on a TV or big screen, or mostly use a controller. It has background music and downloads cover art online for games that have none.
+Chỉnh thế nào: Off by default; keep it off on weak phones to stay light. In Big Picture, press Back to return to the normal screen. Background music can be turned off in Big Picture's settings.
+
+[Mở trình duyệt Android từ Wine]
+Là gì: When a game opens a web page (home page, forum, support-the-developer buttons…), the page opens in your phone's browser.
+Vì sao chỉnh: Turn it on if you need to open web pages from inside a game, for example a guide page or the game's update download page.
+Chỉnh thế nào: Off by default. When on, a game opening a web page switches you to the browser and the game pauses; come back to the app to keep playing.
+
+[Mức tính năng VKD3D]
+Là gì: The DirectX 12 feature level VKD3D reports to the game. Only works when VKD3D version isn't None.
+Vì sao chỉnh: Change it when a DirectX 12 game says the feature level isn't supported, won't open, or closes when starting.
+Chỉnh thế nào: Keep 12_1 (default). If the game wants a higher level: try 12_2. If it closes at launch: try 12_0 or 11_1. VKD3D ignores levels 10_x and 9_x.
+
+[Ngôn ngữ vùng (LC_ALL)]
+Là gì: The language and region the emulated Windows reports to the game. It decides the text encoding, which matters a lot for older Japanese and Chinese games.
+Vì sao chỉnh: With the wrong region, Japanese games (KiriKiri, Siglus, NScripter, Wolf RPG…) may show garbled text, break file names or crash. Translation patches usually still show correctly with ja_JP.
+Chỉnh thế nào: When you add a game, the app picks ja_JP for Japanese games by itself. Garbled text or crashes: pick ja_JP for Japanese games, zh_CN or zh_TW for Chinese games. No problems? Leave it as is.
+
+[Nhập độc quyền]
+Là gì: When on, you pick one controller method for the game: XInput or DInput; with both off, the game detects no controller. When off, the game sees controllers both ways. Applies to real and on-screen controllers, not mouse or keyboard.
+Vì sao chỉnh: Turn it on to stop the game from detecting the controller twice (one button giving two commands). Some DInput games, like Rayman Origins or NFS Most Wanted 2005, need this off.
+Chỉnh thế nào: On by default, using XInput. If an old game doesn't detect the controller: switch on Turn on DInput. Still not working? Turn off Exclusive input.
+
+[Phiên bản Box64]
+Là gì: Box64 translates computer program code (x86-64) into phone chip code (ARM) to run Wine and games. This setting only appears when Wine/Proton isn't an arm64ec version.
+Vì sao chỉnh: Change it when the game crashes, freezes, runs slowly or acts strange, or when you're told to use a specific Box64 version.
+Chỉnh thế nào: Default: 0.4.2 (built in). Versions marked “Download” need internet to download. If the game gets worse after changing, pick 0.4.2 again. Weak phones: just keep the default.
+
+[Phiên bản DXVK]
+Là gì: The DXVK version that translates DirectX 8–11 to Vulkan. arm64ec versions run directly on the phone chip for 64-bit games; async or gplasync versions compile shaders (effect code) in the background.
+Vì sao chỉnh: Change it when the game has broken graphics, closes at launch, or often stutters when new effects appear.
+Chỉnh thế nào: Default 2.3.1 (Mali phones: 1.10.3). Mali phones or old drivers: use 1.10.3. VKD3D needs a 2.x version. Weak phones, 64-bit games: you can try an arm64ec version, and go back if it breaks.
+
+[Phiên bản FEXCore]
+Là gì: The FEXCore version, the emulator that runs a game's computer code (x86) on your phone chip. Used for 64-bit games, and for 32-bit games when FEXCore is picked.
+Vì sao chỉnh: Change it when the game closes by itself, freezes or runs incorrectly and changing FEXCore preset didn't help.
+Chỉnh thế nào: Keep 2601 (built in, default). Only try other versions when the game has problems; versions marked Download need internet. If it gets worse, go back to 2601.
+
+[Phiên bản VKD3D]
+Là gì: VKD3D-Proton translates DirectX 12 to Vulkan. None means it isn't used, leaving only Wine's built-in DirectX 12, which is very limited.
+Vì sao chỉnh: DirectX 12 games need this; with None, DirectX 12 games usually won't run.
+Chỉnh thế nào: Games that aren't DirectX 12: keep None (default). DirectX 12 games: pick 2.14.1, or try 2.8 if it breaks; DXVK must be a 2.x version. DirectX 12 games are very heavy and hard to run smoothly on weak phones.
+
+[Phiên bản Vulkan]
+Là gì: The Vulkan version number (the graphics standard DXVK, VKD3D and Zink use) reported to the game. It only changes the reported number; it doesn't make the driver stronger or weaker.
+Vì sao chỉnh: Rarely needed. Keep the default if the game has no problems.
+Chỉnh thế nào: Keep 1.3 (default). DXVK 2.x and VKD3D need 1.3: lowering it to 1.2 or 1.1 stops them from running. Only try lowering it when the game uses DXVK 1.10.3 or WineD3D and still has problems.
+
+[Phiên bản WOWBox64]
+Là gì: WOWBox64 is a Box64 build that runs 32-bit programs (usually old games) on Wine/Proton arm64ec. Only used when “32-bit emulator” is WOWBox64.
+Vì sao chỉnh: Change it when a 32-bit game crashes, freezes, runs slowly or acts strange, or when you're told to use a specific version.
+Chỉnh thế nào: Default: 0.4.2 (built in). Versions marked “Download” need internet to download. If the game gets worse after changing, pick 0.4.2 again.
+
+[Preset Box64]
+Là gì: Ready-made settings for Box64 and WOWBox64 that balance safety and speed: Stability, Compatibility, Intermediate, Performance (from safest to fastest).
+Vì sao chỉnh: Change it when the game crashes, freezes or acts strange (pick a safer level), or when it runs fine but slowly (pick a faster level).
+Chỉnh thế nào: Default: Compatibility. Game has problems: try Stability. Want more speed: try Intermediate, then Performance; go back if problems show up. Unity games should stay on Compatibility or Stability.
+
+[Preset FEXCore]
+Là gì: Ready-made settings for FEXCore that balance safety and speed: Stability, Compatibility, Intermediate, Performance (from safest to fastest).
+Vì sao chỉnh: Change it when the game crashes, freezes or acts strange (pick a safer level), or when it runs fine but slowly (pick a faster level).
+Chỉnh thế nào: Default: Intermediate. If the game has problems, especially games that use many threads: try Compatibility, then Stability. Want more speed: try Performance, and go back to Intermediate if problems show up.
+
+[Processor Affinity (32-bit apps)]
+Là gì: Picks the CPU cores for 32-bit Windows programs running in this environment.
+Vì sao chỉnh: If a game has its own cores picked under CPU cores, those are used for its 32-bit programs too; otherwise this setting is used. Rarely needs changing.
+Chỉnh thế nào: Leave it at the default. To experiment, keep only the strong cores, usually the higher numbers (for example CPU4–CPU7).
+
+[Renderer]
+Là gì: How the app draws the game picture on your phone screen: Vulkan (default) or EGL, the classic way of drawing with OpenGL ES.
+Vì sao chỉnh: Change it for a black screen, flicker, a broken picture, or when the app closes right when opening a game.
+Chỉnh thế nào: Default: Vulkan (with filters like Snapdragon Super Resolution). Display problems: try EGL; EGL only has the Bilinear and Nearest neighbor filters. Reopen the game to apply.
+
+[Toàn màn hình cho mọi game]
+Là gì: Stretches every game's picture to fill the phone screen, with no black bars on the sides, for both Windows games and Lite Run games.
+Vì sao chỉnh: Turn it on for game pictures that fill the screen. Phone screens are longer than the game frame, so the picture will look a bit wide (characters look slightly chubbier).
+Chỉnh thế nào: Off by default (keeps the right proportions). Games with their own "Stretch to full screen" choice in Game settings follow that choice. Applies from the next time you open a game.
+
+[Sao lưu bản lưu cho mọi game]
+Là gì: When on, each time a game closes, the app finds its saves and zips them into the AGVN-Player/Saves/<game name>/ folder on your phone storage.
+Vì sao chỉnh: Turn it on so you're less likely to lose progress when a game breaks, data gets deleted by mistake, or you reinstall the app.
+Chỉnh thế nào: Default: off. Only games whose own save folder the app can find get backed up. Each game keeps one latest automatic backup; to keep more, tap “Back up now” in Game saves.
+
+[Shader Async]
+Là gì: Lets DXVK build shaders (small programs that create visual effects) in the background so the game doesn't stop and wait. Only works with DXVK versions that have async or gplasync in the name.
+Vì sao chỉnh: Turn it on when the game stutters every time a new scene, object or effect appears.
+Chỉnh thế nào: Default: off. Try turning it on if the game stutters; in exchange, objects or effects may appear a little late. If parts of the picture are missing or flicker, turn it off. Reopen the game to apply.
+
+[Tiện ích Vulkan đã tắt]
+Là gì: A list of Vulkan extensions (extra graphics driver features) the app hides, so the game, DXVK, VKD3D and Zink don't use them. Names are separated by commas.
+Vì sao chỉnh: Use it when a driver extension makes the game crash or show a black screen or broken graphics; hiding it makes the game use another way.
+Chỉnh thế nào: Default: empty. Only fill it in when you're told to, typing the exact name (starting with VK_). Spaces are removed. If the game gets worse, clear it again. Reopen the game to apply.
+
+[Trình chiếu chính xác]
+Là gì: Only when Renderer is DisplayX. When on, each frame is tied to exactly one screen refresh, using the timing Android provides.
+Vì sao chỉnh: Can make frames show more evenly when FPS isn't low but you still see slight stutter.
+Chỉnh thế nào: Just leave it off (default). Try turning it on if the picture stutters slightly; if you see no difference or it feels laggier, turn it off again. Only works on Android 13 or newer; older phones ignore it.
+
+[Trình chiếu theo tần số quét]
+Là gì: Only with DisplayX. On: frames are grouped and sent to the screen in step with the phone's refresh rate. Off: frames are sent as soon as the game finishes drawing.
+Vì sao chỉnh: Turn it on for frames that keep pace with the screen. Turning it off may cut control lag, but frames may come out unevenly.
+Chỉnh thế nào: On by default. If controls feel laggy, try turning it off; if the picture stutters or flickers, turn it back on.
+
+[Tên]
+Là gì: The name of the environment or the game (shown in the library). In the New environment variable box, it's the variable name you type.
+Vì sao chỉnh: Names help you tell games and environments apart; they don't change how the game runs. Variable names, though, must be typed exactly for the variable to work.
+Chỉnh thế nào: Game names can't use \ / : * ? " < > | (they become _). If you rename a game, old backups stay in the folder with the old name. Variable names have no spaces, for example DXVK_HUD.
+
+[Tên GPU]
+Là gì: The graphics card name the game sees. Device is your phone's real GPU name; pick another name to pose as a PC graphics card (the vendor and card IDs change too).
+Vì sao chỉnh: Some games refuse to run, say the graphics card isn't supported, or pick the wrong settings when they see a phone GPU.
+Chỉnh thế nào: Keep Device (default). If the game says the graphics card isn't supported: try NVIDIA GeForce GTX 1060. This doesn't make your phone more powerful.
+
+[Tính shader chính xác]
+Là gì: When on, WineD3D asks the driver to skip the fast but approximate way of computing shaders (small programs that create visual effects). Only works when using WineD3D with the gl renderer.
+Vì sao chỉnh: Rarely needed. With the app's OpenGL drivers (Zink, Freedreno), this makes almost no difference in speed or picture.
+Chỉnh thế nào: Default: on. Leave it if the game runs normally. If you try turning it off and see no difference or worse graphics, turn it back on.
+
+[Tạm dừng game khi ứng dụng chạy nền]
+Là gì: When you leave the app (go to the home screen, open another app or turn the screen off), the game is fully paused so it doesn't run in the background.
+Vì sao chỉnh: Saves battery and keeps the phone cooler when you step away from the game; come back to the app and the game continues.
+Chỉnh thế nào: Best kept on (default). In this version the game always pauses when you leave the app, whether the switch is on or off. To keep the game running while doing something else, use “Floating window” in the game menu.
+
+[Tắt chuột]
+Là gì: Tapping and swiping on the screen no longer control the mouse in the game. On-screen keys, controllers and external mice still work normally.
+Vì sao chỉnh: Turn it on when you play entirely with on-screen keys or a controller and keep touching the screen by accident, making the pointer wander or click by mistake.
+Chỉnh thế nào: Off by default. When on, a four-finger tap no longer opens the menu; use the Back button instead. You can toggle it right in the game menu (the “Disable mouse” switch).
+
+[Tắt Present Wait]
+Là gì: Turns off the driver's present wait feature. This feature lets the game (through DXVK 2.x, VKD3D) wait until a frame actually reaches the screen to keep its timing.
+Vì sao chỉnh: With some drivers, this feature can make the game freeze, hang or stutter at a steady rhythm.
+Chỉnh thế nào: Just leave it off (default). If the game freezes or hangs while you play, or stutters steadily: try turning it on; if that doesn't help, turn it off again. Doesn't affect DXVK 1.10.3.
+
+[Tắt XInput]
+Là gì: When on, this game detects no controller (real controllers or controller buttons in on-screen keys), only mouse and keyboard. On-screen keys mapped to keys or the mouse still work.
+Vì sao chỉnh: For when a controller makes this game's buttons go haywire or the character moves on its own.
+Chỉnh thế nào: Keep it off (default). Only turn it on when this game misbehaves because of a controller. To turn off controllers for every game, use Turn off XInput (mouse/keyboard only) in Settings. Reopen the game after changing it.
+
+[Tắt XInput (chỉ dùng chuột/bàn phím)]
+Là gì: When on, no game detects any controller (real controllers or controller buttons in on-screen keys), only mouse and keyboard. On-screen keys mapped to keys or the mouse still work.
+Vì sao chỉnh: For when a controller (a real one or controller buttons in on-screen keys) makes games' buttons go haywire or characters move on their own.
+Chỉnh thế nào: Keep it off (default). To turn controllers off for one game only, use Turn off XInput in that game's settings. Reopen the game after changing it.
+
+[Tự động sao lưu]
+Là gì: Each time the game closes, the app backs up its save folder. The new automatic backup always replaces the old automatic one, and never touches backups you made yourself.
+Vì sao chỉnh: Turn it on so you don't have to remember to back up, in case your saves get corrupted or you delete the game by mistake.
+Chỉnh thế nào: Only works once the app has found the game's own save folder (see “Save location”). Exit with the power button in the game menu; don't swipe the app away. With “Back up saves for every game” on, this is always on.
+
+[Visual C++ 2010]
+Là gì: The Visual C++ 2010 runtime libraries (msvcp100, msvcr100) that many games and tools need in order to open.
+Vì sao chỉnh: Native (Windows) helps games that need Visual C++ 2010 run reliably. Wine's version sometimes lacks features, making games show errors or crash at launch.
+Chỉnh thế nào: Keep Native (Windows) (default). Don't switch to Built-in (Wine) unless you have specific instructions for that game.
+
+[Vẽ ngoài màn hình]
+Là gì: How WineD3D draws temporary images that aren't on screen yet: fbo (newer way) or backbuffer (older way). Only works when using WineD3D with the gl renderer.
+Vì sao chỉnh: Only change it when a game using WineD3D has a black screen or broken graphics that nothing else fixes.
+Chỉnh thế nào: Default: fbo; keep it. Only try backbuffer after everything else; if it's worse, pick fbo again. Reopen the game to apply.
+
+[Wine / Proton]
+Là gì: The Wine/Proton version used to run Windows games. arm64ec versions run Wine directly on the phone chip and only emulate the game's x86 code; x86_64 versions emulate everything through Box64.
+Vì sao chỉnh: Each version suits different games. Change it when the game won't open or crashes and other settings don't help.
+Chỉnh thế nào: Use Proton 9 arm64ec (built in, usually faster). You can only pick it when creating a new environment; versions marked Download must be downloaded first. If a game breaks, try a new environment with another version.
+
+[XAudio]
+Là gì: The XAudio2, X3DAudio and XACT audio libraries (versions 2.0 to 2.7) that many DirectX 9–11 games use for sound.
+Vì sao chỉnh: Change it when the game has no sound, crackling or repeating sound, or crashes when playing audio.
+Chỉnh thế nào: Keep Built-in (Wine) (default). If sound breaks, try Native (Windows). Newer games using XAudio 2.8/2.9 aren't affected by this setting.
+
+[Đặt khóa API SteamGrid? (Ảnh bìa)]
+Là gì: Lets you enter your own key for the SteamGridDB cover art service. An API key is a personal code that allows the app to download images from that service.
+Vì sao chỉnh: Big Picture mode downloads cover art from SteamGridDB using the app's built-in key. You only need your own key when cover art from there won't load.
+Chỉnh thế nào: Off by default; usually no need to turn it on. Turn it on, paste the key into the “SteamGridDB API key” box, tap Save; turning it off deletes the saved key. Library cover art is made on your phone and doesn't use this key.
+
+[Định dạng bề mặt]
+Là gì: The color channel order of frames (RGBA or BGRA) that the game and the app use to exchange images.
+Vì sao chỉnh: The wrong format can swap colors, for example red turning blue, or people with bright blue skin.
+Chỉnh thế nào: Keep the default: BGRA with Vulkan and EGL, RGBA with DisplayX (set automatically when you change Renderer). If colors are swapped, pick the other value.
+
+[Đồng bộ cấu trúc CPU]
+Là gì: When on, Wine tells the game exactly the CPU cores you picked under CPU cores, instead of all the phone's cores.
+Vì sao chỉnh: If you removed some cores but the game still thinks it has them all, it may split work across too many threads and stutter. Turn this on so the game splits work to match the cores it can use.
+Chỉnh thế nào: Off by default. Only turn it on after removing some cores in CPU cores. If the game gets slower or breaks, turn it off again.
+
+[Đồng bộ khung hình]
+Là gì: Makes the game wait for the GPU to finish drawing each frame before sending it to the screen.
+Vì sao chỉnh: Can fix flicker, black flashes or broken frames; in exchange, FPS drops.
+Chỉnh thế nào: Just leave it off (default). Only turn it on when the picture flickers or breaks and changing Driver present mode didn't fix it. On weak phones keep it off, as it costs FPS.
+
+[Đổi kênh màu đỏ/xanh dương]
+Là gì: Swaps red and blue in the game picture when drawing with Vulkan.
+Vì sao chỉnh: Only use it when the game's colors are swapped, for example skin turning blue or fire looking blue.
+Chỉnh thế nào: Default: off. Only try turning it on when colors are swapped. If the colors don't change, turn it off again and try changing “Surface format” (RGBA/BGRA) in the environment's Video section.
+
+[Độ phân giải]
+Là gì: The size of the emulated Windows screen the game draws at, which is then scaled to fit your phone screen.
+Vì sao chỉnh: Lower is lighter and keeps the phone cooler (but isn't twice as fast), with a blurrier picture. Higher is sharper but heavier and hotter.
+Chỉnh thế nào: Weak phones: 854x480 (16:9); mid-range: 960x544 (16:9); strong phones: 1280x720 (16:9). Games added through the app have their own level, and Adjust Graphics in the library changes it too. Pick Custom to enter your own.
+
+[Độ phân giải tùy chỉnh]
+Là gì: A box for typing your own resolution, shown when you pick Custom under Resolution.
+Vì sao chỉnh: Use it when you need a size that isn't in the list, for example to match your phone's aspect ratio or to go lower on weak phones.
+Chỉnh thế nào: Type it as WIDTHxHEIGHT, for example 1024x576; lowercase or uppercase x both work, each side from 200 to 7680. If you type it wrong, the app keeps the old resolution. On weak phones, stay around 854x480 to 960x544.
+
+[Độ trễ khung hình tối đa]
+Là gì: When on, DXVK lets the game prepare at most 1 frame ahead (DirectX 10/11 games).
+Vì sao chỉnh: Cuts the delay between your tap and the picture's response, good for action games.
+Chỉnh thế nào: Just leave it off (default). Turn it on if controls feel laggy; if FPS drops or it stutters more, turn it off again. On weak phones keep it off.
+
+[Ẩn thanh tải khi mở game]
+Là gì: Removes the “Starting…” waiting screen (game name, cover art, progress bar) when opening a game, and the waiting screen when exiting.
+Vì sao chỉnh: Turn it on if games often get stuck on the “Starting…” screen: without the waiting screen, you can still open the game menu with the Back button to exit.
+Chỉnh thế nào: Off by default. Turning it on doesn't make games open faster. While the game loads you may see a black screen for a few seconds; that's normal.
