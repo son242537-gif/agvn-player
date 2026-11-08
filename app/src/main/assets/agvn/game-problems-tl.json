@@ -1,0 +1,316 @@
+{
+  "problems": {
+    "light-script-error": {
+      "title": "May error ang game sa Magaang Takbo",
+      "cause": "May error ang game: {error}. Kung huminto o mali ang takbo ng game, kadalasang gumagana ang Windows na bersyon nito."
+    },
+    "light-page-crash": {
+      "title": "Nagsara ang page ng game habang naglalaro",
+      "cause": "Nagsara ang bahaging nagpapatakbo ng HTML game (WebView ng Android) habang naglalaro, kadalasan dahil naubos ang RAM ng phone."
+    },
+    "light-frozen": {
+      "title": "Nag-hang ang game sa Magaang Takbo",
+      "cause": "Matagal na hindi tumugon ang game ({runner}) kaya isinara ito ng Android."
+    },
+    "light-crash": {
+      "title": "Biglang nagsara ang game sa Magaang Takbo",
+      "cause": "Nagka-error at nagsara ang game runner na {runner} ({crash})."
+    },
+    "steam": {
+      "title": "Kailangan ng Steam ang game",
+      "cause": "Tumatakbo lang ang bersyong ito ng game kapag may Steam (kulang ang file na {1}). Hindi kayang patakbuhin ng AGVN ang Steam, kaya kailangan ng bersyon ng game na hindi humihingi ng Steam."
+    },
+    "missing-dll": {
+      "title": "Kulang ang file na {1} ng game",
+      "cause": "Kailangan ng game ang file na {1} pero hindi ito makita. Kadalasan, kulang ang nakopyang folder ng game, o kailangan ng game ng Windows library na hindi pa naka-on."
+    },
+    "bad-dll": {
+      "title": "Hindi magamit ang file na {1} ng game",
+      "cause": "Sira ang file na {1}, o 32-bit/64-bit na bersyon ito na hindi tugma sa game. Kopyahin ulit ang folder ng game mula sa orihinal."
+    },
+    "dll-function": {
+      "title": "Kulang ng function ang file na {1}",
+      "cause": "Huminto ang game dahil may program na tumawag ng function sa {1} na wala sa bersyon ng {1} na gamit ngayon. Kung katabi ng executable ng game ang {1}, kadalasang file ito ng cheat table o mod na nagpapasa lang ng ilang function na tinatawag ng game, pero kailangan ng Wine ng iba pang function. Kapag ginamit ang {1} ng Wine, tatakbo ang game, pero hindi gagana ang cheat o mod sa file na iyon."
+    },
+    "dotnet": {
+      "title": "Kailangan ng .NET ang game",
+      "cause": "Gawa sa .NET (C#) ang executable ng game, o ang program na binubuksan nito. Kailangan ng Wine ng .NET runtime (Wine Mono) para buksan ito, at wala pa nito ang bersyon ng Wine na gamit ng game. Kung launcher lang ang file na iyon at may pangunahing executable pa ng game sa folder, direktang bubuksan ng button na \"Patakbuhin ang pangunahing file ng game\" ang file na iyon, hindi na kailangan ng .NET. Kung walang ganoong button, puwede mo ring idagdag ulit ang game gamit ang pangunahing executable: \"Magdagdag ng game\" → \"Pumili ng .exe file (advanced)\"."
+    },
+    "dotnet-load": {
+      "title": "Hindi pa mapatakbo ng Wine ang .NET na bahagi ng game",
+      "cause": "Gawa sa .NET (C#) ang executable ng game, o ang program na binubuksan nito, pero hindi ma-load ng Wine ang .NET runtime (Wine Mono) para sa program na ito: hindi pa tumatakbo sa phone ang 64-bit na .NET program, kaya agad itong nagsasara nang walang ipinapakita. Kung launcher lang iyon at may pangunahing executable pa ng game sa folder, direktang bubuksan ng button na \"Patakbuhin ang pangunahing file ng game\" ang file na iyon. Kung walang ganoong button, idagdag ulit ang game gamit ang pangunahing executable: \"Magdagdag ng game\" → \"Pumili ng .exe file (advanced)\"."
+    },
+    "godot-renderer-bad": {
+      "title": "Hindi tumatakbo ang Godot game sa binagong paraan ng pagguhit",
+      "cause": "Hindi tugma sa bersyon ng Godot ng game ang paraan ng pagguhit na ipinalit ng app para sa Godot game na ito (Vulkan o Direct3D 11)."
+    },
+    "godot-vulkan-crash": {
+      "title": "Nag-error ang graphics driver habang gumuguhit ang Godot game",
+      "cause": "Nag-error ang graphics driver ng phone nang ipa-render dito ng game gamit ang Vulkan, kaya lumabas ang \"Assertion failed!\" box ng Wine at nagsara ang game. Wala sa game ang problema. Puwedeng maiwasan ito kapag pinalitan ang paraan ng pagguhit ng Godot game. Sa phone na may Mali GPU, puwede ring nasa hakbang ng app na nag-aayos ng shader para sa Mali ang problema."
+    },
+    "vulkan-crash": {
+      "title": "Nag-error ang graphics driver habang gumuguhit ang game",
+      "cause": "Nag-error ang graphics driver ng phone nang ipa-render dito ng game gamit ang Vulkan, kaya lumabas ang \"Assertion failed!\" box ng Wine at nagsara ang game. Wala sa game ang problema: kadalasan, hindi pa bagay sa GPU na ito ang napiling bersyon ng DXVK o driver. Sa phone na may Mali GPU, puwede ring nasa hakbang ng app na nag-aayos ng shader para sa Mali ang problema: i-off ang bawat hakbang isa-isa para subukan."
+    },
+    "godot-gl-angle": {
+      "title": "Hindi mabuksan ng Godot game ang OpenGL o Direct3D 11",
+      "cause": "Sinubukan na ng Godot game na ito ang OpenGL 3.3 at Direct3D 11 (ANGLE) pero wala pang gumana sa phone mo."
+    },
+    "godot-opengl": {
+      "title": "Hindi mabuksan ng Godot game ang OpenGL",
+      "cause": "Hindi pa kaya ng phone mo ang OpenGL 3.3 na kailangan ng Godot game na ito."
+    },
+    "godot-vulkan": {
+      "title": "Hindi mabuksan ng Godot game ang Vulkan",
+      "cause": "Hindi pa kaya ng phone mo ang Vulkan sa paraang kailangan ng Godot game na ito."
+    },
+    "godot-switch-failed": {
+      "title": "Kusang nagsara ang Godot game matapos palitan ang paraan ng pagguhit",
+      "cause": "Noong nakaraan, pinalitan ng app ang paraan ng pagguhit ng Godot game na ito para maiwasan ang error. Ngayon, kusang nagsara ang game wala pang isang minuto matapos buksan, kaya hindi pa bagay sa phone mo ang paraang iyon."
+    },
+    "godot-gl-crash": {
+      "title": "Nagsara ang Godot game habang gumuguhit",
+      "cause": "Hindi maiguhit ng GPU ng phone ang isang OpenGL scene ng game kaya kusang nagsara ang game. Kulang ng ilang feature ang Zink (ang bahaging nagsasalin ng OpenGL sa Vulkan) sa ilang GPU, lalo na sa Mali. Puwedeng maiwasan ito kapag pinalitan ang paraan ng pagguhit ng Godot game."
+    },
+    "wine-rpc-crash": {
+      "title": "Nag-error ang Wine nang tumawag ang game ng serbisyo ng Windows",
+      "cause": "Nagka-memory error ang game sa bahagi ng Wine na humahawak sa pagtawag ng mga serbisyo ng Windows (RPC), habang hinihingi ng game ang listahan ng mga serbisyo. Pagkatapos noon, natigil ang game sa itim na screen at nagsara, kahit hindi ubos ang RAM. Error ito ng bersyon ng Wine na gamit sa ARM chip, hindi ng game. Iba ang paraan ng lumang Wine (Proton 9) sa bahaging ito."
+    },
+    "movie-transcode": {
+      "title": "Hindi mabuksan ng Wine ang video sa game",
+      "cause": "Nagpe-play ang game ng video (kadalasan sa paglipat ng eksena) na hindi kusang ma-decode ng bagong paraan ng Wine sa pagbasa ng video, pinakamadalas ang MP4 na may MP3 na audio. Kailangan noon ng Wine ang transcoder ng Steam, na wala sa labas ng Steam, kaya hindi mabuksan ang video at puwedeng matigil ang game sa itim na screen habang hinihintay matapos ang video. Nasa Wine ng app ang problema, hindi sa game. Kaya ng lumang paraan ng Wine na i-decode ang ganitong video."
+    },
+    "deadlock": {
+      "title": "Na-deadlock ang game, naka-freeze",
+      "cause": "Naghihintayan nang walang katapusan ang mga thread ng game: may thread na may hawak na lock at hindi ito binibitawan, at naghintay ang main thread sa lock na iyon nang mahigit 1 minuto kaya nag-freeze ang game (kadalasan habang naglo-load ng eksena, itim ang screen). Hindi ito error sa data ng game: nasa paraan ng CPU emulation o ng Wine sa pagpapatakbo ng mga thread ng game sa phone ang problema. Medyo pinababagal ng bawat ayos sa ibaba ang game, kaya iminumungkahi lang ito ng app kapag na-deadlock ang game."
+    },
+    "swapchain-frozen": {
+      "title": "Nag-freeze ang game pagkatapos magpalit ng display mode",
+      "cause": "Kakapalit lang ng game ng resolution o kaka-on lang ng vsync (binuo ulit ng DXVK ang swapchain, kadalasan pagpasok sa menu), saka hindi na gumuhit ng bagong frame at tumigil: hinihintay nito ang abiso ng screen na lumabas na ang naunang frame, pero hindi dumarating ang abisong iyon. Kapag naka-off ang Present Wait, hindi na hihintayin ng game ang abisong ito. Kung hindi pa rin gumana, ipinaghihintay ng \"Frame sync\" ang game sa bawat frame sa ibang paraan."
+    },
+    "dxvk-map-32": {
+      "title": "Hindi magamit ng 32-bit na bersyon ng game ang graphics memory",
+      "cause": "32-bit na bersyon ng game ang tumatakbo. Sa napiling graphics driver, hindi maipasok ng DXVK (ang bahaging nagsasalin ng DirectX sa Vulkan) ang graphics memory sa 32-bit na program, kaya hindi makagawa ng DirectX at walang maiguhit ang game, kahit bukas pa ang window. Ganoon din ang Ren'Py game: kapag hindi gumana ang OpenGL, DirectX ang gamit nito sa pagguhit. Walang ganitong limitasyon ang 64-bit na bersyon ng game, kung mayroon ang game. Hindi makakatulong ang pagpalit ng bersyon ng DXVK."
+    },
+    "gpu-refused": {
+      "title": "Ayaw magbigay ng memory ang graphics driver sa game, kahit mayroon pa",
+      "cause": "Humingi ang DXVK (ang bahaging nagsasalin ng DirectX sa Vulkan) ng graphics memory para sa game pero tumanggi ang driver, kahit marami pang bakanteng graphics memory. Wala nang paraan ang game para gumuhit kaya nag-freeze ito o kusang nagsara, minsan may error na \"CreateTexture2D … E_INVALIDARG\". Pinakamadalas, texture ito na minarkahan ng game na \"shared\" (para mabasa ng ibang program), uri ng memory na hindi maibigay ng napiling driver. Kapag naka-off ang shared memory, karaniwang texture ang gagawin ng DXVK, at guguhit pa rin ang game gaya ng dati. Hindi sira ang game at hindi ubos ang memory ng phone, kaya hindi makakatulong ang pagbaba ng Graphics."
+    },
+    "dx11-features": {
+      "title": "Kulang ang graphics driver ng DirectX 11 feature na kailangan ng game",
+      "cause": "Hindi makagawa ang DXVK (ang bahaging nagsasalin ng DirectX sa Vulkan) ng DirectX 11 para sa game: kulang ang napiling graphics driver ng feature na kailangan ng game, gaya ng wireframe o geometry shader. Hindi makakatulong ang pagpalit ng bersyon ng DXVK. Kung wala nang ibang button maliban sa \"Ipadala ang logs\", hindi kaya ng phone na ito ang DirectX 11 game na ito."
+    },
+    "dxvk-no-adapter": {
+      "title": "Hindi makagawa ang phone ng DirectX para sa game",
+      "cause": "Walang mahanap ang DXVK (ang bahaging nagsasalin ng DirectX sa Vulkan) na GPU na gagana sa napiling bersyon ng DXVK at driver."
+    },
+    "opengl-unavailable": {
+      "title": "Hindi gumagana ang OpenGL sa phone gamit ang graphics driver na ito",
+      "cause": "Hindi gumagana ang Zink (ang bahaging nagsasalin ng OpenGL sa Vulkan) sa napiling graphics driver, kaya walang maiguhit ang OpenGL game at ang WineD3D (paraan ng pagguhit ng DirectX gamit ang OpenGL). Simula ngayon, hindi na imumungkahi ng app ang WineD3D sa phone na ito gamit ang driver na ito."
+    },
+    "d3d11-level": {
+      "title": "Kailangan ng game ang DirectX 11 level {1}",
+      "cause": "Kailangan ng game (Unreal Engine) ng GPU na may DirectX 11 level {1}, pero hindi pa umaabot doon ang napiling paraan ng pagguhit. Hindi sira ang game: kulang ang DXVK (DirectX sa Vulkan) o WineD3D (DirectX sa OpenGL), sa napiling graphics driver, ng feature na kailangan ng game, gaya ng tessellation. Kung WineD3D ang gamit ng game, gamitin ulit ang DXVK. Kung DXVK na, ibang driver lang ang puwedeng makatulong, dahil kailangan ng lahat ng bersyon ng DXVK ang mga feature na iyon. Kung wala nang ibang button maliban sa \"Ipadala ang logs\", hindi pa kaya ng phone na ito ang game na ito."
+    },
+    "ue-render-timeout": {
+      "title": "Kusang huminto ang Unreal game dahil sobrang tagal maghintay sa pag-render",
+      "cause": "Kusang huminto ang Unreal game (\"GameThread timed out waiting for RenderThread\") nang 120 segundong tuloy-tuloy na abala ang bahaging nagre-render, kadalasan habang naglo-load o bumubuo ng shader at texture sa unang beses sa mabagal na phone. Hindi sira ang game: kapag pinaghintay nang mas matagal, magpapatuloy ang pag-load, kahit puwedeng itim pa ang screen nang ilang sandali."
+    },
+    "directx": {
+      "title": "Sabi ng game, kulang ang DirectX",
+      "cause": "Hindi makagawa ang game ng DirectX sa phone mo gamit ang napiling bersyon ng DXVK at graphics driver."
+    },
+    "dxvk-view": {
+      "title": "Nagsara ang game dahil hindi mabasa ng DXVK ang compressed texture",
+      "cause": "Hindi mabasa ng DXVK (DirectX sa Vulkan) ang ilang compressed texture ng game (uri ng BCn, gaya ng DXT) gamit ang napiling graphics driver, kaya kusang nagsara ang game; sinasabi ng Unreal game ang \"CreateShaderResourceView … E_INVALIDARG\". Sa GPU na hindi kayang basahin ang BCn, gaya ng Mali, dine-decompress ng app ang mga texture na ito, pero nagtatanong ang DXVK 2.x sa driver sa bagong paraan na hindi pa lubos na nasasagot ng bahaging nagde-decompress. Sa lumang paraan nagtatanong ang DXVK 1.10.3 kaya hindi nito nararanasan ang error na ito. Hindi sira ang game."
+    },
+    "ue-crash-box": {
+      "title": "Nag-error at kusang nagsara ang Unreal game",
+      "cause": "Lumabas sa Unreal game ang box na \"… Game has crashed and will close\" at nagsara ito nang pindutin ang OK. Nasa box na iyon ang mensahe ng error, at hindi pa ito mabasa ng app: kumuha ng screenshot ng box para malaman ng AGVN ang error. Kadalasan, hindi pa bagay sa game ang DXVK (DirectX sa Vulkan) o ang napiling graphics driver."
+    },
+    "opengl-crash": {
+      "title": "Nagsara ang game habang gumuguhit",
+      "cause": "Hindi maiguhit ng GPU ng phone ang isang OpenGL scene ng game kaya kusang nagsara ang game. Kulang ng ilang feature ang Zink (ang bahaging nagsasalin ng OpenGL sa Vulkan) sa ilang GPU, lalo na sa Mali."
+    },
+    "gpu-lost": {
+      "title": "Nag-error ang graphics driver habang tumatakbo ang game",
+      "cause": "Huminto ang GPU ng phone sa gitna ng pagguhit ng game: may scene na hindi kayang iguhit ng driver."
+    },
+    "gpu-memory": {
+      "title": "Naubusan ng graphics memory ang game",
+      "cause": "Mas maraming graphics memory ang kailangan ng game kaysa sa bakante sa phone mo. Simula sa susunod na pagbukas, kusang gagamitin ng app ang pinakatipid sa RAM na antas na mayroon ang game na ito."
+    },
+    "memory": {
+      "title": "Naubusan ng RAM ang game",
+      "cause": "Mas maraming RAM ang kailangan ng game kaysa sa bakante sa phone mo. Simula sa susunod na pagbukas, kusang gagamitin ng app ang pinakatipid sa RAM na antas na mayroon ang game na ito."
+    },
+    "corrupt-files": {
+      "title": "Sira ang file ng game",
+      "cause": "May file ng game na sira o hindi natapos makopya. Kopyahin ulit ang folder ng game mula sa orihinal."
+    },
+    "file-not-found": {
+      "title": "Hindi makita ang file ng game",
+      "cause": "Sabi ng Wine, \"File not found.\": wala na sa dating lugar ang executable ng game, o ang isang file na kailangan ng game. Kung kakapalit mo lang ng pangalan, inilipat o binura ang folder ng game, kopyahin ulit ang folder na iyon at idagdag ulit ang game sa library."
+    },
+    "dll-no-access": {
+      "title": "Hindi mabuksan ng game ang sarili nitong DLL library",
+      "cause": "Sinabi ng game ang \"No access to memory location.\" nang buksan ang isa sa mga library (DLL) nito, gaya ng RGSS301.dll ng RPG Maker VX Ace, saka huminto. Wala sa game ang problema: kadalasan, nasa shared storage ng phone (Download) ang folder ng game, kung saan hindi pinapayagan ng Android na direktang magpatakbo ng code mula sa file, at binubuksan ng bagong Wine (Proton 10) ang library na iyon sa paraang kailangan ng permisong ito. Tumatakbo ang RPG Maker XP/VX/VX Ace game sa \"Magaang Takbo\", hindi na kailangan ng Wine; para sa ibang game, subukan ang lumang Wine (Proton 9), na kinokopya muna ang library sa memory bago patakbuhin."
+    },
+    "bad-exe": {
+      "title": "Mali ang format ng executable ng game",
+      "cause": "Sabi ng Wine, \"Bad EXE format\": hindi Windows program na kayang patakbuhin ng Wine ang binuksang file. Maaaring sira ito o hindi natapos makopya, napakalumang program (16-bit o DOS), o hindi ito executable ng game. Kopyahin ulit ang folder ng game mula sa orihinal, o idagdag ulit ang game gamit ang tamang executable nito: \"Magdagdag ng game\" → \"Pumili ng .exe file (advanced)\"."
+    },
+    "killed-low-memory-saved": {
+      "title": "Naubusan ng RAM ang phone kaya isinara ang game",
+      "cause": "Isinara ng Android ang game habang naglalaro dahil naubusan ng RAM ang phone mo, kahit tumakbo na ang game sa pinakatipid sa RAM na antas na kaya ng app para sa game na ito. Hindi na gaanong makakabawas ng RAM ang pagbaba pa ng Graphics. Bago maglaro, isara ang ibang app o i-restart ang phone. Kung mangyari pa rin, mas maraming RAM ang kailangan ng game na ito kaysa sa bakante sa phone mo."
+    },
+    "killed-low-memory": {
+      "title": "Naubusan ng RAM ang phone kaya isinara ang game",
+      "cause": "Isinara ng Android ang game habang naglalaro dahil naubusan ng RAM ang phone mo. Simula sa susunod na pagbukas, kusang gagamitin ng app ang pinakatipid sa RAM na antas na mayroon ang game na ito."
+    },
+    "killed-background": {
+      "title": "Kusang isinara ng phone ang game nang lumipat ka ng app",
+      "cause": "Nang lumipat ka sa ibang app, isinara ng system ang game para makatipid sa baterya o RAM. Kapag pinayagang tumakbo sa background ang AGVN nang walang limitasyon, mananatiling bukas ang game."
+    },
+    "emulator-noexec-crt": {
+      "title": "Hindi mapatakbo ng 32-bit emulator ang code ng game",
+      "cause": "Nagka-error ang game ({crash}). Itinuring ng 32-bit CPU emulator na bawal patakbuhin ang code na iyon, kahit code ito ng library na {1} na kasama ng game at normal itong tumatakbo sa Windows. Nasa emulator sa phone ang problema, hindi sa data ng game. May sariling bersyon ng {1} ang Wine; ang WOWBox64 ay isa pang 32-bit emulator na kasama sa app."
+    },
+    "emulator-noexec": {
+      "title": "Hindi mapatakbo ng 32-bit emulator ang code ng game",
+      "cause": "Nagka-error ang game ({crash}). Itinuring ng 32-bit CPU emulator na bawal patakbuhin ang code na iyon ng game, kahit normal itong tumatakbo sa Windows. Nasa emulator sa phone ang problema, hindi sa data ng game. Ang WOWBox64 ay isa pang 32-bit emulator na kasama sa app."
+    },
+    "crash-after-change": {
+      "title": "Nag-error ang game sa bagong config",
+      "cause": "Gumana ang game noong nakaraan. Pagkatapos palitan ang config, nag-error at kusang nagsara ang game ({crash})."
+    },
+    "dotnet-crash": {
+      "title": "Nag-error at kusang nagsara ang .NET game",
+      "cause": "Nagsara ang game na gawa sa .NET (C#) dahil sa error ({crash}). Sa Wine ng app, may error ang bahagi ng .NET na gumuguhit ng text (GDI+): ang Vietnamese na letrang may tuldik na nag-iisa o nasa dulo ng text (gaya ng \"ắ\", \"ệ\") ay agad nagpapasara sa game, kadalasan sa unang screen na may Vietnamese na text, at walang naitatala sa Wine logs. Naglalagay ang button na \"Ayusin ang pagguhit ng Vietnamese na text sa .NET\" ng na-patch na mlang.dll katabi ng executable ng game; kung may error pa rin, kusang aalisin ito ng app. Kung ikaw mismo ang kalalabas lang sa game, balewalain ang abisong ito."
+    },
+    "unity-crash": {
+      "title": "Nag-error at nag-freeze ang game",
+      "cause": "Nag-crash ang game habang tumatakbo ({crash}). Sinasalo ng Unity, ang engine ng game, ang error na ito kaya kadalasang nagfi-freeze ang game sa halip na kusang magsara. Kung ikaw mismo ang kalalabas lang sa game, balewalain ang abisong ito."
+    },
+    "crash": {
+      "title": "Nag-error at kusang nagsara ang game",
+      "cause": "Nagka-error ang game habang tumatakbo ({crash})."
+    },
+    "low-ram-saved": {
+      "title": "Kusang nagsara ang game nang halos maubos ang RAM",
+      "cause": "Nagsara ang game nang {free} MB na lang ang bakanteng RAM, kahit tumakbo na ang game sa pinakatipid sa RAM na antas na kaya ng app para sa game na ito. Hindi na gaanong makakabawas ng RAM ang pagbaba pa ng Graphics. Bago maglaro, isara ang ibang app o i-restart ang phone, at mag-save nang madalas. Kung mangyari pa rin, mas maraming RAM ang kailangan ng game na ito kaysa sa bakante sa phone mo. Kung ikaw mismo ang kalalabas lang sa game, balewalain ang abisong ito."
+    },
+    "low-ram-end": {
+      "title": "Kusang nagsara ang game nang halos maubos ang RAM",
+      "cause": "Nagsara ang game nang {free} MB na lang ang bakanteng RAM, malamang dahil naubusan ng RAM ang phone kaya isinara ang game. Bago maglaro, isara ang ibang app o i-restart ang phone, at mag-save nang madalas. Simula sa susunod na pagbukas, kusang gagamitin ng app ang pinakatipid sa RAM na antas na mayroon ang game na ito. Kung ikaw mismo ang kalalabas lang sa game, balewalain ang abisong ito."
+    },
+    "not-a-game": {
+      "title": "Binubuksan ang game gamit ang {exe}, hindi ang executable ng game",
+      "cause": "Ang {exe} ay helper program na kasama ng game (pang-report ng error, pang-install ng library o pang-uninstall), hindi ang game: bumubukas ito at kusang nagsasara nang walang ipinapakita. Walang pangunahing executable sa folder ng game na mabubuksan ng app kapalit nito (Unity game: <Pangalan ng game>.exe katabi ng folder na <Pangalan ng game>_Data). Maaaring binura ito ng antivirus, o kulang ang nakopyang folder. Kopyahin ulit ang buong folder ng game mula sa orihinal, saka idagdag ulit ang game gamit ang \"Magdagdag ng game\"."
+    },
+    "chromium-closed": {
+      "title": "Kusang nagsara ang game pagkabukas, walang ipinakita",
+      "cause": "Web page na tumatakbo sa Chromium (Electron o NW.js) ang game na ito. Sa Windows, tumatakbo ang Chromium sa tulong ng Wine at CPU emulation, at may mga bersyon ng Chromium na nabubuksan ang page saka kusang nagsasara pagkalipas ng ilang segundo, nang walang error (isang Electron 44 game, Snapdragon 8 Elite). Binubuksan ng \"Magaang Takbo\" ang page na iyon nang direkta sa browser ng phone, hindi dadaan sa Windows, at kadalasang mas magaan. Hindi pinaghahatian ng \"Magaang Takbo\" at ng Windows ang saves. Ang bahagi ng game na ipinapagawa sa main process ng Electron (Steam, pag-save sa process na iyon) ay maaaring hindi gumana; kapag ganoon, ipapatakbo ulit ito ng \"Kusang Ayos\" sa Windows. Kung ikaw mismo ang kalalabas lang sa game, balewalain ang abisong ito."
+    },
+    "closed-on-start": {
+      "title": "Kusang nagsara ang game pagkalabas ng larawan",
+      "cause": "Natapos mag-load ang game, at wala pang 10 segundo mula nang lumabas ang larawan ay kusa itong nagsara kahit wala ka pang pinindot, at walang error. Kadalasan, nag-error ang game sa mismong pagsisimula. Halimbawa ang The Agnietta: hindi mapatakbo ng 32-bit CPU emulator (FEXCore) ang isang bahagi ng code ng game, pero sinasalo ng game ang error na iyon kaya hindi ito naitatala ng Wine. Kung ikaw mismo ang kalalabas lang sa game, balewalain ang abisong ito."
+    },
+    "chromium-frozen": {
+      "title": "Natigil ang game sa unang page o loading screen",
+      "cause": "Web page na tumatakbo sa Chromium (Electron o NW.js) ang game na ito. Sa Windows, tumatakbo ang Chromium sa tulong ng Wine at CPU emulation, kaya napakabigat nito at puwedeng matigil nang tuluyan sa unang page o sa loading bar: hindi nagbabago ang larawan kahit pumindot ka. May Electron game na natitigil sa lumang Wine (Proton 9) pero gumagana sa bagong Wine (Proton 10), pati ang Steam na bahagi; sa unang beses, ii-install ng app ang bagong Wine, mga isang minuto. Binubuksan ng \"Magaang Takbo\" ang page na iyon nang direkta sa browser ng phone, hindi dadaan sa Windows. Ang bahagi ng game na ipinapagawa sa main process ng Electron (Steam, pag-save sa process na iyon) ay maaaring hindi gumana; kapag ganoon, ipapatakbo ulit ito ng \"Kusang Ayos\" sa Windows."
+    },
+    "wine-gone": {
+      "title": "Hindi makapagsimula ang Wine",
+      "cause": "Huminto ang Wine pagkabukas, bago pa tumakbo ang game: nadiskonekta ang core ng Wine (wineserver) sa unang program. Wala sa game ang problema kaya hindi makakatulong ang pagpalit ng resolution o graphics config ng game. Puwedeng makatulong ang pag-off ng esync, o ang pagpapatakbo sa ibang Wine (ibang container, may sariling core). Kung ganito sa lahat ng game, i-force stop ang app o i-restart ang phone at subukan ulit."
+    },
+    "godot-no-start": {
+      "title": "Nagsara ang Godot game pagkabukas",
+      "cause": "Nagsara ang Godot game bago lumabas ang larawan. Pinakamadalas na dahilan: hindi pa kaya ng phone ang OpenGL 3.3 na kailangan ng game."
+    },
+    "low-resolution": {
+      "title": "Hindi tumatakbo ang game sa resolution na {screen}",
+      "cause": "{screen} ang screen ng game ngayon, mas maliit sa antas na Mababa (854×480). Maraming game ang ayaw tumakbo kapag ganito kaliit ang screen at sinasabing \"resolution is too low\"."
+    },
+    "no-start-after-change": {
+      "title": "Hindi tumatakbo ang game sa bagong config",
+      "cause": "Gumana ang game noong nakaraan. Pagkatapos palitan ang config, agad nagsasara ang game pagkabukas."
+    },
+    "no-start": {
+      "title": "Nagsara ang game pagkabukas",
+      "cause": "Nagsara ang game bago lumabas ang larawan at walang iniwang error na mababasa ng app."
+    },
+    "gpu-tiler": {
+      "title": "Naubusan ng rendering memory ang GPU",
+      "cause": "Ilang beses nang sinabi ng GPU driver na naubusan ito ng rendering memory (Mali: TILER_HEAP_OOM). Sa bawat pagkakataon, kailangang iguhit ng GPU ang frame nang paisa-isang bahagi, kaya natitigilan ang game nang ilang segundo, minsan itim ang screen. Simula sa susunod na pagbukas, gagamitin ng app ang pinakatipid sa RAM na antas para sa game na ito. Nakakatulong din ang pagbaba ng Graphics (mas maliit na screen ng game) o ng kalidad ng larawan sa game."
+    },
+    "slow-gpu": {
+      "title": "Mabagal ang takbo ng game{speed}",
+      "cause": "Ito ang nangyayari sa phone mo: todo-kayod na ang GPU ({gpu}%) pero hindi pa rin makahabol sa pagguhit."
+    },
+    "slow-cpu": {
+      "title": "Mabagal ang takbo ng game{speed}",
+      "cause": "Ito ang nangyayari sa phone mo: overloaded ang CPU (nasa {cpu}% ang isang core) kaya hindi makahabol sa game."
+    },
+    "slow": {
+      "title": "Mabagal ang takbo ng game{speed}",
+      "cause": "Hindi pinapayagan ng phone na mabasa ng app kung gaano kaabala ang GPU. Hindi overloaded ang CPU, kaya malamang todo-kayod ang GPU."
+    },
+    "slow-unknown": {
+      "title": "Mabagal ang takbo ng game{speed}",
+      "cause": "Hindi sinasabi ng phone sa app kung GPU o CPU ang overloaded. Kadalasan GPU ito, dahil mas marami ang kailangang iguhit ng game kaysa sa kaya ng phone."
+    },
+    "power-save": {
+      "title": "Naka-on ang Battery Saver",
+      "cause": "Naka-on ang Battery Saver sa phone mo: pinabagal ang CPU kaya mas mabagal ang game."
+    },
+    "report-flicker": {
+      "title": "Kumikislap, kumukurap ang larawan",
+      "cause": "Kadalasan, kumikislap ang larawan dahil ipinapakita ng DXVK ang larawan bago matapos ang pag-render (async), dahil hindi naka-sync ang frame sa screen, o dahil sa paraan ng Turnip sa pagguhit ng screen nang paisa-isang bahagi."
+    },
+    "report-artifacts": {
+      "title": "May itim na tuldok, itim na bahagi, guhit o maling kulay",
+      "cause": "Kadalasan, may itim na tuldok at itim na bahagi dahil mali ang isang hakbang ng graphics driver sa pagguhit (ang LRZ depth buffer, ang UBWC compression o ang tile memory ng Turnip), dahil sa compressed texture na hindi mabasa ng GPU, o dahil hindi pa bagay ang bersyon ng DXVK sa driver."
+    },
+    "report-black": {
+      "title": "Itim ang screen kahit tumatakbo ang game",
+      "cause": "Tumatakbo pa ang game (may tunog, may tugon) pero walang larawan: kadalasan dahil hindi naipapakita sa screen ang frame, dahil mali ang pagguhit ng Turnip, o dahil masyadong maliit ang screen ng game."
+    },
+    "report-slow": {
+      "title": "Mabagal, putol-putol, nagla-lag ang game",
+      "cause": "Bumabagal ang game kapag hindi makahabol ang GPU o CPU ng phone. Binabawasan ng pagbaba ng Graphics ang trabaho ng GPU; binabawasan naman ng DXVK na direktang tumatakbo sa ARM chip at ng mas mabilis na CPU emulation ang trabaho ng CPU."
+    },
+    "report-freeze": {
+      "title": "Nag-freeze, nag-hang ang game",
+      "cause": "Kadalasan, nagfi-freeze ang game dahil hindi tama ang pagkakasunod-sunod ng pagpapatakbo ng CPU emulation sa code ng game, dahil sa async rendering ng DXVK, dahil hindi pa bagay sa game ang bersyon ng DXVK o driver, o dahil sa mod ng game (BepInEx, MelonLoader, UE4SS)."
+    },
+    "report-crash": {
+      "title": "Kusang nagsasara, nagka-crash ang game",
+      "cause": "Kadalasan, nagka-crash ang game dahil hindi pa bagay sa game ang CPU emulation, bersyon ng DXVK o graphics driver, o dahil sa mod ng game. Sa Unity game na nasa Graphics na Mababa o Napakagaan, puwede ring magka-error ang game dahil sa pinakamababang kalidad na itinakda ng app."
+    },
+    "report-sound": {
+      "title": "Walang tunog, may garalgal o putol-putol na tunog",
+      "cause": "Kadalasan, may error sa tunog dahil hindi pa bagay sa phone ang paraan ng Wine sa pag-play ng tunog: magpapalit ang app sa pagitan ng PulseAudio at ALSA."
+    },
+    "report-text": {
+      "title": "Sirang text, kahon, kakaibang character",
+      "cause": "Kailangang patakbuhin ang Japanese o Chinese na game sa wika ng game para lumabas nang tama ang text; kapag mali ang wika, nagiging kahon o kakaibang character ang text."
+    },
+    "report-blurry": {
+      "title": "Malabo, basag o masyadong maliit ang larawan",
+      "cause": "Mas maliit ang screen ng game kaysa sa screen ng phone kaya pinalalaki ang larawan, at nagiging malabo o basag ito. Itaas ang Graphics para lumaki ang screen ng game (medyo iinit ang phone)."
+    },
+    "report-animation": {
+      "title": "Hindi gumagana ang animation, video o effect",
+      "cause": "Kadalasan, natitigil o hindi lumalabas ang animation, video o effect dahil hindi kayang iguhit ng paraan ng pagguhit (renderer) o ng graphics driver ang effect na iyon, dahil nilalaktawan ng DXVK async ang scene na hindi pa tapos i-render, o dahil pinapatay ng game ang ilang effect kapag mababa ang Graphics. Puwedeng patakbuhin ang Godot game nang direkta sa Android (Magaang Takbo) o palitan ang paraan ng pagguhit."
+    },
+    "report-touch": {
+      "title": "Hindi tumatalab ang tap o pindot",
+      "cause": "Tumatakbo ang game pero hindi nito natatanggap ang tap: hindi mapindot ang button o mapili ang menu. May mga game na totoong mouse lang ang binabasa (raw input), gaya ng Unity game na gumagamit ng Input System; kayang ipadala ng app ang tap sa ganoong paraan. Kung on-screen keys lang ang hindi tumatalab, pumili ng ibang key layout sa \"I-configure ang on-screen keys\"."
+    },
+    "report-other": {
+      "title": "Ibang error",
+      "cause": "Susubukan ng app ang mga pangkalahatang paraan: gamitin ulit ang config na gumana, ibalik sa orihinal na config, mas stable na CPU emulation, palitan ang DXVK at driver."
+    }
+  }
+}

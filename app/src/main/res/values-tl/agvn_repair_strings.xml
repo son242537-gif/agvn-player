@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN: "Kusang Ayos" (Filipino) for what the player reports, and its fixes. Copyright (c) 2026 agvn.io — MIT License. -->
+<resources>
+    <string name="agvn_repair_title">Kusang Ayos</string>
+    <string name="agvn_repair_pick">Ano ang problema ng game?</string>
+    <string name="agvn_repair_plan">Susubukan ng app ang bawat paraan sa ibaba, isa-isa: bubukas ulit ang game, susubukan mo itong laruin, saka magtatanong ang app kung may error pa. Kapag hindi nakatulong ang isang paraan, ibabalik muna ng app ang config bago subukan ang susunod.</string>
+    <string name="agvn_repair_none">Nasubukan na ng app ang lahat ng paraan nito para sa error na ito. Naibalik na ang config ng game sa dati bago inayos. Pindutin ang \"Ipadala ang logs\" para matingnan ng AGVN.</string>
+    <string name="agvn_repair_no_fix">Wala pang paraan ang app para ayusin ang error na ito sa game na ito. Pindutin ang \"Ipadala ang logs\" para matingnan ng AGVN.</string>
+    <string name="agvn_repair_start">Subukan ang paraan 1: %1$s</string>
+    <string name="agvn_repair_trying">Sinusubukan: %1$s. Binubuksan ulit ang game…</string>
+    <string name="agvn_repair_status">Sinusubukan ng app ang ayos na: %1$s. May error pa ba?</string>
+    <string name="agvn_repair_not_run">Itinakda ng app ang ayos na: %1$s, pero hindi pa tumatakbo ulit ang game gamit ito. Buksan ang game para subukan; pagkatapos maglaro nang kaunti, magtatanong ang app kung may error pa.</string>
+    <string name="agvn_repair_play">Subukang laruin gamit ito</string>
+    <string name="agvn_repair_ask_title">May \"%1$s\" pa ba?</string>
+    <string name="agvn_repair_ask_detail">Sinusubukan ng app ang ayos na: %1$s. Laruin muna nang kaunti at sagutin ang app.</string>
+    <string name="agvn_repair_gone">Ayos na</string>
+    <string name="agvn_repair_still">May error pa rin</string>
+    <string name="agvn_repair_later">Tanungin sa susunod</string>
+    <string name="agvn_repair_other">Pumili ng ibang error</string>
+    <string name="agvn_repair_kept">Pinanatili ang ayos: %1$s</string>
+    <string name="agvn_repair_done_title">Nasubukan na ang lahat ng paraan sa app</string>
+    <string name="agvn_repair_off_title">Hindi pa nasubukan: %1$s</string>
+    <string name="agvn_repair_off_detail">Hindi tumakbo ang game sa sinusubukang paraan (%1$s): nagbago ang settings ng game pagkatapos i-on ang paraang ito. Hindi pa ito binibilang ng app na nasubukan.</string>
+    <string name="agvn_repair_off_try">Subukan: %1$s</string>
+    <string name="agvn_repair_undone">Sa sinusubukang paraan (%1$s), kusang nagsara ang game pagkalipas ng %2$s segundo. Itinuring ng app na hindi ito nakatulong, at ibinalik ang config ng game sa dati bago inayos.</string>
+    <string name="agvn_bar_repair_label">🩺 Kusang Ayos</string>
+    <string name="agvn_bar_repair">Kusang Ayos: piliin ang error ng game</string>
+
+    <string name="agvn_fix_render_sysmem">Ipa-render kay Turnip ang buong frame sa memory (sysmem)</string>
+    <string name="agvn_fix_turnip_nolrz">I-off ang LRZ ng Turnip (ayos sa itim na tuldok, kumikislap na larawan)</string>
+    <string name="agvn_fix_turnip_noubwc">I-off ang UBWC compression ng Turnip (ayos sa itim na bahagi, guhit, maling kulay)</string>
+    <string name="agvn_fix_async_off">I-off ang DXVK async (wala nang kislap, puwedeng mas mag-lag sa simula)</string>
+    <string name="agvn_fix_bcn_full">I-decompress ang lahat ng BCn texture (ayos sa itim na texture, nawawalang larawan)</string>
+    <string name="agvn_fix_unity_quality_own">Hayaang ang Unity game ang pumili ng kalidad ng larawan</string>
+    <string name="agvn_fix_audio">Gawing %1$s ang paraan ng pag-play ng tunog</string>
+    <string name="agvn_fix_locale_ja">Patakbuhin ang game sa Japanese (ayos sa sirang text ng Japanese na game)</string>
+    <string name="agvn_fix_locale_zh">Patakbuhin ang game sa Chinese (ayos sa sirang text ng Chinese na game)</string>
+    <string name="agvn_fix_godot_light">Magaang Takbo: patakbuhin ang Godot game nang direkta sa Android, hindi dadaan sa Wine (mas smooth)</string>
+    <string name="agvn_fix_media_old">Basahin ang video sa lumang paraan ng Wine (para sa video na hindi pa mabuksan ng Wine, gaya ng MP4 na may MP3 na audio)</string>
+    <string name="agvn_fix_page_light">Magaang Takbo: patakbuhin ang page ng game (Electron, NW.js) nang direkta sa Android, hindi dadaan sa Wine (mas smooth)</string>
+    <string name="agvn_fix_rgss_light">Magaang Takbo: patakbuhin ang RPG Maker game nang direkta sa Android, hindi dadaan sa Wine (mas smooth)</string>
+    <string name="agvn_fix_godot_light_gl">Ipaguhit ang Godot game (Magaang Takbo) gamit ang OpenGL</string>
+    <string name="agvn_fix_godot_light_vulkan">Ipaguhit ang Godot game (Magaang Takbo) gamit ang Vulkan</string>
+    <string name="agvn_fix_mods_off">Patakbuhin ang game nang walang mod (%1$s), gaya ng orihinal; hindi gagalawin ang mga file ng game</string>
+    <string name="agvn_fix_dll_wine">Gamitin ang %1$s ng Wine sa halip na kasama ng game (hindi gagana ang cheat o mod sa file na ito; hindi gagalawin ang mga file ng game)</string>
+    <string name="agvn_fix_raw_mouse">Ipadala ang tap bilang totoong mouse (para sa game na totoong mouse lang ang binabasa, gaya ng Unity game na gumagamit ng Input System)</string>
+    <string name="agvn_fix_raw_mouse_off">Ipadala ang tap gaya ng dati (gaya ng ibang game)</string>
+    <string name="agvn_fix_exe64">Patakbuhin ang 64-bit na bersyon ng game (%1$s) sa halip na 32-bit</string>
+    <string name="agvn_fix_exe_main">Patakbuhin ang pangunahing file ng game (%1$s) sa halip na launcher (.NET)</string>
+    <string name="agvn_fix_renpy_light">Subukan ang \"Magaang Takbo\" (Ren\'Py 8) sa Ren\'Py 7 game; hiwalay ang saves, kinopya mula sa Windows na bersyon</string>
+    <string name="agvn_fix_renpy_angle">Gumuhit ang Ren\'Py gamit ang ANGLE (Direct3D) sa halip na OpenGL</string>
+    <string name="agvn_fix_gdiplus_text">Ayusin ang pagguhit ng Vietnamese na text sa .NET (ilagay ang na-patch na mlang.dll katabi ng executable ng game)</string>
+</resources>

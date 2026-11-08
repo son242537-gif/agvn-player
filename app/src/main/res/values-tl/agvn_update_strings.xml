@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN: the other way to install the update (Filipino). Copyright (c) 2026 agvn.io — MIT License. -->
+<resources>
+    <string name="agvn_update_retry_title">Hindi pa na-install ang bagong bersyon</string>
+    <string name="agvn_update_retry_session">Hindi pa na-install ang bagong bersyon. Kung nag-error ang installer ng phone (gaya ng \"Parsing failed\" o \"APK contains no signature files\"), kaya ng AGVN Player na mag-install sa ibang paraan: ipapasa mismo ng app sa Android ang nasuring file. Magtatanong pa rin ang Android bago mag-install.</string>
+    <string name="agvn_update_retry_installer">Hindi pa na-install ang bagong bersyon. Puwedeng buksan ng AGVN Player ang installer ng phone para i-install ang nasuring file. Magtatanong pa rin ang Android bago mag-install.</string>
+    <string name="agvn_update_retry_now">I-install sa ibang paraan</string>
+    <string name="agvn_update_session_writing">Inihahanda ang pag-install ng bagong bersyon…</string>
+</resources>

@@ -1,0 +1,674 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AGVN Player</string>
+    <string name="run">Patakbuhin</string>
+    <string name="edit">I-edit</string>
+    <string name="remove">Alisin</string>
+    <string name="add">Idagdag</string>
+    <string name="shortcuts">Mga Game</string>
+    <string name="containers">Environment</string>
+    <string name="input_controls">Mga Kontrol</string>
+    <string name="no_items_to_display">Wala pang maipapakita</string>
+    <string name="new_container">Bagong environment</string>
+    <string name="edit_container">I-edit ang environment</string>
+    <string name="creating_container">Ginagawa ang environment…</string>
+    <string name="removing_container">Inaalis ang environment…</string>
+    <string name="duplicating_container">Dino-duplicate ang environment…</string>
+    <string name="installing_system_files">Ini-install ang system files…</string>
+    <string name="updating_system_files">Ina-update ang system files…</string>
+    <string name="starting_up">Nagsisimula…</string>
+    <string name="remove_loading_bar_when_booting_games">Itago ang loading bar kapag nagbubukas ng game</string>
+    <string name="unable_to_install_system_files">Hindi ma-install ang system files</string>
+    <string name="keyboard">Keyboard</string>
+    <string name="toggle_fullscreen">I-on/i-off ang full screen</string>
+    <string name="exit">Lumabas</string>
+    <string name="no_control_element_selected">Wala pang napiling control button</string>
+    <string name="scale">Laki</string>
+    <string name="aspect_ratio">Aspect ratio</string>
+    <string name="shape">Hugis</string>
+    <string name="type">Uri</string>
+    <string name="binding">Key binding</string>
+    <string name="binding_secondary">Pangalawang key binding</string>
+    <string name="binding_up">Key binding pataas</string>
+    <string name="binding_right">Key binding pakanan</string>
+    <string name="binding_down">Key binding pababa</string>
+    <string name="binding_left">Key binding pakaliwa</string>
+    <string name="overlay_opacity">Opacity ng overlay</string>
+    <string name="profile">Profile</string>
+    <string name="select_profile">Pumili ng profile</string>
+    <string name="profile_name">Pangalan ng profile</string>
+    <string name="name">Pangalan</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Kanselahin</string>
+    <string name="untitled">Walang pangalan</string>
+    <string name="no_profile_selected">Wala pang napiling profile</string>
+    <string name="no_profile_found">Walang nakitang profile</string>
+    <string name="do_you_want_to_remove_this_profile">Alisin ang profile na ito?</string>
+    <string name="do_you_want_to_duplicate_this_profile">I-duplicate ang profile na ito?</string>
+    <string name="do_you_want_to_duplicate_this_preset">I-duplicate ang preset na ito?</string>
+    <string name="do_you_want_to_remove_this_container">Alisin ang environment na ito?</string>
+    <string name="do_you_want_to_duplicate_this_container">I-duplicate ang environment na ito?</string>
+    <string name="do_you_want_to_remove_this_shortcut">Alisin ang game na ito sa library?</string>
+    <string name="do_you_want_to_remove_this_controller">Alisin ang controller na ito?</string>
+    <string name="do_you_want_to_remove_this_wine_version">Gusto mo bang alisin ang bersyon ng Wine na ito?</string>
+    <string name="do_you_want_to_remove_this_preset">Alisin ang preset na ito?</string>
+    <string name="do_you_want_to_end_this_process">Tapusin ang process na ito?</string>
+    <string name="controls_editor">I-edit ang mga kontrol</string>
+    <string name="enabled">Naka-on</string>
+    <string name="disabled">Naka-off</string>
+    <string name="container">Environment</string>
+    <string name="screen_size">Resolution</string>
+    <string name="new_environment_variable">Bagong environment variable</string>
+    <string name="environment_variables">Mga environment variable</string>
+    <string name="value">Value</string>
+    <string name="processor_affinity">Pumili ng CPU core</string>
+    <string name="processor_affinity_32_bit_apps">Pumili ng CPU core (32-bit na app)</string>
+    <string name="cursor_speed">Bilis ng cursor</string>
+    <string name="relative_mouse_movement">Relative na galaw ng mouse</string>
+    <string name="toggle_switch">On/off na switch</string>
+    <string name="profile_exported_to">Na-export ang profile sa</string>
+    <string name="unable_to_import_profile">Hindi ma-import ang profile</string>
+    <string name="wine_configuration">Config ng Wine</string>
+    <string name="registry_keys">Mga Registry key</string>
+    <string name="csmt">CSMT (multithreaded na pagproseso ng command)</string>
+    <string name="gpu_name">Pangalan ng GPU</string>
+    <string name="offscreen_rendering_mode">Mode ng offscreen rendering</string>
+    <string name="strict_shader_math">Eksaktong shader math</string>
+    <string name="video_memory_size">Laki ng video memory</string>
+    <string name="show_fps">Ipakita ang FPS</string>
+    <string name="none">Wala</string>
+    <string name="auto">Auto</string>
+    <string name="custom_text">Custom na text</string>
+    <string name="icon">Icon</string>
+    <string name="import_profile">I-import ang profile</string>
+    <string name="export_profile">I-export ang profile</string>
+    <string name="touchpad_help">Gabay sa touch</string>
+    <string name="touchpad_help_mouse_left_click_title">Left click</string>
+    <string name="touchpad_help_mouse_left_click_description">Mabilis na tap gamit ang isang daliri</string>
+    <string name="touchpad_help_mouse_right_click_title">Right click</string>
+    <string name="touchpad_help_mouse_right_click_description">Idiin ang isang daliri at mabilis na i-tap ang pangalawa</string>
+    <string name="touchpad_help_mouse_scroll_wheel_title">Scroll ng mouse</string>
+    <string name="touchpad_help_mouse_scroll_wheel_description">Ilapat ang dalawang daliri at igalaw</string>
+    <string name="touchpad_help_main_menu_title">Main menu</string>
+    <string name="touchpad_help_main_menu_description">Mag-tap gamit ang apat na daliri</string>
+    <string name="duplicate">I-duplicate</string>
+    <string name="about">Tungkol sa app</string>
+    <string name="credits_and_third_party_apps">Credits at third-party na software</string>
+    <string name="external_controllers">Mga external na controller</string>
+    <string name="graphics_driver">Graphics driver</string>
+    <string name="audio_driver">Audio driver</string>
+    <string name="loading">Naglo-load…</string>
+    <string name="press_any_button_on_your_controller">Pindutin ang kahit anong button sa controller</string>
+    <string name="bindings">mga key binding</string>
+    <string name="show_touchscreen_controls">Ipakita ang touch controls</string>
+    <string name="dxwrapper">DX Wrapper</string>
+    <string name="mouse_warp_override">I-override ang mouse warp</string>
+    <string name="direct3d">Direct3D</string>
+    <string name="directsound">DirectSound</string>
+    <string name="directmusic">DirectMusic</string>
+    <string name="directplay">DirectPlay</string>
+    <string name="directshow">DirectShow</string>
+    <string name="directx">DirectX</string>
+    <string name="xaudio">XAudio</string>
+    <string name="vcrun2010">Visual C++ 2010</string>
+    <string name="opengl">OpenGL</string>
+    <string name="settings">Settings</string>
+    <string name="exec_arguments">Mga argument sa pagpapatakbo</string>
+    <string name="win_components">Mga bahagi ng Windows</string>
+    <string name="drives">Mga drive</string>
+    <string name="range">Saklaw</string>
+    <string name="enable">I-on</string>
+    <string name="disable">I-off</string>
+    <string name="force">Lakas</string>
+    <string name="installed_wine">Naka-install na Wine</string>
+    <string name="install_wine">I-install ang Wine</string>
+    <string name="arch">Arkitektura</string>
+    <string name="version">Bersyon</string>
+    <string name="dxvk_version">Bersyon ng DXVK</string>
+    <string name="vkd3d_version">Bersyon ng VKD3D</string>
+    <string name="unable_to_install_wine">Hindi ma-install ang Wine</string>
+    <string name="unable_to_remove_this_wine_version">Hindi maalis ang bersyon ng Wine na ito</string>
+    <string name="wine_version">Bersyon ng Wine</string>
+    <string name="removing_wine">Inaalis ang Wine…</string>
+    <string name="preparing_installation">Inihahanda ang pag-install…</string>
+    <string name="finishing_installation">Tinatapos ang pag-install…</string>
+    <string name="storage_info">Storage</string>
+    <string name="drive_c">Drive C:</string>
+    <string name="cache">Cache</string>
+    <string name="total">Kabuuan</string>
+    <string name="clear_cache">I-clear ang cache</string>
+    <string name="estimated_used_space">Nagamit na espasyo (tantya)</string>
+    <string name="advanced">Advanced</string>
+    <string name="box64">Box64</string>
+    <string name="system">System</string>
+    <string name="box64_preset">Preset ng Box64</string>
+    <string name="box64_version">Bersyon ng Box64</string>
+    <string name="letter">Letra ng drive</string>
+    <string name="target_path">Target na path</string>
+    <string name="xserver">XServer</string>
+    <string name="use_dri3_extension">Gamitin ang DRI3 extension</string>
+    <string name="width">Lapad</string>
+    <string name="height">Taas</string>
+    <string name="old">luma</string>
+    <string name="_new">bago</string>
+    <string name="task_manager">Task manager</string>
+    <string name="process_name">Pangalan ng process</string>
+    <string name="pid">PID</string>
+    <string name="memory">Memory</string>
+    <string name="end_process">Tapusin ang process</string>
+    <string name="new_task">Bagong task</string>
+    <string name="processes">Mga process</string>
+    <string name="orientation">Oryentasyon ng screen</string>
+    <string name="horizontal">Pahiga</string>
+    <string name="vertical">Patayo</string>
+    <string name="open_file">Buksan ang file</string>
+    <string name="download_file">I-download ang file</string>
+    <string name="do_you_want_to_download_the_selected_profiles">Gusto mo bang i-download ang mga napiling profile?</string>
+    <string name="downloading_file">Dina-download ang file...</string>
+    <string name="unable_to_load_profile_list">Hindi ma-load ang listahan ng profile</string>
+    <string name="copy">Kopyahin</string>
+    <string name="installed_version">Naka-install na bersyon</string>
+    <string name="unable_to_download_file">Hindi ma-download ang file</string>
+    <string name="stability">Katatagan</string>
+    <string name="compatibility">Compatibility</string>
+    <string name="intermediate">Intermediate</string>
+    <string name="performance">Performance</string>
+    <string name="preset">Preset</string>
+    <string name="you_cannot_remove_this_preset">Hindi maaalis ang preset na ito</string>
+    <string name="dxwrapper_help_content"><![CDATA[
+        <i><b>WineD3D</b></i>: isinasalin ang DirectX 1-11 sa OpenGL.<br /><br />
+        <i><b>DXVK</b></i>: isinasalin ang Direct3D 9-11 sa Vulkan.<br /><br />
+        <i><b>VKD3D</b></i>: isinasalin ang Direct3D 12 sa Vulkan.<br /><br />
+        <i><b>CNC DDraw</b></i>: bersyon ng DirectDraw na nagpapatatag sa mga lumang game.
+    ]]></string>
+    <string name="box64_env_var_help__dynarec_safeflags"><![CDATA[
+        Paghawak ng flags sa CALL/RET<br /><br />
+        <b>0</b> : Ituring na hindi kailanman kailangan ng flags ang CALL/RET (mas mabilis, hindi gaanong stable)<br />
+        <b>1</b> : Kailangan ng flags ang karamihan ng RET, hindi ang karamihan ng CALL<br />
+        <b>2</b> : Kailangan ng flags ang lahat ng CALL/RET (mas mabagal)
+    ]]></string>
+    <string name="box64_env_var_help__dynarec_fastnan">Gumawa ng -NAN value gaya ng sa x86</string>
+    <string name="box64_env_var_help__dynarec_fastround">Eksaktong pag-round ng numero gaya ng x86</string>
+    <string name="box64_env_var_help__dynarec_x87double">Gamitin ang Float/Double para i-emulate ang x87</string>
+    <string name="box64_env_var_help__dynarec_bigblock"><![CDATA[
+        Gumagawa ang Dynarec ng malalaking block (BigBlock)<br /><br />
+        <b>0</b> : Huwag subukang gawin ang pinakamalaking posibleng block<br />
+        <b>1</b> : Gumawa ng pinakamalaking posibleng Dynarec block<br />
+        <b>2</b> : Gumawa ng mas malaking Dynarec block (tuloy kapag nagpapatong ang mga block, sa block lang sa elf memory)<br />
+        <b>3</b> : Gumawa ng mas malaking Dynarec block (tuloy kapag nagpapatong ang mga block, sa lahat ng uri ng memory)
+    ]]></string>
+    <string name="box64_env_var_help__dynarec_strongmem"><![CDATA[
+        I-emulate ang strong memory model (Strong Memory)<br /><br />
+        <b>0</b> : Walang espesyal na gagawin<br />
+        <b>1</b> : Magdagdag ng Memory Barrier kapag nagsusulat sa memory (sa ilang MOV)<br />
+        <b>2</b> : Gaya ng level 1, may Memory Barrier sa bawat pagsulat sa memory gamit ang MOV<br />
+        <b>3</b> : Gaya ng level 2, may Memory Barrier din sa pagbasa ng memory at sa ilang SSE/SSE2
+    ]]></string>
+    <string name="box64_env_var_help__dynarec_forward">Pinakamataas na forward value kapag gumagawa ng Block</string>
+    <string name="box64_env_var_help__dynarec_callret">I-optimize ang CALL/RET</string>
+    <string name="box64_env_var_help__dynarec_wait">Kung maghihintay ang Dynarec na maging handa ang FillBlock</string>
+    <string name="box64_env_var_help__dynarec_weakbarrier"><![CDATA[
+        Ayusin ang memory barrier para bawasan ang epekto ng strong memory emulation sa performance<br /><br />
+        <b>0</b> : Gamitin ang karaniwang ligtas na barrier<br />
+        <b>1</b> : Gamitin ang mahinang barrier para bahagyang bumilis<br />
+        <b>2</b> : Gamitin ang mahinang barrier at i-off ang barrier sa huling pagsulat]]></string>
+    <string name="box64_env_var_help__dynarec_aligned_atomics"><![CDATA[
+        Gumawa lang ng aligned na atomic instruction (sa Arm64 lang sa ngayon).<br /><br />
+        <b>0</b> : Gumawa ng code para sa hindi aligned na atomic.<br />
+        <b>1</b> : Aligned na atomic lang, mas mabilis at mas maliit, pero magdudulot ng SIGBUS sa instruction na may LOCK prefix sa hindi aligned na data address.]]></string>
+    <string name="box64_env_var_help__dynarec_df"><![CDATA[
+        I-on o i-off ang deferred flags.<br /><br />
+        <b>0</b> : I-off ang deferred flags.<br />
+        <b>1</b> : I-on ang deferred flags.]]></string>
+    <string name="box64_env_var_help__dynarec_dirty"><![CDATA[
+        Payagang ituloy ang pagpapatakbo ng block na hindi protektado at maaaring nabago (dirty).<br /><br />
+        <b>0</b> : Huwag ituloy ang block na hindi protektado at maaaring nabago.<br />
+        <b>1</b> : Ituloy ang dynablock na nagsusulat ng data sa parehong page ng code. Maaaring bumilis ang loading ng ilang game pero maaari ring biglang mag-crash.<br />
+        <b>2</b> : Bukod dito, kapag may nakitang HotPage, mamarkahan ang page na NEVERCLEAN, kaya hindi ito write-protected pero laging sinusuri ang block mula rito. Maaaring mas mabilis ito (pero may ilang SMC na maaaring makalusot).]]></string>
+    <string name="box64_env_var_help__dynarec_nativeflags"><![CDATA[
+        I-on o i-off ang native flags.<br /><br />
+        <b>0</b> : Huwag gamitin ang native flags.<br />
+        <b>1</b> : Gamitin ang native flags kapag puwede.]]></string>
+    <string name="box64_env_var_help__dynarec_pause"><![CDATA[
+        I-emulate ang x86 PAUSE, maaaring makatulong sa performance ng spinlock.<br /><br />
+        <b>0</b> : Balewalain ang x86 PAUSE.<br />
+        <b>1</b> : Gamitin ang YIELD para i-emulate ang x86 PAUSE.<br />
+        <b>2</b> : Gamitin ang WFI para i-emulate ang x86 PAUSE.<br />
+        <b>3</b> : Gamitin ang SEVL+WFE para i-emulate ang x86 PAUSE.
+    ]]></string>
+    <string name="box64_env_var_help__avx"><![CDATA[
+        Suporta sa AVX at AVX2, kasama ang BMI1, BMI2, ADX, FMA, F16C at RDRAND!<br /><br />
+        <b>0</b> : I-off ang AVX<br />
+        <b>1</b> : I-on ang AVX, BMI1, F16C at VAES.<br />
+        <b>2</b> : Gaya ng level 1, may AVX2, BMI2, FMA, ADX, VPCLMULQDQ at RDRAND din.<br />\
+    ]]></string>
+    <string name="box64_env_var_help__maxcpu">Pinakamaraming CPU na ipinapakita ng Box64 sa program</string>
+    <string name="box64_env_var_help__unityplayer">Hanapin ang UnityPlayer.dll at ilapat ang strongmem setting</string>
+    <string name="box64_env_var_help__mmap32">Pilitin ang lahat ng memory allocation na nasa 32-bit address space</string>
+    <string name="fexcore_env_var_help__tsoenabled">I-on ang TSO IR instruction (kailangan ng mga multithreaded na app).</string>
+    <string name="fexcore_env_var_help__vectortsoenabled">Atomic na vector read/write kapag naka-on ang TSO.</string>
+    <string name="fexcore_env_var_help__halfbarriertsoenabled">Gumamit ng half-barrier sa hindi aligned na read/write kapag naka-on ang TSO.</string>
+    <string name="fexcore_env_var_help__memcpysettsoenabled">Gawing atomic ang REP MOVS / REP STOS kapag naka-on ang TSO.</string>
+    <string name="fexcore_env_var_help__multiblock">Mag-compile ng maraming code block nang sabay. Maaaring tumagal ang JIT compile at magdulot ng stutter.</string>
+    <string name="fexcore_env_var_help__hostfeatures">Kontrolin ang pagpilit sa mga feature ng CPU.</string>
+    <string name="fexcore_env_var_help__smalltscscale">I-adjust ang TSC sa device na mababa ang frequency.</string>
+    <string name="fexcore_env_var_help__smc_checks">Suriin ang self-modifying code (SMC).</string>
+    <string name="fexcore_env_var_help__volatilemetadata">Gamitin ang volatile metadata mula sa PE file para sa TSO kung mayroon.</string>
+    <string name="fexcore_env_var_help__monohacks">SMC trick + hiwalay na JIT block kapag may nakitang Mono.</string>
+    <string name="fexcore_env_var_help__hidehypervisorbit">Itago ang hypervisor bit ng CPUID (nakakatulong sa mga app na nagka-crash dahil dito).</string>
+    <string name="fexcore_env_var_help__disablel2cache">I-off ang L2 cache lookup ng FEXCore JIT; tipid sa memory pero nagdudulot ng stutter.</string>
+    <string name="fexcore_env_var_help__dynamicl1cache">Hayaang magbago ang laki ng L1 cache ng FEXCore JIT; tipid sa memory pero nagdudulot ng stutter.</string>
+    <string name="fexcore_env_var_help__x87reducedprecision">I-emulate ang X87 float gamit ang 64-bit precision. Bumababa ang precision at maaaring magka-glitch ang graphics.</string>
+    <string name="columns">Bilang ng column</string>
+    <string name="directinput_mapper_type">Uri ng DirectInput mapping</string>
+    <string name="desktop">Desktop</string>
+    <string name="theme">Tema</string>
+    <string name="background">Background</string>
+    <string name="max_device_memory">Pinakamataas na device memory</string>
+    <string name="frame_rate">Frame rate</string>
+    <string name="configuration">Config</string>
+    <string name="browse">Mag-browse</string>
+    <string name="magnifier">Magnifier</string>
+    <string name="bring_to_front">Dalhin sa harap</string>
+    <string name="options">Mga opsyon</string>
+    <string name="enable_experimental_wow64_mode">I-on ang experimental na WoW64 mode</string>
+    <string name="logs">Logs</string>
+    <string name="enable_wine_debug">I-on ang Wine debug</string>
+    <string name="enable_winlator_logs">I-on ang logs ng app</string>
+    <string name="enable_box64_logs">I-on ang logs ng Box64</string>
+    <string name="export">I-export</string>
+    <string name="logs_exported_to">Na-export ang logs sa</string>
+    <string name="general">Pangkalahatan</string>
+    <string name="msg_warning_install_wine">Babala: Mag-install lang ng bagong bersyon ng Wine para sumubok.</string>
+    <string name="startup_selection">Startup mode</string>
+    <string name="sync_cpu_topology">I-sync sa Wine</string>
+    <string name="wine_debug_channel">Debug channel ng Wine</string>
+    <string name="game_controller">Game controller</string>
+    <string name="vibration">Vibration</string>
+    <string name="vibration_slot">Slot %1$d</string>
+
+    <string name="experimental">Experimental</string>
+    <string name="glibc_exp_edition">Batay sa</string>
+    <string name="enabled_async">I-on ang Async</string>
+    <string name="enabled_async_cache">I-on ang Async cache</string>
+    <string name="vkd3d_feature_level">Feature level ng VKD3D</string>
+    <string name="filter">I-filter</string>
+    <string name="all">Lahat</string>
+    <string name="group">Grupo</string>
+    <string name="new_group">Bagong grupo</string>
+    <string name="import_group">I-import ang grupo</string>
+    <string name="new_file">Bagong file</string>
+    <string name="new_item">Bagong item</string>
+    <string name="group_edit">I-edit ang grupo</string>
+    <string name="group_name">Pangalan ng grupo</string>
+    <string name="do_you_want_to_duplicate_this_group">Gusto mo bang i-duplicate ang grupong ito?</string>
+    <string name="do_you_want_to_remove_this_group">Gusto mo bang alisin ang grupong ito?</string>
+    <string name="do_you_want_to_duplicate_this_process">Gusto mo bang i-duplicate ang process na ito?</string>
+    <string name="do_you_want_to_remove_this_process">Gusto mo bang alisin ang process na ito?</string>
+    <string name="do_you_want_to_remove_this_variable">Gusto mo bang alisin ang variable na ito?</string>
+    <string name="variable_name">Pangalan ng variable</string>
+    <string name="variable_already_exists">May variable na ganito na</string>
+    <string name="cannot_remove_default_profile">Hindi maaalis ang default na profile.</string>
+    <string name="cannot_edit_default_profile">Hindi mae-edit ang default na profile.</string>
+    <string name="do_you_want_to_restore_default_profile">Gusto mo bang ibalik ang default na profile?</string>
+    <string name="simulate_touch_screen">I-simulate ang touch screen</string>
+    <string name="install_content">I-install ang component</string>
+    <string name="content_type">Uri ng component</string>
+    <string name="contents">Mga Component</string>
+    <string name="do_you_want_to_install_content">Gusto mo bang mag-install ng component?</string>
+    <string name="pls_make_sure_content_trustworthy">May executable file ang component. Puwedeng makasira sa data o device mo ang hindi ligtas na executable. Bago mag-install, SIGURADUHING mapagkakatiwalaan ang component na ini-install mo.</string>
+    <string name="content_suffix_is_wcp_packed_xz_zst">May extension na .wcp ang component file at naka-compress gamit ang xz o zst.</string>
+    <string name="installing_content">Ini-install ang component…</string>
+    <string name="unable_to_install_content">Hindi ma-install ang component.</string>
+    <string name="install_failed">Nabigo ang pag-install</string>
+    <string name="file_cannot_be_recognied">Hindi makilala ang file.</string>
+    <string name="profile_not_found_in_content">Walang nakitang profile sa component.</string>
+    <string name="profile_cannot_be_recognized">Hindi makilala ang profile</string>
+    <string name="content_already_exist">Naka-install na ang component na gusto mong i-install.</string>
+    <string name="content_info">Impormasyon ng component</string>
+    <string name="version_code">Version code</string>
+    <string name="description">Paglalarawan</string>
+    <string name="file_list">Listahan ng file</string>
+    <string name="_continue">Ituloy</string>
+    <string name="content_installed_success">Na-install ang component!</string>
+    <string name="content_cannot_be_trusted">Hindi mapagkakatiwalaan ang component.</string>
+    <string name="content_is_incomplete">Kulang ang component.</string>
+    <string name="warning_content_has_untrusted_files">Babala: May mga file na hindi mapagkakatiwalaan ang component na ito. Karaniwang hindi dapat binabago ang mga file sa ibaba. Pag-isipan kung itutuloy ang pag-install.</string>
+    <string name="warning">Babala</string>
+    <string name="do_you_want_to_remove_this_content">Gusto mo bang alisin ang component na ito?</string>
+    <string name="add_to_home_screen">Idagdag sa home screen</string>
+    <string name="shortcut_not_available">Hindi na magagamit ang game na ito. Alisin ito at idagdag ulit.</string>
+    <string name="enable_file_provider">I-on ang File Provider</string>
+    <string name="take_effect_next_startup">Gagana ang opsyong ito sa susunod na pagbukas.</string>
+    <string name="imagefs">Imagefs</string>
+    <string name="reinstall_imagefs">I-reinstall ang Imagefs</string>
+    <string name="do_you_want_to_reinstall_imagefs">Gusto mo bang i-reinstall ang imagefs? Ibinabalik nito ang system files; hindi mababago ang mga environment mo.</string>
+    <string name="unable_to_remove_content_since_container_using">Hindi maalis ang component na ito dahil may environment na gumagamit ng Wine na ito.</string>
+    <string name="get_more_contents_form_github">Puwede kang pumunta sa https://github.com/longjunyu2/winlator/releases para sa iba pang component.</string>
+    <string name="setup_failed">Nabigo ang setup</string>
+    <string name="graphics_driver_configuration">Config ng graphics driver</string>
+    <string name="select_graphics_driver_version">Pumili ng bersyon ng graphics driver:</string>
+    <string name="graphics_driver_version">Bersyon ng graphics driver</string>
+    <string name="graphics_driver_available_extensions">Mga available na extension</string>
+    <string name="add_to_homescreen">Idagdag sa home screen</string>
+    <string name="add_save">Magdagdag ng save</string>
+    <string name="saves">Mga save</string>
+    <string name="import_save">I-import ang save</string>
+    <string name="transfer">Ilipat</string>
+    <string name="share">Ibahagi</string>
+    <string name="unregister">I-unregister</string>
+    <string name="no_saves_to_display">Wala pang save</string>
+    <string name="new_save">I-register ang save</string>
+    <string name="save_path">Path ng save</string>
+    <string name="save_title">Pangalan ng save</string>
+    <string name="save_container">Napiling environment</string>
+    <string name="select_save_path">Hanapin ang folder ng save</string>
+    <string name="select_container_first">Piliin ang environment na may save.</string>
+    <string name="fill_all_fields">Ilagay ang path at pangalan ng save</string>
+    <string name="invalid_path">Hindi valid ang path ng folder ng save</string>
+    <string name="confirm_selection">Kumpirmahin</string>
+    <string name="select_directory">Piliin ang folder ng save</string>
+    <string name="invalid_container">Hindi valid ang path</string>
+    <string name="up_directory">Umakyat ng isang folder</string>
+    <string name="edit_save_title">Palitan ang pangalan ng save</string>
+    <string name="edit_save">I-edit ang save</string>
+    <string name="original_save_path">Naka-register na path</string>
+    <string name="updated_save_path">Bagong path</string>
+    <string name="confirmation">Kumpirmasyon</string>
+    <string name="yes">Oo</string>
+    <string name="no">Hindi</string>
+    <string name="path_not_changed_prompt">Hindi nagbago ang path. Ituloy?</string>
+    <string name="save_transfer">Ilipat ang save</string>
+    <string name="select_container">Target na environment:</string>
+    <string name="transfer_complete">Tapos nang ilipat</string>
+    <string name="transfer_failed">Hindi nailipat</string>
+    <string name="unable_to_transfer_save">Hindi mailipat ang save</string>
+    <string name="spinner_container_selection">Inililipat...</string>
+    <string name="name_required">Kailangan ng pangalan</string>
+    <string name="exporting_save">Ine-export ang save...</string>
+    <string name="importing_save">Ini-import ang save...</string>
+    <string name="_copy">kopya</string>
+    <string name="backing_up_data">Nagba-backup ng data...</string>
+    <string name="restoring_data">Ibinabalik ang data...</string>
+    <string name="midi_sound_font">MIDI SoundFont</string>
+    <string name="sound">Tunog</string>
+    <string name="icon_set_successfully">Napalitan ang icon</string>
+    <string name="unable_to_set_icon">Hindi mapalitan ang icon</string>
+    <string name="do_you_want_to_remove_this_sound_font">Gusto mo bang alisin ang SoundFont na ito?</string>
+    <string name="sound_font_removed_success">Naalis ang SoundFont!</string>
+    <string name="sound_font_removed_failed">Hindi naalis ang SoundFont!</string>
+    <string name="sound_font_installed_success">Na-install ang SoundFont!</string>
+    <string name="sound_font_installed_failed">Hindi na-install ang SoundFont!</string>
+    <string name="sound_font_already_exist">Naka-install na ang SoundFont na gusto mong i-install.</string>
+    <string name="unable_to_install_soundfont">Hindi ma-install ang SoundFont</string>
+    <string name="installing_soundfont">Ini-install ang SoundFont…</string>
+    <string name="sound_font_bad_format">Hindi valid ang format ng SoundFont.</string>
+    <string name="cannot_remove_default_sound_font">Hindi maaalis ang default na SoundFont</string>
+    <string name="enable_dinput_for_wine_game">I-on ang DInput para sa game sa Wine</string>
+    <string name="enable_xinput_for_wine_game">I-on ang XInput para sa game sa Wine</string>
+    <string name="help_xinput"><![CDATA[
+        Kung gumagamit ang game mo ng <i><b>XInput API</b></i> para sa controller, i-on ang opsyong ito.<br/><br/>
+        Apektado nito ang <i><b>virtual</b></i> na controller (mula sa on-screen keys) at ang <i><b>totoong</b></i> controller.
+    ]]></string>
+    <string name="help_dinput"><![CDATA[
+        Kung gumagamit ang game mo ng <i><b>DInput API</b></i> para sa controller, i-on ang opsyong ito.<br/><br/>
+        Apektado nito ang <i><b>virtual</b></i> na controller (mula sa on-screen keys) at ang <i><b>totoong</b></i> controller.
+    ]]></string>
+    <string name="help_exclusive_xinput">Kailangang i-off ang opsyong ito sa ilang game gaya ng Rayman Origins at Need for Speed: Most Wanted 2005 kapag DInput ang gamit.</string>
+    <string name="enable_xinput_and_dinput_same_time">May mga game na sumusuporta sa dalawang API. Kapag sabay na naka-on ang XInput at DInput sa mga game na ito, puwedeng magkaproblema ang kontrol, halimbawa sa The Binding of Isaac at sa seryeng Resident Evil.</string>
+    <string name="warning_gamepad_mouse_mix">Babala: Puwedeng magdulot ng error sa game ang paghahalo ng controller button at mouse sa iisang controller. Mas mabuting controller button lang, o mouse/keyboard lang.</string>
+    <string name="startup_normal">Normal (i-load ang lahat ng serbisyo)</string>
+    <string name="startup_essential">Mahalaga lang (i-load lang ang kailangang serbisyo)</string>
+    <string name="startup_aggressive">Minimal (itigil ang mga serbisyo sa startup)</string>
+    <string name="toggle_orientation">I-rotate ang screen</string>
+    <string name="help_file_provider"><![CDATA[
+        Pinapayagan ng <i><b>File Provider</b></i> na ma-access ang data sa loob ng AGVN Player gamit ang file manager ng Android.<br/><br/>
+    ]]></string>
+    <string name="proton_options">Mga opsyon ng Proton</string>
+    <string name="reconfigure">I-configure ulit</string>
+    <string name="do_you_want_to_reconfigure_wine">Gusto mo bang i-configure ulit ang environment na ito sa susunod na startup? Buburahin nito ang timestamp para patakbuhin ulit ang Config ng Wine.</string>
+
+    <string name="primary_controller">Pangunahing controller</string>
+    <string name="left_controller">Kaliwang controller</string>
+    <string name="right_controller">Kanang controller</string>
+    <string name="button_a">Button A</string>
+    <string name="button_b">Button B</string>
+    <string name="button_x">Button X</string>
+    <string name="button_y">Button Y</string>
+    <string name="button_grip">Button Grip</string>
+    <string name="button_trigger">Button Trigger</string>
+    <string name="thumbstick_left">Analog stick pakaliwa</string>
+    <string name="thumbstick_right">Analog stick pakanan</string>
+    <string name="thumbstick_up">Analog stick pataas</string>
+    <string name="thumbstick_down">Analog stick pababa</string>
+    <string name="secondary_executable">Path:</string>
+    <string name="enter_secondary_exec_path"> Hal.: \"D:/Games/My Game/My Game.exe\"</string>
+    <string name="exec_delay">Delay bago patakbuhin (segundo):</string>
+    <string name="enter_delay_seconds">Ilagay ang delay (segundo):</string>
+    <string name="use_secondary_executable">Gumamit ng pangalawang executable?</string>
+    <string name="secondary_exec">Pangalawang executable</string>
+    <string name="secondary_exe_path_subtext">(Ilagay sa loob ng double quotes ang path na may space)</string>
+    <string name="pip_mode">Floating window (PiP)</string>
+    <string name="configure">I-configure</string>
+    <string name="enable_sendinput_mode">Gamitin ang SendInput mode ng Windows</string>
+    <string name="enable_touchscreen_timeout">Kusang itago ang touch controls (kailangang i-restart)</string>
+    <string name="enable_touchscreen_haptics">Mag-vibrate kapag hinawakan ang screen</string>
+    <string name="help_steamgrid">SteamGrid API key</string>
+    <string name="disable_xinput_for_shortcut">I-off ang XInput (mouse/keyboard lang)</string>
+    <string name="fullscreen_stretched">Full screen (naka-stretch)</string>
+    <string name="export_container">I-export ang environment</string>
+    <string name="exporting_container">Ine-export ang environment…</string>
+
+    <string name="brightness">Liwanag</string>
+    <string name="contrast">Contrast</string>
+    <string name="gamma">Gamma</string>
+    <string name="color_adjustment">Ayusin ang kulay</string>
+    <string name="enable_fxaa">I-on ang FXAA</string>
+    <string name="enable_crt_shader">I-on ang CRT effect</string>
+
+    <string name="do_you_want_to_add_a_new_profile">Magdagdag ng bagong profile?</string>
+
+    <string name="default_profile">Default na profile</string>
+
+    <string name="reset">I-reset</string>
+
+    <string name="screen_effect">Effect sa screen</string>
+
+    <string name="enable_toon_shader">I-on ang cartoon effect</string>
+    <string name="enable_ntsc_effect">I-on ang NTSC effect</string>
+    <string name="enter_profile_name">Ilagay ang pangalan ng profile</string>
+
+    <string name="configure_analog_sticks">I-configure ang analog stick</string>
+    <string name="analog_stick_settings">Settings ng analog stick</string>
+    <string name="left_analog_stick_settings">Kaliwang analog stick</string>
+    <string name="right_analog_stick_settings">Kanang analog stick</string>
+    <string name="deadzone">Deadzone: %1$d%%</string>
+    <string name="sensitivity">Sensitivity: %1$d%%</string>
+    <string name="invert_x_axis_left">Baligtarin ang X axis (kaliwang stick)</string>
+    <string name="invert_y_axis_left">Baligtarin ang Y axis (kaliwang stick)</string>
+    <string name="invert_x_axis_right">Baligtarin ang X axis (kanang stick)</string>
+    <string name="invert_y_axis_right">Baligtarin ang Y axis (kanang stick)</string>
+    <string name="save">I-save</string>
+    <string name="use_xr">Gamitin ang OpenXR integration</string>
+
+    <string name="not_connected">Hindi nakakonekta</string>
+    <string name="preferences_button_text">   MGA OPSYON   </string>
+    <string name="help_button_text">   TULONG   </string>
+    <string name="exit_button_text">   LUMABAS   </string>
+    <string name="extra_keys_config_desc">Dito mo puwedeng itakda ang value ng extra-keys variable gaya ng sa Termux app (basahin <a href="http://wiki.termux.com/wiki/Touch_Keyboard#Extra_Keys_Row">dito</a>) at iba pa \n
+Hal.: <b>META</b> para sa <i>META key</i>, \n
+<b>KEYBOARD</b> para sa <i>key na nag-o-on/off ng virtual keyboard</i>, \n
+<b>PREFERENCES</b> para sa <i>key na nagbubukas ng mga opsyon</i>, \n
+<b>MOUSE_HELPER</b> para sa <i>key na nag-o-on/off ng mouse helper</i>, \n
+<b>STYLUS_HELPER</b> para sa <i>key na nag-o-on/off ng stylus click overlay</i>, \n
+<b>EXIT</b> para sa <i>key na nagsasara ng app</i>.</string>
+    <string name="notification_content_text">I-swipe pababa para makita ang mga opsyon</string>
+    <string name="notification_open_preferences">Mga opsyon</string>
+    <string name="notification_exit">Lumabas</string>
+    <string name="notification_restart_activity">I-restart</string>
+    <string name="notification_toggle_soft_keyboard">I-on/i-off ang virtual keyboard</string>
+    <string name="notification_toggle_additional_key_bar">I-on/i-off ang extra keyboard</string>
+    <string name="notification_release_pointer_and_keyboard_capture">Bitawan ang mouse at keyboard</string>
+    <string name="notification_toggle_fullscreen">I-on/i-off ang full screen</string>
+
+    <string name="pref_main">Mga opsyon</string>
+    <string name="pref_output">Display</string>
+    <string name="pref_pointer">Pointer</string>
+    <string name="pref_kbd">Keyboard</string>
+    <string name="pref_other">Iba pa</string>
+    <string name="pref_version">Bersyon</string>
+    <string name="pref_ekbar">Mga opsyon ng extra key bar</string>
+    <string name="pref_userActions">Tugon sa mga aksyon ng user</string>
+
+    <string name="pref_displayResolutionMode">Resolution mode</string>
+    <string name="pref_displayScale">Scale ng display, %</string>
+    <string name="pref_displayResolutionExact">Resolution</string>
+    <string name="pref_displayResolutionCustom">Resolution</string>
+    <string name="pref_adjustResolution">Kusang i-adjust ang resolution ayon sa oryentasyon ng screen</string>
+    <string name="pref_displayStretch">I-stretch para kumasya sa screen</string>
+    <string name="pref_Reseed">Palitan ang laki ng screen kapag bukas ang virtual keyboard</string>
+    <string name="pref_Reseed_summary">Aayusin ulit ang laki ng screen habang bukas ang virtual keyboard.</string>
+    <string name="pref_PIP">PIP mode</string>
+    <string name="pref_PIP_summary">Ipakita ang app bilang floating window kapag pinindot ang Home o ang multitasking button</string>
+    <string name="pref_fullscreen">Full screen</string>
+    <string name="pref_fullscreen_summary">I-on/i-off ang full screen mode sa device</string>
+    <string name="pref_forceOrientation">Oryentasyon ng screen</string>
+    <string name="pref_hideCutout">Itago ang notch (kung mayroon)</string>
+    <string name="pref_keepScreenOn">Panatilihing nakabukas ang screen</string>
+
+    <string name="pref_touchMode">Touch mode</string>
+    <string name="pref_scaleTouchpad">Ilapat ang display scale sa touchpad</string>
+    <string name="pref_showStylusClickOverride">Ipakita ang opsyon sa stylus click</string>
+    <string name="pref_showStylusClickOverride_summary">Gawing left, middle o right click ang pindot ng stylus (stylus lang)</string>
+    <string name="pref_stylusIsMouse">I-on ang stylus bilang mouse</string>
+    <string name="pref_stylusIsMouse_summary">Gumagana ang stylus na parang mouse. Kapag naka-on, ginagalaw lang ng stylus ang cursor at nagpapadala ng mouse click, hindi pinapansin ang diin, anggulo at tilt.</string>
+    <string name="pref_stylusButtonContactModifierMode">Mode ng stylus button sa pagdikit</string>
+    <string name="pref_stylusButtonContactModifierMode_summary">I-on para magpadala lang ng right o middle click kapag dumikit ang stylus sa screen habang pinipindot ang button.</string>
+    <string name="pref_showMouseHelper">Ipakita ang overlay na pantulong sa mouse click</string>
+    <string name="pref_showMouseHelper_summary">Mga mouse button sa screen na ginagamit kasama ng touchpad</string>
+    <string name="pref_pointerCapture">Hawakan ang external na mouse kapag puwede</string>
+    <string name="pref_pointerCapture_summary">Tanggapin ang lahat ng event ng hardware mouse. Pindutin ang Esc para ibalik ang mouse sa Android.</string>
+    <string name="pref_transformCapturedPointer">I-transform ang galaw ng nahawakang mouse</string>
+    <string name="pref_capturedPointerSpeedFactor">Bilis ng nahawakang mouse, %</string>
+    <string name="pref_tapToMove">Mag-tap para gumalaw sa touchpad</string>
+
+    <string name="pref_showAdditionalKbd">Ipakita ang extra keyboard</string>
+    <string name="pref_showAdditionalKbd_summary">Ipakita ang keyboard na may mga extra key.</string>
+    <string name="pref_showIMEWhileExternalConnected">Ipakita ang virtual keyboard kapag may external na keyboard</string>
+    <string name="pref_showIMEWhileExternalConnected_summary">Ipakita ang virtual keyboard habang nakakabit ang totoong keyboard.</string>
+    <string name="pref_preferScancodes">Unahin ang scancode kapag puwede</string>
+    <string name="pref_preferScancodes_summary">Hayaan ang X server na hawakan ang layout ng totoong keyboard (gamit ang DE settings o setxkbmap).</string>
+    <string name="pref_hardwareKbdScancodesWorkaround">Ayusin ang scancode ng totoong keyboard</string>
+    <string name="pref_hardwareKbdScancodesWorkaround_summary">Inaayos ang scancode sa ilang device. Puwedeng magka-error kapag maraming layout ang gamit.</string>
+    <string name="pref_dexMetaKeyCapture">Harangin ang mga system shortcut</string>
+    <string name="pref_dexMetaKeyCapture_summary">Para sa Samsung Dex lang. Pinapayagang harangin ang &quot;Alt+F4&quot;, &quot;Meta+D&quot;, &quot;Meta+E&quot;, atbp.</string>
+    <string name="pref_enableAccessibilityService">I-on ang Accessibility service para manu-manong harangin ang mga system shortcut.</string>
+    <string name="pref_enableAccessibilityService_summary">Buksan ang Accessibility settings.</string>
+    <string name="pref_enableAccessibilityServiceAutomatically">Kusang i-on ang Accessibility service para harangin ang mga system shortcut.</string>
+    <string name="pref_enableAccessibilityServiceAutomatically_summary">Kailangan ng WRITE_SECURE_SETTINGS na permiso.</string>
+    <string name="pref_pauseKeyInterceptingWithEsc">I-pause ang pagharang ng key gamit ang Esc</string>
+    <string name="pref_filterOutWinkey">Salain ang naharang na Win key (Meta/Mod4).</string>
+    <string name="pref_filterOutWinkey_summary">Puwedeng gamitin ang mga Dex shortcut habang nanghaharang. Kailangan ng Accessibility service.</string>
+    <string name="pref_enableGboardCJK">Trick para sa Gboard CJK</string>
+    <string name="pref_enableGboardCJK_summary">Maaaring kailangan ng Android 14 at Gboard 14</string>
+
+    <string name="pref_clipboardEnable">Ibahagi ang clipboard</string>
+    <string name="pref_requestNotificationPermission">Humingi ng permiso sa notification</string>
+    <string name="pref_xrMode">XR mode ng Meta Oculus</string>
+    <string name="pref_configureResponseToUserActions">I-configure ang tugon sa mga aksyon ng user</string>
+    <string name="pref_storeSecondaryDisplayPreferencesSeparately">Hiwalay na opsyon para sa pangalawang display</string>
+    <string name="pref_storeSecondaryDisplayPreferencesSeparately_summary">Buksan ang screen na ito sa display na gusto mong i-configure</string>
+
+    <string name="pref_adjustHeightForEK">I-adjust ang taas ng screen para sa extra key bar</string>
+    <string name="pref_adjustHeightForEK_summary">Puwedeng kumislap ang screen kapag ino-on/off ang extra key bar.</string>
+    <string name="pref_useTermuxEKBarBehaviour">Bitawan ang special key sa extra key bar pagkatapos ng bawat pindot</string>
+    <string name="pref_useTermuxEKBarBehaviour_summary">Pindutin nang matagal para i-lock ang special key</string>
+    <string name="pref_opacityEKBar">Opacity ng extra key bar, %</string>
+    <string name="pref_extra_keys_config">Config ng extra keys</string>
+
+    <string name="pref_swipeUpAction">Swipe pataas gamit ang tatlong daliri</string>
+    <string name="pref_swipeDownAction">Swipe pababa gamit ang tatlong daliri</string>
+    <string name="pref_volumeUpAction">Volume up</string>
+    <string name="pref_volumeDownAction">Volume down</string>
+    <string name="pref_backButtonAction">Back button</string>
+    <string name="pref_notificationTapAction">Pag-tap sa notification</string>
+    <string name="pref_notificationButton0Action">Unang button ng notification</string>
+    <string name="pref_notificationButton1Action">Pangalawang button ng notification</string>
+    <string name="pref_mediaKeysAction">Mga media key</string>
+
+    <string name="pref_summary_requiresExactOrCustom">Kailangang \"exact\" o \"custom\" ang \"Resolution mode\"</string>
+    <string name="pref_summary_requiresIntercepting">Kailangang harangin ang mga system shortcut gamit ang Dex mode o Accessibility service</string>
+    <string name="pref_summary_requiresTrackpadAndNative">Kailangang \"Touchpad\" ang \"Touch mode\" at hindi \"native\" ang \"Resolution mode\"</string>
+    <string name="fexcore_config">FEXCore</string>
+    <string name="fexcore_preset">Preset ng FEXCore</string>
+    <string name="installed_driver">Naka-install na driver</string>
+    <string name="driver_repositories">Mga repository ng driver</string>
+    <string name="check_for_driver_updates">Tingnan kung may update ang driver</string>
+    <string name="install_driver_from_file">I-install ang driver mula sa file</string>
+    <string name="adrenotools_gpu_drivers">Mga Adrenotools GPU driver</string>
+    <string name="install_drivers">I-install ang driver</string>
+    <string name="install_drivers_message">Hihilingin sa iyong pumili ng driver. Dapat itong driver na ginagamit sa ibang emulator gaya ng Yuzu, Dolphin, Citra…</string>
+    <string name="install_drivers_warning">Paalala: dahil sa limitasyon ng PC emulation ngayon, maaaring hindi gumana ang Qualcomm driver sa chip na mas mababa sa 8 Gen2 kung hindi pa ito naka-patch.</string>
+    <string name="enable_vulkan_api_dump">I-save sa file ang mga Vulkan API call.</string>
+    <string name="dll_emulator">32-bit emulator</string>
+    <string name="open_with_android_browser">Buksan ang Android browser mula sa Wine</string>
+    <string name="share_android_clipboard">Ibahagi ang Android clipboard sa Wine</string>
+    <string name="ddraw_wrapper">DDraw Wrapper</string>
+    <string name="fexcore_version">Bersyon ng FEXCore</string>
+    <string name="graphics_driver_max_device_memory">Pinakamataas na device memory</string>
+    <string name="graphics_driver_sync_frame">Frame sync (bawat frame)</string>
+    <string name="graphics_driver_disable_present_wait">I-off ang KHR_present_wait</string>
+    <string name="graphics_driver_present_modes">Mga present mode</string>
+    <string name="graphics_driver_resource_type">Uri ng memory resource</string>
+    <string name="graphics_driver_vulkan_version">Bersyon ng Vulkan</string>
+    <string name="graphics_driver_bcn_emulation">BCn emulation</string>
+    <string name="graphics_driver_bcn_emulation_type">Uri ng BCn emulation</string>
+    <string name="graphics_driver_bcn_emulation_cache">Cache ng BCn emulation</string>
+    <string name="vkbasalt">vkBasalt</string>
+    <string name="vkbasalt_sharpness_effects">Mga sharpening effect</string>
+    <string name="vkbasalt_sharpness_level">Antas ng sharpening</string>
+    <string name="num_controllers">Bilang ng controller</string>
+    <string name="vkbasalt_sharpness_denoise">Bawasan ang noise sa sharpening</string>
+    <string name="shutdown">Patayin</string>
+    <string name="disable_mouse">I-on/i-off ang mouse</string>
+    <string name="installing_wine_files">Ini-install ang Wine files...</string>
+    <string name="installing_drivers_files">Ini-install ang system driver files...</string>
+    <string name="high_refresh_rate">I-on ang mataas na refresh rate</string>
+    <string name="pause_resume_wine">I-pause ang game kapag nasa background ang app</string>
+    <string name="release_protons">Mga release ng Proton</string>
+    <string name="available_protons">Mga available na Proton</string>
+    <string name="download_from_contents">I-download mula sa Mga Component</string>
+    <string name="select_local_file">Pumili ng file sa phone</string>
+    <string name="download_proton">I-download ang Proton</string>
+    <string name="delete_proton">Burahin ang Proton</string>
+    <string name="select_proton">Pumili ng Proton</string>
+    <string name="downloading_proton">Dina-download ang Proton…</string>
+    <string name="unable_to_install_proton">Hindi ma-install ang Proton</string>
+    <string name="no_protons_to_delete">Walang napiling Proton na puwedeng burahin</string>
+    <string name="download_proton_description">I-install ang Proton package mula sa GitHub release</string>
+    <string name="download_from_contents_description">Tingnan ang mga Proton o Wine package sa Mga Component</string>
+    <string name="select_local_file_description">I-install ang Proton o Wine package mula sa storage ng phone</string>
+    <string name="delete_proton_description">Burahin ang napiling naka-install na package</string>
+    <string name="proton_package_installed">Naka-install</string>
+    <string name="proton_package_not_installed">I-tap para i-download at i-install</string>
+    <string name="install">I-install</string>
+    <string name="select">Piliin</string>
+    <string name="wine_version_locked_for_existing_container">Hindi mapapalitan ang bersyon ng Wine ng nagawa nang environment</string>
+    <string name="library">Library</string>
+    <string name="configure_container">I-configure ang environment</string>
+    <string name="launch_environment">Buksan ang environment</string>
+    <string name="video">Video</string>
+    <string name="storage">Storage</string>
+    <string name="quick_settings">Mabilisang settings</string>
+    <string name="advanced_settings">Advanced na settings</string>
+    <string name="global_compatibility_profile">Pangkalahatang compatibility profile</string>
+    <string name="profile_compatibility">Compatibility</string>
+    <string name="profile_balanced">Balanse</string>
+    <string name="profile_performance">Performance</string>
+    <string name="profile_custom">Custom</string>
+    <string name="play">Laruin</string>
+    <string name="arguments">Mga argument</string>
+    <string name="game_folder">Folder ng game</string>
+
+    <string name="magnifier_not_available">Hindi magagamit ang magnifier sa DisplayX mode</string>
+</resources>

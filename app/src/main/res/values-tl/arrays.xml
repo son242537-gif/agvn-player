@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="binding_type_entries">
+        <item>Keyboard</item>
+        <item>Mouse</item>
+        <item>Controller</item>
+    </string-array>
+    <string-array name="dxvk_max_device_memory_entries">
+        <item>0 (Default)</item>
+        <item>512 MB</item>
+        <item>1024 MB</item>
+        <item>2048 MB</item>
+        <item>4096 MB</item>
+    </string-array>
+    <string-array name="device_memory_entries">
+        <item>0 (Default)</item>
+        <item>512 MB</item>
+        <item>1024 MB</item>
+        <item>2048 MB</item>
+        <item>4096 MB</item>
+        <item>8192 MB</item>
+        <item>12288 MB</item>
+        <item>16384 MB</item>
+    </string-array>
+    <string-array name="dxvk_framerate_entries">
+        <item>0 (Default)</item>
+        <item>20</item>
+        <item>30</item>
+        <item>40</item>
+        <item>50</item>
+        <item>60</item>
+        <item>70</item>
+        <item>80</item>
+        <item>90</item>
+        <item>100</item>
+        <item>110</item>
+        <item>120</item>
+    </string-array>
+    <string-array name="wincomponent_entries">
+        <item>Kasama na (Wine)</item>
+        <item>Orihinal (Windows)</item>
+    </string-array>
+    <string-array name="desktop_theme_entries">
+        <item>Maliwanag</item>
+        <item>Madilim</item>
+    </string-array>
+    <string-array name="desktop_background_type_entries">
+        <item>Larawan</item>
+        <item>Iisang kulay</item>
+    </string-array>
+    <string-array name="startup_selection_entries">
+        <item>Normal (i-load ang lahat ng serbisyo)</item>
+        <item>Mahalaga lang (i-load lang ang kailangang serbisyo)</item>
+        <item>Minimal (itigil ang mga serbisyo sa startup)</item>
+    </string-array>
+    <string-array name="button_options">
+        <item>A</item>
+        <item>B</item>
+        <item>X</item>
+        <item>Y</item>
+        <item>R1 (Kanang bumper)</item>
+        <item>R2 (Kanang trigger)</item>
+        <item>L1 (Kaliwang bumper)</item>
+        <item>L2 (Kaliwang trigger)</item>
+        <item>Start</item>
+        <item>Select</item>
+        <item>R3 (Pindot ng kanang stick)</item>
+        <item>L3 (Pindot ng kaliwang stick)</item>
+    </string-array>
+    <string-array name="touchscreenInputModesEntries">
+        <item>Touchpad</item>
+        <item>I-simulate ang touch</item>
+        <item>Direktang touch</item>
+    </string-array>
+    <string-array name="transformCapturedPointerEntries">
+        <item>Wala</item>
+        <item>I-rotate pakanan (clockwise)</item>
+        <item>I-rotate pakaliwa (counterclockwise)</item>
+        <item>Baligtad</item>
+        <item>Auto (para sa touchpad)</item>
+    </string-array>
+</resources>

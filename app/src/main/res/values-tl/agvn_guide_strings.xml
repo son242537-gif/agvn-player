@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2026 agvn.io — MIT License. Gabay para sa player (unang setup screen + Gabay), Filipino. -->
+<resources>
+    <string name="agvn_guide_title">Gabay</string>
+    <string name="agvn_guide_subtitle">I-tap ang bawat item para makita kung paano</string>
+    <string name="agvn_guide_open">Tingnan ang gabay</string>
+    <string name="agvn_guide_open_summary">Magdagdag ng game, maglaro, i-adjust ang Graphics at on-screen keys</string>
+    <string name="agvn_guide_close">Isara</string>
+
+    <string name="agvn_guide_add_title">Magdagdag ng game</string>
+    <string name="agvn_guide_add_summary">Kopyahin ang folder ng game sa phone, pindutin ang + at kusang hahanapin ito ng app</string>
+    <string-array name="agvn_guide_add_steps">
+        <item>Kopyahin ang buong folder ng game (na-extract na, may .exe file) mula sa computer papunta sa phone, halimbawa: Internal storage/AGVN/Pangalan ng game. Huwag kopyahin ang .zip file o installer (setup).</item>
+        <item>Mas mabuting ilagay ang game sa AGVN o Download folder (sa internal storage o SD card). Huwag sa Documents folder dahil hindi naghahanap doon ang app.</item>
+        <item>Pindutin ang + sa library (o \"Magdagdag ng game\" sa Settings). Kusang hahanapin ng app ang mga game at ipapakita ang listahan: nasa itaas ang \"Hindi pa naidagdag\", nasa ibaba ang mga nasa library na (may tsek). Mag-type ng ilang letra sa \"Hanapin ang game\" para mabilis na mag-filter, kahit walang tuldik.</item>
+        <item>I-tap ang pangalan ng game at pindutin ang \"I-import\" (kung nasa library na, \"I-update\" ang button). Kusang pipili ang app ng on-screen keys at Graphics na bagay sa game at sa phone mo.</item>
+        <item>Nasa ibang lugar ang game? Pindutin ang \"Pumili ng ibang folder\", pumunta sa folder na may game at pindutin ang \"I-scan ang folder na ito\". Tatandaan ng app ang folder na iyon sa susunod.</item>
+        <item>Kung sabi ng app na wala pa itong permisong basahin ang storage: pindutin ang \"Magbigay ng permiso\", saka i-on ang Payagan ang pamamahala sa lahat ng file (Android 11 pataas) o pumunta sa Mga Pahintulot → Storage → Payagan (Android 9, 10).</item>
+    </string-array>
+
+    <string name="agvn_guide_play_title">Maglaro at lumabas sa game</string>
+    <string name="agvn_guide_play_summary">Pindutin ang ▶ para maglaro, Back button para buksan ang menu</string>
+    <string-array name="agvn_guide_play_steps">
+        <item>Sa library, pindutin ang ▶ sa cover ng game (o i-tap ang cover at pindutin ang \"Laruin\"). Medyo matagal ang unang pagbukas ng game.</item>
+        <item>Sa loob ng game, pindutin ang Back button ng phone (o mag-tap gamit ang 4 na daliri nang sabay) para buksan ang menu sa kaliwa.</item>
+        <item>Para lumabas sa game: i-save muna ang game, buksan ang menu at pindutin ang pulang power button sa pinakaibaba. Agad magsasara ang game, walang tanong.</item>
+        <item>Ifi-freeze ng pause button sa menu ang game. Para ituloy: pindutin ang Back button ng phone para buksan ulit ang menu (habang naka-pause, hindi nabubuksan ng tap ng 4 na daliri ang menu), saka pindutin ang play button.</item>
+    </string-array>
+
+    <string name="agvn_guide_graphics_title">I-adjust ang Graphics (mainit ang phone, nagla-lag ang game)</string>
+    <string name="agvn_guide_graphics_summary">I-drag ang slider: kaliwa para malamig, kanan para mas maganda</string>
+    <string-array name="agvn_guide_graphics_steps">
+        <item>Sa library, pindutin ang ⋮ sa game at piliin ang \"I-adjust ang Graphics: malamig ↔ maganda\".</item>
+        <item>I-drag pakaliwa (Napakagaan, Mababa) para lumamig at mas maging smooth ang phone. I-drag pakanan (Mataas, Napakataas) para gumanda ang larawan pero mas iinit ang phone.</item>
+        <item>Ang antas na may ★ ang rekomendado ng app para sa phone mo. Pindutin ang \"Ibalik sa rekomendado\" kung gusto mong ang app ang mag-adjust.</item>
+        <item>Walang limit sa FPS ang Napakataas, para hindi ma-override ang FPS settings ng game at ng cheat menu. Kapag sobrang init ng phone, buksan ang menu sa game, sa Video, piliin ang \"Limit ng FPS\" na 60.</item>
+        <item>Pindutin ang \"I-save\", saka lumabas sa game at buksan ulit para mailapat.</item>
+    </string-array>
+
+    <string name="agvn_guide_controls_title">On-screen keys</string>
+    <string name="agvn_guide_controls_summary">Magdagdag, maglipat, magpalit ng key habang nasa game</string>
+    <string-array name="agvn_guide_controls_steps">
+        <item>Sa game, may maliit na bar sa gitna sa itaas: \"✎ I-edit\" para ayusin ang keys, \"👁 Itago\" para itago o ipakita ang key layout, \"⌨\" para buksan ang keyboard. Kusang nagtatago ang bar pagkalipas ng 3 segundo para hindi matakpan ang game, at manipis na guhit na lang ang natitira sa itaas na gilid: i-tap ang guhit para ipakita ulit.</item>
+        <item>Pindutin ang \"✎ I-edit\": i-drag ang button para ilipat. I-tap ang isang button para piliin, saka gamitin ang \"Key…\" para palitan ang key, \"－\" / \"＋\" para paliitin o palakihin, \"Estilo…\" para palitan ang hugis (bilog, parisukat, parihaba, rounded) at opacity, \"Burahin\" para alisin ang button.</item>
+        <item>Ipinapakita ng \"+ Button\" ang buong keyboard at mouse, i-tap ang key na gusto mo. Nagdadagdag ang \"+ Swipe area\" ng area na pang-swipe para iikot ang camera sa 3D na game.</item>
+        <item>I-check ang \"Hawakan\" kapag pumipili ng key kung gusto mong mahawakan ang button sa isang pindot at mabitawan sa susunod na pindot (halimbawa, hawakan ang mouse para mag-drag).</item>
+        <item>Pindutin ang \"Tapos\" para i-save. Hiwalay na naka-save ang key layout ng bawat game.</item>
+    </string-array>
+
+    <string name="agvn_guide_mouse_title">Gamitin ang mouse gamit ang daliri</string>
+    <string name="agvn_guide_mouse_summary">Tap para mag-click, pindutin nang matagal at i-drag para mag-drag</string>
+    <string-array name="agvn_guide_mouse_steps">
+        <item>Tap ng 1 daliri = left click sa mismong lugar na tinap mo.</item>
+        <item>Right click: i-tap muna ng 1 daliri ang lugar na ika-click, saka mag-tap ng 2 daliri nang sabay = right click sa lugar na iyon.</item>
+        <item>Pindutin nang matagal at i-drag = hawakan ang left click at i-drag (mag-drag ng item, gumawa ng selection box…).</item>
+        <item>Mag-swipe pataas o pababa gamit ang 2 daliri para mag-scroll.</item>
+    </string-array>
+
+    <string name="agvn_guide_trouble_title">May error o hindi mabuksan ang game</string>
+    <string name="agvn_guide_trouble_summary">Ibaba ang Graphics, isara ang ibang app, ipadala ang error logs</string>
+    <string-array name="agvn_guide_trouble_steps">
+        <item>Ibaba ang Graphics sa \"Napakagaan\" (⋮ sa game, \"I-adjust ang Graphics\") at buksan ulit ang game.</item>
+        <item>Isara ang ibang app na tumatakbo para may sapat na RAM ang game.</item>
+        <item>Tingnan kung kumpleto ang nakopyang folder ng game, walang kulang na file.</item>
+        <item>May error pa rin: pumunta sa Settings, pindutin ang \"I-export ang error logs\". Nasa Download folder ang logs file; ipadala ito sa AGVN para matulungan ka.</item>
+    </string-array>
+
+    <string name="agvn_guide_expert_title">Para sa may alam</string>
+    <string name="agvn_guide_expert_summary">Mag-download ng iba pang Wine, driver, detalyadong settings</string>
+    <string-array name="agvn_guide_expert_steps">
+        <item>Naka-install na sa app ang lahat ng kailangan para maglaro, hindi mo na kailangang mag-download ng iba.</item>
+        <item>Kung may alam ka sa Wine/driver: pumunta sa Settings, buksan ang \"Advanced (para sa may alam)\" para mag-download ng iba pang Wine, Proton, DXVK, graphics driver at pamahalaan ang mga environment.</item>
+        <item>Para i-adjust nang detalyado ang isang game: pindutin ang ⋮ sa game at piliin ang \"Config\".</item>
+    </string-array>
+
+    <!-- Unang setup screen -->
+    <string name="agvn_setup_welcome">Maligayang pagdating sa AGVN Player</string>
+    <string name="agvn_setup_intro">Kusang ini-install ng app ang lahat ng kailangan para maglaro. Hindi na kailangang mag-download ng iba, mga 1–2 minuto lang.</string>
+    <string name="agvn_setup_step_core">I-install ang game runner</string>
+    <string name="agvn_setup_step_core_system">Ine-extract ang system… %1$d%%</string>
+    <string name="agvn_setup_step_core_wine">Ini-install ang Wine/Proton…</string>
+    <string name="agvn_setup_step_core_driver">Ini-install ang graphics driver…</string>
+    <string name="agvn_setup_step_container">Ihanda ang environment para sa game</string>
+    <string name="agvn_setup_step_access">Payagang basahin ang mga folder ng game</string>
+    <string name="agvn_setup_access_why">Kailangan ng app ang permisong ito para kusang mahanap ang mga game na kinopya mo sa phone (AGVN, Download folder sa internal storage o SD card). Hindi binabasa ng app ang mga larawan o mensahe mo.</string>
+    <string name="agvn_setup_access_button">Payagan</string>
+    <string name="agvn_setup_access_later">Mamaya na</string>
+    <string name="agvn_setup_access_denied">Hindi pa pinapayagan. Sa screen na kabubukas lang, i-on ang \"Payagan ang pamamahala sa lahat ng file\". Puwede mo ring pindutin ang \"Mamaya na\"; magtatanong ulit ang app kapag nagdagdag ka ng game.</string>
+    <string name="agvn_setup_access_denied_legacy">Hindi pa pinapayagan. Pindutin ulit ang \"Payagan\" at piliin ang Payagan sa dialog. Kung hindi lumabas ang dialog, pumunta sa Settings ng phone → Apps → AGVN Player → Mga Pahintulot → Storage → Payagan. Puwede mo ring pindutin ang \"Mamaya na\".</string>
+    <string name="agvn_setup_done">Tapos</string>
+    <string name="agvn_setup_failed">Hindi natapos ang pag-install. Siguraduhing may hindi bababa sa 2 GB na bakante ang phone at pindutin ang \"Subukan ulit\".</string>
+    <string name="agvn_setup_retry">Subukan ulit</string>
+    <string name="agvn_setup_start">Magsimula</string>
+    <string name="agvn_setup_guide_header">Habang naghihintay, tingnan kung paano gamitin</string>
+    <string name="agvn_setup_guide_header_done">Mabilisang gabay</string>
+    <string name="agvn_setup_swipe_hint">Mag-swipe pagilid para makita ang susunod</string>
+</resources>

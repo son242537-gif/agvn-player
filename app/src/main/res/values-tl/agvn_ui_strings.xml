@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="agvn_language_title">Wika · Language</string>
+    <string name="agvn_language_system">Wika ng phone</string>
+    <string name="agvn_settings_appearance">ITSURA</string>
+    <string name="agvn_settings_game_screen">SCREEN NG GAME</string>
+    <string name="agvn_settings_fullscreen_all">Full screen sa lahat ng game</string>
+    <string name="agvn_settings_fullscreen_all_summary">I-stretch ang larawan ng game para mapuno ang screen, walang itim na gilid</string>
+    <string name="agvn_settings_saves">SAVES NG GAME</string>
+    <string name="agvn_settings_saves_all">I-back up ang saves ng lahat ng game</string>
+    <string name="agvn_settings_saves_all_summary">Hanapin at i-back up ang saves tuwing aalis ka sa game</string>
+    <string name="agvn_settings_about_section">TUNGKOL</string>
+    <string name="agvn_settings_about">Tungkol</string>
+    <string name="agvn_settings_advanced_section">Advanced (para sa may alam)</string>
+    <string name="agvn_settings_advanced_show">Ipakita ang advanced settings</string>
+    <string name="agvn_settings_advanced_hide">Itago ang advanced settings</string>
+    <string name="agvn_settings_advanced_summary">Wine, driver, environment, logs… Hindi ito kailangang galawin ng karaniwang player.</string>
+</resources>
