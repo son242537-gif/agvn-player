@@ -3666,3 +3666,36 @@ mục "Ren'Py 7 chạy thử trên Ren'Py 8".
   4. "Chạy bằng Windows": bản Windows mở bình thường, file lưu cũ còn nguyên.
   5. Một game Ren'Py 7 khác để màn đen với `gl`: thanh "Màn hình đen" hỏi ANGLE.
 
+## RPG Maker VX Ace "Chạy nhẹ": script gọi hàm Windows qua DL (Rei and the Floating City, bản 0.1.88)
+
+Báo cáo ngày 08/11/2026 (POCO, app 0.1.85). Game có các script "解像度上限突破", "ユニバーサル・マウス",
+"エセフルスクリーン", "拡張選択1".
+
+| # | Lỗi | Sửa |
+|---|---|---|
+| 1 | `DL.dlopen("user32")` luôn báo `can't load` | Trả handle giả. `handle['Hàm']` là một địa chỉ giả, gắn với hàm đó (`agvn_dl_cfunc.rb`). DLL của game được mở trong `rescue` (kể cả `rescue DL::DLError`) vẫn báo lỗi như `Win32API.new`. |
+| 2 | Thiếu `DL::CFunc`, `DL::TYPE_LONG` | `CFunc.new(địa chỉ, kiểu).call([...])` gọi đúng bản giả mà `Win32API.new` cho. Hàm không có bản giả trả 0 và được ghi vào `tim-tep.txt`. |
+| 3 | Thiếu `DL::CPtr[...]` | Tạo vùng nhớ chứa chuỗi + `\0`. Bản giả đọc nó như chuỗi. |
+| 4 | `File.basename("System\RGSS301.dll")` không tách `\`, nên script không định nghĩa `Graphics::PlaneSpeedUp` | `basename`, `dirname`, `extname`, `split` hiểu `\` như Ruby trên Windows (`agvn_ruby19.rb`). `GetPrivateProfileString` qua `CFunc` cũng trả đúng giá trị trong `Game.ini`. |
+| 5 | `InputMouse::WindowHandle` chưa định nghĩa | `CAMouse` giả: `GetWindowHandle` trả 42 (cửa sổ game, như `FindWindow`), `GetWheelDelta`, `DisposeHook`, `RegenerationHook` trả 0 (`agvn_win32_mouse.rb`). |
+| 6 | `ShowCursor` trả 1/0 nên vòng `while ShowCursor(0) >= 0` không dừng | Trả đúng bộ đếm như Windows. |
+| 7 | `nil.to_s.clone.gsub!` báo `FrozenError` | `nil`, `true`, `false` `.to_s` trả chuỗi mới, như Ruby 1.9. |
+| 8 | `Win32API.new(...).freeze` rồi `call` báo `can't modify frozen MiniFFI` | Không còn ghi gì lên đối tượng khi gọi. |
+| 10 | `GetWindowLong`, `MultiByteToWideChar` trả 0 | Bản giả: kiểu cửa sổ có thanh tiêu đề; đổi chữ giữa bảng mã (0 và 932 là Shift_JIS, 65001 là UTF-8) và UTF-16 (`agvn_win32_text.rb`). |
+
+- **Chưa làm:**
+  - `tktk_bitmap` (`ClipMask`, `blur`, `mosaic`): DLL của game sửa ảnh trong bộ nhớ, vẫn trả 0.
+  - Lỗi 9: app chuyển sang Wine sau khi mkxp-z văng, rồi kẹt vì `No access to memory location` (`RGSS301.dll` trong bộ
+    nhớ chung, mục `dll-no-access`). Sửa được các lỗi 1–8 thì game không văng tới bước đó.
+  - Lỗi 11: chạm bằng `adb input tap`. Lệnh này nhấn và nhả gần như cùng lúc, nên cần thử bằng tay.
+- **Quy tắc "có `rescue` thì báo lỗi"** vẫn giữ: Lona RPG cần nó cho bộ đổi màu. Với `CAMouse`, bản giả có trước nên
+  quy tắc không áp. DLL nào khác cũng cần hằng sau `rescue` thì thêm bản giả cho DLL đó.
+- **Test:**
+  - `ruby scripts/agvn/mkxp-z/test-agvn-dl-cfunc.rb`: script dựng theo dạng của Rei.
+  - Các test cũ (`test-agvn-dl-input.rb` của Lona RPG, `test-agvn-win32.rb` của Khas) vẫn qua.
+- **Thử máy:** bản gốc chưa vá của Rei (script 142, 145 nguyên bản):
+  1. Mở game, vào được màn tiêu đề, không có hộp lỗi.
+  2. Ván mới, menu, chuyển bản đồ, trận đánh, màn Trạng thái và Lưu/Tải không văng.
+  3. Không treo khi script ẩn con trỏ.
+  4. Lona RPG và game có Khas vẫn chạy như trước.
+

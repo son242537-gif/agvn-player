@@ -34,6 +34,15 @@ Cùng thư mục `assets/agvn/mkxp-z` còn có phần của AGVN, script này kh
   Xem `docs/agvn/tu-sua-loi.md`, "Lona RPG trên Chạy nhẹ". Kiểm trên PC:
   `ruby scripts/agvn/mkxp-z/test-agvn-text-files.rb` và `ruby scripts/agvn/mkxp-z/test-agvn-dl-input.rb`.
   Từ bản 0.1.84, `agvn_text_files.rb` cũng ghi một chuỗi byte ra file đúng các byte đó, như Windows.
+- `agvn_dl_cfunc.rb`, `agvn_win32_mouse.rb`, `agvn_win32_text.rb`, `agvn_ruby19.rb` (từ bản 0.1.88), cho script gọi
+  hàm Windows qua `DL` lúc nạp (Rei and the Floating City):
+  - `DL.dlopen`, `DL::Handle`, `DL::CFunc`, `DL::CPtr[...]` và các hằng `DL::TYPE_*` gọi tới cùng bản giả của `Win32API`;
+  - `CAMouse` giả (cửa sổ game là 42), `ShowCursor` trả đúng bộ đếm như Windows;
+  - `MultiByteToWideChar` và `WideCharToMultiByte`; `GetWindowLong`;
+  - `nil.to_s`, `true.to_s`, `false.to_s` không đóng băng; `File.basename` hiểu `\` như Ruby trên Windows;
+  - `Win32API` bị `freeze` vẫn gọi được.
+
+  Kiểm trên PC: `ruby scripts/agvn/mkxp-z/test-agvn-dl-cfunc.rb`.
 - `agvn_bools.rb` (từ bản 0.1.85): các thuộc tính có/không của RGSS (`Sprite#visible=`, `Window#active=`,
   `Font#bold=`…) nhận mọi giá trị như Windows. mkxp-z chỉ nhận `true`, `false` và `nil`, còn lại báo
   `Argument 0: Expected bool`. Kiểm trên PC: `ruby scripts/agvn/mkxp-z/test-agvn-bools.rb`.

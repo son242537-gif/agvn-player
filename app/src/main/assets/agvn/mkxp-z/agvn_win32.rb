@@ -10,7 +10,8 @@
 # - a DLL of the game itself raises instead, as on Windows when it cannot load, where the script rescues that
 #   (agvn_win32_rescue.rb): the script then does without it, its own way;
 # - a buffer a script made with DL (agvn_dl.rb) reaches the stand-ins as the string it is;
-# - Call, call's other name, takes the stand-in too: it went to mkxp-z's own call, which has no function here.
+# - Call, call's other name, takes the stand-in too: it went to mkxp-z's own call, which has no function here;
+# - a Win32API the script froze calls as any other (win32_wrap.rb's call wrote on it).
 module AgvnWin32
   LOG_LINES = 40
   # What is known of a function once: its stand-in, and that mkxp-z cannot load it (a script asking every frame)
@@ -41,6 +42,13 @@ module AgvnWin32
       found = lookup(dll, func)
       @impls[k] = found if @impls.size < KNOWN
       found
+    end
+
+    # Whether something stands in for {dll} (a module of its name in Win32API_Impl), as for user32 or CAMouse
+    def stood_in_dll?(dll)
+      find(Win32API_Impl, const_name(dll)).is_a?(Module)
+    rescue StandardError
+      false
     end
 
     def no_native?(dll, func)
@@ -145,8 +153,11 @@ class Win32API
         return 0
       end
     end
-    AgvnWin32.stood_in(@dll, @func) unless @mkxp_native_available
-    agvn_win32_wrap_call(*args)
+    return agvn_win32_wrap_call(*args) if @mkxp_native_available
+    # 0, as win32_wrap.rb's call, without its note on the object: a script may freeze it (Win32API.new(...).freeze),
+    # and "can't modify frozen MiniFFI" hid the game's own error (Rei and the Floating City, 08/11/2026)
+    AgvnWin32.stood_in(@dll, @func)
+    0
   end
 
   alias_method :Call, :call

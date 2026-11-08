@@ -41,9 +41,10 @@ final class AgvnRgssFiles {
      * name the phone writes otherwise; agvn_bools.rb, whose yes/no settings (Sprite#visible=...) take any value as on
      * Windows; and agvn_fps.rb, which reports the frames the game runs per second (the HUD, "Tự sửa lỗi").
      */
-    static final String[] PRELOAD = {"ruby_classic_wrap.rb", "mkxp_wrap.rb", "win32_wrap.rb", "agvn_win32.rb",
-            "agvn_win32_screen.rb", "agvn_win32_ini.rb", "agvn_win32_rescue.rb", "agvn_win32_input.rb", "agvn_dl.rb",
-            "agvn_text_files.rb", "agvn_names.rb", "agvn_files.rb", "agvn_bools.rb", "agvn_fps.rb"};
+    static final String[] PRELOAD = {"ruby_classic_wrap.rb", "agvn_ruby19.rb", "mkxp_wrap.rb", "win32_wrap.rb",
+            "agvn_win32.rb", "agvn_win32_screen.rb", "agvn_win32_ini.rb", "agvn_win32_text.rb", "agvn_win32_rescue.rb",
+            "agvn_win32_input.rb", "agvn_win32_mouse.rb", "agvn_dl.rb", "agvn_dl_cfunc.rb", "agvn_text_files.rb",
+            "agvn_names.rb", "agvn_files.rb", "agvn_bools.rb", "agvn_fps.rb"};
     /** Ruby 3.1.3's own String#unicode_normalize (Ruby License), for agvn_files.rb: mkxp-z carries no Ruby library. */
     static final String[] RUBY_LIB = {"unicode_normalize/normalize.rb", "unicode_normalize/tables.rb"};
     /**

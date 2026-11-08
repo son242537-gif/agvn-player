@@ -22,10 +22,11 @@ module AgvnRescue
       false
     end
 
-    # Whether line {line} of the script {path} runs inside a rescue that takes a RuntimeError
-    def guarded?(path, line)
+    # Whether line {line} of the script {path} runs inside a rescue that takes a RuntimeError, or one of {also}
+    # (DL.dlopen's DL::DLError: "DLError")
+    def guarded?(path, line, also = [])
       seq = seq(path.to_s)
-      seq ? covered?(seq, line) : false
+      seq ? covered?(seq, line, TAKES + also) : false
     rescue StandardError, ScriptError
       false
     end
@@ -51,10 +52,10 @@ module AgvnRescue
       File.binread(path).force_encoding(Encoding::UTF_8).delete_prefix("﻿")
     end
 
-    def covered?(top, line)
+    def covered?(top, line, takes)
       each_seq(top) do |s|
         s[12].each do |c|
-          next unless c[0] == :rescue && takes_runtime?(c[1])
+          next unless c[0] == :rescue && takes_runtime?(c[1], takes)
           lines = region(s[13], c[2], c[3])
           return true if lines && lines.include?(line)
         end
@@ -79,7 +80,7 @@ module AgvnRescue
       lines.empty? ? nil : (lines.min..lines.max)
     end
 
-    def takes_runtime?(rescue_seq)
+    def takes_runtime?(rescue_seq, takes)
       return false unless rescue_seq.is_a?(Array) && rescue_seq[0] == HEADER
       rescue_seq[13].any? do |i|
         next false unless i.is_a?(Array)
@@ -88,7 +89,7 @@ module AgvnRescue
                when :getconstant then i[1].to_s
                when :opt_getconstant_path then Array(i[1]).last.to_s
                end
-        TAKES.include?(name)
+        takes.include?(name)
       end
     end
 

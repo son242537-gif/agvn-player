@@ -116,6 +116,15 @@ module Win32API_Impl
       end
     end
 
+    # (window, index): a game window's styles, captioned and visible (WS_OVERLAPPED|CAPTION|SYSMENU|MINIMIZEBOX|
+    # CLIPSIBLINGS|VISIBLE, WS_EX_WINDOWEDGE), as a full-screen script reads them before it changes them; 0 for the rest
+    class GetWindowLong
+      def call(args)
+        { -16 => 0x14CA0000, -20 => 0x100 }.fetch(args[1].to_i, 0)
+      end
+    end
+    GetWindowLongPtr = GetWindowLong
+
     MonitorFromWindow = MonitorFromPoint = MonitorFromRect = AgvnScreen.returning(AgvnScreen::MONITOR)
     GetDesktopWindow = AgvnScreen.returning(AgvnScreen::DESKTOP)
     GetForegroundWindow = GetActiveWindow = GetFocus = AgvnScreen.returning(AgvnScreen::GAME)
