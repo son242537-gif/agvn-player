@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="agvn_language_title">ภาษา · Language</string>
+    <string name="agvn_language_system">ตามภาษาของโทรศัพท์</string>
+    <string name="agvn_settings_appearance">หน้าตาแอป</string>
+    <string name="agvn_settings_game_screen">หน้าจอเกม</string>
+    <string name="agvn_settings_fullscreen_all">เต็มจอสำหรับทุกเกม</string>
+    <string name="agvn_settings_fullscreen_all_summary">ยืดภาพเกมให้เต็มจอ ไม่มีขอบดำสองข้าง</string>
+    <string name="agvn_settings_saves">เซฟเกม</string>
+    <string name="agvn_settings_saves_all">สำรองเซฟของทุกเกม</string>
+    <string name="agvn_settings_saves_all_summary">ค้นหาและสำรองเซฟทุกครั้งที่ออกจากเกม</string>
+    <string name="agvn_settings_about_section">เกี่ยวกับ</string>
+    <string name="agvn_settings_about">เกี่ยวกับ</string>
+    <string name="agvn_settings_advanced_section">ขั้นสูง (สำหรับผู้เชี่ยวชาญ)</string>
+    <string name="agvn_settings_advanced_show">แสดงการตั้งค่าขั้นสูง</string>
+    <string name="agvn_settings_advanced_hide">ซ่อนการตั้งค่าขั้นสูง</string>
+    <string name="agvn_settings_advanced_summary">Wine, ไดรเวอร์, สภาพแวดล้อม, ล็อก… ผู้เล่นทั่วไปไม่ต้องปรับ</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN: Thai translation of values/agvn_update_strings.xml. Copyright (c) 2026 agvn.io — MIT License. -->
+<resources>
+    <string name="agvn_update_retry_title">ยังไม่ได้ติดตั้งเวอร์ชันใหม่</string>
+    <string name="agvn_update_retry_session">เครื่องยังไม่ได้ติดตั้งเวอร์ชันใหม่ ถ้าตัวติดตั้งของเครื่องแจ้งข้อผิดพลาด (เช่น \"Parsing failed\" หรือ \"APK contains no signature files\") AGVN Player ติดตั้งด้วยวิธีอื่นได้: แอปจะส่งไฟล์ที่ตรวจแล้วให้ Android เอง Android จะยังถามคุณก่อนติดตั้ง</string>
+    <string name="agvn_update_retry_installer">เครื่องยังไม่ได้ติดตั้งเวอร์ชันใหม่ AGVN Player เปิดตัวติดตั้งของเครื่องเพื่อติดตั้งไฟล์ที่ตรวจแล้วได้ Android จะยังถามคุณก่อนติดตั้ง</string>
+    <string name="agvn_update_retry_now">ติดตั้งด้วยวิธีอื่น</string>
+    <string name="agvn_update_session_writing">กำลังเตรียมติดตั้งเวอร์ชันใหม่…</string>
+</resources>

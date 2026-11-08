@@ -1,0 +1,675 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AGVN Player</string>
+    <string name="run">รัน</string>
+    <string name="edit">แก้ไข</string>
+    <string name="remove">ลบ</string>
+    <string name="add">เพิ่ม</string>
+    <string name="shortcuts">เกม</string>
+    <string name="containers">สภาพแวดล้อม</string>
+    <string name="input_controls">การควบคุม</string>
+    <string name="no_items_to_display">ยังไม่มีรายการให้แสดง</string>
+    <string name="new_container">สร้างสภาพแวดล้อมใหม่</string>
+    <string name="edit_container">แก้ไขสภาพแวดล้อม</string>
+    <string name="creating_container">กำลังสร้างสภาพแวดล้อม…</string>
+    <string name="removing_container">กำลังลบสภาพแวดล้อม…</string>
+    <string name="duplicating_container">กำลังทำสำเนาสภาพแวดล้อม…</string>
+    <string name="installing_system_files">กำลังติดตั้งไฟล์ระบบ…</string>
+    <string name="updating_system_files">กำลังอัปเดตไฟล์ระบบ…</string>
+    <string name="starting_up">กำลังเริ่มต้น…</string>
+    <string name="remove_loading_bar_when_booting_games">ซ่อนแถบโหลดตอนเปิดเกม</string>
+    <string name="unable_to_install_system_files">ติดตั้งไฟล์ระบบไม่สำเร็จ</string>
+    <string name="keyboard">คีย์บอร์ด</string>
+    <string name="toggle_fullscreen">เปิด/ปิดเต็มจอ</string>
+    <string name="exit">ออก</string>
+    <string name="no_control_element_selected">ยังไม่ได้เลือกปุ่มควบคุม</string>
+    <string name="scale">ขนาด</string>
+    <string name="aspect_ratio">อัตราส่วนภาพ</string>
+    <string name="shape">รูปทรง</string>
+    <string name="type">ประเภท</string>
+    <string name="binding">กำหนดปุ่ม</string>
+    <string name="binding_secondary">กำหนดปุ่มรอง</string>
+    <string name="binding_up">กำหนดปุ่มขึ้น</string>
+    <string name="binding_right">กำหนดปุ่มขวา</string>
+    <string name="binding_down">กำหนดปุ่มลง</string>
+    <string name="binding_left">กำหนดปุ่มซ้าย</string>
+    <string name="overlay_opacity">ความโปร่งใสของโอเวอร์เลย์</string>
+    <string name="profile">โปรไฟล์</string>
+    <string name="select_profile">เลือกโปรไฟล์</string>
+    <string name="profile_name">ชื่อโปรไฟล์</string>
+    <string name="name">ชื่อ</string>
+    <string name="ok">ตกลง</string>
+    <string name="cancel">ยกเลิก</string>
+    <string name="untitled">ไม่มีชื่อ</string>
+    <string name="no_profile_selected">ยังไม่ได้เลือกโปรไฟล์</string>
+    <string name="no_profile_found">ไม่พบโปรไฟล์</string>
+    <string name="do_you_want_to_remove_this_profile">ลบโปรไฟล์นี้?</string>
+    <string name="do_you_want_to_duplicate_this_profile">ทำสำเนาโปรไฟล์นี้?</string>
+    <string name="do_you_want_to_duplicate_this_preset">ทำสำเนาพรีเซ็ตนี้?</string>
+    <string name="do_you_want_to_remove_this_container">ลบสภาพแวดล้อมนี้?</string>
+    <string name="do_you_want_to_duplicate_this_container">ทำสำเนาสภาพแวดล้อมนี้?</string>
+    <string name="do_you_want_to_remove_this_shortcut">ลบเกมนี้ออกจากคลังเกม?</string>
+    <string name="do_you_want_to_remove_this_controller">ลบจอยนี้?</string>
+    <string name="do_you_want_to_remove_this_wine_version">ต้องการลบ Wine เวอร์ชันนี้ไหม?</string>
+    <string name="do_you_want_to_remove_this_preset">ลบพรีเซ็ตนี้?</string>
+    <string name="do_you_want_to_end_this_process">ปิดโปรเซสนี้?</string>
+    <string name="controls_editor">แก้ไขการควบคุม</string>
+    <string name="enabled">เปิด</string>
+    <string name="disabled">ปิด</string>
+    <string name="container">สภาพแวดล้อม</string>
+    <string name="screen_size">ความละเอียด</string>
+    <string name="new_environment_variable">ตัวแปรสภาพแวดล้อมใหม่</string>
+    <string name="environment_variables">ตัวแปรสภาพแวดล้อม</string>
+    <string name="value">ค่า</string>
+    <string name="processor_affinity">เลือกคอร์ CPU</string>
+    <string name="processor_affinity_32_bit_apps">เลือกคอร์ CPU (แอป 32-bit)</string>
+    <string name="cursor_speed">ความเร็วเคอร์เซอร์</string>
+    <string name="relative_mouse_movement">เลื่อนเมาส์แบบสัมพัทธ์</string>
+    <string name="toggle_switch">สวิตช์เปิด/ปิด</string>
+    <string name="profile_exported_to">ส่งออกโปรไฟล์ไปที่</string>
+    <string name="unable_to_import_profile">นำเข้าโปรไฟล์ไม่สำเร็จ</string>
+    <string name="wine_configuration">การตั้งค่า Wine</string>
+    <string name="registry_keys">คีย์ Registry</string>
+    <string name="csmt">CSMT (ประมวลผลคำสั่งแบบหลายเธรด)</string>
+    <string name="gpu_name">ชื่อ GPU</string>
+    <string name="offscreen_rendering_mode">โหมดเรนเดอร์นอกจอ</string>
+    <string name="strict_shader_math">คำนวณเชเดอร์แบบแม่นยำ</string>
+    <string name="video_memory_size">ขนาดหน่วยความจำวิดีโอ</string>
+    <string name="show_fps">แสดง FPS</string>
+    <string name="none">ไม่มี</string>
+    <string name="auto">อัตโนมัติ</string>
+    <string name="custom_text">ข้อความกำหนดเอง</string>
+    <string name="icon">ไอคอน</string>
+    <string name="import_profile">นำเข้าโปรไฟล์</string>
+    <string name="export_profile">ส่งออกโปรไฟล์</string>
+    <string name="touchpad_help">วิธีใช้การสัมผัส</string>
+    <string name="touchpad_help_mouse_left_click_title">คลิกซ้าย</string>
+    <string name="touchpad_help_mouse_left_click_description">แตะเร็วๆ ด้วยนิ้วเดียว</string>
+    <string name="touchpad_help_mouse_right_click_title">คลิกขวา</string>
+    <string name="touchpad_help_mouse_right_click_description">แตะค้างไว้หนึ่งนิ้ว แล้วแตะเร็วๆ ด้วยนิ้วที่สอง</string>
+    <string name="touchpad_help_mouse_scroll_wheel_title">เลื่อนลูกกลิ้ง</string>
+    <string name="touchpad_help_mouse_scroll_wheel_description">วางสองนิ้วแล้วเลื่อน</string>
+    <string name="touchpad_help_main_menu_title">เมนูหลัก</string>
+    <string name="touchpad_help_main_menu_description">แตะด้วยสี่นิ้ว</string>
+    <string name="duplicate">ทำสำเนา</string>
+    <string name="about">เกี่ยวกับ</string>
+    <string name="credits_and_third_party_apps">เครดิตและซอฟต์แวร์จากบุคคลที่สาม</string>
+    <string name="external_controllers">จอยภายนอก</string>
+    <string name="graphics_driver">ไดรเวอร์กราฟิก</string>
+    <string name="audio_driver">ไดรเวอร์เสียง</string>
+    <string name="loading">กำลังโหลด…</string>
+    <string name="press_any_button_on_your_controller">กดปุ่มใดก็ได้บนจอย</string>
+    <string name="bindings">ปุ่มที่กำหนด</string>
+    <string name="show_touchscreen_controls">แสดงปุ่มควบคุมแบบสัมผัส</string>
+    <string name="dxwrapper">DX Wrapper</string>
+    <string name="mouse_warp_override">บังคับ Mouse Warp</string>
+    <string name="direct3d">Direct3D</string>
+    <string name="directsound">DirectSound</string>
+    <string name="directmusic">DirectMusic</string>
+    <string name="directplay">DirectPlay</string>
+    <string name="directshow">DirectShow</string>
+    <string name="directx">DirectX</string>
+    <string name="xaudio">XAudio</string>
+    <string name="vcrun2010">Visual C++ 2010</string>
+    <string name="opengl">OpenGL</string>
+    <string name="settings">ตั้งค่า</string>
+    <string name="exec_arguments">พารามิเตอร์การรัน</string>
+    <string name="win_components">คอมโพเนนต์ Windows</string>
+    <string name="drives">ไดรฟ์</string>
+    <string name="range">ช่วง</string>
+    <string name="enable">เปิด</string>
+    <string name="disable">ปิด</string>
+    <string name="force">แรง</string>
+    <string name="installed_wine">Wine ที่ติดตั้งแล้ว</string>
+    <string name="install_wine">ติดตั้ง Wine</string>
+    <string name="arch">สถาปัตยกรรม</string>
+    <string name="version">เวอร์ชัน</string>
+    <string name="dxvk_version">เวอร์ชัน DXVK</string>
+    <string name="vkd3d_version">เวอร์ชัน VKD3D</string>
+    <string name="unable_to_install_wine">ติดตั้ง Wine ไม่สำเร็จ</string>
+    <string name="unable_to_remove_this_wine_version">ลบ Wine เวอร์ชันนี้ไม่สำเร็จ</string>
+    <string name="wine_version">เวอร์ชัน Wine</string>
+    <string name="removing_wine">กำลังลบ Wine…</string>
+    <string name="preparing_installation">กำลังเตรียมติดตั้ง…</string>
+    <string name="finishing_installation">กำลังติดตั้งให้เสร็จ…</string>
+    <string name="storage_info">พื้นที่</string>
+    <string name="drive_c">ไดรฟ์ C:</string>
+    <string name="cache">แคช</string>
+    <string name="total">ทั้งหมด</string>
+    <string name="clear_cache">ล้างแคช</string>
+    <string name="estimated_used_space">พื้นที่ที่ใช้ (โดยประมาณ)</string>
+    <string name="advanced">ขั้นสูง</string>
+    <string name="box64">Box64</string>
+    <string name="system">ระบบ</string>
+    <string name="box64_preset">พรีเซ็ต Box64</string>
+    <string name="box64_version">เวอร์ชัน Box64</string>
+    <string name="letter">อักษรไดรฟ์</string>
+    <string name="target_path">พาธปลายทาง</string>
+    <string name="xserver">XServer</string>
+    <string name="use_dri3_extension">ใช้ส่วนขยาย DRI3</string>
+    <string name="width">กว้าง</string>
+    <string name="height">สูง</string>
+    <string name="old">เก่า</string>
+    <string name="_new">ใหม่</string>
+    <string name="task_manager">ตัวจัดการโปรเซส</string>
+    <string name="process_name">ชื่อโปรเซส</string>
+    <string name="pid">PID</string>
+    <string name="memory">หน่วยความจำ</string>
+    <string name="end_process">ปิดโปรเซส</string>
+    <string name="new_task">งานใหม่</string>
+    <string name="processes">โปรเซส</string>
+    <string name="orientation">การหมุนจอ</string>
+    <string name="horizontal">แนวนอน</string>
+    <string name="vertical">แนวตั้ง</string>
+    <string name="open_file">เปิดไฟล์</string>
+    <string name="download_file">ดาวน์โหลดไฟล์</string>
+    <string name="do_you_want_to_download_the_selected_profiles">ต้องการดาวน์โหลดโปรไฟล์ที่เลือกไหม?</string>
+    <string name="downloading_file">กำลังดาวน์โหลดไฟล์...</string>
+    <string name="unable_to_load_profile_list">โหลดรายการโปรไฟล์ไม่สำเร็จ</string>
+    <string name="copy">คัดลอก</string>
+    <string name="installed_version">เวอร์ชันที่ติดตั้ง</string>
+    <string name="unable_to_download_file">ดาวน์โหลดไฟล์ไม่สำเร็จ</string>
+    <string name="stability">เสถียร</string>
+    <string name="compatibility">เข้ากันได้</string>
+    <string name="intermediate">กลางๆ</string>
+    <string name="performance">ประสิทธิภาพ</string>
+    <string name="preset">พรีเซ็ต</string>
+    <string name="you_cannot_remove_this_preset">ลบพรีเซ็ตนี้ไม่ได้</string>
+    <string name="dxwrapper_help_content"><![CDATA[
+        <i><b>WineD3D</b></i> แปลง DirectX 1-11 เป็น OpenGL<br /><br />
+        <i><b>DXVK</b></i> แปลง Direct3D 9-11 เป็น Vulkan<br /><br />
+        <i><b>VKD3D</b></i> แปลง Direct3D 12 เป็น Vulkan<br /><br />
+        <i><b>CNC DDraw</b></i> เป็น DirectDraw ที่ช่วยให้เกมเก่ารันได้เสถียรขึ้น
+    ]]></string>
+    <string name="box64_env_var_help__dynarec_safeflags"><![CDATA[
+        จัดการแฟล็ก (flags) ที่คำสั่ง CALL/RET<br /><br />
+        <b>0</b> : ถือว่า CALL/RET ไม่ต้องใช้แฟล็กเลย (เร็วกว่า เสถียรน้อยกว่า)<br />
+        <b>1</b> : RET ส่วนใหญ่ต้องใช้แฟล็ก CALL ส่วนใหญ่ไม่ต้อง<br />
+        <b>2</b> : CALL/RET ทุกตัวต้องใช้แฟล็ก (ช้ากว่า)
+    ]]></string>
+    <string name="box64_env_var_help__dynarec_fastnan">สร้างค่า -NAN แบบเดียวกับบน x86</string>
+    <string name="box64_env_var_help__dynarec_fastround">ปัดเศษตัวเลขให้ตรงแบบ x86</string>
+    <string name="box64_env_var_help__dynarec_x87double">ใช้ Float/Double เพื่อจำลอง x87</string>
+    <string name="box64_env_var_help__dynarec_bigblock"><![CDATA[
+        Dynarec สร้างบล็อกใหญ่ (BigBlock)<br /><br />
+        <b>0</b> : ไม่พยายามสร้างบล็อกใหญ่ที่สุดเท่าที่ทำได้<br />
+        <b>1</b> : สร้างบล็อก Dynarec ใหญ่ที่สุดเท่าที่ทำได้<br />
+        <b>2</b> : สร้างบล็อก Dynarec ใหญ่ขึ้น (ทำต่อเมื่อบล็อกซ้อนกัน เฉพาะบล็อกในหน่วยความจำ elf)<br />
+        <b>3</b> : สร้างบล็อก Dynarec ใหญ่ขึ้น (ทำต่อเมื่อบล็อกซ้อนกัน กับหน่วยความจำทุกแบบ)
+    ]]></string>
+    <string name="box64_env_var_help__dynarec_strongmem"><![CDATA[
+        จำลองโมเดลหน่วยความจำแบบเข้ม (Strong Memory)<br /><br />
+        <b>0</b> : ไม่ทำอะไรพิเศษ<br />
+        <b>1</b> : เพิ่ม Memory Barrier ตอนเขียนหน่วยความจำ (ในคำสั่ง MOV บางคำสั่ง)<br />
+        <b>2</b> : เหมือนระดับ 1 และเพิ่ม Memory Barrier ทุกครั้งที่เขียนหน่วยความจำด้วย MOV<br />
+        <b>3</b> : เหมือนระดับ 2 และเพิ่ม Memory Barrier ตอนอ่านหน่วยความจำและในคำสั่ง SSE/SSE2 บางคำสั่ง
+    ]]></string>
+    <string name="box64_env_var_help__dynarec_forward">ค่า forward สูงสุดตอนสร้าง Block</string>
+    <string name="box64_env_var_help__dynarec_callret">ปรับแต่งคำสั่ง CALL/RET ให้เร็วขึ้น</string>
+    <string name="box64_env_var_help__dynarec_wait">ให้ Dynarec รอ FillBlock พร้อมหรือไม่</string>
+    <string name="box64_env_var_help__dynarec_weakbarrier"><![CDATA[
+        ปรับ memory barrier เพื่อลดผลต่อประสิทธิภาพของการจำลองหน่วยความจำแบบเข้ม<br /><br />
+        <b>0</b> : ใช้ barrier ปลอดภัยแบบปกติ<br />
+        <b>1</b> : ใช้ barrier แบบอ่อนเพื่อเพิ่มประสิทธิภาพเล็กน้อย<br />
+        <b>2</b> : ใช้ barrier แบบอ่อน และปิด barrier ที่การเขียนครั้งสุดท้าย]]></string>
+    <string name="box64_env_var_help__dynarec_aligned_atomics"><![CDATA[
+        สร้างเฉพาะคำสั่งอะตอมมิก (atomic) แบบจัดแนว (ตอนนี้มีเฉพาะบน Arm64)<br /><br />
+        <b>0</b> : สร้างโค้ดจัดการ atomic แบบไม่จัดแนว<br />
+        <b>1</b> : สร้างเฉพาะ atomic แบบจัดแนว เร็วและเล็กกว่า แต่จะเกิด SIGBUS กับคำสั่งที่มี prefix LOCK บนที่อยู่ข้อมูลที่ไม่จัดแนว]]></string>
+    <string name="box64_env_var_help__dynarec_df"><![CDATA[
+        เปิดหรือปิดแฟล็กแบบหน่วง (deferred flags)<br /><br />
+        <b>0</b> : ปิดแฟล็กแบบหน่วง<br />
+        <b>1</b> : เปิดแฟล็กแบบหน่วง]]></string>
+    <string name="box64_env_var_help__dynarec_dirty"><![CDATA[
+        อนุญาตให้รันบล็อกที่ไม่ได้ป้องกันและอาจถูกแก้ไขแล้ว (dirty) ต่อไป<br /><br />
+        <b>0</b> : ไม่ให้รันบล็อกที่ไม่ได้ป้องกันและอาจถูกแก้ไขแล้วต่อ<br />
+        <b>1</b> : ให้รัน dynablock ที่เขียนข้อมูลลงหน้าเดียวกับโค้ดต่อไป อาจช่วยให้บางเกมโหลดเร็วขึ้น แต่ก็อาจทำให้แครชกะทันหันได้<br />
+        <b>2</b> : นอกจากนั้น เมื่อพบ HotPage จะทำเครื่องหมายหน้านั้นเป็น NEVERCLEAN หน้านั้นจึงไม่ถูกป้องกันการเขียน แต่บล็อกที่สร้างจากหน้านั้นจะถูกตรวจสอบเสมอ วิธีนี้อาจเร็วกว่า (แต่ SMC บางกรณีอาจหลุดไป)]]></string>
+    <string name="box64_env_var_help__dynarec_nativeflags"><![CDATA[
+        เปิดหรือปิดแฟล็กเนทีฟ (native flags)<br /><br />
+        <b>0</b> : ไม่ใช้แฟล็กเนทีฟ<br />
+        <b>1</b> : ใช้แฟล็กเนทีฟเมื่อทำได้]]></string>
+    <string name="box64_env_var_help__dynarec_pause"><![CDATA[
+        จำลองคำสั่ง x86 PAUSE อาจช่วยประสิทธิภาพของ spinlock<br /><br />
+        <b>0</b> : ข้ามคำสั่ง x86 PAUSE<br />
+        <b>1</b> : ใช้ YIELD เพื่อจำลองคำสั่ง x86 PAUSE<br />
+        <b>2</b> : ใช้ WFI เพื่อจำลองคำสั่ง x86 PAUSE<br />
+        <b>3</b> : ใช้ SEVL+WFE เพื่อจำลองคำสั่ง x86 PAUSE
+    ]]></string>
+    <string name="box64_env_var_help__avx"><![CDATA[
+        รองรับ AVX และ AVX2 พร้อมส่วนขยาย BMI1, BMI2, ADX, FMA, F16C และ RDRAND!<br /><br />
+        <b>0</b> : ปิด AVX<br />
+        <b>1</b> : เปิด AVX, BMI1, F16C และ VAES<br />
+        <b>2</b> : เหมือนระดับ 1 และเพิ่ม AVX2, BMI2, FMA, ADX, VPCLMULQDQ และ RDRAND<br />\
+    ]]></string>
+    <string name="box64_env_var_help__maxcpu">จำนวน CPU สูงสุดที่ Box64 ให้โปรแกรมมองเห็น</string>
+    <string name="box64_env_var_help__unityplayer">ตรวจหา UnityPlayer.dll และใช้การตั้งค่า strongmem</string>
+    <string name="box64_env_var_help__mmap32">บังคับให้หน่วยความจำที่จัดสรรทั้งหมดอยู่ในพื้นที่ที่อยู่ 32-bit</string>
+    <string name="fexcore_env_var_help__tsoenabled">เปิดคำสั่ง TSO IR (จำเป็นสำหรับแอปหลายเธรด)</string>
+    <string name="fexcore_env_var_help__vectortsoenabled">อ่าน/เขียนเวกเตอร์แบบอะตอมมิกเมื่อเปิด TSO</string>
+    <string name="fexcore_env_var_help__halfbarriertsoenabled">ใช้ half-barrier สำหรับการอ่าน/เขียนแบบไม่จัดแนวเมื่อเปิด TSO</string>
+    <string name="fexcore_env_var_help__memcpysettsoenabled">ทำให้ REP MOVS / REP STOS เป็นอะตอมมิกเมื่อเปิด TSO</string>
+    <string name="fexcore_env_var_help__multiblock">คอมไพล์โค้ดหลายบล็อกพร้อมกัน อาจทำให้คอมไพล์ JIT นานขึ้นและกระตุก</string>
+    <string name="fexcore_env_var_help__hostfeatures">ควบคุมการบังคับฟีเจอร์ CPU</string>
+    <string name="fexcore_env_var_help__smalltscscale">ปรับ TSC บนเครื่องที่มีความถี่ต่ำ</string>
+    <string name="fexcore_env_var_help__smc_checks">ตรวจโค้ดที่แก้ไขตัวเอง (SMC)</string>
+    <string name="fexcore_env_var_help__volatilemetadata">ใช้ metadata volatile จากไฟล์ PE สำหรับ TSO ถ้ามี</string>
+    <string name="fexcore_env_var_help__monohacks">เทคนิค SMC + บล็อก JIT แยก เมื่อพบ Mono</string>
+    <string name="fexcore_env_var_help__hidehypervisorbit">ซ่อนบิต hypervisor ของ CPUID (มีประโยชน์กับแอปที่แครชเพราะบิตนี้)</string>
+    <string name="fexcore_env_var_help__disablel2cache">ปิดการค้นหาแคช L2 ของ JIT FEXCore ประหยัดหน่วยความจำแต่ทำให้กระตุก</string>
+    <string name="fexcore_env_var_help__dynamicl1cache">ให้แคช L1 ของ JIT FEXCore เปลี่ยนขนาดได้ ประหยัดหน่วยความจำแต่ทำให้กระตุก</string>
+    <string name="fexcore_env_var_help__x87reducedprecision">จำลองเลขทศนิยม X87 ด้วยความแม่นยำ 64-bit ลดความแม่นยำและอาจทำให้ภาพผิดเพี้ยน</string>
+    <string name="columns">จำนวนคอลัมน์</string>
+    <string name="directinput_mapper_type">รูปแบบการแมป DirectInput</string>
+    <string name="desktop">เดสก์ท็อป</string>
+    <string name="theme">ธีม</string>
+    <string name="background">พื้นหลัง</string>
+    <string name="max_device_memory">หน่วยความจำอุปกรณ์สูงสุด</string>
+    <string name="frame_rate">อัตราเฟรม</string>
+    <string name="configuration">การตั้งค่า</string>
+    <string name="browse">เรียกดู</string>
+    <string name="magnifier">แว่นขยาย</string>
+    <string name="bring_to_front">นำมาไว้ด้านหน้า</string>
+    <string name="options">ตัวเลือก</string>
+    <string name="enable_experimental_wow64_mode">เปิดโหมด WoW64 ทดลอง</string>
+    <string name="logs">ล็อก</string>
+    <string name="enable_wine_debug">เปิดดีบัก Wine</string>
+    <string name="enable_winlator_logs">เปิดล็อกของแอป</string>
+    <string name="enable_box64_logs">เปิดล็อก Box64</string>
+    <string name="export">ส่งออก</string>
+    <string name="logs_exported_to">ส่งออกล็อกไปที่</string>
+    <string name="general">ทั่วไป</string>
+    <string name="msg_warning_install_wine">คำเตือน: ควรติดตั้ง Wine เวอร์ชันใหม่เพื่อทดลองเท่านั้น</string>
+    <string name="startup_selection">โหมดเริ่มต้น</string>
+    <string name="sync_cpu_topology">ซิงค์กับ Wine</string>
+    <string name="wine_debug_channel">ช่องดีบัก Wine</string>
+    <string name="game_controller">จอยเกม</string>
+    <string name="vibration">การสั่น</string>
+    <string name="vibration_slot">ช่อง %1$d</string>
+
+    <string name="experimental">ทดลอง</string>
+    <string name="glibc_exp_edition">อิงจาก</string>
+    <string name="enabled_async">เปิด Async</string>
+    <string name="enabled_async_cache">เปิดแคช Async</string>
+    <string name="vkd3d_feature_level">ระดับฟีเจอร์ VKD3D</string>
+    <string name="filter">ตัวกรอง</string>
+    <string name="all">ทั้งหมด</string>
+    <string name="group">กลุ่ม</string>
+    <string name="new_group">กลุ่มใหม่</string>
+    <string name="import_group">นำเข้ากลุ่ม</string>
+    <string name="new_file">ไฟล์ใหม่</string>
+    <string name="new_item">รายการใหม่</string>
+    <string name="group_edit">แก้ไขกลุ่ม</string>
+    <string name="group_name">ชื่อกลุ่ม</string>
+    <string name="do_you_want_to_duplicate_this_group">ต้องการทำสำเนากลุ่มนี้ไหม?</string>
+    <string name="do_you_want_to_remove_this_group">ต้องการลบกลุ่มนี้ไหม?</string>
+    <string name="do_you_want_to_duplicate_this_process">ต้องการทำสำเนาโปรเซสนี้ไหม?</string>
+    <string name="do_you_want_to_remove_this_process">ต้องการลบโปรเซสนี้ไหม?</string>
+    <string name="do_you_want_to_remove_this_variable">ต้องการลบตัวแปรนี้ไหม?</string>
+    <string name="variable_name">ชื่อตัวแปร</string>
+    <string name="variable_already_exists">มีตัวแปรนี้อยู่แล้ว</string>
+    <string name="cannot_remove_default_profile">ลบโปรไฟล์เริ่มต้นไม่ได้</string>
+    <string name="cannot_edit_default_profile">แก้ไขโปรไฟล์เริ่มต้นไม่ได้</string>
+    <string name="do_you_want_to_restore_default_profile">ต้องการคืนค่าโปรไฟล์เริ่มต้นไหม?</string>
+    <string name="simulate_touch_screen">จำลองหน้าจอสัมผัส</string>
+    <string name="install_content">ติดตั้งส่วนประกอบ</string>
+    <string name="content_type">ประเภทส่วนประกอบ</string>
+    <string name="contents">ส่วนประกอบ</string>
+    <string name="do_you_want_to_install_content">ต้องการติดตั้งส่วนประกอบเพิ่มไหม?</string>
+    <string name="pls_make_sure_content_trustworthy">ส่วนประกอบมีไฟล์ที่รันได้ ไฟล์ที่รันได้ซึ่งไม่ปลอดภัยอาจเป็นอันตรายต่อข้อมูลหรืออุปกรณ์ของคุณ ก่อนติดตั้ง โปรดแน่ใจว่าส่วนประกอบที่จะติดตั้งเชื่อถือได้</string>
+    <string name="content_suffix_is_wcp_packed_xz_zst">ไฟล์ส่วนประกอบมีนามสกุล .wcp และบีบอัดด้วย xz หรือ zst</string>
+    <string name="installing_content">กำลังติดตั้งส่วนประกอบ…</string>
+    <string name="unable_to_install_content">ติดตั้งส่วนประกอบไม่สำเร็จ</string>
+    <string name="install_failed">ติดตั้งไม่สำเร็จ</string>
+    <string name="file_cannot_be_recognied">ไม่รู้จักไฟล์นี้</string>
+    <string name="profile_not_found_in_content">ไม่พบโปรไฟล์ในส่วนประกอบ</string>
+    <string name="profile_cannot_be_recognized">ไม่รู้จักโปรไฟล์นี้</string>
+    <string name="content_already_exist">มีส่วนประกอบที่จะติดตั้งอยู่แล้ว</string>
+    <string name="content_info">ข้อมูลส่วนประกอบ</string>
+    <string name="version_code">รหัสเวอร์ชัน</string>
+    <string name="description">คำอธิบาย</string>
+    <string name="file_list">รายการไฟล์</string>
+    <string name="_continue">ต่อไป</string>
+    <string name="content_installed_success">ติดตั้งส่วนประกอบสำเร็จ!</string>
+    <string name="content_cannot_be_trusted">ส่วนประกอบนี้เชื่อถือไม่ได้</string>
+    <string name="content_is_incomplete">ส่วนประกอบไม่ครบ</string>
+    <string name="warning_content_has_untrusted_files">คำเตือน: ส่วนประกอบนี้มีไฟล์ที่เชื่อถือไม่ได้ ปกติไฟล์ด้านล่างไม่ควรถูกแก้ไข โปรดพิจารณาว่าจะติดตั้งต่อหรือไม่</string>
+    <string name="warning">คำเตือน</string>
+    <string name="do_you_want_to_remove_this_content">ต้องการลบส่วนประกอบนี้ไหม?</string>
+    <string name="add_to_home_screen">เพิ่มไปที่หน้าจอหลัก</string>
+    <string name="shortcut_not_available">เกมนี้ใช้ไม่ได้แล้ว โปรดลบแล้วเพิ่มใหม่</string>
+    <string name="enable_file_provider">เปิด File Provider</string>
+    <string name="take_effect_next_startup">ตัวเลือกนี้จะมีผลในการเปิดครั้งถัดไป</string>
+    <string name="imagefs">Imagefs</string>
+    <string name="reinstall_imagefs">ติดตั้ง Imagefs ใหม่</string>
+    <string name="do_you_want_to_reinstall_imagefs">ต้องการติดตั้ง imagefs ใหม่ไหม? การทำเช่นนี้จะกู้คืนไฟล์ระบบ สภาพแวดล้อมของคุณจะไม่ถูกเปลี่ยนแปลง</string>
+    <string name="unable_to_remove_content_since_container_using">ลบส่วนประกอบนี้ไม่ได้ เพราะมีสภาพแวดล้อมที่กำลังใช้ Wine เวอร์ชันนี้อยู่</string>
+    <string name="get_more_contents_form_github">คุณไปที่ https://github.com/longjunyu2/winlator/releases เพื่อรับส่วนประกอบเพิ่มเติมได้</string>
+    <string name="setup_failed">ติดตั้งไม่สำเร็จ</string>
+    <string name="graphics_driver_configuration">การตั้งค่าไดรเวอร์กราฟิก</string>
+    <string name="select_graphics_driver_version">เลือกเวอร์ชันไดรเวอร์กราฟิก:</string>
+    <string name="graphics_driver_version">เวอร์ชันไดรเวอร์กราฟิก</string>
+    <string name="graphics_driver_available_extensions">ส่วนขยายที่มีให้ใช้</string>
+    <string name="add_to_homescreen">เพิ่มไปที่หน้าจอหลัก</string>
+    <string name="add_save">เพิ่มเซฟ</string>
+    <string name="saves">เซฟ</string>
+    <string name="import_save">นำเข้าเซฟ</string>
+    <string name="transfer">ย้าย</string>
+    <string name="share">แชร์</string>
+    <string name="unregister">ยกเลิกการลงทะเบียน</string>
+    <string name="no_saves_to_display">ยังไม่มีเซฟ</string>
+    <string name="new_save">ลงทะเบียนเซฟ</string>
+    <string name="save_path">พาธเซฟ</string>
+    <string name="save_title">ชื่อเซฟ</string>
+    <string name="save_container">สภาพแวดล้อมที่เลือก</string>
+    <string name="select_save_path">หาโฟลเดอร์เซฟ</string>
+    <string name="select_container_first">โปรดเลือกสภาพแวดล้อมที่มีเซฟ</string>
+    <string name="fill_all_fields">ต้องกรอกพาธและชื่อเซฟ</string>
+    <string name="invalid_path">พาธโฟลเดอร์เซฟไม่ถูกต้อง</string>
+    <string name="confirm_selection">ยืนยัน</string>
+    <string name="select_directory">เลือกโฟลเดอร์เซฟ</string>
+    <string name="invalid_container">พาธไม่ถูกต้อง</string>
+    <string name="up_directory">ขึ้นไปโฟลเดอร์บน</string>
+    <string name="edit_save_title">เปลี่ยนชื่อเซฟ</string>
+    <string name="edit_save">แก้ไขเซฟ</string>
+    <string name="original_save_path">พาธที่ลงทะเบียนไว้</string>
+    <string name="updated_save_path">พาธใหม่</string>
+    <string name="confirmation">ยืนยัน</string>
+    <string name="yes">ใช่</string>
+    <string name="no">ไม่</string>
+    <string name="path_not_changed_prompt">พาธยังไม่เปลี่ยน ทำต่อไหม?</string>
+    <string name="save_transfer">ย้ายเซฟ</string>
+    <string name="select_container">สภาพแวดล้อมปลายทาง:</string>
+    <string name="transfer_complete">ย้ายเสร็จแล้ว</string>
+    <string name="transfer_failed">ย้ายไม่สำเร็จ</string>
+    <string name="unable_to_transfer_save">ย้ายเซฟไม่สำเร็จ</string>
+    <string name="spinner_container_selection">กำลังย้าย...</string>
+    <string name="name_required">ต้องใส่ชื่อ</string>
+    <string name="exporting_save">กำลังส่งออกเซฟ...</string>
+    <string name="importing_save">กำลังนำเข้าเซฟ...</string>
+    <string name="_copy">สำเนา</string>
+    <string name="backing_up_data">กำลังสำรองข้อมูล...</string>
+    <string name="restoring_data">กำลังกู้คืนข้อมูล...</string>
+    <string name="midi_sound_font">MIDI SoundFont</string>
+    <string name="sound">เสียง</string>
+    <string name="icon_set_successfully">เปลี่ยนไอคอนแล้ว</string>
+    <string name="unable_to_set_icon">เปลี่ยนไอคอนไม่สำเร็จ</string>
+    <string name="do_you_want_to_remove_this_sound_font">ต้องการลบ SoundFont นี้ไหม?</string>
+    <string name="sound_font_removed_success">ลบ SoundFont แล้ว!</string>
+    <string name="sound_font_removed_failed">ลบ SoundFont ไม่สำเร็จ!</string>
+    <string name="sound_font_installed_success">ติดตั้ง SoundFont แล้ว!</string>
+    <string name="sound_font_installed_failed">ติดตั้ง SoundFont ไม่สำเร็จ!</string>
+    <string name="sound_font_already_exist">มี SoundFont ที่จะติดตั้งอยู่แล้ว</string>
+    <string name="unable_to_install_soundfont">ติดตั้ง SoundFont ไม่สำเร็จ</string>
+    <string name="installing_soundfont">กำลังติดตั้ง SoundFont…</string>
+    <string name="sound_font_bad_format">รูปแบบ SoundFont ไม่ถูกต้อง</string>
+    <string name="cannot_remove_default_sound_font">ลบ SoundFont เริ่มต้นไม่ได้</string>
+    <string name="enable_dinput_for_wine_game">เปิด DInput สำหรับเกมใน Wine</string>
+    <string name="enable_xinput_for_wine_game">เปิด XInput สำหรับเกมใน Wine</string>
+    <string name="help_xinput"><![CDATA[
+        ถ้าเกมของคุณใช้ <i><b>XInput API</b></i> เพื่อรองรับจอย ให้เปิดตัวเลือกนี้<br/><br/>
+        ตัวเลือกนี้มีผลทั้งจอย<i><b>เสมือน</b></i> (จากปุ่มบนจอ) และจอย<i><b>จริง</b></i>
+    ]]></string>
+    <string name="help_dinput"><![CDATA[
+        ถ้าเกมของคุณใช้ <i><b>DInput API</b></i> เพื่อรองรับจอย ให้เปิดตัวเลือกนี้<br/><br/>
+        ตัวเลือกนี้มีผลทั้งจอย<i><b>เสมือน</b></i> (จากปุ่มบนจอ) และจอย<i><b>จริง</b></i>
+    ]]></string>
+    <string name="help_exclusive_xinput">บางเกม เช่น Rayman Origins และ Need for Speed: Most Wanted 2005 ต้องปิดตัวเลือกนี้เมื่อใช้ DInput</string>
+    <string name="enable_xinput_and_dinput_same_time">บางเกมรองรับทั้งสอง API การเปิด XInput และ DInput พร้อมกันในเกมเหล่านี้อาจทำให้การควบคุมผิดพลาด เช่น The Binding of Isaac และซีรีส์ Resident Evil</string>
+    <string name="warning_gamepad_mouse_mix">คำเตือน: การผสมปุ่มจอยกับเมาส์บนจอยเดียวกันอาจทำให้เกมมีปัญหา ควรใช้เฉพาะปุ่มจอย หรือเฉพาะเมาส์/คีย์บอร์ด</string>
+    <string name="startup_normal">ปกติ (โหลดทุกบริการ)</string>
+    <string name="startup_essential">จำเป็น (โหลดเฉพาะบริการที่จำเป็น)</string>
+    <string name="startup_aggressive">น้อยที่สุด (หยุดบริการตอนเริ่มต้น)</string>
+    <string name="toggle_orientation">หมุนจอ</string>
+    <string name="help_file_provider"><![CDATA[
+        <i><b>File Provider</b></i> ช่วยให้เข้าถึงข้อมูลภายใน AGVN Player ผ่านตัวจัดการไฟล์ของ Android<br/><br/>
+    ]]></string>
+    <string name="proton_options">ตัวเลือก Proton</string>
+    <string name="reconfigure">ตั้งค่าใหม่</string>
+    <string name="do_you_want_to_reconfigure_wine">ต้องการตั้งค่าสภาพแวดล้อมนี้ใหม่ในการเริ่มครั้งถัดไปไหม? การทำเช่นนี้จะลบเวลาที่บันทึกไว้เพื่อให้รันการตั้งค่า Wine อีกครั้ง</string>
+
+    <!-- OpenXR specific text -->
+    <string name="primary_controller">จอยหลัก</string>
+    <string name="left_controller">จอยซ้าย</string>
+    <string name="right_controller">จอยขวา</string>
+    <string name="button_a">ปุ่ม A</string>
+    <string name="button_b">ปุ่ม B</string>
+    <string name="button_x">ปุ่ม X</string>
+    <string name="button_y">ปุ่ม Y</string>
+    <string name="button_grip">ปุ่ม Grip</string>
+    <string name="button_trigger">ปุ่ม Trigger</string>
+    <string name="thumbstick_left">ก้านอนาล็อกไปทางซ้าย</string>
+    <string name="thumbstick_right">ก้านอนาล็อกไปทางขวา</string>
+    <string name="thumbstick_up">ก้านอนาล็อกขึ้น</string>
+    <string name="thumbstick_down">ก้านอนาล็อกลง</string>
+    <string name="secondary_executable">พาธ:</string>
+    <string name="enter_secondary_exec_path"> เช่น: \"D:/Games/My Game/My Game.exe\"</string>
+    <string name="exec_delay">หน่วงเวลาการรัน (วินาที):</string>
+    <string name="enter_delay_seconds">ใส่เวลาหน่วง (วินาที):</string>
+    <string name="use_secondary_executable">ใช้ไฟล์รันรอง?</string>
+    <string name="secondary_exec">ไฟล์รันรอง</string>
+    <string name="secondary_exe_path_subtext">(พาธที่มีช่องว่างต้องอยู่ในเครื่องหมายคำพูด)</string>
+    <string name="pip_mode">หน้าต่างลอย (PiP)</string>
+    <string name="configure">ตั้งค่า</string>
+    <string name="enable_sendinput_mode">ใช้โหมด SendInput ของ Windows</string>
+    <string name="enable_touchscreen_timeout">ซ่อนการสัมผัสอัตโนมัติ (ต้องรีสตาร์ท)</string>
+    <string name="enable_touchscreen_haptics">สั่นเมื่อแตะหน้าจอ</string>
+    <string name="help_steamgrid">คีย์ API SteamGrid</string>
+    <string name="disable_xinput_for_shortcut">ปิด XInput (ใช้เฉพาะเมาส์/คีย์บอร์ด)</string>
+    <string name="fullscreen_stretched">เต็มจอ (ยืดภาพ)</string>
+    <string name="export_container">ส่งออกสภาพแวดล้อม</string>
+    <string name="exporting_container">กำลังส่งออกสภาพแวดล้อม…</string>
+
+    <string name="brightness">ความสว่าง</string>
+    <string name="contrast">คอนทราสต์</string>
+    <string name="gamma">แกมมา</string>
+    <string name="color_adjustment">ปรับสี</string>
+    <string name="enable_fxaa">เปิด FXAA</string>
+    <string name="enable_crt_shader">เปิดเอฟเฟกต์ CRT</string>
+
+    <string name="do_you_want_to_add_a_new_profile">เพิ่มโปรไฟล์ใหม่?</string>
+
+    <string name="default_profile">โปรไฟล์เริ่มต้น</string>
+
+    <string name="reset">รีเซ็ต</string>
+
+    <string name="screen_effect">เอฟเฟกต์หน้าจอ</string>
+
+    <string name="enable_toon_shader">เปิดเอฟเฟกต์การ์ตูน</string>
+    <string name="enable_ntsc_effect">เปิดเอฟเฟกต์ NTSC</string>
+    <string name="enter_profile_name">ใส่ชื่อโปรไฟล์</string>
+
+    <string name="configure_analog_sticks">ตั้งค่าก้านอนาล็อก</string>
+    <string name="analog_stick_settings">การตั้งค่าก้านอนาล็อก</string>
+    <string name="left_analog_stick_settings">ก้านอนาล็อกซ้าย</string>
+    <string name="right_analog_stick_settings">ก้านอนาล็อกขวา</string>
+    <string name="deadzone">เดดโซน: %1$d%%</string>
+    <string name="sensitivity">ความไว: %1$d%%</string>
+    <string name="invert_x_axis_left">กลับแกน X (ก้านซ้าย)</string>
+    <string name="invert_y_axis_left">กลับแกน Y (ก้านซ้าย)</string>
+    <string name="invert_x_axis_right">กลับแกน X (ก้านขวา)</string>
+    <string name="invert_y_axis_right">กลับแกน Y (ก้านขวา)</string>
+    <string name="save">บันทึก</string>
+    <string name="use_xr">ใช้การผสาน OpenXR</string>
+
+    <string name="not_connected">ยังไม่เชื่อมต่อ</string>
+    <string name="preferences_button_text">   ตัวเลือก   </string>
+    <string name="help_button_text">   ช่วยเหลือ   </string>
+    <string name="exit_button_text">   ออก   </string>
+    <string name="extra_keys_config_desc">ที่นี่คุณตั้งค่าตัวแปร extra-keys ได้แบบเดียวกับแอป Termux (อ่าน<a href="http://wiki.termux.com/wiki/Touch_Keyboard#Extra_Keys_Row">ที่นี่</a>) และอื่นๆ อีก \n
+เช่น: <b>META</b> สำหรับ<i>ปุ่ม META</i>, \n
+<b>KEYBOARD</b> สำหรับ<i>ปุ่มเปิด/ปิดคีย์บอร์ดบนจอ</i>, \n
+<b>PREFERENCES</b> สำหรับ<i>ปุ่มเปิดตัวเลือก</i>, \n
+<b>MOUSE_HELPER</b> สำหรับ<i>ปุ่มเปิด/ปิดตัวช่วยเมาส์</i>, \n
+<b>STYLUS_HELPER</b> สำหรับ<i>ปุ่มเปิด/ปิดโอเวอร์เลย์คลิกด้วยปากกา</i>, \n
+<b>EXIT</b> สำหรับ<i>ปุ่มออกจากแอป</i></string>
+    <string name="notification_content_text">ปัดลงเพื่อดูตัวเลือก</string>
+    <string name="notification_open_preferences">ตัวเลือก</string>
+    <string name="notification_exit">ออก</string>
+    <string name="notification_restart_activity">รีสตาร์ท</string>
+    <string name="notification_toggle_soft_keyboard">เปิด/ปิดคีย์บอร์ดบนจอ</string>
+    <string name="notification_toggle_additional_key_bar">เปิด/ปิดแถบปุ่มเสริม</string>
+    <string name="notification_release_pointer_and_keyboard_capture">ปล่อยเมาส์และคีย์บอร์ด</string>
+    <string name="notification_toggle_fullscreen">เปิด/ปิดเต็มจอ</string>
+
+    <string name="pref_main">ตัวเลือก</string>
+    <string name="pref_output">การแสดงผล</string>
+    <string name="pref_pointer">ตัวชี้</string>
+    <string name="pref_kbd">คีย์บอร์ด</string>
+    <string name="pref_other">อื่นๆ</string>
+    <string name="pref_version">เวอร์ชัน</string>
+    <string name="pref_ekbar">ตัวเลือกแถบปุ่มเสริม</string>
+    <string name="pref_userActions">การตอบสนองต่อการกระทำของผู้ใช้</string>
+
+    <string name="pref_displayResolutionMode">โหมดความละเอียด</string>
+    <string name="pref_displayScale">สเกลการแสดงผล, %</string>
+    <string name="pref_displayResolutionExact">ความละเอียด</string>
+    <string name="pref_displayResolutionCustom">ความละเอียด</string>
+    <string name="pref_adjustResolution">ปรับความละเอียดตามการหมุนจออัตโนมัติ</string>
+    <string name="pref_displayStretch">ยืดภาพให้พอดีจอ</string>
+    <string name="pref_Reseed">ปรับขนาดหน้าจอเมื่อเปิดคีย์บอร์ดบนจอ</string>
+    <string name="pref_Reseed_summary">ขนาดหน้าจอจะถูกปรับใหม่เมื่อคีย์บอร์ดบนจอเปิดอยู่</string>
+    <string name="pref_PIP">โหมด PIP</string>
+    <string name="pref_PIP_summary">แสดงแอปเป็นหน้าต่างลอยเมื่อกดปุ่มโฮมหรือปุ่มสลับแอป</string>
+    <string name="pref_fullscreen">เต็มจอ</string>
+    <string name="pref_fullscreen_summary">เปิด/ปิดโหมดเต็มจอบนอุปกรณ์</string>
+    <string name="pref_forceOrientation">การหมุนจอ</string>
+    <string name="pref_hideCutout">ซ่อนรอยบาก (ถ้ามี)</string>
+    <string name="pref_keepScreenOn">เปิดหน้าจอค้างไว้</string>
+
+    <string name="pref_touchMode">โหมดสัมผัส</string>
+    <string name="pref_scaleTouchpad">ใช้สเกลการแสดงผลกับทัชแพด</string>
+    <string name="pref_showStylusClickOverride">แสดงตัวเลือกคลิกด้วยปากกา</string>
+    <string name="pref_showStylusClickOverride_summary">ให้การแตะปากกาเป็นคลิกซ้าย กลาง หรือขวา (เฉพาะปากกา)</string>
+    <string name="pref_stylusIsMouse">เปิดโหมดใช้ปากกาเป็นเมาส์</string>
+    <string name="pref_stylusIsMouse_summary">ให้ปากกาทำงานเหมือนเมาส์ เมื่อเปิด ปากกาจะเลื่อนเคอร์เซอร์และส่งคลิกเมาส์เท่านั้น โดยไม่สนแรงกด มุม และความเอียง</string>
+    <string name="pref_stylusButtonContactModifierMode">โหมดปุ่มปากกาเมื่อแตะ</string>
+    <string name="pref_stylusButtonContactModifierMode_summary">เปิดเพื่อส่งคลิกขวาหรือคลิกกลางเฉพาะเมื่อปากกาแตะจอขณะกดปุ่มค้างไว้</string>
+    <string name="pref_showMouseHelper">แสดงโอเวอร์เลย์ช่วยคลิกเมาส์</string>
+    <string name="pref_showMouseHelper_summary">ปุ่มเมาส์บนจอใช้ร่วมกับทัชแพด</string>
+    <string name="pref_pointerCapture">จับเมาส์ภายนอกเมื่อทำได้</string>
+    <string name="pref_pointerCapture_summary">รับทุกเหตุการณ์ของเมาส์จริง กดปุ่ม Esc เพื่อคืนเมาส์ให้ Android</string>
+    <string name="pref_transformCapturedPointer">แปลงการเคลื่อนที่ของเมาส์ที่จับไว้</string>
+    <string name="pref_capturedPointerSpeedFactor">ความเร็วเมาส์ที่จับไว้, %</string>
+    <string name="pref_tapToMove">แตะเพื่อเลื่อนบนทัชแพด</string>
+
+    <string name="pref_showAdditionalKbd">แสดงคีย์บอร์ดเสริม</string>
+    <string name="pref_showAdditionalKbd_summary">แสดงคีย์บอร์ดที่มีปุ่มเสริมเพิ่ม</string>
+    <string name="pref_showIMEWhileExternalConnected">แสดงคีย์บอร์ดบนจอเมื่อมีคีย์บอร์ดภายนอก</string>
+    <string name="pref_showIMEWhileExternalConnected_summary">แสดงคีย์บอร์ดบนจอขณะเสียบคีย์บอร์ดจริงอยู่</string>
+    <string name="pref_preferScancodes">ใช้ scancode เป็นหลักเมื่อทำได้</string>
+    <string name="pref_preferScancodes_summary">ให้ X server จัดการเลย์เอาต์คีย์บอร์ดจริง (ผ่านการตั้งค่า DE หรือ setxkbmap)</string>
+    <string name="pref_hardwareKbdScancodesWorkaround">แก้ปัญหา scancode ของคีย์บอร์ดจริง</string>
+    <string name="pref_hardwareKbdScancodesWorkaround_summary">แก้ scancode บนบางเครื่อง อาจมีปัญหาเมื่อใช้หลายเลย์เอาต์</string>
+    <string name="pref_dexMetaKeyCapture">ดักปุ่มลัดระบบ</string>
+    <string name="pref_dexMetaKeyCapture_summary">สำหรับ Samsung Dex เท่านั้น ช่วยให้ดัก &quot;Alt+F4&quot;, &quot;Meta+D&quot;, &quot;Meta+E&quot; ฯลฯ ได้</string>
+    <string name="pref_enableAccessibilityService">เปิดบริการการช่วยเหลือพิเศษเพื่อดักปุ่มลัดระบบด้วยตัวเอง</string>
+    <string name="pref_enableAccessibilityService_summary">เปิดการตั้งค่าการช่วยเหลือพิเศษ</string>
+    <string name="pref_enableAccessibilityServiceAutomatically">เปิดบริการการช่วยเหลือพิเศษอัตโนมัติเพื่อดักปุ่มลัดระบบ</string>
+    <string name="pref_enableAccessibilityServiceAutomatically_summary">ต้องใช้สิทธิ์ WRITE_SECURE_SETTINGS</string>
+    <string name="pref_pauseKeyInterceptingWithEsc">หยุดดักปุ่มชั่วคราวด้วยปุ่ม Esc</string>
+    <string name="pref_filterOutWinkey">กรองปุ่ม Win (Meta/Mod4) ที่ถูกดักออก</string>
+    <string name="pref_filterOutWinkey_summary">ให้ใช้ปุ่มลัด Dex ได้ขณะดักปุ่ม ต้องใช้บริการการช่วยเหลือพิเศษ</string>
+    <string name="pref_enableGboardCJK">เทคนิคเปิด Gboard CJK</string>
+    <string name="pref_enableGboardCJK_summary">อาจต้องใช้ Android 14 และ Gboard 14</string>
+
+    <string name="pref_clipboardEnable">แชร์คลิปบอร์ด</string>
+    <string name="pref_requestNotificationPermission">ขอสิทธิ์การแจ้งเตือน</string>
+    <string name="pref_xrMode">โหมด XR Meta Oculus</string>
+    <string name="pref_configureResponseToUserActions">ตั้งค่าการตอบสนองต่อการกระทำของผู้ใช้</string>
+    <string name="pref_storeSecondaryDisplayPreferencesSeparately">เก็บตัวเลือกแยกสำหรับจอที่สอง</string>
+    <string name="pref_storeSecondaryDisplayPreferencesSeparately_summary">เปิดหน้านี้บนจอที่ต้องการตั้งค่า</string>
+
+    <string name="pref_adjustHeightForEK">ปรับความสูงหน้าจอสำหรับแถบปุ่มเสริม</string>
+    <string name="pref_adjustHeightForEK_summary">อาจทำให้จอกะพริบเมื่อเปิด/ปิดแถบปุ่มเสริม</string>
+    <string name="pref_useTermuxEKBarBehaviour">ปล่อยปุ่มพิเศษบนแถบปุ่มเสริมหลังกดแต่ละครั้ง</string>
+    <string name="pref_useTermuxEKBarBehaviour_summary">กดค้างเพื่อล็อกปุ่มพิเศษ</string>
+    <string name="pref_opacityEKBar">ความทึบของแถบปุ่มเสริม, %</string>
+    <string name="pref_extra_keys_config">ตั้งค่าปุ่มเสริม</string>
+
+    <string name="pref_swipeUpAction">ปัดสามนิ้วขึ้น</string>
+    <string name="pref_swipeDownAction">ปัดสามนิ้วลง</string>
+    <string name="pref_volumeUpAction">เพิ่มเสียง</string>
+    <string name="pref_volumeDownAction">ลดเสียง</string>
+    <string name="pref_backButtonAction">ปุ่มย้อนกลับ</string>
+    <string name="pref_notificationTapAction">แตะการแจ้งเตือน</string>
+    <string name="pref_notificationButton0Action">ปุ่มแรกของการแจ้งเตือน</string>
+    <string name="pref_notificationButton1Action">ปุ่มที่สองของการแจ้งเตือน</string>
+    <string name="pref_mediaKeysAction">ปุ่มมีเดีย</string>
+
+    <string name="pref_summary_requiresExactOrCustom">ต้องตั้ง \"โหมดความละเอียด\" เป็น \"exact\" หรือ \"custom\"</string>
+    <string name="pref_summary_requiresIntercepting">ต้องดักปุ่มลัดระบบด้วยโหมด Dex หรือบริการการช่วยเหลือพิเศษ</string>
+    <string name="pref_summary_requiresTrackpadAndNative">ต้องตั้ง \"โหมดสัมผัส\" เป็น \"ทัชแพด\" และ \"โหมดความละเอียด\" ที่ไม่ใช่ \"native\"</string>
+    <string name="fexcore_config">FEXCore</string>
+    <string name="fexcore_preset">พรีเซ็ต FEXCore</string>
+    <string name="installed_driver">ไดรเวอร์ที่ติดตั้งแล้ว</string>
+    <string name="driver_repositories">คลังไดรเวอร์</string>
+    <string name="check_for_driver_updates">ตรวจหาอัปเดตไดรเวอร์</string>
+    <string name="install_driver_from_file">ติดตั้งไดรเวอร์จากไฟล์</string>
+    <string name="adrenotools_gpu_drivers">ไดรเวอร์ GPU Adrenotools</string>
+    <string name="install_drivers">ติดตั้งไดรเวอร์</string>
+    <string name="install_drivers_message">ระบบจะให้คุณเลือกไดรเวอร์ ต้องเป็นไดรเวอร์สำหรับอีมูเลเตอร์อื่นๆ เช่น Yuzu, Dolphin, Citra…</string>
+    <string name="install_drivers_warning">หมายเหตุ: ด้วยข้อจำกัดของการจำลอง PC ในตอนนี้ ไดรเวอร์ Qualcomm อาจไม่ทำงานบนชิปที่ต่ำกว่า 8 Gen2 ถ้ายังไม่ได้แพตช์</string>
+    <string name="enable_vulkan_api_dump">เขียนการเรียก API Vulkan ลงไฟล์</string>
+    <string name="dll_emulator">ตัวจำลอง 32-bit</string>
+    <string name="open_with_android_browser">เปิดเบราว์เซอร์ Android จาก Wine</string>
+    <string name="share_android_clipboard">แชร์คลิปบอร์ด Android กับ Wine</string>
+    <string name="ddraw_wrapper">DDraw Wrapper</string>
+    <string name="fexcore_version">เวอร์ชัน FEXCore</string>
+    <string name="graphics_driver_max_device_memory">หน่วยความจำอุปกรณ์สูงสุด</string>
+    <string name="graphics_driver_sync_frame">ซิงค์ทุกเฟรม</string>
+    <string name="graphics_driver_disable_present_wait">ปิด KHR_present_wait</string>
+    <string name="graphics_driver_present_modes">โหมด Present</string>
+    <string name="graphics_driver_resource_type">ประเภททรัพยากรหน่วยความจำ</string>
+    <string name="graphics_driver_vulkan_version">เวอร์ชัน Vulkan</string>
+    <string name="graphics_driver_bcn_emulation">จำลอง BCn</string>
+    <string name="graphics_driver_bcn_emulation_type">รูปแบบการจำลอง BCn</string>
+    <string name="graphics_driver_bcn_emulation_cache">แคชการจำลอง BCn</string>
+    <string name="vkbasalt">vkBasalt</string>
+    <string name="vkbasalt_sharpness_effects">เอฟเฟกต์ความคมชัด</string>
+    <string name="vkbasalt_sharpness_level">ระดับความคมชัด</string>
+    <string name="num_controllers">จำนวนจอย</string>
+    <string name="vkbasalt_sharpness_denoise">ลดสัญญาณรบกวนเมื่อเพิ่มความคมชัด</string>
+    <string name="shutdown">ปิด</string>
+    <string name="disable_mouse">เปิด/ปิดเมาส์</string>
+    <string name="installing_wine_files">กำลังติดตั้งไฟล์ Wine...</string>
+    <string name="installing_drivers_files">กำลังติดตั้งไฟล์ไดรเวอร์ระบบ...</string>
+    <string name="high_refresh_rate">เปิดรีเฟรชเรตสูง</string>
+    <string name="pause_resume_wine">หยุดเกมชั่วคราวเมื่อแอปทำงานเบื้องหลัง</string>
+    <string name="release_protons">Proton รุ่นที่เผยแพร่</string>
+    <string name="available_protons">Proton ที่มีให้ใช้</string>
+    <string name="download_from_contents">ดาวน์โหลดจากส่วนประกอบ</string>
+    <string name="select_local_file">เลือกไฟล์ในเครื่อง</string>
+    <string name="download_proton">ดาวน์โหลด Proton</string>
+    <string name="delete_proton">ลบ Proton</string>
+    <string name="select_proton">เลือก Proton</string>
+    <string name="downloading_proton">กำลังดาวน์โหลด Proton…</string>
+    <string name="unable_to_install_proton">ติดตั้ง Proton ไม่สำเร็จ</string>
+    <string name="no_protons_to_delete">ยังไม่ได้เลือก Proton ที่ลบได้</string>
+    <string name="download_proton_description">ติดตั้งแพ็กเกจ Proton จากรุ่นที่เผยแพร่บน GitHub</string>
+    <string name="download_from_contents_description">เรียกดูแพ็กเกจ Proton หรือ Wine ในส่วนประกอบ</string>
+    <string name="select_local_file_description">ติดตั้งแพ็กเกจ Proton หรือ Wine จากที่เก็บข้อมูลในเครื่อง</string>
+    <string name="delete_proton_description">ลบแพ็กเกจที่ติดตั้งแล้วซึ่งเลือกอยู่</string>
+    <string name="proton_package_installed">ติดตั้งแล้ว</string>
+    <string name="proton_package_not_installed">แตะเพื่อดาวน์โหลดและติดตั้ง</string>
+    <string name="install">ติดตั้ง</string>
+    <string name="select">เลือก</string>
+    <string name="wine_version_locked_for_existing_container">เปลี่ยนเวอร์ชัน Wine ของสภาพแวดล้อมที่สร้างแล้วไม่ได้</string>
+    <string name="library">คลังเกม</string>
+    <string name="configure_container">ตั้งค่าสภาพแวดล้อม</string>
+    <string name="launch_environment">เปิดสภาพแวดล้อม</string>
+    <string name="video">ภาพ</string>
+    <string name="storage">ที่เก็บข้อมูล</string>
+    <string name="quick_settings">ตั้งค่าด่วน</string>
+    <string name="advanced_settings">ตั้งค่าขั้นสูง</string>
+    <string name="global_compatibility_profile">โปรไฟล์ความเข้ากันได้ทั่วไป</string>
+    <string name="profile_compatibility">เข้ากันได้</string>
+    <string name="profile_balanced">สมดุล</string>
+    <string name="profile_performance">ประสิทธิภาพ</string>
+    <string name="profile_custom">กำหนดเอง</string>
+    <string name="play">เล่น</string>
+    <string name="arguments">พารามิเตอร์</string>
+    <string name="game_folder">โฟลเดอร์เกม</string>
+
+    <string name="magnifier_not_available">ใช้แว่นขยายในโหมด DisplayX ไม่ได้</string>
+</resources>

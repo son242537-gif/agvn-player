@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN: Thai translation of values/agvn_repair_strings.xml ("Tự sửa lỗi" = แก้ปัญหาอัตโนมัติ). Copyright (c) 2026 agvn.io — MIT License. -->
+<resources>
+    <string name="agvn_repair_title">แก้ปัญหาอัตโนมัติ</string>
+    <string name="agvn_repair_pick">เกมมีปัญหาอะไร?</string>
+    <string name="agvn_repair_plan">แอปจะลองวิธีด้านล่างทีละวิธี: เกมจะเปิดใหม่ คุณลองเล่น แล้วแอปจะถามว่ายังมีปัญหาไหม ถ้าวิธีไหนไม่ช่วย แอปจะคืนการตั้งค่าเป็นแบบเดิมก่อนลองวิธีถัดไป</string>
+    <string name="agvn_repair_none">แอปลองครบทุกวิธีที่มีสำหรับปัญหานี้แล้ว การตั้งค่าของเกมกลับเป็นแบบก่อนแก้แล้ว กด \"ส่งล็อก\" ให้ AGVN ช่วยดู</string>
+    <string name="agvn_repair_no_fix">แอปยังไม่มีวิธีแก้ปัญหานี้สำหรับเกมนี้ กด \"ส่งล็อก\" ให้ AGVN ช่วยดู</string>
+    <string name="agvn_repair_start">ลองวิธีที่ 1: %1$s</string>
+    <string name="agvn_repair_trying">กำลังลอง: %1$s เกมกำลังเปิดใหม่…</string>
+    <string name="agvn_repair_status">แอปกำลังลองวิธีแก้: %1$s ยังมีปัญหาไหม?</string>
+    <string name="agvn_repair_not_run">แอปตั้งวิธีแก้ไว้แล้ว: %1$s แต่เกมยังไม่ได้รันใหม่ด้วยวิธีนี้ เปิดเกมเพื่อลอง เล่นสักพักแล้วแอปจะถามว่ายังมีปัญหาไหม</string>
+    <string name="agvn_repair_play">ลองเล่นด้วยวิธีนี้</string>
+    <string name="agvn_repair_ask_title">ยังมีปัญหา \"%1$s\" อยู่ไหม?</string>
+    <string name="agvn_repair_ask_detail">แอปกำลังลองวิธีแก้: %1$s ลองเล่นสักพักแล้วช่วยตอบแอปหน่อย</string>
+    <string name="agvn_repair_gone">หายแล้ว</string>
+    <string name="agvn_repair_still">ยังมีปัญหา</string>
+    <string name="agvn_repair_later">ถามครั้งหน้า</string>
+    <string name="agvn_repair_other">เลือกปัญหาอื่น</string>
+    <string name="agvn_repair_kept">เก็บวิธีแก้ไว้แล้ว: %1$s</string>
+    <string name="agvn_repair_done_title">ลองครบทุกวิธีในแอปแล้ว</string>
+    <string name="agvn_repair_off_title">ยังลองไม่ได้: %1$s</string>
+    <string name="agvn_repair_off_detail">เกมไม่ได้รันด้วยวิธีที่กำลังลอง (%1$s): การตั้งค่าของเกมเปลี่ยนไปหลังเปิดวิธีนี้ แอปยังไม่นับว่าได้ลองวิธีนี้แล้ว</string>
+    <string name="agvn_repair_off_try">ลอง: %1$s</string>
+    <string name="agvn_repair_undone">ด้วยวิธีที่กำลังลอง (%1$s) เกมปิดเองหลัง %2$s วินาที แอปนับว่าวิธีนี้ไม่ช่วย และคืนการตั้งค่าของเกมเป็นแบบก่อนแก้แล้ว</string>
+    <string name="agvn_bar_repair_label">🩺 แก้ปัญหา</string>
+    <string name="agvn_bar_repair">แก้ปัญหาอัตโนมัติ: เลือกปัญหาที่เกมเจออยู่</string>
+
+    <string name="agvn_fix_render_sysmem">ให้ Turnip เรนเดอร์ทั้งเฟรมในหน่วยความจำ (sysmem)</string>
+    <string name="agvn_fix_turnip_nolrz">ปิด LRZ ของ Turnip (แก้จุดดำ ภาพกะพริบ)</string>
+    <string name="agvn_fix_turnip_noubwc">ปิดการบีบอัดภาพ UBWC ของ Turnip (แก้แถบดำ เส้น สีเพี้ยน)</string>
+    <string name="agvn_fix_async_off">ปิด DXVK async (หายกะพริบ ช่วงแรกอาจกระตุกกว่าเดิม)</string>
+    <string name="agvn_fix_bcn_full">แตกการบีบอัดเท็กซ์เจอร์ BCn ทั้งหมด (แก้เท็กซ์เจอร์ดำ ภาพหาย)</string>
+    <string name="agvn_fix_unity_quality_own">ให้เกม Unity เลือกคุณภาพภาพเอง</string>
+    <string name="agvn_fix_audio">เปลี่ยนวิธีเล่นเสียงเป็น %1$s</string>
+    <string name="agvn_fix_locale_ja">รันเกมด้วยภาษาญี่ปุ่น (แก้ตัวอักษรเพี้ยนของเกมญี่ปุ่น)</string>
+    <string name="agvn_fix_locale_zh">รันเกมด้วยภาษาจีน (แก้ตัวอักษรเพี้ยนของเกมจีน)</string>
+    <string name="agvn_fix_godot_light">โหมดเบา: รันเกม Godot บน Android โดยตรง ไม่ผ่าน Wine (ลื่นกว่ามาก)</string>
+    <string name="agvn_fix_media_old">อ่านวิดีโอแบบเก่าของ Wine (สำหรับวิดีโอที่ Wine ยังเปิดไม่ได้ เช่น MP4 ที่มีเสียง MP3)</string>
+    <string name="agvn_fix_page_light">โหมดเบา: รันหน้าเว็บของเกม (Electron, NW.js) บน Android โดยตรง ไม่ผ่าน Wine (ลื่นกว่ามาก)</string>
+    <string name="agvn_fix_rgss_light">โหมดเบา: รันเกม RPG Maker บน Android โดยตรง ไม่ผ่าน Wine (ลื่นกว่ามาก)</string>
+    <string name="agvn_fix_godot_light_gl">ให้เกม Godot (โหมดเบา) เรนเดอร์ด้วย OpenGL</string>
+    <string name="agvn_fix_godot_light_vulkan">ให้เกม Godot (โหมดเบา) เรนเดอร์ด้วย Vulkan</string>
+    <string name="agvn_fix_mods_off">รันเกมแบบไม่มีม็อด (%1$s) เหมือนต้นฉบับ ไฟล์ของเกมยังอยู่ครบ</string>
+    <string name="agvn_fix_dll_wine">ใช้ %1$s ของ Wine แทนตัวที่มากับเกม (สูตรโกงหรือม็อดในไฟล์นี้จะไม่ทำงาน ไฟล์ของเกมยังอยู่ครบ)</string>
+    <string name="agvn_fix_raw_mouse">ส่งการแตะเหมือนเมาส์จริง (สำหรับเกมที่อ่านแค่เมาส์จริง เช่น เกม Unity ที่ใช้ Input System)</string>
+    <string name="agvn_fix_raw_mouse_off">ส่งการแตะแบบเดิม (เหมือนเกมอื่นๆ)</string>
+    <string name="agvn_fix_exe64">รันเกมเวอร์ชัน 64-bit (%1$s) แทนเวอร์ชัน 32-bit</string>
+    <string name="agvn_fix_exe_main">รันไฟล์เกมหลัก (%1$s) แทนโปรแกรมเปิดเกม (.NET)</string>
+    <string name="agvn_fix_renpy_light">ลอง \"โหมดเบา\" (Ren\'Py 8) กับเกม Ren\'Py 7 ไฟล์เซฟแยกกัน คัดลอกมาจากเวอร์ชัน Windows</string>
+    <string name="agvn_fix_renpy_angle">ให้ Ren\'Py เรนเดอร์ด้วย ANGLE (Direct3D) แทน OpenGL</string>
+    <string name="agvn_fix_gdiplus_text">แก้การแสดงตัวอักษรเวียดนามของ .NET (วาง mlang.dll ที่แพตช์แล้วไว้ข้างไฟล์รันของเกม)</string>
+</resources>
