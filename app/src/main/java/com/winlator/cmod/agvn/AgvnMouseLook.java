@@ -21,8 +21,11 @@ import java.util.function.IntConsumer;
  * read the mouse through the cursor do. Taps and the rest stay as they were. Pure Java but the sending.
  */
 public final class AgvnMouseLook {
-    /** RC_AGVN_STATE's bits (agvn-winhandler.exe 2). */
-    public static final int LOCKED = 1, TEXT = 2;
+    /**
+     * RC_AGVN_STATE's bits: the game holds the cursor, a text caret of Windows shows (agvn-winhandler.exe 2), the game
+     * turned on its own text input (5: SDL's and Ren'Py's, Unity's, Unreal's, Godot's fields).
+     */
+    public static final int LOCKED = 1, TEXT = 2, TYPING = 4;
     /** A move after this long without one starts a new drag: the finger went down somewhere else. */
     static final long NEW_DRAG_MS = 250;
     /** This many warps to one point, each within {@link #WARP_WINDOW_MS} of the last: the game holds the pointer there. */
@@ -41,15 +44,18 @@ public final class AgvnMouseLook {
         this.xServer = xServer;
     }
 
-    /** What agvn-winhandler.exe reports (RC_AGVN_STATE); a caret coming or going is told to {@link #onText}. */
+    /** What agvn-winhandler.exe reports (RC_AGVN_STATE); a text field coming or going is told to {@link #onText}. */
     public void reported(int state) {
         int before = reported;
         reported = state;
         IntConsumer text = onText;
-        if (text != null && ((before ^ state) & TEXT) != 0) text.accept(state & TEXT);
+        if (text != null && ((before ^ state) & (TEXT | TYPING)) != 0) text.accept(state & (TEXT | TYPING));
     }
 
-    /** Told when a text caret shows (TEXT) or goes (0) in the game (XServerDisplayActivity: the keyboard). */
+    /**
+     * Told when a text field of the game takes typing (TEXT, TYPING or both) or no longer does (0): the keyboard,
+     * {@link AgvnCaretKeyboard}.
+     */
     public void setOnText(IntConsumer onText) {
         this.onText = onText;
     }

@@ -54,7 +54,7 @@ public final class AgvnWinTyping {
         }
     };
     private String sent = "";
-    private boolean typing, imeSeen, clearing, toldShown, toldTyped;
+    private boolean typing, imeSeen, clearing, toldShown, toldTyped, used;
     private long focusLostAt = -REFOCUS_MS;
 
     /** The activity's, made at its first use. */
@@ -74,12 +74,10 @@ public final class AgvnWinTyping {
                 | EditorInfo.IME_FLAG_NO_FULLSCREEN);
         field.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -87,6 +85,7 @@ public final class AgvnWinTyping {
             }
         });
         field.setOnEditorActionListener((v, action, event) -> {
+            used = true;
             keys.key(XKeycode.KEY_ENTER);
             return true;
         });
@@ -111,6 +110,7 @@ public final class AgvnWinTyping {
     public void show() {
         typing = true;
         imeSeen = false;
+        used = false;
         focusField();
         if (!toldShown) {
             toldShown = true;
@@ -125,6 +125,8 @@ public final class AgvnWinTyping {
         if (imm != null) imm.hideSoftInputFromWindow(field.getWindowToken(), 0);
         release();
     }
+
+    boolean used() { return used; } // the player typed, or pressed its Enter, since it last came up
 
     /** [⌨]: up, or away when it is up. */
     public void toggle() {
@@ -176,6 +178,7 @@ public final class AgvnWinTyping {
         String now = text.toString();
         AgvnWinKeys.changed(sent, now, keys);
         sent = now;
+        used |= !now.isEmpty();
         if (!now.isEmpty() && !toldTyped) {
             toldTyped = true;
             AgvnSessionLog.event("Bàn phím Android gửi chữ vào game");

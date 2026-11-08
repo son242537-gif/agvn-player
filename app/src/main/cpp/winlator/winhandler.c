@@ -42,6 +42,10 @@
 #define RC_AGVN_STATE 15
 #define AGVN_STATE_MOUSE_LOCKED 1
 #define AGVN_STATE_TEXT_CARET 2
+/* AGVN 5: bit 2, the game turned its text input on: a field it draws itself
+   (Ren'Py's and SDL's, Unity's, Unreal's, Godot's) that has no caret of
+   Windows, told by the input context (IMM) it gives its window then */
+#define AGVN_STATE_TEXT_INPUT 4
 /* AGVN 2: in RC_AGVN_POINTER's flags, (x, y) is a move by that much, not a pixel */
 #define AGVN_POINTER_RELATIVE 0x40000000
 /* AGVN 3: the game and every process it started have ended, with the game's
@@ -49,7 +53,8 @@
 #define RC_AGVN_GAME_ENDED 16
 /* AGVN 4: /heappad, a 32-bit game's zeroed heap blocks get two more zero bytes
    (app/src/main/cpp/agvn/heap-pad.c, SRPG Studio) */
-#define AGVN_VERSION 4
+/* AGVN 5: RC_AGVN_STATE's AGVN_STATE_TEXT_INPUT */
+#define AGVN_VERSION 5
 BOOL agvnStartPadded(LPCWSTR exe, LPCWSTR args, LPCWSTR dir,
                      PROCESS_INFORMATION *pi);
 
@@ -372,6 +377,8 @@ void handleInput(const char *buffer, int len) {
   }
 }
 
+static BOOL agvnTyping(DWORD now);
+
 /* AGVN 2: RC_AGVN_STATE's bits now. The mouse is locked when the foreground
    thread's cursor is hidden and the cursor is held in a small part of the
    screen, a quarter of it each way at most: Unity's CursorLockMode.Locked
@@ -397,7 +404,76 @@ static BYTE agvnState(void) {
   gui.cbSize = sizeof(gui);
   if (GetGUIThreadInfo(0, &gui) && gui.hwndCaret != NULL)
     state |= AGVN_STATE_TEXT_CARET;
+  if (agvnTyping(GetTickCount()))
+    state |= AGVN_STATE_TEXT_INPUT;
   return state;
+}
+
+/* AGVN 5: the "Wine IME" window of thread {tid}: Wine keeps there the input
+   context of the thread's focus window (imm32's set_ime_ui_window_himc, Wine 9
+   and 10), which another process reads as the window's first 4 bytes. Looked
+   for again once a second while the thread has none. */
+static HWND agvnImeWindow;
+static DWORD agvnImeThread, agvnImeLooked;
+
+static BOOL CALLBACK agvnFindIme(HWND hwnd, LPARAM found) {
+  WCHAR name[16];
+  if (GetClassNameW(hwnd, name, 16) && !lstrcmpW(name, L"Wine IME")) {
+    *(HWND *)found = hwnd;
+    return FALSE;
+  }
+  return TRUE;
+}
+
+/* 1: the focus window of thread {tid} takes typing (it has an input context),
+   0: it has none (the game turned typing off), -1: not known */
+static int agvnImeOn(DWORD tid, DWORD now) {
+  if (tid != agvnImeThread || (agvnImeWindow && !IsWindow(agvnImeWindow))) {
+    agvnImeThread = tid;
+    agvnImeWindow = NULL;
+    agvnImeLooked = now - 1000;
+  }
+  if (!agvnImeWindow && tid && now - agvnImeLooked >= 1000) {
+    agvnImeLooked = now;
+    EnumThreadWindows(tid, agvnFindIme, (LPARAM)&agvnImeWindow);
+  }
+  if (!agvnImeWindow) return -1;
+  return GetWindowLongW(agvnImeWindow, 0) != 0;
+}
+
+/* AGVN 5: whether the game turned its text input on. Its focus window got an
+   input context after it had none for a second: SDL (Ren'Py) gives one at
+   SDL_StartTextInput and takes it at SDL_StopTextInput, Unity, Unreal and
+   Godot while one of their text fields has the focus. A game that never takes
+   it (most of them) is never told; nor is a new window, a dialog box for one,
+   that comes with one. */
+static BOOL agvnTyping(DWORD now) {
+  static HWND focus;
+  static DWORD offSince;
+  static BOOL typing;
+  GUITHREADINFO gui;
+  HWND fg = GetForegroundWindow();
+  DWORD tid = fg ? GetWindowThreadProcessId(fg, NULL) : 0;
+  ZeroMemory(&gui, sizeof(gui));
+  gui.cbSize = sizeof(gui);
+  HWND now_focus = tid && GetGUIThreadInfo(tid, &gui) ? gui.hwndFocus : NULL;
+  if (now_focus != focus) {
+    focus = now_focus;
+    offSince = 0;
+    typing = FALSE;
+  }
+  int on = focus ? agvnImeOn(tid, now) : -1;
+  if (on == 0) {
+    if (!offSince) offSince = now ? now : 1;
+    typing = FALSE;
+  } else if (on == 1) {
+    if (offSince && now - offSince >= 1000) typing = TRUE;
+    offSince = 0;
+  } else {
+    offSince = 0;
+    typing = FALSE;
+  }
+  return typing;
 }
 
 /* AGVN 2: a state is told once it held for two reads in a row: a game that
