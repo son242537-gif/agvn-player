@@ -3803,3 +3803,34 @@ Anh Sơn báo ngày 08/11/2026: app vẫn không tự mở bàn phím ở chỗ 
   2. Game Unity hoặc Godot có ô nhập chữ: chạm vào ô, bàn phím lên. Ra khỏi ô, bàn phím xuống.
   3. Game không có ô nhập chữ: chơi 5 phút, bàn phím không tự lên lần nào.
   4. Gửi nhật ký, `su-kien.txt` có dòng "Game bật nhập chữ cho ô nó tự vẽ".
+
+## Kéo ngón tay xoay camera: không click, không quay ngoắt về phía ngón tay (bản 0.1.89)
+
+Anh Sơn báo ngày 08/11/2026: ở game 3D, lần bấm đầu app tính là một cú click, rồi nhân vật quay mặt về hướng ngón
+tay. Anh cần nhấn và kéo để đổi hướng.
+
+- **Vì sao quay ngoắt:**
+  - App biết game giữ chuột (camera xoay theo chuột) theo một trong hai cách:
+    - `agvn-winhandler.exe` báo con trỏ bị ẩn và bị kẹp lại (Unity `CursorLockMode.Locked`).
+    - Game đặt con trỏ về một điểm nhiều lần liền (`AgvnMouseLook.warped`).
+  - Với cách thứ hai, game chỉ đặt lại con trỏ sau một lần chuột di chuyển. Ngón tay dừng quá 1 giây là app thôi coi
+    game đang giữ chuột.
+  - Lần chạm sau, con trỏ nhảy thẳng tới chỗ ngón tay. Game đọc cú nhảy đó như chuột vừa lia mạnh, nên camera quay về
+    phía ngón tay.
+- **Vì sao bị click:** ở chế độ chạm như màn hình cảm ứng (`simTouchScreen`, và `touchscreen_toggle`), ngón tay chạm
+  xuống là chuột trái được bấm sau 80 ms. Nhấn rồi kéo thành ra kéo trong lúc giữ chuột trái (bắn, đánh, chọn).
+- **Sửa (`AgvnMouseLook`, `TouchpadView`):**
+  - Game đã đặt con trỏ về một điểm (3 lần liền) thì vẫn được coi là giữ chuột tới khi nó hiện lại con trỏ (mở menu).
+    App đọc con trỏ của cửa sổ đang dưới chuột trong X server: con trỏ rỗng mà Wine đặt khi game ẩn con trỏ là
+    `Cursor.isVisible() == false`.
+  - Trong lúc game giữ chuột, cú bấm của ngón tay chờ (`pressLater`):
+    - Ngón tay đi xa hơn 1/40 cạnh ngắn của màn X (khoảng 18 điểm ảnh ở 720p) là kéo: camera xoay, không bấm gì.
+    - Nhấc tay khi chưa đi xa như vậy là chạm: chuột trái bấm rồi nhả (`takePress`), giữ đủ 2 khung hình như các cú
+      click khác.
+  - Game không giữ chuột (menu, game 2D) thì cú bấm đi ngay như trước. Nút phím ảo "Chuột trái" không đổi.
+- **Thử máy:**
+  1. Game 3D xoay camera bằng chuột: nhấn và kéo, camera xoay theo, nhân vật không bắn hay đánh.
+  2. Dừng tay vài giây rồi nhấn kéo tiếp: camera không quay ngoắt về phía ngón tay.
+  3. Chạm nhanh rồi nhấc tay: game nhận một cú click (bắn, tương tác).
+  4. Mở menu của game (con trỏ hiện): chạm vào nút menu, nút được bấm đúng chỗ.
+  5. Game 2D, visual novel: chạm, kéo vẫn như cũ.

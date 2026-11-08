@@ -33,7 +33,7 @@ public class AgvnMouseLookTest {
 
     @Test
     public void aCaretIsToldWhenItComesAndGoes() {
-        AgvnMouseLook look = new AgvnMouseLook(null);
+        AgvnMouseLook look = new AgvnMouseLook(() -> false, () -> 0L);
         List<Integer> told = new ArrayList<>();
         look.setOnText(told::add);
         look.reported(0);
@@ -42,5 +42,45 @@ public class AgvnMouseLookTest {
         look.reported(AgvnMouseLook.TEXT); // the same caret, sent again a second later
         look.reported(0);
         assertEquals(java.util.Arrays.asList(AgvnMouseLook.TEXT, 0), told);
+    }
+
+    /**
+     * A game that reads the mouse through the cursor puts it back only after a move: after a pause, the first touch
+     * jumped to the finger and the camera turned toward it (08/11/2026). It holds the cursor until it shows it again.
+     */
+    @Test
+    public void aGameThatPutsThePointerBackHoldsItUntilItsCursorShows() {
+        boolean[] hidden = {true};
+        long[] now = {1000};
+        AgvnMouseLook look = new AgvnMouseLook(() -> hidden[0], () -> now[0]);
+        for (int i = 0; i < AgvnMouseLook.WARPS; i++) {
+            look.warped(640, 360);
+            now[0] += 16;
+        }
+        assertTrue(look.locked());
+        now[0] += 60_000; // the player stopped for a minute: no warp since
+        assertTrue("still held: its cursor is hidden", look.locked());
+        hidden[0] = false; // a menu, its cursor shows
+        assertFalse(look.locked());
+        hidden[0] = true;
+        assertFalse("hidden again but no warp yet: a tap goes where the finger is", look.locked());
+    }
+
+    @Test
+    public void whileTheCursorIsHeldADragClicksNothingAndATapClicks() {
+        AgvnMouseLook look = new AgvnMouseLook(() -> true, () -> 0L);
+        com.winlator.cmod.xserver.Pointer.Button left = com.winlator.cmod.xserver.Pointer.Button.BUTTON_LEFT;
+        assertFalse("not held: the press goes now", look.pressLater(left));
+        look.reported(AgvnMouseLook.LOCKED);
+        assertTrue(look.pressLater(left));
+        look.move(500, 300);
+        look.move(505, 302); // a finger that shakes a little
+        assertEquals("a tap", left, look.takePress());
+        look.released();
+        assertTrue(look.pressLater(left));
+        look.move(500, 300);
+        look.move(560, 280);
+        look.move(620, 270);
+        assertEquals("a drag turned the camera", null, look.takePress());
     }
 }

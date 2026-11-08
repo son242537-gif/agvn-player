@@ -30,7 +30,7 @@ public class AgvnCaretKeyboardTest {
 
     @Test
     public void theTypingBitReachesTheKeyboardAsTheCaretDoes() {
-        AgvnMouseLook look = new AgvnMouseLook(null);
+        AgvnMouseLook look = new AgvnMouseLook(() -> false, () -> 0L);
         List<Integer> told = new ArrayList<>();
         look.setOnText(told::add);
         look.reported(AgvnMouseLook.TYPING);

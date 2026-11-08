@@ -340,7 +340,7 @@ public class TouchpadView extends View {
                     final Runnable clickDelay = () -> {
                         if (continueClick) {
                             xServer.injectPointerMove(lastTouchedPosX, lastTouchedPosY);
-                            xServer.injectPointerButtonPress(Pointer.Button.BUTTON_LEFT);
+                            agvnPress(Pointer.Button.BUTTON_LEFT);
                         }
                     };
                     if (pointerId == 0) {
@@ -457,7 +457,7 @@ public class TouchpadView extends View {
             if (xServer.isRelativeMouseMovement())
                 xServer.getWinHandler().mouseEvent(MouseEventFlags.LEFTDOWN, 0, 0, 0);
             else
-                xServer.injectPointerButtonPress(Pointer.Button.BUTTON_LEFT);
+                agvnPress(Pointer.Button.BUTTON_LEFT);
         }
     }
 
@@ -472,8 +472,24 @@ public class TouchpadView extends View {
     private void handleTouchUp(MotionEvent event) {
         if (xServer.isRelativeMouseMovement())
             xServer.getWinHandler().mouseEvent(MouseEventFlags.LEFTUP, 0, 0, 0);
-        else
+        else {
+            agvnTapPress();
             xServer.injectPointerButtonRelease(Pointer.Button.BUTTON_LEFT);
+        }
+    }
+
+    /**
+     * AGVN: a finger's press. While the game holds the cursor (a camera that turns with the mouse) it waits for the
+     * finger to lift: a drag turns the camera and clicks nothing, a tap clicks (agvn/AgvnMouseLook).
+     */
+    private void agvnPress(Pointer.Button button) {
+        if (!xServer.agvnMouseLook.pressLater(button)) xServer.injectPointerButtonPress(button);
+    }
+
+    /** AGVN: the finger lifted: the press it held back, if it was a tap. */
+    private void agvnTapPress() {
+        Pointer.Button button = xServer.agvnMouseLook.takePress();
+        if (button != null) xServer.injectPointerButtonPress(button);
     }
 
     private void handleTwoFingerScroll(MotionEvent event) {
@@ -509,8 +525,10 @@ public class TouchpadView extends View {
             case 1:
                 if (simTouchScreen) {
                     final Runnable clickDelay = () -> {
-                        if (continueClick)
+                        if (continueClick) {
+                            agvnTapPress();
                             xServer.injectPointerButtonRelease(Pointer.Button.BUTTON_LEFT);
+                        }
                     };
                     postDelayed(clickDelay, CLICK_DELAYED_TIME);
                 }

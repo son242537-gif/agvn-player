@@ -1,0 +1,6 @@
+AGVN Player v0.1.89 - agvn.io
+
+Sửa lỗi:
+- Xoay camera trong game 3D: nhấn và kéo ngón tay chỉ xoay camera, không còn bị tính là một cú click. Chạm nhanh rồi nhấc tay vẫn là click như cũ.
+- Xoay camera trong game 3D: lần chạm đầu sau khi dừng tay không còn làm nhân vật quay ngoắt về phía ngón tay.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
