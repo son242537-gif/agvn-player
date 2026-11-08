@@ -15,8 +15,11 @@ import java.util.Map;
 
 /**
  * Texts for the "?" next to each setting, from assets/agvn/setting-help.txt. The file is plain text so it is easy to
- * edit: "[label]" starts a setting (the label exactly as the screen shows it), then one line each for "Là gì:",
- * "Vì sao chỉnh:" and "Chỉnh thế nào:". Lines starting with "#" are comments.
+ * edit: "[label]" starts a setting (the label exactly as the screen shows it in Vietnamese), then one line each for
+ * "Là gì:", "Vì sao chỉnh:" and "Chỉnh thế nào:". Lines starting with "#" are comments.
+ * <p>In another language (AgvnLanguage) the texts come from setting-help-&lt;lang&gt;.txt, keyed by the same Vietnamese
+ * labels; one it lacks stays Vietnamese. The screen shows the label translated, so it goes back to its Vietnamese
+ * through the app's own strings: the string whose text it is, read in Vietnamese.
  */
 public final class AgvnSettingHelp {
     private static final String TAG = "AGVN";
@@ -34,24 +37,45 @@ public final class AgvnSettingHelp {
     }
 
     private static volatile Map<String, Entry> entries;
+    /** The translated label → its Vietnamese one, for {@link #language}. */
+    private static volatile Map<String, String> vietnamese = Collections.emptyMap();
+    private static volatile String language;
 
     private AgvnSettingHelp() {}
 
     /** Help for the setting shown as {@code label}, or null when there is none. */
     public static Entry get(Context context, String label) {
         if (label == null) return null;
+        String lang = AgvnLanguage.textLanguage(context);
         Map<String, Entry> map = entries;
-        if (map == null) entries = map = load(context);
-        return map.get(label.trim());
+        if (map == null || !lang.equals(language)) {
+            synchronized (AgvnSettingHelp.class) {
+                map = load(context, ASSET);
+                if (!lang.equals(AgvnLanguage.VIETNAMESE)) {
+                    map = new HashMap<>(map);
+                    map.putAll(load(context, "agvn/setting-help-" + lang + ".txt"));
+                    vietnamese = AgvnStringKeys.toVietnamese(context);
+                } else {
+                    vietnamese = Collections.emptyMap();
+                }
+                entries = map;
+                language = lang;
+            }
+        }
+        String key = label.trim();
+        Entry e = map.get(key);
+        if (e != null) return e;
+        String vi = vietnamese.get(key);
+        return vi != null ? map.get(vi) : null;
     }
 
-    private static Map<String, Entry> load(Context context) {
+    private static Map<String, Entry> load(Context context, String asset) {
         List<String> lines = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                context.getApplicationContext().getAssets().open(ASSET), StandardCharsets.UTF_8))) {
+                context.getApplicationContext().getAssets().open(asset), StandardCharsets.UTF_8))) {
             for (String line; (line = reader.readLine()) != null; ) lines.add(line);
         } catch (Exception e) {
-            Log.w(TAG, "setting help not loaded", e);
+            Log.w(TAG, "setting help not loaded: " + asset, e);
             return Collections.emptyMap();
         }
         return parse(lines);

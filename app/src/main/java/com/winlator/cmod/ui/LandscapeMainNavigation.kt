@@ -28,6 +28,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -123,7 +126,7 @@ fun LandscapeMainNavigation(
     title: String,
     modifier: Modifier = Modifier,
     actionIcon: ImageVector? = null,
-    actionDescription: String = "Thao tác",
+    actionDescription: String? = null,
     onAction: (() -> Unit)? = null
 ) {
     KeepLandscapeChromeHidden(activity)
@@ -134,6 +137,15 @@ fun LandscapeMainNavigation(
             .padding(start = 20.dp, end = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // AGVN: the flag of the app's language, tapped: its choice (AgvnLanguageFlag)
+        val flagContext = androidx.compose.ui.platform.LocalContext.current
+        Text(
+            com.winlator.cmod.agvn.AgvnLanguageFlag.emoji(flagContext),
+            fontSize = 24.sp,
+            modifier = Modifier
+                .padding(end = 12.dp)
+                .clickable { activity?.let { com.winlator.cmod.agvn.AgvnLanguage.showPicker(it) } }
+        )
         Text(
             title,
             style = MaterialTheme.typography.headlineSmall,
@@ -142,16 +154,16 @@ fun LandscapeMainNavigation(
         )
         Spacer(Modifier.weight(1f))
         if (actionIcon != null && onAction != null) {
-            Destination(actionIcon, actionDescription, false, onAction)
+            Destination(actionIcon, actionDescription ?: stringResource(R.string.agvn_nav_action), false, onAction)
         }
-        Destination(Icons.Outlined.Home, "Thư viện", selected == R.id.main_menu_shortcuts) {
+        Destination(Icons.Outlined.Home, stringResource(R.string.agvn_nav_library), selected == R.id.main_menu_shortcuts) {
             activity?.navigateToMainDestination(R.id.main_menu_shortcuts)
         }
-        Destination(Icons.Outlined.SportsEsports, "Điều khiển", selected == R.id.main_menu_input_controls) {
+        Destination(Icons.Outlined.SportsEsports, stringResource(R.string.agvn_nav_controls), selected == R.id.main_menu_input_controls) {
             activity?.navigateToMainDestination(R.id.main_menu_input_controls)
         }
         // AGVN: a red dot while a newer AGVN Player is out
-        Destination(Icons.Outlined.Settings, "Cài đặt", selected == R.id.main_menu_settings, rememberAgvnUpdateDot()) {
+        Destination(Icons.Outlined.Settings, stringResource(R.string.settings), selected == R.id.main_menu_settings, rememberAgvnUpdateDot()) {
             activity?.navigateToMainDestination(R.id.main_menu_settings)
         }
     }

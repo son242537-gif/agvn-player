@@ -16,4 +16,15 @@
     <string name="agvn_settings_advanced_show">Hiện cài đặt nâng cao</string>
     <string name="agvn_settings_advanced_hide">Ẩn cài đặt nâng cao</string>
     <string name="agvn_settings_advanced_summary">Wine, driver, môi trường chạy, nhật ký… Người chơi bình thường không cần chỉnh.</string>
+    <string name="agvn_help_explain">Giải thích: %1$s</string>
+    <string name="agvn_help_ok">Đã hiểu</string>
+    <string name="agvn_help_what">Là gì</string>
+    <string name="agvn_help_why">Vì sao chỉnh</string>
+    <string name="agvn_help_how">Chỉnh thế nào</string>
+    <string name="agvn_nav_action">Thao tác</string>
+    <string name="agvn_nav_library">Thư viện</string>
+    <string name="agvn_nav_controls">Điều khiển</string>
+    <string name="agvn_all_files_title">Cần quyền truy cập mọi file</string>
+    <string name="agvn_all_files_message">Để truy cập thêm thiết bị lưu trữ như USB, bạn cần cấp quyền truy cập mọi file. Bấm Đồng ý để mở Cài đặt Android và cấp quyền.</string>
+    <string name="agvn_all_files_ok">Đồng ý</string>
 </resources>

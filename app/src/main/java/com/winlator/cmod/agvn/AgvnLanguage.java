@@ -35,6 +35,30 @@ public final class AgvnLanguage {
         return prefs.getString(PREF, VIETNAMESE);
     }
 
+    /** True once the player picked a language: the first start asks (AgvnLanguageActivity). */
+    public static boolean chosen(Context ctx) {
+        return PreferenceManager.getDefaultSharedPreferences(ctx).contains(PREF);
+    }
+
+    /**
+     * Keeps {@code code} as the app's language, for the screens opened from now on and for the app's own texts (its
+     * context was wrapped as the app started, AgvnApp); the screen showing gets it once it is made again.
+     */
+    static void choose(Context ctx, String code) {
+        PreferenceManager.getDefaultSharedPreferences(ctx).edit().putString(PREF, code).commit();
+        AgvnDoctor.forgetCatalog(); // its texts are the old language's
+        try {
+            android.content.res.Resources res = ctx.getApplicationContext().getResources();
+            Configuration config = new Configuration(res.getConfiguration());
+            Locale locale = locale(code, Locale.getDefault());
+            config.setLocale(locale);
+            config.setLocales(new LocaleList(locale));
+            res.updateConfiguration(config, res.getDisplayMetrics());
+        } catch (RuntimeException e) {
+            // the app's own texts follow at its next start
+        }
+    }
+
     /** The locale for {@code code}; for {@link #SYSTEM}, the phone's, under the codes the app's folders use. */
     static Locale locale(String code, Locale phone) {
         if (SYSTEM.equals(code)) {
@@ -90,8 +114,7 @@ public final class AgvnLanguage {
                     dialog.dismiss();
                     String code = which < CHOICES.length ? CHOICES[which][0] : SYSTEM;
                     if (code.equals(now)) return;
-                    PreferenceManager.getDefaultSharedPreferences(a).edit().putString(PREF, code).commit();
-                    AgvnDoctor.forgetCatalog(); // its texts are the old language's
+                    choose(a, code);
                     a.recreate();
                 })
                 .setNegativeButton(android.R.string.cancel, null)

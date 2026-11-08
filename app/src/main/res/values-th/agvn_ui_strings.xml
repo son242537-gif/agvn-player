@@ -15,4 +15,15 @@
     <string name="agvn_settings_advanced_show">แสดงการตั้งค่าขั้นสูง</string>
     <string name="agvn_settings_advanced_hide">ซ่อนการตั้งค่าขั้นสูง</string>
     <string name="agvn_settings_advanced_summary">Wine, ไดรเวอร์, สภาพแวดล้อม, ล็อก… ผู้เล่นทั่วไปไม่ต้องปรับ</string>
+    <string name="agvn_help_explain">คำอธิบาย: %1$s</string>
+    <string name="agvn_help_ok">เข้าใจแล้ว</string>
+    <string name="agvn_help_what">คืออะไร</string>
+    <string name="agvn_help_why">ทำไมต้องปรับ</string>
+    <string name="agvn_help_how">ปรับอย่างไร</string>
+    <string name="agvn_nav_action">การทำงาน</string>
+    <string name="agvn_nav_library">คลังเกม</string>
+    <string name="agvn_nav_controls">การควบคุม</string>
+    <string name="agvn_all_files_title">ต้องการสิทธิ์เข้าถึงไฟล์ทั้งหมด</string>
+    <string name="agvn_all_files_message">หากต้องการใช้ที่เก็บข้อมูลเพิ่ม เช่น USB ต้องอนุญาตให้เข้าถึงไฟล์ทั้งหมด แตะ ตกลง เพื่อเปิดการตั้งค่า Android แล้วอนุญาต</string>
+    <string name="agvn_all_files_ok">ตกลง</string>
 </resources>

@@ -15,4 +15,15 @@
     <string name="agvn_settings_advanced_show">Ipakita ang advanced settings</string>
     <string name="agvn_settings_advanced_hide">Itago ang advanced settings</string>
     <string name="agvn_settings_advanced_summary">Wine, driver, environment, logs… Hindi ito kailangang galawin ng karaniwang player.</string>
+    <string name="agvn_help_explain">Paliwanag: %1$s</string>
+    <string name="agvn_help_ok">Gets ko</string>
+    <string name="agvn_help_what">Ano ito</string>
+    <string name="agvn_help_why">Bakit babaguhin</string>
+    <string name="agvn_help_how">Paano itakda</string>
+    <string name="agvn_nav_action">Aksyon</string>
+    <string name="agvn_nav_library">Library</string>
+    <string name="agvn_nav_controls">Controls</string>
+    <string name="agvn_all_files_title">Kailangan ng access sa lahat ng file</string>
+    <string name="agvn_all_files_message">Para magamit ang iba pang storage gaya ng USB, payagan ang access sa lahat ng file. I-tap ang OK para buksan ang settings ng Android at payagan ito.</string>
+    <string name="agvn_all_files_ok">OK</string>
 </resources>

@@ -23,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.winlator.cmod.R
 import com.winlator.cmod.agvn.AgvnSettingHelp
 
 /**
@@ -37,7 +39,7 @@ internal fun SettingHelpButton(label: String) {
     IconButton(onClick = { open = true }, modifier = Modifier.size(36.dp)) {
         Icon(
             Icons.Outlined.HelpOutline,
-            contentDescription = "Giải thích: $label",
+            contentDescription = stringResource(R.string.agvn_help_explain, label),
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(20.dp)
         )
@@ -45,13 +47,13 @@ internal fun SettingHelpButton(label: String) {
     if (open) {
         AlertDialog(
             onDismissRequest = { open = false },
-            confirmButton = { TextButton(onClick = { open = false }) { Text("Đã hiểu") } },
+            confirmButton = { TextButton(onClick = { open = false }) { Text(stringResource(R.string.agvn_help_ok)) } },
             title = { Text(label) },
             text = {
                 Column(Modifier.verticalScroll(rememberScrollState())) {
-                    HelpPart("Là gì", help.what)
-                    HelpPart("Vì sao chỉnh", help.why)
-                    HelpPart("Chỉnh thế nào", help.how)
+                    HelpPart(stringResource(R.string.agvn_help_what), help.what)
+                    HelpPart(stringResource(R.string.agvn_help_why), help.why)
+                    HelpPart(stringResource(R.string.agvn_help_how), help.how)
                 }
             }
         )

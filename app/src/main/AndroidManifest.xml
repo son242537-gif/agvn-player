@@ -96,6 +96,11 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|density|navigation" />
 
         <activity
+            android:name="com.winlator.cmod.agvn.AgvnLanguageActivity"
+            android:exported="false"
+            android:theme="@style/AppThemeFullscreen.Dark" />
+
+        <activity
             android:name="com.winlator.cmod.agvn.SplashActivity"
             android:theme="@style/AppThemeFullscreen.Dark"
             android:screenOrientation="sensor"

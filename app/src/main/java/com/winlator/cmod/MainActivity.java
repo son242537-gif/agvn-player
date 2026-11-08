@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 menuItemId = R.id.main_menu_shortcuts; // AGVN: the library is home, also when it is empty
             }
 
-            if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(false);
+            showLanguageFlag(actionBar); // AGVN: the app's language at the top left (agvn/AgvnLanguageFlag)
             onNavigationItemSelected(navigationView.getMenu().findItem(menuItemId));
             navigationView.setCheckedItem(menuItemId);
             selectBottomDestination(menuItemId);
@@ -250,14 +250,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void showAllFilesAccessDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("Cần quyền truy cập mọi file")
-                .setMessage("Để truy cập thêm thiết bị lưu trữ như USB, bạn cần cấp quyền truy cập mọi file. Bấm Đồng ý để mở Cài đặt Android và cấp quyền.")
-                .setPositiveButton("Đồng ý", (dialog, which) -> {
+                .setTitle(R.string.agvn_all_files_title)
+                .setMessage(R.string.agvn_all_files_message)
+                .setPositiveButton(R.string.agvn_all_files_ok, (dialog, which) -> {
                     Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
                     intent.setData(Uri.parse("package:" + getPackageName()));
                     startActivity(intent);
                 })
-                .setNegativeButton("Hủy", null)
+                .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
 
@@ -387,6 +387,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
             }
 
+            com.winlator.cmod.agvn.AgvnLanguage.showPicker(this); // AGVN: the flag at the top left
             return true;
         } else {
             return super.onOptionsItemSelected(menuItem);
@@ -496,7 +497,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(detail);
             if (detail) actionBar.setHomeAsUpIndicator(R.drawable.ui_ic_back);
+            else showLanguageFlag(actionBar); // AGVN
         }
+    }
+
+    /** AGVN: the flag of the app's language where the back arrow goes on a detail screen; tapped, the choice. */
+    private void showLanguageFlag(ActionBar actionBar) {
+        if (actionBar == null || editInputControls) return;
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeAsUpIndicator(com.winlator.cmod.agvn.AgvnLanguageFlag.drawable(this, 30));
+        actionBar.setHomeActionContentDescription(R.string.agvn_language_title);
     }
 
     private void show(Fragment fragment, boolean reverse) {

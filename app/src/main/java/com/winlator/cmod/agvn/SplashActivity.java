@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.winlator.cmod.MainActivity;
 
-/** "agvn.io" for 1.2 s (tap to skip), then the normal start flow in MainActivity. */
+/** "agvn.io" for 1.2 s (tap to skip), then the choice of language at the first start, then MainActivity. */
 public class SplashActivity extends Activity {
     @Override
     protected void attachBaseContext(android.content.Context base) {
@@ -54,7 +54,8 @@ public class SplashActivity extends Activity {
         if (launched || isFinishing()) return;
         launched = true;
         handler.removeCallbacksAndMessages(null);
-        startActivity(new Intent(this, MainActivity.class));
+        // the first start asks for the app's language before anything else (AgvnLanguageActivity)
+        startActivity(new Intent(this, AgvnLanguage.chosen(this) ? MainActivity.class : AgvnLanguageActivity.class));
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         finish();
     }

@@ -15,4 +15,15 @@
     <string name="agvn_settings_advanced_show">显示高级设置</string>
     <string name="agvn_settings_advanced_hide">隐藏高级设置</string>
     <string name="agvn_settings_advanced_summary">Wine、驱动、运行环境、日志…… 普通玩家无需调整。</string>
+    <string name="agvn_help_explain">说明：%1$s</string>
+    <string name="agvn_help_ok">知道了</string>
+    <string name="agvn_help_what">这是什么</string>
+    <string name="agvn_help_why">为什么要调</string>
+    <string name="agvn_help_how">怎么调</string>
+    <string name="agvn_nav_action">操作</string>
+    <string name="agvn_nav_library">游戏库</string>
+    <string name="agvn_nav_controls">控制</string>
+    <string name="agvn_all_files_title">需要“所有文件访问权限”</string>
+    <string name="agvn_all_files_message">要使用 USB 等更多存储设备，需要允许访问所有文件。点“同意”打开 Android 设置并授予权限。</string>
+    <string name="agvn_all_files_ok">同意</string>
 </resources>

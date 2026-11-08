@@ -15,4 +15,15 @@
     <string name="agvn_settings_advanced_show">Tampilkan pengaturan lanjutan</string>
     <string name="agvn_settings_advanced_hide">Sembunyikan pengaturan lanjutan</string>
     <string name="agvn_settings_advanced_summary">Wine, driver, lingkungan, log… Pemain biasa tidak perlu mengubahnya.</string>
+    <string name="agvn_help_explain">Penjelasan: %1$s</string>
+    <string name="agvn_help_ok">Mengerti</string>
+    <string name="agvn_help_what">Apa ini</string>
+    <string name="agvn_help_why">Kenapa diubah</string>
+    <string name="agvn_help_how">Cara mengatur</string>
+    <string name="agvn_nav_action">Aksi</string>
+    <string name="agvn_nav_library">Pustaka</string>
+    <string name="agvn_nav_controls">Kontrol</string>
+    <string name="agvn_all_files_title">Perlu akses ke semua file</string>
+    <string name="agvn_all_files_message">Untuk memakai penyimpanan lain seperti USB, izinkan akses ke semua file. Ketuk Setuju untuk membuka pengaturan Android dan memberi izin.</string>
+    <string name="agvn_all_files_ok">Setuju</string>
 </resources>
