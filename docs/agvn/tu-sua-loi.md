@@ -3133,8 +3133,8 @@ ngày: ở màn đặt tên, không gõ được chữ nào. Ô trống thì gam
       ra `VK_RETURN`.
   - `su-kien.txt` ghi một lần "Bàn phím Android cho game: ô nhận chữ của app giữ bàn phím…", và một lần "Bàn phím
     Android gửi chữ vào game" khi chữ đầu tiên đi.
-  - Chưa làm: tự mở bàn phím ở ô chữ Unity tự vẽ. Unity không tạo con trỏ nhập chữ của Windows, và trạng thái bộ gõ
-    (IME) của cửa sổ game thì `agvn-winhandler.exe` (một tiến trình khác) không đọc được. Vẫn bấm [⌨].
+  - Chưa làm ở bản này: tự mở bàn phím ở ô chữ Unity tự vẽ. Unity không tạo con trỏ nhập chữ của Windows. Bản 0.1.88
+    làm được (mục "Bàn phím cho ô nhập chữ game tự vẽ").
 - **Cùng lúc: `Player.log` của game có tên hãng kết thúc bằng dấu chấm:**
   - App tìm `AppData/LocalLow/CheeseBugerSt./Body Pay OMG/Player.log`. Windows và Wine tạo thư mục mà bỏ dấu chấm và dấu
     cách ở cuối tên, nên thư mục thật là `CheeseBugerSt`. "Gửi nhật ký" không có `Player.log` ("Nhật ký engine đã chép:
@@ -3703,6 +3703,11 @@ Báo cáo ngày 08/11/2026 (POCO, app 0.1.85). Game có các script "解像度�
 
 Anh Sơn yêu cầu ngày 08/11/2026: thêm tiếng Anh, Thái, Indonesia, Filipino, Trung Quốc.
 
+- **Lần mở app đầu tiên:** màn chọn ngôn ngữ (`AgvnLanguageActivity`, sau `SplashActivity`). Mỗi nút có cờ và tên
+  ngôn ngữ viết bằng chính ngôn ngữ đó, nút cuối là "📱" và ngôn ngữ của máy. Chọn xong mới vào màn chính. Người đã
+  dùng bản cũ cũng gặp màn này một lần.
+- **Cờ ở góc trên bên trái màn chính** (`AgvnLanguageFlag`): cờ của ngôn ngữ đang dùng (🇻🇳 🇬🇧 🇹🇭 🇮🇩 🇵🇭 🇨🇳, theo máy
+  thì 🌐). Chạm vào cờ là mở bảng chọn ngôn ngữ. Màn ngang (`LandscapeMainNavigation`) cũng có cờ, trước tên app.
 - **Chọn:** Cài đặt → "Ngôn ngữ · Language" (`AgvnLanguage`).
   - Các lựa chọn: Tiếng Việt, English, ไทย, Bahasa Indonesia, Filipino, 简体中文, và "Theo ngôn ngữ của máy".
   - Mặc định là tiếng Việt, dù máy để tiếng gì: nhiều người chơi Việt để máy tiếng Anh. Muốn mặc định theo máy thì đổi
@@ -3731,14 +3736,70 @@ Anh Sơn yêu cầu ngày 08/11/2026: thêm tiếng Anh, Thái, Indonesia, Filip
   - `python3 tools/agvn/check_translations.py`: tên chuỗi, `%1$s`, dấu `\'`, số mục của mảng, `{placeholder}`.
   - `AgvnLanguageTest`: mỗi ngôn ngữ dịch đủ 78 mục "Tự sửa lỗi" và giữ đúng chỗ điền.
   - Bản dịch do máy làm, chưa có người bản ngữ đọc lại.
-- **Chưa làm:**
-  - Khoảng 1.400 chữ tiếng Việt viết thẳng trong mã (màn sửa game, môi trường chạy, cài thành phần, quản lý file…)
-    vẫn hiện tiếng Việt. Cần tách ra file chuỗi rồi dịch.
-  - Bảng giải thích từng mục cài đặt (`AgvnSettingHelp`) tra theo tên tiếng Việt, và nội dung vẫn là tiếng Việt.
-  - Nhật ký cho nhà phát triển (`su-kien.txt`…) giữ tiếng Việt.
+- **Chữ trong mã, đã tách ra file chuỗi và dịch:** `values*/agvn_ui_<vùng>_strings.xml`.
+  - `library`: thư viện, chi tiết game, sửa lối tắt, sao lưu save.
+  - `container`: môi trường chạy.
+  - `app`: Cài đặt, màn chào lần đầu, quản lý file, thanh bên trong game, các bảng chọn.
+  - `agvn1`, `agvn2`: các màn của AGVN, như hộp lỗi game HTML, thanh "Chạy nhẹ", thanh phim, cập nhật, giấy phép
+    (`licenses-<lang>.html`).
+  - `layout`: chữ viết thẳng trong layout XML.
+  - Chữ mà mã còn so sánh (giá trị lưu, tên mục để tra) vẫn là khoá tiếng Việt; chỉ chữ hiện ra là dịch. Ví dụ: "Driver
+    đồ họa", "Phiên bản driver", nhóm của "Cài đặt game".
+- **Nút "?" giải thích cài đặt** (`AgvnSettingHelp`): `setting-help-<en|th|in|tl|zh>.txt`, đủ 113 mục, cùng khoá
+  tiếng Việt với `setting-help.txt`. Tên mục đang hiện (đã dịch) được đổi ngược về khoá tiếng Việt
+  (`AgvnStringKeys.toVietnamese`, đọc mọi `R.string`), nên tra đúng mục ở mọi ngôn ngữ.
+- **Còn tiếng Việt:**
+  - Nhật ký cho nhà phát triển (`su-kien.txt`, `tom-tat.txt`…).
+  - Vài câu do lớp Java thuần (không có Context, có test JVM) dựng: lỗi kiểm `agvn-profile.json` (`AgvnProfileValidator`),
+    mô tả mã lỗi trong nguyên nhân "Tự sửa lỗi" (`{crash}`: `AgvnCrashScan`, `AgvnExitReason`, `AgvnGameEnd`), lỗi sao
+    lưu save (`GameSaveManager`), chữ " (siêu nhẹ)" thêm vào tên game.
 - **Thử máy:**
   1. Cài đặt → "Ngôn ngữ · Language" → English: màn chính, Cài đặt, thêm game, "Tự sửa lỗi" hiện tiếng Anh.
   2. Xoay máy: vẫn tiếng Anh.
   3. Mở một game "Chạy nhẹ": thanh và menu trong game hiện tiếng Anh.
   4. Đổi lại "Tiếng Việt" và thử "Theo ngôn ngữ của máy" với máy để tiếng Thái.
+  5. Xoá dữ liệu app (hoặc cài mới), mở app: màn chọn ngôn ngữ hiện trước. Chọn "ไทย": màn chính tiếng Thái, góc trái
+     trên có cờ 🇹🇭. Chạm cờ, chọn "English": màn chính đổi sang tiếng Anh, cờ 🇬🇧.
+  6. Tiếng Anh: Cài đặt → nút "?" cạnh một mục: lời giải thích tiếng Anh. Mở sửa game, môi trường chạy, quản lý file,
+     thanh bên trong game: không còn chữ tiếng Việt.
 
+## Bàn phím cho ô nhập chữ game tự vẽ (bản 0.1.88)
+
+Anh Sơn báo ngày 08/11/2026: app vẫn không tự mở bàn phím ở chỗ game cần nhập chữ.
+
+- **Vì sao:** từ bản 0.1.71, app chỉ tự mở bàn phím khi game có con trỏ nhập chữ (caret) của Windows, như ô nhập của
+  Windows. Ô do game tự vẽ thì không có con trỏ đó, nên app không biết. Ví dụ: ô tên của Ren'Py chạy bằng Windows, ô
+  của game SDL, `InputField` của Unity, ô của Unreal và Godot.
+- **Dấu hiệu dùng được:** khi một ô tự vẽ nhận focus, các engine này bật bộ gõ (IME) cho cửa sổ game. Khi ô mất focus,
+  chúng tắt nó: cửa sổ có input context (`ImmAssociateContext`) hoặc không. SDL làm vậy ở `SDL_StartTextInput` và
+  `SDL_StopTextInput`, nên Ren'Py làm vậy mỗi khi màn có ô `renpy.input`.
+  - Wine (9 và 10) ghi input context của cửa sổ đang có focus vào 4 byte đầu của cửa sổ "Wine IME" của luồng đó
+    (`set_ime_ui_window_himc` trong imm32). Tiến trình khác đọc được bằng `GetWindowLongW`.
+- **Sửa (`agvn-winhandler.exe` 5, `winhandler.c`):**
+  - Bit 2 của `RC_AGVN_STATE` (`AGVN_STATE_TEXT_INPUT`): cửa sổ có focus của game vừa có input context, sau khi đã không
+    có suốt ít nhất 1 giây.
+  - Game không bao giờ tắt bộ gõ thì không bao giờ được báo. Phần lớn game như vậy: SDL bật sẵn từ đầu. Cũng không báo
+    khi focus sang cửa sổ khác (một hộp thoại có sẵn input context), hoặc khi bộ gõ chỉ bật chớp nhoáng (0,1 giây).
+  - App (`AgvnMouseLook.TYPING`, `AgvnCaretKeyboard`) mở bàn phím khi có bit này, như với con trỏ nhập chữ, và đóng khi
+    ô mất focus, nếu chính app đã mở.
+  - Bàn phím mở 2 lần cho ô game tự vẽ mà người chơi không gõ gì (cả Enter): game bật bộ gõ vì việc khác. Lần chơi đó
+    app thôi tự mở cho các ô ấy; [⌨] vẫn mở được. Con trỏ nhập chữ của Windows thì vẫn mở như cũ.
+  - `su-kien.txt`: "Game bật nhập chữ cho ô nó tự vẽ (Ren'Py, SDL, Unity, Godot): mở bàn phím". Khi thôi tự mở: "Bàn
+    phím mở 2 lần cho ô game tự vẽ mà không gõ gì…".
+- **Kiểm trên PC:**
+  - `scripts/agvn/winhandler/test/run-typing-test.sh` (Wine 9.0): `typer.c` tắt rồi bật bộ gõ như SDL, nháy 0,1 giây,
+    rồi đưa focus sang cửa sổ khác. Kết quả: `STATE 4` từ 4,6 tới 7,2 giây, đúng lúc bộ gõ bật, và không lúc nào khác.
+  - Chạy thử với SDL2 2.28.1 thật qua `agvn-winhandler.exe`: `STATE 4` từ 6,3 tới 9,2 giây, đúng khoảng
+    `SDL_StartTextInput` … `SDL_StopTextInput`.
+  - `run-test.sh` (khoá chuột, ô nhập của Windows) vẫn ra như cũ.
+  - Chưa thử game 32-bit: Wine trên PC không chạy được 32-bit. Đọc qua wineserver nên hai bên khác bit vẫn đọc được.
+- **Game không qua Wine:**
+  - Ren'Py "Chạy nhẹ" mở bàn phím bằng SDL của Android khi có ô `renpy.input` (Ren'Py gọi `start_text_input`).
+  - Godot "Chạy nhẹ" dùng bàn phím ảo của chính Godot.
+  - Game HTML dùng `AgvnPageKeyboard`.
+  - Không đổi gì ở đây.
+- **Thử máy:**
+  1. Game Ren'Py chạy bằng Windows có màn đặt tên: tới màn đó, bàn phím tự lên. Gõ tên, Enter: bàn phím xuống.
+  2. Game Unity hoặc Godot có ô nhập chữ: chạm vào ô, bàn phím lên. Ra khỏi ô, bàn phím xuống.
+  3. Game không có ô nhập chữ: chơi 5 phút, bàn phím không tự lên lần nào.
+  4. Gửi nhật ký, `su-kien.txt` có dòng "Game bật nhập chữ cho ô nó tự vẽ".
