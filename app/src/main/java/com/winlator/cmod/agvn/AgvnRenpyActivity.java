@@ -33,6 +33,11 @@ import java.util.Map;
  * ⌨ ✎ 👁 ☰ bar, the menu on Back (the game's menu, quit, "Chạy bằng Windows"...) and the HUD.
  */
 public class AgvnRenpyActivity extends PythonSDLActivity {
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(com.winlator.cmod.agvn.AgvnLanguage.wrap(base)); // AGVN: the app's language
+    }
+
     private static final String TAG = "AGVN";
     public static final String EXTRA_GAME_DIR = "agvn_renpy_game_dir";
 

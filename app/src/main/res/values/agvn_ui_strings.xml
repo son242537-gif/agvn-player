@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN Player (agvn.io): texts of screens that had them in their code, and the language choice (AgvnLanguage). -->
+<resources>
+    <string name="agvn_language_title">Ngôn ngữ · Language</string>
+    <string name="agvn_language_system">Theo ngôn ngữ của máy</string>
+    <string name="agvn_settings_appearance">GIAO DIỆN</string>
+    <string name="agvn_settings_game_screen">MÀN HÌNH GAME</string>
+    <string name="agvn_settings_fullscreen_all">Toàn màn hình cho mọi game</string>
+    <string name="agvn_settings_fullscreen_all_summary">Kéo giãn hình game cho kín màn hình, không còn viền đen hai bên</string>
+    <string name="agvn_settings_saves">BẢN LƯU GAME</string>
+    <string name="agvn_settings_saves_all">Sao lưu bản lưu cho mọi game</string>
+    <string name="agvn_settings_saves_all_summary">Tự tìm và sao lưu bản lưu mỗi khi thoát game</string>
+    <string name="agvn_settings_about_section">GIỚI THIỆU</string>
+    <string name="agvn_settings_about">Giới thiệu</string>
+    <string name="agvn_settings_advanced_section">Nâng cao (cho người rành)</string>
+    <string name="agvn_settings_advanced_show">Hiện cài đặt nâng cao</string>
+    <string name="agvn_settings_advanced_hide">Ẩn cài đặt nâng cao</string>
+    <string name="agvn_settings_advanced_summary">Wine, driver, môi trường chạy, nhật ký… Người chơi bình thường không cần chỉnh.</string>
+</resources>

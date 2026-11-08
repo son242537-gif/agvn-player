@@ -144,6 +144,11 @@ import java.util.regex.Pattern;
 import cn.sherlock.com.sun.media.sound.SF2Soundbank;
 
 public class XServerDisplayActivity extends AppCompatActivity {
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(com.winlator.cmod.agvn.AgvnLanguage.wrap(base)); // AGVN: the app's language
+    }
+
 
     private static final boolean DISABLE_TOUCHSCREEN_AUTO_HIDE = true;
     private static final HashMap<String, Boolean> WINE_XRANDR_SUPPORT_CACHE = new HashMap<>();

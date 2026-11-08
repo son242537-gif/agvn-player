@@ -82,6 +82,10 @@ import java.io.File
 import java.util.ArrayDeque
 
 class ContainersSettingsActivity : AppCompatActivity() {
+    override fun attachBaseContext(base: android.content.Context) {
+        super.attachBaseContext(com.winlator.cmod.agvn.AgvnLanguage.wrap(base)) // AGVN: the app's language
+    }
+
     private lateinit var root: FrameLayout
     private val containersState = mutableStateOf<List<Container>>(emptyList())
     private val propertiesState = mutableStateOf<Container?>(null)

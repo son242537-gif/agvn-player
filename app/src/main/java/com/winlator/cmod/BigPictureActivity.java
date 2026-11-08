@@ -83,6 +83,11 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Toast;
 
 public class BigPictureActivity extends AppCompatActivity {
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(com.winlator.cmod.agvn.AgvnLanguage.wrap(base)); // AGVN: the app's language
+    }
+
     private ImageView coverArtView;
     private TextView gameTitleView, graphicsDriverView, graphicsDriverVersionView, dxWrapperView, dxWrapperConfigView, audioDriverView, box64PresetView, playCountView, playtimeView;
     private RecyclerView recyclerView;

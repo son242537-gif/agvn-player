@@ -21,6 +21,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ExternalControllerBindingsActivity extends AppCompatActivity {
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(com.winlator.cmod.agvn.AgvnLanguage.wrap(base)); // AGVN: the app's language
+    }
+
     private ControlsProfile profile;
     private ExternalController controller;
     private final ExternalControllerBindingsState screenState = new ExternalControllerBindingsState();

@@ -55,7 +55,8 @@ public class AgvnSettingHelpTest {
             for (java.nio.file.Path p : files.filter(f -> f.toString().endsWith(".kt") || f.toString().endsWith(".java"))
                     .collect(Collectors.toList())) code.append(new String(Files.readAllBytes(p), StandardCharsets.UTF_8));
         }
-        for (File values : new File[]{new File("src/main/res/values/strings.xml"), new File("src/main/res/values/agvn_strings.xml")})
+        for (File values : new File[]{new File("src/main/res/values/strings.xml"), new File("src/main/res/values/agvn_strings.xml"),
+                new File("src/main/res/values/agvn_ui_strings.xml")})
             code.append(new String(Files.readAllBytes(values.toPath()), StandardCharsets.UTF_8).replace("\\'", "'"));
         String all = code.toString();
         for (String label : AgvnSettingHelp.parse(Files.readAllLines(ASSET.toPath(), StandardCharsets.UTF_8)).keySet()) {

@@ -17,6 +17,11 @@ import com.winlator.cmod.MainActivity;
 
 /** "agvn.io" for 1.2 s (tap to skip), then the normal start flow in MainActivity. */
 public class SplashActivity extends Activity {
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(com.winlator.cmod.agvn.AgvnLanguage.wrap(base)); // AGVN: the app's language
+    }
+
     private static final long DURATION_MS = 1200;
     private static final String TEXT = "agvn.io";
     private final Handler handler = new Handler(Looper.getMainLooper());

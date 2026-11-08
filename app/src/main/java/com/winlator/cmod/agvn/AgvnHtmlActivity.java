@@ -31,6 +31,11 @@ import java.util.function.Consumer;
  * novel for Tyrano and other NW.js page games), the ⌨ ✎ 👁 ☰ bar, the menu on Back and the HUD.
  */
 public class AgvnHtmlActivity extends AppCompatActivity {
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(com.winlator.cmod.agvn.AgvnLanguage.wrap(base)); // AGVN: the app's language
+    }
+
     public static final String EXTRA_INDEX_PATH = "agvn_html_index";
 
     private WebView webView;

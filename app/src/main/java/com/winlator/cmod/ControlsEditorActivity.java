@@ -56,6 +56,11 @@ import com.winlator.cmod.widget.InputControlsView;
 import com.winlator.cmod.widget.NumberPicker;
 
 public class ControlsEditorActivity extends AppCompatActivity implements View.OnClickListener {
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(com.winlator.cmod.agvn.AgvnLanguage.wrap(base)); // AGVN: the app's language
+    }
+
     private InputControlsView inputControlsView;
     private ControlsProfile profile;
     private ControlElement pendingIconElement = null;

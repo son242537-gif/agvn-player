@@ -21,6 +21,11 @@ import com.winlator.cmod.R;
  * Android's confirmation when Android asks for the player's yes, says why when Android refused, and closes.
  */
 public final class AgvnUpdateStatusActivity extends AppCompatActivity {
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(AgvnLanguage.wrap(base)); // the app's language
+    }
+
     private static final String TAG = "AGVN";
 
     /** Where Android sends the status of session {@code sessionId}. */

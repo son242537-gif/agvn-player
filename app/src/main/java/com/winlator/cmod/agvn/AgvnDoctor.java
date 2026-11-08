@@ -44,7 +44,21 @@ public final class AgvnDoctor {
             Log.w(TAG, "game-problems.json not read", e);
             catalog = AgvnProblemCatalog.parse(new StringReader("{}"));
         }
+        String lang = AgvnLanguage.textLanguage(ctx); // its texts in the app's language (AgvnLanguage)
+        if (!lang.equals(AgvnLanguage.VIETNAMESE)) {
+            try (Reader in = new InputStreamReader(ctx.getAssets().open("agvn/game-problems-" + lang + ".json"),
+                    StandardCharsets.UTF_8)) {
+                catalog.localize(in);
+            } catch (Exception e) {
+                Log.i(TAG, "no game-problems text for " + lang);
+            }
+        }
         return catalog;
+    }
+
+    /** The language changed: the texts are read again (AgvnLanguage). */
+    static synchronized void forgetCatalog() {
+        catalog = null;
     }
 
     /** True when a game left a problem to ask about (MainActivity then stays in front of Big Picture). */

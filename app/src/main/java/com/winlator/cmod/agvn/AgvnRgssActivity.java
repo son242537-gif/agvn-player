@@ -20,6 +20,11 @@ import java.io.File;
  * ⌨ ✎ 👁 ☰ bar, the menu on Back and the HUD. A game that stops on an error says why and offers "Chạy bằng Windows".
  */
 public class AgvnRgssActivity extends SDLActivity {
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(com.winlator.cmod.agvn.AgvnLanguage.wrap(base)); // AGVN: the app's language
+    }
+
     private static final String TAG = "AGVN";
     public static final String EXTRA_GAME_DIR = "agvn_rgss_game_dir";
     public static final String EXTRA_DRIVE_C = "agvn_rgss_drive_c";

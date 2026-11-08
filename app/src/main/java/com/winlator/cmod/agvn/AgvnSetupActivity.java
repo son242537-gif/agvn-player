@@ -27,6 +27,11 @@ import com.winlator.cmod.core.WineInfo;
  * shows a short guide while waiting. The component manager stays in Cài đặt → Nâng cao for experts.
  */
 public class AgvnSetupActivity extends AppCompatActivity implements AgvnFirstRun.Listener, AgvnSetupActions {
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(com.winlator.cmod.agvn.AgvnLanguage.wrap(base)); // AGVN: the app's language
+    }
+
     private static final int REQUEST_ALL_FILES = 931;
     private static final int REQUEST_STORAGE = 932;
     private static final int REQUEST_NOTIFICATIONS = 933;

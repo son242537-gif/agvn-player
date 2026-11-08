@@ -63,6 +63,11 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class OnboardingActivity extends AppCompatActivity {
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(com.winlator.cmod.agvn.AgvnLanguage.wrap(base)); // AGVN: the app's language
+    }
+
     public static final String PREF_ONBOARDING_COMPLETE = "winz_onboarding_complete";
     public static final String EXTRA_COMPONENT_MANAGER = "component_manager";
     public static final String EXTRA_AUTO_INSTALL_TYPE = "auto_install_type";

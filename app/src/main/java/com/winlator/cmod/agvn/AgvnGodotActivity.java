@@ -22,6 +22,11 @@ import java.io.File;
  * HUD. A game that ends before its first frame says so and offers "Chạy bằng Windows".
  */
 public class AgvnGodotActivity extends GodotActivity {
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(com.winlator.cmod.agvn.AgvnLanguage.wrap(base)); // AGVN: the app's language
+    }
+
     private static final String TAG = "AGVN";
     public static final String EXTRA_GAME_DIR = "agvn_godot_game_dir", EXTRA_EXE = "agvn_godot_exe",
             EXTRA_APPDATA = "agvn_godot_appdata", EXTRA_LOG = "agvn_godot_log";

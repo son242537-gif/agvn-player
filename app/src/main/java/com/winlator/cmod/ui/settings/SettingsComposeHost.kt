@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.ChevronRight
@@ -183,13 +184,19 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
     }
 
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-        if (landscape) LandscapeMainNavigation(activity, R.id.main_menu_settings, "Cài đặt")
+        if (landscape) LandscapeMainNavigation(activity, R.id.main_menu_settings, stringResource(R.string.settings))
         LazyColumn(
             modifier = Modifier.fillMaxWidth().weight(1f),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 30.dp),
             verticalArrangement = Arrangement.spacedBy(7.dp)
         ) {
             item("agvn-title") { SectionTitle(stringResource(R.string.agvn_settings_section)) }
+            item("agvn-language") {
+                NavigationRow(Icons.Outlined.Translate, stringResource(R.string.agvn_language_title),
+                    remember { com.winlator.cmod.agvn.AgvnLanguage.summary(context) }) {
+                    activity?.let { com.winlator.cmod.agvn.AgvnLanguage.showPicker(it) }
+                }
+            }
             item("agvn-guide") {
                 NavigationRow(Icons.Outlined.HelpOutline, stringResource(R.string.agvn_guide_title), stringResource(R.string.agvn_guide_open_summary)) {
                     com.winlator.cmod.agvn.AgvnGuideActivity.open(context)
@@ -222,42 +229,42 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
                 }
             }
 
-            item("appearance-title") { SectionTitle("GIAO DIỆN") }
+            item("appearance-title") { SectionTitle(stringResource(R.string.agvn_settings_appearance)) }
             item("theme") { WinlatorThemePreferenceCard() }
 
-            item("game-screen-title") { SectionTitle("MÀN HÌNH GAME") }
+            item("game-screen-title") { SectionTitle(stringResource(R.string.agvn_settings_game_screen)) }
             item("game-screen") {
                 GroupCard {
                     ToggleRow(
-                        "Toàn màn hình cho mọi game",
+                        stringResource(R.string.agvn_settings_fullscreen_all),
                         model.fullscreenAll,
-                        "Kéo giãn hình game cho kín màn hình, không còn viền đen hai bên"
+                        stringResource(R.string.agvn_settings_fullscreen_all_summary)
                     ) { callbacks.onBooleanChanged(com.winlator.cmod.agvn.AgvnFullscreen.PREF, it) }
                 }
             }
 
-            item("game-saves-title") { SectionTitle("BẢN LƯU GAME") }
+            item("game-saves-title") { SectionTitle(stringResource(R.string.agvn_settings_saves)) }
             item("game-saves") {
                 GroupCard {
                     ToggleRow(
-                        "Sao lưu bản lưu cho mọi game",
+                        stringResource(R.string.agvn_settings_saves_all),
                         model.gameSavesAllShortcuts,
-                        "Tự tìm và sao lưu bản lưu mỗi khi thoát game"
+                        stringResource(R.string.agvn_settings_saves_all_summary)
                     ) { callbacks.onBooleanChanged("game_saves_all_shortcuts", it) }
                 }
             }
 
-            item("about-title") { SectionTitle("GIỚI THIỆU") }
+            item("about-title") { SectionTitle(stringResource(R.string.agvn_settings_about_section)) }
             item("about") {
-                NavigationRow(Icons.Outlined.Info, "Giới thiệu", null) { activity?.showAboutDialog() }
+                NavigationRow(Icons.Outlined.Info, stringResource(R.string.agvn_settings_about), null) { activity?.showAboutDialog() }
             }
 
-            item("advanced-title") { SectionTitle("Nâng cao (cho người rành)") }
+            item("advanced-title") { SectionTitle(stringResource(R.string.agvn_settings_advanced_section)) }
             item("advanced-toggle") {
                 NavigationRow(
                     Icons.Outlined.Tune,
-                    if (advancedOpen) "Ẩn cài đặt nâng cao" else "Hiện cài đặt nâng cao",
-                    "Wine, driver, môi trường chạy, nhật ký… Người chơi bình thường không cần chỉnh."
+                    stringResource(if (advancedOpen) R.string.agvn_settings_advanced_hide else R.string.agvn_settings_advanced_show),
+                    stringResource(R.string.agvn_settings_advanced_summary)
                 ) { advancedOpen = !advancedOpen }
             }
             if (advancedOpen) {

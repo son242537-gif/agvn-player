@@ -11,6 +11,10 @@ import com.winlator.cmod.ui.theme.WinZTheme
 
 /** "Hướng dẫn": simple how-to cards for players (add a game, play, graphics, on-screen keys, mouse, problems). */
 class AgvnGuideActivity : AppCompatActivity() {
+    override fun attachBaseContext(base: android.content.Context) {
+        super.attachBaseContext(com.winlator.cmod.agvn.AgvnLanguage.wrap(base)) // AGVN: the app's language
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         applyAppFullscreen(this)

@@ -76,6 +76,25 @@ final class AgvnProblemCatalog {
         return new AgvnProblemCatalog(list);
     }
 
+    /**
+     * The titles and causes of {@code json} (game-problems-&lt;lang&gt;.json: {"problems": {"id": {"title", "cause"}}})
+     * in place of the Vietnamese ones, problem by problem; one it lacks stays Vietnamese. Never throws.
+     */
+    void localize(Reader json) {
+        try {
+            com.google.gson.JsonObject texts = new Gson().fromJson(json, com.google.gson.JsonObject.class)
+                    .getAsJsonObject("problems");
+            for (Problem p : problems) {
+                com.google.gson.JsonObject t = texts != null ? texts.getAsJsonObject(p.id) : null;
+                if (t == null) continue;
+                if (t.has("title")) p.title = t.get("title").getAsString();
+                if (t.has("cause")) p.cause = t.get("cause").getAsString();
+            }
+        } catch (RuntimeException e) {
+            // the Vietnamese texts stay
+        }
+    }
+
     List<Problem> all() {
         return Collections.unmodifiableList(problems);
     }

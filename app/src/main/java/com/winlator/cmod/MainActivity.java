@@ -60,6 +60,11 @@ import java.io.File;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(com.winlator.cmod.agvn.AgvnLanguage.wrap(base)); // AGVN: the app's language
+    }
+
     public static final @IntRange(from = 1, to = 19) byte CONTAINER_PATTERN_COMPRESSION_LEVEL = 9;
     public static final int PERMISSION_WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 500;
     public static final int PERMISSION_POST_NOTIFICATIONS_REQUEST_CODE = 501;
