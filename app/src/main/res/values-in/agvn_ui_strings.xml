@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="agvn_language_title">Bahasa · Language</string>
+    <string name="agvn_language_system">Ikuti bahasa ponsel</string>
+    <string name="agvn_settings_appearance">TAMPILAN</string>
+    <string name="agvn_settings_game_screen">LAYAR GAME</string>
+    <string name="agvn_settings_fullscreen_all">Layar penuh untuk semua game</string>
+    <string name="agvn_settings_fullscreen_all_summary">Rentangkan gambar game memenuhi layar, tanpa bilah hitam di kedua sisi</string>
+    <string name="agvn_settings_saves">SAVE GAME</string>
+    <string name="agvn_settings_saves_all">Cadangkan save semua game</string>
+    <string name="agvn_settings_saves_all_summary">Cari dan cadangkan save setiap kali Anda keluar dari game</string>
+    <string name="agvn_settings_about_section">TENTANG</string>
+    <string name="agvn_settings_about">Tentang</string>
+    <string name="agvn_settings_advanced_section">Lanjutan (untuk yang paham)</string>
+    <string name="agvn_settings_advanced_show">Tampilkan pengaturan lanjutan</string>
+    <string name="agvn_settings_advanced_hide">Sembunyikan pengaturan lanjutan</string>
+    <string name="agvn_settings_advanced_summary">Wine, driver, lingkungan, log… Pemain biasa tidak perlu mengubahnya.</string>
+</resources>

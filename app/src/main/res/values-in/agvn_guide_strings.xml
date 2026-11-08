@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2026 agvn.io — MIT License. Panduan untuk pemain (layar pemasangan pertama + bagian Panduan). -->
+<resources>
+    <string name="agvn_guide_title">Panduan</string>
+    <string name="agvn_guide_subtitle">Ketuk tiap bagian untuk melihat caranya</string>
+    <string name="agvn_guide_open">Lihat panduan</string>
+    <string name="agvn_guide_open_summary">Tambah game, main game, atur grafis dan tombol layar</string>
+    <string name="agvn_guide_close">Tutup</string>
+
+    <string name="agvn_guide_add_title">Tambah game</string>
+    <string name="agvn_guide_add_summary">Salin folder game ke ponsel, ketuk + dan aplikasi mencarinya sendiri</string>
+    <string-array name="agvn_guide_add_steps">
+        <item>Salin seluruh folder game (sudah diekstrak, ada file .exe) dari komputer ke ponsel, misalnya: Penyimpanan internal/AGVN/Nama game. Jangan salin file .zip atau file instalasi (setup).</item>
+        <item>Sebaiknya taruh game di folder AGVN atau Download (di penyimpanan internal atau kartu SD). Jangan taruh di folder Documents karena aplikasi tidak mencari di sana.</item>
+        <item>Ketuk tombol + di pustaka (atau \"Tambah game\" di Pengaturan). Aplikasi mencari game sendiri dan menampilkan daftar: game \"Belum ditambahkan\" di atas, game yang sudah ada di pustaka di bawah (bertanda centang). Ketik beberapa huruf di kotak \"Cari game\" untuk menyaring cepat, tidak perlu mengetik huruf beraksen.</item>
+        <item>Ketuk nama game lalu ketuk \"Impor\" (jika game sudah ada, tombolnya \"Perbarui\"). Aplikasi memilih sendiri tombol layar dan grafis yang cocok dengan game dan ponsel Anda.</item>
+        <item>Game ada di tempat lain? Ketuk \"Pilih folder lain\", buka folder berisi game lalu ketuk \"Pindai folder ini\". Aplikasi mengingat folder itu untuk lain kali.</item>
+        <item>Jika aplikasi bilang belum diizinkan membaca penyimpanan: ketuk \"Beri izin\", lalu aktifkan Izinkan akses untuk mengelola semua file (Android 11 ke atas) atau buka Izin → Penyimpanan → Izinkan (Android 9, 10).</item>
+    </string-array>
+
+    <string name="agvn_guide_play_title">Main dan keluar game</string>
+    <string name="agvn_guide_play_summary">Ketuk ▶ untuk main, tombol Kembali untuk membuka menu</string>
+    <string-array name="agvn_guide_play_steps">
+        <item>Di pustaka, ketuk tombol ▶ di sampul game (atau ketuk sampul lalu ketuk \"Main\"). Pertama kali membuka game akan sedikit lebih lama.</item>
+        <item>Di dalam game, tekan tombol Kembali ponsel (atau ketuk dengan 4 jari sekaligus) untuk membuka menu di kiri.</item>
+        <item>Untuk keluar game: simpan game dulu, buka menu lalu ketuk tombol daya merah di paling bawah. Game langsung tertutup, tanpa bertanya lagi.</item>
+        <item>Tombol jeda di menu akan membekukan game. Untuk lanjut main: tekan tombol Kembali ponsel untuk membuka menu lagi (saat dijeda, ketuk 4 jari tidak membuka menu), lalu ketuk tombol main.</item>
+    </string-array>
+
+    <string name="agvn_guide_graphics_title">Atur grafis (ponsel panas, game tersendat)</string>
+    <string name="agvn_guide_graphics_summary">Geser penggeser: kiri lebih dingin, kanan lebih bagus</string>
+    <string-array name="agvn_guide_graphics_steps">
+        <item>Di pustaka, ketuk ⋮ pada game lalu pilih \"Atur grafis: dingin ↔ bagus\".</item>
+        <item>Geser ke kiri (Super ringan, Rendah) agar ponsel lebih dingin dan lancar. Geser ke kanan (Tinggi, Sangat tinggi) agar gambar lebih bagus tetapi ponsel lebih panas.</item>
+        <item>Tingkat bertanda ★ adalah saran aplikasi untuk ponsel Anda. Ketuk \"Kembali ke saran\" jika ingin aplikasi mengatur sendiri.</item>
+        <item>Tingkat Sangat tinggi tidak membatasi FPS, agar tidak menimpa pengaturan FPS game dan menu cheat. Jika ponsel terlalu panas, di dalam game buka menu, bagian Gambar, pilih \"Batas FPS\" 60.</item>
+        <item>Ketuk \"Simpan\" lalu keluar game dan buka lagi untuk menerapkan.</item>
+    </string-array>
+
+    <string name="agvn_guide_controls_title">Tombol layar</string>
+    <string name="agvn_guide_controls_summary">Tambah, pindahkan, ganti tombol langsung di dalam game</string>
+    <string-array name="agvn_guide_controls_steps">
+        <item>Di dalam game ada bilah kecil di tengah atas: \"✎ Ubah\" untuk mengatur tombol, \"👁 Sembunyi\" untuk menyembunyikan atau menampilkan set tombol, \"⌨\" untuk membuka keyboard. Bilah ini sembunyi sendiri setelah 3 detik agar tidak menutupi game, hanya tersisa garis samar di tepi atas: ketuk garis itu untuk menampilkannya lagi.</item>
+        <item>Ketuk \"✎ Ubah\": seret tombol untuk memindahkan. Ketuk sebuah tombol untuk memilih, lalu pakai \"Fungsi…\" untuk mengganti fungsinya, \"－\" / \"＋\" untuk memperkecil atau memperbesar, \"Gaya…\" untuk mengubah bentuk (bulat, persegi, persegi panjang, sudut bulat) dan transparansi, \"Hapus\" untuk membuang tombol.</item>
+        <item>\"+ Tombol\" menampilkan seluruh keyboard dan mouse, ketuk tombol yang Anda mau. \"+ Area putar\" menambah area usap untuk memutar kamera di game 3D.</item>
+        <item>Centang kotak \"Tahan\" saat memilih fungsi jika ingin tombol itu ditekan sekali untuk menahan, ditekan lagi untuk melepas (misalnya menahan mouse untuk seret lepas).</item>
+        <item>Ketuk \"Selesai\" untuk menyimpan. Set tombol disimpan terpisah untuk tiap game.</item>
+    </string-array>
+
+    <string name="agvn_guide_mouse_title">Memakai mouse dengan jari</string>
+    <string name="agvn_guide_mouse_summary">Ketuk untuk klik, tahan lalu seret untuk seret lepas</string>
+    <string-array name="agvn_guide_mouse_steps">
+        <item>Ketuk 1 jari = klik kiri tepat di tempat yang Anda ketuk.</item>
+        <item>Klik kanan: ketuk 1 jari dulu di tempat yang ingin diklik, lalu ketuk 2 jari sekaligus = klik kanan di tempat itu.</item>
+        <item>Tahan lalu seret = tahan klik kiri dan seret (seret lepas benda, seret kotak pilihan…).</item>
+        <item>Usap ke atas atau ke bawah dengan 2 jari untuk menggulir (scroll halaman).</item>
+    </string-array>
+
+    <string name="agvn_guide_trouble_title">Game error atau tidak bisa dibuka</string>
+    <string name="agvn_guide_trouble_summary">Turunkan grafis, tutup aplikasi lain, kirim log error</string>
+    <string-array name="agvn_guide_trouble_steps">
+        <item>Turunkan grafis ke \"Super ringan\" (⋮ pada game, \"Atur grafis\") lalu buka lagi game.</item>
+        <item>Tutup aplikasi lain yang sedang berjalan agar game punya cukup RAM.</item>
+        <item>Pastikan folder game sudah disalin lengkap, tidak ada file yang kurang.</item>
+        <item>Masih error: buka Pengaturan, ketuk \"Ekspor log error\". File log ada di folder Download, kirim file itu ke AGVN untuk mendapat bantuan.</item>
+    </string-array>
+
+    <string name="agvn_guide_expert_title">Untuk yang paham</string>
+    <string name="agvn_guide_expert_summary">Unduh Wine, driver lain, atur detail</string>
+    <string-array name="agvn_guide_expert_steps">
+        <item>Aplikasi sudah memasang semua yang dibutuhkan untuk main, Anda tidak perlu mengunduh apa pun.</item>
+        <item>Jika Anda paham Wine/driver: buka Pengaturan, buka \"Lanjutan (untuk yang paham)\" untuk mengunduh Wine, Proton, DXVK, driver grafis lain dan mengelola lingkungan.</item>
+        <item>Ingin mengatur detail satu game: ketuk ⋮ pada game lalu pilih \"Konfigurasi\".</item>
+    </string-array>
+
+    <!-- Layar pemasangan pertama -->
+    <string name="agvn_setup_welcome">Selamat datang di AGVN Player</string>
+    <string name="agvn_setup_intro">Aplikasi sedang memasang semua yang dibutuhkan untuk main game. Tidak perlu mengunduh apa pun, hanya sekitar 1–2 menit.</string>
+    <string name="agvn_setup_step_core">Pasang komponen inti</string>
+    <string name="agvn_setup_step_core_system">Mengekstrak sistem… %1$d%%</string>
+    <string name="agvn_setup_step_core_wine">Memasang Wine/Proton…</string>
+    <string name="agvn_setup_step_core_driver">Memasang driver grafis…</string>
+    <string name="agvn_setup_step_container">Menyiapkan lingkungan main game</string>
+    <string name="agvn_setup_step_access">Izinkan membaca folder game</string>
+    <string name="agvn_setup_access_why">Aplikasi perlu izin ini untuk mencari sendiri game yang Anda salin ke ponsel (folder AGVN, Download di penyimpanan internal atau kartu SD). Aplikasi tidak membaca foto atau pesan Anda.</string>
+    <string name="agvn_setup_access_button">Izinkan</string>
+    <string name="agvn_setup_access_later">Nanti saja</string>
+    <string name="agvn_setup_access_denied">Belum diizinkan. Di layar yang baru terbuka, aktifkan \"Izinkan akses untuk mengelola semua file\". Anda juga bisa ketuk \"Nanti saja\", aplikasi akan bertanya lagi saat menambah game.</string>
+    <string name="agvn_setup_access_denied_legacy">Belum diizinkan. Ketuk \"Izinkan\" sekali lagi dan pilih Izinkan di dialog. Jika dialog tidak muncul, buka Setelan ponsel → Aplikasi → AGVN Player → Izin → Penyimpanan → Izinkan. Anda juga bisa ketuk \"Nanti saja\".</string>
+    <string name="agvn_setup_done">Selesai</string>
+    <string name="agvn_setup_failed">Pemasangan belum berhasil. Pastikan ponsel masih punya ruang kosong minimal 2 GB lalu ketuk \"Coba lagi\".</string>
+    <string name="agvn_setup_retry">Coba lagi</string>
+    <string name="agvn_setup_start">Mulai</string>
+    <string name="agvn_setup_guide_header">Sambil menunggu, lihat cara pakai</string>
+    <string name="agvn_setup_guide_header_done">Lihat cara pakai</string>
+    <string name="agvn_setup_swipe_hint">Usap ke samping untuk lanjut</string>
+</resources>

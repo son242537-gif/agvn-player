@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN: "Tự sửa lỗi" (Perbaikan Otomatis) for what the player reports (agvn/AgvnRepair*), and its fixes. Copyright (c) 2026 agvn.io — MIT License. -->
+<resources>
+    <string name="agvn_repair_title">Perbaikan Otomatis</string>
+    <string name="agvn_repair_pick">Apa masalah game ini?</string>
+    <string name="agvn_repair_plan">Aplikasi akan mencoba cara di bawah ini satu per satu: game dibuka ulang, Anda mencoba main, lalu aplikasi bertanya apakah masih bermasalah. Jika suatu cara tidak membantu, aplikasi mengembalikan konfigurasi seperti semula sebelum mencoba cara berikutnya.</string>
+    <string name="agvn_repair_none">Aplikasi sudah mencoba semua cara yang ada untuk masalah ini. Konfigurasi game sudah kembali seperti sebelum diperbaiki. Ketuk \"Kirim log\" agar AGVN membantu memeriksa.</string>
+    <string name="agvn_repair_no_fix">Aplikasi belum punya cara memperbaiki masalah ini untuk game ini. Ketuk \"Kirim log\" agar AGVN membantu memeriksa.</string>
+    <string name="agvn_repair_start">Coba cara 1: %1$s</string>
+    <string name="agvn_repair_trying">Mencoba: %1$s. Game sedang dibuka ulang…</string>
+    <string name="agvn_repair_status">Aplikasi sedang mencoba perbaikan: %1$s. Masih bermasalah?</string>
+    <string name="agvn_repair_not_run">Aplikasi sudah memasang perbaikan: %1$s, tetapi game belum dijalankan ulang dengan cara ini. Buka game untuk mencoba; main sebentar, aplikasi akan bertanya apakah masih bermasalah.</string>
+    <string name="agvn_repair_play">Coba main dengan cara ini</string>
+    <string name="agvn_repair_ask_title">Masih ada masalah \"%1$s\"?</string>
+    <string name="agvn_repair_ask_detail">Aplikasi sedang mencoba perbaikan: %1$s. Coba main sebentar lalu jawab.</string>
+    <string name="agvn_repair_gone">Sudah beres</string>
+    <string name="agvn_repair_still">Masih bermasalah</string>
+    <string name="agvn_repair_later">Tanya lain kali</string>
+    <string name="agvn_repair_other">Pilih masalah lain</string>
+    <string name="agvn_repair_kept">Perbaikan dipertahankan: %1$s</string>
+    <string name="agvn_repair_done_title">Semua cara di aplikasi sudah dicoba</string>
+    <string name="agvn_repair_off_title">Belum bisa dicoba: %1$s</string>
+    <string name="agvn_repair_off_detail">Game tidak berjalan dengan cara yang sedang dicoba (%1$s): pengaturan game berubah setelah cara ini diaktifkan. Aplikasi belum menghitung cara ini sebagai sudah dicoba.</string>
+    <string name="agvn_repair_off_try">Coba: %1$s</string>
+    <string name="agvn_repair_undone">Dengan cara yang sedang dicoba (%1$s), game tertutup sendiri setelah %2$s detik. Aplikasi menganggap cara ini tidak membantu, dan mengembalikan konfigurasi game seperti sebelum diperbaiki.</string>
+    <string name="agvn_bar_repair_label">🩺 Perbaiki</string>
+    <string name="agvn_bar_repair">Perbaikan Otomatis: pilih masalah yang dialami game</string>
+
+    <string name="agvn_fix_render_sysmem">Biarkan Turnip menggambar seluruh frame di memori (sysmem)</string>
+    <string name="agvn_fix_turnip_nolrz">Matikan LRZ Turnip (perbaiki bintik hitam, gambar berkedip)</string>
+    <string name="agvn_fix_turnip_noubwc">Matikan kompresi gambar UBWC Turnip (perbaiki area hitam, garis, warna salah)</string>
+    <string name="agvn_fix_async_off">Matikan DXVK async (tidak berkedip lagi, awalnya mungkin lebih tersendat)</string>
+    <string name="agvn_fix_bcn_full">Dekompres semua texture BCn (perbaiki texture hitam, gambar hilang)</string>
+    <string name="agvn_fix_unity_quality_own">Biarkan game Unity memilih kualitas gambar sendiri</string>
+    <string name="agvn_fix_audio">Ganti cara memutar suara ke %1$s</string>
+    <string name="agvn_fix_locale_ja">Jalankan game dalam bahasa Jepang (perbaiki teks rusak di game Jepang)</string>
+    <string name="agvn_fix_locale_zh">Jalankan game dalam bahasa Mandarin (perbaiki teks rusak di game Tiongkok)</string>
+    <string name="agvn_fix_godot_light">Mode Ringan: jalankan game Godot langsung di Android, tanpa Wine (jauh lebih lancar)</string>
+    <string name="agvn_fix_media_old">Baca video dengan cara lama Wine (untuk video yang belum bisa dibuka Wine, seperti MP4 dengan audio MP3)</string>
+    <string name="agvn_fix_page_light">Mode Ringan: jalankan halaman game (Electron, NW.js) langsung di Android, tanpa Wine (jauh lebih lancar)</string>
+    <string name="agvn_fix_rgss_light">Mode Ringan: jalankan game RPG Maker langsung di Android, tanpa Wine (jauh lebih lancar)</string>
+    <string name="agvn_fix_godot_light_gl">Game Godot (Mode Ringan) menggambar dengan OpenGL</string>
+    <string name="agvn_fix_godot_light_vulkan">Game Godot (Mode Ringan) menggambar dengan Vulkan</string>
+    <string name="agvn_fix_mods_off">Jalankan game tanpa mod (%1$s), seperti versi asli; file game tetap utuh</string>
+    <string name="agvn_fix_dll_wine">Pakai %1$s dari Wine, bukan versi bawaan game (cheat atau mod di file ini tidak akan jalan; file game tetap utuh)</string>
+    <string name="agvn_fix_raw_mouse">Kirim sentuhan seperti mouse asli (untuk game yang hanya membaca mouse asli, seperti game Unity dengan Input System)</string>
+    <string name="agvn_fix_raw_mouse_off">Kirim sentuhan seperti sebelumnya (seperti game lain)</string>
+    <string name="agvn_fix_exe64">Jalankan versi 64-bit game (%1$s), bukan versi 32-bit</string>
+    <string name="agvn_fix_exe_main">Jalankan file utama game (%1$s), bukan peluncur game (.NET)</string>
+    <string name="agvn_fix_renpy_light">Coba \"Mode Ringan\" (Ren\'Py 8) untuk game Ren\'Py 7; save terpisah, disalin dari versi Windows</string>
+    <string name="agvn_fix_renpy_angle">Ren\'Py menggambar dengan ANGLE (Direct3D), bukan OpenGL</string>
+    <string name="agvn_fix_gdiplus_text">Perbaiki tampilan huruf Vietnam di .NET (taruh mlang.dll yang sudah ditambal di samping file exe game)</string>
+</resources>

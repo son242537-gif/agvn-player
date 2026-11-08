@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN: the other way to install the update (agvn/AgvnUpdateRetry, AgvnSessionInstall). Copyright (c) 2026 agvn.io — MIT License. -->
+<resources>
+    <string name="agvn_update_retry_title">Versi baru belum terpasang</string>
+    <string name="agvn_update_retry_session">Ponsel belum memasang versi baru. Jika penginstal ponsel menampilkan error (seperti \"Parsing failed\" atau \"APK contains no signature files\"), AGVN Player bisa memasang dengan cara lain: aplikasi sendiri yang menyerahkan file yang sudah diperiksa ke Android. Android tetap bertanya kepada Anda sebelum memasang.</string>
+    <string name="agvn_update_retry_installer">Ponsel belum memasang versi baru. AGVN Player bisa membuka penginstal ponsel untuk memasang file yang sudah diperiksa. Android tetap bertanya kepada Anda sebelum memasang.</string>
+    <string name="agvn_update_retry_now">Pasang dengan cara lain</string>
+    <string name="agvn_update_session_writing">Menyiapkan pemasangan versi baru…</string>
+</resources>

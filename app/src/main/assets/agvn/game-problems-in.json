@@ -1,0 +1,316 @@
+{
+  "problems": {
+    "light-script-error": {
+      "title": "Game error saat Mode Ringan",
+      "cause": "Game melaporkan error: {error}. Jika game berhenti atau berjalan tidak benar, versi Windows game biasanya bisa berjalan."
+    },
+    "light-page-crash": {
+      "title": "Halaman game tertutup di tengah jalan",
+      "cause": "Bagian yang menjalankan game HTML (WebView Android) tertutup saat bermain, biasanya karena RAM ponsel habis."
+    },
+    "light-frozen": {
+      "title": "Game macet saat Mode Ringan",
+      "cause": "Game ({runner}) tidak merespons cukup lama sehingga Android menutupnya."
+    },
+    "light-crash": {
+      "title": "Game tiba-tiba tertutup saat Mode Ringan",
+      "cause": "Penjalan game {runner} error dan tertutup ({crash})."
+    },
+    "steam": {
+      "title": "Game butuh Steam",
+      "cause": "Versi game ini hanya berjalan jika ada Steam (file {1} tidak ada). AGVN tidak bisa menjalankan Steam, jadi perlu versi game yang tidak meminta Steam."
+    },
+    "missing-dll": {
+      "title": "Game kekurangan file {1}",
+      "cause": "Game butuh file {1} tetapi tidak menemukannya. Biasanya karena folder game belum tersalin lengkap, atau game butuh komponen Windows yang belum aktif."
+    },
+    "bad-dll": {
+      "title": "File {1} dari game tidak bisa dipakai",
+      "cause": "File {1} rusak atau versi 32-bit/64-bit-nya tidak cocok dengan game. Salin ulang folder game dari versi aslinya."
+    },
+    "dll-function": {
+      "title": "File {1} kekurangan fungsi",
+      "cause": "Game berhenti karena ada program yang memanggil fungsi di {1} yang tidak ada di versi {1} yang sedang dipakai. Jika {1} ada di samping file exe game, biasanya itu file dari tabel cheat atau mod, yang hanya meneruskan beberapa fungsi yang dipanggil game, sedangkan Wine butuh fungsi lain. Dengan {1} dari Wine game bisa berjalan, tetapi cheat atau mod di file itu tidak akan jalan."
+    },
+    "dotnet": {
+      "title": "Game butuh .NET",
+      "cause": "File exe game, atau program yang dibukanya, ditulis dengan .NET (C#). Wine butuh runtime .NET (Wine Mono) untuk membukanya, dan versi Wine yang dipakai game belum memilikinya. Jika file itu hanya peluncur game dan folder masih berisi file exe utama game, tombol \"Jalankan file utama game\" langsung membuka file itu, tanpa .NET. Jika tidak ada tombol itu, Anda juga bisa menambahkan ulang game dengan file exe utamanya: \"Tambah game\" → \"Pilih file .exe sendiri (lanjutan)\"."
+    },
+    "dotnet-load": {
+      "title": "Wine belum bisa menjalankan bagian .NET game",
+      "cause": "File exe game, atau program yang dibukanya, ditulis dengan .NET (C#), tetapi Wine tidak bisa memuat runtime .NET (Wine Mono) untuk program ini: program .NET 64-bit belum bisa berjalan di ponsel, jadi program langsung tertutup tanpa menampilkan apa pun. Jika itu hanya peluncur game dan folder masih berisi file exe utama game, tombol \"Jalankan file utama game\" langsung membuka file itu. Jika tidak ada tombol itu, tambahkan ulang game dengan file exe utamanya: \"Tambah game\" → \"Pilih file .exe sendiri (lanjutan)\"."
+    },
+    "godot-renderer-bad": {
+      "title": "Game Godot tidak bisa berjalan dengan cara render yang diubah",
+      "cause": "Cara render yang diubah aplikasi untuk game Godot ini (Vulkan atau Direct3D 11) tidak cocok dengan versi Godot game."
+    },
+    "godot-vulkan-crash": {
+      "title": "Driver grafis error saat game Godot menggambar",
+      "cause": "Driver grafis ponsel error saat game memintanya merender dengan Vulkan, jadi Wine menampilkan kotak \"Assertion failed!\" lalu menutup game. Masalahnya bukan di game. Mengganti cara render game Godot bisa menghindari error ini. Di ponsel dengan GPU Mali, error juga bisa berasal dari langkah aplikasi memperbaiki shader untuk Mali."
+    },
+    "vulkan-crash": {
+      "title": "Driver grafis error saat game menggambar",
+      "cause": "Driver grafis ponsel error saat game memintanya merender dengan Vulkan, jadi Wine menampilkan kotak \"Assertion failed!\" lalu menutup game. Masalahnya bukan di game: biasanya versi DXVK atau driver yang dipilih belum cocok dengan GPU ini. Di ponsel dengan GPU Mali, error juga bisa berasal dari langkah aplikasi memperbaiki shader untuk Mali: matikan satu per satu untuk mencoba."
+    },
+    "godot-gl-angle": {
+      "title": "Game Godot tidak bisa membuka OpenGL maupun Direct3D 11",
+      "cause": "Game Godot ini sudah mencoba OpenGL 3.3 dan Direct3D 11 (ANGLE), tetapi ponsel Anda belum bisa menjalankan keduanya."
+    },
+    "godot-opengl": {
+      "title": "Game Godot tidak bisa membuka OpenGL",
+      "cause": "Ponsel Anda belum bisa menjalankan OpenGL 3.3 yang dibutuhkan game Godot ini."
+    },
+    "godot-vulkan": {
+      "title": "Game Godot tidak bisa membuka Vulkan",
+      "cause": "Ponsel Anda belum bisa menjalankan Vulkan seperti yang dibutuhkan game Godot ini."
+    },
+    "godot-switch-failed": {
+      "title": "Game Godot tertutup sendiri setelah cara render diganti",
+      "cause": "Sebelumnya aplikasi mengganti cara render game Godot ini untuk menghindari error. Kali ini game tertutup sendiri kurang dari satu menit setelah dibuka, jadi cara render itu belum cocok dengan ponsel Anda."
+    },
+    "godot-gl-crash": {
+      "title": "Game Godot tertutup saat menggambar",
+      "cause": "GPU ponsel tidak bisa menggambar salah satu adegan OpenGL game sehingga game tertutup sendiri. Zink (bagian yang mengubah OpenGL ke Vulkan) kekurangan beberapa fitur di sebagian GPU, terutama Mali. Mengganti cara render game Godot bisa menghindari error ini."
+    },
+    "wine-rpc-crash": {
+      "title": "Wine error saat game memanggil layanan Windows",
+      "cause": "Game mengalami error memori di bagian Wine yang menangani panggilan layanan Windows (RPC), saat game meminta daftar layanan. Setelah error itu game tertahan di layar hitam lalu tertutup, walau RAM ponsel tidak habis. Ini error dari versi Wine yang dipakai di chip ARM, bukan dari game. Wine lama (Proton 9) menangani bagian ini dengan cara lain."
+    },
+    "movie-transcode": {
+      "title": "Wine tidak bisa membuka video dalam game",
+      "cause": "Game memutar video (biasanya saat pergantian adegan) yang tidak bisa didekode sendiri oleh cara baca video baru Wine, paling sering video MP4 dengan audio MP3. Wine lalu butuh transcoder Steam, yang tidak ada di luar Steam, jadi video tidak terbuka dan game bisa tertahan di layar hitam menunggu video selesai. Masalahnya ada di Wine aplikasi, bukan di game. Cara baca video lama Wine bisa mendekode jenis video ini."
+    },
+    "deadlock": {
+      "title": "Game terkunci (deadlock), membeku",
+      "cause": "Thread-thread game saling menunggu tanpa akhir: satu thread memegang kunci tanpa melepasnya, thread utama menunggu kunci itu lebih dari 1 menit sehingga game membeku (biasanya saat memuat adegan, layar hitam). Ini bukan kerusakan data game: masalahnya ada di cara emulator CPU atau Wine menjalankan thread game di ponsel. Tiap perbaikan di bawah membuat game sedikit lebih lambat, jadi aplikasi hanya menyarankannya saat game terkunci."
+    },
+    "swapchain-frozen": {
+      "title": "Game membeku tepat setelah mengganti mode gambar",
+      "cause": "Game baru saja mengganti resolusi atau mengaktifkan vsync (DXVK membangun ulang swapchain, biasanya saat masuk menu), lalu tidak menggambar frame lagi dan diam: game menunggu layar memberi tahu bahwa frame sebelumnya sudah tampil, tetapi pemberitahuan itu tidak pernah datang. Dengan Present Wait dimatikan, game tidak menunggu pemberitahuan ini lagi. Jika belum berhasil, \"Sinkron frame\" membuat game menunggu tiap frame dengan cara lain."
+    },
+    "dxvk-map-32": {
+      "title": "Versi 32-bit game tidak bisa memakai memori grafis",
+      "cause": "Game sedang menjalankan versi 32-bit. Dengan driver grafis yang dipilih, DXVK (bagian yang mengubah DirectX ke Vulkan) tidak bisa memberikan memori grafis ke program 32-bit, jadi DirectX tidak bisa dibuat dan game tidak bisa menggambar apa pun, walau jendelanya tetap terbuka. Game Ren'Py juga begitu: saat OpenGL tidak berjalan, game menggambar dengan DirectX. Versi 64-bit game, jika ada, tidak punya batasan ini. Mengganti versi DXVK tidak membantu."
+    },
+    "gpu-refused": {
+      "title": "Driver grafis tidak memberi memori ke game, padahal masih ada",
+      "cause": "DXVK (bagian yang mengubah DirectX ke Vulkan) meminta memori grafis untuk game tetapi driver menolak, walau memori grafis masih banyak kosong. Game tidak bisa menggambar sehingga membeku atau tertutup sendiri, kadang dengan error \"CreateTexture2D … E_INVALIDARG\". Paling sering ini texture yang ditandai game sebagai \"berbagi\" (agar bisa dibaca program lain), jenis memori yang tidak bisa diberikan driver yang dipilih. Dengan memori berbagi dimatikan, DXVK membuat texture biasa, dan game tetap menggambar seperti biasa. Game tidak rusak dan ponsel tidak kehabisan memori, jadi menurunkan Grafis tidak membantu."
+    },
+    "dx11-features": {
+      "title": "Driver grafis kekurangan fitur DirectX 11 yang dibutuhkan game",
+      "cause": "DXVK (bagian yang mengubah DirectX ke Vulkan) tidak bisa membuat DirectX 11 untuk game: driver grafis yang dipilih kekurangan fitur yang dibutuhkan game, seperti gambar wireframe atau geometry shader. Mengganti versi DXVK tidak membantu. Jika tidak ada tombol lain selain \"Kirim log\", ponsel ini tidak bisa menjalankan game DirectX 11 ini."
+    },
+    "dxvk-no-adapter": {
+      "title": "Ponsel tidak bisa membuat DirectX untuk game",
+      "cause": "DXVK (bagian yang mengubah DirectX ke Vulkan) tidak menemukan GPU yang bisa dipakai dengan versi DXVK dan driver yang dipilih."
+    },
+    "opengl-unavailable": {
+      "title": "Ponsel tidak bisa menjalankan OpenGL dengan driver grafis ini",
+      "cause": "Zink (bagian yang mengubah OpenGL ke Vulkan) tidak bisa berjalan dengan driver grafis yang dipilih, jadi game OpenGL dan WineD3D (cara menggambar DirectX dengan OpenGL) tidak bisa menggambar apa pun. Mulai sekarang aplikasi tidak lagi menyarankan WineD3D di ponsel ini dengan driver ini."
+    },
+    "d3d11-level": {
+      "title": "Game butuh DirectX 11 level {1}",
+      "cause": "Game (Unreal Engine) butuh GPU dengan DirectX 11 level {1}, sedangkan cara render yang dipilih belum mencapai level itu. Game tidak rusak: DXVK (DirectX lewat Vulkan) atau WineD3D (DirectX lewat OpenGL), dengan driver grafis yang dipilih, kekurangan fitur yang dibutuhkan game, seperti tessellation. Jika game berjalan dengan WineD3D, pakai lagi DXVK. Jika berjalan dengan DXVK, hanya driver lain yang mungkin membantu, karena semua versi DXVK butuh fitur itu. Jika tidak ada tombol lain selain \"Kirim log\", ponsel ini belum bisa menjalankan game ini."
+    },
+    "ue-render-timeout": {
+      "title": "Game Unreal berhenti sendiri karena terlalu lama menunggu render",
+      "cause": "Game Unreal berhenti sendiri (\"GameThread timed out waiting for RenderThread\") saat bagian render sibuk terus selama 120 detik, biasanya saat memuat atau membangun shader dan texture pertama kali di ponsel yang lambat. Game tidak rusak: jika game dibiarkan menunggu lebih lama, game lanjut memuat, walau layar mungkin masih hitam sebentar."
+    },
+    "directx": {
+      "title": "Game bilang DirectX tidak ada",
+      "cause": "Game tidak bisa membuat DirectX di ponsel Anda dengan versi DXVK dan driver grafis yang dipilih."
+    },
+    "dxvk-view": {
+      "title": "Game tertutup karena DXVK tidak bisa membaca texture terkompresi",
+      "cause": "DXVK (DirectX lewat Vulkan) tidak bisa membaca beberapa texture terkompresi game (jenis BCn, seperti DXT) dengan driver grafis yang dipilih, jadi game tertutup sendiri; game Unreal melaporkan \"CreateShaderResourceView … E_INVALIDARG\". Pada GPU yang tidak bisa membaca BCn sendiri, seperti Mali, aplikasi mendekompres texture ini, tetapi DXVK 2.x bertanya ke driver dengan cara baru yang belum dijawab lengkap oleh bagian dekompresi. DXVK 1.10.3 bertanya dengan cara lama sehingga tidak mengalami error ini. Game tidak rusak."
+    },
+    "ue-crash-box": {
+      "title": "Game Unreal menampilkan error lalu tertutup sendiri",
+      "cause": "Game Unreal menampilkan kotak \"… Game has crashed and will close\" lalu tertutup saat OK ditekan. Pesan errornya ada di kotak itu dan belum bisa dibaca aplikasi: tangkapan layar kotak itu membantu AGVN tahu errornya. Biasanya DXVK (DirectX lewat Vulkan) atau driver grafis yang dipilih belum cocok dengan game."
+    },
+    "opengl-crash": {
+      "title": "Game tertutup saat menggambar",
+      "cause": "GPU ponsel tidak bisa menggambar salah satu adegan OpenGL game sehingga game tertutup sendiri. Zink (bagian yang mengubah OpenGL ke Vulkan) kekurangan beberapa fitur di sebagian GPU, terutama Mali."
+    },
+    "gpu-lost": {
+      "title": "Driver grafis error saat menjalankan game",
+      "cause": "GPU ponsel berhenti di tengah jalan saat menggambar game: driver menemui adegan yang tidak bisa digambarnya."
+    },
+    "gpu-memory": {
+      "title": "Game kehabisan memori grafis",
+      "cause": "Game butuh memori grafis lebih banyak daripada yang masih kosong di ponsel Anda. Mulai pembukaan berikutnya, aplikasi otomatis memakai tingkat hemat RAM tertinggi yang dimiliki game ini."
+    },
+    "memory": {
+      "title": "Game kehabisan RAM",
+      "cause": "Game butuh RAM lebih banyak daripada yang masih kosong di ponsel Anda. Mulai pembukaan berikutnya, aplikasi otomatis memakai tingkat hemat RAM tertinggi yang dimiliki game ini."
+    },
+    "corrupt-files": {
+      "title": "File game rusak",
+      "cause": "Salah satu file game rusak atau belum selesai disalin. Salin ulang folder game dari versi aslinya."
+    },
+    "file-not-found": {
+      "title": "File game tidak ditemukan",
+      "cause": "Wine melaporkan \"File not found.\": file exe game, atau file yang dibutuhkan game, sudah tidak ada di tempat semula. Jika Anda baru saja mengganti nama, memindahkan, atau menghapus folder game, salin lagi folder itu lalu tambahkan ulang game ke pustaka."
+    },
+    "dll-no-access": {
+      "title": "Game tidak bisa membuka pustaka DLL-nya",
+      "cause": "Game melaporkan \"No access to memory location.\" saat membuka salah satu pustaka (DLL) miliknya, seperti RGSS301.dll dari RPG Maker VX Ace, lalu berhenti. Masalahnya bukan di game: biasanya karena folder game ada di penyimpanan bersama ponsel (Download), tempat Android tidak mengizinkan kode dijalankan langsung dari file, sedangkan Wine baru (Proton 10) membuka pustaka itu dengan cara yang butuh izin ini. Game RPG Maker XP/VX/VX Ace bisa berjalan dengan \"Mode Ringan\", tanpa Wine; untuk game lain coba Wine lama (Proton 9), yang menyalin pustaka ke memori sebelum dijalankan."
+    },
+    "bad-exe": {
+      "title": "Format file exe game salah",
+      "cause": "Wine melaporkan \"Bad EXE format\": file yang dibuka bukan program Windows yang bisa dijalankan Wine. File mungkin rusak atau belum selesai disalin, program yang sangat lama (16-bit atau DOS), atau bukan file exe game. Salin ulang folder game dari versi aslinya, atau tambahkan ulang game dengan file exe yang benar: \"Tambah game\" → \"Pilih file .exe sendiri (lanjutan)\"."
+    },
+    "killed-low-memory-saved": {
+      "title": "RAM ponsel habis sehingga game ditutup",
+      "cause": "Android menutup game saat sedang dimainkan karena RAM ponsel Anda habis, walau game sudah berjalan dengan tingkat hemat RAM tertinggi yang bisa diberikan aplikasi untuk game ini. Menurunkan Grafis lagi juga tidak banyak menghemat RAM. Sebelum main, tutup aplikasi lain atau mulai ulang ponsel. Jika masih terjadi, game ini butuh RAM lebih banyak daripada yang masih kosong di ponsel Anda."
+    },
+    "killed-low-memory": {
+      "title": "RAM ponsel habis sehingga game ditutup",
+      "cause": "Android menutup game saat sedang dimainkan karena RAM ponsel Anda habis. Mulai pembukaan berikutnya, aplikasi otomatis memakai tingkat hemat RAM tertinggi yang dimiliki game ini."
+    },
+    "killed-background": {
+      "title": "Ponsel menutup game saat Anda berpindah aplikasi",
+      "cause": "Saat Anda berpindah ke aplikasi lain, sistem menutup game untuk menghemat baterai atau RAM. Izinkan AGVN berjalan di latar belakang tanpa batasan agar game tetap terbuka."
+    },
+    "emulator-noexec-crt": {
+      "title": "Emulator 32-bit tidak bisa menjalankan kode game",
+      "cause": "Game error ({crash}). Emulator CPU 32-bit menganggap kode itu tidak boleh dijalankan, padahal itu kode dari pustaka {1} bawaan game dan di Windows berjalan normal. Masalahnya ada di emulator di ponsel, bukan di data game. Wine punya versi {1} sendiri; WOWBox64 adalah emulator 32-bit lain yang tersedia di aplikasi."
+    },
+    "emulator-noexec": {
+      "title": "Emulator 32-bit tidak bisa menjalankan kode game",
+      "cause": "Game error ({crash}). Emulator CPU 32-bit menganggap kode game itu tidak boleh dijalankan, padahal di Windows berjalan normal. Masalahnya ada di emulator di ponsel, bukan di data game. WOWBox64 adalah emulator 32-bit lain yang tersedia di aplikasi."
+    },
+    "crash-after-change": {
+      "title": "Game error dengan konfigurasi baru",
+      "cause": "Sebelumnya game bisa berjalan. Setelah konfigurasi diubah, game error dan tertutup sendiri ({crash})."
+    },
+    "dotnet-crash": {
+      "title": "Game .NET error dan tertutup sendiri",
+      "cause": "Game yang ditulis dengan .NET (C#) tertutup karena error ({crash}). Di Wine aplikasi, bagian penggambar teks .NET (GDI+) punya bug: huruf Vietnam beraksen yang berdiri sendiri atau di akhir teks (seperti \"ắ\", \"ệ\") membuat game langsung tertutup, biasanya di layar pertama yang berisi teks Vietnam, dan log Wine tidak mencatat apa pun. Tombol \"Perbaiki tampilan huruf Vietnam di .NET\" menaruh file mlang.dll yang sudah ditambal di samping file exe game; jika masih error, aplikasi menghapus file itu sendiri. Jika Anda sendiri yang baru keluar dari game, abaikan pemberitahuan ini."
+    },
+    "unity-crash": {
+      "title": "Game error dan membeku",
+      "cause": "Game crash saat berjalan ({crash}). Unity, engine game ini, menangkap error ini sendiri sehingga game biasanya membeku, bukan tertutup. Jika Anda sendiri yang baru keluar dari game, abaikan pemberitahuan ini."
+    },
+    "crash": {
+      "title": "Game error dan tertutup sendiri",
+      "cause": "Game mengalami error saat berjalan ({crash})."
+    },
+    "low-ram-saved": {
+      "title": "Game tertutup sendiri saat RAM ponsel hampir habis",
+      "cause": "Game tertutup saat RAM kosong ponsel tinggal {free} MB, walau game sudah berjalan dengan tingkat hemat RAM tertinggi yang bisa diberikan aplikasi untuk game ini. Menurunkan Grafis lagi juga tidak banyak menghemat RAM. Sebelum main, tutup aplikasi lain atau mulai ulang ponsel, dan sering-seringlah menyimpan game. Jika masih terjadi, game ini butuh RAM lebih banyak daripada yang masih kosong di ponsel Anda. Jika Anda sendiri yang baru keluar dari game, abaikan pemberitahuan ini."
+    },
+    "low-ram-end": {
+      "title": "Game tertutup sendiri saat RAM ponsel hampir habis",
+      "cause": "Game tertutup saat RAM kosong ponsel tinggal {free} MB, kemungkinan besar karena RAM ponsel habis sehingga game ditutup. Sebelum main, tutup aplikasi lain atau mulai ulang ponsel, dan sering-seringlah menyimpan game. Mulai pembukaan berikutnya, aplikasi otomatis memakai tingkat hemat RAM tertinggi yang dimiliki game ini. Jika Anda sendiri yang baru keluar dari game, abaikan pemberitahuan ini."
+    },
+    "not-a-game": {
+      "title": "Game dibuka dengan {exe}, bukan file exe game",
+      "cause": "{exe} adalah program pendukung bawaan game (pelapor error, pemasang pustaka, atau uninstaller), bukan game: program itu terbuka lalu tertutup sendiri tanpa menampilkan apa pun. Folder game tidak berisi file exe utama yang bisa dibuka aplikasi sebagai gantinya (game Unity: <Nama game>.exe ada di samping folder <Nama game>_Data). File itu mungkin dihapus antivirus, atau folder belum tersalin lengkap. Salin ulang folder game selengkapnya dari versi aslinya, lalu tambahkan ulang game dengan \"Tambah game\"."
+    },
+    "chromium-closed": {
+      "title": "Game tertutup sendiri begitu dibuka, tanpa tampilan apa pun",
+      "cause": "Game ini adalah halaman web yang berjalan di Chromium (Electron atau NW.js). Lewat Windows, Chromium berjalan dengan Wine dan emulator CPU, dan ada versi Chromium yang bisa membuka halaman lalu tertutup semua setelah beberapa detik, tanpa pesan error (sebuah game Electron 44, Snapdragon 8 Elite). \"Mode Ringan\" membuka halaman itu langsung di browser ponsel, tanpa Windows, biasanya jauh lebih ringan. Save \"Mode Ringan\" dan save Windows tidak dipakai bersama. Bagian game yang dikerjakan proses utama Electron (Steam, menyimpan lewat proses itu) mungkin tidak jalan; jika begitu, \"Perbaikan Otomatis\" menjalankan ulang dengan Windows. Jika Anda sendiri yang baru keluar dari game, abaikan pemberitahuan ini."
+    },
+    "closed-on-start": {
+      "title": "Game tertutup sendiri begitu tampil",
+      "cause": "Game selesai dimuat, baru tampil kurang dari 10 detik lalu tertutup sendiri walau Anda belum menekan apa pun, dan tanpa pesan error. Biasanya game error tepat saat mulai berjalan. Contohnya The Agnietta: emulator CPU 32-bit (FEXCore) tidak bisa menjalankan sebagian kode game, tetapi game menangkap error itu sendiri sehingga Wine tidak mencatatnya. Jika Anda sendiri yang baru keluar dari game, abaikan pemberitahuan ini."
+    },
+    "chromium-frozen": {
+      "title": "Game tertahan di halaman pertama atau layar memuat",
+      "cause": "Game ini adalah halaman web yang berjalan di Chromium (Electron atau NW.js). Lewat Windows, Chromium berjalan dengan Wine dan emulator CPU, jadi sangat berat dan bisa tertahan terus di halaman pertama atau bilah memuat: gambar tidak berubah walau Anda menekan. Ada game Electron yang macet di Wine lama (Proton 9) tetapi berjalan di Wine baru (Proton 10), termasuk bagian Steam; pertama kali aplikasi memasang Wine baru, butuh sekitar satu menit. \"Mode Ringan\" membuka halaman itu langsung di browser ponsel, tanpa Windows. Bagian game yang dikerjakan proses utama Electron (Steam, menyimpan lewat proses itu) mungkin tidak jalan; jika begitu, \"Perbaikan Otomatis\" menjalankan ulang dengan Windows."
+    },
+    "wine-gone": {
+      "title": "Wine tidak bisa dimulai",
+      "cause": "Wine berhenti tepat saat dibuka, sebelum game sempat berjalan: inti Wine (wineserver) memutus koneksi dengan program pertama. Masalahnya bukan di game, jadi mengganti resolusi atau konfigurasi grafis game tidak membantu. Mematikan esync, atau menjalankan dengan Wine lain (container lain, dengan inti sendiri), bisa membantu. Jika semua game mengalami hal yang sama, paksa berhenti aplikasi atau mulai ulang ponsel lalu coba lagi."
+    },
+    "godot-no-start": {
+      "title": "Game Godot langsung tertutup setelah dibuka",
+      "cause": "Game Godot tertutup sebelum tampil. Penyebab paling umum adalah ponsel belum bisa menjalankan OpenGL 3.3 yang dibutuhkan game."
+    },
+    "low-resolution": {
+      "title": "Game tidak mau berjalan di resolusi {screen}",
+      "cause": "Layar game saat ini {screen}, lebih kecil dari tingkat Rendah (854×480). Banyak game tidak mau berjalan di layar sekecil itu dan melaporkan \"resolution is too low\"."
+    },
+    "no-start-after-change": {
+      "title": "Game tidak berjalan dengan konfigurasi baru",
+      "cause": "Sebelumnya game bisa berjalan. Setelah konfigurasi diubah, game langsung tertutup saat dibuka."
+    },
+    "no-start": {
+      "title": "Game langsung tertutup setelah dibuka",
+      "cause": "Game tertutup sebelum tampil dan tidak meninggalkan error yang bisa dibaca aplikasi."
+    },
+    "gpu-tiler": {
+      "title": "GPU kehabisan memori render",
+      "cause": "Driver GPU berkali-kali melaporkan memori render habis (Mali: TILER_HEAP_OOM). Setiap kali itu terjadi, GPU harus menggambar frame dalam beberapa bagian, jadi game tersendat beberapa detik, kadang layar hitam. Mulai pembukaan berikutnya, aplikasi memakai tingkat hemat RAM tertinggi untuk game ini. Menurunkan Grafis (layar game lebih kecil) atau menurunkan kualitas gambar di dalam game juga membantu."
+    },
+    "slow-gpu": {
+      "title": "Game berjalan lambat{speed}",
+      "cause": "Yang terjadi di ponsel Anda: GPU bekerja penuh ({gpu}%) tetapi tetap tidak sempat menggambar."
+    },
+    "slow-cpu": {
+      "title": "Game berjalan lambat{speed}",
+      "cause": "Yang terjadi di ponsel Anda: CPU kelebihan beban (satu inti berjalan {cpu}%) sehingga tidak sanggup mengikuti game."
+    },
+    "slow": {
+      "title": "Game berjalan lambat{speed}",
+      "cause": "Ponsel tidak mengizinkan aplikasi membaca tingkat kesibukan GPU. CPU tidak kelebihan beban, jadi kemungkinan besar GPU sedang bekerja penuh."
+    },
+    "slow-unknown": {
+      "title": "Game berjalan lambat{speed}",
+      "cause": "Ponsel tidak memberi tahu aplikasi apakah GPU atau CPU yang kelebihan beban. Biasanya GPU, karena game harus menggambar lebih banyak daripada kemampuan ponsel."
+    },
+    "power-save": {
+      "title": "Penghemat Baterai sedang aktif",
+      "cause": "Ponsel Anda sedang mengaktifkan Penghemat Baterai: kecepatan CPU diturunkan sehingga game berjalan jauh lebih lambat."
+    },
+    "report-flicker": {
+      "title": "Gambar berkedip-kedip",
+      "cause": "Gambar berkedip biasanya karena DXVK menampilkan gambar sebelum selesai dirender (async), karena frame belum sinkron dengan layar, atau karena cara Turnip menggambar layar per bagian."
+    },
+    "report-artifacts": {
+      "title": "Gambar ada bintik hitam, area hitam, garis, atau warna salah",
+      "cause": "Bintik hitam dan area hitam biasanya karena driver grafis salah menggambar satu langkah (buffer kedalaman LRZ, kompresi gambar UBWC, atau memori tile Turnip), karena texture terkompresi yang tidak bisa dibaca GPU, atau karena versi DXVK belum cocok dengan driver."
+    },
+    "report-black": {
+      "title": "Layar hitam padahal game masih berjalan",
+      "cause": "Game masih berjalan (ada suara, ada respons) tetapi tidak tampil: biasanya karena frame tidak dikirim ke layar, karena Turnip salah menggambar, atau karena layar game terlalu kecil."
+    },
+    "report-slow": {
+      "title": "Game lambat, tersendat, lag",
+      "cause": "Game lambat saat GPU atau CPU ponsel tidak sanggup mengikuti. Menurunkan Grafis meringankan kerja GPU; DXVK yang berjalan langsung di chip ARM dan emulator CPU yang lebih cepat meringankan kerja CPU."
+    },
+    "report-freeze": {
+      "title": "Game membeku, macet",
+      "cause": "Game membeku biasanya karena emulator CPU menjalankan kode game dengan urutan yang belum benar, karena DXVK merender async, karena versi DXVK atau driver belum cocok dengan game, atau karena mod game (BepInEx, MelonLoader, UE4SS)."
+    },
+    "report-crash": {
+      "title": "Game tertutup sendiri, keluar tiba-tiba",
+      "cause": "Game keluar tiba-tiba biasanya karena emulator CPU, versi DXVK, atau driver grafis belum cocok dengan game, atau karena mod game. Untuk game Unity di Grafis Rendah atau Super ringan, tingkat kualitas terendah yang dipasang aplikasi untuk game juga bisa membuat game error."
+    },
+    "report-sound": {
+      "title": "Tidak ada suara, suara kresek atau putus-putus",
+      "cause": "Suara bermasalah biasanya karena cara Wine memutar suara belum cocok dengan ponsel: aplikasi beralih antara PulseAudio dan ALSA."
+    },
+    "report-text": {
+      "title": "Teks rusak, kotak-kotak, karakter aneh",
+      "cause": "Game Jepang atau Tiongkok harus dijalankan dengan bahasa game itu agar teksnya bisa tampil; jika bahasanya salah, teks berubah jadi kotak-kotak atau karakter aneh."
+    },
+    "report-blurry": {
+      "title": "Gambar buram, pecah, atau terlalu kecil",
+      "cause": "Layar game lebih kecil dari layar ponsel sehingga gambar diperbesar, jadi buram atau pecah. Naikkan Grafis agar layar game lebih besar (ponsel sedikit lebih panas)."
+    },
+    "report-animation": {
+      "title": "Animasi, video, atau efek tidak berjalan",
+      "cause": "Animasi, video, atau efek yang diam atau tidak tampil biasanya karena cara render (renderer) atau driver grafis tidak bisa menggambar efek itu, karena DXVK async melewati adegan yang belum selesai dirender, atau karena Grafis rendah membuat game mematikan sebagian efek. Game Godot bisa berjalan langsung di Android (Mode Ringan) atau mengganti cara render."
+    },
+    "report-touch": {
+      "title": "Sentuhan, tekanan tidak berfungsi",
+      "cause": "Game masih berjalan tetapi tidak menerima sentuhan: tidak bisa menekan tombol atau memilih menu. Ada game yang hanya membaca mouse asli (raw input), seperti game Unity dengan Input System; aplikasi bisa mengirim sentuhan dengan cara itu. Jika hanya tombol layar yang tidak berfungsi, pilih set tombol lain di \"Atur tombol layar\"."
+    },
+    "report-other": {
+      "title": "Masalah lain",
+      "cause": "Aplikasi mencoba cara umum: pakai lagi konfigurasi yang pernah berjalan, kembali ke konfigurasi asli, emulator CPU yang lebih stabil, ganti DXVK dan driver."
+    }
+  }
+}

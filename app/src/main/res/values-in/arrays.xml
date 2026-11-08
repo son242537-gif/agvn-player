@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="binding_type_entries">
+        <item>Keyboard</item>
+        <item>Mouse</item>
+        <item>Kontroler</item>
+    </string-array>
+    <string-array name="dxvk_max_device_memory_entries">
+        <item>0 (Bawaan)</item>
+        <item>512 MB</item>
+        <item>1024 MB</item>
+        <item>2048 MB</item>
+        <item>4096 MB</item>
+    </string-array>
+    <string-array name="device_memory_entries">
+        <item>0 (Bawaan)</item>
+        <item>512 MB</item>
+        <item>1024 MB</item>
+        <item>2048 MB</item>
+        <item>4096 MB</item>
+        <item>8192 MB</item>
+        <item>12288 MB</item>
+        <item>16384 MB</item>
+    </string-array>
+    <string-array name="dxvk_framerate_entries">
+        <item>0 (Bawaan)</item>
+        <item>20</item>
+        <item>30</item>
+        <item>40</item>
+        <item>50</item>
+        <item>60</item>
+        <item>70</item>
+        <item>80</item>
+        <item>90</item>
+        <item>100</item>
+        <item>110</item>
+        <item>120</item>
+    </string-array>
+    <string-array name="wincomponent_entries">
+        <item>Bawaan (Wine)</item>
+        <item>Asli (Windows)</item>
+    </string-array>
+    <string-array name="desktop_theme_entries">
+        <item>Terang</item>
+        <item>Gelap</item>
+    </string-array>
+    <string-array name="desktop_background_type_entries">
+        <item>Gambar</item>
+        <item>Warna polos</item>
+    </string-array>
+    <string-array name="startup_selection_entries">
+        <item>Normal (muat semua layanan)</item>
+        <item>Penting (hanya muat layanan yang perlu)</item>
+        <item>Minimal (hentikan layanan saat mulai)</item>
+    </string-array>
+    <string-array name="button_options">
+        <item>A</item>
+        <item>B</item>
+        <item>X</item>
+        <item>Y</item>
+        <item>R1 (Bumper kanan)</item>
+        <item>R2 (Trigger kanan)</item>
+        <item>L1 (Bumper kiri)</item>
+        <item>L2 (Trigger kiri)</item>
+        <item>Start</item>
+        <item>Select</item>
+        <item>R3 (Tekan analog kanan)</item>
+        <item>L3 (Tekan analog kiri)</item>
+    </string-array>
+    <string-array name="touchscreenInputModesEntries">
+        <item>Touchpad</item>
+        <item>Simulasi sentuh</item>
+        <item>Sentuh langsung</item>
+    </string-array>
+    <string-array name="transformCapturedPointerEntries">
+        <item>Tidak</item>
+        <item>Putar searah jarum jam</item>
+        <item>Putar berlawanan arah jarum jam</item>
+        <item>Terbalik</item>
+        <item>Otomatis (untuk touchpad)</item>
+    </string-array>
+</resources>
