@@ -39,8 +39,8 @@ public class AgvnGuideStringsTest {
     public void quotedLabelsExistInTheApp() throws Exception {
         Document doc = parse(new File(RES, "agvn_guide_strings.xml"));
         StringBuilder ui = new StringBuilder();
-        for (String name : new String[]{"strings.xml", "agvn_strings.xml", "agvn_ui_strings.xml"})
-            ui.append(read(new File(RES, name)));
+        File[] values = RES.listFiles((dir, name) -> name.endsWith(".xml")); // the app's labels, wherever they are kept
+        if (values != null) for (File f : values) ui.append(read(f));
         appendSources(JAVA, ui);
         String haystack = ui.toString().replace("\\\"", "\"");
         List<String> missing = new ArrayList<>();

@@ -68,7 +68,7 @@ public final class AgvnUpdateStatusActivity extends AppCompatActivity {
         Log.w(TAG, "update session failed: " + status + " " + message);
         AgvnUpdateRetry.sessionFailed(this);
         new AlertDialog.Builder(this)
-                .setMessage(getString(R.string.agvn_update_failed, AgvnSessionInstall.reason(status, message)))
+                .setMessage(getString(R.string.agvn_update_failed, AgvnSessionInstall.reason(this, status, message)))
                 .setPositiveButton(android.R.string.ok, null)
                 .setOnDismissListener(d -> finish())
                 .show();

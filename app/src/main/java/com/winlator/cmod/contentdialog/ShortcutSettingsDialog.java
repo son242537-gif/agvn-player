@@ -546,10 +546,10 @@ public class ShortcutSettingsDialog extends ContentDialog implements DXVKConfigD
                 text.equalsIgnoreCase("Input Controls") ||
                 text.equalsIgnoreCase("Game Controller") ||
                 text.equalsIgnoreCase("System") ||
-                text.equalsIgnoreCase("Chung") ||
-                text.equalsIgnoreCase("Điều khiển") ||
-                text.equalsIgnoreCase("Tay cầm chơi game") ||
-                text.equalsIgnoreCase("Hệ thống") ||
+                text.equalsIgnoreCase(getContext().getString(R.string.general)) ||
+                text.equalsIgnoreCase(getContext().getString(R.string.input_controls)) ||
+                text.equalsIgnoreCase(getContext().getString(R.string.game_controller)) ||
+                text.equalsIgnoreCase(getContext().getString(R.string.system)) ||
                 text.equalsIgnoreCase("vkBasalt");
     }
 

@@ -223,7 +223,7 @@ public class OnboardingActivity extends AppCompatActivity {
                 syncComposeCatalog();
                 if (!success) {
                     Toast.makeText(OnboardingActivity.this,
-                            "Cài thành phần lõi thất bại. Chạm Thử lại để cài lại.", Toast.LENGTH_LONG).show();
+                            R.string.agvn_ui_app_onb_core_install_failed, Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -241,7 +241,7 @@ public class OnboardingActivity extends AppCompatActivity {
         if (installBusy || !coreReady) return;
         installBusy = true;
         composeController.setInstallBusy(BUNDLED_RUNTIME_ID, true);
-        composeController.updateInstallProgress("Đang cài " + BUNDLED_RUNTIME_NAME, -1);
+        composeController.updateInstallProgress(getString(R.string.agvn_ui_app_installing_name, BUNDLED_RUNTIME_NAME), -1);
         io.execute(() -> {
             boolean success;
             try {
@@ -256,7 +256,7 @@ public class OnboardingActivity extends AppCompatActivity {
                 composeController.setInstallBusy(null, false);
                 refreshBundledRuntimeState();
                 syncComposeCatalog();
-                if (!installed) Toast.makeText(this, "Không cài được " + BUNDLED_RUNTIME_NAME + ".", Toast.LENGTH_LONG).show();
+                if (!installed) Toast.makeText(this, getString(R.string.agvn_ui_app_install_failed_name, BUNDLED_RUNTIME_NAME), Toast.LENGTH_LONG).show();
             });
         });
     }
@@ -265,17 +265,17 @@ public class OnboardingActivity extends AppCompatActivity {
         String using = WineRuntimeGuard.getContainerUsing(this, WineInfo.MAIN_WINE_VERSION.identifier());
         if (using != null) {
             new AlertDialog.Builder(this)
-                    .setTitle("Proton đang được dùng")
-                    .setMessage(BUNDLED_RUNTIME_NAME + " không xóa được vì đang được dùng bởi " + using + ".")
+                    .setTitle(R.string.agvn_ui_app_onb_proton_in_use_title)
+                    .setMessage(getString(R.string.agvn_ui_app_onb_remove_blocked, BUNDLED_RUNTIME_NAME, using))
                     .setPositiveButton(android.R.string.ok, null)
                     .show();
             return;
         }
         new AlertDialog.Builder(this)
-                .setTitle("Xóa " + BUNDLED_RUNTIME_NAME + "?")
-                .setMessage("File Proton đi kèm sẽ bị xóa. Bạn có thể cài lại sau.")
+                .setTitle(getString(R.string.agvn_ui_app_onb_remove_name_title, BUNDLED_RUNTIME_NAME))
+                .setMessage(R.string.agvn_ui_app_onb_remove_bundled_proton_message)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton("Xóa", (dialog, which) -> removeBundledRuntime())
+                .setPositiveButton(R.string.agvn_ui_app_delete, (dialog, which) -> removeBundledRuntime())
                 .show();
     }
 
@@ -289,7 +289,7 @@ public class OnboardingActivity extends AppCompatActivity {
                 installBusy = false;
                 composeController.setInstallBusy(null, false);
                 refreshBundledRuntimeState();
-                if (!removed) Toast.makeText(this, BUNDLED_RUNTIME_NAME + " không xóa được.", Toast.LENGTH_LONG).show();
+                if (!removed) Toast.makeText(this, getString(R.string.agvn_ui_app_onb_remove_failed_name, BUNDLED_RUNTIME_NAME), Toast.LENGTH_LONG).show();
             });
         });
     }
@@ -472,7 +472,7 @@ public class OnboardingActivity extends AppCompatActivity {
         installBusy = true;
         String id = componentId(item);
         composeController.setInstallBusy(id, true);
-        composeController.updateInstallProgress("Đang chuẩn bị " + item.name, 0);
+        composeController.updateInstallProgress(getString(R.string.agvn_ui_app_onb_preparing_name, item.name), 0);
         io.execute(() -> {
             File archive = new File(getCacheDir(), "winz-component-" + System.nanoTime());
             try {
@@ -482,7 +482,7 @@ public class OnboardingActivity extends AppCompatActivity {
                     runOnUiThread(() -> finishInstall(id, null));
                 }, error -> runOnUiThread(() -> finishInstall(id, error)));
             } catch (Exception error) {
-                runOnUiThread(() -> finishInstall(id, "Không cài được " + item.name + "."));
+                runOnUiThread(() -> finishInstall(id, getString(R.string.agvn_ui_app_install_failed_name, item.name)));
             } finally {
                 archive.delete();
             }
@@ -495,7 +495,7 @@ public class OnboardingActivity extends AppCompatActivity {
         String id = componentId(item);
         ProtonPackageManager.PackageInfo packageInfo = item.packageInfo;
         composeController.setInstallBusy(id, true);
-        composeController.updateInstallProgress("Đang chuẩn bị " + item.name, 0);
+        composeController.updateInstallProgress(getString(R.string.agvn_ui_app_onb_preparing_name, item.name), 0);
         io.execute(() -> {
             File archive = new File(getCacheDir(), packageInfo.identifier + "-" + System.nanoTime());
             boolean installed = false;
@@ -504,12 +504,12 @@ public class OnboardingActivity extends AppCompatActivity {
                         packageInfo,
                         archive,
                         progress -> postInstallProgress(
-                                "Đang tải " + item.name,
+                                getString(R.string.agvn_ui_app_onb_downloading_name, item.name),
                                 Math.min(70, progress * 70 / 100)
                         )
                 );
                 if (downloaded) {
-                    postInstallProgress("Đang cài " + item.name, 72);
+                    postInstallProgress(getString(R.string.agvn_ui_app_installing_name, item.name), 72);
                     installed = ProtonPackageManager.installPackage(this, packageInfo.identifier, archive);
                 }
             } finally {
@@ -519,7 +519,7 @@ public class OnboardingActivity extends AppCompatActivity {
             final boolean success = installed;
             runOnUiThread(() -> finishInstall(
                     id,
-                    success ? null : "Không cài được " + item.name + "."
+                    success ? null : getString(R.string.agvn_ui_app_install_failed_name, item.name)
             ));
         });
     }
@@ -528,36 +528,36 @@ public class OnboardingActivity extends AppCompatActivity {
 
     private void installContentArchive(Uri uri, String displayName, int startProgress,
                                        Runnable success, FailureCallback failure) {
-        postInstallProgress("Đang cài " + displayName, startProgress);
+        postInstallProgress(getString(R.string.agvn_ui_app_installing_name, displayName), startProgress);
         contentsManager.extraContentFile(uri, archiveProgress -> {
             int progress = archiveProgress < 0
                     ? -1
                     : startProgress + ((92 - startProgress) * archiveProgress / 100);
-            postInstallProgress("Đang cài " + displayName, progress);
+            postInstallProgress(getString(R.string.agvn_ui_app_installing_name, displayName), progress);
         }, new ContentsManager.OnInstallFinishedCallback() {
             @Override
             public void onFailed(ContentsManager.InstallFailedReason reason, Exception error) {
-                failure.call("Gói không hợp lệ: " + reason);
+                failure.call(getString(R.string.agvn_ui_app_onb_bad_package, String.valueOf(reason)));
             }
 
             @Override
             public void onSucceed(ContentProfile extracted) {
                 String installedName = extracted.verName != null && !extracted.verName.isEmpty()
                         ? extracted.verName : displayName;
-                postInstallProgress("Đang kiểm tra " + installedName, 92);
+                postInstallProgress(getString(R.string.agvn_ui_app_onb_checking_name, installedName), 92);
                 contentsManager.finishInstallContent(extracted, new ContentsManager.OnInstallFinishedCallback() {
                     @Override
                     public void onFailed(ContentsManager.InstallFailedReason reason, Exception error) {
                         if (reason == ContentsManager.InstallFailedReason.ERROR_EXIST) {
-                            postInstallProgress("Đã cài " + installedName, 100);
+                            postInstallProgress(getString(R.string.agvn_ui_app_onb_installed_name, installedName), 100);
                             success.run();
                         }
-                        else failure.call("Cài đặt thất bại: " + reason);
+                        else failure.call(getString(R.string.agvn_ui_app_onb_install_failed_reason, String.valueOf(reason)));
                     }
 
                     @Override
                     public void onSucceed(ContentProfile installed) {
-                        postInstallProgress("Đã cài " + installedName, 100);
+                        postInstallProgress(getString(R.string.agvn_ui_app_onb_installed_name, installedName), 100);
                         success.run();
                     }
                 });
@@ -571,7 +571,7 @@ public class OnboardingActivity extends AppCompatActivity {
             long total = response.body().contentLength();
             long copied = 0;
             int lastProgress = -1;
-            postInstallProgress("Đang tải " + displayName, total > 0 ? 0 : -1);
+            postInstallProgress(getString(R.string.agvn_ui_app_onb_downloading_name, displayName), total > 0 ? 0 : -1);
             try (InputStream input = response.body().byteStream(); FileOutputStream output = new FileOutputStream(out)) {
                 byte[] buffer = new byte[64 * 1024];
                 int read;
@@ -582,7 +582,7 @@ public class OnboardingActivity extends AppCompatActivity {
                         int progress = Math.min(70, (int)((copied * 70L) / total));
                         if (progress != lastProgress) {
                             lastProgress = progress;
-                            postInstallProgress("Đang tải " + displayName, progress);
+                            postInstallProgress(getString(R.string.agvn_ui_app_onb_downloading_name, displayName), progress);
                         }
                     }
                 }
@@ -612,7 +612,7 @@ public class OnboardingActivity extends AppCompatActivity {
         } catch (Exception ignored) {
         }
         if (name == null || name.trim().isEmpty()) name = uri.getLastPathSegment();
-        return name == null || name.trim().isEmpty() ? "thành phần trên máy" : name;
+        return name == null || name.trim().isEmpty() ? getString(R.string.agvn_ui_app_onb_local_component) : name;
     }
 
     private void finishInstall(String id, String error) {
@@ -635,10 +635,10 @@ public class OnboardingActivity extends AppCompatActivity {
     private void requestRemoveComponent(String componentId) {
         if (componentId.startsWith("adrenotools:")) {
             new AlertDialog.Builder(this)
-                    .setTitle("Xóa driver?")
-                    .setMessage("File driver đã cài sẽ bị xóa.")
+                    .setTitle(R.string.agvn_ui_app_onb_remove_driver_title)
+                    .setMessage(R.string.agvn_ui_app_onb_remove_driver_message)
                     .setNegativeButton(android.R.string.cancel, null)
-                    .setPositiveButton("Xóa", (d, w) -> removeDriver(componentId.substring("adrenotools:".length())))
+                    .setPositiveButton(R.string.agvn_ui_app_delete, (d, w) -> removeDriver(componentId.substring("adrenotools:".length())))
                     .show();
             return;
         }
@@ -652,17 +652,17 @@ public class OnboardingActivity extends AppCompatActivity {
         if (!WineRuntimeGuard.canRemove(this, profile)) {
             String using = WineRuntimeGuard.getContainerUsing(this, ContentsManager.getEntryName(profile));
             new AlertDialog.Builder(this)
-                    .setTitle("Thành phần đang được dùng")
-                    .setMessage(profile.verName + " không xóa được vì đang được dùng bởi " + using + ".")
+                    .setTitle(R.string.agvn_ui_app_onb_component_in_use_title)
+                    .setMessage(getString(R.string.agvn_ui_app_onb_remove_blocked, profile.verName, using))
                     .setPositiveButton(android.R.string.ok, null)
                     .show();
             return;
         }
         new AlertDialog.Builder(this)
-                .setTitle("Xóa thành phần?")
-                .setMessage("File đã cài sẽ bị xóa khỏi AGVN Player.")
+                .setTitle(R.string.agvn_ui_app_onb_remove_component_title)
+                .setMessage(R.string.agvn_ui_app_onb_remove_component_message)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton("Xóa", (d, w) -> removeContent(profile, componentId))
+                .setPositiveButton(R.string.agvn_ui_app_delete, (d, w) -> removeContent(profile, componentId))
                 .show();
     }
 
@@ -671,17 +671,17 @@ public class OnboardingActivity extends AppCompatActivity {
         String using = WineRuntimeGuard.getContainerUsing(this, identifier);
         if (using != null) {
             new AlertDialog.Builder(this)
-                    .setTitle("Thành phần đang được dùng")
-                    .setMessage(item.name + " không xóa được vì đang được dùng bởi " + using + ".")
+                    .setTitle(R.string.agvn_ui_app_onb_component_in_use_title)
+                    .setMessage(getString(R.string.agvn_ui_app_onb_remove_blocked, item.name, using))
                     .setPositiveButton(android.R.string.ok, null)
                     .show();
             return;
         }
         new AlertDialog.Builder(this)
-                .setTitle("Xóa thành phần?")
-                .setMessage("File đã cài sẽ bị xóa khỏi AGVN Player.")
+                .setTitle(R.string.agvn_ui_app_onb_remove_component_title)
+                .setMessage(R.string.agvn_ui_app_onb_remove_component_message)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton("Xóa", (d, w) -> {
+                .setPositiveButton(R.string.agvn_ui_app_delete, (d, w) -> {
                     if (installBusy) return;
                     installBusy = true;
                     composeController.setInstallBusy(componentId, true);
@@ -752,7 +752,7 @@ public class OnboardingActivity extends AppCompatActivity {
         final RemoteDriverCatalog.Entry driver = found;
         installBusy = true;
         composeController.setInstallBusy(componentId, true);
-        composeController.updateInstallProgress("Đang cài " + driver.name, -1);
+        composeController.updateInstallProgress(getString(R.string.agvn_ui_app_installing_name, driver.name), -1);
         io.execute(() -> {
             String installed = RemoteDriverCatalog.install(this, driver.url);
             runOnUiThread(() -> {
@@ -760,7 +760,7 @@ public class OnboardingActivity extends AppCompatActivity {
                 composeController.setInstallBusy(null, false);
                 syncComposeCatalog();
                 if (installed == null || installed.isEmpty()) {
-                    Toast.makeText(this, "Không cài được " + driver.name + ".", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.agvn_ui_app_install_failed_name, driver.name), Toast.LENGTH_LONG).show();
                 }
             });
         });
@@ -802,7 +802,7 @@ public class OnboardingActivity extends AppCompatActivity {
             composeController.setInstallBusy("local", true);
             Uri uri = data.getData();
             String displayName = localDisplayName(uri);
-            composeController.updateInstallProgress("Đang chuẩn bị " + displayName, 0);
+            composeController.updateInstallProgress(getString(R.string.agvn_ui_app_onb_preparing_name, displayName), 0);
             io.execute(() -> installContentArchive(uri, displayName, 5, () -> {
                 rebuildCatalog();
                 runOnUiThread(() -> finishInstall("local", null));
@@ -812,7 +812,7 @@ public class OnboardingActivity extends AppCompatActivity {
             installBusy = true;
             composeController.setInstallBusy("driver-local", true);
             Uri uri = data.getData();
-            composeController.updateInstallProgress("Đang cài " + localDisplayName(uri), -1);
+            composeController.updateInstallProgress(getString(R.string.agvn_ui_app_installing_name, localDisplayName(uri)), -1);
             io.execute(() -> {
                 String installed = adrenotoolsManager.installDriver(uri);
                 runOnUiThread(() -> {
@@ -820,7 +820,7 @@ public class OnboardingActivity extends AppCompatActivity {
                     composeController.setInstallBusy(null, false);
                     syncComposeCatalog();
                     if (installed == null || installed.isEmpty()) {
-                        Toast.makeText(this, "Không cài được driver.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, R.string.agvn_ui_app_onb_driver_install_failed, Toast.LENGTH_LONG).show();
                     }
                 });
             });
@@ -861,7 +861,7 @@ public class OnboardingActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, results);
         if (requestCode == REQUEST_STORAGE) {
             if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) continuePermissionFlow();
-            else Toast.makeText(this, "Cần quyền truy cập bộ nhớ để quản lý game.", Toast.LENGTH_LONG).show();
+            else Toast.makeText(this, R.string.agvn_ui_app_onb_storage_permission_needed, Toast.LENGTH_LONG).show();
         } else if (requestCode == REQUEST_NOTIFICATIONS) {
             finishOnboarding();
         }
@@ -884,14 +884,14 @@ public class OnboardingActivity extends AppCompatActivity {
         String runtime = resolveSelectedRuntime();
         if (runtime == null) {
             finishing = false;
-            Toast.makeText(this, "Hãy cài và chọn Wine hoặc Proton trước.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.agvn_ui_app_onb_pick_runtime_first, Toast.LENGTH_LONG).show();
             return;
         }
 
         WineInfo wineInfo = WineInfo.fromIdentifier(this, contentsManager, runtime);
         if (wineInfo.path == null || wineInfo.path.isEmpty()) {
             finishing = false;
-            Toast.makeText(this, "Wine/Proton đã chọn không còn được cài.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.agvn_ui_app_onb_runtime_missing, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -920,14 +920,14 @@ public class OnboardingActivity extends AppCompatActivity {
             manager.createContainerAsync(data, contentsManager, created -> {
                 if (created == null) {
                     finishing = false;
-                    Toast.makeText(this, "Không tạo được môi trường chạy đầu tiên.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.agvn_ui_app_onb_first_environment_failed, Toast.LENGTH_LONG).show();
                 } else {
                     enterMainApp();
                 }
             });
         } catch (Exception error) {
             finishing = false;
-            Toast.makeText(this, "Không chuẩn bị được môi trường chạy đầu tiên.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.agvn_ui_app_onb_first_environment_prepare_failed, Toast.LENGTH_LONG).show();
         }
     }
 

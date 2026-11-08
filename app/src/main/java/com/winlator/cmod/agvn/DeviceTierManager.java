@@ -7,6 +7,7 @@ import android.os.Build;
 
 import androidx.preference.PreferenceManager;
 
+import com.winlator.cmod.R;
 import com.winlator.cmod.core.FileUtils;
 
 import java.lang.reflect.Method;
@@ -48,7 +49,16 @@ public final class DeviceTierManager {
 
     public static String presetSummary(Context ctx, DeviceTier tier) {
         DeviceTierRules.Preset p = getRules(ctx).preset(tier);
-        return "Giới hạn FPS: " + p.fps + ", Độ phân giải: " + p.resolution.replace('x', '×') + ", Texture pool: " + p.texturePool + " MB";
+        return ctx.getString(R.string.agvn_ui_agvn2_tier_preset, p.fps, p.resolution.replace('x', '×'), p.texturePool);
+    }
+
+    /** {@code tier}'s name in the app's language ({@link DeviceTier#label} is the Vietnamese one). */
+    public static String label(Context ctx, DeviceTier tier) {
+        switch (tier) {
+            case FLAGSHIP: return ctx.getString(R.string.agvn_ui_agvn2_tier_flagship);
+            case YEU: return ctx.getString(R.string.agvn_ui_agvn2_tier_weak);
+            default: return ctx.getString(R.string.agvn_ui_agvn2_tier_medium);
+        }
     }
 
     public static String socModel() {

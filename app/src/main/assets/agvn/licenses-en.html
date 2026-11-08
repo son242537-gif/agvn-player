@@ -1,0 +1,68 @@
+<html><body>
+<h2>AGVN Player</h2>
+<p>Published by agvn.io. AGVN Player is free software, released under the GNU General Public License (GNU GPL) version 3 or later. The full license text is at the end of this page.</p>
+<p>Full source code of each release: https://github.com/son242537-gif/agvn-player (that release's v0.1.x tag).</p>
+<p>AGVN Player is based on Winlator by BrunoSX and on Winlator Ludashi by StevenMXZ and pipetto-crypto
+(https://github.com/StevenMXZ/Winlator-Ludashi). Many thanks to the original authors.</p>
+<h3>MIT License (Winlator)</h3>
+<p>The code of Winlator and the code AGVN added can still be used on their own under the MIT license below.</p>
+<p>MIT License</p><p>Copyright (c) 2023 BrunoSX</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+<h3>Third-party components</h3>
+<p>The following components have their own licenses; their source code is at the addresses below.</p>
+<ul>
+<li>Wine (LGPL 2.1+): https://www.winehq.org</li>
+<li>Proton (LGPL/BSD, Valve): https://github.com/ValveSoftware/Proton</li>
+<li>Proton 10.0-4 arm64ec for Android (LGPL 2.1, the app's second Wine): package proton-10.0-4-arm64ec.wcp, source code on the
+proton_10.0 branch of https://github.com/The412Banner/proton-wine</li>
+<li>Wine Mono 9.3.1 (the .NET runtime for Wine, unpacked only for games that need .NET): the Mono part is MIT X11 or LGPL, FNA is
+MS-PL and MIT, FAudio and SDL2 are zlib, WinForms and WPF are MIT, SharpZipLib is GPL with an exception (see the COPYING file of Wine
+Mono). The app ships the original release unchanged; the source code of this exact version (wine-mono-9.3.1-src.tar.xz) is at
+https://github.com/wine-mono/wine-mono/releases/tag/wine-mono-9.3.1, repository: https://gitlab.winehq.org/mono/wine-mono</li>
+<li>Box64 (MIT): https://github.com/ptitSeb/box64</li>
+<li>FEX-Emu (MIT): https://github.com/FEX-Emu/FEX</li>
+<li>Mesa: Turnip, Wrapper (MIT): https://github.com/xMeM/mesa/tree/wrapper</li>
+<li>Mesa 25.1.9: Zink (MIT): https://gitlab.freedesktop.org/mesa/mesa. How it is built and its patches are in the source code of AGVN Player
+(scripts/agvn/zink)</li>
+<li>DXVK (zlib): https://github.com/doitsujin/dxvk</li>
+<li>VKD3D-Proton / VKD3D (LGPL 2.1): https://gitlab.winehq.org/wine/vkd3d</li>
+<li>D8VK (zlib): https://github.com/AlpyneDreams/d8vk</li>
+<li>CNC DDraw (MIT): https://github.com/FunkyFr3sh/cnc-ddraw</li>
+<li>dxwrapper (zlib): https://github.com/elishacloud/dxwrapper</li>
+<li>libadrenotools (BSD-2-Clause): https://github.com/bylaws/libadrenotools</li>
+<li>Termux packages, Termux:X11 (GPL 3.0): https://github.com/termux/termux-packages, https://github.com/termux/termux-x11</li>
+<li>proot (GPL 2.0): https://proot-me.github.io</li>
+<li>patchelf (GPL 3.0): https://github.com/NixOS/patchelf</li>
+<li>PulseAudio (LGPL 2.1): https://www.freedesktop.org/wiki/Software/PulseAudio</li>
+<li>DejaVu fonts (Bitstream Vera license, Copyright (c) 2003 Bitstream, Inc.; the DejaVu changes are public domain):
+https://github.com/dejavu-fonts/dejavu-fonts. On the phone, the app makes copies of DejaVu Sans renamed "Tahoma" and "Segoe UI" for
+DirectWrite text; the copyright line and the full license text are inside those fonts.</li>
+<li>GLIBC fork by longjunyu2: https://github.com/longjunyu2/winlator/tree/use-glibc-instead-of-proot</li>
+<li>Big Picture Mode music: Dale Melvin Blevens III (Fumer)</li>
+<li>Ren'Py 8.5.3 (MIT, Copyright 2004-2026 Tom Rothamel and contributors; Lite Run for Ren'Py games), including Python 3.12 (PSF License,
+Copyright 2001-2023 Python Software Foundation), SDL2 (zlib, Copyright 1997-2022 Sam Lantinga), pyjnius (MIT, Copyright
+2010-2023 Kivy Team and other contributors), FFmpeg (LGPL 2.1) and other libraries: https://www.renpy.org, source code
+https://github.com/renpy/renpy and https://github.com/renpy/renpy-build. The full license of Ren'Py and the list of libraries are
+at the end of this page.</li>
+<li>mkxp-z (GPL 3.0 or later, Copyright 2013-2023 Amaryllis Kulla and the mkxp-z authors; Lite Run for RPG Maker
+XP/VX/VX Ace games), including Ruby 3.1 (Ruby License / BSD-2-Clause), SDL2, SDL_image, SDL_sound, SDL_ttf and PhysicsFS (zlib), OpenAL
+Soft and FluidSynth (LGPL 2.1), FreeType (FreeType License) and other libraries: https://github.com/mkxp-z/mkxp-z. Source code
+and build scripts for Android: scripts/agvn/mkxp-z in the AGVN Player repository. The full licenses are at the end of this page.</li>
+<li>Godot Engine 4.7.2 (MIT, Copyright 2014-present Godot Engine contributors, 2007-2014 Juan Linietsky and Ariel Manzur;
+Lite Run for Godot 4 games), including FreeType, HarfBuzz, ICU, mbedTLS, Vulkan Memory Allocator, Swappy (Apache 2.0) and other
+libraries: https://godotengine.org, source code https://github.com/godotengine/godot. The engine in the app is rebuilt from the
+official source code, with patches: scripts/agvn/godot in the AGVN Player repository. The full licenses are at the end of this page.</li>
+<li>Spine Runtimes 4.2 (spine-cpp and spine-godot, Copyright (c) 2013-2025 Esoteric Software LLC), built into the Godot
+engine above so that Godot games made with Spine can use Lite Run. Spine Runtimes is not open source and not under the GPL: it is used
+under the Spine Runtimes License Agreement, whose full text is at the end of this page. Source code: https://github.com/EsotericSoftware/spine-runtimes.</li>
+<li>Android libraries: AndroidX, Material Components, Gson, OkHttp, Retrofit, Glide, zstd-jni, XZ for Java,
+Apache Commons Compress, Conscrypt, Bouncy Castle, OpenJSSE, junixsocket (Apache 2.0 / MIT / BSD respectively)</li>
+</ul>
+<h3>License of Ren'Py</h3>
+<p>The LICENSE.txt file of Ren'Py 8.5.3 as written, after the full text of the GNU GPL 3.</p>
+<h3>Licenses of mkxp-z and the libraries it comes with</h3>
+<p>After the license of Ren'Py, at the end of this page.</p>
+<h3>Licenses of Godot and the libraries it comes with</h3>
+<p>LICENSE.txt and COPYRIGHT.txt of Godot 4.7.2 as written, the license of Swappy and the Spine Runtimes license, after
+the licenses of mkxp-z.</p>
+<h3>GNU GPL version 3</h3>
+</body></html>

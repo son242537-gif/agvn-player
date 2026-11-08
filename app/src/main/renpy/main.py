@@ -11,6 +11,7 @@
 #   - ANDROID_PUBLIC: beside Ren'Py's log.txt, faulthandler.txt gets the Python lines a crash in native code came from.
 #   - AGVN_RENPY_PY2: "1" for a Ren'Py 6 or 7 game (Python 2) on trial: agvn_py2.py gives it Python 2's builtins,
 #     division and dict methods.
+#   - AGVN_RENPY_LIVE2D_MISSING: what the error screen says to a Live2D game, in the app's language.
 # Live2D is checked as Ren'Py meant, and each start time goes into log.txt once (ModuleHooks). Then Ren'Py's renpy.py
 # runs unchanged, in this module, so its path functions are the ones Ren'Py calls.
 
@@ -26,8 +27,10 @@ import time
 # 'check_live2d.<locals>.checked_load'") and every Ren'Py game stopped as it started. They go in Ren'Py's own list of
 # names its backup leaves out, so a reload (which restores the backup) keeps them too.
 LIVE2D_NAMES = ("renpy.gl2.live2dmodel.load", "renpy.gl2.live2d.onetime_init")
-LIVE2D_MISSING = ("Game cần Live2D, mà bản Chạy nhẹ của AGVN Player không có thư viện Live2D Cubism Core "
-                  "(libLive2DCubismCore.so). Bản Windows của game có thư viện này: chọn \"Chạy bằng Windows\".")
+# Vietnamese when the app gave no AGVN_RENPY_LIVE2D_MISSING
+LIVE2D_MISSING = os.environ.get("AGVN_RENPY_LIVE2D_MISSING") or (
+    "Game cần Live2D, mà bản Chạy nhẹ của AGVN Player không có thư viện Live2D Cubism Core "
+    "(libLive2DCubismCore.so). Bản Windows của game có thư viện này: chọn \"Chạy bằng Windows\".")
 
 basedir = os.environ.get("AGVN_RENPY_BASEDIR")
 

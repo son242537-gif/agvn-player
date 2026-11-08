@@ -76,8 +76,10 @@ public final class AgvnMovieWatch implements Callback<String> {
         Log.i(TAG, "movie not opened: " + undecoded);
         Shortcut s = activity.agvnShortcut();
         boolean old = s == null || !AgvnMediaFoundation.canReadOldWay(s);
+        String audio = AgvnMediaFoundation.audio(undecoded);
+        String shown = audio != null ? activity.getString(R.string.agvn_ui_agvn2_movie_audio, audio) : kind;
         String detail = activity.getString(R.string.agvn_movie_open_detail,
-                kind != null ? kind : activity.getString(R.string.agvn_movie_open_unknown))
+                shown != null ? shown : activity.getString(R.string.agvn_movie_open_unknown))
                 + (old ? "" : "\n" + activity.getString(R.string.agvn_movie_open_old));
         List<AgvnWarningBar.Choice> choices = new ArrayList<>();
         if (!old) choices.add(new AgvnWarningBar.Choice(R.string.agvn_movie_open_restart, () -> readOldWay(s)));
@@ -104,7 +106,8 @@ public final class AgvnMovieWatch implements Callback<String> {
         Shortcut s = activity.agvnShortcut();
         boolean skip = s == null || !"0".equals(s.getExtra(EXTRA_SKIP));
         boolean wine = s != null && !AgvnWine10.runs(s.container) && !"1".equals(s.getExtra(AgvnGameMove.EXTRA_NOT_TEN));
-        String detail = activity.getString(R.string.agvn_movie_detail, rules.movie() != null ? movie : "này")
+        String detail = activity.getString(R.string.agvn_movie_detail,
+                rules.movie() != null ? movie : activity.getString(R.string.agvn_ui_agvn2_movie_unnamed))
                 + (wine ? "\n" + activity.getString(R.string.agvn_movie_wine10) : "") + "\n"
                 + activity.getString(skip || wine ? R.string.agvn_doctor_lead : R.string.agvn_movie_no_skip);
         List<AgvnWarningBar.Choice> choices = new ArrayList<>();

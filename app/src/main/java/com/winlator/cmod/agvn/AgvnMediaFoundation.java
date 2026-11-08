@@ -118,10 +118,18 @@ public final class AgvnMediaFoundation {
     /** "âm thanh MP3" for "audio/mpeg, mpegversion=(int)1, …" (a caps Wine printed), else its kind; null for none. */
     static String kind(String caps) {
         if (caps == null) return null;
+        String audio = audio(caps);
+        if (audio != null) return "âm thanh " + audio; // su-kien.txt; the bar says it in the app's language
         String c = caps.trim();
-        if (c.startsWith("audio/mpeg") && c.contains("mpegversion=(int)1")) return "âm thanh MP3";
-        if (c.startsWith("audio/mpeg")) return "âm thanh AAC";
         int cut = c.indexOf(',');
         return cut > 0 ? c.substring(0, cut) : c;
+    }
+
+    /** "MP3" or "AAC" for an audio/mpeg caps, else null. */
+    static String audio(String caps) {
+        if (caps == null) return null;
+        String c = caps.trim();
+        if (!c.startsWith("audio/mpeg")) return null;
+        return c.contains("mpegversion=(int)1") ? "MP3" : "AAC";
     }
 }

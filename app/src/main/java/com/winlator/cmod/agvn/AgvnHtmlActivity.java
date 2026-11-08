@@ -88,6 +88,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
             compatJs = AgvnHtmlExe.line(getIntent().getStringExtra("shortcut_path"), AgvnLightGame.folderOf(index)) + compatJs;
         if (compatJs != null && getIntent().getBooleanExtra(AgvnFullscreen.INTENT, false))
             compatJs = "window.__agvnStretch = true;\n" + compatJs; // "Toàn màn hình cho mọi game"
+        if (compatJs != null) compatJs = pageTexts() + compatJs; // its error box in the app's language
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         AgvnRefreshCap.apply(this); // 60 Hz: the page draws every refresh, the games move 60 times a second
         // with a log setting on (Cài đặt > Nhật ký), the page can be inspected over USB and logs all its console
@@ -127,6 +128,13 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         tools = AgvnLightTools.attach(this, rpgMaker ? AgvnLayouts.RPG : AgvnLayouts.VN, getIntent().getStringExtra("shortcut_name"),
                 AgvnLightGame.folderOf(index), new AgvnHtmlHost(this, webView, root));
         webView.postDelayed(fatalPoll, AgvnHtmlConsole.FATAL_POLL_MS);
+    }
+
+    /** The texts html-compat.js shows on the game screen, put before it: window.__agvnText = {...}; */
+    private String pageTexts() {
+        return "window.__agvnText = {loadTitle: " + AgvnHtmlKeys.js(getString(R.string.agvn_ui_agvn1_html_load_title))
+                + ", noFirstScene: " + AgvnHtmlKeys.js(getString(R.string.agvn_ui_agvn1_html_no_first_scene))
+                + ", missingModules: " + AgvnHtmlKeys.js(getString(R.string.agvn_ui_agvn1_html_missing_modules)) + "};\n";
     }
 
     /** "Tự sửa lỗi": an error that stopped the game (html-compat.js keeps it in __agvnFatal), asked about at the end. */

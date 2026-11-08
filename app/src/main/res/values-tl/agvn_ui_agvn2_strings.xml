@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN Player (agvn.io): the texts of values/agvn_ui_agvn2_strings.xml. -->
+<resources>
+    <string name="agvn_ui_agvn2_hud_game">Game %1$d MB</string>
+    <string name="agvn_ui_agvn2_hud_free_ram">Bakanteng RAM %1$s GB</string>
+    <string name="agvn_ui_agvn2_hud_battery">Baterya %1$d%%</string>
+    <string name="agvn_ui_agvn2_movie_audio">%1$s audio</string>
+    <string name="agvn_ui_agvn2_movie_unnamed">ito</string>
+    <string name="agvn_ui_agvn2_install_storage">kulang ang bakanteng storage ng phone para ma-install ito</string>
+    <string name="agvn_ui_agvn2_install_invalid">invalid ang install file ayon sa Android</string>
+    <string name="agvn_ui_agvn2_install_conflict">hindi ma-install ang bagong bersyon sa ibabaw ng app na mayroon ka</string>
+    <string name="agvn_ui_agvn2_install_incompatible">hindi tugma ang bagong bersyon sa phone na ito</string>
+    <string name="agvn_ui_agvn2_install_blocked">hinaharangan ng phone ang pag-install ng app</string>
+    <string name="agvn_ui_agvn2_install_failed">hindi ma-install ng Android ang bagong bersyon</string>
+    <string name="agvn_ui_agvn2_update_server_error">nagbalik ang server ng error %1$d, subukan ulit</string>
+    <string name="agvn_ui_agvn2_update_damaged">sira ang na-download na file, subukan ulit</string>
+    <string name="agvn_ui_agvn2_update_not_agvn">hindi AGVN Player bersyon %1$s ang na-download na file</string>
+    <string name="agvn_ui_agvn2_update_other_key">hindi pareho ang signing key ng bagong bersyon at ng naka-install na app, kaya hindi ito ma-update sa ibabaw</string>
+    <string name="agvn_ui_agvn2_tier_preset">Limit ng FPS: %1$d, Resolution: %2$s, Texture pool: %3$d MB</string>
+    <string name="agvn_ui_agvn2_tier_flagship">Malakas</string>
+    <string name="agvn_ui_agvn2_tier_medium">Katamtaman</string>
+    <string name="agvn_ui_agvn2_tier_weak">Mahina</string>
+    <string name="agvn_ui_agvn2_renpy_live2d_missing">Kailangan ng game na ito ang Live2D, pero walang Live2D Cubism Core library (libLive2DCubismCore.so) ang Magaang Takbo ng AGVN Player. Mayroon nito ang Windows na bersyon ng game: piliin ang \"Patakbuhin sa Windows\".</string>
+</resources>

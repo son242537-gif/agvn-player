@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN Player (agvn.io): texts of AGVN classes that had them in their code (the "Chạy nhẹ" HUD, the movie bar, update errors, device tiers, Ren'Py's Live2D message). -->
+<resources>
+    <string name="agvn_ui_agvn2_hud_game">Game %1$d MB</string>
+    <string name="agvn_ui_agvn2_hud_free_ram">RAM trống %1$s GB</string>
+    <string name="agvn_ui_agvn2_hud_battery">Pin %1$d%%</string>
+    <string name="agvn_ui_agvn2_movie_audio">âm thanh %1$s</string>
+    <string name="agvn_ui_agvn2_movie_unnamed">này</string>
+    <string name="agvn_ui_agvn2_install_storage">máy không đủ bộ nhớ trống để cài</string>
+    <string name="agvn_ui_agvn2_install_invalid">Android thấy tệp cài không hợp lệ</string>
+    <string name="agvn_ui_agvn2_install_conflict">bản mới không cài đè lên được app đang có</string>
+    <string name="agvn_ui_agvn2_install_incompatible">bản mới không hợp với máy này</string>
+    <string name="agvn_ui_agvn2_install_blocked">máy đang chặn việc cài app</string>
+    <string name="agvn_ui_agvn2_install_failed">Android không cài được bản mới</string>
+    <string name="agvn_ui_agvn2_update_server_error">máy chủ trả lỗi %1$d, hãy thử lại</string>
+    <string name="agvn_ui_agvn2_update_damaged">tệp tải về bị hỏng, hãy thử lại</string>
+    <string name="agvn_ui_agvn2_update_not_agvn">tệp tải về không phải AGVN Player bản %1$s</string>
+    <string name="agvn_ui_agvn2_update_other_key">bản mới không cùng chữ ký với app đang cài, nên không cập nhật đè được</string>
+    <string name="agvn_ui_agvn2_tier_preset">Giới hạn FPS: %1$d, Độ phân giải: %2$s, Texture pool: %3$d MB</string>
+    <string name="agvn_ui_agvn2_tier_flagship">Mạnh</string>
+    <string name="agvn_ui_agvn2_tier_medium">Trung bình</string>
+    <string name="agvn_ui_agvn2_tier_weak">Yếu</string>
+    <string name="agvn_ui_agvn2_renpy_live2d_missing">Game cần Live2D, mà bản Chạy nhẹ của AGVN Player không có thư viện Live2D Cubism Core (libLive2DCubismCore.so). Bản Windows của game có thư viện này: chọn \"Chạy bằng Windows\".</string>
+</resources>

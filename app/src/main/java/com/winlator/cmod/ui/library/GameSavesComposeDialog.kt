@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
@@ -93,13 +94,13 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
     fun rescan() {
         if (busy) return
         busy = true
-        message = "Đang quét các vị trí lưu phổ biến…"
+        message = context.getString(R.string.agvn_ui_library_scanning_common)
         scope.launch {
             roots = withContext(Dispatchers.IO) { GameSaveManager.rediscoverSaveRoots(shortcut) }
             message = if (roots.isEmpty()) {
-                "Chưa tìm thấy thư mục lưu riêng của game. Sao lưu thủ công sẽ lưu toàn bộ hồ sơ Wine."
+                context.getString(R.string.agvn_ui_library_no_own_folder_whole)
             } else {
-                "Tìm thấy ${roots.size} vị trí lưu game."
+                context.getString(R.string.agvn_ui_library_saves_found, roots.size)
             }
             busy = false
         }
@@ -133,10 +134,10 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(Modifier.weight(1f)) {
-                        Text("Bản lưu game", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.agvn_ui_library_saves_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                         Text(shortcut.name, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                    TextButton(onClick = onClose, enabled = !busy) { Text("Đóng") }
+                    TextButton(onClick = onClose, enabled = !busy) { Text(stringResource(R.string.agvn_ui_library_close)) }
                 }
 
                 Surface(
@@ -145,16 +146,16 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .55f)
                 ) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                        Text("Thư mục sao lưu", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.agvn_ui_library_backup_folder), style = MaterialTheme.typography.labelLarge)
                         Text(
                             "AGVN-Player/Saves/${GameSaveManager.getGameDir(shortcut).name}/",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(Modifier.height(3.dp))
-                        Text("Bản sao lưu mới nhất", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.agvn_ui_library_latest_backup), style = MaterialTheme.typography.labelLarge)
                         Text(
-                            latest?.let(::backupLabel) ?: "Chưa có bản sao lưu",
+                            latest?.let(::backupLabel) ?: stringResource(R.string.agvn_ui_library_no_backup),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -165,10 +166,12 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(Modifier.weight(1f)) {
-                        Text("Tự sao lưu", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.agvn_ui_library_auto_backup_short), fontWeight = FontWeight.SemiBold)
                         Text(
-                            if (globalAutoBackup) "Đang bật chung trong Cài đặt"
-                            else "Ghi đè auto-latest.zip khi thoát game",
+                            stringResource(
+                                if (globalAutoBackup) R.string.agvn_ui_library_auto_backup_global
+                                else R.string.agvn_ui_library_auto_backup_summary
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -183,15 +186,15 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                     )
                 }
 
-                Text("Vị trí lưu", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.agvn_ui_library_save_locations), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                 if (loading) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(modifier = Modifier.height(22.dp))
-                        Text("  Đang dò tìm…", style = MaterialTheme.typography.bodyMedium)
+                        Text("  " + stringResource(R.string.agvn_ui_library_detecting), style = MaterialTheme.typography.bodyMedium)
                     }
                 } else if (roots.isEmpty()) {
                     Text(
-                        "Chưa tìm thấy thư mục cụ thể.",
+                        stringResource(R.string.agvn_ui_library_no_specific_folder),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -206,7 +209,7 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !busy && !loading
                 ) {
-                    Text("Quét lại vị trí lưu")
+                    Text(stringResource(R.string.agvn_ui_library_rescan))
                 }
 
                 Row(
@@ -217,7 +220,7 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                         onClick = {
                             if (!busy) {
                                 busy = true
-                                message = "Đang sao lưu…"
+                                message = context.getString(R.string.agvn_ui_library_backing_up)
                                 scope.launch {
                                     val result = withContext(Dispatchers.IO) {
                                         GameSaveManager.backup(shortcut, false)
@@ -225,9 +228,9 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                                     refreshLatest()
                                     message = when {
                                         result.ok && result.wholeProfile ->
-                                            "Sao lưu xong: ${result.fileCount} file. Không tìm thấy thư mục lưu riêng nên đã sao lưu cả hồ sơ Wine."
-                                        result.ok -> "Sao lưu xong: ${result.fileCount} file."
-                                        else -> "Sao lưu thất bại: ${result.error ?: "lỗi không rõ"}"
+                                            context.getString(R.string.agvn_ui_library_backup_done_whole, result.fileCount)
+                                        result.ok -> context.getString(R.string.agvn_ui_library_backup_done, result.fileCount)
+                                        else -> context.getString(R.string.agvn_ui_library_backup_failed, result.error ?: context.getString(R.string.agvn_ui_library_unknown_error))
                                     }
                                     busy = false
                                 }
@@ -236,22 +239,22 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                         modifier = Modifier.weight(1f),
                         enabled = !busy && !loading
                     ) {
-                        Text("Sao lưu ngay")
+                        Text(stringResource(R.string.agvn_ui_library_backup_now))
                     }
 
                     OutlinedButton(
                         onClick = {
                             if (!busy) {
                                 busy = true
-                                message = "Đang khôi phục bản sao lưu mới nhất…"
+                                message = context.getString(R.string.agvn_ui_library_restoring)
                                 scope.launch {
                                     val result = withContext(Dispatchers.IO) {
                                         GameSaveManager.restoreLatest(shortcut)
                                     }
                                     message = if (result.ok) {
-                                        "Đã khôi phục ${result.fileCount} file."
+                                        context.getString(R.string.agvn_ui_library_restored, result.fileCount)
                                     } else {
-                                        "Khôi phục thất bại: ${result.error ?: "lỗi không rõ"}"
+                                        context.getString(R.string.agvn_ui_library_restore_failed, result.error ?: context.getString(R.string.agvn_ui_library_unknown_error))
                                     }
                                     busy = false
                                 }
@@ -260,7 +263,7 @@ private fun GameSavesPanel(shortcut: Shortcut, onClose: () -> Unit) {
                         modifier = Modifier.weight(1f),
                         enabled = !busy && latest != null
                     ) {
-                        Text("Khôi phục")
+                        Text(stringResource(R.string.agvn_ui_library_restore))
                     }
                 }
 

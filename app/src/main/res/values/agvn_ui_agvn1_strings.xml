@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN Player (agvn.io): texts the "agvn1" area's classes had in their code (HTML game screen, picture notice). -->
+<resources>
+    <string name="agvn_ui_agvn1_html_load_title">Lỗi khi nạp game</string>
+    <string name="agvn_ui_agvn1_html_no_first_scene">Game chưa vào được cảnh đầu</string>
+    <string name="agvn_ui_agvn1_html_missing_modules">app chưa hỗ trợ mô-đun Node: %1$s</string>
+    <string name="agvn_ui_agvn1_picture_game_folder">thư mục game</string>
+    <string name="agvn_ui_agvn1_picture_no_access_game">app không đọc được thư mục game</string>
+    <string name="agvn_ui_agvn1_picture_short">tệp chỉ có %1$s byte, không phải ảnh</string>
+    <string name="agvn_ui_agvn1_picture_no_access">app không đọc được thư mục %1$s</string>
+    <string name="agvn_ui_agvn1_picture_not_found">không có trong %1$s</string>
+    <string name="agvn_ui_agvn1_picture_no_file">không có tệp này</string>
+</resources>

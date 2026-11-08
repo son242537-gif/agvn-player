@@ -2124,13 +2124,13 @@ public class XServerDisplayActivity extends AppCompatActivity {
                     container.putExtra("graphicsColorMode", "0");
                 }
                 container.saveData();
-                Toast.makeText(this, "Đã lưu preset", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.agvn_ui_app_preset_saved, Toast.LENGTH_SHORT).show();
             });
         }
 
         if (vkRenderer == null) return;
 
-        final String[] upscalerLabels = {"SGSR", "FSR", "Lanczos 2", "Tăng màu"};
+        final String[] upscalerLabels = {"SGSR", "FSR", "Lanczos 2", getString(R.string.agvn_ui_app_filter_color_boost)};
         if (spUpscalerMode != null) {
             ArrayAdapter<String> a = createSidebarSpinnerAdapter(upscalerLabels);
             a.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -2207,7 +2207,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (lblSharpnessHeader != null) lblSharpnessHeader.setVisibility(sharpVis);
         if (sbSharpness        != null) sbSharpness.setVisibility(sharpVis);
 
-        final String[] frameGenLabels = {"Nội suy 2x", "Luôn bật"};
+        final String[] frameGenLabels = {getString(R.string.agvn_ui_app_framegen_interpolate_2x), getString(R.string.agvn_ui_app_framegen_always_on)};
         if (spFrameGenFPS != null) {
             ArrayAdapter<String> a = createSidebarSpinnerAdapter(frameGenLabels);
             a.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

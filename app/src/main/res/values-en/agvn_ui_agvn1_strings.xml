@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN Player (agvn.io): texts the "agvn1" area's classes had in their code (HTML game screen, picture notice). -->
+<resources>
+    <string name="agvn_ui_agvn1_html_load_title">Error loading the game</string>
+    <string name="agvn_ui_agvn1_html_no_first_scene">The game did not reach its first scene</string>
+    <string name="agvn_ui_agvn1_html_missing_modules">Node modules the app does not support yet: %1$s</string>
+    <string name="agvn_ui_agvn1_picture_game_folder">the game folder</string>
+    <string name="agvn_ui_agvn1_picture_no_access_game">the app cannot read the game folder</string>
+    <string name="agvn_ui_agvn1_picture_short">the file is only %1$s bytes, not a picture</string>
+    <string name="agvn_ui_agvn1_picture_no_access">the app cannot read the folder %1$s</string>
+    <string name="agvn_ui_agvn1_picture_not_found">not in %1$s</string>
+    <string name="agvn_ui_agvn1_picture_no_file">the file is not there</string>
+</resources>

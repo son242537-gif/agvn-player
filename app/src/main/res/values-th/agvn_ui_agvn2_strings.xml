@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN Player (agvn.io): the texts of values/agvn_ui_agvn2_strings.xml. -->
+<resources>
+    <string name="agvn_ui_agvn2_hud_game">เกม %1$d MB</string>
+    <string name="agvn_ui_agvn2_hud_free_ram">RAM ว่าง %1$s GB</string>
+    <string name="agvn_ui_agvn2_hud_battery">แบต %1$d%%</string>
+    <string name="agvn_ui_agvn2_movie_audio">เสียง %1$s</string>
+    <string name="agvn_ui_agvn2_movie_unnamed">นี้</string>
+    <string name="agvn_ui_agvn2_install_storage">เครื่องมีพื้นที่ว่างไม่พอสำหรับติดตั้ง</string>
+    <string name="agvn_ui_agvn2_install_invalid">Android เห็นว่าไฟล์ติดตั้งไม่ถูกต้อง</string>
+    <string name="agvn_ui_agvn2_install_conflict">เวอร์ชันใหม่ติดตั้งทับแอปที่มีอยู่ไม่ได้</string>
+    <string name="agvn_ui_agvn2_install_incompatible">เวอร์ชันใหม่ใช้กับเครื่องนี้ไม่ได้</string>
+    <string name="agvn_ui_agvn2_install_blocked">เครื่องกำลังบล็อกการติดตั้งแอป</string>
+    <string name="agvn_ui_agvn2_install_failed">Android ติดตั้งเวอร์ชันใหม่ไม่ได้</string>
+    <string name="agvn_ui_agvn2_update_server_error">เซิร์ฟเวอร์ตอบกลับด้วยข้อผิดพลาด %1$d โปรดลองใหม่</string>
+    <string name="agvn_ui_agvn2_update_damaged">ไฟล์ที่ดาวน์โหลดเสียหาย โปรดลองใหม่</string>
+    <string name="agvn_ui_agvn2_update_not_agvn">ไฟล์ที่ดาวน์โหลดไม่ใช่ AGVN Player เวอร์ชัน %1$s</string>
+    <string name="agvn_ui_agvn2_update_other_key">เวอร์ชันใหม่ไม่ได้เซ็นด้วยคีย์เดียวกับแอปที่ติดตั้งอยู่ จึงอัปเดตทับไม่ได้</string>
+    <string name="agvn_ui_agvn2_tier_preset">จำกัด FPS: %1$d, ความละเอียด: %2$s, Texture pool: %3$d MB</string>
+    <string name="agvn_ui_agvn2_tier_flagship">แรง</string>
+    <string name="agvn_ui_agvn2_tier_medium">ปานกลาง</string>
+    <string name="agvn_ui_agvn2_tier_weak">อ่อน</string>
+    <string name="agvn_ui_agvn2_renpy_live2d_missing">เกมนี้ต้องใช้ Live2D แต่ AGVN Player ในโหมดเบาไม่มีไลบรารี Live2D Cubism Core (libLive2DCubismCore.so) เกมเวอร์ชัน Windows มีไลบรารีนี้: เลือก \"รันด้วย Windows\"</string>
+</resources>

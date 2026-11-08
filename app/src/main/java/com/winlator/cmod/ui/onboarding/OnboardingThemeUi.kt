@@ -24,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.winlator.cmod.ui.theme.WinlatorThemeChoices
 import com.winlator.cmod.ui.theme.WinlatorThemeManager
+import androidx.compose.ui.res.stringResource
+import com.winlator.cmod.R
 
 @Composable
 internal fun OnboardingThemeScreen(
@@ -46,12 +48,12 @@ internal fun OnboardingThemeScreen(
         ) {
             Column(Modifier.weight(0.8f)) {
                 Text(
-                    "Chọn giao diện",
+                    stringResource(R.string.agvn_ui_app_onb_pick_theme),
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    "Chọn giao diện bạn thích. Có thể đổi lại trong Cài đặt.",
+                    stringResource(R.string.agvn_ui_app_onb_pick_theme_desc),
                     modifier = Modifier.padding(top = 8.dp),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -81,12 +83,12 @@ internal fun OnboardingThemeScreen(
         Spacer(Modifier.height(8.dp))
         Column(Modifier.widthIn(max = 620.dp)) {
             Text(
-                "Chọn giao diện",
+                stringResource(R.string.agvn_ui_app_onb_pick_theme),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                "Chọn giao diện bạn thích. Có thể đổi lại trong Cài đặt.",
+                stringResource(R.string.agvn_ui_app_onb_pick_theme_desc),
                 modifier = Modifier.padding(top = 7.dp, bottom = 22.dp),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -111,11 +113,11 @@ private fun ThemeNavigationButtons(
     ) {
         if (onBack != null) {
             OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) {
-                Text("Quay lại")
+                Text(stringResource(R.string.agvn_ui_app_back))
             }
         }
         Button(onClick = onContinue, modifier = Modifier.weight(1f)) {
-            Text("Tiếp tục")
+            Text(stringResource(R.string._continue))
         }
     }
 }

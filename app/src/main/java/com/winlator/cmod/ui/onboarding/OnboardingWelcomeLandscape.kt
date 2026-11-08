@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.winlator.cmod.R
+import androidx.compose.ui.res.stringResource
 
 @Composable
 internal fun ClassicWelcomeLandscape(
@@ -41,14 +42,14 @@ internal fun ClassicWelcomeLandscape(
             Column(Modifier.weight(.9f), horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(painterResource(R.drawable.agvn_logo), "AGVN Player", Modifier.size(132.dp))
                 Spacer(Modifier.height(14.dp))
-                Text("Chào mừng bạn", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
-                Text("Chơi game PC trên điện thoại, bản tiếng Việt.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.agvn_ui_app_onb_welcome), style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.agvn_ui_app_onb_welcome_desc), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
             }
             Spacer(Modifier.width(36.dp))
             Column(Modifier.weight(1f)) {
-                ClassicWelcomeCard(Icons.Outlined.Apps, "Bắt đầu", "Chọn thành phần", start)
+                ClassicWelcomeCard(Icons.Outlined.Apps, stringResource(R.string.agvn_ui_app_onb_start), stringResource(R.string.agvn_ui_app_onb_start_desc), start)
                 Spacer(Modifier.height(10.dp))
-                ClassicWelcomeCard(Icons.Outlined.SkipNext, "Bỏ qua", "Dùng các thành phần có sẵn và cấu hình sau.", skip)
+                ClassicWelcomeCard(Icons.Outlined.SkipNext, stringResource(R.string.agvn_ui_app_onb_skip), stringResource(R.string.agvn_ui_app_onb_skip_desc), skip)
                 Spacer(Modifier.height(10.dp))
                 ClassicCoreStatusCard(ready, progress, retry)
             }

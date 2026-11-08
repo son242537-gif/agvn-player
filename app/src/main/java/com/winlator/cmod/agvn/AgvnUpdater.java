@@ -11,6 +11,8 @@ import android.provider.Settings;
 
 import androidx.core.content.FileProvider;
 
+import com.winlator.cmod.R;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,9 +42,14 @@ public final class AgvnUpdater {
 
     private AgvnUpdater() {}
 
-    /** The newest release, or null when none is published yet. */
+    /** The newest release, or null when none is published yet; a server's error in Vietnamese. */
     public static AgvnUpdateInfo fetch() throws IOException {
-        return AgvnUpdateInfo.parse(getText(AgvnUpdateInfo.LATEST_URL));
+        return fetch(null);
+    }
+
+    /** {@link #fetch()}, a server's error for the player in {@code context}'s language (null: Vietnamese). */
+    public static AgvnUpdateInfo fetch(Context context) throws IOException {
+        return AgvnUpdateInfo.parse(getText(context, AgvnUpdateInfo.LATEST_URL));
     }
 
     public static long installedCode(Context context) {
@@ -98,7 +105,7 @@ public final class AgvnUpdater {
             int status = c.getResponseCode();
             if (status == 416) apk.delete(); // the part we have no longer fits the file: start over next time
             if (status != HttpURLConnection.HTTP_OK && status != HttpURLConnection.HTTP_PARTIAL)
-                throw new IOException("máy chủ trả lỗi " + status + ", hãy thử lại");
+                throw new IOException(context.getString(R.string.agvn_ui_agvn2_update_server_error, status));
             boolean append = status == HttpURLConnection.HTTP_PARTIAL;
             if (!append) have = 0;
             try (InputStream in = c.getInputStream(); OutputStream out = new FileOutputStream(apk, append)) {
@@ -115,7 +122,7 @@ public final class AgvnUpdater {
         }
         if (apk.length() != info.size || !info.sha256.equals(sha256(apk))) {
             apk.delete();
-            throw new IOException("tệp tải về bị hỏng, hãy thử lại");
+            throw new IOException(context.getString(R.string.agvn_ui_agvn2_update_damaged));
         }
         checkPackage(context, info, apk);
     }
@@ -125,7 +132,7 @@ public final class AgvnUpdater {
         PackageInfo update = pm.getPackageArchiveInfo(apk.getPath(), PackageManager.GET_SIGNING_CERTIFICATES);
         if (update == null || !context.getPackageName().equals(update.packageName) || update.getLongVersionCode() != info.versionCode) {
             apk.delete();
-            throw new IOException("tệp tải về không phải AGVN Player bản " + info.versionName);
+            throw new IOException(context.getString(R.string.agvn_ui_agvn2_update_not_agvn, info.versionName));
         }
         try {
             PackageInfo self = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNING_CERTIFICATES);
@@ -133,7 +140,7 @@ public final class AgvnUpdater {
             Signature[] theirs = update.signingInfo != null ? update.signingInfo.getApkContentsSigners() : null;
             // Android refuses an update with another key anyway; saying so here is clearer than its "App not installed"
             if (mine != null && theirs != null && !Arrays.equals(mine, theirs))
-                throw new IOException("bản mới không cùng chữ ký với app đang cài, nên không cập nhật đè được");
+                throw new IOException(context.getString(R.string.agvn_ui_agvn2_update_other_key));
         } catch (PackageManager.NameNotFoundException ignored) {}
     }
 
@@ -169,12 +176,13 @@ public final class AgvnUpdater {
     }
 
     /** The text at {@code url}, or null when nothing is published there (404). */
-    private static String getText(String url) throws IOException {
+    private static String getText(Context context, String url) throws IOException {
         HttpURLConnection c = open(url);
         try {
             int status = c.getResponseCode();
             if (status == HttpURLConnection.HTTP_NOT_FOUND) return null;
-            if (status != HttpURLConnection.HTTP_OK) throw new IOException("máy chủ trả lỗi " + status);
+            if (status != HttpURLConnection.HTTP_OK) throw new IOException(context != null
+                    ? context.getString(R.string.agvn_ui_agvn2_update_server_error, status) : "máy chủ trả lỗi " + status);
             try (InputStream in = c.getInputStream()) {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 byte[] buf = new byte[8192];

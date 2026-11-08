@@ -34,6 +34,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.winlator.cmod.R
 
 enum class EnvValueKind { CHECKBOX, SELECT, MULTI, TEXT, NUMBER }
 
@@ -104,7 +106,7 @@ fun EnvironmentVariablesEditor(
                 color = MaterialTheme.colorScheme.surface
             ) {
                 Text(
-                    "Chưa thêm biến môi trường nào.",
+                    stringResource(R.string.agvn_ui_app_env_vars_empty),
                     modifier = Modifier.padding(14.dp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -134,7 +136,7 @@ fun EnvironmentVariablesEditor(
         OutlinedButton(onClick = { addOpen = true }, modifier = Modifier.fillMaxWidth()) {
             Icon(Icons.Outlined.Add, null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.size(7.dp))
-            Text("Thêm biến")
+            Text(stringResource(R.string.agvn_ui_app_env_vars_add))
         }
     }
 
@@ -165,7 +167,7 @@ private fun EnvironmentVariableRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(row.name, modifier = Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
-            IconButton(onClick = onRemove) { Icon(Icons.Outlined.DeleteOutline, "Xóa") }
+            IconButton(onClick = onRemove) { Icon(Icons.Outlined.DeleteOutline, stringResource(R.string.agvn_ui_app_delete)) }
         }
         when (spec.kind) {
             EnvValueKind.CHECKBOX -> {
@@ -178,13 +180,13 @@ private fun EnvironmentVariableRow(
                 )
             }
             EnvValueKind.SELECT -> SettingChoice(
-                label = "Giá trị",
+                label = stringResource(R.string.agvn_ui_app_env_vars_value),
                 selected = row.value.ifBlank { spec.options.firstOrNull().orEmpty() },
                 entries = spec.options
             ) { onValue(it) }
             EnvValueKind.MULTI -> MultiEnvironmentChoice(spec.options, row.value, onValue)
-            EnvValueKind.NUMBER -> SettingText("Giá trị", row.value) { onValue(it.filter(Char::isDigit)) }
-            EnvValueKind.TEXT -> SettingText("Giá trị", row.value, onChanged = onValue)
+            EnvValueKind.NUMBER -> SettingText(stringResource(R.string.agvn_ui_app_env_vars_value), row.value) { onValue(it.filter(Char::isDigit)) }
+            EnvValueKind.TEXT -> SettingText(stringResource(R.string.agvn_ui_app_env_vars_value), row.value, onChanged = onValue)
         }
     }
 }
@@ -192,10 +194,11 @@ private fun EnvironmentVariableRow(
 @Composable
 private fun MultiEnvironmentChoice(options: List<String>, value: String, onChanged: (String) -> Unit) {
     var open by remember { mutableStateOf(false) }
-    val selectedText = value.ifBlank { "Không có" }
+    val none = stringResource(R.string.agvn_ui_app_none)
+    val selectedText = value.ifBlank { none }
     Surface(onClick = { open = true }, color = androidx.compose.ui.graphics.Color.Transparent, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 9.dp)) {
-            Text("Giá trị", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.agvn_ui_app_env_vars_value), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(selectedText, style = MaterialTheme.typography.bodyLarge)
         }
     }
@@ -211,10 +214,10 @@ private fun MultiEnvironmentChoice(options: List<String>, value: String, onChang
                 TextButton(onClick = {
                     onChanged(selected.joinToString(","))
                     open = false
-                }) { Text("Xong") }
+                }) { Text(stringResource(R.string.agvn_ui_app_done)) }
             },
-            dismissButton = { TextButton(onClick = { open = false }) { Text("Hủy") } },
-            title = { Text("Chọn giá trị") },
+            dismissButton = { TextButton(onClick = { open = false }) { Text(stringResource(R.string.cancel)) } },
+            title = { Text(stringResource(R.string.agvn_ui_app_env_vars_pick_value)) },
             text = {
                 LazyColumn(Modifier.heightIn(max = 420.dp)) {
                     items(options) { option ->
@@ -247,14 +250,15 @@ private fun AddEnvironmentVariableDialog(
     val available = knownEnvironmentVariables.map { it.name }
     var name by remember { mutableStateOf(available.firstOrNull().orEmpty()) }
     var customName by remember { mutableStateOf("") }
-    val options = available + "Tùy chỉnh…"
-    val selected = if (name in available) name else "Tùy chỉnh…"
+    val custom = stringResource(R.string.agvn_ui_app_custom_ellipsis)
+    val options = available + custom
+    val selected = if (name in available) name else custom
 
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = {
-                val finalName = if (selected == "Tùy chỉnh…") customName.trim().replace(" ", "") else name
+                val finalName = if (selected == custom) customName.trim().replace(" ", "") else name
                 if (finalName.isNotBlank() && finalName !in existing) {
                     val spec = knownEnvironmentVariables.firstOrNull { it.name == finalName }
                     val initial = when (spec?.kind) {
@@ -264,17 +268,17 @@ private fun AddEnvironmentVariableDialog(
                     }
                     onAdd(finalName, initial)
                 }
-            }) { Text("Thêm") }
+            }) { Text(stringResource(R.string.add)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Hủy") } },
-        title = { Text("Thêm biến môi trường") },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
+        title = { Text(stringResource(R.string.agvn_ui_app_env_vars_add_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                SettingChoice("Biến", selected, options) { picked ->
-                    name = if (picked == "Tùy chỉnh…") "" else picked
+                SettingChoice(stringResource(R.string.agvn_ui_app_env_vars_variable), selected, options) { picked ->
+                    name = if (picked == custom) "" else picked
                 }
-                if (selected == "Tùy chỉnh…") {
-                    SettingText("Tên", customName) { customName = it }
+                if (selected == custom) {
+                    SettingText(stringResource(R.string.agvn_ui_app_env_vars_name), customName) { customName = it }
                 }
             }
         }

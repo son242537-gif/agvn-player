@@ -36,6 +36,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.winlator.cmod.core.ProtonPackageManager
+import androidx.compose.ui.res.stringResource
+import com.winlator.cmod.R
 
 private val bundledRuntimeId = "bundled:${ProtonPackageManager.DEFAULT_IDENTIFIER}"
 private val bundledRuntimeName = ProtonPackageManager.getPackage(ProtonPackageManager.DEFAULT_IDENTIFIER)?.title
@@ -85,7 +87,7 @@ internal fun OnboardingRuntimeSelectionScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             item {
-                Text("Chọn môi trường", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.agvn_ui_app_onb_pick_environment), style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
                 if (preparing) {
                     Spacer(Modifier.height(18.dp))
                     Surface(
@@ -95,7 +97,7 @@ internal fun OnboardingRuntimeSelectionScreen(
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
                     ) {
                         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            Text("Đang chuẩn bị môi trường", fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.agvn_ui_app_onb_preparing_environment), fontWeight = FontWeight.SemiBold)
                             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                         }
                     }
@@ -126,7 +128,7 @@ internal fun OnboardingRuntimeSelectionScreen(
                 item {
                     Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp), color = MaterialTheme.colorScheme.surface) {
                         Text(
-                            "Hãy cài ít nhất một phiên bản Wine hoặc Proton để tiếp tục.",
+                            stringResource(R.string.agvn_ui_app_onb_install_runtime_first),
                             Modifier.padding(16.dp),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -142,14 +144,14 @@ internal fun OnboardingRuntimeSelectionScreen(
                     modifier = Modifier.weight(1f).height(48.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Quay lại")
+                    Text(stringResource(R.string.agvn_ui_app_back))
                 }
                 Button(
                     onClick = { if (selected.isNotBlank() && !preparing) onContinue(selected) },
                     enabled = selected.isNotBlank() && !preparing,
                     modifier = Modifier.weight(1f).height(48.dp),
                     shape = RoundedCornerShape(12.dp)
-                ) { Text(if (preparing) "Preparing…" else "Tiếp tục") }
+                ) { Text(stringResource(if (preparing) R.string.agvn_ui_app_onb_preparing else R.string._continue)) }
             }
         }
     }

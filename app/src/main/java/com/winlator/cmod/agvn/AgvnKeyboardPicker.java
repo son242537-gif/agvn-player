@@ -124,7 +124,8 @@ final class AgvnKeyboardPicker {
             line.addView(new View(activity), lp);
             return false;
         }
-        key.setText(parts.length > 1 && !parts[1].isEmpty() ? parts[1] : AgvnBindingLabels.label(activity, binding));
+        key.setText(parts.length > 1 && !parts[1].isEmpty() ? parts[1] : parts[0].startsWith("MOUSE")
+                ? AgvnBindingLabels.label(activity, binding) : AgvnBindingLabels.faceText(activity, binding));
         key.setTextColor(Color.WHITE);
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(parts[0].startsWith("MOUSE") ? 0xFF2E4A6B : 0xFF3A3F4A);

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN Player (agvn.io): the texts of values/agvn_ui_agvn2_strings.xml. -->
+<resources>
+    <string name="agvn_ui_agvn2_hud_game">Game %1$d MB</string>
+    <string name="agvn_ui_agvn2_hud_free_ram">Free RAM %1$s GB</string>
+    <string name="agvn_ui_agvn2_hud_battery">Battery %1$d%%</string>
+    <string name="agvn_ui_agvn2_movie_audio">%1$s audio</string>
+    <string name="agvn_ui_agvn2_movie_unnamed">file</string>
+    <string name="agvn_ui_agvn2_install_storage">the phone doesn\'t have enough free storage to install it</string>
+    <string name="agvn_ui_agvn2_install_invalid">Android found the install file invalid</string>
+    <string name="agvn_ui_agvn2_install_conflict">the new version can\'t install over the app you have</string>
+    <string name="agvn_ui_agvn2_install_incompatible">the new version isn\'t compatible with this phone</string>
+    <string name="agvn_ui_agvn2_install_blocked">the phone is blocking app installs</string>
+    <string name="agvn_ui_agvn2_install_failed">Android couldn\'t install the new version</string>
+    <string name="agvn_ui_agvn2_update_server_error">the server returned error %1$d, try again</string>
+    <string name="agvn_ui_agvn2_update_damaged">the downloaded file is damaged, try again</string>
+    <string name="agvn_ui_agvn2_update_not_agvn">the downloaded file isn\'t AGVN Player version %1$s</string>
+    <string name="agvn_ui_agvn2_update_other_key">the new version isn\'t signed with the same key as the installed app, so it can\'t update over it</string>
+    <string name="agvn_ui_agvn2_tier_preset">FPS limit: %1$d, Resolution: %2$s, Texture pool: %3$d MB</string>
+    <string name="agvn_ui_agvn2_tier_flagship">Strong</string>
+    <string name="agvn_ui_agvn2_tier_medium">Medium</string>
+    <string name="agvn_ui_agvn2_tier_weak">Weak</string>
+    <string name="agvn_ui_agvn2_renpy_live2d_missing">This game needs Live2D, but the Lite Run version of AGVN Player doesn\'t have the Live2D Cubism Core library (libLive2DCubismCore.so). The Windows version of the game has it: choose \"Run with Windows\".</string>
+</resources>

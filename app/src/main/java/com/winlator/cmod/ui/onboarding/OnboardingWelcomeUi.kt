@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.winlator.cmod.R
+import androidx.compose.ui.res.stringResource
 
 @Composable
 internal fun ClassicWinlatorWelcome(
@@ -51,7 +52,7 @@ internal fun ClassicWinlatorWelcome(
             )
             Spacer(Modifier.height(22.dp))
             Text(
-                "Chào mừng bạn",
+                stringResource(R.string.agvn_ui_app_onb_welcome),
                 style = MaterialTheme.typography.displaySmall.copy(fontSize = 28.sp),
                 color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 1,
@@ -59,22 +60,22 @@ internal fun ClassicWinlatorWelcome(
             )
             Spacer(Modifier.height(7.dp))
             Text(
-                "Chơi game PC trên điện thoại, bản tiếng Việt.",
+                stringResource(R.string.agvn_ui_app_onb_welcome_desc),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(26.dp))
             ClassicWelcomeCard(
                 Icons.Outlined.Apps,
-                "Bắt đầu",
-                "Chọn thành phần",
+                stringResource(R.string.agvn_ui_app_onb_start),
+                stringResource(R.string.agvn_ui_app_onb_start_desc),
                 start
             )
             Spacer(Modifier.height(12.dp))
             ClassicWelcomeCard(
                 Icons.Outlined.SkipNext,
-                "Bỏ qua",
-                "Dùng các thành phần có sẵn và cấu hình sau.",
+                stringResource(R.string.agvn_ui_app_onb_skip),
+                stringResource(R.string.agvn_ui_app_onb_skip_desc),
                 skip
             )
             Spacer(Modifier.height(12.dp))

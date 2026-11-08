@@ -81,17 +81,35 @@ final class AgvnSessionInstall {
         }
     }
 
+    /** Android's failures told apart; their words follow in the same order, the last for any other failure. */
+    private static final int[] FAILURES = {PackageInstaller.STATUS_FAILURE_STORAGE,
+            PackageInstaller.STATUS_FAILURE_INVALID, PackageInstaller.STATUS_FAILURE_CONFLICT,
+            PackageInstaller.STATUS_FAILURE_INCOMPATIBLE, PackageInstaller.STATUS_FAILURE_BLOCKED};
+    private static final int[] WORDS = {R.string.agvn_ui_agvn2_install_storage,
+            R.string.agvn_ui_agvn2_install_invalid, R.string.agvn_ui_agvn2_install_conflict,
+            R.string.agvn_ui_agvn2_install_incompatible, R.string.agvn_ui_agvn2_install_blocked,
+            R.string.agvn_ui_agvn2_install_failed};
+    /** The same words in Vietnamese (values/agvn_ui_agvn2_strings.xml), for a caller without a Context: the JVM tests. */
+    private static final String[] VIETNAMESE = {"máy không đủ bộ nhớ trống để cài",
+            "Android thấy tệp cài không hợp lệ", "bản mới không cài đè lên được app đang có",
+            "bản mới không hợp với máy này", "máy đang chặn việc cài app", "Android không cài được bản mới"};
+
     /** The player's words for a session Android did not install, from its {@code status} and {@code message}. */
+    static String reason(Context context, int status, String message) {
+        return withMessage(context.getString(WORDS[failure(status)]), message);
+    }
+
+    /** {@link #reason(Context, int, String)} in Vietnamese. */
     static String reason(int status, String message) {
-        String why;
-        switch (status) {
-            case PackageInstaller.STATUS_FAILURE_STORAGE: why = "máy không đủ bộ nhớ trống để cài"; break;
-            case PackageInstaller.STATUS_FAILURE_INVALID: why = "Android thấy tệp cài không hợp lệ"; break;
-            case PackageInstaller.STATUS_FAILURE_CONFLICT: why = "bản mới không cài đè lên được app đang có"; break;
-            case PackageInstaller.STATUS_FAILURE_INCOMPATIBLE: why = "bản mới không hợp với máy này"; break;
-            case PackageInstaller.STATUS_FAILURE_BLOCKED: why = "máy đang chặn việc cài app"; break;
-            default: why = "Android không cài được bản mới";
-        }
+        return withMessage(VIETNAMESE[failure(status)], message);
+    }
+
+    private static int failure(int status) {
+        for (int i = 0; i < FAILURES.length; i++) if (FAILURES[i] == status) return i;
+        return FAILURES.length;
+    }
+
+    private static String withMessage(String why, String message) {
         return message == null || message.isEmpty() ? why : why + " (" + message + ")";
     }
 }

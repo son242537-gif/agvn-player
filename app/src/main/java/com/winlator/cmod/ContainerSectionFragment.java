@@ -181,13 +181,13 @@ public class ContainerSectionFragment extends Fragment {
 
         String description;
         if (section == VIDEO) {
-            description = "Bộ dựng hình, driver đồ họa và độ phân giải";
+            description = getString(R.string.agvn_ui_container_video_desc);
         }
         else if (section == AUDIO) {
-            description = "Chọn backend âm thanh của Wine";
+            description = getString(R.string.agvn_ui_container_audio_desc);
         }
         else {
-            description = "Wrapper DirectX và tùy chọn DXVK/VKD3D";
+            description = getString(R.string.agvn_ui_container_wrapper_desc);
         }
 
         String defaultGraphicsVersion = GPUInformation.isDriverSupported(DefaultVersion.WRAPPER_ADRENO, requireContext())

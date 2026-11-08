@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
@@ -11,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.winlator.cmod.MainActivity
+import com.winlator.cmod.R
 import com.winlator.cmod.ui.LibraryToolbarActions
 import com.winlator.cmod.ui.applyAppFullscreen
 import com.winlator.cmod.ui.theme.WinZTheme
@@ -137,4 +139,8 @@ object LibraryComposeHost {
     }
 }
 
-internal enum class LibraryFilter(val label: String) { All("Tất cả"), Favorites("Yêu thích"), Recent("Gần đây") }
+internal enum class LibraryFilter(@StringRes val label: Int) {
+    All(R.string.agvn_ui_library_filter_all),
+    Favorites(R.string.agvn_ui_library_favorite),
+    Recent(R.string.agvn_ui_library_filter_recent)
+}

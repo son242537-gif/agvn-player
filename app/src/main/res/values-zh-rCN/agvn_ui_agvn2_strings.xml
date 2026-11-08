@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN Player (agvn.io): the texts of values/agvn_ui_agvn2_strings.xml. -->
+<resources>
+    <string name="agvn_ui_agvn2_hud_game">游戏 %1$d MB</string>
+    <string name="agvn_ui_agvn2_hud_free_ram">可用内存 %1$s GB</string>
+    <string name="agvn_ui_agvn2_hud_battery">电量 %1$d%%</string>
+    <string name="agvn_ui_agvn2_movie_audio">%1$s 音频</string>
+    <string name="agvn_ui_agvn2_movie_unnamed">文件</string>
+    <string name="agvn_ui_agvn2_install_storage">手机可用存储空间不足，无法安装</string>
+    <string name="agvn_ui_agvn2_install_invalid">Android 认为安装文件无效</string>
+    <string name="agvn_ui_agvn2_install_conflict">新版本无法覆盖安装现有应用</string>
+    <string name="agvn_ui_agvn2_install_incompatible">新版本与这部手机不兼容</string>
+    <string name="agvn_ui_agvn2_install_blocked">手机正在阻止安装应用</string>
+    <string name="agvn_ui_agvn2_install_failed">Android 无法安装新版本</string>
+    <string name="agvn_ui_agvn2_update_server_error">服务器返回错误 %1$d，请重试</string>
+    <string name="agvn_ui_agvn2_update_damaged">下载的文件已损坏，请重试</string>
+    <string name="agvn_ui_agvn2_update_not_agvn">下载的文件不是 AGVN Player %1$s 版</string>
+    <string name="agvn_ui_agvn2_update_other_key">新版本与已安装应用的签名密钥不同，无法覆盖更新</string>
+    <string name="agvn_ui_agvn2_tier_preset">FPS 上限：%1$d，分辨率：%2$s，纹理池：%3$d MB</string>
+    <string name="agvn_ui_agvn2_tier_flagship">强</string>
+    <string name="agvn_ui_agvn2_tier_medium">中</string>
+    <string name="agvn_ui_agvn2_tier_weak">弱</string>
+    <string name="agvn_ui_agvn2_renpy_live2d_missing">这个游戏需要 Live2D，但 AGVN Player 的轻量运行没有 Live2D Cubism Core 库（libLive2DCubismCore.so）。游戏的 Windows 版有这个库：请选择“用 Windows 运行”。</string>
+</resources>

@@ -77,7 +77,7 @@ public class FpsLimiterControl extends LinearLayout {
         sliderGroup.addView(valueRow, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
         TextView title = new TextView(context);
-        title.setText("Giới hạn FPS");
+        title.setText(R.string.agvn_ui_app_fps_limit);
         title.setTextColor(onSurface);
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
@@ -108,7 +108,7 @@ public class FpsLimiterControl extends LinearLayout {
         customValue.setSingleLine(true);
         customValue.setInputType(InputType.TYPE_CLASS_NUMBER);
         customValue.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        customValue.setHint("Nhập FPS tùy chỉnh");
+        customValue.setHint(R.string.agvn_ui_app_fps_custom_hint);
         customValue.setTextColor(onSurface);
         customValue.setHintTextColor(onSurfaceVariant);
         customValue.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
@@ -342,8 +342,8 @@ public class FpsLimiterControl extends LinearLayout {
         boolean customMode = position >= CUSTOM_POSITION;
         customValue.setVisibility(customMode ? VISIBLE : GONE);
 
-        if (position <= 0) valueLabel.setText("Tắt");
-        else if (customMode) valueLabel.setText("Tùy chỉnh");
+        if (position <= 0) valueLabel.setText(R.string.agvn_ui_app_off);
+        else if (customMode) valueLabel.setText(R.string.agvn_ui_app_custom);
         else if (!pacing.isChecked()) valueLabel.setText((position * STEP_FPS) + " FPS");
         else valueLabel.setText(com.winlator.cmod.agvn.AgvnFramePacing.label(position * STEP_FPS,
                 com.winlator.cmod.agvn.AgvnFramePacing.refreshHz(this))); // AGVN: "25 → 20 FPS" on 60 Hz

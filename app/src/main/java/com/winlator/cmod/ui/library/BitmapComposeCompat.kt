@@ -84,6 +84,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -160,12 +161,12 @@ private fun LibraryRootBody(
                 Spacer(Modifier.height(7.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                     LibraryFilter.values().forEach { option ->
-                        LibraryFilterChip(option.label, option == filter) { filterName = option.name }
+                        LibraryFilterChip(stringResource(option.label), option == filter) { filterName = option.name }
                     }
                 }
             },
             footerActions = { item ->
-                IconButton(onClick = { menu = item }) { Icon(Icons.Outlined.MoreVert, "Thêm tùy chọn", tint = Color.White) }
+                IconButton(onClick = { menu = item }) { Icon(Icons.Outlined.MoreVert, stringResource(R.string.agvn_ui_library_more_options), tint = Color.White) }
             }
         )
         menu?.let { LibraryItemMenuCompat(it, cb) { menu = null } }
@@ -185,14 +186,14 @@ private fun LibraryRootBody(
         if (selection.active) LibrarySelectionBar(selection, visible, cb::onRemoveMany)
         Row(Modifier.padding(vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             LibraryFilter.values().forEach { option ->
-                LibraryFilterChip(option.label, option == filter) { filterName = option.name }
+                LibraryFilterChip(stringResource(option.label), option == filter) { filterName = option.name }
             }
         }
         if (visible.isEmpty()) {
             if (query.isNotBlank() || (filter != LibraryFilter.All && items.isNotEmpty())) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        if (query.isNotBlank()) "Không có game nào khớp" else "Chưa có game nào ở mục này",
+                        stringResource(if (query.isNotBlank()) R.string.agvn_ui_library_no_match else R.string.agvn_ui_library_none_here),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -217,7 +218,7 @@ private fun LibraryRootBody(
                                 Box(contentAlignment = Alignment.Center) { Icon(Icons.Outlined.Add, null, modifier = Modifier.size(34.dp)) }
                             }
                             Spacer(Modifier.height(16.dp))
-                            Text("Thêm game", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.agvn_ui_library_add_game), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
@@ -247,7 +248,7 @@ private fun LibraryLandscapeHeader(
 ) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(
-            "Thư viện",
+            stringResource(R.string.agvn_ui_library_library),
             color = if (onArtwork) Color.White else MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Medium
@@ -280,15 +281,15 @@ private fun LibraryOrientationMenu(activity: MainActivity?) {
     Box {
         LibraryTopIcon(Icons.Outlined.MoreVert, false) { expanded = true }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            OrientationToggleMenuItem("Khóa hướng màn hình", orientationState.first) {
+            OrientationToggleMenuItem(stringResource(R.string.agvn_ui_library_lock_orientation), orientationState.first) {
                 activity?.toggleOrientationLock()
                 orientationRevision++
             }
-            OrientationToggleMenuItem("Chế độ dọc", orientationState.second) {
+            OrientationToggleMenuItem(stringResource(R.string.agvn_ui_library_portrait_mode), orientationState.second) {
                 activity?.toggleVerticalMode()
                 orientationRevision++
             }
-            OrientationToggleMenuItem("Chế độ ngang", orientationState.third) {
+            OrientationToggleMenuItem(stringResource(R.string.agvn_ui_library_landscape_mode), orientationState.third) {
                 activity?.toggleHorizontalMode()
                 orientationRevision++
             }
@@ -459,14 +460,14 @@ private fun PlayCompat(item: LibraryItem, cb: LibraryCallbacks, overlay: Boolean
         shape = CircleShape,
         color = if (overlay) Color.Black.copy(.72f) else MaterialTheme.colorScheme.surfaceVariant,
         contentColor = if (overlay) Color.White else MaterialTheme.colorScheme.onSurface
-    ) { Box(contentAlignment = Alignment.Center) { Icon(Icons.Outlined.PlayArrow, "Chơi") } }
+    ) { Box(contentAlignment = Alignment.Center) { Icon(Icons.Outlined.PlayArrow, stringResource(R.string.agvn_ui_library_play)) } }
 }
 
 @Composable
 private fun MenuButtonCompat(item: LibraryItem, cb: LibraryCallbacks, light: Boolean) {
     var open by remember { mutableStateOf(false) }
     IconButton(onClick = { open = true }) {
-        Icon(Icons.Outlined.MoreVert, "Thêm tùy chọn", tint = if (light) Color.White else MaterialTheme.colorScheme.onSurfaceVariant)
+        Icon(Icons.Outlined.MoreVert, stringResource(R.string.agvn_ui_library_more_options), tint = if (light) Color.White else MaterialTheme.colorScheme.onSurfaceVariant)
     }
     if (open) LibraryItemMenuCompat(item, cb) { open = false }
 }
@@ -508,7 +509,7 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
             androidx.compose.material3.HorizontalDivider(
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .65f)
             )
-            val favoriteLabel = if (item.favorite) "Bỏ yêu thích" else "Yêu thích"
+            val favoriteLabel = stringResource(if (item.favorite) R.string.agvn_ui_library_unfavorite else R.string.agvn_ui_library_favorite)
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -522,11 +523,11 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_FAVORITE)
                 }
-                LibraryActionTileCompat(Icons.Outlined.Settings, "Cấu hình", Modifier.weight(1f), horizontal = landscape) {
+                LibraryActionTileCompat(Icons.Outlined.Settings, stringResource(R.string.agvn_ui_library_configure), Modifier.weight(1f), horizontal = landscape) {
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SETTINGS)
                 }
-                LibraryActionTileCompat(Icons.Outlined.Photo, "Ảnh bìa", Modifier.weight(1f), horizontal = landscape) {
+                LibraryActionTileCompat(Icons.Outlined.Photo, stringResource(R.string.agvn_ui_library_cover_art), Modifier.weight(1f), horizontal = landscape) {
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_ICON)
                 }
@@ -535,7 +536,7 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                LibraryActionTileCompat(Icons.Outlined.Speed, "Chỉnh đồ họa: mát máy ↔ đẹp", Modifier.weight(1f), horizontal = true) {
+                LibraryActionTileCompat(Icons.Outlined.Speed, stringResource(R.string.agvn_ui_library_quality), Modifier.weight(1f), horizontal = true) {
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_QUALITY)
                 }
@@ -544,11 +545,11 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                LibraryActionTileCompat(Icons.Outlined.FileDownload, "Nhập save", Modifier.weight(1f), horizontal = true) {
+                LibraryActionTileCompat(Icons.Outlined.FileDownload, stringResource(R.string.agvn_ui_library_save_import), Modifier.weight(1f), horizontal = true) {
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SAVE_IMPORT)
                 }
-                LibraryActionTileCompat(Icons.Outlined.Save, "Xuất save", Modifier.weight(1f), horizontal = true) {
+                LibraryActionTileCompat(Icons.Outlined.Save, stringResource(R.string.agvn_ui_library_save_export), Modifier.weight(1f), horizontal = true) {
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SAVE_EXPORT)
                 }
@@ -557,15 +558,15 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                LibraryActionTileCompat(Icons.Outlined.Home, "Màn hình chính", Modifier.weight(1f), horizontal = landscape) {
+                LibraryActionTileCompat(Icons.Outlined.Home, stringResource(R.string.agvn_ui_library_home_screen), Modifier.weight(1f), horizontal = landscape) {
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_HOME)
                 }
-                LibraryActionTileCompat(Icons.Outlined.ContentCopy, "Nhân bản", Modifier.weight(1f), horizontal = landscape) {
+                LibraryActionTileCompat(Icons.Outlined.ContentCopy, stringResource(R.string.agvn_ui_library_clone), Modifier.weight(1f), horizontal = landscape) {
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_CLONE)
                 }
-                LibraryActionTileCompat(Icons.Outlined.FileUpload, "Xuất", Modifier.weight(1f), horizontal = landscape) {
+                LibraryActionTileCompat(Icons.Outlined.FileUpload, stringResource(R.string.agvn_ui_library_export), Modifier.weight(1f), horizontal = landscape) {
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_EXPORT)
                 }
@@ -574,25 +575,25 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                LibraryActionTileCompat(Icons.Outlined.Build, "Tự sửa lỗi", Modifier.weight(1f), horizontal = true) {
+                LibraryActionTileCompat(Icons.Outlined.Build, stringResource(R.string.agvn_ui_library_repair), Modifier.weight(1f), horizontal = true) {
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_REPAIR)
                 }
-                LibraryActionTileCompat(Icons.Outlined.BugReport, "Gửi nhật ký", Modifier.weight(1f), horizontal = true) {
+                LibraryActionTileCompat(Icons.Outlined.BugReport, stringResource(R.string.agvn_ui_library_send_logs), Modifier.weight(1f), horizontal = true) {
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SEND_LOGS)
                 }
             }
             val selection = LocalLibrarySelection.current
             if (selection != null) {
-                LibraryActionTileCompat(Icons.Outlined.Checklist, "Chọn nhiều game (để xóa)", Modifier.fillMaxWidth().padding(top = 8.dp), horizontal = true) {
+                LibraryActionTileCompat(Icons.Outlined.Checklist, stringResource(R.string.agvn_ui_library_pick_many), Modifier.fillMaxWidth().padding(top = 8.dp), horizontal = true) {
                     close()
                     selection.start(item.shortcutPath)
                 }
             }
             LibraryActionTileCompat(
                 Icons.Outlined.DeleteOutline,
-                "Xóa khỏi thư viện",
+                stringResource(R.string.agvn_ui_library_remove_from_library),
                 Modifier.fillMaxWidth().padding(top = 8.dp),
                 destructive = true,
                 horizontal = landscape

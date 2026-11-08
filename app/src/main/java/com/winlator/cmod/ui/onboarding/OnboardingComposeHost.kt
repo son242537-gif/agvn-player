@@ -24,6 +24,7 @@ import com.winlator.cmod.ui.applyAppFullscreen
 import com.winlator.cmod.ui.settings.cleanContainerEnvironment
 import com.winlator.cmod.ui.theme.WinZTheme
 import org.json.JSONObject
+import com.winlator.cmod.R
 
 @Immutable
 data class OnboardingComponent @JvmOverloads constructor(
@@ -176,7 +177,7 @@ private fun prepareInitialContainer(
     val contents = ContentsManager(activity).apply { syncContents() }
     val wineInfo = WineInfo.fromIdentifier(activity, contents, runtimeIdentifier)
     if (wineInfo.path.isNullOrBlank()) {
-        Toast.makeText(activity, "Wine/Proton đã chọn không còn được cài.", Toast.LENGTH_LONG).show()
+        Toast.makeText(activity, R.string.agvn_ui_app_onb_runtime_missing, Toast.LENGTH_LONG).show()
         return
     }
 
@@ -217,7 +218,7 @@ private fun prepareInitialContainer(
             preparing.value = false
             if (created == null) {
                 ready.value = false
-                Toast.makeText(activity, "Không tạo được môi trường chạy đầu tiên.", Toast.LENGTH_LONG).show()
+                Toast.makeText(activity, R.string.agvn_ui_app_onb_first_environment_failed, Toast.LENGTH_LONG).show()
             } else {
                 ready.value = true
             }
@@ -225,7 +226,7 @@ private fun prepareInitialContainer(
     } catch (_: Exception) {
         preparing.value = false
         ready.value = false
-        Toast.makeText(activity, "Không chuẩn bị được môi trường chạy đầu tiên.", Toast.LENGTH_LONG).show()
+        Toast.makeText(activity, R.string.agvn_ui_app_onb_first_environment_prepare_failed, Toast.LENGTH_LONG).show()
     }
 }
 

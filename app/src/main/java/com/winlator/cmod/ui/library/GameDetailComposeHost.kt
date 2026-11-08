@@ -55,10 +55,12 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.winlator.cmod.MainActivity
+import com.winlator.cmod.R
 import com.winlator.cmod.ui.KeepLandscapeChromeHidden
 import com.winlator.cmod.ui.applyAppFullscreen
 import com.winlator.cmod.ui.theme.WinZTheme
@@ -132,7 +134,7 @@ private fun LandscapeDetail(title: String, subtitle: String, artwork: Bitmap?, f
             border = BorderStroke(1.dp, Color.White.copy(.16f))
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Icon(Icons.Outlined.ArrowBack, "Quay lại", modifier = Modifier.size(24.dp))
+                Icon(Icons.Outlined.ArrowBack, stringResource(R.string.agvn_ui_library_back), modifier = Modifier.size(24.dp))
             }
         }
 
@@ -157,7 +159,7 @@ private fun LandscapeDetail(title: String, subtitle: String, artwork: Bitmap?, f
                             Text(subtitle, color = Color.White.copy(.72f), style = MaterialTheme.typography.bodyLarge)
                         }
                         IconButton(onClick = toggleFavorite) {
-                            Icon(if (favorite) Icons.Outlined.Star else Icons.Outlined.StarBorder, "Yêu thích", tint = Color.White)
+                            Icon(if (favorite) Icons.Outlined.Star else Icons.Outlined.StarBorder, stringResource(R.string.agvn_ui_library_favorite), tint = Color.White)
                         }
                     }
                     Spacer(Modifier.height(20.dp))
@@ -169,17 +171,17 @@ private fun LandscapeDetail(title: String, subtitle: String, artwork: Bitmap?, f
                     ) {
                         Icon(Icons.Outlined.PlayArrow, null)
                         Spacer(Modifier.size(8.dp))
-                        Text("Chơi", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.agvn_ui_library_play), fontWeight = FontWeight.Bold)
                     }
                     Spacer(Modifier.height(10.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        DetailAction(Icons.Outlined.Settings, "Cấu hình", Modifier.weight(1f), callbacks::onConfigure)
-                        DetailAction(Icons.Outlined.PlayArrow, "Mở môi trường chạy", Modifier.weight(1f), callbacks::onArguments)
+                        DetailAction(Icons.Outlined.Settings, stringResource(R.string.agvn_ui_library_configure), Modifier.weight(1f), callbacks::onConfigure)
+                        DetailAction(Icons.Outlined.PlayArrow, stringResource(R.string.agvn_ui_library_open_environment), Modifier.weight(1f), callbacks::onArguments)
                     }
                     Spacer(Modifier.height(10.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        DetailAction(Icons.Outlined.Folder, "Bản lưu", Modifier.weight(1f), callbacks::onSaves)
-                        DetailAction(Icons.Outlined.DeleteOutline, "Xóa", Modifier.weight(1f), callbacks::onRemove, true)
+                        DetailAction(Icons.Outlined.Folder, stringResource(R.string.agvn_ui_library_saves), Modifier.weight(1f), callbacks::onSaves)
+                        DetailAction(Icons.Outlined.DeleteOutline, stringResource(R.string.agvn_ui_library_remove), Modifier.weight(1f), callbacks::onRemove, true)
                     }
                 }
             }
@@ -195,7 +197,7 @@ private fun PortraitDetail(title: String, subtitle: String, artwork: Bitmap?, fa
             if (artwork != null) Image(artwork.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
             Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Black.copy(.18f), Color.Transparent, Color.Black.copy(.88f)))))
             IconButton(onClick = toggleFavorite, modifier = Modifier.align(Alignment.TopEnd).padding(12.dp).size(48.dp)) {
-                Icon(if (favorite) Icons.Outlined.Star else Icons.Outlined.StarBorder, "Yêu thích", tint = Color.White)
+                Icon(if (favorite) Icons.Outlined.Star else Icons.Outlined.StarBorder, stringResource(R.string.agvn_ui_library_favorite), tint = Color.White)
             }
             Column(Modifier.align(Alignment.BottomStart).padding(22.dp)) {
                 Text(title, color = Color.White, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
@@ -208,11 +210,11 @@ private fun PortraitDetail(title: String, subtitle: String, artwork: Bitmap?, fa
                 modifier = Modifier.fillMaxWidth().height(54.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary)
-            ) { Icon(Icons.Outlined.PlayArrow, null); Spacer(Modifier.size(8.dp)); Text("Chơi", fontWeight = FontWeight.Bold) }
-            DetailAction(Icons.Outlined.Settings, "Cấu hình", Modifier.fillMaxWidth(), callbacks::onConfigure)
-            DetailAction(Icons.Outlined.PlayArrow, "Mở môi trường chạy", Modifier.fillMaxWidth(), callbacks::onArguments)
-            DetailAction(Icons.Outlined.Folder, "Bản lưu", Modifier.fillMaxWidth(), callbacks::onSaves)
-            DetailAction(Icons.Outlined.DeleteOutline, "Xóa", Modifier.fillMaxWidth(), callbacks::onRemove, true)
+            ) { Icon(Icons.Outlined.PlayArrow, null); Spacer(Modifier.size(8.dp)); Text(stringResource(R.string.agvn_ui_library_play), fontWeight = FontWeight.Bold) }
+            DetailAction(Icons.Outlined.Settings, stringResource(R.string.agvn_ui_library_configure), Modifier.fillMaxWidth(), callbacks::onConfigure)
+            DetailAction(Icons.Outlined.PlayArrow, stringResource(R.string.agvn_ui_library_open_environment), Modifier.fillMaxWidth(), callbacks::onArguments)
+            DetailAction(Icons.Outlined.Folder, stringResource(R.string.agvn_ui_library_saves), Modifier.fillMaxWidth(), callbacks::onSaves)
+            DetailAction(Icons.Outlined.DeleteOutline, stringResource(R.string.agvn_ui_library_remove), Modifier.fillMaxWidth(), callbacks::onRemove, true)
             Spacer(Modifier.height(12.dp))
         }
     }

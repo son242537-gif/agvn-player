@@ -15,7 +15,8 @@ import com.winlator.cmod.core.FileUtils;
 
 /**
  * "Giấy phép mã nguồn mở": the app's GNU GPL 3 notice, upstream MIT notice and third-party list from
- * assets/agvn/licenses.html, then the full GPL text (assets/agvn/gpl-3.0.txt), which GPL requires to be given along,
+ * assets/agvn/licenses.html (licenses-en.html etc. in the app's other languages; the license texts stay as written),
+ * then the full GPL text (assets/agvn/gpl-3.0.txt), which GPL requires to be given along,
  * then Ren'Py's LICENSE.txt with the libraries in librenpython.so (assets/agvn/renpy-license.txt, app/agvn-renpy.gradle),
  * then mkxp-z and the libraries in libmkxp-z.so (assets/agvn/mkxp-z-license.txt, scripts/agvn/mkxp-z/licenses.sh),
  * then Godot and the libraries in libgodot_android.so (assets/agvn/godot-license.txt, scripts/agvn/godot/build-godot.sh).
@@ -34,7 +35,7 @@ public class LicensesActivity extends AppCompatActivity {
         text.setPadding(pad, pad, pad, pad);
         text.setTextColor(Color.parseColor("#E6E6EA"));
         text.setTextIsSelectable(true);
-        String html = FileUtils.readString(this, "agvn/licenses.html");
+        String html = page();
         String gpl = FileUtils.readString(this, "agvn/gpl-3.0.txt");
         String renpy = FileUtils.readString(this, "agvn/renpy-license.txt");
         String mkxpz = FileUtils.readString(this, "agvn/mkxp-z-license.txt");
@@ -46,5 +47,13 @@ public class LicensesActivity extends AppCompatActivity {
         scroll.setBackgroundColor(Color.parseColor("#15171C"));
         scroll.addView(text);
         setContentView(scroll);
+    }
+
+    /** licenses.html in the app's language: licenses-&lt;lang&gt;.html, else the Vietnamese page. */
+    private String page() {
+        String lang = AgvnLanguage.textLanguage(this);
+        String html = lang.equals(AgvnLanguage.VIETNAMESE) ? ""
+                : FileUtils.readString(this, "agvn/licenses-" + lang + ".html");
+        return html.isEmpty() ? FileUtils.readString(this, "agvn/licenses.html") : html;
     }
 }

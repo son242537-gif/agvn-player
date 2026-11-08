@@ -48,9 +48,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.winlator.cmod.R
 import com.winlator.cmod.ui.theme.WinZTheme
 
 object ContainerOverviewLandscapeComposeHost {
@@ -67,14 +69,15 @@ private data class LandscapeSection(val id: String, val title: String, val subti
 
 @Composable
 private fun LandscapeContainerOverview(model: ContainerOverviewModel, callbacks: ContainerOverviewCallbacks) {
-    val sections = remember(model) {
+    val titles = containerSectionTitles()
+    val sections = remember(model, titles) {
         listOf(
-            LandscapeSection(ContainerOverviewComposeHost.SECTION_SYSTEM, "Hệ thống", "Wine ${model.wineVersion}", Icons.Outlined.Settings),
-            LandscapeSection(ContainerOverviewComposeHost.SECTION_VIDEO, "Hình ảnh", "${model.renderer}  •  ${model.screenSize}", Icons.Outlined.DesktopWindows),
-            LandscapeSection(ContainerOverviewComposeHost.SECTION_AUDIO, "Âm thanh", model.audioDriver, Icons.Outlined.VolumeUp),
-            LandscapeSection(ContainerOverviewComposeHost.SECTION_COMPATIBILITY, "Tương thích", model.emulator, Icons.Outlined.VerifiedUser),
-            LandscapeSection(ContainerOverviewComposeHost.SECTION_STORAGE, "Ổ đĩa", "", Icons.Outlined.Folder),
-            LandscapeSection(ContainerOverviewComposeHost.SECTION_ADVANCED, "Nâng cao", "", Icons.Outlined.Tune)
+            LandscapeSection(ContainerOverviewComposeHost.SECTION_SYSTEM, titles[0], "Wine ${model.wineVersion}", Icons.Outlined.Settings),
+            LandscapeSection(ContainerOverviewComposeHost.SECTION_VIDEO, titles[1], "${model.renderer}  •  ${model.screenSize}", Icons.Outlined.DesktopWindows),
+            LandscapeSection(ContainerOverviewComposeHost.SECTION_AUDIO, titles[2], model.audioDriver, Icons.Outlined.VolumeUp),
+            LandscapeSection(ContainerOverviewComposeHost.SECTION_COMPATIBILITY, titles[3], model.emulator, Icons.Outlined.VerifiedUser),
+            LandscapeSection(ContainerOverviewComposeHost.SECTION_STORAGE, titles[4], "", Icons.Outlined.Folder),
+            LandscapeSection(ContainerOverviewComposeHost.SECTION_ADVANCED, titles[5], "", Icons.Outlined.Tune)
         )
     }
     var selected by remember { mutableStateOf(ContainerOverviewComposeHost.SECTION_SYSTEM) }
@@ -90,7 +93,7 @@ private fun LandscapeContainerOverview(model: ContainerOverviewModel, callbacks:
                         .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()).height(48.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary)
-                ) { Text("Mở môi trường chạy", fontWeight = FontWeight.SemiBold) }
+                ) { Text(stringResource(R.string.agvn_ui_container_open), fontWeight = FontWeight.SemiBold) }
             }
         }
     ) { padding ->

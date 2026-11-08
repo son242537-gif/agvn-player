@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN Player (agvn.io): texts the "agvn1" area's classes had in their code (HTML game screen, picture notice). -->
+<resources>
+    <string name="agvn_ui_agvn1_html_load_title">Error saat memuat game</string>
+    <string name="agvn_ui_agvn1_html_no_first_scene">Game belum sampai ke adegan pertama</string>
+    <string name="agvn_ui_agvn1_html_missing_modules">Modul Node yang belum didukung aplikasi: %1$s</string>
+    <string name="agvn_ui_agvn1_picture_game_folder">folder game</string>
+    <string name="agvn_ui_agvn1_picture_no_access_game">aplikasi tidak bisa membaca folder game</string>
+    <string name="agvn_ui_agvn1_picture_short">file hanya %1$s byte, bukan gambar</string>
+    <string name="agvn_ui_agvn1_picture_no_access">aplikasi tidak bisa membaca folder %1$s</string>
+    <string name="agvn_ui_agvn1_picture_not_found">tidak ada di %1$s</string>
+    <string name="agvn_ui_agvn1_picture_no_file">file ini tidak ada</string>
+</resources>

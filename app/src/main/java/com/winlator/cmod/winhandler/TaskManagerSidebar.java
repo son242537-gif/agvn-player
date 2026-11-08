@@ -150,7 +150,7 @@ public class TaskManagerSidebar implements OnGetProcessInfoListener {
                 if (container == null) return;
 
                 TextView title = rootView.findViewById(R.id.TVProcessesTitle);
-                if (title != null) title.setText("Tiến trình: " + numProcesses);
+                if (title != null) title.setText(activity.getString(R.string.agvn_ui_app_processes_count, numProcesses));
 
                 View empty = rootView.findViewById(R.id.TVEmptyText);
                 if (numProcesses == 0) {

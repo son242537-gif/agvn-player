@@ -22,17 +22,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.winlator.cmod.R
 
 @Composable
 internal fun OnboardingAccessScreen(back: () -> Unit, next: () -> Unit) {
-    val title = "Cấp quyền"
-    val action = "Cho phép"
+    val title = stringResource(R.string.agvn_ui_app_onb_access_title)
+    val action = stringResource(R.string.agvn_ui_app_onb_access_allow)
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background), contentAlignment = Alignment.Center) {
         Column(Modifier.fillMaxWidth().padding(28.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(Icons.Outlined.Security, null, modifier = Modifier.size(52.dp))
             Spacer(Modifier.height(14.dp))
             Text(title, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-            Text("AGVN Player cần quyền bộ nhớ và thông báo để quản lý game và giữ game chạy ổn định.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.agvn_ui_app_onb_access_message), color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(20.dp))
             Button(onClick = next, modifier = Modifier.fillMaxWidth().height(50.dp)) {
                 Icon(Icons.Outlined.NotificationsNone, null)
@@ -40,7 +42,7 @@ internal fun OnboardingAccessScreen(back: () -> Unit, next: () -> Unit) {
                 Text(action)
             }
             Spacer(Modifier.height(8.dp))
-            OutlinedButton(onClick = back, modifier = Modifier.fillMaxWidth().height(48.dp)) { Text("Quay lại") }
+            OutlinedButton(onClick = back, modifier = Modifier.fillMaxWidth().height(48.dp)) { Text(stringResource(R.string.agvn_ui_app_back)) }
         }
     }
 }

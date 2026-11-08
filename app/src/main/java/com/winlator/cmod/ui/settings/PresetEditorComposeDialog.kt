@@ -56,6 +56,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.winlator.cmod.R
 import com.winlator.cmod.ui.theme.WinZTheme
+import androidx.compose.ui.res.stringResource
 
 data class PresetEditorVariable(
     val name: String,
@@ -144,7 +145,7 @@ private fun PresetEditorScreen(
             Column(Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 16.dp)) {
                 Text(title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
                 Text(
-                    if (readOnly) "Preset có sẵn · chỉ xem" else "Sửa tên preset và biến môi trường",
+                    stringResource(if (readOnly) R.string.agvn_ui_app_preset_read_only else R.string.agvn_ui_app_preset_edit_desc),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
@@ -154,11 +155,11 @@ private fun PresetEditorScreen(
                     onValueChange = { name = it },
                     enabled = !readOnly,
                     singleLine = true,
-                    label = { Text("Tên preset") },
+                    label = { Text(stringResource(R.string.agvn_ui_app_preset_name)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
-                    "Biến môi trường",
+                    stringResource(R.string.agvn_ui_app_env_vars),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 18.dp, bottom = 7.dp)
@@ -195,7 +196,7 @@ private fun PresetEditorScreen(
                     modifier = Modifier.fillMaxWidth().padding(top = 14.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    TextButton(onClick = onCancel, modifier = Modifier.weight(1f)) { Text("Hủy") }
+                    TextButton(onClick = onCancel, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.cancel)) }
                     Button(
                         onClick = {
                             val cleanName = name.trim().replace(Regex("[,|]+"), "")
@@ -203,7 +204,7 @@ private fun PresetEditorScreen(
                         },
                         enabled = !readOnly && name.isNotBlank(),
                         modifier = Modifier.weight(1f)
-                    ) { Text("Lưu") }
+                    ) { Text(stringResource(R.string.save)) }
                 }
             }
         }
@@ -286,7 +287,7 @@ private fun PresetVariableRow(
                 IconButton(onClick = onHelp, modifier = Modifier.size(36.dp)) {
                     Icon(
                         Icons.Outlined.HelpOutline,
-                        contentDescription = "Trợ giúp",
+                        contentDescription = stringResource(R.string.agvn_ui_app_help),
                         modifier = Modifier.size(20.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )

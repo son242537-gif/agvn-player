@@ -102,7 +102,7 @@ public class FileManagerFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (getActivity() != null && ((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Quản lý file");
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.agvn_ui_app_fm_title);
         }
     }
 
@@ -393,7 +393,7 @@ public class FileManagerFragment extends Fragment {
         View arrow = getView() != null ? getView().findViewById(R.id.IVDriveArrow) : null;
         if (arrow != null) arrow.setRotation(180f);
         if (discoveredExternalStorageRoots.isEmpty()) {
-            Toast.makeText(getContext(), "Không tìm thấy bộ nhớ ngoài", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.agvn_ui_app_fm_no_external, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -407,39 +407,39 @@ public class FileManagerFragment extends Fragment {
         // AGVN: the storage root (where players copy the AGVN folder) was only reachable by going up from Downloads
         File agvnDir = new File(dRoot, "AGVN");
         driveOptionsPanel.addView(createDriveOptionRow(
-                "Bộ nhớ trong", agvnDir.isDirectory() ? "Có thư mục AGVN" : dRoot.getAbsolutePath(),
+                getString(R.string.agvn_ui_app_fm_internal_storage), agvnDir.isDirectory() ? getString(R.string.agvn_ui_app_fm_has_agvn_folder) : dRoot.getAbsolutePath(),
                 samePath(currentDir, dRoot), () -> openDrive(dRoot, dRoot)));
         driveOptionsPanel.addView(createDriveOptionRow(
-                "Ổ D:", "Thư mục tải về", samePath(currentDriveRoot, dRoot), () -> openDrive(dTarget, dRoot)));
+                getString(R.string.agvn_ui_app_fm_drive_d), getString(R.string.agvn_ui_app_fm_downloads_folder), samePath(currentDriveRoot, dRoot), () -> openDrive(dTarget, dRoot)));
 
         boolean inDriveC = currentDir != null && normalizeFilePath(currentDir.getAbsolutePath()).contains("/.wine/drive_c");
         driveOptionsPanel.addView(createDriveOptionRow(
-                "Ổ C:", "Hệ thống Wine", inDriveC, this::handleDriveCSelection));
+                getString(R.string.agvn_ui_app_fm_drive_c), getString(R.string.agvn_ui_app_fm_wine_system), inDriveC, this::handleDriveCSelection));
 
         File rootFs = new File(requireContext().getFilesDir(), "imagefs");
         driveOptionsPanel.addView(createDriveOptionRow(
-                "Ổ Z:", "RootFS", samePath(currentDriveRoot, rootFs), () -> {
+                getString(R.string.agvn_ui_app_fm_drive_z), "RootFS", samePath(currentDriveRoot, rootFs), () -> {
                     if (rootFs.exists()) openDrive(rootFs, rootFs);
-                    else Toast.makeText(getContext(), "Không tìm thấy RootFS", Toast.LENGTH_SHORT).show();
+                    else Toast.makeText(getContext(), R.string.agvn_ui_app_fm_rootfs_missing, Toast.LENGTH_SHORT).show();
                 }));
 
         if (discoveredExternalStorageRoots != null) {
             for (File external : discoveredExternalStorageRoots) {
                 driveOptionsPanel.addView(createDriveOptionRow(
-                        "Bộ nhớ ngoài", external.getName(), samePath(currentDriveRoot, external), () -> openDrive(external, external)));
+                        getString(R.string.agvn_ui_app_fm_external_storage), external.getName(), samePath(currentDriveRoot, external), () -> openDrive(external, external)));
             }
         }
 
         driveOptionsPanel.addView(createDriveOptionRow(
-                "Thêm bộ nhớ ngoài",
-                discoveredExternalStorageRoots == null ? "Tìm thẻ SD hoặc USB" : "Quét lại",
+                getString(R.string.agvn_ui_app_fm_add_external),
+                getString(discoveredExternalStorageRoots == null ? R.string.agvn_ui_app_fm_find_sd_usb : R.string.agvn_ui_app_fm_rescan),
                 false,
                 this::discoverExternalStorage));
     }
 
     private void openDrive(File directory, File driveRoot) {
         if (directory == null || !directory.exists() || !directory.isDirectory() || !directory.canRead()) {
-            Toast.makeText(getContext(), "Không truy cập được bộ nhớ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.agvn_ui_app_fm_storage_unreachable, Toast.LENGTH_SHORT).show();
             return;
         }
         currentDriveRoot = driveRoot != null ? driveRoot : inferDriveRoot(directory);
@@ -501,8 +501,8 @@ public class FileManagerFragment extends Fragment {
         ArrayList<Container> containers = containerManager.getContainers();
         if (containers == null || containers.isEmpty()) {
             new AlertDialog.Builder(getContext())
-                    .setTitle("Chưa có môi trường chạy")
-                    .setMessage("Bạn cần tạo môi trường chạy trước để mở ổ C:.")
+                    .setTitle(R.string.agvn_ui_app_fm_no_environment_title)
+                    .setMessage(R.string.agvn_ui_app_fm_no_environment_message)
                     .setPositiveButton("OK", null)
                     .show();
             return;
@@ -514,7 +514,7 @@ public class FileManagerFragment extends Fragment {
             String[] names = new String[containers.size()];
             for (int i = 0; i < containers.size(); i++) names[i] = containers.get(i).getName();
             new AlertDialog.Builder(getContext())
-                    .setTitle("Chọn ổ C: của môi trường chạy")
+                    .setTitle(R.string.agvn_ui_app_fm_pick_drive_c)
                     .setItems(names, (dialog, which) -> navigateToContainerDriveC(containers.get(which)))
                     .show();
         }
@@ -525,12 +525,11 @@ public class FileManagerFragment extends Fragment {
         File windowsDir = new File(driveC, "windows");
         if (driveC.exists() && driveC.isDirectory() && windowsDir.exists()) {
             openDrive(driveC, driveC);
-            Toast.makeText(getContext(), "Đã mở C: (" + container.getName() + ")", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.agvn_ui_app_fm_opened_c, container.getName()), Toast.LENGTH_SHORT).show();
         } else {
             new AlertDialog.Builder(getContext())
-                    .setTitle("Ổ C: chưa được khởi tạo")
-                    .setMessage("Thiếu file hệ thống Wine (ổ C:) của '" + container.getName() + "'.\n\n" +
-                            "Hãy CHẠY môi trường chạy này một lần để tạo hệ thống file.")
+                    .setTitle(R.string.agvn_ui_app_fm_drive_c_not_ready_title)
+                    .setMessage(getString(R.string.agvn_ui_app_fm_drive_c_not_ready_message, container.getName()))
                     .setPositiveButton("OK", null)
                     .show();
         }
@@ -539,7 +538,7 @@ public class FileManagerFragment extends Fragment {
     private void navigateUp() {
         if (currentDir == null) return;
         if (currentDriveRoot != null && samePath(currentDir, currentDriveRoot)) {
-            Toast.makeText(getContext(), "Đã ở thư mục gốc của ổ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.agvn_ui_app_fm_at_drive_root, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -547,13 +546,13 @@ public class FileManagerFragment extends Fragment {
         if (parent != null && parent.canRead() && isWithinRoot(parent, currentDriveRoot)) {
             loadDirectory(parent);
         } else {
-            Toast.makeText(getContext(), "Đã ở thư mục gốc của ổ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.agvn_ui_app_fm_at_drive_root, Toast.LENGTH_SHORT).show();
         }
     }
 
     private void loadDirectory(File dir) {
         if (dir == null || !dir.exists() || !dir.isDirectory() || !dir.canRead()) {
-            Toast.makeText(getContext(), "Không truy cập được thư mục", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.agvn_ui_app_fm_folder_unreachable, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -590,16 +589,16 @@ public class FileManagerFragment extends Fragment {
         String path = normalizeFilePath(dir.getAbsolutePath());
         String primary = normalizeFilePath(Environment.getExternalStorageDirectory().getAbsolutePath());
         if (path.contains("/.wine/drive_c")) {
-            tvDriveName.setText("Ổ C:");
+            tvDriveName.setText(R.string.agvn_ui_app_fm_drive_c);
             ivDriveIcon.setImageResource(R.drawable.icon_wine);
         } else if (path.equals(primary) || path.startsWith(primary + File.separator)) {
-            tvDriveName.setText("Ổ D:");
+            tvDriveName.setText(R.string.agvn_ui_app_fm_drive_d);
             ivDriveIcon.setImageResource(R.drawable.ic_internal_storage);
         } else if (path.startsWith("/storage/") && !path.startsWith("/storage/emulated")) {
-            tvDriveName.setText("Bộ nhớ ngoài");
+            tvDriveName.setText(R.string.agvn_ui_app_fm_external_storage);
             ivDriveIcon.setImageResource(R.drawable.ic_internal_storage);
         } else {
-            tvDriveName.setText("Ổ Z:");
+            tvDriveName.setText(R.string.agvn_ui_app_fm_drive_z);
             ivDriveIcon.setImageResource(android.R.drawable.ic_menu_manage);
         }
     }
@@ -607,7 +606,7 @@ public class FileManagerFragment extends Fragment {
     private void performContainerAction(File file, ContainerAction action) {
         ArrayList<Container> containers = containerManager.getContainers();
         if (containers == null || containers.isEmpty()) {
-            Toast.makeText(getContext(), "Hãy tạo môi trường chạy trước!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.agvn_ui_app_fm_create_environment_first, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -617,7 +616,7 @@ public class FileManagerFragment extends Fragment {
             String[] names = new String[containers.size()];
             for (int i = 0; i < containers.size(); i++) names[i] = containers.get(i).getName();
             new AlertDialog.Builder(getContext())
-                    .setTitle("Chọn môi trường chạy")
+                    .setTitle(R.string.agvn_ui_app_fm_pick_environment)
                     .setItems(names, (dialog, which) -> action.onContainerSelected(containers.get(which)))
                     .show();
         }
@@ -797,7 +796,7 @@ public class FileManagerFragment extends Fragment {
     private void runFileDirectly(File file, Container container) {
         try {
             if (!ensureExternalStorageMapped(container, file)) {
-                Toast.makeText(getContext(), "Hết ký tự ổ trống cho bộ nhớ ngoài", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), R.string.agvn_ui_app_fm_no_free_drive_letter, Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -822,7 +821,7 @@ public class FileManagerFragment extends Fragment {
             intent.putExtra("shortcut_path", tempShortcut.getAbsolutePath());
             startActivity(intent);
         } catch (Exception e) {
-            Toast.makeText(getContext(), "Lỗi khi chạy: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), getString(R.string.agvn_ui_app_fm_run_error, e.getMessage()), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
     }
@@ -830,7 +829,7 @@ public class FileManagerFragment extends Fragment {
     private void createShortcutDirectly(File file, Container container) {
         try {
             if (!ensureExternalStorageMapped(container, file)) {
-                Toast.makeText(getContext(), "Hết ký tự ổ trống cho bộ nhớ ngoài", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), R.string.agvn_ui_app_fm_no_free_drive_letter, Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -853,7 +852,7 @@ public class FileManagerFragment extends Fragment {
                 writer.println("[Extra Data]");
                 writer.println("simTouchScreen=1");
             }
-            Toast.makeText(getContext(), "Đã thêm game vào Thư viện!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.agvn_ui_app_fm_game_added, Toast.LENGTH_SHORT).show();
 
             File iconDir64 = container.getIconsDir(64);
             if (!iconDir64.exists()) iconDir64.mkdirs();
@@ -884,12 +883,12 @@ public class FileManagerFragment extends Fragment {
         this.clipboardFile = file;
         this.isCutOperation = isCut;
         if (fabPaste != null) fabPaste.setVisibility(View.VISIBLE);
-        Toast.makeText(getContext(), (isCut ? "Đã cắt: " : "Đã chép: ") + file.getName(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getString(isCut ? R.string.agvn_ui_app_fm_cut_name : R.string.agvn_ui_app_fm_copied_name, file.getName()), Toast.LENGTH_SHORT).show();
     }
 
     private void startPasteOperation() {
         if (clipboardFile == null || !clipboardFile.exists()) {
-            Toast.makeText(getContext(), "Không có gì để dán", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.agvn_ui_app_fm_nothing_to_paste, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -897,15 +896,15 @@ public class FileManagerFragment extends Fragment {
         File dest = new File(currentDir, source.getName());
         if (dest.exists()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setTitle("Trùng file");
-            builder.setMessage("\"" + dest.getName() + "\" đã tồn tại ở nơi đến.");
-            builder.setPositiveButton("Thay thế", (dialog, which) -> {
+            builder.setTitle(R.string.agvn_ui_app_fm_file_exists_title);
+            builder.setMessage(getString(R.string.agvn_ui_app_fm_file_exists_message, dest.getName()));
+            builder.setPositiveButton(R.string.agvn_ui_app_fm_replace, (dialog, which) -> {
                 deleteRecursive(dest);
                 executePaste(source, dest);
             });
-            builder.setNeutralButton("Đổi tên", (dialog, which) ->
+            builder.setNeutralButton(R.string.agvn_ui_app_rename, (dialog, which) ->
                     executePaste(source, getUniqueDestination(currentDir, source.getName())));
-            builder.setNegativeButton("Hủy", null);
+            builder.setNegativeButton(R.string.cancel, null);
             builder.show();
         } else {
             executePaste(source, dest);
@@ -932,12 +931,12 @@ public class FileManagerFragment extends Fragment {
 
     private void executePaste(File source, File dest) {
         if (isCutOperation && source.renameTo(dest)) {
-            Toast.makeText(getContext(), "Đã chuyển xong", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.agvn_ui_app_fm_move_done, Toast.LENGTH_SHORT).show();
             finishPaste(true);
             return;
         }
 
-        showProgressDialog(isCutOperation ? "Đang chuyển..." : "Đang chép...");
+        showProgressDialog(getString(isCutOperation ? R.string.agvn_ui_app_fm_moving : R.string.agvn_ui_app_fm_copying));
         isOperationCancelled = false;
         new Thread(() -> {
             try {
@@ -953,10 +952,10 @@ public class FileManagerFragment extends Fragment {
                 new Handler(Looper.getMainLooper()).post(() -> {
                     dismissProgressDialog();
                     if (!isOperationCancelled) {
-                        Toast.makeText(getContext(), "Thành công!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.agvn_ui_app_fm_success, Toast.LENGTH_SHORT).show();
                         finishPaste(isCutOperation);
                     } else {
-                        Toast.makeText(getContext(), "Đã hủy", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.agvn_ui_app_fm_cancelled, Toast.LENGTH_SHORT).show();
                         deleteRecursive(dest);
                         loadDirectory(currentDir);
                     }
@@ -965,7 +964,7 @@ public class FileManagerFragment extends Fragment {
                 final String errorMsg = e.getMessage();
                 new Handler(Looper.getMainLooper()).post(() -> {
                     dismissProgressDialog();
-                    Toast.makeText(getContext(), "Lỗi: " + errorMsg + ". File gốc vẫn được giữ.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), getString(R.string.agvn_ui_app_fm_paste_error, errorMsg), Toast.LENGTH_LONG).show();
                     deleteRecursive(dest);
                     loadDirectory(currentDir);
                 });
@@ -1002,12 +1001,12 @@ public class FileManagerFragment extends Fragment {
         layout.addView(progressBar);
 
         progressText = new TextView(getContext());
-        progressText.setText("Đang tính...");
+        progressText.setText(R.string.agvn_ui_app_fm_calculating);
         progressText.setPadding(0, 20, 0, 0);
         layout.addView(progressText);
 
         builder.setView(layout);
-        builder.setNegativeButton("Hủy", (d, w) -> isOperationCancelled = true);
+        builder.setNegativeButton(R.string.cancel, (d, w) -> isOperationCancelled = true);
         progressDialog = builder.create();
         progressDialog.show();
     }
@@ -1087,7 +1086,7 @@ public class FileManagerFragment extends Fragment {
 
     private void renameFile(File file) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Đổi tên");
+        builder.setTitle(R.string.agvn_ui_app_rename);
         final EditText input = new EditText(getContext());
         input.setText(file.getName());
         builder.setView(input);
@@ -1095,9 +1094,9 @@ public class FileManagerFragment extends Fragment {
             String newName = input.getText().toString();
             File newFile = new File(file.getParent(), newName);
             if (file.renameTo(newFile)) loadDirectory(currentDir);
-            else Toast.makeText(getContext(), "Đổi tên thất bại", Toast.LENGTH_SHORT).show();
+            else Toast.makeText(getContext(), R.string.agvn_ui_app_fm_rename_failed, Toast.LENGTH_SHORT).show();
         });
-        builder.setNegativeButton("Hủy", null);
+        builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
 
@@ -1109,36 +1108,36 @@ public class FileManagerFragment extends Fragment {
     private void showFileOptions(File file, View anchor) {
         PopupMenu popup = new PopupMenu(getContext(), anchor);
         if (isExecutable(file)) {
-            popup.getMenu().add("Chạy / Mở").setOnMenuItemClickListener(item -> {
+            popup.getMenu().add(R.string.agvn_ui_app_fm_run_open).setOnMenuItemClickListener(item -> {
                 performContainerAction(file, container -> runFileDirectly(file, container));
                 return true;
             });
-            popup.getMenu().add("Thêm game này").setOnMenuItemClickListener(item -> {
+            popup.getMenu().add(R.string.agvn_ui_app_fm_add_this_game).setOnMenuItemClickListener(item -> {
                 performContainerAction(file, container -> createShortcutDirectly(file, container));
                 return true;
             });
         }
-        popup.getMenu().add("Sao chép").setOnMenuItemClickListener(item -> {
+        popup.getMenu().add(R.string.copy).setOnMenuItemClickListener(item -> {
             copyToClipboard(file, false);
             return true;
         });
-        popup.getMenu().add("Cắt (di chuyển)").setOnMenuItemClickListener(item -> {
+        popup.getMenu().add(R.string.agvn_ui_app_fm_cut_move).setOnMenuItemClickListener(item -> {
             copyToClipboard(file, true);
             return true;
         });
-        popup.getMenu().add("Đổi tên").setOnMenuItemClickListener(item -> {
+        popup.getMenu().add(R.string.agvn_ui_app_rename).setOnMenuItemClickListener(item -> {
             renameFile(file);
             return true;
         });
-        popup.getMenu().add("Xóa").setOnMenuItemClickListener(item -> {
+        popup.getMenu().add(R.string.agvn_ui_app_delete).setOnMenuItemClickListener(item -> {
             new AlertDialog.Builder(getContext())
-                    .setTitle("Xóa")
-                    .setMessage("Bạn có chắc muốn xóa " + file.getName() + "?")
-                    .setPositiveButton("Có", (d, w) -> {
+                    .setTitle(R.string.agvn_ui_app_delete)
+                    .setMessage(getString(R.string.agvn_ui_app_fm_delete_confirm, file.getName()))
+                    .setPositiveButton(R.string.yes, (d, w) -> {
                         deleteRecursive(file);
                         loadDirectory(currentDir);
                     })
-                    .setNegativeButton("Không", null)
+                    .setNegativeButton(R.string.no, null)
                     .show();
             return true;
         });
@@ -1245,7 +1244,7 @@ public class FileManagerFragment extends Fragment {
         File[] children = file.listFiles();
         int count = children == null ? 0 : children.length;
         String date = modifiedLabel(file);
-        return "Thư mục  •  " + count + " mục" + (date.isEmpty() ? "" : "  •  " + date);
+        return getString(R.string.agvn_ui_app_fm_folder_details, count) + (date.isEmpty() ? "" : "  •  " + date);
     }
 
     private String fileDetails(File file) {

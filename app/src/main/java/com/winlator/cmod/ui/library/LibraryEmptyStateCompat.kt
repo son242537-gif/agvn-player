@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -66,9 +67,9 @@ internal fun LibraryRootWithoutEmptyDescription(
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         if (landscape) {
             LandscapeMainNavigation(
-                activity, R.id.main_menu_shortcuts, "Thư viện",
+                activity, R.id.main_menu_shortcuts, stringResource(R.string.agvn_ui_library_library),
                 actionIcon = Icons.Outlined.HelpOutline,
-                actionDescription = "Hướng dẫn",
+                actionDescription = stringResource(R.string.agvn_ui_library_guide),
                 onAction = { activity?.let { com.winlator.cmod.agvn.AgvnGuideActivity.open(it) } }
             )
         }
@@ -86,21 +87,21 @@ private fun EmptyLibraryContent(activity: MainActivity?, modifier: Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(12.dp))
-        Text("Chưa có game nào", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.agvn_ui_library_empty_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(6.dp))
         Text(
-            "Chép thư mục game vào máy (ví dụ Bộ nhớ trong/AGVN/Tên game), rồi bấm \"Thêm game\". App tự tìm game và tự chỉnh phím, đồ họa cho bạn.",
+            stringResource(R.string.agvn_ui_library_empty_body),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             modifier = Modifier.widthIn(max = 520.dp)
         )
         Spacer(Modifier.height(20.dp))
-        EmptyActionCard(Icons.Outlined.Add, "Thêm game", "Tự tìm game trong máy") {
+        EmptyActionCard(Icons.Outlined.Add, stringResource(R.string.agvn_ui_library_add_game), stringResource(R.string.agvn_ui_library_empty_add_subtitle)) {
             activity?.let { com.winlator.cmod.agvn.AgvnImportDialog.show(it) }
         }
         Spacer(Modifier.height(12.dp))
-        EmptyActionCard(Icons.Outlined.HelpOutline, "Xem hướng dẫn", "Thêm game, chơi game, chỉnh đồ họa và phím ảo") {
+        EmptyActionCard(Icons.Outlined.HelpOutline, stringResource(R.string.agvn_ui_library_view_guide), stringResource(R.string.agvn_ui_library_empty_guide_subtitle)) {
             activity?.let { com.winlator.cmod.agvn.AgvnGuideActivity.open(it) }
         }
     }

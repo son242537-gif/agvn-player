@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN Player (agvn.io): texts the "agvn1" area's classes had in their code (HTML game screen, picture notice). -->
+<resources>
+    <string name="agvn_ui_agvn1_html_load_title">Error habang nilo-load ang game</string>
+    <string name="agvn_ui_agvn1_html_no_first_scene">Hindi pa nakarating ang game sa unang eksena</string>
+    <string name="agvn_ui_agvn1_html_missing_modules">Mga Node module na hindi pa suportado ng app: %1$s</string>
+    <string name="agvn_ui_agvn1_picture_game_folder">folder ng game</string>
+    <string name="agvn_ui_agvn1_picture_no_access_game">hindi mabasa ng app ang folder ng game</string>
+    <string name="agvn_ui_agvn1_picture_short">%1$s byte lang ang file, hindi ito larawan</string>
+    <string name="agvn_ui_agvn1_picture_no_access">hindi mabasa ng app ang folder na %1$s</string>
+    <string name="agvn_ui_agvn1_picture_not_found">wala sa %1$s</string>
+    <string name="agvn_ui_agvn1_picture_no_file">wala ang file na ito</string>
+</resources>

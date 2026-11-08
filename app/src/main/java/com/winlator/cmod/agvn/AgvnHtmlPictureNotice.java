@@ -2,9 +2,11 @@
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
+import android.content.Context;
 
 import com.winlator.cmod.R;
 
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -15,6 +17,9 @@ import java.util.function.Consumer;
  * error instead ("ButtonSet image is too small", 19/10/2026). Pure Java but {@link #around} and {@link #show}.
  */
 final class AgvnHtmlPictureNotice {
+    /** How {@link AgvnHtmlStandIn#why} names the game folder itself. */
+    private static final String GAME_FOLDER = "the game folder";
+
     private AgvnHtmlPictureNotice() {}
 
     /** {@code keep} (the session's list), also showing the bar for the first system picture told. */
@@ -28,7 +33,7 @@ final class AgvnHtmlPictureNotice {
     }
 
     private static void show(Activity a, String item) {
-        String detail = a.getString(R.string.agvn_html_picture_detail, file(item), reason(why(item)));
+        String detail = a.getString(R.string.agvn_html_picture_detail, file(item), reason(a, why(item)));
         if (!AgvnFirstContainer.hasStorageAccess(a)) detail += "\n" + a.getString(R.string.agvn_html_picture_access);
         AgvnWarningBar.show(a, a.getString(R.string.agvn_html_picture_title), detail,
                 new AgvnWarningBar.Choice(R.string.agvn_movie_ok, null));
@@ -47,12 +52,28 @@ final class AgvnHtmlPictureNotice {
         return open > 0 && item.endsWith(")") ? item.substring(open + 2, item.length() - 1) : "";
     }
 
-    /** {@link AgvnHtmlStandIn#why} in the player's words. */
+    /** {@link AgvnHtmlStandIn#why} in the player's words, in Vietnamese (the JVM tests: no Context). */
     static String reason(String why) {
-        String in = why.replace("the game folder", "thư mục game");
-        if (in.startsWith("short: ")) return "tệp chỉ có " + in.substring(7).replace(" bytes", " byte") + ", không phải ảnh";
-        if (in.startsWith("no-access to ")) return "app không đọc được thư mục " + in.substring(13);
-        if (in.startsWith("not-found in ")) return "không có trong " + in.substring(13);
-        return "không có tệp này";
+        return reason(null, why);
+    }
+
+    /** {@link AgvnHtmlStandIn#why} in the player's words, in the app's language ({@code c} null: in Vietnamese). */
+    static String reason(Context c, String why) {
+        if (why.equals("no-access to " + GAME_FOLDER))
+            return text(c, R.string.agvn_ui_agvn1_picture_no_access_game, "app không đọc được thư mục game");
+        String in = why.replace(GAME_FOLDER, text(c, R.string.agvn_ui_agvn1_picture_game_folder, "thư mục game"));
+        if (in.startsWith("short: "))
+            return text(c, R.string.agvn_ui_agvn1_picture_short, "tệp chỉ có %1$s byte, không phải ảnh",
+                    in.substring(7).replace(" bytes", ""));
+        if (in.startsWith("no-access to "))
+            return text(c, R.string.agvn_ui_agvn1_picture_no_access, "app không đọc được thư mục %1$s", in.substring(13));
+        if (in.startsWith("not-found in "))
+            return text(c, R.string.agvn_ui_agvn1_picture_not_found, "không có trong %1$s", in.substring(13));
+        return text(c, R.string.agvn_ui_agvn1_picture_no_file, "không có tệp này");
+    }
+
+    /** The app's text {@code id}, else (no Context) its Vietnamese {@code vi}, with {@code args}. */
+    private static String text(Context c, int id, String vi, Object... args) {
+        return c != null ? c.getString(id, args) : String.format(Locale.ROOT, vi, args);
     }
 }

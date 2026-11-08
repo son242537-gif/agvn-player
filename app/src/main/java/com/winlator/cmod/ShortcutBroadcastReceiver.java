@@ -22,10 +22,10 @@ public class ShortcutBroadcastReceiver extends BroadcastReceiver {
             boolean isShortcutAdded = intent.getBooleanExtra("shortcut_added", false);
             if (isShortcutAdded) {
                 Log.d(LOG_TAG, "Shortcut added successfully!");
-                Toast.makeText(context, "Rất tiếc, thiết bị của bạn có thể không được hỗ trợ", Toast.LENGTH_SHORT).show(); // yeah. I'm at a loss here.
+                Toast.makeText(context, R.string.agvn_ui_library_device_unsupported, Toast.LENGTH_SHORT).show(); // yeah. I'm at a loss here.
             } else {
                 Log.d(LOG_TAG, "Shortcut addition failed.");
-                Toast.makeText(context, "Không thêm được lối tắt.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.agvn_ui_library_shortcut_add_failed, Toast.LENGTH_SHORT).show();
 
                 // Attempt to add the shortcut here if it failed
                 addShortcutToHomeScreen(context, intent);
@@ -56,7 +56,7 @@ public class ShortcutBroadcastReceiver extends BroadcastReceiver {
                     Log.d(LOG_TAG, "Pin shortcut requested with result: " + result);
 
                     if (result) {
-                        Toast.makeText(context, "Đã thêm lối tắt!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, R.string.agvn_ui_library_shortcut_added_pin, Toast.LENGTH_SHORT).show();
                     } else {
                         Log.e(LOG_TAG, "Failed to add shortcut from BroadcastReceiver.");
                     }
@@ -72,10 +72,10 @@ public class ShortcutBroadcastReceiver extends BroadcastReceiver {
                 try {
                     context.sendBroadcast(addIntent);
                     Log.d(LOG_TAG, "Sent broadcast to install shortcut from BroadcastReceiver.");
-                    Toast.makeText(context, "Đã thêm lối tắt.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, R.string.agvn_ui_library_shortcut_added, Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
                     Log.e(LOG_TAG, "Error sending broadcast for installing shortcut: " + e.getMessage(), e);
-                    Toast.makeText(context, "Không thêm được lối tắt.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, R.string.agvn_ui_library_shortcut_add_failed, Toast.LENGTH_SHORT).show();
                 }
             }
         } else {

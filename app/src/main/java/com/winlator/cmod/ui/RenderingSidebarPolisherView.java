@@ -24,9 +24,11 @@ import com.winlator.cmod.XServerDisplayActivity;
 import com.winlator.cmod.container.Container;
 
 public class RenderingSidebarPolisherView extends View {
-    private static final String[] VULKAN_UPSCALERS = {
-            "SGSR", "FSR", "Lanczos 2", "Tăng màu"
-    };
+    private String[] vulkanUpscalers() {
+        return new String[]{
+                "SGSR", "FSR", "Lanczos 2", getContext().getString(R.string.agvn_ui_app_filter_color_boost)
+        };
+    }
 
     private boolean applied;
 
@@ -119,9 +121,10 @@ public class RenderingSidebarPolisherView extends View {
             return;
         }
 
-        if (spinner.getAdapter().getCount() < VULKAN_UPSCALERS.length) {
+        String[] upscalers = vulkanUpscalers();
+        if (spinner.getAdapter().getCount() < upscalers.length) {
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                    getContext(), android.R.layout.simple_spinner_item, VULKAN_UPSCALERS) {
+                    getContext(), android.R.layout.simple_spinner_item, upscalers) {
                 @NonNull
                 @Override
                 public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {

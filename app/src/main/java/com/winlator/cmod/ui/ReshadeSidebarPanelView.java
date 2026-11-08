@@ -17,7 +17,7 @@ import com.winlator.cmod.widget.VulkanXServerView;
 
 public class ReshadeSidebarPanelView extends FrameLayout {
     private static final String[] EFFECTS = {
-            "Tắt",
+            null, // "Off", from R.string.agvn_ui_app_off (see wireOnce)
             "Game Clarity",
             "Cinematic",
             "Vivid",
@@ -65,8 +65,10 @@ public class ReshadeSidebarPanelView extends FrameLayout {
         final View root = getRootView();
         Spinner spinner = findViewById(R.id.SPReshadeEffect);
         if (spinner != null) {
+            String[] effects = EFFECTS.clone();
+            effects[0] = getContext().getString(R.string.agvn_ui_app_off);
             ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                    getContext(), android.R.layout.simple_spinner_item, EFFECTS);
+                    getContext(), android.R.layout.simple_spinner_item, effects);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(adapter);
             spinner.setSelection(0, false);

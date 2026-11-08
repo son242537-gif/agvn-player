@@ -217,9 +217,9 @@ public class FEXCorePresetManager {
             }
         }
         if (presetFile != null && presetFile.exists())
-            AppUtils.showToast(context, "Đã xuất preset " + presetFile.getName() + " vào " + presetFile.getParentFile().getPath());
+            AppUtils.showToast(context, context.getString(R.string.agvn_ui_app_preset_exported, presetFile.getName(), presetFile.getParentFile().getPath()));
         else
-            AppUtils.showToast(context, "Xuất preset thất bại");
+            AppUtils.showToast(context, R.string.agvn_ui_app_preset_export_failed);
     }
 
     public static void importPreset(Context context, InputStream stream) {

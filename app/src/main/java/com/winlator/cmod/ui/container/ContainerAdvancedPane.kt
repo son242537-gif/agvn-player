@@ -10,7 +10,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.winlator.cmod.R
 import com.winlator.cmod.container.ContainerManager
 import com.winlator.cmod.ui.settings.CpuSelectorRow
 import com.winlator.cmod.ui.settings.EnvironmentVariablesEditor
@@ -34,8 +36,13 @@ private val advancedComponents = listOf(
 internal fun ContainerAdvancedPane(containerId: Int) {
     val context = LocalContext.current
     val container = remember(containerId) { ContainerManager(context).getContainerById(containerId) } ?: return
-    var page by remember { mutableStateOf("Biến môi trường") }
-    val pages = listOf("Biến môi trường", "Thành phần", "Khởi động & điều khiển", "CPU")
+    var page by remember { mutableStateOf(0) }
+    val pages = listOf(
+        stringResource(R.string.agvn_ui_container_tab_env),
+        stringResource(R.string.agvn_ui_container_tab_components),
+        stringResource(R.string.agvn_ui_container_tab_startup),
+        "CPU"
+    )
     var environment by remember(container.getEnvVars()) { mutableStateOf(container.getEnvVars()) }
     val components = remember(container.getWinComponents()) {
         mutableStateMapOf<String, Int>().apply { putAll(parseComponents(container.getWinComponents())) }
@@ -70,17 +77,24 @@ internal fun ContainerAdvancedPane(containerId: Int) {
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        SettingsCard { SettingChoice("Nâng cao", page, pages) { page = it } }
+        SettingsCard {
+            SettingChoice(stringResource(R.string.agvn_ui_container_section_advanced), pages[page], pages) {
+                page = pages.indexOf(it).coerceAtLeast(0)
+            }
+        }
         when (page) {
-            "Biến môi trường" -> EnvironmentVariablesEditor(environment, onChanged = {
+            0 -> EnvironmentVariablesEditor(environment, onChanged = {
                 environment = it
                 container.setEnvVars(it)
                 container.saveData()
             })
 
-            "Thành phần" -> SettingsCard {
+            1 -> SettingsCard {
+                val entries = listOf(
+                    stringResource(R.string.agvn_ui_container_component_builtin),
+                    stringResource(R.string.agvn_ui_container_component_native)
+                )
                 advancedComponents.forEachIndexed { index, (key, label) ->
-                    val entries = listOf("Có sẵn (Wine)", "Gốc (Windows)")
                     val selected = entries[(components[key] ?: 0).coerceIn(0, 1)]
                     SettingChoice(label, selected, entries) { value ->
                         components[key] = entries.indexOf(value).coerceAtLeast(0)
@@ -95,19 +109,15 @@ internal fun ContainerAdvancedPane(containerId: Int) {
                 }
             }
 
-            "Khởi động & điều khiển" -> SettingsCard {
-                val startupEntries = listOf(
-                    "Bình thường (tải mọi dịch vụ)",
-                    "Thiết yếu (chỉ tải dịch vụ cần thiết)",
-                    "Tối giản (dừng dịch vụ khi khởi động)"
-                )
-                SettingChoice("Chế độ khởi động", startupEntries[startup], startupEntries) { value ->
+            2 -> SettingsCard {
+                val startupEntries = containerStartupEntries()
+                SettingChoice(stringResource(R.string.agvn_ui_container_startup_mode), startupEntries[startup], startupEntries) { value ->
                     startup = startupEntries.indexOf(value).coerceAtLeast(0)
                     container.setStartupSelection(startup.toByte())
                     container.saveData()
                 }
                 SettingsDivider()
-                SettingToggle("Nhập độc quyền", exclusive) { enabled ->
+                SettingToggle(stringResource(R.string.agvn_ui_container_exclusive_input), exclusive) { enabled ->
                     exclusive = enabled
                     if (!enabled) {
                         xinput = true
@@ -118,13 +128,13 @@ internal fun ContainerAdvancedPane(containerId: Int) {
                     saveInput()
                 }
                 SettingsDivider()
-                SettingToggle("Bật XInput", xinput, exclusive) { enabled ->
+                SettingToggle(stringResource(R.string.agvn_ui_container_enable_xinput), xinput, exclusive) { enabled ->
                     xinput = enabled
                     if (exclusive && enabled && dinput) dinput = false
                     saveInput()
                 }
                 SettingsDivider()
-                SettingToggle("Bật DInput", dinput, exclusive) { enabled ->
+                SettingToggle(stringResource(R.string.agvn_ui_container_enable_dinput), dinput, exclusive) { enabled ->
                     dinput = enabled
                     if (exclusive && enabled && xinput) xinput = false
                     saveInput()
@@ -132,12 +142,12 @@ internal fun ContainerAdvancedPane(containerId: Int) {
             }
 
             else -> SettingsCard {
-                SettingToggle("Đồng bộ cấu trúc CPU", syncCpu) {
+                SettingToggle(stringResource(R.string.agvn_ui_container_sync_cpu), syncCpu) {
                     syncCpu = it
                     saveCpu()
                 }
                 SettingsDivider()
-                CpuSelectorRow("Chọn nhân CPU", cpu64) { index, checked ->
+                CpuSelectorRow(stringResource(R.string.agvn_ui_container_cpu_cores), cpu64) { index, checked ->
                     cpu64[index] = checked
                     saveCpu()
                 }
@@ -150,6 +160,14 @@ internal fun ContainerAdvancedPane(containerId: Int) {
         }
     }
 }
+
+/** The three startup modes, in the order of Container.STARTUP_SELECTION_*. */
+@Composable
+internal fun containerStartupEntries(): List<String> = listOf(
+    stringResource(R.string.agvn_ui_container_startup_normal),
+    stringResource(R.string.agvn_ui_container_startup_essential),
+    stringResource(R.string.agvn_ui_container_startup_minimal)
+)
 
 private fun parseComponents(raw: String): Map<String, Int> {
     val result = mutableMapOf<String, Int>()

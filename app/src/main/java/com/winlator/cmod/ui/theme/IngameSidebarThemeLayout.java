@@ -123,17 +123,17 @@ public class IngameSidebarThemeLayout extends FrameLayout {
 
     private void applyCompactPremiumLayout() {
         FpsLimiterControl fps = findFirstFpsLimiter(this);
-        insertSectionLabelBefore(fps, "HIỆU NĂNG");
+        insertSectionLabelBefore(fps, getContext().getString(R.string.agvn_ui_app_sidebar_performance));
 
         View imageQuality = findViewById(R.id.LLStandardOptions);
-        insertSectionLabelBefore(imageQuality, "CHẤT LƯỢNG HÌNH");
+        insertSectionLabelBefore(imageQuality, getContext().getString(R.string.agvn_ui_app_sidebar_image_quality));
         flattenSection(imageQuality);
 
         View frameGen = findViewById(R.id.LLFrameGenOptions);
         flattenSection(frameGen);
 
         View savePreset = findViewById(R.id.BTSaveGraphicsPreset);
-        insertSectionLabelBefore(savePreset, "PRESET");
+        insertSectionLabelBefore(savePreset, getContext().getString(R.string.agvn_ui_app_sidebar_preset));
         compactActionRow(savePreset);
 
         View hudStyle = findViewById(R.id.LLHudStyleRow);
@@ -141,15 +141,15 @@ public class IngameSidebarThemeLayout extends FrameLayout {
             LinearLayout hudParent = (LinearLayout) hudStyle.getParent();
             int styleIndex = hudParent.indexOfChild(hudStyle);
             View enableHud = previousContentChild(hudParent, styleIndex);
-            insertSectionLabelBefore(enableHud, "CHUNG");
-            insertSectionLabelBefore(hudStyle, "GIAO DIỆN");
+            insertSectionLabelBefore(enableHud, getContext().getString(R.string.agvn_ui_app_sidebar_general));
+            insertSectionLabelBefore(hudStyle, getContext().getString(R.string.agvn_ui_app_sidebar_look));
 
             flattenSection(enableHud);
             flattenSection(hudStyle);
 
             TextView resetText = findTextView(this, "Đặt lại HUD");
             View resetRow = directChildUnder(hudParent, resetText);
-            insertSectionLabelBefore(resetRow, "THAO TÁC");
+            insertSectionLabelBefore(resetRow, getContext().getString(R.string.agvn_ui_app_sidebar_actions));
             compactActionRow(resetRow);
         }
     }

@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -69,6 +70,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -158,7 +160,8 @@ private val execArgumentPresetsV2 = listOf(
     "/d3d9"
 )
 
-private data class ShortcutCategoryItemV2(val label: String, val icon: ImageVector)
+/** [key] picks the category's settings (data, kept in Vietnamese); [label] is what the player reads. */
+private data class ShortcutCategoryItemV2(val key: String, @StringRes val label: Int, val icon: ImageVector)
 
 private class ShortcutEditorStateV2(val shortcut: Shortcut) {
     val container: Container = shortcut.container
@@ -439,13 +442,13 @@ internal fun ShortcutEditorV2(fragment: Fragment, shortcut: Shortcut, close: () 
     val graphicsEntries = remember { context.resources.getStringArray(R.array.graphics_driver_entries).toList() }
     val audioEntries = remember { context.resources.getStringArray(R.array.audio_driver_entries).toList() }
     val wrapperEntries = remember { context.resources.getStringArray(R.array.dxwrapper_entries).toList() }
-    val localeEntries = remember { listOf("Mặc định") + context.resources.getStringArray(R.array.some_lc_all).toList() }
+    val localeEntries = remember { listOf(context.getString(R.string.agvn_ui_library_locale_default)) + context.resources.getStringArray(R.array.some_lc_all).toList() }
     val soundFonts = remember { loadShortcutSoundFontsV2(context) }
     val gpuNames = remember { loadShortcutGpuNamesV2(context) }
     val fexPresets = remember { FEXCorePresetManager.getPresets(context).associate { it.id to it.name } }
     val boxPresets = remember { Box64PresetManager.getPresets("box64", context).associate { it.id to it.name } }
     val profiles = remember {
-        linkedMapOf("" to context.getString(R.string.agvn_controls_auto), "0" to "Tắt phím ảo").apply { // AGVN: "" = AGVN picks the layout
+        linkedMapOf("" to context.getString(R.string.agvn_controls_auto), "0" to context.getString(R.string.agvn_ui_library_controls_off)).apply { // AGVN: "" = AGVN picks the layout
             InputControlsManager(context).getProfiles(true).forEach { put(it.id.toString(), it.name) }
         }
     }
@@ -463,7 +466,7 @@ internal fun ShortcutEditorV2(fragment: Fragment, shortcut: Shortcut, close: () 
         scope.launch {
             val installed = installRuntimeComponent(context, type, version)
             state.installing = state.installing - key
-            if (installed == null) Toast.makeText(context, "Không cài được $version", Toast.LENGTH_SHORT).show()
+            if (installed == null) Toast.makeText(context, context.getString(R.string.agvn_ui_library_install_failed, version), Toast.LENGTH_SHORT).show()
             else {
                 done(installed)
                 state.revision++
@@ -478,7 +481,7 @@ internal fun ShortcutEditorV2(fragment: Fragment, shortcut: Shortcut, close: () 
         scope.launch {
             val installed = installAdrenoDriver(context, option)
             state.installing = state.installing - key
-            if (installed == null) Toast.makeText(context, "Không cài được ${option.label}", Toast.LENGTH_SHORT).show()
+            if (installed == null) Toast.makeText(context, context.getString(R.string.agvn_ui_library_install_failed, option.label), Toast.LENGTH_SHORT).show()
             else {
                 state.driverVersion = installed
                 state.graphics("version", installed)
@@ -510,7 +513,7 @@ internal fun ShortcutEditorV2(fragment: Fragment, shortcut: Shortcut, close: () 
         val target = containers.firstOrNull { it.id == targetId } ?: return
         if (target.id == state.container.id) return
         if (shortcut.cloneToContainer(target)) {
-            Toast.makeText(context, "Đã chép lối tắt sang ${target.name}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.agvn_ui_library_copied_to, target.name), Toast.LENGTH_SHORT).show()
             if (fragment is ShortcutsFragment && fragment.isAdded) fragment.loadShortcutsList()
             close()
         }
@@ -518,12 +521,12 @@ internal fun ShortcutEditorV2(fragment: Fragment, shortcut: Shortcut, close: () 
 
     var category by remember { mutableStateOf("Chung") }
     val categories = listOf(
-        ShortcutCategoryItemV2("Chung", Icons.Outlined.Settings),
-        ShortcutCategoryItemV2("Hình ảnh", Icons.Outlined.Monitor),
-        ShortcutCategoryItemV2("Tương thích", Icons.Outlined.Tune),
-        ShortcutCategoryItemV2("Điều khiển", Icons.Outlined.Gamepad),
-        ShortcutCategoryItemV2("Môi trường chạy", Icons.Outlined.Terminal),
-        ShortcutCategoryItemV2("Nâng cao", Icons.Outlined.Terminal)
+        ShortcutCategoryItemV2("Chung", R.string.agvn_ui_library_cat_general, Icons.Outlined.Settings),
+        ShortcutCategoryItemV2("Hình ảnh", R.string.agvn_ui_library_cat_display, Icons.Outlined.Monitor),
+        ShortcutCategoryItemV2("Tương thích", R.string.agvn_ui_library_cat_compat, Icons.Outlined.Tune),
+        ShortcutCategoryItemV2("Điều khiển", R.string.agvn_ui_library_cat_controls, Icons.Outlined.Gamepad),
+        ShortcutCategoryItemV2("Môi trường chạy", R.string.agvn_ui_library_environment, Icons.Outlined.Terminal),
+        ShortcutCategoryItemV2("Nâng cao", R.string.agvn_ui_library_cat_advanced, Icons.Outlined.Terminal)
     )
     val landscape = LocalConfiguration.current.screenWidthDp > LocalConfiguration.current.screenHeightDp
 
@@ -555,14 +558,14 @@ internal fun ShortcutEditorV2(fragment: Fragment, shortcut: Shortcut, close: () 
                     ) {
                         item {
                             Text(
-                                "Cài đặt lối tắt",
+                                stringResource(R.string.agvn_ui_library_editor_title),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.SemiBold,
                                 modifier = Modifier.padding(8.dp)
                             )
                         }
                         items(categories) { item ->
-                            ShortcutNavItemV2(item.label, item.icon, category == item.label) { category = item.label }
+                            ShortcutNavItemV2(stringResource(item.label), item.icon, category == item.key) { category = item.key }
                         }
                     }
                 }
@@ -589,7 +592,7 @@ internal fun ShortcutEditorV2(fragment: Fragment, shortcut: Shortcut, close: () 
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     items(categories) { item ->
-                        ShortcutNavItemV2(item.label, item.icon, category == item.label) { category = item.label }
+                        ShortcutNavItemV2(stringResource(item.label), item.icon, category == item.key) { category = item.key }
                     }
                 }
                 LazyColumn(
@@ -636,7 +639,7 @@ private fun ShortcutGameSavesCard(s: ShortcutEditorStateV2, context: Context) {
 
     SettingsCard {
         SettingToggle(
-            "Lưu game",
+            stringResource(R.string.agvn_ui_library_game_saves),
             active,
             enabled = !globalEnabled
         ) { enabled ->
@@ -648,7 +651,7 @@ private fun ShortcutGameSavesCard(s: ShortcutEditorStateV2, context: Context) {
         if (globalEnabled) {
             SettingsDivider()
             Text(
-                "Đang bật chung trong Cài đặt. Mọi game được sao lưu khi thoát.",
+                stringResource(R.string.agvn_ui_library_saves_global_on),
                 modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -658,7 +661,7 @@ private fun ShortcutGameSavesCard(s: ShortcutEditorStateV2, context: Context) {
         if (active) {
             SettingsDivider()
             SettingToggle(
-                "Tự động sao lưu",
+                stringResource(R.string.agvn_ui_library_auto_backup),
                 globalEnabled || s.autoSaveBackup,
                 enabled = !globalEnabled
             ) { enabled ->
@@ -671,22 +674,22 @@ private fun ShortcutGameSavesCard(s: ShortcutEditorStateV2, context: Context) {
                 Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-                Text("Thư mục sao lưu", style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.agvn_ui_library_backup_folder), style = MaterialTheme.typography.labelLarge)
                 Text(
                     "AGVN-Player/Saves/${GameSaveManager.getGameDir(s.shortcut).name}/",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Text("Bản sao lưu mới nhất", style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.agvn_ui_library_latest_backup), style = MaterialTheme.typography.labelLarge)
                 Text(
-                    latestBackup?.let(::shortcutBackupLabel) ?: "Chưa có bản sao lưu",
+                    latestBackup?.let(::shortcutBackupLabel) ?: stringResource(R.string.agvn_ui_library_no_backup),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Text("Vị trí lưu game", style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.agvn_ui_library_game_save_locations), style = MaterialTheme.typography.labelLarge)
                 if (roots.isEmpty()) {
                     Text(
-                        "Không tìm thấy thư mục lưu riêng.",
+                        stringResource(R.string.agvn_ui_library_no_own_folder),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -702,15 +705,15 @@ private fun ShortcutGameSavesCard(s: ShortcutEditorStateV2, context: Context) {
                 onClick = {
                     if (!busy) {
                         busy = true
-                        message = "Đang quét vị trí lưu game…"
+                        message = context.getString(R.string.agvn_ui_library_scanning_game)
                         scope.launch {
                             roots = withContext(Dispatchers.IO) {
                                 GameSaveManager.rediscoverSaveRoots(s.shortcut)
                             }
                             message = if (roots.isEmpty()) {
-                                "Không tìm thấy thư mục lưu riêng của game."
+                                context.getString(R.string.agvn_ui_library_no_own_folder_game)
                             } else {
-                                "Tìm thấy ${roots.size} vị trí lưu game."
+                                context.getString(R.string.agvn_ui_library_saves_found, roots.size)
                             }
                             refreshKey++
                             busy = false
@@ -720,7 +723,7 @@ private fun ShortcutGameSavesCard(s: ShortcutEditorStateV2, context: Context) {
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
                 enabled = !busy
             ) {
-                Text("Quét lại vị trí lưu game")
+                Text(stringResource(R.string.agvn_ui_library_rescan_game))
             }
 
             Row(
@@ -731,16 +734,16 @@ private fun ShortcutGameSavesCard(s: ShortcutEditorStateV2, context: Context) {
                     onClick = {
                         if (!busy) {
                             busy = true
-                            message = "Đang sao lưu…"
+                            message = context.getString(R.string.agvn_ui_library_backing_up)
                             scope.launch {
                                 val result = withContext(Dispatchers.IO) {
                                     GameSaveManager.backup(s.shortcut, false)
                                 }
                                 message = when {
                                     result.ok && result.wholeProfile ->
-                                        "Sao lưu xong: ${result.fileCount} file. Đã sao lưu cả hồ sơ Wine vì không tìm thấy thư mục lưu riêng của game."
-                                    result.ok -> "Sao lưu xong: ${result.fileCount} file."
-                                    else -> "Sao lưu thất bại: ${result.error ?: "lỗi không rõ"}"
+                                        context.getString(R.string.agvn_ui_library_backup_done_whole_game, result.fileCount)
+                                    result.ok -> context.getString(R.string.agvn_ui_library_backup_done, result.fileCount)
+                                    else -> context.getString(R.string.agvn_ui_library_backup_failed, result.error ?: context.getString(R.string.agvn_ui_library_unknown_error))
                                 }
                                 refreshKey++
                                 busy = false
@@ -750,22 +753,22 @@ private fun ShortcutGameSavesCard(s: ShortcutEditorStateV2, context: Context) {
                     modifier = Modifier.weight(1f),
                     enabled = !busy
                 ) {
-                    Text("Sao lưu ngay")
+                    Text(stringResource(R.string.agvn_ui_library_backup_now))
                 }
 
                 OutlinedButton(
                     onClick = {
                         if (!busy) {
                             busy = true
-                            message = "Đang khôi phục bản sao lưu mới nhất…"
+                            message = context.getString(R.string.agvn_ui_library_restoring)
                             scope.launch {
                                 val result = withContext(Dispatchers.IO) {
                                     GameSaveManager.restoreLatest(s.shortcut)
                                 }
                                 message = if (result.ok) {
-                                    "Đã khôi phục ${result.fileCount} file."
+                                    context.getString(R.string.agvn_ui_library_restored, result.fileCount)
                                 } else {
-                                    "Khôi phục thất bại: ${result.error ?: "lỗi không rõ"}"
+                                    context.getString(R.string.agvn_ui_library_restore_failed, result.error ?: context.getString(R.string.agvn_ui_library_unknown_error))
                                 }
                                 refreshKey++
                                 busy = false
@@ -775,7 +778,7 @@ private fun ShortcutGameSavesCard(s: ShortcutEditorStateV2, context: Context) {
                     modifier = Modifier.weight(1f),
                     enabled = !busy && latestBackup != null
                 ) {
-                    Text("Khôi phục")
+                    Text(stringResource(R.string.agvn_ui_library_restore))
                 }
             }
 
@@ -846,12 +849,12 @@ private fun ShortcutCategoryV2(
 ) {
     when (category) {
         "Chung" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SettingsCard { SettingText("Tên", s.name) { s.name = it } }
+            SettingsCard { SettingText(stringResource(R.string.agvn_ui_library_name), s.name) { s.name = it } }
             SettingsCard {
                 val currentLabel = environmentLabel(s.container)
                 if (containers.size > 1) {
                     val labels = containers.associate { it.id to environmentLabel(it) }
-                    SettingChoice("Môi trường chạy", currentLabel, labels.values.toList()) { selected ->
+                    SettingChoice(stringResource(R.string.agvn_ui_library_environment), currentLabel, labels.values.toList()) { selected ->
                         labels.entries.firstOrNull { it.value == selected }?.key?.let(changeContainer)
                     }
                 } else {
@@ -860,31 +863,31 @@ private fun ShortcutCategoryV2(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text("Môi trường chạy", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(stringResource(R.string.agvn_ui_library_environment), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Text(currentLabel, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
                         }
-                        IconButton(onClick = createContainer) { Icon(Icons.Outlined.Add, "Tạo môi trường chạy") }
+                        IconButton(onClick = createContainer) { Icon(Icons.Outlined.Add, stringResource(R.string.agvn_ui_library_create_environment)) }
                     }
                 }
                 SettingsDivider()
                 Button(onClick = enterContainer, modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                     Icon(Icons.Outlined.PlayArrow, null)
                     Spacer(Modifier.size(7.dp))
-                    Text("Vào môi trường chạy")
+                    Text(stringResource(R.string.agvn_ui_library_enter_environment))
                 }
             }
             SettingsCard {
-                SettingChoice("Driver âm thanh", audioEntries.firstOrNull { StringUtils.parseIdentifier(it).equals(s.audio, true) } ?: s.audio, audioEntries) {
+                SettingChoice(stringResource(R.string.agvn_ui_library_audio_driver), audioEntries.firstOrNull { StringUtils.parseIdentifier(it).equals(s.audio, true) } ?: s.audio, audioEntries) {
                     s.audio = StringUtils.parseIdentifier(it); s.extra("audioDriver", s.audio)
                 }
                 SettingsDivider()
-                SettingToggle("Kéo giãn toàn màn hình", s.fullscreen) {
+                SettingToggle(stringResource(R.string.agvn_ui_library_stretch_fullscreen), s.fullscreen) {
                     s.fullscreen = it; s.extra("fullscreenStretched", if (it) "1" else "0")
                 }
             }
             SettingsCard {
-                val hudEntries = listOf("Tắt", "Cổ điển", "Hiện đại")
-                SettingChoice("HUD", hudEntries.getOrElse(s.winlatorHudMode) { "Tắt" }, hudEntries) {
+                val hudEntries = listOf(stringResource(R.string.agvn_ui_library_off), stringResource(R.string.agvn_ui_library_hud_classic), stringResource(R.string.agvn_ui_library_hud_modern))
+                SettingChoice("HUD", hudEntries.getOrElse(s.winlatorHudMode) { hudEntries[0] }, hudEntries) {
                     s.winlatorHudMode = hudEntries.indexOf(it).coerceAtLeast(0)
                     s.extra("hudMode", s.winlatorHudMode.toString())
                 }
@@ -892,16 +895,19 @@ private fun ShortcutCategoryV2(
                 SettingToggle("DXVK HUD", s.dxvkHud) { s.updateDxvkHud(it) }
             }
             SettingsCard {
-                val locale = localeDisplayValue(s.lcAll)
-                SettingChoice("Ngôn ngữ vùng (LC_ALL)", locale, localeEntries) {
-                    s.lcAll = normalizeLocaleValue(it)
+                // AGVN: the first entry is "Mặc định" (no LC_ALL) in the player's language; normalizeLocaleValue knows only Vietnamese
+                val defaultLocale = localeEntries.first()
+                val locale = localeDisplayValue(s.lcAll).let { if (it == localeDisplayValue("")) defaultLocale else it }
+                SettingChoice(stringResource(R.string.agvn_ui_library_locale), locale, localeEntries) {
+                    s.lcAll = if (it == defaultLocale) "" else normalizeLocaleValue(it)
                     s.extra("lc_all", s.lcAll.ifBlank { null })
                 }
                 SettingsDivider()
-                val sound = s.midiSoundFont.ifBlank { "Tắt" }
+                val soundOff = stringResource(R.string.agvn_ui_library_off) // the first of soundFonts
+                val sound = s.midiSoundFont.ifBlank { soundOff }
                 SettingChoice("MIDI SoundFont", sound, soundFonts) {
                     // AGVN: "" (off) is stored too, so a game can turn off the environment's SoundFont
-                    s.midiSoundFont = if (it == "Tắt") "" else it; s.extra("midiSoundFont", s.midiSoundFont)
+                    s.midiSoundFont = if (it == soundOff) "" else it; s.extra("midiSoundFont", s.midiSoundFont)
                 }
             }
             ShortcutGameSavesCard(s, context)
@@ -914,7 +920,7 @@ private fun ShortcutCategoryV2(
                 }
                 val screenChoice = if (customScreenSelected) "Custom"
                 else screenEntries.firstOrNull { normalizeResolution(it).equals(s.screen, true) } ?: "Custom"
-                SettingChoice("Độ phân giải", screenChoice, screenEntries) {
+                SettingChoice(stringResource(R.string.agvn_ui_library_resolution), screenChoice, screenEntries) {
                     if (it.equals("Custom", true)) {
                         customScreenSelected = true
                     } else {
@@ -925,13 +931,13 @@ private fun ShortcutCategoryV2(
                 }
                 if (screenChoice == "Custom") {
                     SettingsDivider()
-                    SettingText("Độ phân giải tùy chỉnh", s.screen) { value ->
+                    SettingText(stringResource(R.string.agvn_ui_library_custom_resolution), s.screen) { value ->
                         s.screen = value
                         AgvnScreenSize.normalize(value)?.let { s.extra("screenSize", it) }
                     }
                 }
                 SettingsDivider()
-                SettingChoice("Bộ dựng hình", s.renderer, listOf("Vulkan", "EGL", "DisplayX")) {
+                SettingChoice(stringResource(R.string.agvn_ui_library_renderer), s.renderer, listOf("Vulkan", "EGL", "DisplayX")) {
                     s.renderer = it
                     s.surfaceFormat = if (it == "DisplayX") "rgba8" else "bgra8"
                     if (it == "EGL" && s.filterMode > 1) s.filterMode = 0
@@ -939,7 +945,7 @@ private fun ShortcutCategoryV2(
                 }
                 SettingsDivider()
                 SettingChoice(
-                    "Định dạng bề mặt",
+                    stringResource(R.string.agvn_ui_library_surface_format),
                     if (s.surfaceFormat == "bgra8") "BGRA" else "RGBA",
                     listOf("RGBA", "BGRA")
                 ) {
@@ -948,55 +954,57 @@ private fun ShortcutCategoryV2(
                 }
                 if (s.renderer == "DisplayX") {
                     SettingsDivider()
-                    SettingToggle("Bỏ qua X11", s.trueDisplayX) {
+                    SettingToggle(stringResource(R.string.agvn_ui_library_skip_x11), s.trueDisplayX) {
                         s.trueDisplayX = it
                         s.saveRenderer()
                     }
                     SettingsDivider()
-                    SettingToggle("Chế độ hiệu năng", s.displayXPerformanceMode) {
+                    SettingToggle(stringResource(R.string.agvn_ui_library_performance_mode), s.displayXPerformanceMode) {
                         s.displayXPerformanceMode = it
                         s.saveRenderer()
                     }
                     SettingsDivider()
-                    SettingToggle("Trình chiếu theo tần số quét", s.displayXPresentAtRefreshRate) {
+                    SettingToggle(stringResource(R.string.agvn_ui_library_present_refresh), s.displayXPresentAtRefreshRate) {
                         s.displayXPresentAtRefreshRate = it
                         s.saveRenderer()
                     }
                     SettingsDivider()
-                    SettingToggle("Gửi mọi buffer", s.displayXBackPressure) {
+                    SettingToggle(stringResource(R.string.agvn_ui_library_send_all_buffers), s.displayXBackPressure) {
                         s.displayXBackPressure = it
                         s.saveRenderer()
                     }
                     SettingsDivider()
-                    SettingToggle("Trình chiếu chính xác", s.displayXPrecisePresentation) {
+                    SettingToggle(stringResource(R.string.agvn_ui_library_precise_present), s.displayXPrecisePresentation) {
                         s.displayXPrecisePresentation = it
                         s.saveRenderer()
                     }
                 } else {
                     if (s.renderer != "EGL") {
                         SettingsDivider()
-                        SettingChoice("Chế độ trình chiếu", s.presentMode, listOf("mailbox", "fifo")) {
+                        SettingChoice(stringResource(R.string.agvn_ui_library_present_mode), s.presentMode, listOf("mailbox", "fifo")) {
                             s.presentMode = it
                             s.saveRenderer()
                         }
                         catalog?.let { c ->
                             SettingsDivider()
-                            SettingMappedChoice("Driver dựng hình", s.rendererDriver, c.rendererDrivers) {
+                            SettingMappedChoice(stringResource(R.string.agvn_ui_library_renderer_driver), s.rendererDriver, c.rendererDrivers) {
                                 s.rendererDriver = it
                                 s.saveRenderer()
                             }
                         }
                     }
                     SettingsDivider()
-                    val filters = if (s.renderer == "EGL") listOf("Bilinear", "Điểm gần nhất")
-                    else listOf("Bilinear", "Điểm gần nhất", "Snapdragon Super Resolution", "AMD FidelityFX Super Resolution", "Lanczos 2 (16-tap)", "Tăng màu")
-                    SettingChoice("Lọc texture", filters.getOrElse(s.filterMode) { filters.first() }, filters) {
+                    val nearest = stringResource(R.string.agvn_ui_library_filter_nearest) // filters are stored by their place in the list
+                    val filters = if (s.renderer == "EGL") listOf("Bilinear", nearest)
+                    else listOf("Bilinear", nearest, "Snapdragon Super Resolution", "AMD FidelityFX Super Resolution", "Lanczos 2 (16-tap)", stringResource(R.string.agvn_ui_library_filter_color_boost))
+                    SettingChoice(stringResource(R.string.agvn_ui_library_texture_filter), filters.getOrElse(s.filterMode) { filters.first() }, filters) {
                         s.filterMode = filters.indexOf(it).coerceAtLeast(0)
                         s.saveRenderer()
                     }
                 }
             }
             SettingsCard {
+                // AGVN: these two labels stay Vietnamese: SettingChoice/SettingDriverChoice show them as "Driver OpenGL"/"Driver Vulkan"
                 SettingChoice("Driver đồ họa", graphicsEntries.firstOrNull { StringUtils.parseIdentifier(it).equals(s.graphicsDriver, true) } ?: s.graphicsDriver, graphicsEntries) {
                     s.selectGraphicsDriver(StringUtils.parseIdentifier(it))
                 }
@@ -1012,32 +1020,32 @@ private fun ShortcutCategoryV2(
                 }
                 if (isTurnipDriver(s.driverVersion)) {
                     SettingsDivider()
-                    SettingChoice("Chế độ dựng hình", s.renderingMode, listOf("None", "Sysmem", "Gmem", "Autotuner Profiled")) { s.applyRenderingMode(it) }
+                    SettingChoice(stringResource(R.string.agvn_ui_library_rendering_mode), s.renderingMode, listOf("None", "Sysmem", "Gmem", "Autotuner Profiled")) { s.applyRenderingMode(it) }
                 }
                 SettingsDivider()
-                SettingChoice("Phiên bản Vulkan", s.vulkanVersion, listOf("1.1", "1.2", "1.3")) { s.vulkanVersion = it; s.graphics("vulkanVersion", it) }
+                SettingChoice(stringResource(R.string.agvn_ui_library_vulkan_version), s.vulkanVersion, listOf("1.1", "1.2", "1.3")) { s.vulkanVersion = it; s.graphics("vulkanVersion", it) }
                 SettingsDivider()
-                SettingChoice("Tên GPU", s.gpuName, gpuNames) { s.gpuName = it; s.graphics("gpuName", it) }
+                SettingChoice(stringResource(R.string.agvn_ui_library_gpu_name), s.gpuName, gpuNames) { s.gpuName = it; s.graphics("gpuName", it) }
                 SettingsDivider()
-                SettingChoice("Bộ nhớ thiết bị tối đa", s.maxMemory, listOf("0", "512", "1024", "2048", "4096", "8192", "12288", "16384")) {
+                SettingChoice(stringResource(R.string.agvn_ui_library_max_device_memory), s.maxMemory, listOf("0", "512", "1024", "2048", "4096", "8192", "12288", "16384")) {
                     s.maxMemory = it; s.graphics("maxDeviceMemory", it)
                 }
                 SettingsDivider()
-                SettingChoice("Chế độ trình chiếu của driver", s.graphicsPresentMode, listOf("mailbox", "fifo", "immediate", "relaxed")) {
+                SettingChoice(stringResource(R.string.agvn_ui_library_driver_present_mode), s.graphicsPresentMode, listOf("mailbox", "fifo", "immediate", "relaxed")) {
                     s.graphicsPresentMode = it; s.graphics("presentMode", it)
                 }
                 SettingsDivider()
-                SettingToggle("Đồng bộ khung hình", s.syncFrame) { s.syncFrame = it; s.graphics("syncFrame", if (it) "1" else "0") }
+                SettingToggle(stringResource(R.string.agvn_ui_library_sync_frame), s.syncFrame) { s.syncFrame = it; s.graphics("syncFrame", if (it) "1" else "0") }
                 SettingsDivider()
-                SettingToggle("Tắt Present Wait", s.disablePresentWait) { s.disablePresentWait = it; s.graphics("disablePresentWait", if (it) "1" else "0") }
+                SettingToggle(stringResource(R.string.agvn_ui_library_disable_present_wait), s.disablePresentWait) { s.disablePresentWait = it; s.graphics("disablePresentWait", if (it) "1" else "0") }
                 SettingsDivider()
-                SettingChoice("Loại tài nguyên", s.resourceType, listOf("auto", "dmabuf", "ahb", "opaque")) { s.resourceType = it; s.graphics("resourceType", it) }
+                SettingChoice(stringResource(R.string.agvn_ui_library_resource_type), s.resourceType, listOf("auto", "dmabuf", "ahb", "opaque")) { s.resourceType = it; s.graphics("resourceType", it) }
                 SettingsDivider()
-                SettingChoice("Giả lập BCN", s.bcn, listOf("none", "partial", "full", "auto")) { s.bcn = it; s.graphics("bcnEmulation", it) }
+                SettingChoice(stringResource(R.string.agvn_ui_library_bcn_emulation), s.bcn, listOf("none", "partial", "full", "auto")) { s.bcn = it; s.graphics("bcnEmulation", it) }
                 SettingsDivider()
-                SettingChoice("Kiểu giả lập BCN", s.bcnType, listOf("software", "compute")) { s.bcnType = it; s.graphics("bcnEmulationType", it) }
+                SettingChoice(stringResource(R.string.agvn_ui_library_bcn_type), s.bcnType, listOf("software", "compute")) { s.bcnType = it; s.graphics("bcnEmulationType", it) }
                 SettingsDivider()
-                SettingToggle("Bộ đệm giả lập BCN", s.bcnCache) { s.bcnCache = it; s.graphics("bcnEmulationCache", if (it) "1" else "0") }
+                SettingToggle(stringResource(R.string.agvn_ui_library_bcn_cache), s.bcnCache) { s.bcnCache = it; s.graphics("bcnEmulationCache", if (it) "1" else "0") }
             }
         }
 
@@ -1049,10 +1057,10 @@ private fun ShortcutCategoryV2(
                     catalog?.let { c ->
                         val dxvkCatalog = filterDxvkForVkd3d(c.dxvk, s.vkd3dVersion)
                         SettingsDivider()
-                        SettingInstallChoice("Phiên bản DXVK", s.dxvkVersion, dxvkCatalog, s.installing, "DXVK",
+                        SettingInstallChoice(stringResource(R.string.agvn_ui_library_dxvk_version), s.dxvkVersion, dxvkCatalog, s.installing, "DXVK",
                             { v -> installRuntime("DXVK", v) { installed -> s.selectDxvkVersion(installed) } }) { s.selectDxvkVersion(it) }
                         SettingsDivider()
-                        SettingInstallChoice("Phiên bản VKD3D", s.vkd3dVersion, c.vkd3d, s.installing, "VKD3D",
+                        SettingInstallChoice(stringResource(R.string.agvn_ui_library_vkd3d_version), s.vkd3dVersion, c.vkd3d, s.installing, "VKD3D",
                             { v -> installRuntime("VKD3D", v) { installed ->
                                 s.vkd3dVersion = installed
                                 s.wrapperValue("vkd3dVersion", installed)
@@ -1068,11 +1076,11 @@ private fun ShortcutCategoryV2(
                         }
                     }
                     SettingsDivider()
-                    SettingChoice("Mức tính năng VKD3D", s.vkd3dLevel, listOf("12_0", "12_1", "12_2", "11_1", "11_0", "10_1", "10_0", "9_3", "9_2", "9_1")) { s.vkd3dLevel = it; s.wrapperValue("vkd3dLevel", it) }
+                    SettingChoice(stringResource(R.string.agvn_ui_library_vkd3d_level), s.vkd3dLevel, listOf("12_0", "12_1", "12_2", "11_1", "11_0", "10_1", "10_0", "9_3", "9_2", "9_1")) { s.vkd3dLevel = it; s.wrapperValue("vkd3dLevel", it) }
                     SettingsDivider()
-                    SettingText("Giới hạn FPS", s.frameRate) { s.frameRate = it.filter(Char::isDigit).take(4); s.wrapperValue("framerate", s.frameRate.ifBlank { "0" }) }
+                    SettingText(stringResource(R.string.agvn_ui_library_fps_limit), s.frameRate) { s.frameRate = it.filter(Char::isDigit).take(4); s.wrapperValue("framerate", s.frameRate.ifBlank { "0" }) }
                     SettingsDivider()
-                    SettingToggle("Độ trễ khung hình tối đa", s.maxFrameLatency) { s.maxFrameLatency = it; s.wrapperValue("maxFrameLatency", if (it) "1" else "0") }
+                    SettingToggle(stringResource(R.string.agvn_ui_library_max_frame_latency), s.maxFrameLatency) { s.maxFrameLatency = it; s.wrapperValue("maxFrameLatency", if (it) "1" else "0") }
                     val asyncMode = dxvkAsyncMode(s.dxvkVersion)
                     if (asyncMode != DxvkAsyncMode.NONE) {
                         SettingsDivider()
@@ -1080,7 +1088,7 @@ private fun ShortcutCategoryV2(
                     }
                     if (asyncMode == DxvkAsyncMode.GPL_ASYNC) {
                         SettingsDivider()
-                        SettingToggle("Bộ đệm Async", s.asyncCache) { s.asyncCache = it; s.wrapperValue("asyncCache", if (it) "1" else "0") }
+                        SettingToggle(stringResource(R.string.agvn_ui_library_async_cache), s.asyncCache) { s.asyncCache = it; s.wrapperValue("asyncCache", if (it) "1" else "0") }
                     }
                     SettingsDivider()
                     DDrawWrapperChoice(s.ddrawWrapper) { s.ddrawWrapper = it; s.wrapperValue("ddrawrapper", it) }
@@ -1088,23 +1096,23 @@ private fun ShortcutCategoryV2(
                     SettingsDivider()
                     SettingToggle("CSMT", s.csmt) { s.csmt = it; s.wrapperValue("csmt", if (it) "3" else "0") }
                     SettingsDivider()
-                    SettingToggle("Tính shader chính xác", s.strictShaderMath) { s.strictShaderMath = it; s.wrapperValue("strict_shader_math", if (it) "1" else "0") }
+                    SettingToggle(stringResource(R.string.agvn_ui_library_strict_shader), s.strictShaderMath) { s.strictShaderMath = it; s.wrapperValue("strict_shader_math", if (it) "1" else "0") }
                     SettingsDivider()
-                    SettingChoice("Chế độ vẽ ngoài màn hình", s.offscreenMode, listOf("fbo", "backbuffer")) { s.offscreenMode = it; s.wrapperValue("OffscreenRenderingMode", it) }
+                    SettingChoice(stringResource(R.string.agvn_ui_library_offscreen_mode), s.offscreenMode, listOf("fbo", "backbuffer")) { s.offscreenMode = it; s.wrapperValue("OffscreenRenderingMode", it) }
                     SettingsDivider()
-                    SettingChoice("Bộ dựng hình Wine", s.wineRenderer, listOf("vulkan", "gl")) { s.wineRenderer = it; s.wrapperValue("renderer", it) }
+                    SettingChoice(stringResource(R.string.agvn_ui_library_wine_renderer), s.wineRenderer, listOf("vulkan", "gl")) { s.wineRenderer = it; s.wrapperValue("renderer", it) }
                     SettingsDivider()
-                    SettingText("Bộ nhớ video", s.videoMemory) { s.videoMemory = it.filter(Char::isDigit).take(6); s.wrapperValue("videoMemorySize", s.videoMemory) }
+                    SettingText(stringResource(R.string.agvn_ui_library_video_memory), s.videoMemory) { s.videoMemory = it.filter(Char::isDigit).take(6); s.wrapperValue("videoMemorySize", s.videoMemory) }
                 }
             }
             SettingsCard {
                 if (s.arm64) {
-                    SettingChoice("Giả lập 32-bit", s.emulator, listOf("FEXCore", "WOWBox64")) {
+                    SettingChoice(stringResource(R.string.agvn_ui_library_emulator_32), s.emulator, listOf("FEXCore", "WOWBox64")) {
                         s.emulator = it; s.extra("emulator", if (it == "FEXCore") "FEXCore" else "Box64")
                     }
                     catalog?.let { c ->
                         SettingsDivider()
-                        SettingInstallChoice("Phiên bản FEXCore", s.fexVersion, c.fex, s.installing, "FEXCore",
+                        SettingInstallChoice(stringResource(R.string.agvn_ui_library_fexcore_version), s.fexVersion, c.fex, s.installing, "FEXCore",
                             { v -> installRuntime("FEXCore", v) { installed -> s.fexVersion = installed; s.extra("fexcoreVersion", installed) } }) {
                             s.fexVersion = it; s.extra("fexcoreVersion", it)
                         }
@@ -1117,7 +1125,7 @@ private fun ShortcutCategoryV2(
                         val versionCatalog = if (s.arm64) c.wow else c.box
                         val type = if (s.arm64) "WOWBox64" else "Box64"
                         SettingsDivider()
-                        SettingInstallChoice("Phiên bản $type", s.boxVersion, versionCatalog, s.installing, type,
+                        SettingInstallChoice(stringResource(if (s.arm64) R.string.agvn_ui_library_wowbox64_version else R.string.agvn_ui_library_box64_version), s.boxVersion, versionCatalog, s.installing, type,
                             { v -> installRuntime(type, v) { installed -> s.boxVersion = installed; s.extra("box64Version", installed) } }) {
                             s.boxVersion = it; s.extra("box64Version", it)
                         }
@@ -1130,30 +1138,30 @@ private fun ShortcutCategoryV2(
 
         "Điều khiển" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
-                SettingMappedChoice("Cấu hình phím ảo", s.controlsProfile, profiles) {
+                SettingMappedChoice(stringResource(R.string.agvn_ui_library_controls_profile), s.controlsProfile, profiles) {
                     s.controlsProfile = it
                     s.shortcut.putExtra(com.winlator.cmod.agvn.AgvnLayouts.EXTRA_AUTO, null)
                     if (it != "0") s.shortcut.putExtra(com.winlator.cmod.agvn.AgvnControlsFork.EXTRA_HIDDEN, null) // AGVN: picked keys show
                     s.extra("controlsProfile", it.ifEmpty { null })
                 } // AGVN: player's choice; "0" = controls off, "" = automatic; Chạy nhẹ games too (AgvnLightPick)
                 SettingsDivider()
-                SettingToggle("Nhập độc quyền", s.exclusive) {
+                SettingToggle(stringResource(R.string.agvn_ui_library_exclusive_input), s.exclusive) {
                     s.exclusive = it
                     if (!it) { s.xinput = true; s.dinput = true } else if (s.xinput && s.dinput) s.dinput = false
                     s.saveInput()
                 }
                 SettingsDivider()
-                SettingToggle("Bật XInput", s.xinput, s.exclusive) { s.xinput = it; if (s.exclusive && it && s.dinput) s.dinput = false; s.saveInput() }
+                SettingToggle(stringResource(R.string.agvn_ui_library_enable_xinput), s.xinput, s.exclusive) { s.xinput = it; if (s.exclusive && it && s.dinput) s.dinput = false; s.saveInput() }
                 SettingsDivider()
-                SettingToggle("Bật DInput", s.dinput, s.exclusive) { s.dinput = it; if (s.exclusive && it && s.xinput) s.xinput = false; s.saveInput() }
+                SettingToggle(stringResource(R.string.agvn_ui_library_enable_dinput), s.dinput, s.exclusive) { s.dinput = it; if (s.exclusive && it && s.xinput) s.xinput = false; s.saveInput() }
                 SettingsDivider()
-                SettingToggle("Tắt XInput", s.disableXInput) { s.disableXInput = it; s.extra("disableXinput", if (it) "1" else null) }
+                SettingToggle(stringResource(R.string.agvn_ui_library_disable_xinput), s.disableXInput) { s.disableXInput = it; s.extra("disableXinput", if (it) "1" else null) }
                 SettingsDivider()
-                SettingToggle("Chuột tương đối", s.relativeMouse) { s.relativeMouse = it; s.extra("enableRelativeMouse", if (it) "1" else null) }
+                SettingToggle(stringResource(R.string.agvn_ui_library_relative_mouse), s.relativeMouse) { s.relativeMouse = it; s.extra("enableRelativeMouse", if (it) "1" else null) }
                 SettingsDivider()
-                SettingToggle("Tắt chuột", s.disableMouse) { s.disableMouse = it; s.extra("disableMouse", if (it) "1" else null) }
+                SettingToggle(stringResource(R.string.agvn_ui_library_disable_mouse), s.disableMouse) { s.disableMouse = it; s.extra("disableMouse", if (it) "1" else null) }
                 SettingsDivider()
-                SettingToggle("Giả lập màn hình cảm ứng", s.simulatedTouch) { s.simulatedTouch = it; s.extra("simTouchScreen", if (it) "1" else "0") }
+                SettingToggle(stringResource(R.string.agvn_ui_library_simulated_touch), s.simulatedTouch) { s.simulatedTouch = it; s.extra("simTouchScreen", if (it) "1" else "0") }
             }
         }
 
@@ -1164,29 +1172,29 @@ private fun ShortcutCategoryV2(
         else -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
                 val startupEntries = listOf(
-                    "Bình thường (tải mọi dịch vụ)",
-                    "Thiết yếu (chỉ tải dịch vụ cần thiết)",
-                    "Tối giản (dừng dịch vụ khi khởi động)"
+                    stringResource(R.string.agvn_ui_library_startup_normal),
+                    stringResource(R.string.agvn_ui_library_startup_essential),
+                    stringResource(R.string.agvn_ui_library_startup_minimal)
                 )
-                SettingChoice("Chế độ khởi động", startupEntries[s.startup], startupEntries) {
+                SettingChoice(stringResource(R.string.agvn_ui_library_startup_mode), startupEntries[s.startup], startupEntries) {
                     s.startup = startupEntries.indexOf(it).coerceAtLeast(0); s.extra("startupSelection", s.startup.toString())
                 }
             }
             SettingsCard {
-                SettingToggle("Đồng bộ cấu trúc CPU", s.syncCpu) { s.syncCpu = it; s.saveCpu() }
+                SettingToggle(stringResource(R.string.agvn_ui_library_sync_cpu), s.syncCpu) { s.syncCpu = it; s.saveCpu() }
                 SettingsDivider()
-                CpuSelectorRow("Chọn nhân CPU", s.cpu) { index, checked -> s.cpu[index] = checked; s.saveCpu() }
+                CpuSelectorRow(stringResource(R.string.agvn_ui_library_cpu_cores), s.cpu) { index, checked -> s.cpu[index] = checked; s.saveCpu() }
             }
             SettingsCard {
-                SettingChoice("Hiệu ứng làm nét", s.sharpnessEffect, listOf("None", "CAS", "DLS")) {
+                SettingChoice(stringResource(R.string.agvn_ui_library_sharpness_effect), s.sharpnessEffect, listOf("None", "CAS", "DLS")) {
                     s.sharpnessEffect = it; s.extra("sharpnessEffect", it)
                 }
                 SettingsDivider()
-                SharpnessSliderV2("Mức làm nét", s.sharpnessLevel) {
+                SharpnessSliderV2(stringResource(R.string.agvn_ui_library_sharpness_level), s.sharpnessLevel) {
                     s.sharpnessLevel = it; s.extra("sharpnessLevel", it)
                 }
                 SettingsDivider()
-                SharpnessSliderV2("Khử nhiễu khi làm nét", s.sharpnessDenoise) {
+                SharpnessSliderV2(stringResource(R.string.agvn_ui_library_sharpness_denoise), s.sharpnessDenoise) {
                     s.sharpnessDenoise = it; s.extra("sharpnessDenoise", it)
                 }
             }
@@ -1195,7 +1203,7 @@ private fun ShortcutCategoryV2(
             }
             SettingsCard {
                 shortcutComponentRowsV2.forEachIndexed { index, (key, label) ->
-                    val entries = listOf("Có sẵn (Wine)", "Gốc (Windows)")
+                    val entries = listOf(stringResource(R.string.agvn_ui_library_component_builtin), stringResource(R.string.agvn_ui_library_component_native))
                     val selected = entries[(s.components[key] ?: 0).coerceIn(0, 1)]
                     SettingChoice(label, selected, entries) {
                         s.components[key] = entries.indexOf(it).coerceAtLeast(0); s.saveComponents()
@@ -1235,7 +1243,7 @@ private fun ExecArgumentsEditorV2(value: String, onChanged: (String) -> Unit) {
             OutlinedTextField(
                 value = value,
                 onValueChange = onChanged,
-                label = { Text("Tham số chạy") },
+                label = { Text(stringResource(R.string.agvn_ui_library_exec_args)) },
                 modifier = Modifier.weight(1f),
                 singleLine = true,
                 shape = RoundedCornerShape(10.dp)
@@ -1262,7 +1270,7 @@ private fun ExecArgumentsEditorV2(value: String, onChanged: (String) -> Unit) {
 private fun ShortcutVulkanExtensionsV2(context: Context, driver: String, blacklisted: String, onChanged: (String) -> Unit) {
     val extensions = remember(driver) { runCatching { GPUInformation.enumerateExtensions(driver, context).toList().sorted() }.getOrDefault(emptyList()) }
     if (extensions.isEmpty()) {
-        SettingText("Tiện ích Vulkan đã tắt", blacklisted, 2) { onChanged(it.replace(" ", "")) }
+        SettingText(stringResource(R.string.agvn_ui_library_vulkan_ext_disabled), blacklisted, 2) { onChanged(it.replace(" ", "")) }
         return
     }
     val disabled = blacklisted.split(',').map(String::trim).filter(String::isNotBlank).toSet()
@@ -1270,8 +1278,8 @@ private fun ShortcutVulkanExtensionsV2(context: Context, driver: String, blackli
     var open by remember { mutableStateOf(false) }
     Surface(onClick = { open = true }, color = Color.Transparent, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 11.dp)) {
-            Text("Tiện ích Vulkan", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text("Đã bật $enabledCount/${extensions.size}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+            Text(stringResource(R.string.agvn_ui_library_vulkan_ext), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.agvn_ui_library_vulkan_ext_count, enabledCount, extensions.size), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
         }
     }
     if (open) {
@@ -1279,10 +1287,10 @@ private fun ShortcutVulkanExtensionsV2(context: Context, driver: String, blackli
         AlertDialog(
             onDismissRequest = { open = false },
             confirmButton = {
-                TextButton(onClick = { onChanged(extensions.filterNot { it in selected }.joinToString(",")); open = false }) { Text("Xong") }
+                TextButton(onClick = { onChanged(extensions.filterNot { it in selected }.joinToString(",")); open = false }) { Text(stringResource(R.string.agvn_ui_library_done)) }
             },
-            dismissButton = { TextButton(onClick = { open = false }) { Text("Hủy") } },
-            title = { Text("Tiện ích Vulkan") },
+            dismissButton = { TextButton(onClick = { open = false }) { Text(stringResource(R.string.cancel)) } },
+            title = { Text(stringResource(R.string.agvn_ui_library_vulkan_ext)) },
             text = {
                 LazyColumn(Modifier.heightIn(max = 460.dp)) {
                     items(extensions) { extension ->
@@ -1314,7 +1322,7 @@ private fun loadShortcutGpuNamesV2(context: Context): List<String> {
 }
 
 private fun loadShortcutSoundFontsV2(context: Context): List<String> {
-    val result = linkedSetOf("Tắt", MidiManager.DEFAULT_SF2_FILE)
+    val result = linkedSetOf(context.getString(R.string.agvn_ui_library_off), MidiManager.DEFAULT_SF2_FILE)
     MidiManager.getSoundFontDir(context).listFiles()?.filter { it.isFile }?.sortedBy { it.name.lowercase() }?.forEach { result.add(it.name) }
     return result.toList()
 }

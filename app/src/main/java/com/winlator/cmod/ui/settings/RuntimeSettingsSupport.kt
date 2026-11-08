@@ -67,6 +67,7 @@ import java.io.File
 import java.io.FileOutputStream
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import androidx.compose.ui.res.stringResource
 
 internal data class VersionCatalog(val all: List<String>, val installed: Set<String>)
 internal data class DriverOption(
@@ -224,7 +225,7 @@ internal suspend fun loadSettingsCatalog(
     }
 
     val adreno = AdrenotoolsManager(context)
-    val rendererDrivers = linkedMapOf("system" to "Hệ thống")
+    val rendererDrivers = linkedMapOf("system" to context.getString(R.string.system))
     val driverOptions = linkedMapOf<String, DriverOption>()
 
     context.resources.getStringArray(R.array.wrapper_graphics_driver_version_entries).forEach { version ->
@@ -435,14 +436,14 @@ private fun WallpaperPreview() {
         if (bitmap != null) {
             Image(
                 bitmap = bitmap.asImageBitmap(),
-                contentDescription = "Xem trước hình nền",
+                contentDescription = stringResource(R.string.agvn_ui_app_wallpaper_preview),
                 modifier = Modifier.fillMaxWidth().height(132.dp).clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
         } else {
             Image(
                 painter = painterResource(R.drawable.wallpaper),
-                contentDescription = "Xem trước hình nền",
+                contentDescription = stringResource(R.string.agvn_ui_app_wallpaper_preview),
                 modifier = Modifier.fillMaxWidth().height(132.dp).clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
@@ -503,7 +504,11 @@ internal fun SettingChoice(
                 }
             }
         }
-        if (label == "Hình nền desktop" && selected.equals("Hình ảnh", ignoreCase = true)) {
+        // AGVN: the label and choice arrive as shown (Vietnamese, or translated by the container screen)
+        val wallpaperLabel = stringResource(R.string.agvn_ui_container_desktop_background)
+        val imageChoice = stringResource(R.string.agvn_ui_container_bg_image)
+        if ((label == "Hình nền desktop" || label == wallpaperLabel) &&
+            (selected.equals("Hình ảnh", ignoreCase = true) || selected.equals(imageChoice, ignoreCase = true))) {
             WallpaperPreview()
         }
     }
@@ -533,6 +538,7 @@ internal fun SettingWineRuntimeChoice(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val selectedOption = options.firstOrNull { it.id == selectedId }
+    val pickVersion = stringResource(R.string.agvn_ui_app_pick_version)
     Box(Modifier.fillMaxWidth()) {
         Surface(onClick = { expanded = true }, modifier = Modifier.fillMaxWidth(), color = Color.Transparent) {
             Row(
@@ -542,7 +548,7 @@ internal fun SettingWineRuntimeChoice(
                 Column(Modifier.weight(1f)) {
                     Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(
-                        selectedOption?.label ?: selectedId.ifBlank { "Chọn phiên bản" },
+                        selectedOption?.label ?: selectedId.ifBlank { pickVersion },
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Medium,
                         maxLines = 1,
@@ -565,7 +571,8 @@ internal fun SettingWineRuntimeChoice(
                         Column {
                             Text(option.label, color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (option.installed) 1f else .52f))
                             Text(
-                                if (option.installed) option.type else if (busy) "${option.type} • Downloading…" else "${option.type} • Download",
+                                if (option.installed) option.type
+                                else "${option.type} • ${stringResource(if (busy) R.string.agvn_ui_app_downloading else R.string.agvn_ui_app_download)}",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -600,6 +607,7 @@ internal fun SettingInstallChoice(
     onSelected: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val pickVersion = stringResource(R.string.agvn_ui_app_pick_version)
     Box(Modifier.fillMaxWidth()) {
         Surface(onClick = { expanded = true }, modifier = Modifier.fillMaxWidth(), color = Color.Transparent) {
             Row(
@@ -608,7 +616,7 @@ internal fun SettingInstallChoice(
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(selected.ifBlank { "Chọn phiên bản" }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+                    Text(selected.ifBlank { pickVersion }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
                 }
                 SettingHelpButton(label)
                 Icon(Icons.Outlined.KeyboardArrowDown, null)
@@ -626,7 +634,7 @@ internal fun SettingInstallChoice(
                     text = {
                         Column {
                             Text(value, color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (available) 1f else .52f))
-                            if (!available) Text(if (busy) "Đang tải…" else "Tải về", style = MaterialTheme.typography.labelSmall)
+                            if (!available) Text(stringResource(if (busy) R.string.agvn_ui_app_downloading else R.string.agvn_ui_app_download), style = MaterialTheme.typography.labelSmall)
                         }
                     },
                     trailingIcon = {
@@ -689,7 +697,7 @@ internal fun SettingDriverChoice(
                     text = {
                         Column {
                             Text(option.label, color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (option.installed) 1f else .52f))
-                            if (!option.installed) Text(if (busy) "Đang tải…" else "Tải về", style = MaterialTheme.typography.labelSmall)
+                            if (!option.installed) Text(stringResource(if (busy) R.string.agvn_ui_app_downloading else R.string.agvn_ui_app_download), style = MaterialTheme.typography.labelSmall)
                         }
                     },
                     trailingIcon = {

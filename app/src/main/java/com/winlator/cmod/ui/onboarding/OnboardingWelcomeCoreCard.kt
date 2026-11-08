@@ -19,6 +19,8 @@ import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.winlator.cmod.R
 
 @Composable
 internal fun ClassicCoreStatusCard(readyState: State<Boolean>, progressState: State<Int>, retry: () -> Unit) {
@@ -46,7 +48,7 @@ internal fun ClassicCoreStatusCard(readyState: State<Boolean>, progressState: St
             }
             Spacer(Modifier.size(14.dp))
             Text(
-                if (ready) "Lõi AGVN Player đã sẵn sàng" else "Đang chuẩn bị lõi AGVN Player ở chế độ nền",
+                stringResource(if (ready) R.string.agvn_ui_app_onb_core_ready else R.string.agvn_ui_app_onb_core_preparing),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

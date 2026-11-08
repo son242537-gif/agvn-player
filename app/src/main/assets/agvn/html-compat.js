@@ -651,10 +651,21 @@
         if (isText(f)) [60, 400].forEach(function (ms) { setTimeout(function () { fitField(f); }, ms); });
     }
 
+    // a text the player sees, in the app's language (AgvnHtmlActivity sets __agvnText first); Vietnamese without it
+    function said(key, vi) {
+        var t = window.__agvnText;
+        return t && typeof t[key] === 'string' && t[key] ? t[key] : vi;
+    }
+
+    function missingSaid(missing) {
+        if (!missing.length) return '';
+        var list = missing.join(', ');
+        return ' · ' + said('missingModules', 'app chưa hỗ trợ mô-đun Node: %1$s').replace('%1$s', function () { return list; });
+    }
+
     function keepFatal(text) {
         var missing = window.__agvnMissingModules || [];
-        if (!window.__agvnFatal) window.__agvnFatal = String(text).slice(0, 300)
-            + (missing.length ? ' · app chưa hỗ trợ mô-đun Node: ' + missing.join(', ') : '');
+        if (!window.__agvnFatal) window.__agvnFatal = String(text).slice(0, 300) + missingSaid(missing);
     }
 
     // --- 5, as the scripts load: an error in a plugin's first lines keeps RPG Maker MZ from starting (main.js shows it
@@ -680,11 +691,11 @@
         setTimeout(function () {
             var missing = window.__agvnMissingModules || [];
             if (!window.SceneManager || SceneManager._scene || (!loadError && !missing.length)) return;
-            var text = (loadError || 'Game chưa vào được cảnh đầu')
-                + (missing.length ? ' · app chưa hỗ trợ mô-đun Node: ' + missing.join(', ') : '');
+            var text = (loadError || said('noFirstScene', 'Game chưa vào được cảnh đầu')) + missingSaid(missing);
             keepFatal(text);
             console.error('[AGVN] game chưa vào cảnh đầu sau 15 giây: ' + text);
-            if (window.Graphics && typeof Graphics.printError === 'function') Graphics.printError('Lỗi khi nạp game', text);
+            if (window.Graphics && typeof Graphics.printError === 'function')
+                Graphics.printError(said('loadTitle', 'Lỗi khi nạp game'), text);
         }, 15000);
     });
 

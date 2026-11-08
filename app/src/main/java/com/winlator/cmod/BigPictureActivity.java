@@ -407,7 +407,7 @@ public class BigPictureActivity extends AppCompatActivity {
 
             playDefaultMp3FromAssets();
 
-            Toast.makeText(this, "Đã đặt lại MP3 mặc định", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.agvn_ui_library_mp3_reset, Toast.LENGTH_SHORT).show();
         });
 
 
@@ -478,7 +478,7 @@ public class BigPictureActivity extends AppCompatActivity {
                     editor.putString("saved_youtube_url", userUrl);
                     editor.apply();
                 } else {
-                    youtubeUrlInput.setError("Link YouTube không hợp lệ");
+                    youtubeUrlInput.setError(getString(R.string.agvn_ui_library_youtube_link_invalid));
                 }
             } else {
                 loadYouTubeVideo(defaultVideoId);
@@ -611,9 +611,9 @@ public class BigPictureActivity extends AppCompatActivity {
 
     private void updateBgMusicButtonText(Button button, boolean isEnabled) {
         if (isEnabled) {
-            button.setText("Tắt nhạc nền");
+            button.setText(R.string.agvn_ui_library_music_off);
         } else {
-            button.setText("Bật nhạc nền");
+            button.setText(R.string.agvn_ui_library_music_on);
         }
     }
 
@@ -734,8 +734,8 @@ public class BigPictureActivity extends AppCompatActivity {
 
     private void showCoverArtOptionsDialog() {
         new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Tùy chọn ảnh bìa")
-                .setItems(new CharSequence[]{"Xóa ảnh bìa tùy chỉnh", "Tải ảnh bìa mới"}, (dialog, which) -> {
+                .setTitle(R.string.agvn_ui_library_cover_options)
+                .setItems(new CharSequence[]{getString(R.string.agvn_ui_library_cover_remove), getString(R.string.agvn_ui_library_cover_upload)}, (dialog, which) -> {
                     switch (which) {
                         case 0: // Remove Custom Cover Art
                             removeCustomCoverArt();
@@ -745,7 +745,7 @@ public class BigPictureActivity extends AppCompatActivity {
                             break;
                     }
                 })
-                .setNegativeButton("Hủy", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
@@ -858,8 +858,8 @@ public class BigPictureActivity extends AppCompatActivity {
         SharedPreferences playtimePrefs = getSharedPreferences("playtime_stats", Context.MODE_PRIVATE);
         long totalPlaytime = playtimePrefs.getLong(shortcut.name + "_playtime", 0);
         int playCount = playtimePrefs.getInt(shortcut.name + "_play_count", 0);
-        playCountView.setText("Số lần chơi: " + playCount);
-        playtimeView.setText("Thời gian chơi: " + formatPlaytime(totalPlaytime));
+        playCountView.setText(getString(R.string.agvn_ui_library_play_count, playCount));
+        playtimeView.setText(getString(R.string.agvn_ui_library_playtime, formatPlaytime(totalPlaytime)));
 
         Container container = manager.getContainerForShortcut(shortcut);
         String graphicsDriver = shortcut.getExtra("graphicsDriver");
@@ -914,7 +914,7 @@ public class BigPictureActivity extends AppCompatActivity {
         } else if (!containerValue.isEmpty()) {
             textView.setText(containerValue); // Fallback to the container's value
         } else {
-            textView.setText("Chưa đặt"); // Fallback if neither are available
+            textView.setText(R.string.agvn_ui_library_not_set); // Fallback if neither are available
         }
     }
 
@@ -925,7 +925,7 @@ public class BigPictureActivity extends AppCompatActivity {
         } else if (!containerValue.isEmpty()) {
             textView.setText(label + containerValue); // Fallback to the container's value
         } else {
-            textView.setText(label + "Chưa đặt"); // Fallback if neither are available
+            textView.setText(label + getString(R.string.agvn_ui_library_not_set)); // Fallback if neither are available
         }
     }
 
@@ -979,7 +979,7 @@ public class BigPictureActivity extends AppCompatActivity {
             }
 
             uploadText = new TextView(this); // Initialize the uploadText variable
-            uploadText.setText("Không tìm thấy ảnh bìa phù hợp cho " + shortcut.name + ". Chạm vào ảnh để tải ảnh bìa tùy chỉnh hoặc đổi tên lối tắt để SteamGrid nhận ra.");
+            uploadText.setText(getString(R.string.agvn_ui_library_cover_not_found, shortcut.name));
             uploadText.setTextColor(Color.WHITE);
             uploadText.setTextSize(18);
             uploadText.setPadding(20, 20, 20, 20);
@@ -1096,7 +1096,7 @@ public class BigPictureActivity extends AppCompatActivity {
 
                     String[] displayOptions = {"Center", "Stretch", "Tile"};
                     new AlertDialog.Builder(this)
-                            .setTitle("Chọn kiểu hiển thị")
+                            .setTitle(R.string.agvn_ui_library_display_style)
                             .setItems(displayOptions, (dialog, which) -> {
                                 editor.putString(WALLPAPER_DISPLAY_PREF_KEY, displayOptions[which].toLowerCase());
                                 editor.apply();
@@ -1448,13 +1448,13 @@ public class BigPictureActivity extends AppCompatActivity {
     private void loadFramesFromFolder(Uri folderUri) {
         DocumentFile docFolder = DocumentFile.fromTreeUri(this, folderUri);
         if (docFolder == null || !docFolder.isDirectory()) {
-            Toast.makeText(this, "Thư mục đã chọn không hợp lệ!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.agvn_ui_library_folder_invalid, Toast.LENGTH_SHORT).show();
             return;
         }
 
         DocumentFile[] docFiles = docFolder.listFiles();
         if (docFiles == null || docFiles.length == 0) {
-            Toast.makeText(this, "Thư mục không có file nào!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.agvn_ui_library_folder_empty, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -1473,7 +1473,7 @@ public class BigPictureActivity extends AppCompatActivity {
         }
 
         if (bitmaps.isEmpty()) {
-            Toast.makeText(this, "Không có file PNG trong thư mục này!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.agvn_ui_library_folder_no_png, Toast.LENGTH_SHORT).show();
             return;
         }
 

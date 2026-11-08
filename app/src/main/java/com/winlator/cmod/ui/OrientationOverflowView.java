@@ -34,7 +34,7 @@ public final class OrientationOverflowView extends AppCompatImageButton {
         super(activity);
         this.activity = activity;
         setImageResource(R.drawable.ui_ic_more);
-        setContentDescription("Thêm");
+        setContentDescription(activity.getString(R.string.agvn_ui_app_more));
         setScaleType(ScaleType.CENTER_INSIDE);
         setPadding(dp(11), dp(11), dp(11), dp(11));
         setMinimumWidth(dp(48));
@@ -74,12 +74,12 @@ public final class OrientationOverflowView extends AppCompatImageButton {
         popup.setElevation(dp(10));
         popup.setClippingEnabled(true);
 
-        content.addView(createPlainRow("Hướng dẫn", v -> { // AGVN
+        content.addView(createPlainRow(activity.getString(R.string.agvn_guide_title), v -> { // AGVN
             popup.dismiss();
             com.winlator.cmod.agvn.AgvnGuideActivity.open(activity);
         }));
         content.addView(createRow(
-                "Khóa hướng màn hình",
+                activity.getString(R.string.agvn_ui_app_lock_orientation),
                 activity.isOrientationLocked(),
                 false,
                 v -> {
@@ -88,7 +88,7 @@ public final class OrientationOverflowView extends AppCompatImageButton {
                 }
         ));
         content.addView(createRow(
-                "Chế độ dọc",
+                activity.getString(R.string.agvn_ui_app_portrait_mode),
                 activity.isVerticalModeEnabled(),
                 true,
                 v -> {
@@ -97,7 +97,7 @@ public final class OrientationOverflowView extends AppCompatImageButton {
                 }
         ));
         content.addView(createRow(
-                "Chế độ ngang",
+                activity.getString(R.string.agvn_ui_app_landscape_mode),
                 activity.isHorizontalModeEnabled(),
                 true,
                 v -> {

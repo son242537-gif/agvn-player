@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
@@ -55,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -331,8 +333,16 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
     val state = remember(editing?.id) { ContainerEditorStateV2(context, manager, editing) }
     val scope = rememberCoroutineScope()
 
-    var category by remember { mutableStateOf("Chung") }
-    val categories = listOf("Chung", "Hình ảnh", "Tương thích", "Điều khiển", "Ổ đĩa", "Môi trường", "Nâng cao")
+    var category by remember { mutableIntStateOf(0) }
+    val categories = listOf(
+        stringResource(R.string.agvn_ui_container_cat_general),
+        stringResource(R.string.agvn_ui_container_section_video),
+        stringResource(R.string.agvn_ui_container_section_compat),
+        stringResource(R.string.agvn_ui_container_cat_controls),
+        stringResource(R.string.agvn_ui_container_section_drives),
+        stringResource(R.string.agvn_ui_container_cat_environment),
+        stringResource(R.string.agvn_ui_container_section_advanced)
+    )
     val landscape = LocalConfiguration.current.screenWidthDp > LocalConfiguration.current.screenHeightDp
     var revision by remember { mutableIntStateOf(0) }
     var installing by remember { mutableStateOf<Set<String>>(emptySet()) }
@@ -372,7 +382,8 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
     val graphicsEntries = remember { context.resources.getStringArray(R.array.graphics_driver_entries).toList() }
     val wrapperEntries = remember { context.resources.getStringArray(R.array.dxwrapper_entries).toList() }
     val audioEntries = remember { context.resources.getStringArray(R.array.audio_driver_entries).toList() }
-    val localeEntries = remember { listOf("Mặc định") + context.resources.getStringArray(R.array.some_lc_all).toList() }
+    val defaultLocale = stringResource(R.string.agvn_ui_container_locale_default)
+    val localeEntries = remember(defaultLocale) { listOf(defaultLocale) + context.resources.getStringArray(R.array.some_lc_all).toList() }
     val soundFonts = remember(revision) { loadContainerSoundFontsV2(context) }
     val gpuNames = remember { loadContainerGpuNamesV2(context) }
     val fexPresets = remember { FEXCorePresetManager.getPresets(context).associate { it.id to it.name } }
@@ -392,7 +403,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
         scope.launch {
             val installed = installRuntimeComponent(context, type, version)
             installing = installing - key
-            if (installed == null) Toast.makeText(context, "Không cài được $version", Toast.LENGTH_SHORT).show()
+            if (installed == null) Toast.makeText(context, context.getString(R.string.agvn_ui_container_install_failed, version), Toast.LENGTH_SHORT).show()
             else {
                 done(installed)
                 revision++
@@ -407,7 +418,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
         scope.launch {
             val installedId = installWineRuntimeComponent(context, option)
             installing = installing - key
-            if (installedId == null) Toast.makeText(context, "Không cài được ${option.label}", Toast.LENGTH_LONG).show()
+            if (installedId == null) Toast.makeText(context, context.getString(R.string.agvn_ui_container_install_failed, option.label), Toast.LENGTH_LONG).show()
             else {
                 state.runtime = installedId
                 contents.syncContents()
@@ -423,7 +434,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
         scope.launch {
             val installed = installAdrenoDriver(context, option)
             installing = installing - key
-            if (installed == null) Toast.makeText(context, "Không cài được ${option.label}", Toast.LENGTH_SHORT).show()
+            if (installed == null) Toast.makeText(context, context.getString(R.string.agvn_ui_container_install_failed, option.label), Toast.LENGTH_SHORT).show()
             else {
                 state.driverVersion = installed
                 state.graphics("version", installed)
@@ -503,7 +514,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
         if (creating || state.runtime.isBlank()) return
         val wineInfo = WineInfo.fromIdentifier(context, contents, state.runtime)
         if (wineInfo.path.isNullOrBlank()) {
-            Toast.makeText(context, "Wine/Proton đã chọn chưa được cài.", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, R.string.agvn_ui_container_wine_not_installed, Toast.LENGTH_LONG).show()
             return
         }
         creating = true
@@ -562,7 +573,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
             }
             manager.createContainerAsync(data, contents) { created ->
                 creating = false
-                if (created == null) Toast.makeText(context, "Không tạo được môi trường chạy.", Toast.LENGTH_LONG).show()
+                if (created == null) Toast.makeText(context, R.string.agvn_ui_container_create_failed, Toast.LENGTH_LONG).show()
                 else {
                     applyMouseWarp(created)
                     onCreated()
@@ -570,7 +581,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
             }
         } catch (_: Exception) {
             creating = false
-            Toast.makeText(context, "Không tạo được môi trường chạy.", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, R.string.agvn_ui_container_create_failed, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -581,7 +592,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text(if (editing == null) "Môi trường chạy mới" else state.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                title = { Text(if (editing == null) stringResource(R.string.agvn_ui_container_new) else state.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Outlined.ArrowBack, null) } }
             )
         },
@@ -597,7 +608,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 10.dp).height(50.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text(if (creating) "Đang tạo…" else "Tạo môi trường chạy", fontWeight = FontWeight.SemiBold)
+                        Text(if (creating) stringResource(R.string.agvn_ui_container_creating) else stringResource(R.string.agvn_ui_container_create), fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -621,13 +632,13 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
                     ) {
                         item {
                             Text(
-                                "Cài đặt môi trường chạy",
+                                stringResource(R.string.agvn_ui_container_settings_title),
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.SemiBold,
                                 modifier = Modifier.padding(8.dp)
                             )
                         }
-                        items(categories) { item -> ContainerNavItemV2(item, category == item) { category = item } }
+                        itemsIndexed(categories) { index, item -> ContainerNavItemV2(item, category == index) { category = index } }
                     }
                 }
                 LazyColumn(
@@ -651,7 +662,7 @@ internal fun ContainerEditorV2(editId: Int?, onBack: () -> Unit, onCreated: () -
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    items(categories) { item -> ContainerNavItemV2(item, category == item) { category = item } }
+                    itemsIndexed(categories) { index, item -> ContainerNavItemV2(item, category == index) { category = index } }
                 }
                 LazyColumn(
                     Modifier.fillMaxSize().padding(horizontal = 14.dp),
@@ -690,7 +701,7 @@ private fun ContainerNavItemV2(label: String, selected: Boolean, onClick: () -> 
 @Suppress("LongParameterList")
 @Composable
 private fun ContainerCategoryV2(
-    category: String,
+    category: Int,
     s: ContainerEditorStateV2,
     runtimes: List<WineRuntimeOption>,
     arm64: Boolean,
@@ -710,6 +721,12 @@ private fun ContainerCategoryV2(
     installRuntime: (String, String, (String) -> Unit) -> Unit
 ) {
     val context = LocalContext.current
+    val off = stringResource(R.string.agvn_ui_container_off)
+    val defaultLocale = localeEntries.first()
+    val darkTheme = stringResource(R.string.agvn_ui_container_theme_dark)
+    val lightTheme = stringResource(R.string.agvn_ui_container_theme_light)
+    val imageBackground = stringResource(R.string.agvn_ui_container_bg_image)
+    val colorBackground = stringResource(R.string.agvn_ui_container_bg_color)
     val wallpaperPicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
             runCatching {
@@ -721,46 +738,58 @@ private fun ContainerCategoryV2(
                 s.desktopBackground = "Hình ảnh"
                 s.wallpaperStamp = stamp
             }.onFailure {
-                Toast.makeText(context, "Không đặt được hình nền.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.agvn_ui_container_wallpaper_failed, Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     when (category) {
-        "Chung" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        0 -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
-                SettingText("Tên", s.name) { s.name = it }
+                SettingText(stringResource(R.string.agvn_ui_container_field_name), s.name) { s.name = it }
                 SettingsDivider()
                 SettingWineRuntimeChoice("Wine / Proton", s.runtime, runtimes, installing, installWine) { s.runtime = it }
             }
             SettingsCard {
                 SettingChoice(
-                    "Driver âm thanh",
+                    stringResource(R.string.agvn_ui_container_audio_driver),
                     audioEntries.firstOrNull { StringUtils.parseIdentifier(it).equals(s.audio, true) } ?: s.audio,
                     audioEntries
                 ) { s.audio = StringUtils.parseIdentifier(it) }
                 // AGVN: no Oboe latency or backend rows: "oboe" is played by PulseAudio-GN, which never reads them
                 SettingsDivider()
-                val hudEntries = listOf("Tắt", "Cổ điển", "Hiện đại")
-                SettingChoice("HUD Winlator", hudEntries.getOrElse(s.hudMode) { "Tắt" }, hudEntries) {
+                val hudEntries = listOf(off, stringResource(R.string.agvn_ui_container_hud_classic), stringResource(R.string.agvn_ui_container_hud_modern))
+                SettingChoice("HUD Winlator", hudEntries.getOrElse(s.hudMode) { off }, hudEntries) {
                     s.hudMode = hudEntries.indexOf(it).coerceAtLeast(0)
                 }
             }
             SettingsCard {
-                SettingChoice("Ngôn ngữ vùng (LC_ALL)", localeDisplayValue(s.locale), localeEntries) {
-                    s.locale = normalizeLocaleValue(it)
+                SettingChoice(
+                    stringResource(R.string.agvn_ui_container_locale),
+                    if (s.locale.isBlank()) defaultLocale else localeDisplayValue(s.locale),
+                    localeEntries
+                ) {
+                    s.locale = if (it == defaultLocale) "" else normalizeLocaleValue(it)
                 }
                 SettingsDivider()
-                SettingChoice("MIDI SoundFont", s.soundFont.ifBlank { "Tắt" }, soundFonts) {
-                    s.soundFont = if (it == "Tắt") "" else it
+                SettingChoice("MIDI SoundFont", s.soundFont.ifBlank { off }, soundFonts) {
+                    s.soundFont = if (it == off) "" else it
                 }
                 SettingsDivider()
-                SettingToggle("Kéo giãn toàn màn hình", s.fullscreen) { s.fullscreen = it }
+                SettingToggle(stringResource(R.string.agvn_ui_container_stretch_fullscreen), s.fullscreen) { s.fullscreen = it }
             }
             SettingsCard {
-                SettingChoice("Giao diện desktop", s.desktopTheme, listOf("Tối", "Sáng")) { s.desktopTheme = it }
+                SettingChoice(
+                    stringResource(R.string.agvn_ui_container_desktop_theme),
+                    if (s.desktopTheme == "Sáng") lightTheme else darkTheme,
+                    listOf(darkTheme, lightTheme)
+                ) { s.desktopTheme = if (it == lightTheme) "Sáng" else "Tối" }
                 SettingsDivider()
-                SettingChoice("Hình nền desktop", s.desktopBackground, listOf("Hình ảnh", "Màu đơn")) { s.desktopBackground = it }
+                SettingChoice(
+                    stringResource(R.string.agvn_ui_container_desktop_background),
+                    if (s.desktopBackground == "Màu đơn") colorBackground else imageBackground,
+                    listOf(imageBackground, colorBackground)
+                ) { s.desktopBackground = if (it == colorBackground) "Màu đơn" else "Hình ảnh" }
                 if (s.desktopBackground == "Hình ảnh") {
                     SettingsDivider()
                     Row(
@@ -769,34 +798,34 @@ private fun ContainerCategoryV2(
                     ) {
                         Column(Modifier.weight(1f)) {
                             Text(
-                                "Ảnh hình nền",
+                                stringResource(R.string.agvn_ui_container_wallpaper_image),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                if (s.wallpaperStamp > 0L) "Ảnh tùy chỉnh" else "Hình nền mặc định",
+                                if (s.wallpaperStamp > 0L) stringResource(R.string.agvn_ui_container_wallpaper_custom) else stringResource(R.string.agvn_ui_container_wallpaper_default_bg),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium
                             )
                         }
                         TextButton(onClick = { wallpaperPicker.launch("image/*") }) {
-                            Text(if (s.wallpaperStamp > 0L) "Đổi" else "Chọn")
+                            Text(if (s.wallpaperStamp > 0L) stringResource(R.string.agvn_ui_container_change) else stringResource(R.string.agvn_ui_container_choose))
                         }
                     }
                 }
                 SettingsDivider()
-                SettingChoice("Ghi đè di chuyển chuột", s.mouseWarp, listOf("disable", "enable", "force")) { s.mouseWarp = it }
+                SettingChoice(stringResource(R.string.agvn_ui_container_mouse_warp), s.mouseWarp, listOf("disable", "enable", "force")) { s.mouseWarp = it }
             }
         }
 
-        "Hình ảnh" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        1 -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
                 var customScreenSelected by remember {
                     mutableStateOf(screenEntries.none { normalizeResolution(it).equals(s.screen, true) })
                 }
                 val shownScreen = if (customScreenSelected) "Custom"
                 else screenEntries.firstOrNull { normalizeResolution(it).equals(s.screen, true) } ?: "Custom"
-                SettingChoice("Độ phân giải", shownScreen, screenEntries) {
+                SettingChoice(stringResource(R.string.agvn_ui_container_resolution), shownScreen, screenEntries) {
                     if (it.equals("Custom", true)) {
                         customScreenSelected = true
                     } else {
@@ -806,65 +835,66 @@ private fun ContainerCategoryV2(
                 }
                 if (shownScreen == "Custom") {
                     SettingsDivider()
-                    SettingText("Độ phân giải tùy chỉnh", s.screen) { s.screen = it }
+                    SettingText(stringResource(R.string.agvn_ui_container_custom_resolution), s.screen) { s.screen = it }
                 }
                 SettingsDivider()
-                SettingChoice("Bộ dựng hình", s.renderer, listOf("Vulkan", "EGL", "DisplayX")) {
+                SettingChoice(stringResource(R.string.agvn_ui_container_renderer), s.renderer, listOf("Vulkan", "EGL", "DisplayX")) {
                     s.renderer = it
                     s.surfaceFormat = if (it == "DisplayX") "rgba8" else "bgra8"
                     if (it == "EGL" && s.filterMode > 1) s.filterMode = 0
                 }
                 SettingsDivider()
                 SettingChoice(
-                    "Định dạng bề mặt",
+                    stringResource(R.string.agvn_ui_container_surface_format),
                     if (s.surfaceFormat == "bgra8") "BGRA" else "RGBA",
                     listOf("RGBA", "BGRA")
                 ) { s.surfaceFormat = if (it == "BGRA") "bgra8" else "rgba8" }
                 if (s.renderer == "DisplayX") {
                     SettingsDivider()
-                    SettingToggle("Bỏ qua X11", s.trueDisplayX) {
+                    SettingToggle(stringResource(R.string.agvn_ui_container_bypass_x11), s.trueDisplayX) {
                         s.trueDisplayX = it
                     }
                     SettingsDivider()
-                    SettingToggle("Chế độ hiệu năng", s.displayXPerformanceMode) {
+                    SettingToggle(stringResource(R.string.agvn_ui_container_performance_mode), s.displayXPerformanceMode) {
                         s.displayXPerformanceMode = it
                     }
                     SettingsDivider()
-                    SettingToggle("Trình chiếu theo tần số quét", s.displayXPresentAtRefreshRate) {
+                    SettingToggle(stringResource(R.string.agvn_ui_container_present_refresh), s.displayXPresentAtRefreshRate) {
                         s.displayXPresentAtRefreshRate = it
                     }
                     SettingsDivider()
-                    SettingToggle("Gửi mọi buffer", s.displayXBackPressure) {
+                    SettingToggle(stringResource(R.string.agvn_ui_container_back_pressure), s.displayXBackPressure) {
                         s.displayXBackPressure = it
                     }
                     SettingsDivider()
-                    SettingToggle("Trình chiếu chính xác", s.displayXPrecisePresentation) {
+                    SettingToggle(stringResource(R.string.agvn_ui_container_precise_present), s.displayXPrecisePresentation) {
                         s.displayXPrecisePresentation = it
                     }
                 } else {
                     if (s.renderer != "EGL") {
                         SettingsDivider()
-                        SettingChoice("Chế độ trình chiếu", s.rendererPresentMode, listOf("fifo", "mailbox")) {
+                        SettingChoice(stringResource(R.string.agvn_ui_container_present_mode), s.rendererPresentMode, listOf("fifo", "mailbox")) {
                             s.rendererPresentMode = it
                         }
                         catalog?.let { c ->
                             SettingsDivider()
-                            SettingMappedChoice("Driver dựng hình", s.rendererDriver, c.rendererDrivers) {
+                            SettingMappedChoice(stringResource(R.string.agvn_ui_container_renderer_driver), s.rendererDriver, c.rendererDrivers) {
                                 s.rendererDriver = it
                             }
                         }
                     }
                     SettingsDivider()
-                    val filters = if (s.renderer == "EGL") listOf("Bilinear", "Điểm gần nhất")
+                    val nearest = stringResource(R.string.agvn_ui_container_filter_nearest)
+                    val filters = if (s.renderer == "EGL") listOf("Bilinear", nearest)
                     else listOf(
                         "Bilinear",
-                        "Điểm gần nhất",
+                        nearest,
                         "Snapdragon Super Resolution",
                         "AMD FidelityFX Super Resolution",
                         "Lanczos 2 (16-tap)",
-                        "Tăng màu"
+                        stringResource(R.string.agvn_ui_container_filter_color_boost)
                     )
-                    SettingChoice("Lọc texture", filters.getOrElse(s.filterMode) { filters.first() }, filters) {
+                    SettingChoice(stringResource(R.string.agvn_ui_container_texture_filter), filters.getOrElse(s.filterMode) { filters.first() }, filters) {
                         s.filterMode = filters.indexOf(it).coerceAtLeast(0)
                     }
                 }
@@ -887,56 +917,56 @@ private fun ContainerCategoryV2(
                     }
                     SettingsDivider()
                 }
-                SettingChoice("Phiên bản Vulkan", s.vulkanVersion, listOf("1.1", "1.2", "1.3")) {
+                SettingChoice(stringResource(R.string.agvn_ui_container_vulkan_version), s.vulkanVersion, listOf("1.1", "1.2", "1.3")) {
                     s.vulkanVersion = it; s.graphics("vulkanVersion", it)
                 }
                 SettingsDivider()
-                SettingChoice("Tên GPU", s.gpuName, gpuNames) { s.gpuName = it; s.graphics("gpuName", it) }
+                SettingChoice(stringResource(R.string.agvn_ui_container_gpu_name), s.gpuName, gpuNames) { s.gpuName = it; s.graphics("gpuName", it) }
                 SettingsDivider()
-                SettingChoice("Bộ nhớ thiết bị tối đa", s.maxMemory, listOf("0", "512", "1024", "2048", "4096", "8192", "12288", "16384")) {
+                SettingChoice(stringResource(R.string.agvn_ui_container_max_device_memory), s.maxMemory, listOf("0", "512", "1024", "2048", "4096", "8192", "12288", "16384")) {
                     s.maxMemory = it; s.graphics("maxDeviceMemory", it)
                 }
                 SettingsDivider()
-                SettingChoice("Chế độ trình chiếu của driver", s.driverPresentMode, listOf("mailbox", "fifo", "immediate", "relaxed")) {
+                SettingChoice(stringResource(R.string.agvn_ui_container_driver_present_mode), s.driverPresentMode, listOf("mailbox", "fifo", "immediate", "relaxed")) {
                     s.driverPresentMode = it; s.graphics("presentMode", it)
                 }
                 SettingsDivider()
-                SettingToggle("Đồng bộ khung hình", s.syncFrame) { s.syncFrame = it; s.graphics("syncFrame", if (it) "1" else "0") }
+                SettingToggle(stringResource(R.string.agvn_ui_container_sync_frame), s.syncFrame) { s.syncFrame = it; s.graphics("syncFrame", if (it) "1" else "0") }
                 SettingsDivider()
-                SettingToggle("Tắt Present Wait", s.disablePresentWait) {
+                SettingToggle(stringResource(R.string.agvn_ui_container_disable_present_wait), s.disablePresentWait) {
                     s.disablePresentWait = it; s.graphics("disablePresentWait", if (it) "1" else "0")
                 }
                 SettingsDivider()
-                SettingChoice("Loại tài nguyên", s.resourceType, listOf("auto", "dmabuf", "ahb", "opaque")) {
+                SettingChoice(stringResource(R.string.agvn_ui_container_resource_type), s.resourceType, listOf("auto", "dmabuf", "ahb", "opaque")) {
                     s.resourceType = it; s.graphics("resourceType", it)
                 }
                 SettingsDivider()
-                SettingChoice("Giả lập BCN", s.bcn, listOf("none", "partial", "full", "auto")) {
+                SettingChoice(stringResource(R.string.agvn_ui_container_bcn_emulation), s.bcn, listOf("none", "partial", "full", "auto")) {
                     s.bcn = it; s.graphics("bcnEmulation", it)
                 }
                 SettingsDivider()
-                SettingChoice("Kiểu giả lập BCN", s.bcnType, listOf("software", "compute")) {
+                SettingChoice(stringResource(R.string.agvn_ui_container_bcn_type), s.bcnType, listOf("software", "compute")) {
                     s.bcnType = it; s.graphics("bcnEmulationType", it)
                 }
                 SettingsDivider()
-                SettingToggle("Bộ đệm giả lập BCN", s.bcnCache) {
+                SettingToggle(stringResource(R.string.agvn_ui_container_bcn_cache), s.bcnCache) {
                     s.bcnCache = it; s.graphics("bcnEmulationCache", if (it) "1" else "0")
                 }
             }
         }
 
-        "Tương thích" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        2 -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
                 val shownWrapper = wrapperEntries.firstOrNull { StringUtils.parseIdentifier(it).equals(s.wrapper, true) } ?: s.wrapper
                 SettingChoice("DX Wrapper", shownWrapper, wrapperEntries) { s.wrapper = StringUtils.parseIdentifier(it) }
                 if (s.wrapper.contains("dxvk", true)) catalog?.let { c ->
                     val dxvkCatalog = filterDxvkForVkd3d(c.dxvk, s.vkd3dVersion)
                     SettingsDivider()
-                    SettingInstallChoice("Phiên bản DXVK", s.dxvkVersion, dxvkCatalog, installing, "DXVK", { v ->
+                    SettingInstallChoice(stringResource(R.string.agvn_ui_container_dxvk_version), s.dxvkVersion, dxvkCatalog, installing, "DXVK", { v ->
                         installRuntime("DXVK", v) { installed -> s.selectDxvkVersion(installed) }
                     }) { s.selectDxvkVersion(it) }
                     SettingsDivider()
-                    SettingInstallChoice("Phiên bản VKD3D", s.vkd3dVersion, c.vkd3d, installing, "VKD3D", { v ->
+                    SettingInstallChoice(stringResource(R.string.agvn_ui_container_vkd3d_version), s.vkd3dVersion, c.vkd3d, installing, "VKD3D", { v ->
                         installRuntime("VKD3D", v) { installed ->
                             s.vkd3dVersion = installed
                             s.wrapperValue("vkd3dVersion", installed)
@@ -952,15 +982,15 @@ private fun ContainerCategoryV2(
                         }
                     }
                     SettingsDivider()
-                    SettingChoice("Mức tính năng VKD3D", s.vkd3dLevel, listOf("12_0", "12_1", "12_2", "11_1", "11_0", "10_1", "10_0", "9_3", "9_2", "9_1")) {
+                    SettingChoice(stringResource(R.string.agvn_ui_container_vkd3d_level), s.vkd3dLevel, listOf("12_0", "12_1", "12_2", "11_1", "11_0", "10_1", "10_0", "9_3", "9_2", "9_1")) {
                         s.vkd3dLevel = it; s.wrapperValue("vkd3dLevel", it)
                     }
                     SettingsDivider()
-                    SettingText("Giới hạn FPS", s.frameRate) {
+                    SettingText(stringResource(R.string.agvn_ui_container_fps_limit), s.frameRate) {
                         s.frameRate = it.filter(Char::isDigit).take(4); s.wrapperValue("framerate", s.frameRate.ifBlank { "0" })
                     }
                     SettingsDivider()
-                    SettingToggle("Độ trễ khung hình tối đa", s.maxFrameLatency) {
+                    SettingToggle(stringResource(R.string.agvn_ui_container_max_frame_latency), s.maxFrameLatency) {
                         s.maxFrameLatency = it; s.wrapperValue("maxFrameLatency", if (it) "1" else "0")
                     }
                     val asyncMode = dxvkAsyncMode(s.dxvkVersion)
@@ -970,7 +1000,7 @@ private fun ContainerCategoryV2(
                     }
                     if (asyncMode == DxvkAsyncMode.GPL_ASYNC) {
                         SettingsDivider()
-                        SettingToggle("Bộ đệm Async", s.asyncCache) { s.asyncCache = it; s.wrapperValue("asyncCache", if (it) "1" else "0") }
+                        SettingToggle(stringResource(R.string.agvn_ui_container_async_cache), s.asyncCache) { s.asyncCache = it; s.wrapperValue("asyncCache", if (it) "1" else "0") }
                     }
                     SettingsDivider()
                     DDrawWrapperChoice(s.ddrawWrapper) {
@@ -980,10 +1010,10 @@ private fun ContainerCategoryV2(
             }
             SettingsCard {
                 if (arm64) {
-                    SettingChoice("Giả lập 32-bit", s.emulator, listOf("FEXCore", "WOWBox64")) { s.emulator = it }
+                    SettingChoice(stringResource(R.string.agvn_ui_container_emulator_32), s.emulator, listOf("FEXCore", "WOWBox64")) { s.emulator = it }
                     catalog?.let { c ->
                         SettingsDivider()
-                        SettingInstallChoice("Phiên bản FEXCore", s.fexVersion, c.fex, installing, "FEXCore", { v ->
+                        SettingInstallChoice(stringResource(R.string.agvn_ui_container_fexcore_version), s.fexVersion, c.fex, installing, "FEXCore", { v ->
                             installRuntime("FEXCore", v) { installed -> s.fexVersion = installed }
                         }) { s.fexVersion = it }
                     }
@@ -995,7 +1025,7 @@ private fun ContainerCategoryV2(
                         val type = if (arm64) "WOWBox64" else "Box64"
                         val versions = if (arm64) c.wow else c.box
                         if (arm64) SettingsDivider()
-                        SettingInstallChoice("Phiên bản $type", s.boxVersion, versions, installing, type, { v ->
+                        SettingInstallChoice(stringResource(if (arm64) R.string.agvn_ui_container_wowbox64_version else R.string.agvn_ui_container_box64_version), s.boxVersion, versions, installing, type, { v ->
                             installRuntime(type, v) { installed -> s.boxVersion = installed }
                         }) { s.boxVersion = it }
                     }
@@ -1005,57 +1035,53 @@ private fun ContainerCategoryV2(
             }
         }
 
-        "Điều khiển" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        3 -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
-                SettingToggle("Nhập độc quyền", s.exclusive) { enabled ->
+                SettingToggle(stringResource(R.string.agvn_ui_container_exclusive_input), s.exclusive) { enabled ->
                     s.exclusive = enabled
                     if (!enabled) {
                         s.xinput = true; s.dinput = true
                     } else if (s.xinput && s.dinput) s.dinput = false
                 }
                 SettingsDivider()
-                SettingToggle("Bật XInput", s.xinput, s.exclusive) {
+                SettingToggle(stringResource(R.string.agvn_ui_container_enable_xinput), s.xinput, s.exclusive) {
                     s.xinput = it; if (s.exclusive && it && s.dinput) s.dinput = false
                 }
                 SettingsDivider()
-                SettingToggle("Bật DInput", s.dinput, s.exclusive) {
+                SettingToggle(stringResource(R.string.agvn_ui_container_enable_dinput), s.dinput, s.exclusive) {
                     s.dinput = it; if (s.exclusive && it && s.xinput) s.xinput = false
                 }
             }
         }
 
-        "Ổ đĩa" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        4 -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             DriveLettersEditorV2(
                 initialDrives = s.drives,
-                subtitle = "Thay đổi được lưu cùng môi trường chạy này"
+                subtitle = stringResource(R.string.agvn_ui_container_drives_subtitle)
             ) { s.drives = it }
         }
 
-        "Môi trường" -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        5 -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             EnvironmentVariablesEditor(cleanContainerEnvironment(s.envVars), onChanged = { s.setEnvironment(it) })
         }
 
         else -> Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SettingsCard {
-                val startupEntries = listOf(
-                    "Bình thường (tải mọi dịch vụ)",
-                    "Thiết yếu (chỉ tải dịch vụ cần thiết)",
-                    "Tối giản (dừng dịch vụ khi khởi động)"
-                )
-                SettingChoice("Chế độ khởi động", startupEntries[s.startup.coerceIn(0, 2)], startupEntries) {
+                val startupEntries = containerStartupEntries()
+                SettingChoice(stringResource(R.string.agvn_ui_container_startup_mode), startupEntries[s.startup.coerceIn(0, 2)], startupEntries) {
                     s.startup = startupEntries.indexOf(it).coerceAtLeast(0)
                 }
             }
             SettingsCard {
-                SettingToggle("Đồng bộ cấu trúc CPU", s.syncCpu) { s.syncCpu = it }
+                SettingToggle(stringResource(R.string.agvn_ui_container_sync_cpu), s.syncCpu) { s.syncCpu = it }
                 SettingsDivider()
-                CpuSelectorRow("Chọn nhân CPU", s.cpu64) { index, checked -> s.cpu64[index] = checked }
+                CpuSelectorRow(stringResource(R.string.agvn_ui_container_cpu_cores), s.cpu64) { index, checked -> s.cpu64[index] = checked }
                 SettingsDivider()
-                CpuSelectorRow("Chọn nhân CPU (ứng dụng 32-bit)", s.cpu32) { index, checked -> s.cpu32[index] = checked }
+                CpuSelectorRow(stringResource(R.string.agvn_ui_container_cpu_cores_32), s.cpu32) { index, checked -> s.cpu32[index] = checked }
             }
             SettingsCard {
+                val entries = listOf(stringResource(R.string.agvn_ui_container_component_builtin), stringResource(R.string.agvn_ui_container_component_native))
                 containerComponentRowsV2.forEachIndexed { index, (key, label) ->
-                    val entries = listOf("Có sẵn (Wine)", "Gốc (Windows)")
                     val selected = entries[(s.components[key] ?: 0).coerceIn(0, 1)]
                     SettingChoice(label, selected, entries) { s.components[key] = entries.indexOf(it).coerceAtLeast(0) }
                     if (index != containerComponentRowsV2.lastIndex) SettingsDivider()
@@ -1076,7 +1102,7 @@ private fun ContainerVulkanExtensionsV2(
         runCatching { GPUInformation.enumerateExtensions(driver, context).toList().sorted() }.getOrDefault(emptyList())
     }
     if (extensions.isEmpty()) {
-        SettingText("Tiện ích Vulkan đã tắt", blacklisted, 2) { onChanged(it.replace(" ", "")) }
+        SettingText(stringResource(R.string.agvn_ui_container_vulkan_ext_disabled), blacklisted, 2) { onChanged(it.replace(" ", "")) }
         return
     }
     val disabled = blacklisted.split(',').map(String::trim).filter(String::isNotBlank).toSet()
@@ -1084,8 +1110,8 @@ private fun ContainerVulkanExtensionsV2(
     var open by remember { mutableStateOf(false) }
     Surface(onClick = { open = true }, color = Color.Transparent, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 11.dp)) {
-            Text("Tiện ích Vulkan", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text("Đã bật $enabledCount/${extensions.size}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+            Text(stringResource(R.string.agvn_ui_container_vulkan_ext), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.agvn_ui_container_enabled_count, enabledCount, extensions.size), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
         }
     }
     if (open) {
@@ -1097,10 +1123,10 @@ private fun ContainerVulkanExtensionsV2(
             confirmButton = {
                 TextButton(onClick = {
                     onChanged(extensions.filterNot { it in selected }.joinToString(",")); open = false
-                }) { Text("Xong") }
+                }) { Text(stringResource(R.string.agvn_ui_container_done)) }
             },
-            dismissButton = { TextButton(onClick = { open = false }) { Text("Hủy") } },
-            title = { Text("Tiện ích Vulkan") },
+            dismissButton = { TextButton(onClick = { open = false }) { Text(stringResource(R.string.agvn_ui_container_cancel)) } },
+            title = { Text(stringResource(R.string.agvn_ui_container_vulkan_ext)) },
             text = {
                 LazyColumn(Modifier.heightIn(max = 460.dp)) {
                     items(extensions) { extension ->
@@ -1133,7 +1159,7 @@ private fun loadContainerGpuNamesV2(context: Context): List<String> {
 }
 
 private fun loadContainerSoundFontsV2(context: Context): List<String> {
-    val result = linkedSetOf("Tắt", MidiManager.DEFAULT_SF2_FILE)
+    val result = linkedSetOf(context.getString(R.string.agvn_ui_container_off), MidiManager.DEFAULT_SF2_FILE)
     MidiManager.getSoundFontDir(context).listFiles()?.filter(File::isFile)?.sortedBy { it.name.lowercase() }?.forEach { result.add(it.name) }
     return result.toList()
 }

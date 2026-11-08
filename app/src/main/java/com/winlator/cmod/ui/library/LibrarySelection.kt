@@ -34,8 +34,10 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.winlator.cmod.R
 
 /**
  * Picking several games of the library to remove them at once: "Chọn nhiều game" in a game's menu starts it with that
@@ -84,9 +86,9 @@ internal fun LibrarySelectionBar(selection: LibrarySelection, visible: List<Libr
         color = MaterialTheme.colorScheme.surfaceVariant
     ) {
         Row(Modifier.padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = selection::end) { Icon(Icons.Outlined.Close, "Thoát chọn nhiều") }
+            IconButton(onClick = selection::end) { Icon(Icons.Outlined.Close, stringResource(R.string.agvn_ui_library_exit_pick)) }
             Text(
-                "Đã chọn ${selection.picked.size}",
+                stringResource(R.string.agvn_ui_library_picked_count, selection.picked.size),
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
@@ -94,7 +96,7 @@ internal fun LibrarySelectionBar(selection: LibrarySelection, visible: List<Libr
             TextButton(onClick = {
                 if (all) selection.picked.clear()
                 else visible.forEach { if (it.shortcutPath !in selection.picked) selection.picked.add(it.shortcutPath) }
-            }) { Text(if (all) "Bỏ chọn hết" else "Chọn tất cả") }
+            }) { Text(stringResource(if (all) R.string.agvn_ui_library_unpick_all else R.string.agvn_ui_library_pick_all)) }
             Button(
                 onClick = { onRemove(selection.picked.toList()) },
                 enabled = selection.picked.isNotEmpty(),
@@ -105,7 +107,7 @@ internal fun LibrarySelectionBar(selection: LibrarySelection, visible: List<Libr
             ) {
                 Icon(Icons.Outlined.DeleteOutline, null, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Xóa")
+                Text(stringResource(R.string.agvn_ui_library_remove))
             }
         }
     }
@@ -120,7 +122,7 @@ internal fun LibrarySelectionMark(picked: Boolean, modifier: Modifier = Modifier
     ) {
         Icon(
             if (picked) Icons.Filled.CheckCircle else Icons.Outlined.RadioButtonUnchecked,
-            if (picked) "Đã chọn" else "Chưa chọn",
+            stringResource(if (picked) R.string.agvn_ui_library_picked else R.string.agvn_ui_library_not_picked),
             tint = if (picked) MaterialTheme.colorScheme.primary else Color.White,
             modifier = Modifier.size(28.dp)
         )

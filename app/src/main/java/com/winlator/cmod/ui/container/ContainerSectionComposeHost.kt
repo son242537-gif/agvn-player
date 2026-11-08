@@ -58,10 +58,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.winlator.cmod.R
 import com.winlator.cmod.core.DefaultVersion
 import com.winlator.cmod.ui.theme.WinZTheme
 
@@ -365,7 +367,7 @@ private fun ContainerSectionScreen(
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    Text("Lưu", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.agvn_ui_container_save), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 }
             }
         }
@@ -394,15 +396,15 @@ private fun ContainerSectionScreen(
                         1 -> {
                             ChoiceSetting(
                                 Icons.Outlined.DesktopWindows,
-                                "Bộ dựng hình",
+                                stringResource(R.string.agvn_ui_container_renderer),
                                 renderer,
                                 rendererEntries
                             ) { renderer = it }
                             GroupDivider()
                             ActionSetting(
                                 Icons.Outlined.Tune,
-                                "Tùy chọn dựng hình",
-                                "Chế độ trình chiếu, driver, bộ lọc và kênh màu",
+                                stringResource(R.string.agvn_ui_container_renderer_options),
+                                stringResource(R.string.agvn_ui_container_renderer_options_desc),
                                 expanded = rendererOptionsExpanded
                             ) { rendererOptionsExpanded = !rendererOptionsExpanded }
                             if (rendererOptionsExpanded) {
@@ -421,7 +423,7 @@ private fun ContainerSectionScreen(
                                 )
                             }
                             GroupDivider()
-                            ChoiceSetting(Icons.Outlined.Memory, "Độ phân giải", screen, screenEntries) { screen = it }
+                            ChoiceSetting(Icons.Outlined.Memory, stringResource(R.string.agvn_ui_container_resolution), screen, screenEntries) { screen = it }
                             if (screen.equals("Custom", true)) {
                                 CustomResolutionFields(
                                     width = customWidth,
@@ -433,15 +435,15 @@ private fun ContainerSectionScreen(
                             GroupDivider()
                             ChoiceSetting(
                                 Icons.Outlined.DesktopWindows,
-                                "Driver đồ họa",
+                                stringResource(R.string.agvn_ui_container_graphics_driver),
                                 graphics,
                                 graphicsEntries
                             ) { graphics = it }
                             GroupDivider()
                             ActionSetting(
                                 Icons.Outlined.Tune,
-                                "Tùy chọn driver đồ họa",
-                                "Phiên bản driver, Vulkan, tài nguyên và BCN",
+                                stringResource(R.string.agvn_ui_container_graphics_driver_options),
+                                stringResource(R.string.agvn_ui_container_graphics_driver_options_desc),
                                 expanded = graphicsOptionsExpanded
                             ) { graphicsOptionsExpanded = !graphicsOptionsExpanded }
                             if (graphicsOptionsExpanded) {
@@ -471,9 +473,9 @@ private fun ContainerSectionScreen(
                             }
                         }
                         2 -> {
-                            ChoiceSetting(Icons.Outlined.VolumeUp, "Driver âm thanh", audio, audioEntries) { audio = it }
+                            ChoiceSetting(Icons.Outlined.VolumeUp, stringResource(R.string.agvn_ui_container_audio_driver), audio, audioEntries) { audio = it }
                             GroupDivider()
-                            InfoText("ALSA xuất âm thanh trực tiếp. PulseAudio có thể tương thích tốt hơn với một số ứng dụng.")
+                            InfoText(stringResource(R.string.agvn_ui_container_audio_info))
                         }
                         else -> {
                             ChoiceSetting(Icons.Outlined.VerifiedUser, "DX Wrapper", wrapper, wrapperEntries) {
@@ -482,8 +484,8 @@ private fun ContainerSectionScreen(
                             GroupDivider()
                             ActionSetting(
                                 Icons.Outlined.Tune,
-                                "Tùy chọn wrapper",
-                                "Phiên bản DXVK / VKD3D và cấu hình wrapper",
+                                stringResource(R.string.agvn_ui_container_wrapper_options),
+                                stringResource(R.string.agvn_ui_container_wrapper_options_desc),
                                 expanded = wrapperOptionsExpanded
                             ) { wrapperOptionsExpanded = !wrapperOptionsExpanded }
                             if (wrapperOptionsExpanded) {
@@ -526,21 +528,21 @@ private fun ContainerSectionScreen(
                             GroupDivider()
                             ReadOnlySetting(
                                 icon = Icons.Outlined.Memory,
-                                label = "Giả lập 64-bit",
+                                label = stringResource(R.string.agvn_ui_container_emulator_64),
                                 value = if (arm64EcWine) "FEXCore" else "Box64"
                             )
                             GroupDivider()
                             if (arm64EcWine) {
                                 ChoiceSetting(
                                     Icons.Outlined.Memory,
-                                    "Giả lập 32-bit",
+                                    stringResource(R.string.agvn_ui_container_emulator_32),
                                     if (emulator.equals("FEXCore", true)) "FEXCore" else "WOWBox64",
                                     arrayOf("FEXCore", "WOWBox64")
                                 ) { emulator = if (it.equals("WOWBox64", true)) "Box64" else "FEXCore" }
                             } else {
                                 ReadOnlySetting(
                                     icon = Icons.Outlined.Memory,
-                                    label = "Giả lập 32-bit",
+                                    label = stringResource(R.string.agvn_ui_container_emulator_32),
                                     value = "Box64"
                                 )
                             }
@@ -548,7 +550,7 @@ private fun ContainerSectionScreen(
                                 GroupDivider()
                                 ChoiceSetting(
                                     Icons.Outlined.Memory,
-                                    "Phiên bản FEXCore",
+                                    stringResource(R.string.agvn_ui_container_fexcore_version),
                                     fexcoreVersion,
                                     fexcoreVersionEntries,
                                     installedEntries = installedFexcoreVersionEntries,
@@ -568,7 +570,7 @@ private fun ContainerSectionScreen(
                                 GroupDivider()
                                 ChoiceSetting(
                                     Icons.Outlined.Memory,
-                                    if (arm64EcWine) "Phiên bản WOWBox64" else "Phiên bản Box64",
+                                    stringResource(if (arm64EcWine) R.string.agvn_ui_container_wowbox64_version else R.string.agvn_ui_container_box64_version),
                                     box64Version,
                                     box64VersionEntries,
                                     installedEntries = installedBox64VersionEntries,
@@ -709,7 +711,7 @@ private fun ChoiceSetting(
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
                 )
                 Text(
-                    "Chọn một mục",
+                    stringResource(R.string.agvn_ui_container_pick_one),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 8.dp).padding(bottom = 10.dp)
@@ -739,7 +741,7 @@ private fun ChoiceSetting(
                                     Icon(Icons.Outlined.Check, null)
                                 } else if (!installed) {
                                     Text(
-                                        "Tải về",
+                                        stringResource(R.string.agvn_ui_container_download),
                                         style = MaterialTheme.typography.labelMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -804,12 +806,14 @@ private fun RendererOptionsPanel(
 ) {
     val presentEntries = arrayOf("Mailbox", "Fifo")
     val presentIds = arrayOf("mailbox", "fifo")
+    val nearest = stringResource(R.string.agvn_ui_container_filter_nearest)
+    val systemDriver = stringResource(R.string.agvn_ui_container_section_system)
     val filterEntries = if (nativeRenderer) {
-        arrayOf("Bilinear", "Điểm gần nhất")
+        arrayOf("Bilinear", nearest)
     } else {
         arrayOf(
             "Bilinear",
-            "Điểm gần nhất",
+            nearest,
             "Snapdragon Super Resolution",
             "AMD FidelityFX Super Resolution"
         )
@@ -823,15 +827,15 @@ private fun RendererOptionsPanel(
         Column(Modifier.padding(vertical = 4.dp)) {
             if (!nativeRenderer) {
                 InlineChoice(
-                    label = "Chế độ trình chiếu",
+                    label = stringResource(R.string.agvn_ui_container_present_mode),
                     selected = presentEntries[presentIds.indexOf(presentMode).coerceAtLeast(0)],
                     entries = presentEntries
                 ) { value -> onPresentMode(presentIds[presentEntries.indexOf(value)]) }
                 ThinDivider()
                 val selectedDriver = driverIds.indexOf(driverId).takeIf { it >= 0 } ?: 0
                 InlineChoice(
-                    label = "Driver dựng hình",
-                    selected = driverEntries.getOrElse(selectedDriver) { "Hệ thống" },
+                    label = stringResource(R.string.agvn_ui_container_renderer_driver),
+                    selected = driverEntries.getOrElse(selectedDriver) { systemDriver },
                     entries = driverEntries
                 ) { value ->
                     val index = driverEntries.indexOf(value).coerceAtLeast(0)
@@ -840,7 +844,7 @@ private fun RendererOptionsPanel(
                 ThinDivider()
             }
             InlineChoice(
-                label = "Lọc texture",
+                label = stringResource(R.string.agvn_ui_container_texture_filter),
                 selected = filterEntries.getOrElse(filterMode) { filterEntries[0] },
                 entries = filterEntries
             ) { value -> onFilterMode(filterEntries.indexOf(value).coerceAtLeast(0)) }
@@ -849,7 +853,7 @@ private fun RendererOptionsPanel(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 7.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Đổi kênh màu đỏ/xanh dương", modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.agvn_ui_container_swap_rb), modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
                 Switch(checked = swapRB, onCheckedChange = onSwapRB)
             }
         }
@@ -889,7 +893,7 @@ private fun GraphicsDriverOptionsPanel(
         Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
             ChoiceSetting(
                 icon = Icons.Outlined.DesktopWindows,
-                label = "Phiên bản driver",
+                label = stringResource(R.string.agvn_ui_container_driver_version),
                 selected = version,
                 entries = versionEntries,
                 showIcon = false,
@@ -898,21 +902,21 @@ private fun GraphicsDriverOptionsPanel(
                 onSelected = onVersion
             )
             ThinDivider()
-            InlineChoice("Phiên bản Vulkan", vulkanVersion, arrayOf("1.1", "1.2", "1.3"), onVulkanVersion)
+            InlineChoice(stringResource(R.string.agvn_ui_container_vulkan_version), vulkanVersion, arrayOf("1.1", "1.2", "1.3"), onVulkanVersion)
             ThinDivider()
-            InlineChoice("Chế độ trình chiếu", presentMode, arrayOf("mailbox", "fifo", "immediate", "relaxed"), onPresentMode)
+            InlineChoice(stringResource(R.string.agvn_ui_container_present_mode), presentMode, arrayOf("mailbox", "fifo", "immediate", "relaxed"), onPresentMode)
             ThinDivider()
-            InlineChoice("Loại tài nguyên", resourceType, arrayOf("auto", "buffer", "image"), onResourceType)
+            InlineChoice(stringResource(R.string.agvn_ui_container_resource_type), resourceType, arrayOf("auto", "buffer", "image"), onResourceType)
             ThinDivider()
-            InlineChoice("Giả lập BCN", bcnEmulation, arrayOf("none", "partial", "full", "auto"), onBcnEmulation)
+            InlineChoice(stringResource(R.string.agvn_ui_container_bcn_emulation), bcnEmulation, arrayOf("none", "partial", "full", "auto"), onBcnEmulation)
             ThinDivider()
-            InlineChoice("Kiểu giả lập BCN", bcnEmulationType, arrayOf("software", "compute"), onBcnEmulationType)
+            InlineChoice(stringResource(R.string.agvn_ui_container_bcn_type), bcnEmulationType, arrayOf("software", "compute"), onBcnEmulationType)
             ThinDivider()
-            ToggleSetting("Bộ đệm giả lập BCN", bcnEmulationCache, onBcnEmulationCache)
+            ToggleSetting(stringResource(R.string.agvn_ui_container_bcn_cache), bcnEmulationCache, onBcnEmulationCache)
             ThinDivider()
-            ToggleSetting("Đồng bộ khung hình", syncFrame, onSyncFrame)
+            ToggleSetting(stringResource(R.string.agvn_ui_container_sync_frame), syncFrame, onSyncFrame)
             ThinDivider()
-            ToggleSetting("Tắt Present Wait", disablePresentWait, onDisablePresentWait)
+            ToggleSetting(stringResource(R.string.agvn_ui_container_disable_present_wait), disablePresentWait, onDisablePresentWait)
         }
     }
 }
@@ -963,7 +967,7 @@ private fun WrapperOptionsPanel(
             if (dxvk) {
                 ChoiceSetting(
                     icon = Icons.Outlined.Memory,
-                    label = "Phiên bản DXVK",
+                    label = stringResource(R.string.agvn_ui_container_dxvk_version),
                     selected = dxvkVersion.ifBlank { dxvkEntries.firstOrNull().orEmpty() },
                     entries = dxvkEntries,
                     showIcon = false,
@@ -973,7 +977,7 @@ private fun WrapperOptionsPanel(
                 )
                 ChoiceSetting(
                     icon = Icons.Outlined.Memory,
-                    label = "Phiên bản VKD3D",
+                    label = stringResource(R.string.agvn_ui_container_vkd3d_version),
                     selected = vkd3dVersion.ifBlank { vkd3dEntries.firstOrNull().orEmpty() },
                     entries = vkd3dEntries,
                     showIcon = false,
@@ -982,20 +986,20 @@ private fun WrapperOptionsPanel(
                     onSelected = onVkd3dVersion
                 )
                 InlineChoice(
-                    label = "Mức tính năng VKD3D",
+                    label = stringResource(R.string.agvn_ui_container_vkd3d_level),
                     selected = vkd3dLevel,
                     entries = arrayOf("12_0", "12_1", "12_2", "11_1", "11_0", "10_1", "10_0", "9_3", "9_2", "9_1"),
                     onSelected = onVkd3dLevel
                 )
                 CompactTextField(
-                    label = "Giới hạn FPS",
+                    label = stringResource(R.string.agvn_ui_container_fps_limit),
                     value = frameRate,
                     onValueChange = onFrameRate,
                     numeric = true
                 )
-                ToggleSetting("Độ trễ khung hình tối đa", maxFrameLatency, onMaxFrameLatency)
+                ToggleSetting(stringResource(R.string.agvn_ui_container_max_frame_latency), maxFrameLatency, onMaxFrameLatency)
                 ToggleSetting("Shader Async", async, onAsync)
-                ToggleSetting("Bộ đệm shader Async", asyncCache, onAsyncCache)
+                ToggleSetting(stringResource(R.string.agvn_ui_container_async_shader_cache), asyncCache, onAsyncCache)
                 InlineChoice(
                     label = "DDraw Wrapper",
                     selected = ddrawWrapper,
@@ -1004,21 +1008,21 @@ private fun WrapperOptionsPanel(
                 )
             } else {
                 ToggleSetting("CSMT", csmt, onCsmt)
-                ToggleSetting("Tính shader chính xác", strictShaderMath, onStrictShaderMath)
+                ToggleSetting(stringResource(R.string.agvn_ui_container_strict_shader_math), strictShaderMath, onStrictShaderMath)
                 InlineChoice(
-                    label = "Vẽ ngoài màn hình",
+                    label = stringResource(R.string.agvn_ui_container_offscreen),
                     selected = offscreenMode,
                     entries = arrayOf("fbo", "backbuffer"),
                     onSelected = onOffscreenMode
                 )
                 InlineChoice(
-                    label = "Bộ dựng hình WineD3D",
+                    label = stringResource(R.string.agvn_ui_container_wined3d_renderer),
                     selected = wineRenderer,
                     entries = arrayOf("gl", "vulkan", "gdi"),
                     onSelected = onWineRenderer
                 )
                 CompactTextField(
-                    label = "Bộ nhớ video (MB)",
+                    label = stringResource(R.string.agvn_ui_container_video_memory_mb),
                     value = videoMemory,
                     onValueChange = onVideoMemory,
                     numeric = true
@@ -1038,9 +1042,9 @@ private fun WrapperOptionsPanel(
                     Icon(Icons.Outlined.Memory, null, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(10.dp))
                     Column(Modifier.weight(1f)) {
-                        Text("Quản lý phiên bản đã cài", style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.agvn_ui_container_manage_versions), style = MaterialTheme.typography.titleSmall)
                         Text(
-                            "Cài hoặc xóa DXVK, VKD3D và các trình giả lập",
+                            stringResource(R.string.agvn_ui_container_manage_versions_desc),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -1100,7 +1104,7 @@ private fun CustomResolutionFields(
             value = width,
             onValueChange = onWidth,
             modifier = Modifier.weight(1f),
-            label = { Text("Rộng") },
+            label = { Text(stringResource(R.string.agvn_ui_container_width)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             shape = RoundedCornerShape(10.dp)
@@ -1109,7 +1113,7 @@ private fun CustomResolutionFields(
             value = height,
             onValueChange = onHeight,
             modifier = Modifier.weight(1f),
-            label = { Text("Cao") },
+            label = { Text(stringResource(R.string.agvn_ui_container_height)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             shape = RoundedCornerShape(10.dp)

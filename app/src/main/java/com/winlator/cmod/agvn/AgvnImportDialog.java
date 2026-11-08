@@ -58,7 +58,7 @@ public final class AgvnImportDialog {
         AgvnProfile p = candidate.profile;
         LaunchPresetResolver.Effective eff = LaunchPresetResolver.resolve(p, tier, DeviceTierManager.getRules(activity).preset(tier));
         StringBuilder msg = new StringBuilder();
-        msg.append(activity.getString(R.string.agvn_import_preview_tier, tier.label)).append('\n');
+        msg.append(activity.getString(R.string.agvn_import_preview_tier, DeviceTierManager.label(activity, tier))).append('\n');
         boolean hasExe = new File(gameDir, candidate.exe).isFile();
         msg.append(hasExe ? activity.getString(R.string.agvn_import_preview_exe, candidate.exe)
                 : activity.getString(R.string.agvn_import_preview_no_exe)).append('\n');
@@ -83,7 +83,7 @@ public final class AgvnImportDialog {
                 .setMessage(msg.toString().trim())
                 .setPositiveButton(existing != null ? R.string.agvn_import_update : R.string.agvn_import_confirm,
                         (d, w) -> doImport(activity, candidate, tier, existing, onImported))
-                .setNeutralButton(activity.getString(R.string.agvn_import_change_tier, tier.label), (d, w) ->
+                .setNeutralButton(activity.getString(R.string.agvn_import_change_tier, DeviceTierManager.label(activity, tier)), (d, w) ->
                         AgvnTierDialog.choose(activity, activity.getString(R.string.agvn_tier_for_game), tier.ordinal() + 1,
                                 chosen -> preview(activity, gameDir, variant, chosen != null ? chosen : DeviceTierManager.detect(activity), existing, onImported)))
                 .setNegativeButton(R.string.agvn_cancel, null)

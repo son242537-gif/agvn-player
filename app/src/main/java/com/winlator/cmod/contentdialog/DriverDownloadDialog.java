@@ -48,14 +48,14 @@ public class DriverDownloadDialog {
 
     public void show() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Driver có sẵn"); // English
+        builder.setTitle(R.string.agvn_ui_app_available_drivers);
 
         recyclerView = new RecyclerView(context);
         recyclerView.setBackgroundColor(Color.BLACK);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
         builder.setView(recyclerView);
-        builder.setNegativeButton("Quay lại", null); // English
+        builder.setNegativeButton(R.string.agvn_ui_app_back, null);
 
         dialog = builder.create();
         dialog.show();
@@ -69,7 +69,7 @@ public class DriverDownloadDialog {
             String jsonStr = Downloader.downloadString(repoUrl);
             
             if (jsonStr == null) {
-                runOnUi(() -> Toast.makeText(context, "Kết nối thất bại!", Toast.LENGTH_SHORT).show());
+                runOnUi(() -> Toast.makeText(context, R.string.agvn_ui_app_connection_failed, Toast.LENGTH_SHORT).show());
                 return;
             }
 
@@ -139,7 +139,7 @@ public class DriverDownloadDialog {
             }
 
             new AlertDialog.Builder(context)
-                .setTitle("Chọn phiên bản")
+                .setTitle(R.string.agvn_ui_app_pick_version)
                 .setItems(assetNames, (dialogInterface, which) -> {
                     startDownload(item.assets.get(which));
                 })
@@ -148,7 +148,7 @@ public class DriverDownloadDialog {
     }
 
     private void startDownload(DriverAsset asset) {
-        Toast.makeText(context, "Đang tải " + asset.name + "...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, context.getString(R.string.agvn_ui_app_downloading_name, asset.name), Toast.LENGTH_SHORT).show();
         
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
@@ -162,15 +162,15 @@ public class DriverDownloadDialog {
                     runOnUi(() -> {
                         String installedName = adrenotoolsManager.installDriver(fileUri);
                         if (!installedName.isEmpty()) {
-                            Toast.makeText(context, "Đã cài: " + installedName, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, context.getString(R.string.agvn_ui_app_installed_name, installedName), Toast.LENGTH_SHORT).show();
                             if (onDismissCallback != null) onDismissCallback.run();
                         } else {
-                            Toast.makeText(context, "Cài đặt thất bại! File ZIP không hợp lệ.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, R.string.agvn_ui_app_install_failed_bad_zip, Toast.LENGTH_LONG).show();
                         }
                         tmpFile.delete();
                     });
                 } else {
-                    runOnUi(() -> Toast.makeText(context, "Tải về thất bại!", Toast.LENGTH_SHORT).show());
+                    runOnUi(() -> Toast.makeText(context, R.string.agvn_ui_app_download_failed, Toast.LENGTH_SHORT).show());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -180,7 +180,7 @@ public class DriverDownloadDialog {
 
     private void setupAdapter(List<ReleaseItem> releases) {
         if (releases.isEmpty()) {
-            Toast.makeText(context, "Không tìm thấy driver nào.", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, R.string.agvn_ui_app_no_drivers_found, Toast.LENGTH_LONG).show();
             return;
         }
         recyclerView.setAdapter(new DriverAdapter(releases));
@@ -218,12 +218,12 @@ public class DriverDownloadDialog {
             
             
             if (item.assets.size() > 1) {
-                holder.subtitle.setText(item.assets.size() + " phiên bản (chạm để chọn)");
+                holder.subtitle.setText(context.getString(R.string.agvn_ui_app_versions_tap_to_pick, item.assets.size()));
             } else {
                 
                 String shortDesc = item.description.replace("\n", " ").trim();
                 if (shortDesc.length() > 50) shortDesc = shortDesc.substring(0, 50) + "...";
-                if (shortDesc.isEmpty()) shortDesc = "Không có mô tả";
+                if (shortDesc.isEmpty()) shortDesc = context.getString(R.string.agvn_ui_app_no_description);
                 holder.subtitle.setText(shortDesc);
             }
 

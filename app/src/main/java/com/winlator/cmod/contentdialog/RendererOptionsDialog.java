@@ -43,19 +43,18 @@ public class RendererOptionsDialog extends ContentDialog {
         "Fifo"
     };
 
-    private static final String[] FILTER_LABELS_VULKAN = {
-        "Bilinear",
-        "Điểm gần nhất",
-        "Snapdragon Super Resolution",
-        "AMD FidelityFX Super Resolution",
-        "Lanczos 2",
-        "Tăng màu"
-    };
-
-    private static final String[] FILTER_LABELS_EGL = {
-        "Bilinear",
-        "Điểm gần nhất"
-    };
+    private static String[] filterLabels(Context ctx, boolean egl) {
+        String nearest = ctx.getString(R.string.agvn_ui_app_filter_nearest);
+        if (egl) return new String[]{"Bilinear", nearest};
+        return new String[]{
+            "Bilinear",
+            nearest,
+            "Snapdragon Super Resolution",
+            "AMD FidelityFX Super Resolution",
+            "Lanczos 2",
+            ctx.getString(R.string.agvn_ui_app_filter_color_boost)
+        };
+    }
 
     public RendererOptionsDialog(View anchorView, Config config, boolean isNativeMode) {
         super(anchorView.getContext(), R.layout.renderer_options_dialog);
@@ -98,7 +97,7 @@ public class RendererOptionsDialog extends ContentDialog {
         }
         spDriver.setSelection(drvSel);
 
-        String[] filterLabels = isNativeMode ? FILTER_LABELS_EGL : FILTER_LABELS_VULKAN;
+        String[] filterLabels = filterLabels(ctx, isNativeMode);
         setAmoledAdapter(ctx, spFilter, filterLabels);
         int filterSel = config.getRendererFilterMode();
         if (filterSel < 0 || filterSel >= filterLabels.length) filterSel = 0;

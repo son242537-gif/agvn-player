@@ -150,25 +150,25 @@ public class SidebarCleanupView extends View implements SharedPreferences.OnShar
 
             addHudOptionRow(metrics,
                     "FPS", WinlatorHUD.SHOW_FPS,
-                    "Bộ dựng hình", WinlatorHUD.SHOW_RENDERER);
+                    getContext().getString(R.string.agvn_ui_app_hud_renderer), WinlatorHUD.SHOW_RENDERER);
             addHudOptionRow(metrics,
-                    "Tải GPU", WinlatorHUD.SHOW_GPU_USAGE,
-                    "Tên GPU", WinlatorHUD.SHOW_GPU_NAME);
+                    getContext().getString(R.string.agvn_ui_app_hud_gpu_load), WinlatorHUD.SHOW_GPU_USAGE,
+                    getContext().getString(R.string.agvn_ui_app_hud_gpu_name), WinlatorHUD.SHOW_GPU_NAME);
             addHudOptionRow(metrics,
-                    "Tải CPU", WinlatorHUD.SHOW_CPU_USAGE,
-                    "Nhiệt CPU", WinlatorHUD.SHOW_CPU_TEMP);
+                    getContext().getString(R.string.agvn_ui_app_hud_cpu_load), WinlatorHUD.SHOW_CPU_USAGE,
+                    getContext().getString(R.string.agvn_ui_app_hud_cpu_temp), WinlatorHUD.SHOW_CPU_TEMP);
             addHudOptionRow(metrics,
                     "RAM", WinlatorHUD.SHOW_RAM,
-                    "Công suất", WinlatorHUD.SHOW_POWER);
+                    getContext().getString(R.string.agvn_ui_app_hud_power), WinlatorHUD.SHOW_POWER);
             addHudOptionRow(metrics,
-                    "Nhiệt pin", WinlatorHUD.SHOW_BATTERY_TEMP,
-                    "Trạng thái sạc", WinlatorHUD.SHOW_CHARGE_STATE);
+                    getContext().getString(R.string.agvn_ui_app_hud_battery_temp), WinlatorHUD.SHOW_BATTERY_TEMP,
+                    getContext().getString(R.string.agvn_ui_app_hud_charge_state), WinlatorHUD.SHOW_CHARGE_STATE);
 
             SharedPreferences hudPrefs = getContext().getSharedPreferences(
                     WinlatorHUD.PREFS, Context.MODE_PRIVATE);
             Switch dualCell = new Switch(getContext());
             dualCell.setTag("dual_cell");
-            dualCell.setText("Hiệu chỉnh pin 2 cell");
+            dualCell.setText(R.string.agvn_ui_app_hud_dual_cell);
             dualCell.setTextColor(resolveColor(R.attr.ingameSidebarOnSurface, 0xFFFFFFFF));
             dualCell.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
             dualCell.setGravity(Gravity.CENTER_VERTICAL);

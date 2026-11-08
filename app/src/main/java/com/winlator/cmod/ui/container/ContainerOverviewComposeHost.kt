@@ -50,9 +50,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.winlator.cmod.R
 import com.winlator.cmod.ui.theme.WinZTheme
 
 @Immutable
@@ -92,19 +94,32 @@ object ContainerOverviewComposeHost {
         }
 }
 
+/** The titles of the six sections, in the order of [ContainerOverviewComposeHost]'s SECTION_ ids. */
+@Composable
+internal fun containerSectionTitles(): List<String> = listOf(
+    stringResource(R.string.agvn_ui_container_section_system),
+    stringResource(R.string.agvn_ui_container_section_video),
+    stringResource(R.string.agvn_ui_container_section_audio),
+    stringResource(R.string.agvn_ui_container_section_compat),
+    stringResource(R.string.agvn_ui_container_section_drives),
+    stringResource(R.string.agvn_ui_container_section_advanced)
+)
+
 @Immutable
 private data class SectionItem(val id: String, val title: String, val subtitle: String, val icon: ImageVector)
 
 @Composable
 private fun ContainerOverviewScreen(model: ContainerOverviewModel, callbacks: ContainerOverviewCallbacks) {
-    val sections = remember(model) {
+    val titles = containerSectionTitles()
+    val storageSubtitle = stringResource(R.string.agvn_ui_container_storage_subtitle)
+    val sections = remember(model, titles, storageSubtitle) {
         listOf(
-            SectionItem(ContainerOverviewComposeHost.SECTION_SYSTEM, "Hệ thống", "Wine ${model.wineVersion}", Icons.Outlined.Settings),
-            SectionItem(ContainerOverviewComposeHost.SECTION_VIDEO, "Hình ảnh", "${model.renderer}  •  ${model.screenSize}", Icons.Outlined.DesktopWindows),
-            SectionItem(ContainerOverviewComposeHost.SECTION_AUDIO, "Âm thanh", model.audioDriver, Icons.Outlined.VolumeUp),
-            SectionItem(ContainerOverviewComposeHost.SECTION_COMPATIBILITY, "Tương thích", model.emulator, Icons.Outlined.Extension),
-            SectionItem(ContainerOverviewComposeHost.SECTION_STORAGE, "Ổ đĩa", "File của môi trường chạy", Icons.Outlined.Folder),
-            SectionItem(ContainerOverviewComposeHost.SECTION_ADVANCED, "Nâng cao", "", Icons.Outlined.Tune)
+            SectionItem(ContainerOverviewComposeHost.SECTION_SYSTEM, titles[0], "Wine ${model.wineVersion}", Icons.Outlined.Settings),
+            SectionItem(ContainerOverviewComposeHost.SECTION_VIDEO, titles[1], "${model.renderer}  •  ${model.screenSize}", Icons.Outlined.DesktopWindows),
+            SectionItem(ContainerOverviewComposeHost.SECTION_AUDIO, titles[2], model.audioDriver, Icons.Outlined.VolumeUp),
+            SectionItem(ContainerOverviewComposeHost.SECTION_COMPATIBILITY, titles[3], model.emulator, Icons.Outlined.Extension),
+            SectionItem(ContainerOverviewComposeHost.SECTION_STORAGE, titles[4], storageSubtitle, Icons.Outlined.Folder),
+            SectionItem(ContainerOverviewComposeHost.SECTION_ADVANCED, titles[5], "", Icons.Outlined.Tune)
         )
     }
     var expanded by remember { mutableStateOf<String?>(null) }
@@ -119,7 +134,7 @@ private fun ContainerOverviewScreen(model: ContainerOverviewModel, callbacks: Co
                         .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()).height(52.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary)
-                ) { Text("Mở môi trường chạy", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold) }
+                ) { Text(stringResource(R.string.agvn_ui_container_open), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold) }
             }
         }
     ) { padding ->

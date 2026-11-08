@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.winlator.cmod.R;
+
+import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -23,6 +26,8 @@ import java.util.concurrent.TimeUnit;
  */
 final class AgvnLightHud {
     static final long EVERY_MS = 1500;
+    /** The words of the Vietnamese line, as in values/agvn_ui_agvn2_strings.xml: game memory, free RAM, battery. */
+    private static final String[] VIETNAMESE = {"Game %1$d MB", "RAM trống %1$s GB", "Pin %1$d%%"};
 
     private final Activity activity;
     private final AgvnLightTools.Host host;
@@ -63,7 +68,7 @@ final class AgvnLightHud {
 
     private void poll() {
         try {
-            String line = text(host.fps(), host.gameMb(), AgvnMemoryProbe.freeMb(), battery(activity),
+            String line = text(activity, host.fps(), host.gameMb(), AgvnMemoryProbe.freeMb(), battery(activity),
                     ThermalMonitor.batteryTempC(activity));
             activity.runOnUiThread(() -> view.setText(line));
         } catch (RuntimeException ignored) {
@@ -78,13 +83,32 @@ final class AgvnLightHud {
 
     /** "FPS 60 · Game 412 MB · RAM trống 2,3 GB · Pin 78% · 38,5°C"; parts that are unknown (negative, NaN) are left out. */
     static String text(int fps, long gameMb, long freeMb, int batteryPercent, float tempC) {
+        return text(fps, gameMb, freeMb, batteryPercent, tempC, VIETNAMESE, ',');
+    }
+
+    /** {@link #text(int, long, long, int, float)} in the app's language, with its decimal mark ("2.3 GB" in English). */
+    static String text(Context ctx, int fps, long gameMb, long freeMb, int batteryPercent, float tempC) {
+        String[] words = {ctx.getString(R.string.agvn_ui_agvn2_hud_game),
+                ctx.getString(R.string.agvn_ui_agvn2_hud_free_ram), ctx.getString(R.string.agvn_ui_agvn2_hud_battery)};
+        Locale locale = ctx.getResources().getConfiguration().getLocales().get(0);
+        char decimal = DecimalFormatSymbols.getInstance(locale).getDecimalSeparator();
+        return text(fps, gameMb, freeMb, batteryPercent, tempC, words, decimal);
+    }
+
+    private static String text(int fps, long gameMb, long freeMb, int batteryPercent, float tempC, String[] words,
+                               char decimal) {
         StringBuilder sb = new StringBuilder();
         if (fps >= 0) part(sb, "FPS " + fps);
-        if (gameMb >= 0) part(sb, "Game " + gameMb + " MB");
-        if (freeMb >= 0) part(sb, "RAM trống " + String.format(Locale.ROOT, "%.1f", freeMb / 1024f).replace('.', ',') + " GB");
-        if (batteryPercent >= 0 && batteryPercent <= 100) part(sb, "Pin " + batteryPercent + "%");
-        if (!Float.isNaN(tempC)) part(sb, String.format(Locale.ROOT, "%.1f", tempC).replace('.', ',') + "°C");
+        if (gameMb >= 0) part(sb, String.format(Locale.ROOT, words[0], gameMb));
+        if (freeMb >= 0) part(sb, String.format(Locale.ROOT, words[1], tenths(freeMb / 1024f, decimal)));
+        boolean battery = batteryPercent >= 0 && batteryPercent <= 100;
+        if (battery) part(sb, String.format(Locale.ROOT, words[2], batteryPercent));
+        if (!Float.isNaN(tempC)) part(sb, tenths(tempC, decimal) + "°C");
         return sb.toString();
+    }
+
+    private static String tenths(float value, char decimal) {
+        return String.format(Locale.ROOT, "%.1f", value).replace('.', decimal);
     }
 
     private static void part(StringBuilder sb, String text) {

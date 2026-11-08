@@ -7,13 +7,16 @@ import com.winlator.cmod.inputcontrols.Binding;
 final class AgvnKeyboardRows {
     private AgvnKeyboardRows() {}
 
-    /** "BINDING|label|weight"; "|" alone (empty binding) is a gap. Labels are left empty to use the Vietnamese names. */
+    /**
+     * "BINDING|label|weight"; "|" alone (empty binding) is a gap. An empty label is the key's short name in the app's
+     * language.
+     */
     static final String[][] ROWS = {
             {"KEY_ESC|Esc|1.2", "|", "KEY_F1|F1", "KEY_F2|F2", "KEY_F3|F3", "KEY_F4|F4", "KEY_F5|F5", "KEY_F6|F6",
                     "KEY_F7|F7", "KEY_F8|F8", "KEY_F9|F9", "KEY_F10|F10", "KEY_F11|F11", "KEY_F12|F12", "|",
                     "KEY_PRTSCN|PrtSc", "KEY_INSERT|Ins", "KEY_DEL|Del"},
             {"KEY_GRAVE|`", "KEY_1|1", "KEY_2|2", "KEY_3|3", "KEY_4|4", "KEY_5|5", "KEY_6|6", "KEY_7|7", "KEY_8|8",
-                    "KEY_9|9", "KEY_0|0", "KEY_MINUS|-", "KEY_KP_ADD|+", "KEY_BKSP|Xóa|2", "|", "KEY_HOME|Home",
+                    "KEY_9|9", "KEY_0|0", "KEY_MINUS|-", "KEY_KP_ADD|+", "KEY_BKSP||2", "|", "KEY_HOME|Home",
                     "KEY_PG_UP|PgUp"},
             {"KEY_TAB|Tab|1.5", "KEY_Q|Q", "KEY_W|W", "KEY_E|E", "KEY_R|R", "KEY_T|T", "KEY_Y|Y", "KEY_U|U", "KEY_I|I",
                     "KEY_O|O", "KEY_P|P", "KEY_BRACKET_LEFT|[", "KEY_BRACKET_RIGHT|]", "KEY_BACKSLASH|\\|1.5", "|",

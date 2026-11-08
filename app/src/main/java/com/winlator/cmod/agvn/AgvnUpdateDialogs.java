@@ -71,7 +71,7 @@ public final class AgvnUpdateDialogs {
             AgvnUpdateInfo info = null;
             Exception error = null;
             try {
-                info = AgvnUpdater.fetch();
+                info = AgvnUpdater.fetch(activity);
                 prefs.edit().putLong(PREF_LAST_CHECK, System.currentTimeMillis()).apply();
                 AgvnUpdateBadge.found(activity, info);
             } catch (Exception e) {

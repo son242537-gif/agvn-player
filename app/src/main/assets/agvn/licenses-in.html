@@ -1,0 +1,68 @@
+<html><body>
+<h2>AGVN Player</h2>
+<p>Diterbitkan oleh agvn.io. AGVN Player adalah perangkat lunak bebas, dirilis di bawah GNU General Public License (GNU GPL) versi 3 atau yang lebih baru. Teks lengkap lisensinya ada di akhir halaman ini.</p>
+<p>Kode sumber lengkap setiap rilis: https://github.com/son242537-gif/agvn-player (tag v0.1.x rilis tersebut).</p>
+<p>AGVN Player dibuat berdasarkan Winlator karya BrunoSX dan Winlator Ludashi karya StevenMXZ dan pipetto-crypto
+(https://github.com/StevenMXZ/Winlator-Ludashi). Terima kasih kepada para pembuat aslinya.</p>
+<h3>Lisensi MIT (Winlator)</h3>
+<p>Kode Winlator dan kode tambahan AGVN tetap bisa dipakai tersendiri di bawah lisensi MIT berikut.</p>
+<p>MIT License</p><p>Copyright (c) 2023 BrunoSX</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+<h3>Komponen pihak ketiga</h3>
+<p>Komponen berikut memiliki lisensi sendiri; kode sumbernya ada di alamat di bawah.</p>
+<ul>
+<li>Wine (LGPL 2.1+): https://www.winehq.org</li>
+<li>Proton (LGPL/BSD, Valve): https://github.com/ValveSoftware/Proton</li>
+<li>Proton 10.0-4 arm64ec untuk Android (LGPL 2.1, Wine kedua di aplikasi): paket proton-10.0-4-arm64ec.wcp, kode sumber di cabang
+proton_10.0 dari https://github.com/The412Banner/proton-wine</li>
+<li>Wine Mono 9.3.1 (runtime .NET untuk Wine, hanya diekstrak untuk game yang butuh .NET): bagian Mono berlisensi MIT X11 atau LGPL, FNA
+MS-PL dan MIT, FAudio dan SDL2 zlib, WinForms dan WPF MIT, SharpZipLib GPL dengan pengecualian (lihat file COPYING milik Wine
+Mono). Aplikasi menyertakan rilis aslinya tanpa diubah; kode sumber versi ini (wine-mono-9.3.1-src.tar.xz) ada di
+https://github.com/wine-mono/wine-mono/releases/tag/wine-mono-9.3.1, repositori: https://gitlab.winehq.org/mono/wine-mono</li>
+<li>Box64 (MIT): https://github.com/ptitSeb/box64</li>
+<li>FEX-Emu (MIT): https://github.com/FEX-Emu/FEX</li>
+<li>Mesa: Turnip, Wrapper (MIT): https://github.com/xMeM/mesa/tree/wrapper</li>
+<li>Mesa 25.1.9: Zink (MIT): https://gitlab.freedesktop.org/mesa/mesa. Cara build dan patch-nya ada di kode sumber AGVN Player
+(scripts/agvn/zink)</li>
+<li>DXVK (zlib): https://github.com/doitsujin/dxvk</li>
+<li>VKD3D-Proton / VKD3D (LGPL 2.1): https://gitlab.winehq.org/wine/vkd3d</li>
+<li>D8VK (zlib): https://github.com/AlpyneDreams/d8vk</li>
+<li>CNC DDraw (MIT): https://github.com/FunkyFr3sh/cnc-ddraw</li>
+<li>dxwrapper (zlib): https://github.com/elishacloud/dxwrapper</li>
+<li>libadrenotools (BSD-2-Clause): https://github.com/bylaws/libadrenotools</li>
+<li>Termux packages, Termux:X11 (GPL 3.0): https://github.com/termux/termux-packages, https://github.com/termux/termux-x11</li>
+<li>proot (GPL 2.0): https://proot-me.github.io</li>
+<li>patchelf (GPL 3.0): https://github.com/NixOS/patchelf</li>
+<li>PulseAudio (LGPL 2.1): https://www.freedesktop.org/wiki/Software/PulseAudio</li>
+<li>Font DejaVu (lisensi Bitstream Vera, Copyright (c) 2003 Bitstream, Inc.; bagian DejaVu berstatus domain publik):
+https://github.com/dejavu-fonts/dejavu-fonts. Di ponsel, aplikasi membuat salinan DejaVu Sans yang diganti namanya menjadi "Tahoma" dan "Segoe UI" untuk
+teks DirectWrite; baris hak cipta dan teks lengkap lisensinya ada di dalam font tersebut.</li>
+<li>GLIBC fork by longjunyu2: https://github.com/longjunyu2/winlator/tree/use-glibc-instead-of-proot</li>
+<li>Big Picture Mode music: Dale Melvin Blevens III (Fumer)</li>
+<li>Ren'Py 8.5.3 (MIT, Copyright 2004-2026 Tom Rothamel dan kontributor; Mode Ringan untuk game Ren'Py), termasuk Python 3.12 (PSF License,
+Copyright 2001-2023 Python Software Foundation), SDL2 (zlib, Copyright 1997-2022 Sam Lantinga), pyjnius (MIT, Copyright
+2010-2023 Kivy Team and other contributors), FFmpeg (LGPL 2.1) dan library lainnya: https://www.renpy.org, kode sumber
+https://github.com/renpy/renpy dan https://github.com/renpy/renpy-build. Lisensi lengkap Ren'Py dan daftar library-nya
+ada di akhir halaman ini.</li>
+<li>mkxp-z (GPL 3.0 atau yang lebih baru, Copyright 2013-2023 Amaryllis Kulla dan para pembuat mkxp-z; Mode Ringan untuk game RPG Maker
+XP/VX/VX Ace), termasuk Ruby 3.1 (Ruby License / BSD-2-Clause), SDL2, SDL_image, SDL_sound, SDL_ttf dan PhysicsFS (zlib), OpenAL
+Soft dan FluidSynth (LGPL 2.1), FreeType (FreeType License) serta library lainnya: https://github.com/mkxp-z/mkxp-z. Kode sumber
+dan skrip build untuk Android: scripts/agvn/mkxp-z di repositori AGVN Player. Lisensi lengkapnya ada di akhir halaman ini.</li>
+<li>Godot Engine 4.7.2 (MIT, Copyright 2014-present Godot Engine contributors, 2007-2014 Juan Linietsky dan Ariel Manzur;
+Mode Ringan untuk game Godot 4), termasuk FreeType, HarfBuzz, ICU, mbedTLS, Vulkan Memory Allocator, Swappy (Apache 2.0) serta
+library lainnya: https://godotengine.org, kode sumber https://github.com/godotengine/godot. Engine di aplikasi di-build ulang dari
+kode sumber resmi, dengan patch: scripts/agvn/godot di repositori AGVN Player. Lisensi lengkapnya ada di akhir halaman ini.</li>
+<li>Spine Runtimes 4.2 (spine-cpp dan spine-godot, Copyright (c) 2013-2025 Esoteric Software LLC), di-build ke dalam engine
+Godot di atas agar game Godot yang dibuat dengan Spine bisa memakai Mode Ringan. Spine Runtimes bukan open source dan tidak berlisensi GPL: dipakai
+sesuai Spine Runtimes License Agreement, teks lengkapnya ada di akhir halaman ini. Kode sumber: https://github.com/EsotericSoftware/spine-runtimes.</li>
+<li>Library Android: AndroidX, Material Components, Gson, OkHttp, Retrofit, Glide, zstd-jni, XZ for Java,
+Apache Commons Compress, Conscrypt, Bouncy Castle, OpenJSSE, junixsocket (masing-masing Apache 2.0 / MIT / BSD)</li>
+</ul>
+<h3>Lisensi Ren'Py</h3>
+<p>Teks asli file LICENSE.txt dari Ren'Py 8.5.3, setelah teks lengkap GNU GPL 3.</p>
+<h3>Lisensi mkxp-z dan library yang disertakan</h3>
+<p>Setelah lisensi Ren'Py, di akhir halaman ini.</p>
+<h3>Lisensi Godot dan library yang disertakan</h3>
+<p>Teks asli LICENSE.txt dan COPYRIGHT.txt dari Godot 4.7.2, lisensi Swappy dan lisensi Spine Runtimes, setelah
+lisensi mkxp-z.</p>
+<h3>GNU GPL versi 3</h3>
+</body></html>

@@ -268,17 +268,17 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
                 ) { advancedOpen = !advancedOpen }
             }
             if (advancedOpen) {
-                item("environment-title") { SectionTitle("MÔI TRƯỜNG") }
+                item("environment-title") { SectionTitle(stringResource(R.string.agvn_ui_app_settings_environment_section)) }
                 item("containers") {
-                    NavigationRow(Icons.Outlined.Dns, "Môi trường chạy", "Tạo và quản lý môi trường Windows") {
+                    NavigationRow(Icons.Outlined.Dns, stringResource(R.string.agvn_ui_app_env_title), stringResource(R.string.agvn_ui_app_settings_environment_desc)) {
                         context.startActivity(Intent(context, ContainersSettingsActivity::class.java))
                     }
                 }
                 item("components") {
-                    NavigationRow(Icons.Outlined.Apps, "Tải thêm Wine / Proton / DXVK / driver", "Không bắt buộc: app đã cài sẵn đủ để chơi", callbacks::onOpenComponents)
+                    NavigationRow(Icons.Outlined.Apps, stringResource(R.string.agvn_ui_app_settings_components), stringResource(R.string.agvn_ui_app_settings_components_desc), callbacks::onOpenComponents)
                 }
 
-                item("presets-title") { SectionTitle("PRESET") }
+                item("presets-title") { SectionTitle(stringResource(R.string.agvn_ui_app_settings_presets_section)) }
                 item("presets") {
                     GroupCard {
                         PresetChoiceRow(
@@ -308,20 +308,20 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
                     SoundFontCard(model.soundFonts, callbacks::onInstallSoundFont, callbacks::onRemoveSoundFont)
                 }
 
-                item("paths-title") { SectionTitle("THƯ MỤC") }
-                item("winlator-path") { NavigationRow(Icons.Outlined.Storage, "Thư mục dữ liệu", model.winlatorPath, callbacks::onChooseWinlatorPath) }
-                item("shortcut-path") { NavigationRow(Icons.Outlined.FolderOpen, "Thư mục xuất game", model.shortcutPath, callbacks::onChooseShortcutPath) }
+                item("paths-title") { SectionTitle(stringResource(R.string.agvn_ui_app_settings_folders_section)) }
+                item("winlator-path") { NavigationRow(Icons.Outlined.Storage, stringResource(R.string.agvn_ui_app_settings_data_folder), model.winlatorPath, callbacks::onChooseWinlatorPath) }
+                item("shortcut-path") { NavigationRow(Icons.Outlined.FolderOpen, stringResource(R.string.agvn_ui_app_settings_export_folder), model.shortcutPath, callbacks::onChooseShortcutPath) }
 
-                item("big-picture-title") { SectionTitle("CHẾ ĐỘ BIG PICTURE") }
+                item("big-picture-title") { SectionTitle(stringResource(R.string.agvn_ui_app_settings_big_picture_section)) }
                 item("big-picture") {
                     GroupCard {
-                        ToggleRow("Mở chế độ Big Picture khi khởi động", model.bigPicture) { callbacks.onBooleanChanged("enable_big_picture_mode", it) }
+                        ToggleRow(stringResource(R.string.agvn_ui_app_settings_big_picture_on_start), model.bigPicture) { callbacks.onBooleanChanged("enable_big_picture_mode", it) }
                         GroupDivider()
-                        ToggleRow("Đặt khóa API SteamGrid? (Ảnh bìa)", model.customApiKeyEnabled) { callbacks.onBooleanChanged("enable_custom_api_key", it) }
+                        ToggleRow(stringResource(R.string.agvn_ui_app_settings_steamgrid_key_toggle), model.customApiKeyEnabled) { callbacks.onBooleanChanged("enable_custom_api_key", it) }
                     }
                 }
                 if (model.customApiKeyEnabled) {
-                    item("api-key") { EditableValueCard("Khóa API SteamGridDB", model.customApiKey, callbacks::onCustomApiKeyChanged) }
+                    item("api-key") { EditableValueCard(stringResource(R.string.agvn_ui_app_settings_steamgrid_key), model.customApiKey, callbacks::onCustomApiKeyChanged) }
                 }
 
                 item("xserver-title") { SectionTitle(stringResource(R.string.xserver)) }
@@ -335,9 +335,9 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
                             ToggleRow(stringResource(R.string.use_xr), model.useXr) { callbacks.onBooleanChanged("use_xr", it) }
                         }
                         GroupDivider()
-                        ToggleRow("Bắt chuột ngoài", model.cursorLock) { callbacks.onBooleanChanged("cursor_lock", it) }
+                        ToggleRow(stringResource(R.string.agvn_ui_app_settings_cursor_lock), model.cursorLock) { callbacks.onBooleanChanged("cursor_lock", it) }
                         GroupDivider()
-                        ToggleRow("Tắt XInput (chỉ dùng chuột/bàn phím)", model.xInput) { callbacks.onBooleanChanged("xinput_toggle", it) }
+                        ToggleRow(stringResource(R.string.agvn_ui_app_settings_xinput_off), model.xInput) { callbacks.onBooleanChanged("xinput_toggle", it) }
                     }
                 }
 
@@ -376,7 +376,7 @@ private fun SettingsScreen(model: SettingsModel, callbacks: SettingsCallbacks) {
                         ToggleRow(stringResource(R.string.remove_loading_bar_when_booting_games), model.removeLoadingBar) { callbacks.onBooleanChanged("remove_loading_bar_when_booting_games", it) }
                     }
                 }
-                item("contents-url") { EditableValueCard("Link tải thành phần", model.contentsUrl, callbacks::onContentsUrlChanged) }
+                item("contents-url") { EditableValueCard(stringResource(R.string.agvn_ui_app_settings_contents_url), model.contentsUrl, callbacks::onContentsUrlChanged) }
 
                 item("imagefs-title") { SectionTitle(stringResource(R.string.imagefs)) }
                 item("imagefs") { NavigationRow(Icons.Outlined.Refresh, stringResource(R.string.reinstall_imagefs), null, callbacks::onReinstallImageFs) }
@@ -478,7 +478,7 @@ private fun CursorSpeedRow(value: Int, onChanged: (Int) -> Unit) {
     var draft by remember(value) { mutableFloatStateOf(value.coerceIn(10, 200).toFloat()) }
     Column(Modifier.fillMaxWidth().padding(horizontal = 15.dp, vertical = 10.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Tốc độ con trỏ", modifier = Modifier.weight(1f))
+            Text(stringResource(R.string.agvn_ui_app_settings_cursor_speed), modifier = Modifier.weight(1f))
             Text("${draft.roundToInt()}%", color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Slider(
@@ -527,11 +527,11 @@ private fun PresetChoiceRow(
             }
             Box {
                 IconButton(onClick = { actionsOpen = true }) {
-                    Icon(Icons.Outlined.MoreVert, "Thao tác preset")
+                    Icon(Icons.Outlined.MoreVert, stringResource(R.string.agvn_ui_app_settings_preset_actions))
                 }
                 DropdownMenu(expanded = actionsOpen, onDismissRequest = { actionsOpen = false }) {
                     DropdownMenuItem(
-                        text = { Text("Tạo mới") },
+                        text = { Text(stringResource(R.string.agvn_ui_app_settings_create_new)) },
                         leadingIcon = { Icon(Icons.Outlined.Add, null) },
                         onClick = {
                             actionsOpen = false
@@ -540,7 +540,7 @@ private fun PresetChoiceRow(
                     )
                     if (selectedId.isNotBlank()) {
                         DropdownMenuItem(
-                            text = { Text("Nhân bản") },
+                            text = { Text(stringResource(R.string.agvn_ui_app_duplicate)) },
                             leadingIcon = { Icon(Icons.Outlined.ContentCopy, null) },
                             onClick = {
                                 actionsOpen = false
@@ -548,7 +548,7 @@ private fun PresetChoiceRow(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Sửa") },
+                            text = { Text(stringResource(R.string.edit)) },
                             leadingIcon = { Icon(Icons.Outlined.Edit, null) },
                             onClick = {
                                 actionsOpen = false
@@ -556,7 +556,7 @@ private fun PresetChoiceRow(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Xóa") },
+                            text = { Text(stringResource(R.string.agvn_ui_app_delete)) },
                             leadingIcon = { Icon(Icons.Outlined.DeleteOutline, null) },
                             onClick = {
                                 actionsOpen = false
@@ -608,7 +608,7 @@ private fun WineDebugChannelsRow(
         selectedValue.split(',').map { it.trim() }.filter { it.isNotEmpty() }
     }
     val summary = when {
-        selectedChannels.isEmpty() -> "Chưa chọn kênh nào"
+        selectedChannels.isEmpty() -> stringResource(R.string.agvn_ui_app_settings_no_channels)
         selectedChannels.size <= 3 -> selectedChannels.joinToString(", ")
         else -> selectedChannels.take(3).joinToString(", ") + " +${selectedChannels.size - 3}"
     }
@@ -621,7 +621,7 @@ private fun WineDebugChannelsRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(Modifier.weight(1f)) {
-            Text("Kênh debug Wine", style = MaterialTheme.typography.bodyLarge)
+            Text(stringResource(R.string.agvn_ui_app_settings_wine_debug_channels), style = MaterialTheme.typography.bodyLarge)
             Text(
                 summary,
                 style = MaterialTheme.typography.bodySmall,
@@ -665,13 +665,13 @@ private fun WineDebugChannelsDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Kênh debug Wine") },
+        title = { Text(stringResource(R.string.agvn_ui_app_settings_wine_debug_channels)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedTextField(
                     value = query,
                     onValueChange = { query = it },
-                    label = { Text("Tìm kênh") },
+                    label = { Text(stringResource(R.string.agvn_ui_app_settings_search_channel)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -704,10 +704,10 @@ private fun WineDebugChannelsDialog(
         },
         confirmButton = {
             TextButton(onClick = { onApply(allOptions.filter { it in selected }.joinToString(",")) }) {
-                Text("Áp dụng")
+                Text(stringResource(R.string.agvn_ui_app_settings_apply))
             }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Hủy") } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } }
     )
 }
 
@@ -726,7 +726,7 @@ private fun SoundFontCard(choices: List<SettingChoice>, onInstall: () -> Unit, o
         Button(onClick = onInstall, modifier = Modifier.fillMaxWidth().padding(12.dp)) {
             Icon(Icons.Outlined.Add, null)
             Spacer(Modifier.width(7.dp))
-            Text("Cài SoundFont")
+            Text(stringResource(R.string.agvn_ui_app_settings_install_soundfont))
         }
     }
 }
@@ -741,6 +741,6 @@ private fun EditableInlineValue(label: String, initial: String, onSave: (String)
     var value by remember(initial) { mutableStateOf(initial) }
     Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         OutlinedTextField(value = value, onValueChange = { value = it }, label = { Text(label) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-        Button(onClick = { onSave(value) }, modifier = Modifier.align(Alignment.End)) { Text("Lưu") }
+        Button(onClick = { onSave(value) }, modifier = Modifier.align(Alignment.End)) { Text(stringResource(R.string.save)) }
     }
 }

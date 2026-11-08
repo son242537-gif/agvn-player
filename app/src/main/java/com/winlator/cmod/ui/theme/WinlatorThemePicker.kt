@@ -38,6 +38,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.winlator.cmod.R
 
 @Composable
 fun WinlatorThemeChoices(
@@ -83,9 +85,9 @@ private fun ThemeChoiceRow(
             ThemePreview(preview)
             Spacer(Modifier.width(13.dp))
             Column(Modifier.weight(1f)) {
-                Text(theme.displayName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(theme.displayNameRes), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Text(
-                    theme.description,
+                    stringResource(theme.descriptionRes),
                     style = MaterialTheme.typography.bodySmall,
                     color = if (selected) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.72f)
                     else MaterialTheme.colorScheme.onSurfaceVariant
@@ -152,8 +154,8 @@ fun WinlatorThemePreferenceCard(modifier: Modifier = Modifier) {
             }
             Spacer(Modifier.width(11.dp))
             Column(Modifier.weight(1f)) {
-                Text("Giao diện", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
-                Text(current.displayName, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.agvn_ui_app_theme_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Medium)
+                Text(stringResource(current.displayNameRes), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Icon(Icons.Outlined.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
         }
@@ -174,9 +176,9 @@ fun WinlatorThemePreferenceCard(modifier: Modifier = Modifier) {
                     .padding(horizontal = 18.dp)
                     .padding(bottom = 24.dp)
             ) {
-                Text("Giao diện", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.agvn_ui_app_theme_title), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Chọn giao diện cho ứng dụng. Thay đổi được áp dụng ngay.",
+                    stringResource(R.string.agvn_ui_app_theme_picker_desc),
                     modifier = Modifier.padding(top = 4.dp, bottom = 14.dp),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant

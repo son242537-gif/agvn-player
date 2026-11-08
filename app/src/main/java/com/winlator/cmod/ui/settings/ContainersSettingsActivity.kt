@@ -80,6 +80,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.ArrayDeque
+import androidx.compose.ui.res.stringResource
+import com.winlator.cmod.R
 
 class ContainersSettingsActivity : AppCompatActivity() {
     override fun attachBaseContext(base: android.content.Context) {
@@ -157,7 +159,7 @@ class ContainersSettingsActivity : AppCompatActivity() {
         val container = manager.getContainerById(id) ?: return
         manager.duplicateContainerAsync(container) {
             refresh()
-            Toast.makeText(this, "Đã nhân bản môi trường chạy", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.agvn_ui_app_env_duplicated, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -165,13 +167,13 @@ class ContainersSettingsActivity : AppCompatActivity() {
         val manager = ContainerManager(this)
         val container = manager.getContainerById(id) ?: return
         AppCompatAlertDialog.Builder(this)
-            .setTitle("Xóa môi trường chạy?")
-            .setMessage("${container.name} và các file của nó sẽ bị xóa.")
+            .setTitle(R.string.agvn_ui_app_env_remove_title)
+            .setMessage(getString(R.string.agvn_ui_app_env_remove_message, container.name))
             .setNegativeButton(android.R.string.cancel, null)
-            .setPositiveButton("Xóa") { _, _ ->
+            .setPositiveButton(R.string.agvn_ui_app_delete) { _, _ ->
                 manager.removeContainerAsync(container) {
                     refresh()
-                    Toast.makeText(this, "Đã xóa môi trường chạy", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, R.string.agvn_ui_app_env_removed, Toast.LENGTH_SHORT).show()
                 }
             }
             .show()
@@ -211,12 +213,12 @@ private fun ContainersSettingsScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("Môi trường chạy") },
+                title = { Text(stringResource(R.string.agvn_ui_app_env_title)) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Outlined.ArrowBack, null) } }
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAdd) { Icon(Icons.Outlined.Add, "Môi trường chạy mới") }
+            FloatingActionButton(onClick = onAdd) { Icon(Icons.Outlined.Add, stringResource(R.string.agvn_ui_app_env_new)) }
         }
     ) { padding ->
         if (containers.isEmpty()) {
@@ -230,8 +232,8 @@ private fun ContainersSettingsScreen(
                         Box(contentAlignment = Alignment.Center) { Icon(Icons.Outlined.Dns, null, modifier = Modifier.size(36.dp)) }
                     }
                     Spacer(Modifier.height(14.dp))
-                    Text("Chưa có môi trường chạy", style = MaterialTheme.typography.titleLarge)
-                    Text("Tạo môi trường Windows để chơi game.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.agvn_ui_app_fm_no_environment_title), style = MaterialTheme.typography.titleLarge)
+                    Text(stringResource(R.string.agvn_ui_app_env_empty_desc), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         } else {
@@ -291,8 +293,8 @@ private fun SettingsContainerCard(
                 Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                ActionButton(Icons.Outlined.Edit, "Sửa", Modifier.weight(1f)) { onEdit(container.id) }
-                ActionButton(Icons.Outlined.Info, "Thuộc tính", Modifier.weight(1f)) { onProperties(container.id) }
+                ActionButton(Icons.Outlined.Edit, stringResource(R.string.edit), Modifier.weight(1f)) { onEdit(container.id) }
+                ActionButton(Icons.Outlined.Info, stringResource(R.string.agvn_ui_app_env_properties), Modifier.weight(1f)) { onProperties(container.id) }
                 ContainerMoreButton(
                     modifier = Modifier.weight(1f),
                     onDuplicate = { onDuplicate(container.id) },
@@ -331,10 +333,10 @@ private fun ContainerMoreButton(
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box(modifier) {
-        ActionButton(Icons.Outlined.MoreVert, "Thêm", Modifier.fillMaxWidth()) { expanded = true }
+        ActionButton(Icons.Outlined.MoreVert, stringResource(R.string.agvn_ui_app_more), Modifier.fillMaxWidth()) { expanded = true }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             DropdownMenuItem(
-                text = { Text("Nhân bản") },
+                text = { Text(stringResource(R.string.agvn_ui_app_duplicate)) },
                 leadingIcon = { Icon(Icons.Outlined.ContentCopy, null) },
                 onClick = {
                     expanded = false
@@ -342,7 +344,7 @@ private fun ContainerMoreButton(
                 }
             )
             DropdownMenuItem(
-                text = { Text("Xóa") },
+                text = { Text(stringResource(R.string.agvn_ui_app_delete)) },
                 leadingIcon = { Icon(Icons.Outlined.DeleteOutline, null) },
                 onClick = {
                     expanded = false
@@ -390,7 +392,7 @@ private fun ContainerPropertiesDialog(container: Container, onDismiss: () -> Uni
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Outlined.Storage, null) },
-        title = { Text("Thuộc tính môi trường chạy") },
+        title = { Text(stringResource(R.string.agvn_ui_app_env_properties_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 Text(
@@ -409,14 +411,14 @@ private fun ContainerPropertiesDialog(container: Container, onDismiss: () -> Uni
                     ) {
                         CircularProgressIndicator(Modifier.size(28.dp), strokeWidth = 3.dp)
                         Spacer(Modifier.width(12.dp))
-                        Text("Đang tính dung lượng…", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.agvn_ui_app_env_calculating_size), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            StorageValue("Ổ C", driveSize)
-                            StorageValue("Bộ đệm", cacheSize)
-                            StorageValue("Tổng", totalSize, emphasize = true)
+                            StorageValue(stringResource(R.string.agvn_ui_app_env_drive_c), driveSize)
+                            StorageValue(stringResource(R.string.agvn_ui_app_env_cache), cacheSize)
+                            StorageValue(stringResource(R.string.agvn_ui_app_env_total), totalSize, emphasize = true)
                         }
                         Surface(
                             modifier = Modifier.size(90.dp),
@@ -427,7 +429,7 @@ private fun ContainerPropertiesDialog(container: Container, onDismiss: () -> Uni
                             Box(contentAlignment = Alignment.Center) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text("$usedPercent%", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
-                                    Text("bộ nhớ", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(stringResource(R.string.agvn_ui_app_env_storage), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
                             }
                         }
@@ -456,14 +458,14 @@ private fun ContainerPropertiesDialog(container: Container, onDismiss: () -> Uni
                 if (clearing) {
                     CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
                     Spacer(Modifier.width(8.dp))
-                    Text("Đang dọn…")
+                    Text(stringResource(R.string.agvn_ui_app_env_clearing))
                 } else {
-                    Text("Xóa bộ đệm")
+                    Text(stringResource(R.string.agvn_ui_app_env_clear_cache))
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Đóng") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.agvn_ui_app_close)) }
         }
     )
 }

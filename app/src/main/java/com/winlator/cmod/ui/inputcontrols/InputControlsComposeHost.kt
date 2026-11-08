@@ -58,6 +58,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -140,7 +141,7 @@ private fun InputControlsScreen(model: InputControlsModel, callbacks: InputContr
     }
 
     Column(Modifier.fillMaxSize()) {
-        if (landscape) LandscapeMainNavigation(activity, R.id.main_menu_input_controls, "Phím ảo")
+        if (landscape) LandscapeMainNavigation(activity, R.id.main_menu_input_controls, stringResource(R.string.agvn_ui_app_ic_title))
         if (landscape) {
             Row(
                 modifier = Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 10.dp),
@@ -163,7 +164,7 @@ private fun InputControlsScreen(model: InputControlsModel, callbacks: InputContr
                 ) {
                     item {
                         Text(
-                            "TAY CẦM NGOÀI",
+                            stringResource(R.string.agvn_ui_app_ic_external_controllers),
                             modifier = Modifier.padding(top = 4.dp, bottom = 2.dp),
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.SemiBold,
@@ -193,7 +194,7 @@ private fun PortraitContent(model: InputControlsModel, selectedName: String, cal
         item { EditorButton(callbacks) }
         item {
             Text(
-                "TAY CẦM NGOÀI",
+                stringResource(R.string.agvn_ui_app_ic_external_controllers),
                 modifier = Modifier.padding(top = 10.dp, bottom = 2.dp),
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.SemiBold,
@@ -207,17 +208,17 @@ private fun PortraitContent(model: InputControlsModel, selectedName: String, cal
 
 @Composable
 private fun ProfileSection(model: InputControlsModel, selectedName: String, callbacks: InputControlsCallbacks) {
-    SettingsCard(title = "Cấu hình") {
+    SettingsCard(title = stringResource(R.string.agvn_ui_app_ic_profile)) {
         ProfilePicker(model, selectedName, callbacks)
         Spacer(Modifier.height(10.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            RoundAction(Icons.Outlined.Add, "Thêm cấu hình", callbacks::onAddProfile)
+            RoundAction(Icons.Outlined.Add, stringResource(R.string.agvn_ui_app_ic_add_profile), callbacks::onAddProfile)
             Spacer(Modifier.width(10.dp))
-            RoundAction(Icons.Outlined.Edit, "Sửa cấu hình", callbacks::onEditProfile)
+            RoundAction(Icons.Outlined.Edit, stringResource(R.string.agvn_ui_app_ic_edit_profile), callbacks::onEditProfile)
             Spacer(Modifier.width(10.dp))
-            RoundAction(Icons.Outlined.ContentCopy, "Nhân bản cấu hình", callbacks::onDuplicateProfile)
+            RoundAction(Icons.Outlined.ContentCopy, stringResource(R.string.agvn_ui_app_ic_duplicate_profile), callbacks::onDuplicateProfile)
             Spacer(Modifier.width(10.dp))
-            RoundAction(Icons.Outlined.Delete, "Xóa cấu hình", callbacks::onRemoveProfile)
+            RoundAction(Icons.Outlined.Delete, stringResource(R.string.agvn_ui_app_ic_remove_profile), callbacks::onRemoveProfile)
         }
     }
 }
@@ -230,13 +231,13 @@ private fun TransferActions(callbacks: InputControlsCallbacks) {
             modifier = Modifier.weight(1f).height(48.dp),
             shape = RoundedCornerShape(12.dp),
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-        ) { Icon(Icons.Outlined.FileDownload, null); Spacer(Modifier.width(8.dp)); Text("Nhập") }
+        ) { Icon(Icons.Outlined.FileDownload, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.agvn_ui_app_import)) }
         OutlinedButton(
             onClick = callbacks::onExportProfile,
             modifier = Modifier.weight(1f).height(48.dp),
             shape = RoundedCornerShape(12.dp),
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-        ) { Icon(Icons.Outlined.FileUpload, null); Spacer(Modifier.width(8.dp)); Text("Xuất") }
+        ) { Icon(Icons.Outlined.FileUpload, null); Spacer(Modifier.width(8.dp)); Text(stringResource(R.string.export)) }
     }
 }
 
@@ -250,7 +251,7 @@ private fun EditorButton(callbacks: InputControlsCallbacks) {
     ) {
         Icon(Icons.Outlined.SportsEsports, null)
         Spacer(Modifier.width(10.dp))
-        Text("Chỉnh sửa phím ảo", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.agvn_ui_app_ic_edit_keys), style = MaterialTheme.typography.titleMedium)
     }
 }
 
@@ -287,7 +288,7 @@ private fun ProfilePicker(model: InputControlsModel, selectedName: String, callb
             }
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }, modifier = Modifier.fillMaxWidth(0.82f)) {
-            DropdownMenuItem(text = { Text("-- Chọn cấu hình --") }, onClick = { expanded = false; callbacks.onProfileSelected(0) })
+            DropdownMenuItem(text = { Text(stringResource(R.string.agvn_ui_app_ic_pick_profile)) }, onClick = { expanded = false; callbacks.onProfileSelected(0) })
             model.profiles.forEach { profile ->
                 DropdownMenuItem(
                     text = { Text(profile.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
@@ -313,7 +314,7 @@ private fun RoundAction(icon: androidx.compose.ui.graphics.vector.ImageVector, d
 @Composable
 private fun OpacityCard(initialPercent: Int, onOpacityChanged: (Int) -> Unit) {
     var opacity by remember(initialPercent) { mutableFloatStateOf(initialPercent.toFloat()) }
-    SettingsCard(title = "Độ mờ lớp phủ") {
+    SettingsCard(title = stringResource(R.string.agvn_ui_app_ic_overlay_opacity)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Slider(
                 value = opacity,
@@ -337,7 +338,7 @@ private fun EmptyControllers() {
         Column(modifier = Modifier.fillMaxWidth().padding(vertical = 22.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(Icons.Outlined.Gamepad, null, modifier = Modifier.size(30.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(10.dp))
-            Text("Chưa kết nối tay cầm nào", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.agvn_ui_app_ic_no_controllers), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -359,9 +360,9 @@ private fun ControllerCard(controller: InputControllerItem, callbacks: InputCont
             Spacer(Modifier.width(13.dp))
             Column(Modifier.weight(1f)) {
                 Text(controller.name, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text("${controller.bindings} phím đã gán", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.agvn_ui_app_ic_bound_keys, controller.bindings), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            if (controller.bindings > 0) IconButton(onClick = { callbacks.onRemoveController(controller.index) }) { Icon(Icons.Outlined.Delete, "Xóa tay cầm") }
+            if (controller.bindings > 0) IconButton(onClick = { callbacks.onRemoveController(controller.index) }) { Icon(Icons.Outlined.Delete, stringResource(R.string.agvn_ui_app_ic_remove_controller)) }
             Icon(Icons.Outlined.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.width(8.dp))
         }

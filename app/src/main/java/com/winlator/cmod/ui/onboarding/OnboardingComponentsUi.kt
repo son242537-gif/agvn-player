@@ -48,13 +48,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.winlator.cmod.core.ProtonPackageManager
+import androidx.compose.ui.res.stringResource
+import com.winlator.cmod.R
 
 private val bundledRuntimeId = "bundled:${ProtonPackageManager.DEFAULT_IDENTIFIER}"
 private val bundledRuntimeName = ProtonPackageManager.getPackage(ProtonPackageManager.DEFAULT_IDENTIFIER)?.title
     ?: "Proton 10.0-5 arm64ec"
 
+// AGVN: category keys; RECOMMENDED_CATEGORY is shown as R.string.agvn_ui_app_onb_recommended
+private const val RECOMMENDED_CATEGORY = "recommended"
+
 private val componentCategories = listOf(
-    "Khuyên dùng", "Wine & Proton", "DXVK", "VKD3D", "FEXCore", "Box64", "WOWBox64", "AdrenoTools"
+    RECOMMENDED_CATEGORY, "Wine & Proton", "DXVK", "VKD3D", "FEXCore", "Box64", "WOWBox64", "AdrenoTools"
 )
 
 private val latestRecommendedTypes = setOf("DXVK", "VKD3D", "FEXCore", "Box64", "WOWBox64")
@@ -147,13 +152,13 @@ internal fun OnboardingComponentsScreen(
     onContinue: () -> Unit,
     cb: OnboardingCallbacks
 ) {
-    var category by rememberSaveable { mutableStateOf("Khuyên dùng") }
+    var category by rememberSaveable { mutableStateOf(RECOMMENDED_CATEGORY) }
     val landscape = LocalConfiguration.current.screenWidthDp > LocalConfiguration.current.screenHeightDp
     val recommendedIds = remember(all) { recommendedComponentIds(all) }
     val visible = remember(all, category, recommendedIds) {
         all.filter {
             when (category) {
-                "Khuyên dùng" -> it.id in recommendedIds
+                RECOMMENDED_CATEGORY -> it.id in recommendedIds
                 "Wine & Proton" -> it.type == "Wine" || it.type == "Proton"
                 else -> it.type == category
             }
@@ -162,7 +167,7 @@ internal fun OnboardingComponentsScreen(
     val hasInstalledRuntime = bundledInstalled.value || all.any {
         it.installed && (it.type == "Wine" || it.type == "Proton") && !it.runtimeIdentifier.isNullOrBlank()
     }
-    val showBundled = category == "Khuyên dùng" || category == "Wine & Proton"
+    val showBundled = category == RECOMMENDED_CATEGORY || category == "Wine & Proton"
     val showLocalInstallProgress = installing == "local" || installing == "driver-local"
 
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
@@ -172,10 +177,10 @@ internal fun OnboardingComponentsScreen(
                 horizontalArrangement = Arrangement.spacedBy(18.dp)
             ) {
                 Column(Modifier.weight(.9f).fillMaxHeight()) {
-                    Text("Chọn thành phần", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.agvn_ui_app_onb_components_title), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
                     Text(
-                        if (managerMode) "Cài và quản lý các phiên bản runtime."
-                        else "Hãy cài Wine hoặc Proton trước khi tiếp tục.",
+                        stringResource(if (managerMode) R.string.agvn_ui_app_onb_components_manager_desc
+                        else R.string.agvn_ui_app_onb_components_install_first),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(Modifier.height(14.dp))
@@ -189,7 +194,7 @@ internal fun OnboardingComponentsScreen(
                     if (category == "AdrenoTools") {
                         Spacer(Modifier.height(10.dp))
                         OutlinedButton(onClick = { cb.onBrowseDriver() }, modifier = Modifier.fillMaxWidth()) {
-                            Text("Cài driver từ máy")
+                            Text(stringResource(R.string.agvn_ui_app_onb_install_driver_local))
                         }
                     }
                     if (showBundled) {
@@ -208,8 +213,8 @@ internal fun OnboardingComponentsScreen(
                     if (!managerMode && !hasInstalledRuntime) {
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            if (!ready.value) "Hãy chờ $bundledRuntimeName cài xong, hoặc cài một phiên bản Wine/Proton khác."
-                            else "Hãy cài ít nhất một phiên bản Wine hoặc Proton để tiếp tục.",
+                            if (!ready.value) stringResource(R.string.agvn_ui_app_onb_wait_bundled, bundledRuntimeName)
+                            else stringResource(R.string.agvn_ui_app_onb_install_runtime_first),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -232,10 +237,10 @@ internal fun OnboardingComponentsScreen(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 item {
-                    Text("Chọn thành phần", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.agvn_ui_app_onb_components_title), style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
                     Text(
-                        if (managerMode) "Cài và quản lý các phiên bản runtime."
-                        else "Có thể cài nhiều phiên bản. Cần ít nhất một Wine hoặc Proton.",
+                        stringResource(if (managerMode) R.string.agvn_ui_app_onb_components_manager_desc
+                        else R.string.agvn_ui_app_onb_components_multi_desc),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(Modifier.height(16.dp))
@@ -248,7 +253,7 @@ internal fun OnboardingComponentsScreen(
                     CategorySelector(category) { category = it }
                     if (category == "AdrenoTools") {
                         Spacer(Modifier.height(8.dp))
-                        OutlinedButton(onClick = { cb.onBrowseDriver() }) { Text("Cài driver từ máy") }
+                        OutlinedButton(onClick = { cb.onBrowseDriver() }) { Text(stringResource(R.string.agvn_ui_app_onb_install_driver_local)) }
                     }
                     if (showBundled) {
                         Spacer(Modifier.height(10.dp))
@@ -278,8 +283,8 @@ internal fun OnboardingComponentsScreen(
                 if (!managerMode && !hasInstalledRuntime) {
                     item {
                         Text(
-                            if (!ready.value) "Nút Tiếp tục sẽ mở khi $bundledRuntimeName cài xong hoặc đã cài một bản Wine/Proton khác."
-                            else "Hãy cài ít nhất một phiên bản Wine hoặc Proton để tiếp tục.",
+                            if (!ready.value) stringResource(R.string.agvn_ui_app_onb_continue_unlocks, bundledRuntimeName)
+                            else stringResource(R.string.agvn_ui_app_onb_install_runtime_first),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -292,7 +297,7 @@ internal fun OnboardingComponentsScreen(
             next = onContinue,
             landscape = landscape,
             nextEnabled = managerMode || hasInstalledRuntime,
-            nextLabel = if (managerMode) "Xong" else "Tiếp tục"
+            nextLabel = stringResource(if (managerMode) R.string.agvn_ui_app_done else R.string._continue)
         )
     }
 }
@@ -312,7 +317,7 @@ private fun ComponentList(
         else if (list.isEmpty()) item {
             Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp), color = MaterialTheme.colorScheme.surface) {
                 Text(
-                    "Mục này chưa có thành phần nào.",
+                    stringResource(R.string.agvn_ui_app_onb_category_empty),
                     Modifier.padding(16.dp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -340,8 +345,8 @@ private fun SourceSelector(local: () -> Unit) {
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
         Row(Modifier.height(56.dp)) {
-            SourcePart(Icons.Outlined.Dns, "Máy chủ tải thành phần", true, {}, Modifier.weight(1f))
-            SourcePart(Icons.Outlined.Folder, "Gói trên máy", false, local, Modifier.weight(1f))
+            SourcePart(Icons.Outlined.Dns, stringResource(R.string.agvn_ui_app_onb_source_server), true, {}, Modifier.weight(1f))
+            SourcePart(Icons.Outlined.Folder, stringResource(R.string.agvn_ui_app_onb_source_local), false, local, Modifier.weight(1f))
         }
     }
 }
@@ -374,7 +379,11 @@ private fun CategorySelector(selected: String, select: (String) -> Unit) {
                 color = if (selected == it) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent,
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
             ) {
-                Text(it, Modifier.padding(horizontal = 13.dp, vertical = 8.dp), style = MaterialTheme.typography.labelLarge)
+                Text(
+                    if (it == RECOMMENDED_CATEGORY) stringResource(R.string.agvn_ui_app_onb_recommended) else it,
+                    Modifier.padding(horizontal = 13.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
         }
     }
@@ -403,11 +412,11 @@ private fun CoreComponentCard(
             Column(Modifier.weight(1f)) {
                 Text(bundledRuntimeName, fontWeight = FontWeight.SemiBold)
                 val status = when {
-                    busy -> "Đang xử lý…"
-                    installed && inUse -> "Có sẵn trong app • Đã cài • Đang dùng"
-                    installed -> "Có sẵn trong app • Đã cài"
-                    !ready.value -> "Có sẵn trong app • Đang cài ${progress.value}%"
-                    else -> "Có sẵn trong app • Chưa cài"
+                    busy -> stringResource(R.string.agvn_ui_app_onb_processing)
+                    installed && inUse -> stringResource(R.string.agvn_ui_app_onb_bundled_installed_in_use)
+                    installed -> stringResource(R.string.agvn_ui_app_onb_bundled_installed)
+                    !ready.value -> stringResource(R.string.agvn_ui_app_onb_bundled_installing, progress.value)
+                    else -> stringResource(R.string.agvn_ui_app_onb_bundled_not_installed)
                 }
                 Text(status, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
             }
@@ -416,12 +425,12 @@ private fun CoreComponentCard(
                 installed -> OutlinedButton(onClick = onRemove, enabled = !locked && !inUse) {
                     Icon(Icons.Outlined.DeleteOutline, null)
                     Spacer(Modifier.width(5.dp))
-                    Text(if (inUse) "Đang dùng" else "Xóa")
+                    Text(stringResource(if (inUse) R.string.agvn_ui_app_onb_in_use else R.string.agvn_ui_app_delete))
                 }
                 else -> OutlinedButton(onClick = onInstall, enabled = !locked) {
                     Icon(Icons.Outlined.Download, null)
                     Spacer(Modifier.width(5.dp))
-                    Text("Cài")
+                    Text(stringResource(R.string.install))
                 }
             }
         }
@@ -451,9 +460,9 @@ private fun ComponentCard(
                     Text(item.name, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     val status = when {
                         busy && installingProgress >= 0 ->
-                            "${installingLabel ?: "Đang cài"} • ${installingProgress}%"
-                        busy -> installingLabel ?: "Đang xử lý…"
-                        item.inUse -> "${item.type} • Đang dùng"
+                            "${installingLabel ?: stringResource(R.string.agvn_ui_app_onb_installing)} • ${installingProgress}%"
+                        busy -> installingLabel ?: stringResource(R.string.agvn_ui_app_onb_processing)
+                        item.inUse -> "${item.type} • ${stringResource(R.string.agvn_ui_app_onb_in_use)}"
                         else -> item.type
                     }
                     Text(
@@ -467,10 +476,10 @@ private fun ComponentCard(
                     OutlinedButton(onClick = { cb.onRemove(item.id) }, enabled = !locked && !item.inUse) {
                         Icon(Icons.Outlined.DeleteOutline, null)
                         Spacer(Modifier.width(5.dp))
-                        Text(if (item.inUse) "Đang dùng" else "Xóa")
+                        Text(stringResource(if (item.inUse) R.string.agvn_ui_app_onb_in_use else R.string.agvn_ui_app_delete))
                     }
                 } else if (!item.installed) {
-                    OutlinedButton(onClick = { cb.onInstall(item.id) }, enabled = !locked) { Text("Tải về") }
+                    OutlinedButton(onClick = { cb.onInstall(item.id) }, enabled = !locked) { Text(stringResource(R.string.agvn_ui_app_download)) }
                 } else Icon(Icons.Outlined.Check, null)
             }
             if (busy) {
@@ -501,10 +510,10 @@ private fun InstallProgressCard(label: String?, progress: Int) {
                 Icon(Icons.Outlined.InsertDriveFile, null, modifier = Modifier.size(28.dp))
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Cài thành phần", fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.install_content), fontWeight = FontWeight.SemiBold)
                     Text(
-                        if (progress >= 0) "${label ?: "Đang cài"} • ${progress}%"
-                        else label ?: "Đang cài thành phần…",
+                        if (progress >= 0) "${label ?: stringResource(R.string.agvn_ui_app_onb_installing)} • ${progress}%"
+                        else label ?: stringResource(R.string.agvn_ui_app_onb_installing_component),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall,
                         maxLines = 1,
@@ -532,7 +541,7 @@ private fun LoadingCard() {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 3.dp)
             Spacer(Modifier.width(12.dp))
-            Text("Đang tải danh sách thành phần…")
+            Text(stringResource(R.string.agvn_ui_app_onb_loading_components))
         }
     }
 }
@@ -560,7 +569,7 @@ private fun ComponentsFooter(
                 onClick = back,
                 modifier = Modifier.weight(1f).height(48.dp),
                 shape = RoundedCornerShape(12.dp)
-            ) { Text("Quay lại") }
+            ) { Text(stringResource(R.string.agvn_ui_app_back)) }
             Button(
                 onClick = next,
                 enabled = nextEnabled,

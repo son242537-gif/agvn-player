@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN Player (agvn.io): the texts of values/agvn_ui_agvn2_strings.xml. -->
+<resources>
+    <string name="agvn_ui_agvn2_hud_game">Game %1$d MB</string>
+    <string name="agvn_ui_agvn2_hud_free_ram">RAM kosong %1$s GB</string>
+    <string name="agvn_ui_agvn2_hud_battery">Baterai %1$d%%</string>
+    <string name="agvn_ui_agvn2_movie_audio">audio %1$s</string>
+    <string name="agvn_ui_agvn2_movie_unnamed">ini</string>
+    <string name="agvn_ui_agvn2_install_storage">ruang kosong di ponsel tidak cukup untuk memasang</string>
+    <string name="agvn_ui_agvn2_install_invalid">Android menganggap file pemasangan tidak valid</string>
+    <string name="agvn_ui_agvn2_install_conflict">versi baru tidak bisa dipasang menimpa aplikasi yang ada</string>
+    <string name="agvn_ui_agvn2_install_incompatible">versi baru tidak cocok dengan ponsel ini</string>
+    <string name="agvn_ui_agvn2_install_blocked">ponsel sedang memblokir pemasangan aplikasi</string>
+    <string name="agvn_ui_agvn2_install_failed">Android gagal memasang versi baru</string>
+    <string name="agvn_ui_agvn2_update_server_error">server mengembalikan error %1$d, coba lagi</string>
+    <string name="agvn_ui_agvn2_update_damaged">file unduhan rusak, coba lagi</string>
+    <string name="agvn_ui_agvn2_update_not_agvn">file unduhan bukan AGVN Player versi %1$s</string>
+    <string name="agvn_ui_agvn2_update_other_key">versi baru tidak ditandatangani dengan kunci yang sama dengan aplikasi terpasang, jadi tidak bisa diperbarui menimpanya</string>
+    <string name="agvn_ui_agvn2_tier_preset">Batas FPS: %1$d, Resolusi: %2$s, Texture pool: %3$d MB</string>
+    <string name="agvn_ui_agvn2_tier_flagship">Kuat</string>
+    <string name="agvn_ui_agvn2_tier_medium">Sedang</string>
+    <string name="agvn_ui_agvn2_tier_weak">Lemah</string>
+    <string name="agvn_ui_agvn2_renpy_live2d_missing">Game ini butuh Live2D, tetapi Mode Ringan AGVN Player tidak punya library Live2D Cubism Core (libLive2DCubismCore.so). Versi Windows game ini memilikinya: pilih \"Jalankan dengan Windows\".</string>
+</resources>

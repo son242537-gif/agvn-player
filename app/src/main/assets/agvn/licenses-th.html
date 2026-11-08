@@ -1,0 +1,48 @@
+<html><body>
+<h2>AGVN Player</h2>
+<p>เผยแพร่โดย agvn.io AGVN Player เป็นซอฟต์แวร์เสรี เผยแพร่ภายใต้สัญญาอนุญาตสาธารณะทั่วไปของ GNU (GNU GPL) รุ่น 3 หรือใหม่กว่า ข้อความเต็มของสัญญาอนุญาตอยู่ท้ายหน้านี้</p>
+<p>ซอร์สโค้ดฉบับเต็มของแต่ละรุ่นที่เผยแพร่: https://github.com/son242537-gif/agvn-player (แท็ก v0.1.x ของรุ่นนั้น)</p>
+<p>AGVN Player พัฒนาต่อจาก Winlator ของ BrunoSX และ Winlator Ludashi ของ StevenMXZ และ pipetto-crypto
+(https://github.com/StevenMXZ/Winlator-Ludashi) ขอขอบคุณผู้พัฒนาต้นฉบับทุกท่าน</p>
+<h3>สัญญาอนุญาต MIT (Winlator)</h3>
+<p>โค้ดของ Winlator และโค้ดที่ AGVN เขียนเพิ่ม ยังนำไปใช้แยกต่างหากได้ภายใต้สัญญาอนุญาต MIT ด้านล่างนี้</p>
+<p>MIT License</p><p>Copyright (c) 2023 BrunoSX</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+<h3>ส่วนประกอบจากบุคคลที่สาม</h3>
+<p>ส่วนประกอบต่อไปนี้มีสัญญาอนุญาตของตนเอง ซอร์สโค้ดอยู่ที่ที่อยู่ด้านล่าง</p>
+<ul>
+<li>Wine (LGPL 2.1+): https://www.winehq.org</li>
+<li>Proton (LGPL/BSD, Valve): https://github.com/ValveSoftware/Proton</li>
+<li>Proton 10.0-4 arm64ec สำหรับ Android (LGPL 2.1, Wine ตัวที่สองของแอป): แพ็กเกจ proton-10.0-4-arm64ec.wcp ซอร์สโค้ดอยู่ในสาขา proton_10.0 ของ https://github.com/The412Banner/proton-wine</li>
+<li>Wine Mono 9.3.1 (ตัวรัน .NET สำหรับ Wine แตกไฟล์เฉพาะเกมที่ต้องใช้ .NET): ส่วน Mono เป็น MIT X11 หรือ LGPL, FNA เป็น MS-PL และ MIT, FAudio และ SDL2 เป็น zlib, WinForms และ WPF เป็น MIT, SharpZipLib เป็น GPL ที่มีข้อยกเว้น (ดูไฟล์ COPYING ของ Wine Mono) แอปรวมรุ่นเผยแพร่ต้นฉบับไว้โดยไม่แก้ไข ซอร์สโค้ดของรุ่นนี้ (wine-mono-9.3.1-src.tar.xz) อยู่ที่ https://github.com/wine-mono/wine-mono/releases/tag/wine-mono-9.3.1 คลังโค้ด: https://gitlab.winehq.org/mono/wine-mono</li>
+<li>Box64 (MIT): https://github.com/ptitSeb/box64</li>
+<li>FEX-Emu (MIT): https://github.com/FEX-Emu/FEX</li>
+<li>Mesa: Turnip, Wrapper (MIT): https://github.com/xMeM/mesa/tree/wrapper</li>
+<li>Mesa 25.1.9: Zink (MIT): https://gitlab.freedesktop.org/mesa/mesa วิธีบิลด์และแพตช์อยู่ในซอร์สโค้ดของ AGVN Player (scripts/agvn/zink)</li>
+<li>DXVK (zlib): https://github.com/doitsujin/dxvk</li>
+<li>VKD3D-Proton / VKD3D (LGPL 2.1): https://gitlab.winehq.org/wine/vkd3d</li>
+<li>D8VK (zlib): https://github.com/AlpyneDreams/d8vk</li>
+<li>CNC DDraw (MIT): https://github.com/FunkyFr3sh/cnc-ddraw</li>
+<li>dxwrapper (zlib): https://github.com/elishacloud/dxwrapper</li>
+<li>libadrenotools (BSD-2-Clause): https://github.com/bylaws/libadrenotools</li>
+<li>Termux packages, Termux:X11 (GPL 3.0): https://github.com/termux/termux-packages, https://github.com/termux/termux-x11</li>
+<li>proot (GPL 2.0): https://proot-me.github.io</li>
+<li>patchelf (GPL 3.0): https://github.com/NixOS/patchelf</li>
+<li>PulseAudio (LGPL 2.1): https://www.freedesktop.org/wiki/Software/PulseAudio</li>
+<li>ฟอนต์ DejaVu (สัญญาอนุญาต Bitstream Vera, Copyright (c) 2003 Bitstream, Inc.; ส่วนของ DejaVu เป็นสาธารณสมบัติ): https://github.com/dejavu-fonts/dejavu-fonts แอปสร้างสำเนาของ DejaVu Sans บนเครื่องโดยเปลี่ยนชื่อเป็น "Tahoma" และ "Segoe UI" สำหรับข้อความ DirectWrite บรรทัดลิขสิทธิ์และข้อความเต็มของสัญญาอนุญาตอยู่ในฟอนต์เหล่านั้นเอง</li>
+<li>GLIBC fork by longjunyu2: https://github.com/longjunyu2/winlator/tree/use-glibc-instead-of-proot</li>
+<li>Big Picture Mode music: Dale Melvin Blevens III (Fumer)</li>
+<li>Ren'Py 8.5.3 (MIT, Copyright 2004-2026 Tom Rothamel และผู้ร่วมพัฒนา; โหมดเบาสำหรับเกม Ren'Py) รวมถึง Python 3.12 (PSF License, Copyright 2001-2023 Python Software Foundation), SDL2 (zlib, Copyright 1997-2022 Sam Lantinga), pyjnius (MIT, Copyright 2010-2023 Kivy Team and other contributors), FFmpeg (LGPL 2.1) และไลบรารีอื่น ๆ: https://www.renpy.org ซอร์สโค้ด https://github.com/renpy/renpy และ https://github.com/renpy/renpy-build สัญญาอนุญาตฉบับเต็มของ Ren'Py และรายชื่อไลบรารีอยู่ท้ายหน้านี้</li>
+<li>mkxp-z (GPL 3.0 หรือใหม่กว่า, Copyright 2013-2023 Amaryllis Kulla และผู้พัฒนา mkxp-z; โหมดเบาสำหรับเกม RPG Maker XP/VX/VX Ace) รวมถึง Ruby 3.1 (Ruby License / BSD-2-Clause), SDL2, SDL_image, SDL_sound, SDL_ttf และ PhysicsFS (zlib), OpenAL Soft และ FluidSynth (LGPL 2.1), FreeType (FreeType License) และไลบรารีอื่น ๆ: https://github.com/mkxp-z/mkxp-z ซอร์สโค้ดและสคริปต์บิลด์สำหรับ Android: scripts/agvn/mkxp-z ในคลังโค้ดของ AGVN Player สัญญาอนุญาตฉบับเต็มอยู่ท้ายหน้านี้</li>
+<li>Godot Engine 4.7.2 (MIT, Copyright 2014-present Godot Engine contributors, 2007-2014 Juan Linietsky และ Ariel Manzur; โหมดเบาสำหรับเกม Godot 4) รวมถึง FreeType, HarfBuzz, ICU, mbedTLS, Vulkan Memory Allocator, Swappy (Apache 2.0) และไลบรารีอื่น ๆ: https://godotengine.org ซอร์สโค้ด https://github.com/godotengine/godot เอนจินในแอปบิลด์ใหม่จากซอร์สโค้ดทางการ พร้อมแพตช์: scripts/agvn/godot ในคลังโค้ดของ AGVN Player สัญญาอนุญาตฉบับเต็มอยู่ท้ายหน้านี้</li>
+<li>Spine Runtimes 4.2 (spine-cpp และ spine-godot, Copyright (c) 2013-2025 Esoteric Software LLC) บิลด์รวมไว้ในเอนจิน Godot ข้างบน เพื่อให้เกม Godot ที่ทำด้วย Spine ใช้โหมดเบาได้ Spine Runtimes ไม่ใช่โอเพนซอร์สและไม่อยู่ภายใต้ GPL: ใช้ตาม Spine Runtimes License Agreement ข้อความเต็มอยู่ท้ายหน้านี้ ซอร์สโค้ด: https://github.com/EsotericSoftware/spine-runtimes</li>
+<li>ไลบรารี Android: AndroidX, Material Components, Gson, OkHttp, Retrofit, Glide, zstd-jni, XZ for Java,
+Apache Commons Compress, Conscrypt, Bouncy Castle, OpenJSSE, junixsocket (Apache 2.0 / MIT / BSD ตามลำดับ)</li>
+</ul>
+<h3>สัญญาอนุญาตของ Ren'Py</h3>
+<p>ข้อความตามต้นฉบับของไฟล์ LICENSE.txt ของ Ren'Py 8.5.3 อยู่ต่อจากข้อความเต็มของ GNU GPL 3</p>
+<h3>สัญญาอนุญาตของ mkxp-z และไลบรารีที่มาด้วย</h3>
+<p>อยู่ต่อจากสัญญาอนุญาตของ Ren'Py ท้ายหน้านี้</p>
+<h3>สัญญาอนุญาตของ Godot และไลบรารีที่มาด้วย</h3>
+<p>LICENSE.txt และ COPYRIGHT.txt ของ Godot 4.7.2 ตามต้นฉบับ สัญญาอนุญาตของ Swappy และสัญญาอนุญาต Spine Runtimes อยู่ต่อจากสัญญาอนุญาตของ mkxp-z</p>
+<h3>GNU GPL รุ่น 3</h3>
+</body></html>

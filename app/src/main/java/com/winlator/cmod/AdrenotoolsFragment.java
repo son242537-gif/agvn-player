@@ -99,7 +99,7 @@ public class AdrenotoolsFragment extends Fragment {
             String jsonStr = Downloader.downloadString(repo.apiUrl);
 
             if (jsonStr == null) {
-                runOnUi(() -> Toast.makeText(getContext(), "Kết nối thất bại!", Toast.LENGTH_SHORT).show());
+                runOnUi(() -> Toast.makeText(getContext(), R.string.agvn_ui_app_connection_failed, Toast.LENGTH_SHORT).show());
                 return;
             }
 
@@ -123,14 +123,14 @@ public class AdrenotoolsFragment extends Fragment {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                runOnUi(() -> Toast.makeText(getContext(), "Không đọc được danh sách cập nhật driver.", Toast.LENGTH_SHORT).show());
+                runOnUi(() -> Toast.makeText(getContext(), R.string.agvn_ui_app_driver_updates_unreadable, Toast.LENGTH_SHORT).show());
                 return;
             }
 
             runOnUi(() -> {
                 updateAdapter.setItems(updates);
                 if (updates.isEmpty()) {
-                    Toast.makeText(getContext(), "Không có cập nhật driver.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.agvn_ui_app_no_driver_updates, Toast.LENGTH_SHORT).show();
                 }
             });
         });
@@ -140,7 +140,7 @@ public class AdrenotoolsFragment extends Fragment {
         if (getContext() == null) return;
 
         File cacheDir = getContext().getCacheDir();
-        Toast.makeText(getContext(), "Đang tải " + item.name + "...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getContext().getString(R.string.agvn_ui_app_downloading_name, item.name), Toast.LENGTH_SHORT).show();
 
         Executors.newSingleThreadExecutor().execute(() -> {
             File tmpFile = new File(cacheDir, "driver_update.zip");
@@ -149,19 +149,19 @@ public class AdrenotoolsFragment extends Fragment {
             boolean success = Downloader.downloadFile(item.downloadUrl, tmpFile);
             runOnUi(() -> {
                 if (!success) {
-                    Toast.makeText(getContext(), "Tải về thất bại!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.agvn_ui_app_download_failed, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 String installedName = adrenotoolsManager.installDriver(Uri.fromFile(tmpFile));
                 if (!installedName.isEmpty()) {
-                    Toast.makeText(getContext(), "Đã cài: " + installedName, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getContext().getString(R.string.agvn_ui_app_installed_name, installedName), Toast.LENGTH_SHORT).show();
                     RecyclerView.Adapter adapter = recyclerView.getAdapter();
                     if (adapter instanceof DriversAdapter) {
                         ((DriversAdapter)adapter).reloadList();
                     }
                 } else {
-                    Toast.makeText(getContext(), "Cài đặt thất bại! File ZIP không hợp lệ.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), R.string.agvn_ui_app_install_failed_bad_zip, Toast.LENGTH_LONG).show();
                 }
                 tmpFile.delete();
             });
@@ -196,7 +196,7 @@ public class AdrenotoolsFragment extends Fragment {
             h.name.setText(adrenotoolsManager.getDriverName(driversList.get(position)));
             h.version.setText(adrenotoolsManager.getDriverVersion(driversList.get(position)));
             h.badge.setVisibility(View.VISIBLE);
-            h.badge.setText("Driver hiện tại");
+            h.badge.setText(R.string.agvn_ui_app_current_driver);
             h.actionButton.setImageResource(android.R.drawable.ic_menu_delete);
             h.actionButton.setOnClickListener((v) -> removeAtIndex(position));
         }

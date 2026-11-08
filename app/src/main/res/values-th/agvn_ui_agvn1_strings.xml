@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN Player (agvn.io): texts the "agvn1" area's classes had in their code (HTML game screen, picture notice). -->
+<resources>
+    <string name="agvn_ui_agvn1_html_load_title">เกิดข้อผิดพลาดขณะโหลดเกม</string>
+    <string name="agvn_ui_agvn1_html_no_first_scene">เกมยังไปไม่ถึงฉากแรก</string>
+    <string name="agvn_ui_agvn1_html_missing_modules">โมดูล Node ที่แอปยังไม่รองรับ: %1$s</string>
+    <string name="agvn_ui_agvn1_picture_game_folder">โฟลเดอร์เกม</string>
+    <string name="agvn_ui_agvn1_picture_no_access_game">แอปอ่านโฟลเดอร์เกมไม่ได้</string>
+    <string name="agvn_ui_agvn1_picture_short">ไฟล์มีขนาดแค่ %1$s ไบต์ ไม่ใช่รูปภาพ</string>
+    <string name="agvn_ui_agvn1_picture_no_access">แอปอ่านโฟลเดอร์ %1$s ไม่ได้</string>
+    <string name="agvn_ui_agvn1_picture_not_found">ไม่มีใน %1$s</string>
+    <string name="agvn_ui_agvn1_picture_no_file">ไม่มีไฟล์นี้</string>
+</resources>

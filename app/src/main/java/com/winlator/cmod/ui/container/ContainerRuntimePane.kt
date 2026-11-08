@@ -17,6 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.winlator.cmod.R
@@ -134,7 +135,7 @@ internal fun ContainerRuntimePane(
         scope.launch {
             val installed = installRuntimeComponent(context, type, version)
             installing = installing - key
-            if (installed == null) Toast.makeText(context, "Không cài được $version", Toast.LENGTH_SHORT).show()
+            if (installed == null) Toast.makeText(context, context.getString(R.string.agvn_ui_container_install_failed, version), Toast.LENGTH_SHORT).show()
             else { done(installed); revision++ }
         }
     }
@@ -145,14 +146,14 @@ internal fun ContainerRuntimePane(
         scope.launch {
             val installed = installAdrenoDriver(context, option)
             installing = installing - key
-            if (installed == null) Toast.makeText(context, "Không cài được ${option.label}", Toast.LENGTH_SHORT).show()
+            if (installed == null) Toast.makeText(context, context.getString(R.string.agvn_ui_container_install_failed, option.label), Toast.LENGTH_SHORT).show()
             else { driverVersion = installed; saveGraphics("version", installed); revision++ }
         }
     }
 
     when (section) {
         ContainerOverviewComposeHost.SECTION_AUDIO -> SettingsCard {
-            SettingChoice("Driver âm thanh", audioEntries.firstOrNull { StringUtils.parseIdentifier(it).equals(audio, true) } ?: audio, audioEntries) {
+            SettingChoice(stringResource(R.string.agvn_ui_container_audio_driver), audioEntries.firstOrNull { StringUtils.parseIdentifier(it).equals(audio, true) } ?: audio, audioEntries) {
                 audio = StringUtils.parseIdentifier(it)
                 container.setAudioDriver(audio)
                 container.saveData()
@@ -165,32 +166,33 @@ internal fun ContainerRuntimePane(
                     renderer = it; container.setRendererNative(it == "EGL"); container.saveData()
                 }
                 SettingsDivider()
-                SettingChoice("Chế độ trình chiếu", presentMode, listOf("mailbox", "fifo")) {
+                SettingChoice(stringResource(R.string.agvn_ui_container_present_mode), presentMode, listOf("mailbox", "fifo")) {
                     presentMode = it; container.setRendererPresentMode(it); container.saveData()
                 }
                 catalog?.let { c ->
                     SettingsDivider()
-                    SettingMappedChoice("Driver dựng hình", rendererDriverId, c.rendererDrivers) {
+                    SettingMappedChoice(stringResource(R.string.agvn_ui_container_renderer_driver), rendererDriverId, c.rendererDrivers) {
                         rendererDriverId = it; container.setRendererDriverId(it); container.saveData()
                     }
                 }
                 SettingsDivider()
-                val filters = if (renderer == "EGL") listOf("Bilinear", "Điểm gần nhất") else listOf("Bilinear", "Điểm gần nhất", "Snapdragon Super Resolution", "AMD FidelityFX Super Resolution")
-                SettingChoice("Lọc texture", filters.getOrElse(filterMode) { filters.first() }, filters) {
+                val nearest = stringResource(R.string.agvn_ui_container_filter_nearest)
+                val filters = if (renderer == "EGL") listOf("Bilinear", nearest) else listOf("Bilinear", nearest, "Snapdragon Super Resolution", "AMD FidelityFX Super Resolution")
+                SettingChoice(stringResource(R.string.agvn_ui_container_texture_filter), filters.getOrElse(filterMode) { filters.first() }, filters) {
                     filterMode = filters.indexOf(it).coerceAtLeast(0); container.setRendererFilterMode(filterMode); container.saveData()
                 }
                 SettingsDivider()
-                SettingToggle("Đổi kênh màu đỏ/xanh dương", swapRB) { swapRB = it; container.setRendererSwapRB(it); container.saveData() }
+                SettingToggle(stringResource(R.string.agvn_ui_container_swap_rb), swapRB) { swapRB = it; container.setRendererSwapRB(it); container.saveData() }
             }
             SettingsCard {
-                SettingChoice("Độ phân giải", screenChoice, screenEntries) {
+                SettingChoice(stringResource(R.string.agvn_ui_container_resolution), screenChoice, screenEntries) {
                     screenChoice = it
                     if (!it.equals("Custom", true)) {
                         screen = normalizeResolution(it); container.setScreenSize(screen); container.saveData()
                     }
                 }
                 if (screenChoice.equals("Custom", true)) {
-                    SettingsDivider(); SettingText("Độ phân giải tùy chỉnh", screen) {
+                    SettingsDivider(); SettingText(stringResource(R.string.agvn_ui_container_custom_resolution), screen) {
                         screen = it
                         AgvnScreenSize.normalize(it)?.let { size -> container.setScreenSize(size); container.saveData() }
                     }
@@ -205,17 +207,17 @@ internal fun ContainerRuntimePane(
                         driverVersion = it; saveGraphics("version", it)
                     }
                 }
-                SettingsDivider(); SettingChoice("Phiên bản Vulkan", vulkanVersion, listOf("1.1", "1.2", "1.3")) { vulkanVersion = it; saveGraphics("vulkanVersion", it) }
-                SettingsDivider(); SettingChoice("Bộ nhớ thiết bị tối đa", maxDeviceMemory, listOf("0", "512", "1024", "2048", "4096", "8192", "12288", "16384")) { maxDeviceMemory = it; saveGraphics("maxDeviceMemory", it) }
-                SettingsDivider(); SettingChoice("Chế độ trình chiếu của driver", graphicsPresentMode, listOf("mailbox", "fifo", "immediate", "relaxed")) { graphicsPresentMode = it; saveGraphics("presentMode", it) }
-                SettingsDivider(); SettingToggle("Đồng bộ khung hình", syncFrame) { syncFrame = it; saveGraphics("syncFrame", if (it) "1" else "0") }
-                SettingsDivider(); SettingToggle("Tắt Present Wait", disablePresentWait) { disablePresentWait = it; saveGraphics("disablePresentWait", if (it) "1" else "0") }
-                SettingsDivider(); SettingChoice("Loại tài nguyên", resourceType, listOf("auto", "dmabuf", "ahb", "opaque")) { resourceType = it; saveGraphics("resourceType", it) }
-                SettingsDivider(); SettingChoice("Giả lập BCN", bcnEmulation, listOf("none", "partial", "full", "auto")) { bcnEmulation = it; saveGraphics("bcnEmulation", it) }
-                SettingsDivider(); SettingChoice("Kiểu giả lập BCN", bcnType, listOf("software", "compute")) { bcnType = it; saveGraphics("bcnEmulationType", it) }
-                SettingsDivider(); SettingToggle("Bộ đệm giả lập BCN", bcnCache) { bcnCache = it; saveGraphics("bcnEmulationCache", if (it) "1" else "0") }
-                SettingsDivider(); SettingText("Tên GPU", gpuName) { gpuName = it; saveGraphics("gpuName", it) }
-                SettingsDivider(); SettingText("Tiện ích Vulkan đã tắt", blacklistedExtensions, 2) { blacklistedExtensions = it; saveGraphics("blacklistedExtensions", it.replace(" ", "")) }
+                SettingsDivider(); SettingChoice(stringResource(R.string.agvn_ui_container_vulkan_version), vulkanVersion, listOf("1.1", "1.2", "1.3")) { vulkanVersion = it; saveGraphics("vulkanVersion", it) }
+                SettingsDivider(); SettingChoice(stringResource(R.string.agvn_ui_container_max_device_memory), maxDeviceMemory, listOf("0", "512", "1024", "2048", "4096", "8192", "12288", "16384")) { maxDeviceMemory = it; saveGraphics("maxDeviceMemory", it) }
+                SettingsDivider(); SettingChoice(stringResource(R.string.agvn_ui_container_driver_present_mode), graphicsPresentMode, listOf("mailbox", "fifo", "immediate", "relaxed")) { graphicsPresentMode = it; saveGraphics("presentMode", it) }
+                SettingsDivider(); SettingToggle(stringResource(R.string.agvn_ui_container_sync_frame), syncFrame) { syncFrame = it; saveGraphics("syncFrame", if (it) "1" else "0") }
+                SettingsDivider(); SettingToggle(stringResource(R.string.agvn_ui_container_disable_present_wait), disablePresentWait) { disablePresentWait = it; saveGraphics("disablePresentWait", if (it) "1" else "0") }
+                SettingsDivider(); SettingChoice(stringResource(R.string.agvn_ui_container_resource_type), resourceType, listOf("auto", "dmabuf", "ahb", "opaque")) { resourceType = it; saveGraphics("resourceType", it) }
+                SettingsDivider(); SettingChoice(stringResource(R.string.agvn_ui_container_bcn_emulation), bcnEmulation, listOf("none", "partial", "full", "auto")) { bcnEmulation = it; saveGraphics("bcnEmulation", it) }
+                SettingsDivider(); SettingChoice(stringResource(R.string.agvn_ui_container_bcn_type), bcnType, listOf("software", "compute")) { bcnType = it; saveGraphics("bcnEmulationType", it) }
+                SettingsDivider(); SettingToggle(stringResource(R.string.agvn_ui_container_bcn_cache), bcnCache) { bcnCache = it; saveGraphics("bcnEmulationCache", if (it) "1" else "0") }
+                SettingsDivider(); SettingText(stringResource(R.string.agvn_ui_container_gpu_name), gpuName) { gpuName = it; saveGraphics("gpuName", it) }
+                SettingsDivider(); SettingText(stringResource(R.string.agvn_ui_container_vulkan_ext_disabled), blacklistedExtensions, 2) { blacklistedExtensions = it; saveGraphics("blacklistedExtensions", it.replace(" ", "")) }
             }
         }
 
@@ -225,39 +227,39 @@ internal fun ContainerRuntimePane(
                 SettingChoice("DX Wrapper", shownWrapper, wrapperEntries) { wrapper = StringUtils.parseIdentifier(it); container.setDXWrapper(wrapper); container.saveData() }
                 if (wrapper.contains("dxvk", true)) {
                     catalog?.let { c ->
-                        SettingsDivider(); SettingInstallChoice("Phiên bản DXVK", dxvkVersion, c.dxvk, installing, "DXVK", { v -> installRuntime("DXVK", v) { dxvkVersion = it; saveWrapper("version", it) } }) { dxvkVersion = it; saveWrapper("version", it) }
-                        SettingsDivider(); SettingInstallChoice("Phiên bản VKD3D", vkd3dVersion, c.vkd3d, installing, "VKD3D", { v -> installRuntime("VKD3D", v) { vkd3dVersion = it; saveWrapper("vkd3dVersion", it) } }) { vkd3dVersion = it; saveWrapper("vkd3dVersion", it) }
+                        SettingsDivider(); SettingInstallChoice(stringResource(R.string.agvn_ui_container_dxvk_version), dxvkVersion, c.dxvk, installing, "DXVK", { v -> installRuntime("DXVK", v) { dxvkVersion = it; saveWrapper("version", it) } }) { dxvkVersion = it; saveWrapper("version", it) }
+                        SettingsDivider(); SettingInstallChoice(stringResource(R.string.agvn_ui_container_vkd3d_version), vkd3dVersion, c.vkd3d, installing, "VKD3D", { v -> installRuntime("VKD3D", v) { vkd3dVersion = it; saveWrapper("vkd3dVersion", it) } }) { vkd3dVersion = it; saveWrapper("vkd3dVersion", it) }
                     }
-                    SettingsDivider(); SettingChoice("Mức tính năng VKD3D", vkd3dLevel, listOf("12_0", "12_1", "12_2")) { vkd3dLevel = it; saveWrapper("vkd3dLevel", it) }
-                    SettingsDivider(); SettingText("Giới hạn FPS", frameRate) { frameRate = it.filter(Char::isDigit).take(4); saveWrapper("framerate", frameRate.ifBlank { "0" }) }
-                    SettingsDivider(); SettingToggle("Độ trễ khung hình tối đa", maxFrameLatency) { maxFrameLatency = it; saveWrapper("maxFrameLatency", if (it) "1" else "0") }
+                    SettingsDivider(); SettingChoice(stringResource(R.string.agvn_ui_container_vkd3d_level), vkd3dLevel, listOf("12_0", "12_1", "12_2")) { vkd3dLevel = it; saveWrapper("vkd3dLevel", it) }
+                    SettingsDivider(); SettingText(stringResource(R.string.agvn_ui_container_fps_limit), frameRate) { frameRate = it.filter(Char::isDigit).take(4); saveWrapper("framerate", frameRate.ifBlank { "0" }) }
+                    SettingsDivider(); SettingToggle(stringResource(R.string.agvn_ui_container_max_frame_latency), maxFrameLatency) { maxFrameLatency = it; saveWrapper("maxFrameLatency", if (it) "1" else "0") }
                     SettingsDivider(); SettingToggle("Async", async) { async = it; saveWrapper("async", if (it) "1" else "0") }
-                    SettingsDivider(); SettingToggle("Bộ đệm Async", asyncCache) { asyncCache = it; saveWrapper("asyncCache", if (it) "1" else "0") }
+                    SettingsDivider(); SettingToggle(stringResource(R.string.agvn_ui_container_async_cache), asyncCache) { asyncCache = it; saveWrapper("asyncCache", if (it) "1" else "0") }
                     SettingsDivider(); SettingChoice("DDraw Wrapper", ddrawWrapper, listOf("wined3d", "cnc-ddraw", "dd7to9", "none")) { ddrawWrapper = it; saveWrapper("ddrawrapper", it) }
                 } else {
                     SettingsDivider(); SettingToggle("CSMT", csmt) { csmt = it; saveWrapper("csmt", if (it) "3" else "0") }
-                    SettingsDivider(); SettingToggle("Tính shader chính xác", strictShaderMath) { strictShaderMath = it; saveWrapper("strict_shader_math", if (it) "1" else "0") }
-                    SettingsDivider(); SettingChoice("Chế độ vẽ ngoài màn hình", offscreenMode, listOf("fbo", "backbuffer")) { offscreenMode = it; saveWrapper("OffscreenRenderingMode", it) }
-                    SettingsDivider(); SettingChoice("Bộ dựng hình Wine", wineRenderer, listOf("vulkan", "gl")) { wineRenderer = it; saveWrapper("renderer", it) }
-                    SettingsDivider(); SettingText("Bộ nhớ video", videoMemory) { videoMemory = it.filter(Char::isDigit).take(6); saveWrapper("videoMemorySize", videoMemory) }
+                    SettingsDivider(); SettingToggle(stringResource(R.string.agvn_ui_container_strict_shader_math), strictShaderMath) { strictShaderMath = it; saveWrapper("strict_shader_math", if (it) "1" else "0") }
+                    SettingsDivider(); SettingChoice(stringResource(R.string.agvn_ui_container_offscreen_mode), offscreenMode, listOf("fbo", "backbuffer")) { offscreenMode = it; saveWrapper("OffscreenRenderingMode", it) }
+                    SettingsDivider(); SettingChoice(stringResource(R.string.agvn_ui_container_wine_renderer), wineRenderer, listOf("vulkan", "gl")) { wineRenderer = it; saveWrapper("renderer", it) }
+                    SettingsDivider(); SettingText(stringResource(R.string.agvn_ui_container_video_memory), videoMemory) { videoMemory = it.filter(Char::isDigit).take(6); saveWrapper("videoMemorySize", videoMemory) }
                 }
             }
             SettingsCard {
-                Text("Trình giả lập", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp))
+                Text(stringResource(R.string.agvn_ui_container_emulators), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp))
                 SettingsDivider()
                 if (arm64) {
-                    SettingChoice("Giả lập 32-bit", emulator, listOf("FEXCore", "WOWBox64")) {
+                    SettingChoice(stringResource(R.string.agvn_ui_container_emulator_32), emulator, listOf("FEXCore", "WOWBox64")) {
                         emulator = it; container.setEmulator(if (it == "FEXCore") "FEXCore" else "Box64"); container.saveData()
                     }
                     catalog?.let { c ->
-                        SettingsDivider(); SettingInstallChoice("Phiên bản FEXCore", fexVersion, c.fex, installing, "FEXCore", { v -> installRuntime("FEXCore", v) { fexVersion = it; container.setFEXCoreVersion(it); container.saveData() } }) { fexVersion = it; container.setFEXCoreVersion(it); container.saveData() }
+                        SettingsDivider(); SettingInstallChoice(stringResource(R.string.agvn_ui_container_fexcore_version), fexVersion, c.fex, installing, "FEXCore", { v -> installRuntime("FEXCore", v) { fexVersion = it; container.setFEXCoreVersion(it); container.saveData() } }) { fexVersion = it; container.setFEXCoreVersion(it); container.saveData() }
                     }
                     SettingsDivider(); SettingMappedChoice("FEXCore Preset", fexPreset, fexPresets) { fexPreset = it; container.setFEXCorePreset(it); container.saveData() }
                 }
                 if (!arm64 || emulator == "WOWBox64") {
                     catalog?.let { c ->
                         val versions = if (arm64) c.wow else c.box; val type = if (arm64) "WOWBox64" else "Box64"
-                        SettingsDivider(); SettingInstallChoice("Phiên bản $type", boxVersion, versions, installing, type, { v -> installRuntime(type, v) { boxVersion = it; container.setBox64Version(it); container.saveData() } }) { boxVersion = it; container.setBox64Version(it); container.saveData() }
+                        SettingsDivider(); SettingInstallChoice(stringResource(if (arm64) R.string.agvn_ui_container_wowbox64_version else R.string.agvn_ui_container_box64_version), boxVersion, versions, installing, type, { v -> installRuntime(type, v) { boxVersion = it; container.setBox64Version(it); container.saveData() } }) { boxVersion = it; container.setBox64Version(it); container.saveData() }
                     }
                     SettingsDivider(); SettingMappedChoice("Box64 Preset", boxPreset, boxPresets) { boxPreset = it; container.setBox64Preset(it); container.saveData() }
                 }

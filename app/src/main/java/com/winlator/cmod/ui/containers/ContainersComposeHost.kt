@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -118,9 +119,9 @@ private fun ContainersScreen(
             LandscapeMainNavigation(
                 activity = activity,
                 selected = R.id.main_menu_containers,
-                title = "Môi trường chạy",
+                title = stringResource(R.string.agvn_ui_container_title),
                 actionIcon = Icons.Outlined.Add,
-                actionDescription = "Thêm môi trường chạy",
+                actionDescription = stringResource(R.string.agvn_ui_container_add),
                 onAction = callbacks::onAdd
             )
         }
@@ -144,10 +145,10 @@ private fun ContainersScreen(
                         }
                     }
                     Spacer(Modifier.height(14.dp))
-                    Text("Chưa có môi trường chạy", style = MaterialTheme.typography.titleLarge)
+                    Text(stringResource(R.string.agvn_ui_container_empty), style = MaterialTheme.typography.titleLarge)
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Tạo môi trường chạy để chuẩn bị môi trường Windows đầu tiên.",
+                        stringResource(R.string.agvn_ui_container_empty_hint),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -247,7 +248,7 @@ private fun ContainerCard(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Outlined.PlayArrow, "Chạy", modifier = Modifier.size(27.dp))
+                        Icon(Icons.Outlined.PlayArrow, stringResource(R.string.agvn_ui_container_run), modifier = Modifier.size(27.dp))
                     }
                 }
             }
@@ -262,16 +263,16 @@ private fun ContainerCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (compact) {
-                    IconButton(onClick = { callbacks.onEdit(container.id) }) { Icon(Icons.Outlined.Edit, "Sửa") }
-                    IconButton(onClick = { callbacks.onDuplicate(container.id) }) { Icon(Icons.Outlined.ContentCopy, "Nhân bản") }
-                    IconButton(onClick = { callbacks.onRemove(container.id) }) { Icon(Icons.Outlined.DeleteOutline, "Xóa") }
+                    IconButton(onClick = { callbacks.onEdit(container.id) }) { Icon(Icons.Outlined.Edit, stringResource(R.string.agvn_ui_container_edit)) }
+                    IconButton(onClick = { callbacks.onDuplicate(container.id) }) { Icon(Icons.Outlined.ContentCopy, stringResource(R.string.agvn_ui_container_duplicate)) }
+                    IconButton(onClick = { callbacks.onRemove(container.id) }) { Icon(Icons.Outlined.DeleteOutline, stringResource(R.string.agvn_ui_container_remove)) }
                 } else {
-                    ContainerAction(Icons.Outlined.Edit, "Edit") { callbacks.onEdit(container.id) }
-                    ContainerAction(Icons.Outlined.ContentCopy, "Duplicate") { callbacks.onDuplicate(container.id) }
-                    ContainerAction(Icons.Outlined.DeleteOutline, "Remove") { callbacks.onRemove(container.id) }
+                    ContainerAction(Icons.Outlined.Edit, stringResource(R.string.agvn_ui_container_edit)) { callbacks.onEdit(container.id) }
+                    ContainerAction(Icons.Outlined.ContentCopy, stringResource(R.string.agvn_ui_container_duplicate)) { callbacks.onDuplicate(container.id) }
+                    ContainerAction(Icons.Outlined.DeleteOutline, stringResource(R.string.agvn_ui_container_remove)) { callbacks.onRemove(container.id) }
                 }
                 IconButton(onClick = { callbacks.onInfo(container.id) }) {
-                    Icon(Icons.Outlined.Info, "Thông tin môi trường chạy")
+                    Icon(Icons.Outlined.Info, stringResource(R.string.agvn_ui_container_info))
                 }
             }
         }

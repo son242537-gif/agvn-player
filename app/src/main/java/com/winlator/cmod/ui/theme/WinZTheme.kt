@@ -37,18 +37,19 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.winlator.cmod.R
+import androidx.annotation.StringRes
 
 enum class WinlatorThemeType(
     val id: String,
-    val displayName: String,
-    val description: String
+    @StringRes val displayNameRes: Int,
+    @StringRes val descriptionRes: Int
 ) {
-    WHITE("white", "Trắng", "Nền sáng, chữ tối"),
-    BLACK("black", "Đen", "Giao diện tối cân bằng · Mặc định"),
-    AMOLED("amoled", "AMOLED", "Nền đen tuyền cho màn hình OLED"),
-    BLUE("blue", "Xanh dương", "Giao diện tối, điểm nhấn xanh dương"),
-    RED("red", "Đỏ", "Giao diện tối, điểm nhấn đỏ"),
-    PURPLE("purple", "Tím", "Giao diện tối, điểm nhấn tím");
+    WHITE("white", R.string.agvn_ui_app_theme_white, R.string.agvn_ui_app_theme_white_desc),
+    BLACK("black", R.string.agvn_ui_app_theme_black, R.string.agvn_ui_app_theme_black_desc),
+    AMOLED("amoled", R.string.agvn_ui_app_theme_amoled, R.string.agvn_ui_app_theme_amoled_desc),
+    BLUE("blue", R.string.agvn_ui_app_theme_blue, R.string.agvn_ui_app_theme_blue_desc),
+    RED("red", R.string.agvn_ui_app_theme_red, R.string.agvn_ui_app_theme_red_desc),
+    PURPLE("purple", R.string.agvn_ui_app_theme_purple, R.string.agvn_ui_app_theme_purple_desc);
 
     companion object {
         fun fromId(id: String?): WinlatorThemeType = values().firstOrNull { it.id == id } ?: BLACK

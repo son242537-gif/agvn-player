@@ -1,0 +1,46 @@
+<html><body>
+<h2>AGVN Player</h2>
+<p>由 agvn.io 发布。AGVN Player 是自由软件，按 GNU 通用公共许可证（GNU GPL）第 3 版或更新版本发布。许可证全文见本页末尾。</p>
+<p>每个发布版本的完整源代码：https://github.com/son242537-gif/agvn-player （该版本的 v0.1.x 标签）。</p>
+<p>AGVN Player 基于 BrunoSX 的 Winlator，以及 StevenMXZ 和 pipetto-crypto 的 Winlator Ludashi（https://github.com/StevenMXZ/Winlator-Ludashi）。感谢原作者。</p>
+<h3>MIT 许可证（Winlator）</h3>
+<p>Winlator 的代码和 AGVN 新增的代码仍可单独按下面的 MIT 许可证使用。</p>
+<p>MIT License</p><p>Copyright (c) 2023 BrunoSX</p><p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p><p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p><p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+<h3>第三方组件</h3>
+<p>以下组件有各自的许可证，其源代码见下列地址。</p>
+<ul>
+<li>Wine (LGPL 2.1+): https://www.winehq.org</li>
+<li>Proton (LGPL/BSD, Valve): https://github.com/ValveSoftware/Proton</li>
+<li>Proton 10.0-4 arm64ec for Android（LGPL 2.1，应用的第二个 Wine）：proton-10.0-4-arm64ec.wcp 包，源代码在 https://github.com/The412Banner/proton-wine 的 proton_10.0 分支</li>
+<li>Wine Mono 9.3.1（Wine 的 .NET 运行库，只为需要 .NET 的游戏解压）：Mono 部分为 MIT X11 或 LGPL，FNA 为 MS-PL 和 MIT，FAudio 和 SDL2 为 zlib，WinForms 和 WPF 为 MIT，SharpZipLib 为带例外条款的 GPL（见 Wine Mono 的 COPYING 文件）。应用附带未经修改的原始发布版本；该版本的源代码（wine-mono-9.3.1-src.tar.xz）在 https://github.com/wine-mono/wine-mono/releases/tag/wine-mono-9.3.1 ，代码库：https://gitlab.winehq.org/mono/wine-mono</li>
+<li>Box64 (MIT): https://github.com/ptitSeb/box64</li>
+<li>FEX-Emu (MIT): https://github.com/FEX-Emu/FEX</li>
+<li>Mesa: Turnip, Wrapper (MIT): https://github.com/xMeM/mesa/tree/wrapper</li>
+<li>Mesa 25.1.9: Zink (MIT): https://gitlab.freedesktop.org/mesa/mesa 。构建方法和补丁在 AGVN Player 的源代码中（scripts/agvn/zink）</li>
+<li>DXVK (zlib): https://github.com/doitsujin/dxvk</li>
+<li>VKD3D-Proton / VKD3D (LGPL 2.1): https://gitlab.winehq.org/wine/vkd3d</li>
+<li>D8VK (zlib): https://github.com/AlpyneDreams/d8vk</li>
+<li>CNC DDraw (MIT): https://github.com/FunkyFr3sh/cnc-ddraw</li>
+<li>dxwrapper (zlib): https://github.com/elishacloud/dxwrapper</li>
+<li>libadrenotools (BSD-2-Clause): https://github.com/bylaws/libadrenotools</li>
+<li>Termux packages, Termux:X11 (GPL 3.0): https://github.com/termux/termux-packages, https://github.com/termux/termux-x11</li>
+<li>proot (GPL 2.0): https://proot-me.github.io</li>
+<li>patchelf (GPL 3.0): https://github.com/NixOS/patchelf</li>
+<li>PulseAudio (LGPL 2.1): https://www.freedesktop.org/wiki/Software/PulseAudio</li>
+<li>DejaVu 字体（Bitstream Vera 许可证，Copyright (c) 2003 Bitstream, Inc.；DejaVu 部分属于公有领域）：https://github.com/dejavu-fonts/dejavu-fonts 。应用会在手机上把 DejaVu Sans 复制并改名为 "Tahoma" 和 "Segoe UI"，用于 DirectWrite 文字；版权行和许可证全文就在这些字体中。</li>
+<li>GLIBC fork by longjunyu2: https://github.com/longjunyu2/winlator/tree/use-glibc-instead-of-proot</li>
+<li>Big Picture Mode music: Dale Melvin Blevens III (Fumer)</li>
+<li>Ren'Py 8.5.3（MIT，Copyright 2004-2026 Tom Rothamel 及其贡献者；用于 Ren'Py 游戏的轻量运行），包含 Python 3.12（PSF License，Copyright 2001-2023 Python Software Foundation）、SDL2（zlib，Copyright 1997-2022 Sam Lantinga）、pyjnius（MIT，Copyright 2010-2023 Kivy Team and other contributors）、FFmpeg（LGPL 2.1）及其他库：https://www.renpy.org ，源代码 https://github.com/renpy/renpy 和 https://github.com/renpy/renpy-build 。Ren'Py 的完整许可证和库列表见本页末尾。</li>
+<li>mkxp-z（GPL 3.0 或更新版本，Copyright 2013-2023 Amaryllis Kulla 及 mkxp-z 作者；用于 RPG Maker XP/VX/VX Ace 游戏的轻量运行），包含 Ruby 3.1（Ruby License / BSD-2-Clause）、SDL2、SDL_image、SDL_sound、SDL_ttf 和 PhysicsFS（zlib）、OpenAL Soft 和 FluidSynth（LGPL 2.1）、FreeType（FreeType License）及其他库：https://github.com/mkxp-z/mkxp-z 。源代码和 Android 构建脚本：AGVN Player 代码库中的 scripts/agvn/mkxp-z。完整许可证见本页末尾。</li>
+<li>Godot Engine 4.7.2（MIT，Copyright 2014-present Godot Engine contributors, 2007-2014 Juan Linietsky 和 Ariel Manzur；用于 Godot 4 游戏的轻量运行），包含 FreeType、HarfBuzz、ICU、mbedTLS、Vulkan Memory Allocator、Swappy（Apache 2.0）及其他库：https://godotengine.org ，源代码 https://github.com/godotengine/godot 。应用中的引擎由官方源代码重新构建，带有补丁：AGVN Player 代码库中的 scripts/agvn/godot。完整许可证见本页末尾。</li>
+<li>Spine Runtimes 4.2（spine-cpp 和 spine-godot，Copyright (c) 2013-2025 Esoteric Software LLC），构建进上面的 Godot 引擎，让用 Spine 制作的 Godot 游戏可以轻量运行。Spine Runtimes 不是开源软件，也不受 GPL 约束：按 Spine Runtimes License Agreement 使用，全文见本页末尾。源代码：https://github.com/EsotericSoftware/spine-runtimes</li>
+<li>Android 库：AndroidX、Material Components、Gson、OkHttp、Retrofit、Glide、zstd-jni、XZ for Java、Apache Commons Compress、Conscrypt、Bouncy Castle、OpenJSSE、junixsocket（分别为 Apache 2.0 / MIT / BSD）</li>
+</ul>
+<h3>Ren'Py 的许可证</h3>
+<p>Ren'Py 8.5.3 的 LICENSE.txt 原文，位于 GNU GPL 3 全文之后。</p>
+<h3>mkxp-z 及其附带库的许可证</h3>
+<p>位于 Ren'Py 的许可证之后，在本页末尾。</p>
+<h3>Godot 及其附带库的许可证</h3>
+<p>Godot 4.7.2 的 LICENSE.txt 和 COPYRIGHT.txt 原文、Swappy 的许可证和 Spine Runtimes 许可证，位于 mkxp-z 的许可证之后。</p>
+<h3>GNU GPL 第 3 版</h3>
+</body></html>

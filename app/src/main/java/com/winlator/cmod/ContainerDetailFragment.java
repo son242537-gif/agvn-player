@@ -298,7 +298,7 @@ public class ContainerDetailFragment extends Fragment implements DXVKConfigDialo
                         openDirectoryCallback.call(path);
                     }
                 } else {
-                    Toast.makeText(getContext(), "Thư mục đã chọn không hợp lệ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.agvn_ui_container_invalid_folder, Toast.LENGTH_SHORT).show();
                 }
             }
             openDirectoryCallback = null;

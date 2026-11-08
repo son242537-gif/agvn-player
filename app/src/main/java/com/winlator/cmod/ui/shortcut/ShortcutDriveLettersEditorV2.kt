@@ -35,9 +35,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.winlator.cmod.R
 import com.winlator.cmod.container.Container
 import com.winlator.cmod.core.FileUtils
 import com.winlator.cmod.ui.settings.SettingsCard
@@ -55,7 +57,7 @@ private val shortcutDriveLettersV2 = ('D'..'Z').map { it.toString() }
 internal fun ShortcutDriveLettersEditorV2(container: Container) {
     DriveLettersEditorV2(
         initialDrives = container.drives.orEmpty(),
-        subtitle = "Thay đổi áp dụng cho môi trường chạy này"
+        subtitle = stringResource(R.string.agvn_ui_library_drives_subtitle)
     ) { serialized ->
         if (serialized != container.drives.orEmpty()) {
             container.setDrives(serialized)
@@ -67,7 +69,7 @@ internal fun ShortcutDriveLettersEditorV2(container: Container) {
 @Composable
 internal fun DriveLettersEditorV2(
     initialDrives: String,
-    subtitle: String = "Thay đổi áp dụng cho môi trường chạy này",
+    subtitle: String = stringResource(R.string.agvn_ui_library_drives_subtitle),
     onChanged: (String) -> Unit
 ) {
     val context = LocalContext.current
@@ -109,7 +111,7 @@ internal fun DriveLettersEditorV2(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(Modifier.weight(1f)) {
-                Text("Ký tự ổ đĩa", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.agvn_ui_library_drive_letters), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Text(
                     subtitle,
                     style = MaterialTheme.typography.bodySmall,
@@ -121,13 +123,13 @@ internal fun DriveLettersEditorV2(
                 onClick = { if (nextLetter != null) entries.add(ShortcutDriveEntryV2(nextLetter, "")) },
                 enabled = nextLetter != null
             ) {
-                Icon(Icons.Outlined.Add, "Thêm ổ")
+                Icon(Icons.Outlined.Add, stringResource(R.string.agvn_ui_library_add_drive))
             }
         }
 
         if (entries.isEmpty()) {
             Text(
-                "Chưa có ổ tùy chỉnh",
+                stringResource(R.string.agvn_ui_library_no_drives),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -202,11 +204,11 @@ private fun ShortcutDriveLetterRowV2(
             onValueChange = onPath,
             modifier = Modifier.weight(1f),
             singleLine = true,
-            label = { Text("Đường dẫn") },
+            label = { Text(stringResource(R.string.agvn_ui_library_path)) },
             placeholder = { Text("/storage/emulated/0/...", maxLines = 1, overflow = TextOverflow.Ellipsis) },
             shape = RoundedCornerShape(10.dp)
         )
-        IconButton(onClick = onBrowse) { Icon(Icons.Outlined.FolderOpen, "Chọn thư mục") }
-        IconButton(onClick = onRemove) { Icon(Icons.Outlined.DeleteOutline, "Xóa ổ") }
+        IconButton(onClick = onBrowse) { Icon(Icons.Outlined.FolderOpen, stringResource(R.string.agvn_ui_library_pick_folder)) }
+        IconButton(onClick = onRemove) { Icon(Icons.Outlined.DeleteOutline, stringResource(R.string.agvn_ui_library_remove_drive)) }
     }
 }

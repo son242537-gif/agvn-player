@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AGVN Player (agvn.io): texts the "agvn1" area's classes had in their code (HTML game screen, picture notice). -->
+<resources>
+    <string name="agvn_ui_agvn1_html_load_title">加载游戏时出错</string>
+    <string name="agvn_ui_agvn1_html_no_first_scene">游戏未能进入第一个场景</string>
+    <string name="agvn_ui_agvn1_html_missing_modules">应用尚不支持的 Node 模块：%1$s</string>
+    <string name="agvn_ui_agvn1_picture_game_folder">游戏文件夹</string>
+    <string name="agvn_ui_agvn1_picture_no_access_game">应用无法读取游戏文件夹</string>
+    <string name="agvn_ui_agvn1_picture_short">文件只有 %1$s 字节，不是图片</string>
+    <string name="agvn_ui_agvn1_picture_no_access">应用无法读取文件夹 %1$s</string>
+    <string name="agvn_ui_agvn1_picture_not_found">%1$s 中没有</string>
+    <string name="agvn_ui_agvn1_picture_no_file">没有这个文件</string>
+</resources>

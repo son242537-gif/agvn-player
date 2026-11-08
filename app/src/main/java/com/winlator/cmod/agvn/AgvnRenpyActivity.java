@@ -3,6 +3,7 @@ package com.winlator.cmod.agvn;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Process;
@@ -23,6 +24,7 @@ import org.renpy.android.PythonSDLActivity;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -111,7 +113,17 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
         for (Map.Entry<String, String> e : env.entrySet()) nativeSetEnv(e.getKey(), e.getValue());
         // "Toàn màn hình cho mọi game" (AgvnFullscreen): main.py stretches the game over the whole screen
         nativeSetEnv("AGVN_RENPY_STRETCH", getIntent().getBooleanExtra(AgvnFullscreen.INTENT, false) ? "1" : "0");
+        nativeSetEnv("AGVN_RENPY_LIVE2D_MISSING", screenText(R.string.agvn_ui_agvn2_renpy_live2d_missing)); // main.py
         Log.i(TAG, "Ren'Py game " + gameDir + ", logs in " + publicDir);
+    }
+
+    /** {@code res} for Ren'Py's error screen, whose font (DejaVu Sans) has no Thai or Chinese letters: English there. */
+    private String screenText(int res) {
+        String lang = AgvnLanguage.textLanguage(this);
+        if (!lang.equals("th") && !lang.equals("zh")) return getString(res);
+        Configuration english = new Configuration(getResources().getConfiguration());
+        english.setLocale(Locale.ENGLISH);
+        return createConfigurationContext(english).getString(res);
     }
 
     @Override

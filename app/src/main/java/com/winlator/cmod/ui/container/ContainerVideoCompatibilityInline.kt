@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -82,29 +83,29 @@ internal fun ContainerWrapperInline(containerId: Int, callbacks: ContainerInline
     }
 
     VCPanel {
-        Text("Wrapper DirectX", Modifier.padding(horizontal = 12.dp, vertical = 9.dp), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.agvn_ui_container_directx_wrapper), Modifier.padding(horizontal = 12.dp, vertical = 9.dp), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         VCChoice("DX Wrapper", wrapper, wrapperEntries) { wrapper = it }
         VCDivider()
         if (StringUtils.parseIdentifier(wrapper).contains("dxvk", true)) {
-            VCDownloadChoice("Phiên bản DXVK", dxvkVersion, dxvk, installedDxvk, "DXVK", callbacks) { dxvkVersion = it }
+            VCDownloadChoice(stringResource(R.string.agvn_ui_container_dxvk_version), dxvkVersion, dxvk, installedDxvk, "DXVK", callbacks) { dxvkVersion = it }
             VCDivider()
-            VCDownloadChoice("Phiên bản VKD3D", vkd3dVersion, vkd3d, installedVkd3d, "VKD3D", callbacks) { vkd3dVersion = it }
+            VCDownloadChoice(stringResource(R.string.agvn_ui_container_vkd3d_version), vkd3dVersion, vkd3d, installedVkd3d, "VKD3D", callbacks) { vkd3dVersion = it }
             VCDivider()
-            VCChoice("Mức tính năng VKD3D", vkd3dLevel, arrayOf("12_0", "12_1", "12_2", "11_1", "11_0", "10_1", "10_0", "9_3", "9_2", "9_1")) { vkd3dLevel = it }
-            VCField("Giới hạn FPS", frameRate) { frameRate = it.filter(Char::isDigit).take(4) }
-            VCToggle("Độ trễ khung hình tối đa", maxLatency) { maxLatency = it }
+            VCChoice(stringResource(R.string.agvn_ui_container_vkd3d_level), vkd3dLevel, arrayOf("12_0", "12_1", "12_2", "11_1", "11_0", "10_1", "10_0", "9_3", "9_2", "9_1")) { vkd3dLevel = it }
+            VCField(stringResource(R.string.agvn_ui_container_fps_limit), frameRate) { frameRate = it.filter(Char::isDigit).take(4) }
+            VCToggle(stringResource(R.string.agvn_ui_container_max_frame_latency), maxLatency) { maxLatency = it }
             VCToggle("Shader Async", asyncShaders) { asyncShaders = it }
-            VCToggle("Bộ đệm shader Async", asyncCache) { asyncCache = it }
+            VCToggle(stringResource(R.string.agvn_ui_container_async_shader_cache), asyncCache) { asyncCache = it }
             VCChoice("DDraw Wrapper", ddraw, arrayOf("wined3d", "cnc-ddraw")) { ddraw = it }
         } else {
             VCToggle("CSMT", csmt) { csmt = it }
-            VCToggle("Tính shader chính xác", strictMath) { strictMath = it }
-            VCChoice("Vẽ ngoài màn hình", offscreen, arrayOf("fbo", "backbuffer")) { offscreen = it }
-            VCChoice("Bộ dựng hình WineD3D", wineRenderer, arrayOf("gl", "vulkan", "gdi")) { wineRenderer = it }
-            VCField("Bộ nhớ video (MB)", videoMemory) { videoMemory = it.filter(Char::isDigit).take(6) }
+            VCToggle(stringResource(R.string.agvn_ui_container_strict_shader_math), strictMath) { strictMath = it }
+            VCChoice(stringResource(R.string.agvn_ui_container_offscreen), offscreen, arrayOf("fbo", "backbuffer")) { offscreen = it }
+            VCChoice(stringResource(R.string.agvn_ui_container_wined3d_renderer), wineRenderer, arrayOf("gl", "vulkan", "gdi")) { wineRenderer = it }
+            VCField(stringResource(R.string.agvn_ui_container_video_memory_mb), videoMemory) { videoMemory = it.filter(Char::isDigit).take(6) }
         }
         OutlinedButton(onClick = callbacks::onManageComponents, modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 7.dp)) {
-            Text("Quản lý phiên bản đã cài")
+            Text(stringResource(R.string.agvn_ui_container_manage_versions))
         }
         VCSave {
             val parsedWrapper = StringUtils.parseIdentifier(wrapper)
@@ -161,30 +162,30 @@ internal fun ContainerCompatibilityInline(containerId: Int, callbacks: Container
 
     VCPanel {
         if (arm64) {
-            VCReadOnly("Giả lập 64-bit", "FEXCore")
+            VCReadOnly(stringResource(R.string.agvn_ui_container_emulator_64), "FEXCore")
             VCDivider()
-            VCChoice("Giả lập 32-bit", emulator32, arrayOf("FEXCore", "WOWBox64")) { emulator32 = it }
+            VCChoice(stringResource(R.string.agvn_ui_container_emulator_32), emulator32, arrayOf("FEXCore", "WOWBox64")) { emulator32 = it }
             VCDivider()
-            VCDownloadChoice("Phiên bản FEXCore", fexVersion, fexVersions, installedFex, "FEXCore", callbacks) { fexVersion = it }
+            VCDownloadChoice(stringResource(R.string.agvn_ui_container_fexcore_version), fexVersion, fexVersions, installedFex, "FEXCore", callbacks) { fexVersion = it }
             VCDivider()
             VCPresetChoice("Preset FEXCore", fexPreset, fexPresets.map { it.name }.toTypedArray(), fexPresets.map { it.id }.toTypedArray()) { fexPreset = it }
             if (emulator32 == "WOWBox64") {
                 VCDivider()
-                VCDownloadChoice("Phiên bản WOWBox64", boxVersion, boxVersions, installedBox, "WOWBox64", callbacks) { boxVersion = it }
+                VCDownloadChoice(stringResource(R.string.agvn_ui_container_wowbox64_version), boxVersion, boxVersions, installedBox, "WOWBox64", callbacks) { boxVersion = it }
                 VCDivider()
                 VCPresetChoice("Preset Box64", boxPreset, boxPresets.map { it.name }.toTypedArray(), boxPresets.map { it.id }.toTypedArray()) { boxPreset = it }
             }
         } else {
-            VCReadOnly("Giả lập 64-bit", "Box64")
+            VCReadOnly(stringResource(R.string.agvn_ui_container_emulator_64), "Box64")
             VCDivider()
-            VCReadOnly("Giả lập 32-bit", "Box64")
+            VCReadOnly(stringResource(R.string.agvn_ui_container_emulator_32), "Box64")
             VCDivider()
-            VCDownloadChoice("Phiên bản Box64", boxVersion, boxVersions, installedBox, "Box64", callbacks) { boxVersion = it }
+            VCDownloadChoice(stringResource(R.string.agvn_ui_container_box64_version), boxVersion, boxVersions, installedBox, "Box64", callbacks) { boxVersion = it }
             VCDivider()
             VCPresetChoice("Preset Box64", boxPreset, boxPresets.map { it.name }.toTypedArray(), boxPresets.map { it.id }.toTypedArray()) { boxPreset = it }
         }
         OutlinedButton(onClick = callbacks::onManageComponents, modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 7.dp)) {
-            Text("Quản lý phiên bản đã cài")
+            Text(stringResource(R.string.agvn_ui_container_manage_versions))
         }
         VCSave {
             container.setEmulator(if (arm64 && emulator32 == "FEXCore") "FEXCore" else "Box64")
@@ -261,7 +262,7 @@ private fun VCDownloadChoice(label: String, selected: String, entries: Array<Str
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(value, Modifier.weight(1f))
-                            if (!ready) Text("Tải về", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            if (!ready) Text(stringResource(R.string.agvn_ui_container_download), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     },
                     onClick = { open = false; if (ready) onSelected(value) else callbacks.onInstallComponent(type, value) }
@@ -303,7 +304,7 @@ private fun VCToggle(label: String, checked: Boolean, onChange: (Boolean) -> Uni
 @Composable
 private fun VCSave(onClick: () -> Unit) {
     Button(onClick = onClick, modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp)) {
-        Text("Lưu", fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.agvn_ui_container_save), fontWeight = FontWeight.SemiBold)
     }
 }
 

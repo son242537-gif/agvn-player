@@ -259,16 +259,16 @@ public class ShortcutsFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        MenuItem viewItem = menu.add(0, MENU_VIEW_MODE, 0, isGridView ? "Dạng danh sách" : "Dạng lưới");
+        MenuItem viewItem = menu.add(0, MENU_VIEW_MODE, 0, isGridView ? R.string.agvn_ui_library_view_list : R.string.agvn_ui_library_view_grid);
         viewItem.setIcon(R.drawable.ui_ic_view);
         viewItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-        MenuItem searchItem = menu.add(0, MENU_SEARCH, 1, "Tìm kiếm");
+        MenuItem searchItem = menu.add(0, MENU_SEARCH, 1, R.string.agvn_ui_library_search);
         searchItem.setIcon(R.drawable.ui_ic_search);
         searchItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS |
                 MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
         SearchView searchView = new SearchView(requireContext());
-        searchView.setQueryHint("Tìm game");
+        searchView.setQueryHint(getString(R.string.agvn_ui_library_search_hint));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -284,27 +284,27 @@ public class ShortcutsFragment extends Fragment {
         });
         searchItem.setActionView(searchView);
 
-        MenuItem addItem = menu.add(0, MENU_FILE_MANAGER, 2, "Thêm game");
+        MenuItem addItem = menu.add(0, MENU_FILE_MANAGER, 2, R.string.agvn_ui_library_add_game);
         addItem.setIcon(R.drawable.ui_ic_add);
         addItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-        MenuItem helpItem = menu.add(0, MENU_HELP, 2, "Hướng dẫn"); // AGVN
+        MenuItem helpItem = menu.add(0, MENU_HELP, 2, R.string.agvn_ui_library_guide); // AGVN
         helpItem.setIcon(R.drawable.ui_ic_help);
         helpItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
         MainActivity activity = (MainActivity) requireActivity();
-        SubMenu moreMenu = menu.addSubMenu(0, MENU_MORE, 3, "Thêm");
+        SubMenu moreMenu = menu.addSubMenu(0, MENU_MORE, 3, R.string.agvn_ui_library_more);
         MenuItem moreItem = moreMenu.getItem();
         moreItem.setIcon(R.drawable.ui_ic_more);
         moreItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-        moreMenu.add(MENU_GROUP_LOCK, MENU_LOCK_ORIENTATION, 0, "Khóa hướng màn hình")
+        moreMenu.add(MENU_GROUP_LOCK, MENU_LOCK_ORIENTATION, 0, R.string.agvn_ui_library_lock_orientation)
                 .setCheckable(true)
                 .setChecked(activity.isOrientationLocked());
-        moreMenu.add(MENU_GROUP_ORIENTATION_MODE, MENU_VERTICAL_MODE, 1, "Chế độ dọc")
+        moreMenu.add(MENU_GROUP_ORIENTATION_MODE, MENU_VERTICAL_MODE, 1, R.string.agvn_ui_library_portrait_mode)
                 .setCheckable(true)
                 .setChecked(activity.isVerticalModeEnabled());
-        moreMenu.add(MENU_GROUP_ORIENTATION_MODE, MENU_HORIZONTAL_MODE, 2, "Chế độ ngang")
+        moreMenu.add(MENU_GROUP_ORIENTATION_MODE, MENU_HORIZONTAL_MODE, 2, R.string.agvn_ui_library_landscape_mode)
                 .setCheckable(true)
                 .setChecked(activity.isHorizontalModeEnabled());
         moreMenu.setGroupCheckable(MENU_GROUP_LOCK, true, false);
@@ -653,11 +653,11 @@ public class ShortcutsFragment extends Fragment {
                 }
             }
 
-            Toast.makeText(getContext(), "Đã cập nhật biểu tượng!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.agvn_ui_library_icon_updated, Toast.LENGTH_SHORT).show();
             loadShortcutsList();
 
         } catch (Exception e) {
-            Toast.makeText(getContext(), "Lỗi khi lưu biểu tượng", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.agvn_ui_library_icon_save_error, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -779,7 +779,7 @@ public class ShortcutsFragment extends Fragment {
             ContentDialog.confirm(context, R.string.do_you_want_to_remove_this_shortcut, () -> {
                 if (removeShortcut(shortcut)) {
                     loadShortcutsList();
-                    Toast.makeText(context, "Đã xóa lối tắt.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, R.string.agvn_ui_library_shortcut_removed, Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -787,14 +787,14 @@ public class ShortcutsFragment extends Fragment {
             ContainerManager containerManager = new ContainerManager(context);
             ArrayList<Container> containers = containerManager.getContainers();
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Chọn môi trường chạy");
+            builder.setTitle(R.string.agvn_ui_library_pick_environment);
             String[] containerNames = new String[containers.size()];
             for (int i = 0; i < containers.size(); i++) {
                 containerNames[i] = containers.get(i).getName();
             }
             builder.setItems(containerNames, (dialog, which) -> {
                 if (shortcut.cloneToContainer(containers.get(which))) {
-                    Toast.makeText(context, "Đã nhân bản xong.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, R.string.agvn_ui_library_cloned, Toast.LENGTH_SHORT).show();
                     loadShortcutsList();
                 }
             });
@@ -1114,7 +1114,7 @@ public class ShortcutsFragment extends Fragment {
     /** AGVN: the games picked in the library ("Chọn nhiều game"), removed after one question. */
     private void removeShortcuts(List<String> shortcutPaths) {
         Context context = requireContext();
-        String msg = "Xóa " + shortcutPaths.size() + " game đã chọn khỏi thư viện?\nFile game vẫn còn trong máy.";
+        String msg = context.getString(R.string.agvn_ui_library_remove_many_question, shortcutPaths.size());
         ContentDialog.confirm(context, msg, () -> {
             int removed = 0;
             for (String path : shortcutPaths) {
@@ -1122,7 +1122,7 @@ public class ShortcutsFragment extends Fragment {
                 if (shortcut != null && removeShortcut(shortcut)) removed++;
             }
             loadShortcutsList();
-            Toast.makeText(context, "Đã xóa " + removed + " game khỏi thư viện.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.agvn_ui_library_removed_many, removed), Toast.LENGTH_SHORT).show();
         });
     }
 
