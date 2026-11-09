@@ -2,9 +2,11 @@
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
+import android.app.LocaleManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.LocaleList;
 import android.preference.PreferenceManager;
 
@@ -20,6 +22,9 @@ import java.util.Locale;
  * many Vietnamese players keep their phone in English, and the app is made for them first. Each activity takes it in
  * attachBaseContext ({@link #wrap}), so it stays through a turn of the screen, and so does the app's own context
  * (AgvnApp); a new pick restarts the screen it was made on. A language the app has no text for shows Vietnamese.
+ * <p>On Android 13 and later the pick is also Android's own language for the app ({@link #toAndroid}), which every
+ * screen and the app's texts then take from Android itself: with {@link #wrap} alone, a POCO F8 Pro (HyperOS 3,
+ * 09/11/2026) showed its screens in Chinese while Tiếng Việt was picked, and another pick changed nothing.
  */
 public final class AgvnLanguage {
     static final String PREF = "agvn_language", SYSTEM = "system", VIETNAMESE = "vi";
@@ -42,11 +47,14 @@ public final class AgvnLanguage {
 
     /**
      * Keeps {@code code} as the app's language, for the screens opened from now on and for the app's own texts (its
-     * context was wrapped as the app started, AgvnApp); the screen showing gets it once it is made again.
+     * context was wrapped as the app started, AgvnApp); the screen showing gets it once it is made again: by Android
+     * when this returns true ({@link #toAndroid}), else by the caller.
      */
-    static void choose(Context ctx, String code) {
+    static boolean choose(Context ctx, String code) {
         PreferenceManager.getDefaultSharedPreferences(ctx).edit().putString(PREF, code).commit();
         AgvnDoctor.forgetCatalog(); // its texts are the old language's
+        boolean remade = toAndroid(ctx, code);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) return remade; // Android gives the app's texts too
         try {
             android.content.res.Resources res = ctx.getApplicationContext().getResources();
             Configuration config = new Configuration(res.getConfiguration());
@@ -57,6 +65,31 @@ public final class AgvnLanguage {
         } catch (RuntimeException e) {
             // the app's own texts follow at its next start
         }
+        return remade;
+    }
+
+    /**
+     * Android 13+: {@code code} as Android's language for the app (LocaleManager; none for {@link #SYSTEM}, which is the
+     * phone's). True when that changed it: Android then makes the app's screens again in it.
+     */
+    static boolean toAndroid(Context ctx, String code) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return false;
+        try {
+            LocaleManager manager = ctx.getSystemService(LocaleManager.class);
+            if (manager == null) return false;
+            LocaleList want = SYSTEM.equals(code) ? LocaleList.getEmptyLocaleList()
+                    : new LocaleList(locale(code, Locale.getDefault()));
+            if (want.equals(manager.getApplicationLocales())) return false;
+            manager.setApplicationLocales(want);
+            return true;
+        } catch (RuntimeException e) {
+            return false; // wrap() still gives the screens the language
+        }
+    }
+
+    /** At the app's start (AgvnApp): Android's language for the app is the one picked, also after an update. */
+    public static void sync(Context ctx) {
+        if (chosen(ctx)) toAndroid(ctx, picked(ctx));
     }
 
     /** The locale for {@code code}; for {@link #SYSTEM}, the phone's, under the codes the app's folders use. */
@@ -84,7 +117,7 @@ public final class AgvnLanguage {
     public static Context wrap(Context base) {
         try {
             Locale locale = locale(picked(base), Locale.getDefault());
-            Configuration config = new Configuration(base.getResources().getConfiguration());
+            Configuration config = new Configuration(); // the language only: the rest follows the phone (a turn)
             config.setLocale(locale);
             config.setLocales(new LocaleList(locale));
             return base.createConfigurationContext(config);
@@ -114,8 +147,7 @@ public final class AgvnLanguage {
                     dialog.dismiss();
                     String code = which < CHOICES.length ? CHOICES[which][0] : SYSTEM;
                     if (code.equals(now)) return;
-                    choose(a, code);
-                    a.recreate();
+                    if (!choose(a, code)) a.recreate(); // else Android makes it again in the new language
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();

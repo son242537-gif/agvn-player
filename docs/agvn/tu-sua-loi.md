@@ -3834,3 +3834,33 @@ tay. Anh cần nhấn và kéo để đổi hướng.
   3. Chạm nhanh rồi nhấc tay: game nhận một cú click (bắn, tương tác).
   4. Mở menu của game (con trỏ hiện): chạm vào nút menu, nút được bấm đúng chỗ.
   5. Game 2D, visual novel: chạm, kéo vẫn như cũ.
+
+## Ngôn ngữ không đổi được trên POCO F8 Pro (bản 0.1.90)
+
+Anh Sơn báo ngày 09/11/2026 (ảnh, bản 0.1.89): app hiện tiếng Trung, cờ góc trên là 🇨🇳, nhưng dòng "Ngôn ngữ ·
+Language" ghi "Tiếng Việt"; đổi sang ngôn ngữ khác không có tác dụng.
+
+- **Nhận định từ ảnh:** lựa chọn đã lưu là tiếng Việt (`AgvnLanguage.picked`). Nhưng cấu hình của màn hình lại là
+  tiếng Trung, vì cờ đọc ngôn ngữ từ `getResources().getConfiguration()`. Vậy `wrap()` (`createConfigurationContext`
+  trong `attachBaseContext`) không giữ được ngôn ngữ trên máy này. Chưa có logcat nên chưa biết chính xác chỗ nào ghi
+  đè.
+- **Hai chỗ có thể gây ra:**
+  - `wrap()` chép cả cấu hình lúc mở màn (kích thước, hướng màn hình…) làm cấu hình ghi đè, không chỉ ngôn ngữ.
+  - `choose()` gọi `updateConfiguration` trên tài nguyên của app. Các màn có cùng khoá tài nguyên có thể dùng chung
+    `ResourcesImpl`, nên lệnh đó có thể đổi ngôn ngữ của cả những màn ấy.
+- **Sửa (`AgvnLanguage`):**
+  - Android 13 trở lên: lựa chọn cũng thành ngôn ngữ Android dùng cho app (`LocaleManager.setApplicationLocales`;
+    "Theo ngôn ngữ của máy" là danh sách rỗng). Android tự áp ngôn ngữ đó cho mọi màn và cho chữ của app, và tự dựng
+    lại các màn đang mở.
+    - `AgvnApp.onCreate` đồng bộ lại lựa chọn mỗi lần app mở (`sync`). Máy cập nhật từ 0.1.88 hoặc 0.1.89 cũng nhận
+      đúng ngôn ngữ đã chọn.
+  - `wrap()` chỉ ghi đè ngôn ngữ (`new Configuration()` với `setLocales`). Phần cấu hình còn lại theo máy.
+  - Android 13 trở lên không gọi `updateConfiguration` nữa; dưới 13 vẫn gọi như cũ.
+  - App không khai `localeConfig`, nên phần cài đặt ngôn ngữ riêng cho app trong máy không liệt kê app. Lựa chọn trong
+    app luôn thắng.
+- **Thử máy:**
+  1. Cài đè 0.1.90, mở app: màn hiện đúng ngôn ngữ dòng "Ngôn ngữ · Language" đang ghi (Tiếng Việt).
+  2. Đổi sang English, ไทย, 简体中文, rồi Tiếng Việt: mỗi lần màn chính đổi theo, cờ đổi theo.
+  3. Tắt hẳn app rồi mở lại: vẫn ngôn ngữ vừa chọn.
+  4. Chọn "Theo ngôn ngữ của máy": app theo ngôn ngữ của máy.
+  5. Mở một game: thanh bên trong game theo ngôn ngữ đã chọn.

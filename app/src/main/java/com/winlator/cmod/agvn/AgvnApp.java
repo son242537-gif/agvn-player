@@ -14,5 +14,6 @@ public class AgvnApp extends Application {
     public void onCreate() {
         super.onCreate();
         CrashRecorder.install(this);
+        AgvnLanguage.sync(this); // Android 13+: Android's language for the app is the one picked
     }
 }

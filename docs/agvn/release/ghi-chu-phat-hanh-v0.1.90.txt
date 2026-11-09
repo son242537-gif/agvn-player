@@ -1,0 +1,5 @@
+AGVN Player v0.1.90 - agvn.io
+
+Sửa lỗi:
+- Ngôn ngữ: một số máy (như POCO, HyperOS) hiện app bằng ngôn ngữ khác với ngôn ngữ đã chọn, và đổi sang ngôn ngữ khác không có tác dụng. Từ Android 13, ngôn ngữ chọn trong app giờ là ngôn ngữ Android dùng cho app, nên mọi màn đều theo đúng lựa chọn.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
