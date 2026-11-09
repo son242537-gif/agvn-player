@@ -57,6 +57,20 @@ f.renameSync('/save/file1.rpgsave', '/save/file2.rpgsave');
 assert.strictEqual(f.existsSync('/save/file1.rpgsave'), false);
 assert.strictEqual(f.readFileSync('/save/file2.rpgsave'), 'abcdef');
 assert.throws(() => f.accessSync('/nope.json'));
+// Node's way to check a file (an MZ plugin, 09/11/2026): fs.constants was undefined, its TypeError read as "missing"
+assert.strictEqual(f.constants.R_OK, 4);
+assert.strictEqual(f.constants.F_OK, 0);
+assert.strictEqual(f.W_OK, 2);
+f.accessSync('/data/Items.json', f.constants.R_OK);
+assert.throws(() => f.accessSync('/nope.json', f.constants.F_OK), e => e.code === 'ENOENT');
+// JSON a script cannot read goes to the log once, and still throws as it did
+const warned = [];
+ctx.console.warn = s => warned.push(s);
+assert.throws(() => vm.runInContext("JSON.parse('{bad')", ctx), e => e.name === 'SyntaxError');
+assert.throws(() => vm.runInContext("JSON.parse('{bad')", ctx));
+assert.strictEqual(warned.filter(w => /JSON\.parse/.test(w)).length, 1);
+assert.strictEqual(vm.runInContext("JSON.parse('[1,2]').join()", ctx), '1,2');
+ctx.console.warn = () => {};
 let copied = null;
 f.copyFile('/data/Items.json', '/data/copy.json', e => { copied = e; });
 assert.strictEqual(copied, null);

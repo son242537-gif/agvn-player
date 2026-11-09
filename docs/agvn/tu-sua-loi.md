@@ -3864,3 +3864,33 @@ Language" ghi "Tiếng Việt"; đổi sang ngôn ngữ khác không có tác d�
   3. Tắt hẳn app rồi mở lại: vẫn ngôn ngữ vừa chọn.
   4. Chọn "Theo ngôn ngữ của máy": app theo ngôn ngữ của máy.
   5. Mở một game: thanh bên trong game theo ngôn ngữ đã chọn.
+
+## Game RPG Maker MZ "Chạy nhẹ": `fs.constants`, và JSON không tải được (bản 0.1.90)
+
+Báo cáo ngày 09/11/2026 (bản 0.1.88, máy POCO, RPG Maker MZ chạy không có NW.js).
+
+- **Lỗi 1, `fs` giả lập thiếu `fs.constants`:**
+  - Plugin kiểm tra tệp theo cách quen của Node: `fs.accessSync(p, fs.constants.R_OK)` trong `try`.
+  - `fs.constants` là `undefined`, nên `fs.constants.R_OK` ném `TypeError` trước khi `accessSync` kịp chạy. `catch` của
+    game nuốt lỗi đó, coi như tệp không có. Game báo thiếu ảnh, dữ liệu, thư mục ngôn ngữ dù tệp có đủ.
+  - App không ghi `HTML game file missing`, vì game chưa từng gửi yêu cầu tải.
+  - **Sửa (`html-compat.js`, mục 15):** thêm `fs.constants` với giá trị của Node: `F_OK 0`, `R_OK 4`, `W_OK 2`,
+    `X_OK 1`, `COPYFILE_*`. Thêm cả `fs.F_OK`, `fs.R_OK`, `fs.W_OK`, `fs.X_OK` như Node cũ.
+  - `accessSync` vẫn bỏ qua tham số `mode` và gọi `statSync`, nên hiểu cả tệp lẫn thư mục. Tệp không có thì ném lỗi
+    `ENOENT`.
+- **Lỗi 2, tải JSON trong thư mục con của `data/` thất bại:**
+  - Chưa rõ do app hay do game. Chỗ trả tệp (`AgvnHtmlFiles.serve`) trả JSON với mã 200 và `UTF-8`, và tìm lại tên tệp
+    không phân biệt hoa thường.
+  - **Thêm nhật ký (`html-compat.js`, mục 16):** mỗi trường hợp ghi một dòng vào danh sách cảnh báo của trang trong
+    nhật ký, nhiều nhất 20 dòng.
+    - Yêu cầu `.json` không có trả lời hoặc nhận mã từ 400 trở lên: `AGVN: data file not loaded (<mã>): <đường dẫn>`.
+    - `JSON.parse` thất bại: `AGVN: JSON.parse: <lỗi> in "<60 ký tự đầu>"`. Lỗi vẫn được ném lại như cũ.
+  - Các lần đọc thử của chính `fs` giả lập không ghi, vì chúng có thể không tìm thấy tệp mà vẫn đúng.
+  - "Tự sửa lỗi" không đọc các dòng này (lỗi kịch bản lấy từ `ERROR`), nên không đưa ra cách sửa sai.
+- **Kiểm:** `tools/agvn/tests/html_compat_sim.js`:
+  - `fs.constants.R_OK` bằng 4.
+  - `accessSync` với một tệp có thật không ném lỗi; với tệp không có thì ném lỗi `ENOENT`.
+  - `JSON.parse` hỏng ghi một dòng (hai lần hỏng giống nhau vẫn một dòng) và vẫn ném `SyntaxError`.
+- **Thử máy:**
+  1. Mở lại game đó bằng "Chạy nhẹ": ảnh, dữ liệu và chữ nạp đúng.
+  2. Nếu còn lỗi tải JSON: "Gửi nhật ký", tìm dòng `AGVN: data file not loaded` hoặc `AGVN: JSON.parse`.

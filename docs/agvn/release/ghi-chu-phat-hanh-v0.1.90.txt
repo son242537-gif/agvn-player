@@ -2,4 +2,6 @@ AGVN Player v0.1.90 - agvn.io
 
 Sửa lỗi:
 - Ngôn ngữ: một số máy (như POCO, HyperOS) hiện app bằng ngôn ngữ khác với ngôn ngữ đã chọn, và đổi sang ngôn ngữ khác không có tác dụng. Từ Android 13, ngôn ngữ chọn trong app giờ là ngôn ngữ Android dùng cho app, nên mọi màn đều theo đúng lựa chọn.
+- "Chạy nhẹ" game RPG Maker MZ: plugin kiểm tra tệp theo cách của Node (fs.constants) không còn tưởng mọi tệp đều thiếu, nên ảnh, dữ liệu và chữ của game nạp đúng.
+- "Chạy nhẹ" game HTML: tệp dữ liệu (JSON) game không tải được giờ được ghi vào nhật ký, để tìm ra nguyên nhân.
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

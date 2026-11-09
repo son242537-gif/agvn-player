@@ -43,7 +43,10 @@
  *     files the game wrote (localStorage); require('process') is `process`, and events, stream, util, assert, url, tty,
  *     string_decoder, worker_threads and module come from html-node-modules.js, loaded before this. MV, which goes on
  *     after an error in a script as it loads, shows that error once its first scene has not come 15 s after the page
- *     loaded, as MZ does.
+ *     loaded, as MZ does. fs.constants (F_OK, R_OK...) is there too: an MZ plugin checked its files with
+ *     fs.accessSync(p, fs.constants.R_OK), whose TypeError its catch took for "missing" (0.1.88, 09/11/2026).
+ * 16. A data file the game asked for and did not get (no answer, 404, or JSON it cannot read) goes once to the session
+ *     log, as the app does not see why a script of the game gave up on it (the same game, a JSON in a data/ folder).
  */
 (function () {
     'use strict';
@@ -61,6 +64,7 @@
     function httpGet(p, method) {
         try {
             var xhr = new XMLHttpRequest();
+            xhr.__agvnQuiet = true; // fs's own look, which may well find nothing (16)
             xhr.open(method || 'GET', encodeURI(norm(p)), false);
             xhr.overrideMimeType('text/plain; charset=utf-8');
             xhr.send();
@@ -138,6 +142,8 @@
     var fds = {}, nextFd = 3;
 
     var fs = {
+        constants: { F_OK: 0, R_OK: 4, W_OK: 2, X_OK: 1, COPYFILE_EXCL: 1, COPYFILE_FICLONE: 2, COPYFILE_FICLONE_FORCE: 4 },
+        F_OK: 0, R_OK: 4, W_OK: 2, X_OK: 1,
         existsSync: function (p) {
             return stored(p) !== null || httpGet(p, 'HEAD') !== null || fsInfo('stat', p) !== null
                 || Object.keys(storedIn(p)).length > 0;
@@ -750,6 +756,39 @@
     }
     fitTextures(window.WebGLRenderingContext && window.WebGLRenderingContext.prototype);
     fitTextures(window.WebGL2RenderingContext && window.WebGL2RenderingContext.prototype);
+
+    // 16. a data file not loaded, or JSON that does not parse: once each in the session log (at most 20 lines)
+    (function () {
+        var seen = {}, told = 0;
+        function tell(what) {
+            if (seen[what] || told >= 20) return;
+            seen[what] = true;
+            told++;
+            console.warn('AGVN: ' + what);
+        }
+        var proto = typeof XMLHttpRequest === 'function' ? XMLHttpRequest.prototype : null;
+        if (proto && proto.open && proto.send && proto.addEventListener) {
+            var open = proto.open, send = proto.send;
+            proto.open = function (method, url) { this.__agvnUrl = String(url); return open.apply(this, arguments); };
+            proto.send = function () {
+                var xhr = this;
+                if (!xhr.__agvnQuiet && /\.json([?#]|$)/i.test(xhr.__agvnUrl || '')) xhr.addEventListener('loadend', function () {
+                    if (xhr.status === 0 || xhr.status >= 400)
+                        tell('data file not loaded (' + (xhr.status || 'no answer') + '): ' + xhr.__agvnUrl);
+                });
+                return send.apply(this, arguments);
+            };
+        }
+        var parse = JSON.parse;
+        JSON.parse = function () {
+            try {
+                return parse.apply(JSON, arguments);
+            } catch (e) {
+                tell('JSON.parse: ' + e.message + ' in "' + String(arguments[0]).slice(0, 60).replace(/\s+/g, ' ') + '"');
+                throw e;
+            }
+        };
+    })();
 
     var tries = 0;
     var timer = setInterval(function () { if (patch() || ++tries > 2000) clearInterval(timer); }, 30);
