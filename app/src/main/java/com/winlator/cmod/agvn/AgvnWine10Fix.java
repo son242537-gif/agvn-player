@@ -31,17 +31,23 @@ final class AgvnWine10Fix {
      * has its own prefix and wineserver.
      */
     static final String WINE_GONE = "wine-gone";
+    /**
+     * game-problems.json's finding of a game that ended as its movie began ({@link AgvnMovieEnd}): Demonion II's WMV
+     * movies through wmvcore, on Proton 9 (Xiaomi 2510DPC44G, 10/11/2026).
+     */
+    static final String MOVIE_CRASH = "movie-crash";
 
     private AgvnWine10Fix() {}
 
     /**
      * The button for {@code s}, or null: a game on Proton 9 that did not come back from 10, and a Chromium one (Electron,
-     * NW.js), unless Wine itself did not start ({@link #WINE_GONE}): then Proton 10's own container may.
+     * NW.js), unless Wine itself did not start ({@link #WINE_GONE}): then Proton 10's own container may; or the game
+     * ended as its movie began ({@link #MOVIE_CRASH}), a movie Proton 10 may read.
      */
     static AgvnFixes.Fix make(Activity a, Shortcut s, AgvnProblemCatalog.Finding finding) {
         if (AgvnWine10.runs(s.container) || "1".equals(s.getExtra(AgvnGameMove.EXTRA_NOT_TEN))) return null;
-        boolean wineGone = finding != null && WINE_GONE.equals(finding.id());
-        if (!wineGone && !GameExeResolver.chromiumShell(AgvnEngineLogs.gameDir(s))) return null;
+        boolean any = finding != null && (WINE_GONE.equals(finding.id()) || MOVIE_CRASH.equals(finding.id()));
+        if (!any && !GameExeResolver.chromiumShell(AgvnEngineLogs.gameDir(s))) return null;
         return new AgvnFixes.Fix(ID, a.getString(R.string.agvn_fix_wine_new), null);
     }
 

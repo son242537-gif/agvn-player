@@ -180,6 +180,10 @@
       "title": "Hindi mapatakbo ng 32-bit emulator ang code ng game",
       "cause": "Nagka-error ang game ({crash}). Itinuring ng 32-bit CPU emulator na bawal patakbuhin ang code na iyon ng game, kahit normal itong tumatakbo sa Windows. Nasa emulator sa phone ang problema, hindi sa data ng game. Ang WOWBox64 ay isa pang 32-bit emulator na kasama sa app."
     },
+    "movie-crash": {
+      "title": "Nagsasara ang laro pagsimula ng video",
+      "cause": "Nagsara ang laro pagkatapos nitong simulang i-play ang isang video (pambungad na video o cutscene). Hindi pa nababasa ng lumang Wine (Proton 9) ang lahat ng uri ng video na gamit ng mga laro, lalo na ang WMV; mas marami ang nababasa ng bagong Wine (Proton 10)."
+    },
     "crash-after-change": {
       "title": "Nag-error ang game sa bagong config",
       "cause": "Gumana ang game noong nakaraan. Pagkatapos palitan ang config, nag-error at kusang nagsara ang game ({crash})."

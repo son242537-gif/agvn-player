@@ -60,6 +60,7 @@ public final class AgvnMovieWatch implements Callback<String> {
     @Override
     public void call(String line) {
         if (line == null) return;
+        AgvnMovieEnd.line(line, System.currentTimeMillis()); // a game that ends as its movie begins
         if (rules.add(line, SystemClock.uptimeMillis())) handler.post(this::found);
         int caps = line.indexOf(CANNOT_DECODE);
         if (caps >= 0) undecoded = line.substring(caps + CANNOT_DECODE.length());

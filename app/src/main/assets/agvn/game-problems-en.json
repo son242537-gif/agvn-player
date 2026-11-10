@@ -180,6 +180,10 @@
       "title": "The 32-bit emulator can't run the game's code",
       "cause": "The game crashed ({crash}). The 32-bit CPU emulator treated that part of the game's code as not allowed to run, though it runs fine on Windows. The problem is in the emulator on the phone, not in the game's data. WOWBox64 is another 32-bit emulator built into the app."
     },
+    "movie-crash": {
+      "title": "The game closes as a movie starts",
+      "cause": "The game closed right after it began playing a movie (an opening movie or a cut scene). The old Wine (Proton 9) cannot read every kind of movie games use, WMV ones above all; the new Wine (Proton 10) reads more of them."
+    },
     "crash-after-change": {
       "title": "The game crashes with the new settings",
       "cause": "The game ran last time. After the settings changed, the game crashed and closed ({crash})."

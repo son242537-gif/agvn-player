@@ -65,6 +65,7 @@ public final class AgvnSessionTrack {
         usedMb = usedBeforeMb = -1;
         engineCrash = null;
         AgvnGameEnd.reset();
+        AgvnMovieEnd.reset();
         AgvnUnrealBox.reset();
         AgvnGamePause.reset(System.nanoTime());
         stoppedAtStartNs = AgvnGamePause.pausedNs(System.nanoTime());
@@ -161,6 +162,11 @@ public final class AgvnSessionTrack {
     /** The game's end: Wine's, or the player's exit, whichever came first. */
     static void noteEnd(long nowMs) {
         if (endMs == 0) endMs = nowMs;
+    }
+
+    /** When the game ended ({@link #noteEnd}); 0 before. */
+    static long endMs() {
+        return endMs;
     }
 
     /**

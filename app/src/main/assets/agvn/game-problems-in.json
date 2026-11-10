@@ -180,6 +180,10 @@
       "title": "Emulator 32-bit tidak bisa menjalankan kode game",
       "cause": "Game error ({crash}). Emulator CPU 32-bit menganggap kode game itu tidak boleh dijalankan, padahal di Windows berjalan normal. Masalahnya ada di emulator di ponsel, bukan di data game. WOWBox64 adalah emulator 32-bit lain yang tersedia di aplikasi."
     },
+    "movie-crash": {
+      "title": "Game tertutup saat video mulai diputar",
+      "cause": "Game langsung tertutup setelah mulai memutar video (video pembuka atau adegan). Wine lama (Proton 9) belum bisa membaca semua jenis video yang dipakai game, terutama WMV; Wine baru (Proton 10) bisa membaca lebih banyak jenis."
+    },
     "crash-after-change": {
       "title": "Game error dengan konfigurasi baru",
       "cause": "Sebelumnya game bisa berjalan. Setelah konfigurasi diubah, game error dan tertutup sendiri ({crash})."

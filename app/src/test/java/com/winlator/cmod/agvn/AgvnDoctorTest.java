@@ -38,7 +38,7 @@ public class AgvnDoctorTest {
             "ended-early", "godot-switched", "changed", "small-screen", "killed-low-memory", "killed-background", "low-ram",
             "ram-saved", "live", "light", "script-error", "page-crash", "frozen", "reported", "module-code",
             "closed-on-start", "froze", "chromium", "helper-exe", "media-new", "gpu-room",
-            "swapchain-last", "dotnet-crash"));
+            "swapchain-last", "dotnet-crash", "movie-end"));
     static AgvnProblemCatalog catalog;
 
     @BeforeClass
@@ -395,6 +395,38 @@ public class AgvnDoctorTest {
         ev.changed = true;
         assertEquals("file-not-found", found(ev));
         assertEquals("only Wine's box", "no-start", found(noStart("File not found: save1.dat")));
+    }
+
+    @Test
+    public void aGameThatEndsAsItsMovieBeginsIsOfferedProton10() {
+        // Demonion II (WMV movies through wmvcore, Proton 9, Xiaomi 2510DPC44G, 10/11/2026): 2 min 40 s of play, then
+        // Wine began a movie and the game was gone 1.8 s later, Wine saying nothing more
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.started = true;
+        ev.endedByGame = true;
+        ev.seconds = 160;
+        ev.movieEndMs = 1800;
+        ev.lines.addAll(Arrays.asList(
+                "0:00:00.124088125 22712 0xb40000773b2cc9e0 WARN                    WINE wg_parser.c:1466:pad_removed_cb: No pin matching pad \"src_0\" found.",
+                "0:00:00.145314219 22712 0xb40000773b2cf500 WARN                    WINE wg_parser.c:999:sink_event_cb: Ignoring \"stream-start\" event."));
+        assertEquals("movie-crash", found(ev));
+        assertEquals(Arrays.asList("wine-new", "emulator-stable", "wine-old", "send-logs"),
+                catalog.byId("movie-crash").fixes);
+        assertFalse("not a good run", ev.good());
+        ev.exitKnown = true;
+        ev.exitCrash = true; // agvn-winhandler.exe told a crash code
+        assertEquals("movie-crash", found(ev));
+
+        ev.exitCrash = false; // code 0 or the game's own: it quit after its movie
+        assertNull(found(ev));
+        assertTrue(ev.good());
+        ev.exitKnown = false;
+        ev.movieEndMs = 8000; // the movie began long before
+        assertNull(found(ev));
+        ev.movieEndMs = 1800;
+        ev.endedByGame = false;
+        ev.playerQuit = true;
+        assertNull("the player quit", found(ev));
     }
 
     @Test

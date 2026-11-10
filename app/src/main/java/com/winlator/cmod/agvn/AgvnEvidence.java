@@ -51,6 +51,10 @@ final class AgvnEvidence {
     boolean newMediaSource;
     /** The game is a .NET program and ended with a crash code agvn-winhandler.exe reported ({@link AgvnMlangFix}). */
     boolean dotNet, exitCrash;
+    /** agvn-winhandler.exe told the game's exit code ({@link AgvnGameEnd#known}). */
+    boolean exitKnown;
+    /** Milliseconds from Wine's last line on a movie to the game's end ({@link AgvnMovieEnd}); -1: none. */
+    long movieEndMs = -1;
     long seconds;
     /** How Android ended the app, for a session found unfinished at the next start; -1 when it was not. */
     int killedReason = -1, killedImportance;
@@ -106,6 +110,7 @@ final class AgvnEvidence {
             case "helper-exe": return helperExe;
             case "media-new": return newMediaSource;
             case "dotnet-crash": return dotNet && (crashed || exitCrash);
+            case "movie-end": return movieEnd();
             case "gpu-room": return AgvnGpuAlloc.roomLeft(lines);
             case "swapchain-last": return AgvnSwapchainStuck.lastWords(lines);
             default: return false; // "live" problems are found while playing; names a newer file may add stay unmet
@@ -115,6 +120,15 @@ final class AgvnEvidence {
     boolean holdsAll(List<String> conditions) {
         for (String c : conditions) if (!holds(c)) return false;
         return true;
+    }
+
+    /**
+     * The game ended by itself as a movie began ({@link AgvnMovieEnd#WITHIN_MS}): with a crash, a crash code, or no
+     * code told. A game that quits after its last movie, with code 0 or its own, is not one.
+     */
+    boolean movieEnd() {
+        return movieEndMs >= 0 && movieEndMs <= AgvnMovieEnd.WITHIN_MS && !playerQuit && killedReason < 0
+                && (crashed || exitCrash || endedByGame && !exitKnown);
     }
 
     /** The game stopped showing frames before it ended, though the player kept pressing ({@link #FROZEN_S}). */
@@ -150,6 +164,6 @@ final class AgvnEvidence {
      */
     boolean good() {
         return started && !crashed && killedReason < 0 && !frozeAtEnd() && !loadingOnly() && !closedOnStart()
-                && tilerOoms < TILER_OOM_MANY && (playerQuit || seconds >= GOOD_AFTER_S);
+                && !movieEnd() && tilerOoms < TILER_OOM_MANY && (playerQuit || seconds >= GOOD_AFTER_S);
     }
 }

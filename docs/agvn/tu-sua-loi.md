@@ -3894,3 +3894,43 @@ Báo cáo ngày 09/11/2026 (bản 0.1.88, máy POCO, RPG Maker MZ chạy không 
 - **Thử máy:**
   1. Mở lại game đó bằng "Chạy nhẹ": ảnh, dữ liệu và chữ nạp đúng.
   2. Nếu còn lỗi tải JSON: "Gửi nhật ký", tìm dòng `AGVN: data file not loaded` hoặc `AGVN: JSON.parse`.
+
+## Game tự tắt khi vừa mở phim: Tự sửa lỗi nhận ra và đề nghị Wine mới (bản 0.1.91)
+
+Nhật ký ngày 10/11/2026: Demonion II (bản Việt hoá). Máy Xiaomi 2510DPC44G (Snapdragon 8 Elite), app 0.1.63, Proton 9
+arm64ec, FEXCore 2601. Người chơi báo "game chơi đến đây là văng".
+
+- **Đọc nhật ký:**
+  - Game 32-bit, phát phim WMV bằng `wmvcore` (`movies.gxp`). Phim chạy qua winegstreamer của Wine.
+  - Cả 5 lần mở đều kết thúc ngay sau khi Wine bắt đầu một phim. Dòng cuối của Wine luôn là các dòng GStreamer:
+    `wg_parser.c … Ignoring "stream-start" event`. Sau đó không có dòng nào.
+  - Ở lần dài nhất: 17:10:29.852 game nạp `winegstreamer.dll`, 17:10:30.024 là dòng phim cuối. 17:10:30.076 app mất kết
+    nối với game. 17:10:31.8 phiên kết thúc.
+  - Không có dòng nào báo văng, vì bản 0.1.63 tắt gần hết nhật ký lỗi của Wine. App chưa biết mã thoát của game
+    (`agvn-winhandler.exe` báo mã thoát từ bản 0.1.74).
+  - Lần chơi 2 phút 40 giây bị tính là "lần chạy tốt" (`AgvnEvidence.good`: trên 60 giây và không thấy văng). Vì vậy
+    Tự sửa lỗi không hỏi gì, và còn giữ cấu hình đó làm cấu hình tốt.
+- **Sửa (`AgvnMovieEnd`, `movie-end`, vấn đề `movie-crash`):**
+  - App ghi lúc Wine in dòng phim cuối cùng: dòng của winegstreamer (`WINE wg_parser.c:…`, `wg_source.c`, …), đọc
+    từ đầu ra của Wine như `AgvnMovieWatch`, dù bật hay tắt nhật ký.
+  - Game tự tắt (không phải người chơi thoát, không phải Android tắt) trong vòng 5 giây sau dòng đó thì là tắt vì phim.
+    Phải có thêm một trong ba điều: Wine báo văng, `agvn-winhandler.exe` báo mã văng, hoặc không có mã thoát. Game tự
+    thoát với mã 0 hay mã riêng của nó sau phim cuối thì không tính.
+  - Lần đó không tính là lần chạy tốt. `su-kien.txt` ghi "Game tắt … giây sau khi Wine bắt đầu mở phim".
+  - Tự sửa lỗi hiện "Game tự tắt khi vừa mở phim", với các nút:
+    - "Chạy bằng Wine mới (Proton 10)": Proton 10 đọc được nhiều loại phim WMV hơn Proton 9 (`AgvnWine10`). Nút này
+      trước chỉ có cho game Chromium và khi Wine không khởi động.
+    - Giả lập ổn định.
+    - Wine cũ, cho game đang ở Proton 10.
+    - Gửi nhật ký.
+  - Vấn đề này đứng trước "Game bị lỗi với cấu hình mới" và "Game bị lỗi": phim là dấu hiệu rõ hơn. Các vấn đề nhận ra
+    bằng dòng lỗi cụ thể vẫn đứng trước nó.
+- **Chưa biết:** Proton 10 có phát được phim của Demonion II không. Không có tệp phim nên chưa thử được.
+- **Test:** `AgvnMovieEndTest` (dòng phim của Proton 9 và 10, dòng không phải phim, phiên mới). `AgvnDoctorTest`:
+  - Nhật ký Demonion II ra `movie-crash`, kể cả khi có mã văng.
+  - Mã thoát 0, phim từ 8 giây trước, hoặc người chơi tự thoát: không ra.
+- **Thử máy:**
+  1. Cập nhật app lên bản mới nhất. Mở Demonion II tới chỗ phim.
+  2. Nếu game tắt: Tự sửa lỗi hiện "Game tự tắt khi vừa mở phim". Bấm "Chạy bằng Wine mới (Proton 10)" (lần đầu app cài
+     Wine mới, khoảng một phút). Mở lại tới chỗ phim.
+  3. Hồi quy: game có phim chạy bình thường (một game Unity có video, một game KiriKiri) không bị hỏi gì khi thoát.

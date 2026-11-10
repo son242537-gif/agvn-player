@@ -30,6 +30,11 @@ public final class AgvnGameEnd {
         lastCode = 0;
     }
 
+    /** True once agvn-winhandler.exe told the game's exit code this session. */
+    static boolean known() {
+        return ended;
+    }
+
     /** The crash code the game ended with in this session, or 0 when it did not end with one. */
     static int crashCode() {
         return ended && crash(lastCode) ? lastCode : 0;

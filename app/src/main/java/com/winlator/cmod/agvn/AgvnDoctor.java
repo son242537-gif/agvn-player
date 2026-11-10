@@ -97,6 +97,8 @@ public final class AgvnDoctor {
             ev.godotSwitched = AgvnFixEdits.godotSwitched(ranWith.get("execArgs"));
             if (ev.frozeAtEnd()) AgvnSessionLog.event("Game đứng hình " + ev.frozenS + " giây trước khi tắt (người chơi "
                     + "bấm " + ev.frozenPresses + " lần mà hình không đổi): không tính là lần chạy tốt");
+            if (ev.movieEnd()) AgvnSessionLog.event("Game tắt " + ev.movieEndMs / 1000.0
+                    + " giây sau khi Wine bắt đầu mở phim: không tính là lần chạy tốt");
             diagnose(ctx, s, ev, ranWith, true);
         } catch (RuntimeException e) {
             Log.w(TAG, "doctor: game end not read", e);
@@ -197,6 +199,8 @@ public final class AgvnDoctor {
         if (helper != null) ev.params.put("exe", helper);
         ev.newMediaSource = AgvnMediaFoundation.canReadOldWay(s); // as the game is now: the bar may have switched it already
         AgvnMlangFix.evidence(ev, s, AgvnGameEnd.crashCode()); // a .NET game that ended with a crash code
+        ev.exitKnown = AgvnGameEnd.known();
+        ev.movieEndMs = AgvnMovieEnd.msBefore(AgvnSessionTrack.endMs()); // a game that ended as its movie began
         if (ev.lowRamFreeMb >= 0) ev.params.put("free", String.valueOf(ev.lowRamFreeMb));
         return ev;
     }
