@@ -1,0 +1,5 @@
+AGVN Player v0.1.92 - agvn.io
+
+Sửa lỗi:
+- "Chạy nhẹ" game RPG Maker MV có plugin đặt tên ô save theo bản đồ hay chương: nút "Tiếp tục" không còn bị mờ, màn Tải chọn được ô save và tải đúng chỗ, như khi chơi trên PC. Save đã có vẫn tải được.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
