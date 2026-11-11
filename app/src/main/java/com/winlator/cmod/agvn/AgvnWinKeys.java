@@ -11,7 +11,10 @@ import com.winlator.cmod.xserver.XKeycode;
  * (Unity's InputField and TextMeshPro's). Pure Java (JVM-testable).
  */
 final class AgvnWinKeys {
-    /** A keycode the X server's keys leave free (they end at 119, KEY_DEL), among the 8 to 131 it keeps keysyms for. */
+    /**
+     * A keycode the X server's keys leave free (they end at 119, KEY_DEL), among the 8 to 131 it keeps keysyms for: as a
+     * Java byte -126, which the X server reads unsigned (Keyboard.keysymIndex).
+     */
     static final byte SPARE = (byte) 130;
 
     /** The X server, as {@link #type} uses it. */

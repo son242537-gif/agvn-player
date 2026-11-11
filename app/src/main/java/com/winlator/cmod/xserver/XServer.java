@@ -264,6 +264,9 @@ public class XServer {
         inputHold.pressing(input);
         try (XLock lock = lock(Lockable.WINDOW_MANAGER, Lockable.INPUT_DEVICE)) {
             keyboard.setKeyPress(keycode, keysym);
+        } catch (RuntimeException e) { // a character the game cannot get is dropped; the app and the game stay
+            com.winlator.cmod.agvn.AgvnSessionLog.event("Bàn phím Android: ký tự U+"
+                    + Integer.toHexString(keysym & 0xffffff).toUpperCase() + " không gửi được vào game: " + e);
         }
         Runnable release = () -> {
             try (XLock lock = lock(Lockable.WINDOW_MANAGER, Lockable.INPUT_DEVICE)) {

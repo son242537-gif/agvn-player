@@ -3,6 +3,7 @@ package com.winlator.cmod.agvn;
 
 import static org.junit.Assert.assertEquals;
 
+import com.winlator.cmod.xserver.Keyboard;
 import com.winlator.cmod.xserver.XKeycode;
 
 import org.junit.Test;
@@ -48,6 +49,17 @@ public class AgvnWinKeysTest {
                 typed("ăưạđ"));
         assertEquals("é is Latin-1", Arrays.asList("spare 000000E9"), typed("é"));
         assertEquals("a character beyond the first plane", Arrays.asList("spare 0101F600"), typed("😀"));
+    }
+
+    @Test
+    public void theSpareKeyHasItsPlaceInTheXServersKeysyms() {
+        // as a Java byte, 130 is -126: the X server read index -268 and the app crashed (Sexpatch, 11/11/2026)
+        assertEquals(244, Keyboard.keysymIndex(AgvnWinKeys.SPARE));
+        assertEquals(0, Keyboard.keysymIndex((byte) Keyboard.MIN_KEYCODE));
+        assertEquals("the last keycode with keysyms", 246, Keyboard.keysymIndex((byte) 131));
+        assertEquals(-1, Keyboard.keysymIndex((byte) 132));
+        assertEquals(-1, Keyboard.keysymIndex((byte) 255));
+        assertEquals(-1, Keyboard.keysymIndex((byte) 7));
     }
 
     @Test

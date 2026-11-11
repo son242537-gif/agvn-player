@@ -25,9 +25,10 @@ public abstract class KeyboardRequests {
             outputStream.writeInt(count);
             outputStream.writePad(24);
 
-            int i = firstKeycode - Keyboard.MIN_KEYCODE;
+            int i = (firstKeycode & 0xff) - Keyboard.MIN_KEYCODE; // AGVN: a keycode over 127 is a negative byte
+            int[] keysyms = client.xServer.keyboard.keysyms;
             while (count != 0) {
-                outputStream.writeInt(client.xServer.keyboard.keysyms[i]);
+                outputStream.writeInt(i >= 0 && i < keysyms.length ? keysyms[i] : 0);
                 count--;
                 i++;
             }

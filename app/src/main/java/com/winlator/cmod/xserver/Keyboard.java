@@ -34,15 +34,26 @@ public class Keyboard {
         return modifiersMask;
     }
 
+    /**
+     * AGVN: where {@code keycode}'s keysyms are in {@link #keysyms}, or -1 for a keycode it has none for. A keycode over
+     * 127 is a negative byte: agvn/AgvnWinKeys.SPARE (130) gave index -268, and a capital or a Vietnamese letter typed
+     * on Android's keyboard crashed the app (Sexpatch's name field, POCO, 0.1.88, 11/11/2026).
+     */
+    public static int keysymIndex(byte keycode) {
+        int index = ((keycode & 0xff) - MIN_KEYCODE) * KEYSYMS_PER_KEYCODE;
+        return index >= 0 && index + 1 < KEYS_COUNT ? index : -1;
+    }
+
     public void setKeysyms(byte keycode, int minKeysym, int majKeysym) {
-        int index = keycode - 8;
-        keysyms[index*KEYSYMS_PER_KEYCODE+0] = minKeysym;
-        keysyms[index*KEYSYMS_PER_KEYCODE+1] = majKeysym;
+        int index = keysymIndex(keycode); // AGVN
+        if (index < 0) return;
+        keysyms[index] = minKeysym;
+        keysyms[index + 1] = majKeysym;
     }
 
     public boolean hasKeysym(byte keycode, int keysym) {
-        int index = keycode - 8;
-        return keysyms[index*KEYSYMS_PER_KEYCODE+0] == keysym || keysyms[index*KEYSYMS_PER_KEYCODE+1] == keysym;
+        int index = keysymIndex(keycode); // AGVN
+        return index >= 0 && (keysyms[index] == keysym || keysyms[index + 1] == keysym);
     }
 
     public void setKeyPress(byte keycode, int keysym) {

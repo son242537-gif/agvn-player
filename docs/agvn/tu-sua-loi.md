@@ -3934,3 +3934,36 @@ arm64ec, FEXCore 2601. Người chơi báo "game chơi đến đây là văng".
   2. Nếu game tắt: Tự sửa lỗi hiện "Game tự tắt khi vừa mở phim". Bấm "Chạy bằng Wine mới (Proton 10)" (lần đầu app cài
      Wine mới, khoảng một phút). Mở lại tới chỗ phim.
   3. Hồi quy: game có phim chạy bình thường (một game Unity có video, một game KiriKiri) không bị hỏi gì khi thoát.
+
+## App văng khi gõ chữ hoa hay chữ có dấu vào game Windows (bản 0.1.91)
+
+Báo cáo ngày 11/11/2026: Sexpatch (Unity 6000.3, ô tên hồ sơ `TMP_InputField`). POCO 2510DPC44G, app 0.1.88. Bàn phím
+Android hiện lên, gõ ký tự đầu tiên thì cả app văng:
+`ArrayIndexOutOfBoundsException: length=248; index=-268 at Keyboard.hasKeysym`, từ `AgvnWinTyping` →
+`XServer.agvnTypeKey`.
+
+- **Vì sao:**
+  - Từ bản 0.1.79, mọi ký tự không có phím riêng (chữ hoa, chữ có dấu, dấu câu) đi trên phím dự phòng
+    `AgvnWinKeys.SPARE` = 130, với keysym của ký tự.
+  - Trong Java, `(byte) 130` là −126. `Keyboard.hasKeysym` và `setKeysyms` tính chỉ số `(keycode − 8) × 2` theo số có
+    dấu, ra −268, nên văng ngay trên luồng chính.
+  - Chữ thường a–z, số và dấu cách có phím riêng nên không văng. Vì vậy lỗi lọt qua lần thử bản 0.1.79.
+  - `KeyboardRequests.getKeyboardMapping` có cùng lỗi dấu, khi một chương trình X hỏi bảng phím từ một mã phím trên 127.
+- **Sửa:**
+  - `Keyboard.keysymIndex`: chỉ số tính từ mã phím không dấu (`keycode & 0xFF`). Mã phím ngoài 8…131 (bảng keysym
+    của X server chỉ có tới đó) thì không có chỗ: `hasKeysym` trả false, `setKeysyms` bỏ qua.
+  - `getKeyboardMapping` đọc mã phím không dấu và không đọc ngoài bảng.
+  - `XServer.agvnTypeKey` bắt lỗi khi nhấn phím. Ký tự hỏng bị bỏ, app và game chạy tiếp, `su-kien.txt` ghi
+    "Bàn phím Android: ký tự U+… không gửi được vào game".
+- **Kiểm chứng trên Wine 9.0 (máy cloud, Xvfb):**
+  - Cùng cách gửi (đổi keysym của một phím trống thành keysym Unicode của ký tự, báo MappingNotify, rồi nhấn phím),
+    bằng `xdotool type`, vào ô EDIT của một chương trình Windows.
+  - Wine nhận đúng "aĐạo ăn ư", kể cả khi `LC_ALL` rỗng như trong app.
+  - "Ê" thành "ê" là do `xdotool` chỉ đặt một cột keysym. App đặt cả hai cột như nhau, nên Xlib giữ chữ hoa.
+- **Test:** `AgvnWinKeysTest.theSpareKeyHasItsPlaceInTheXServersKeysyms` (130 → 244, 8 → 0, 131 → 246, 132, 255 và 7
+  → không có chỗ).
+- **Thử máy:**
+  1. Sexpatch, ô tên hồ sơ: gõ "a", "A", "1", "đ", "ê", "ư", "ơ", "ấ", "ệ", dán một chuỗi tiếng Việt. App không văng,
+     chữ hiện đúng trong ô.
+  2. Một ô nhập tên của game RPG Maker và của Ren'Py chạy bằng Windows: như trên.
+  3. Emoji: không văng. Game có thể không hiện được emoji.
