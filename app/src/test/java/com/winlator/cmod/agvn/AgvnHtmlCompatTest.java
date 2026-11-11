@@ -83,7 +83,7 @@ public class AgvnHtmlCompatTest {
         // the game still fills the screen and goes quiet when the player leaves the app, as on the phone
         assertTrue(js.contains("'_defaultStretchMode'") && js.contains("'_shouldMuteOnHide'"));
         // MZ: a narrow img/system/ButtonSet stretched, not "ButtonSet image is too small" (scripts/agvn/html runs it)
-        assertTrue(js.contains("function wideButtons()") && js.contains("SM.run = function () { wideButtons();"));
+        assertTrue(js.contains("function wideButtons()") && js.contains("SM.run = function () {\n            wideButtons();"));
     }
 
     @Test
@@ -91,7 +91,9 @@ public class AgvnHtmlCompatTest {
         // RPG Maker prevents every touchstart inside the game, so a plugin's <input> and button over it took no tap
         // (tools/agvn/tests/html_form_taps_sim.js plays it through with the engines' own handlers)
         String js = compatJs();
-        assertTrue(js.contains("function formTaps()") && js.contains("wideButtons(); formTaps(); return run.apply(this, arguments);"));
+        assertTrue(js.contains("function formTaps()") && js.contains("wideButtons();\n            formTaps();\n"
+                + "            pcSlots(window.DataManager); // a plugin may have replaced it since\n"
+                + "            return run.apply(this, arguments);"));
         // a game's language by its exe's name: path.parse(process.execPath).name
         assertTrue(js.contains("parse: function (p)") && js.contains("window.__agvnExe"));
         // also before the game starts, and when it bound its handler before html-compat.js could wrap it

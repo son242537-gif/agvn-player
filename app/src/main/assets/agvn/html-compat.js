@@ -361,14 +361,36 @@
         }
     }
 
+    var mvFileSaves = false; // MV's saves are files (mvSaves): its slots are taken as on a PC (pcSlots)
+
     function filesForSaves(SM) {
         var saves = window.AgvnSaves;
         if (!saves || !SM || SM.__agvnSaves) return;
         SM.__agvnSaves = true;
         if (!saves.writable()) return; // a folder the app cannot write to: saves stay in the browser, as before
         var fromBrowser = !saves.any();
-        if (typeof SM.saveToWebStorage === 'function') mvSaves(SM, saves, fromBrowser);
-        else if (typeof SM.saveToForage === 'function') mzSaves(SM, saves, fromBrowser);
+        if (typeof SM.saveToWebStorage === 'function') {
+            mvSaves(SM, saves, fromBrowser);
+            mvFileSaves = true;
+        } else if (typeof SM.saveToForage === 'function') mzSaves(SM, saves, fromBrowser);
+    }
+
+    // MV with its saves as files: a slot is this game's when the global file lists it with this game's id, as NW.js
+    // takes it on a PC. A browser's rule also wants the slot's title to be the game's title, which a plugin naming each
+    // slot after its map or chapter changes (DataManager.makeSavefileInfo: AutoSaveTitle...): every save was "another
+    // game's", Continue greyed out and no slot to load, even one saved on the phone (POCO, 0.1.88, 11/11/2026). The
+    // engine's own answer comes first, so a plugin's rule stays; MZ never compares titles. Again as the game starts,
+    // for a plugin that replaced the function.
+    function pcSlots(DM) {
+        if (!mvFileSaves || !DM || typeof DM.isThisGameFile !== 'function' || DM.isThisGameFile.__agvnPc) return;
+        var isThisGameFile = DM.isThisGameFile;
+        DM.isThisGameFile = function (savefileId) {
+            if (isThisGameFile.apply(this, arguments)) return true;
+            var info = typeof this.loadGlobalInfo === 'function' ? this.loadGlobalInfo() : null;
+            info = info && info[savefileId];
+            return !!info && info.globalId === this._globalId;
+        };
+        DM.isThisGameFile.__agvnPc = true;
     }
 
     // A plugin may keep its own data (achievements, a gallery, unlocks for every playthrough) under an id that is not
@@ -485,12 +507,18 @@
         if (!SM || SM.__agvnPatched) return !!SM;
         SM.__agvnPatched = true;
         filesForSaves(window.StorageManager);
+        pcSlots(window.DataManager);
         var isMz = window.Utils && Utils.RPGMAKER_NAME === 'MZ';
         if (!isMz) desktopMv(); // before main.js starts the game: the renderer and screen size are chosen then
         if (window.__agvnStretch) stretch(window.Graphics); // "Toàn màn hình cho mọi game"
         wideButtons(); // MZ: when its sprites are loaded; else as the game starts, once the plugins are too
         var run = SM.run;
-        if (typeof run === 'function') SM.run = function () { wideButtons(); formTaps(); return run.apply(this, arguments); };
+        if (typeof run === 'function') SM.run = function () {
+            wideButtons();
+            formTaps();
+            pcSlots(window.DataManager); // a plugin may have replaced it since
+            return run.apply(this, arguments);
+        };
         var original = SM.catchException;
         SM.catchException = function (e) {
             if (e && /^ButtonSet image is too small/.test(e.message) && !(window.Sprite_Button && Sprite_Button.prototype.__agvnWide)) {

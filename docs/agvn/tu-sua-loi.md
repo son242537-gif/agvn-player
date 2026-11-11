@@ -3967,3 +3967,40 @@ Android hiện lên, gõ ký tự đầu tiên thì cả app văng:
      chữ hiện đúng trong ô.
   2. Một ô nhập tên của game RPG Maker và của Ren'Py chạy bằng Windows: như trên.
   3. Emoji: không văng. Game có thể không hiện được emoji.
+
+## Game RPG Maker MV có plugin đổi tên ô save: Tiếp tục tắt, màn Tải không chọn được ô nào (bản 0.1.92)
+
+Báo cáo ngày 11/11/2026: game MV bản PC, chạy bằng "Chạy nhẹ". POCO 2510DPC44G, app 0.1.88. Lưu được, tệp
+`www/save/fileN.rpgsave` và `global.rpgsave` ghi đúng. Mở lại thì "Tiếp tục" mờ, màn Tải hiện các ô nhưng ô nào cũng
+mờ, kể cả save vừa tạo trên máy. Trên PC (NW.js) thì tải được. Không có lỗi JS nào.
+
+- **Vì sao (`rpg_managers.js` của MV):**
+  - `DataManager.isThisGameFile` trên PC (`StorageManager.isLocalMode()` đúng) chỉ cần ô có trong `global.rpgsave`.
+  - Trong trình duyệt (`isLocalMode()` sai, như trong app, vì `process` của app không phải NW.js) nó còn đòi
+    `title === $dataSystem.gameTitle`.
+  - Game có plugin đặt tên ô theo bản đồ, ngày hay chương (`DataManager.makeSavefileInfo` gán `info.title`,
+    AutoSaveTitle và nhiều plugin màn Lưu). Vì vậy ô nào cũng bị coi là của game khác:
+    - `isAnySavefileExists()` sai, nên "Tiếp tục" tắt.
+    - `Window_SavefileList.isEnabled` sai, nên mọi ô mờ.
+  - Mục 6 của `html-compat.js` (bản 0.1.24) đã đưa save ra tệp như bản PC. Nhưng nhận ô thì vẫn theo luật của trình
+    duyệt.
+- **Sửa (`pcSlots` trong `html-compat.js`):**
+  - Khi save của MV là tệp (`mvSaves` chạy, thư mục ghi được), `isThisGameFile` hỏi hàm của engine trước. Hàm đó
+    trả sai thì ô vẫn là của game nếu `global.rpgsave` có ô đó với đúng `globalId` của game. Đây là luật của NW.js,
+    không so tên ô.
+  - Plugin nào tự đè `isThisGameFile` thì vẫn giữ luật của nó. Hàm được bọc lại lúc game bắt đầu
+    (`SceneManager.run`), phòng plugin thay hàm sau đó.
+  - Save ở bộ nhớ trình duyệt (thư mục không ghi được) giữ luật của trình duyệt như cũ.
+  - MZ không cần sửa: MZ không so tên ô.
+  - Save của game khác (`globalId` khác) vẫn bị loại.
+- **Test:** `tools/agvn/tests/html_saves_sim.js`, với `DataManager` của MV 1.6 theo luật trình duyệt:
+  - Ô tên "Rừng Đen 5/31" có `globalId` đúng: "Tiếp tục" sáng, ô tải được.
+  - Ô có `globalId` khác: bị loại. Ô không có: sai.
+  - Plugin thay hàm sau đó: luật của nó vẫn còn, ô của game vẫn nhận.
+  - Save trong trình duyệt: luật cũ.
+  - Với `html-compat.js` của bản 0.1.91, ca này hỏng đúng ở "Continue is lit".
+- **Thử máy:**
+  1. Game của báo cáo (bỏ phần vá tạm phía game): ván mới, lưu, thoát app, mở lại. "Tiếp tục" sáng, màn Tải chọn
+     được ô, tải vào đúng chỗ.
+  2. Game MV không đổi tên ô: "Tiếp tục" và màn Tải như trước.
+  3. Save chép từ bản Windows của cùng game vào `www/save`: "Tiếp tục" được.

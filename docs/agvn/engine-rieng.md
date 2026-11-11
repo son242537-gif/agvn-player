@@ -333,6 +333,9 @@ Chỗ để save của từng loại game: xem "Save, Nhập save và Xuất sav
      `game/www/save/...` (hoặc `game/save/...`).
   3. Chép save của game đó từ PC (`www/save/*.rpgsave`, cả `global.rpgsave`: MV chỉ hiện những ô có trong file này)
      vào máy, rồi "Nhập save" chọn các file đó. Mở game: màn "Tải" có các save của PC.
+     - Từ bản 0.1.92, khi save là tệp, MV nhận ô save như trên PC: ô có trong `global.rpgsave` với đúng `globalId` của
+       game, không so tên ô (`pcSlots` trong `html-compat.js`). Xem "Game RPG Maker MV có plugin đổi tên ô save" trong
+       `tu-sua-loi.md`.
   4. Game MZ: như các bước 1–3, với `save/*.rmmzsave`.
   5. Lưu khi "Chạy nhẹ", rồi "Chạy bằng Windows": thấy save đó, ở MV/MZ, Ren'Py, RPG Maker XP/VX/VX Ace và Godot.
   6. Godot (Party Me): "Xuất save" có `profile/AppData/Roaming/Godot/app_userdata/<tên dự án>/...`. "Nhập save" file

@@ -40,6 +40,35 @@ function page(files, browser, readOnly) {
   return { ctx, start: () => listeners.load() };
 }
 
+/* MV's DataManager, as in rpg_managers.js 1.6 in a browser: a slot is the game's when the global file lists it with
+ * the game's id and the game's title. */
+function mvData(ctx) {
+  ctx.$dataSystem = { gameTitle: 'Game' };
+  ctx.StorageManager.isLocalMode = () => false;
+  ctx.DataManager = {
+    _globalId: 'RPGMV',
+    loadGlobalInfo() {
+      const json = ctx.StorageManager.load(0);
+      if (!json) return [];
+      const info = JSON.parse(json);
+      for (let i = 1; i <= 20; i++) if (!ctx.StorageManager.exists(i)) delete info[i];
+      return info;
+    },
+    isThisGameFile(id) {
+      const info = this.loadGlobalInfo();
+      if (!info || !info[id]) return false;
+      if (ctx.StorageManager.isLocalMode()) return true;
+      return info[id].globalId === this._globalId && info[id].title === ctx.$dataSystem.gameTitle;
+    },
+    isAnySavefileExists() {
+      const info = this.loadGlobalInfo();
+      for (let i = 1; i < info.length; i++) if (this.isThisGameFile(i)) return true;
+      return false;
+    },
+  };
+  return ctx.DataManager;
+}
+
 /* MV's StorageManager, as in rpg_managers.js 1.6 in a browser (isLocalMode() false): its file paths are what a PC uses. */
 function mvEngine(ctx) {
   ctx.Utils = { RPGMAKER_NAME: 'MV' };
@@ -125,6 +154,32 @@ function counterPlugin(SM) {
   SM.saveToWebStorage(2, '{2}');
   assert.strictEqual(browser['RPG File2'], 'Z{2}');
   assert.strictEqual(files.size, 0);
+
+  // MV, a plugin that names each slot after its map (AutoSaveTitle...): its saves, files as on a PC, are the game's
+  // when the global file lists them with the game's id, as NW.js takes them (POCO, 0.1.88, 11/11/2026)
+  const global = [null, null, null, { globalId: 'RPGMV', title: 'Rừng Đen 5/31' }, null, { globalId: 'OTHER', title: 'Game' }];
+  files = new Map([['global.rpgsave', 'Z' + JSON.stringify(global)], ['file3.rpgsave', 'Z{3}'], ['file5.rpgsave', 'Z{5}']]);
+  p = page(files, {});
+  SM = mvEngine(p.ctx);
+  let DM = mvData(p.ctx);
+  let runs = 0;
+  p.ctx.SceneManager.run = () => { runs++; };
+  p.start();
+  assert.ok(DM.isAnySavefileExists(), 'Continue is lit');
+  assert.ok(DM.isThisGameFile(3), 'a slot named after its map loads');
+  assert.ok(!DM.isThisGameFile(5), "another game's id stays out");
+  assert.ok(!DM.isThisGameFile(4), 'no slot');
+  // a plugin with its own rule, put in after the engine: kept, and slots are taken as on a PC again as the game starts
+  DM.isThisGameFile = function (id) { return id === 9; };
+  p.ctx.SceneManager.run();
+  assert.strictEqual(runs, 1);
+  assert.ok(DM.isThisGameFile(9) && DM.isThisGameFile(3) && !DM.isThisGameFile(5));
+  // saves in the browser (a folder the app cannot write to): the browser's rule, as before
+  p = page(new Map(), { 'RPG Global': 'Z' + JSON.stringify(global), 'RPG File3': 'Z{3}' }, true);
+  SM = mvEngine(p.ctx);
+  DM = mvData(p.ctx);
+  p.start();
+  assert.ok(!DM.isThisGameFile(3) && !DM.isAnySavefileExists());
 
   // MZ, played on the phone before: carried over at the first load, then files only
   files = new Map();
