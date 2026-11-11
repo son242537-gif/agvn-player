@@ -1,0 +1,6 @@
+AGVN Player v0.1.91 - agvn.io
+
+Sửa lỗi:
+- Game Windows có ô nhập chữ (như ô đặt tên): gõ chữ hoa, chữ có dấu hay dấu câu bằng bàn phím Android không còn làm app văng. Chữ tiếng Việt vào đúng ô của game.
+- Game tự tắt ngay khi bắt đầu phát phim (như Demonion II): "Tự sửa lỗi" nay nhận ra và đề nghị "Chạy bằng Wine mới (Proton 10)", đọc được nhiều loại phim hơn. Lần chơi tắt như vậy không còn bị tính là lần chạy tốt.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
