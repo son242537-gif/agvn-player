@@ -10,13 +10,14 @@ import com.winlator.cmod.core.FileUtils;
  * html-compat.js, whose require hands crypto out. A plugin of an RPG Maker MZ game decrypted its settings with
  * Buffer and crypto.createDecipheriv as it loaded, and stopped the game with "Buffer is not defined" (POCO, 26/10/2026).
  * html-node-modules.js: events, stream, util and the other modules a bundled logger asked for as it loaded (RPG Maker
- * MV, 0.1.77, 06/11/2026). Also html-shader-precision.js: WebGL 2 shaders get the sampler precisions Android's WebView requires (mv3d's
+ * MV, 0.1.77, 06/11/2026). html-steam.js: greenworks and steamworks.js, as JoiPlay ships its own greenworks.js, for a
+ * game that asks Steam for its achievements or player name. Also html-shader-precision.js: WebGL 2 shaders get the sampler precisions Android's WebView requires (mv3d's
  * babylon.js drew every map black, 27/10/2026).
  */
 final class AgvnHtmlNode {
     /** In the order they need each other. */
     static final String[] SCRIPTS = {"agvn/html-node-buffer.js", "agvn/html-node-hash.js", "agvn/html-node-aes.js",
-            "agvn/html-node-crypto.js", "agvn/html-node-modules.js", "agvn/html-shader-precision.js"};
+            "agvn/html-node-crypto.js", "agvn/html-node-modules.js", "agvn/html-steam.js", "agvn/html-shader-precision.js"};
 
     private AgvnHtmlNode() {}
 

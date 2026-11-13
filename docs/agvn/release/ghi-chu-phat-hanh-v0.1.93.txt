@@ -1,0 +1,8 @@
+AGVN Player v0.1.93 - agvn.io
+
+Mới:
+- "Chạy nhẹ" có greenworks.js riêng của app, như JoiPlay: game RPG Maker MV/MZ hay NW.js dùng Steam (thành tựu, tên người chơi, Steam Cloud) không còn dừng vì thiếu Steam. Thành tựu game mở được nhớ trong máy.
+
+Sửa lỗi:
+- "Chạy nhẹ" game RPG Maker MV có plugin đặt tên ô save theo bản đồ hay chương: nút "Tiếp tục" không còn bị mờ, màn Tải chọn được ô save và tải đúng chỗ, như khi chơi trên PC. Save đã có vẫn tải được.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

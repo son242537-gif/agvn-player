@@ -4004,3 +4004,28 @@ mờ, kể cả save vừa tạo trên máy. Trên PC (NW.js) thì tải đượ
      được ô, tải vào đúng chỗ.
   2. Game MV không đổi tên ô: "Tiếp tục" và màn Tải như trước.
   3. Save chép từ bản Windows của cùng game vào `www/save`: "Tiếp tục" được.
+
+## "Chạy nhẹ": greenworks.js riêng của app cho game dùng Steam, như JoiPlay (bản 0.1.93)
+
+Yêu cầu của anh Sơn ngày 13/11/2026: JoiPlay mang greenworks.js riêng (mã app JoiPlay nhắc thẳng tới tệp này); AGVN
+làm như vậy.
+
+- **Trước đây:** trên PC, `require('greenworks')` nạp thư viện Steam (`greenworks-win64.node`), điện thoại không chạy
+  được. App có bản giả greenworks và steamworks.js từ 0.1.70, nhưng chỉ cho game Electron (`html-electron.js`). Game
+  RPG Maker MV/MZ hay NW.js khác nhận `{}`, và plugin Steam dừng game với `greenworks.init is not a function`, hoặc
+  log "[AGVN] app chưa hỗ trợ mô-đun Node: greenworks". Bản giả cũ cũng luôn trả "chưa mở" cho thành tựu.
+- **Sửa (`html-steam.js`, nạp cho mọi game trang của "Chạy nhẹ" qua `AgvnHtmlNode`):**
+  - `require` trả greenworks giả theo tên hay phần cuối đường dẫn: `greenworks`, `./greenworks.js`,
+    `./lib/greenworks-win64.node` (cả `-win32`, `-linux64`, `-osx64`); `steamworks.js` cũng vậy.
+  - Steam luôn "đang chạy", người chơi tên "Player", ngôn ngữ `english`.
+  - Thành tựu game mở (`activateAchievement`, steamworks `achievement.activate`) được nhớ trong trang (localStorage, theo
+    từng game) và ghi "[AGVN] Steam: mở thành tựu …" vào console; hỏi lại thì là "đã mở". Chỉ số (`setStat`) cũng nhớ.
+  - Tệp lưu lên Steam Cloud (`saveTextToFile`) nằm trong trang, đọc lại được.
+  - Hàm Steam app chưa có thì không làm gì, console ghi tên một lần.
+  - Game Electron dùng chung bản này; phần Steam trong `html-electron.js` bỏ đi.
+- **Chưa có:** thông báo thành tựu trên màn hình (Steam vẽ lớp phủ của nó, điện thoại không có).
+- **Test:** chạy thử bằng Node `html-node-modules.js` + `html-steam.js` + `html-compat.js` (và `html-electron.js`): đủ
+  các cách gọi tên, thành tựu nhớ được, Steam Cloud, steamworks.js, game Electron vẫn có `electron` và greenworks.
+- **Thử máy:** một game RPG Maker MV có plugin Steam (thường có `greenworks.js` và `lib/greenworks-win64.node` ở thư
+  mục game) mở bằng "Chạy nhẹ": game vào được màn tiêu đề; mở một thành tựu rồi thoát và vào lại, game không mở lại
+  thành tựu đó lần nữa. Hồi quy: game Electron "Chạy nhẹ" vẫn mở.
