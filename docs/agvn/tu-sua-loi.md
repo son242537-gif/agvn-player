@@ -4094,3 +4094,43 @@ Node: path/posix".
   đúng tên tệp `.bin`, không còn "path/posix", lỗi được giữ cho "Tự sửa lỗi".
 - **Thử máy:** Lovey-Dovey Lockdown bằng "Chạy nhẹ": sau khoảng 15 giây màn hình ghi "Game dùng mã đã biên dịch riêng cho
   NW.js (evalNWBin: js/plugins/ChimakiSpine.bin)…". Hồi quy: một game MV không dùng `evalNWBin` vẫn vào màn tiêu đề như cũ.
+
+## Game RPG Maker VX Ace văng lúc nạp script: biến `@@` trong `class << X` (bản 0.1.95)
+
+Báo cáo ngày 14/11/2026: 7 Girls War v1.02 (Kagura Games, VX Ace), máy POCO.
+- **Triệu chứng:** game văng trước màn tiêu đề với
+  `Script 'プチスロット' line 112: RuntimeError occurred. class variable access from toplevel`. Cùng thư mục game chạy
+  trên PC bình thường.
+
+- **Vì sao:**
+  - Script máy xèng của CACAO viết `class << Sound` rồi `@@reel_stop = RPG::SE.new(...)` ngay trong khối đó.
+  - Ruby tìm biến lớp `@@` theo lớp bao quanh trong mã, nhưng bỏ qua các khối `class << X`. Khối này lại không nằm
+    trong lớp hay module nào, nên Ruby lần ra tới cấp ngoài cùng (toplevel).
+  - Ruby 1.9 của RGSS coi đó là biến lớp của `Object`. Từ Ruby 3.0 (mkxp-z dùng Ruby 3.1.3), đọc hay gán biến lớp ở
+    cấp ngoài cùng là `RuntimeError`.
+- **Sửa (`agvn_ruby19_cvars.rb`, script nạp trước của mkxp-z):**
+  - Chỗ chen vào: mkxp-z giải nén mọi script vào `$RGSS_SCRIPTS[i][3]`, chạy các script nạp trước, rồi mới chạy từng
+    script của game từ đúng chỗ đó. Vì vậy script nạp trước sửa được mã của game trước khi nó chạy, không cần dựng lại
+    mkxp-z.
+  - Khối nào được sửa: khối `class << X` bắt đầu ở cột 0, nằm ngoài mọi `class`/`module` (đoán theo thụt lề), và có
+    `@@` bên trong.
+  - Cách sửa: dòng mở thành `class Object; class << X`, dòng `end` của khối thành `end; end`. Số dòng giữ nguyên, nên
+    lỗi về sau vẫn báo đúng dòng.
+    - Biến `@@` khi đó là của `Object`, như Ruby 1.9.
+    - `class << self` thành `class << TOPLEVEL_BINDING.receiver`, vẫn là `main` như trước.
+  - Game đang chạy tốt không bị đổi gì:
+    - Chỉ sửa những khối Ruby 3 không chạy được.
+    - `class << self` nằm trong một module vẫn giữ nguyên, biến vẫn là của module đó.
+    - Không chắc dòng `end` nào đóng khối (thân không thụt lề, heredoc ở cột 0): để nguyên.
+    - Mã sau khi sửa không biên dịch được (`RubyVM::InstructionSequence.compile`): để nguyên.
+  - `tim-tep.txt`: `Ruby 1.9: @@ trong "class << ..." (script <số> '<tên>', dòng <n>) đọc như trên PC`.
+- **Kiểm trên PC (Ruby 3.3):** `ruby scripts/agvn/mkxp-z/test-agvn-ruby19-cvars.rb`.
+  - Chưa sửa thì script máy xèng dừng đúng lỗi trên điện thoại.
+  - Sửa rồi thì script nạp được, tiếng dừng guồng phát được, và mọi dòng giữ số.
+  - Các trường hợp phải để nguyên vẫn nguyên.
+- **Chưa làm:** `@@` ở cấp ngoài cùng nằm ngoài khối `class << X` (ngay ở đầu script, trong `def self.x` hay khối `do`
+  ở cấp ngoài cùng). Chưa thấy game nào dùng.
+- **Thử máy:**
+  1. Mở 7 Girls War bản gốc, không vá: vào được màn tiêu đề.
+  2. Chơi tới minigame máy xèng: guồng dừng có tiếng.
+  3. Gửi nhật ký: `tim-tep.txt` có dòng `Ruby 1.9: @@ trong "class << ..." (script ... 'プチスロット'`.

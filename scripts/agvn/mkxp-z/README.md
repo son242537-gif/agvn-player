@@ -43,6 +43,11 @@ Cùng thư mục `assets/agvn/mkxp-z` còn có phần của AGVN, script này kh
   - `Win32API` bị `freeze` vẫn gọi được.
 
   Kiểm trên PC: `ruby scripts/agvn/mkxp-z/test-agvn-dl-cfunc.rb`.
+- `agvn_ruby19_cvars.rb` (từ bản 0.1.95): khối `class << X` không nằm trong lớp hay module nào mà có biến `@@` được
+  bọc thành `class Object; class << X` … `end; end` trên đúng các dòng cũ, trước khi script chạy (mkxp-z giải nén sẵn
+  mọi script vào `$RGSS_SCRIPTS[i][3]` trước các script nạp trước). Ruby 1.9 của RGSS coi biến đó là của `Object`; Ruby 3
+  báo `class variable access from toplevel` (7 Girls War, "プチスロット"). Ghi `tim-tep.txt`. Kiểm trên PC:
+  `ruby scripts/agvn/mkxp-z/test-agvn-ruby19-cvars.rb`.
 - `agvn_bools.rb` (từ bản 0.1.85): các thuộc tính có/không của RGSS (`Sprite#visible=`, `Window#active=`,
   `Font#bold=`…) nhận mọi giá trị như Windows. mkxp-z chỉ nhận `true`, `false` và `nil`, còn lại báo
   `Argument 0: Expected bool`. Kiểm trên PC: `ruby scripts/agvn/mkxp-z/test-agvn-bools.rb`.

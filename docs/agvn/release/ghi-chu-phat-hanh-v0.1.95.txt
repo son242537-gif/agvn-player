@@ -1,0 +1,5 @@
+AGVN Player v0.1.95 - agvn.io
+
+Sửa lỗi:
+- "Chạy nhẹ" game RPG Maker VX Ace (như 7 Girls War): game có script dùng biến @@ trong khối "class << ..." (như máy xèng của CACAO) không còn văng lúc nạp với lỗi "class variable access from toplevel". Script chạy như trên PC.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
