@@ -44,7 +44,7 @@
  *     the files the game wrote (localStorage); require('process') is `process`, and events, stream, util, assert, url, tty,
  *     string_decoder, worker_threads and module come from html-node-modules.js, loaded before this. MV, which goes on
  *     after an error in a script as it loads, shows that error once its first scene has not come 15 s after the page
- *     loaded, as MZ does. fs.constants (F_OK, R_OK...) is there too: an MZ plugin checked its files with
+ *     loaded, as MZ does (a module the app has not, with no such error, is only told in the console). fs.constants (F_OK, R_OK...) is there too: an MZ plugin checked its files with
  *     fs.accessSync(p, fs.constants.R_OK), whose TypeError its catch took for "missing" (0.1.88, 09/11/2026).
  * 16. A plugin's preload of a whole picture folder that only works on NW.js (SRD_PreloaderCore) is skipped when it
  *     fails, instead of stopping the game at its boot: the pictures then load as the game shows them.
@@ -245,7 +245,8 @@
         uptime: function () { return Math.round(Date.now() / 1000 - startedS); }, loadavg: function () { return [0, 0, 0]; },
         homedir: function () { return '/'; }, tmpdir: function () { return '/tmp'; }, endianness: function () { return 'LE'; },
         userInfo: function () { return { username: 'player', homedir: '/' }; }, networkInterfaces: function () { return {}; } };
-    var modules = { fs: fs, path: path, 'nw.gui': gui, os: os };
+    // path/posix and path/win32 are path under other names (a plugin's require('path/posix'), 14/11/2026)
+    var modules = { fs: fs, path: path, 'path/posix': path, 'path/win32': path, 'nw.gui': gui, os: os };
     // 13: Node's Buffer and crypto (html-node-*.js, loaded first), and child_process for a plugin that opens a page with
     // it: an error it can catch, since a phone runs no program
     if (window.__agvnNodeCrypto) modules.crypto = window.__agvnNodeCrypto;
@@ -732,13 +733,16 @@
             if (shown && !(window.SceneManager && SceneManager._scene)) keepFatal(loadError || shown);
         }, 0);
         // 15: MV goes on after an error in a script as it loads; when that error kept its first scene from coming, the
-        // page stayed black with nothing said. Shown on its own error screen, and kept for "Tự sửa lỗi" (5)
+        // page stayed black with nothing said. Shown on its own error screen, and kept for "Tự sửa lỗi" (5). Only for
+        // an error a script threw: a module the app has not is an empty object a plugin may never use, and its error
+        // screen covered a game still loading (path/posix, 14/11/2026); that one is only told in the console
         setTimeout(function () {
             var missing = window.__agvnMissingModules || [];
             if (!window.SceneManager || SceneManager._scene || (!loadError && !missing.length)) return;
             var text = (loadError || said('noFirstScene', 'Game chưa vào được cảnh đầu')) + missingSaid(missing);
-            keepFatal(text);
             console.error('[AGVN] game chưa vào cảnh đầu sau 15 giây: ' + text);
+            if (!loadError) return;
+            keepFatal(text);
             if (window.Graphics && typeof Graphics.printError === 'function')
                 Graphics.printError(said('loadTitle', 'Lỗi khi nạp game'), text);
         }, 15000);

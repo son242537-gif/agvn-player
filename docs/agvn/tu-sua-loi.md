@@ -4052,5 +4052,12 @@ Báo cáo ngày 14/11/2026 (ảnh chụp, app 0.1.93): một game RPG Maker MV (
     cho cả `fs` lẫn tệp tải thường).
 - **Test:** `AgvnHtmlFsTest.aWwwPathInAGameWhoseRootIsItsWwwFolder`; chạy thử bằng Node với plugin mô phỏng đúng stack
   trên (thư mục lỗi bị bỏ qua, phần sau vẫn chạy) và các phép kiểm `fs` cũ.
+- **Cũng ngày 14/11 (ảnh chụp thứ hai):** màn "Lỗi khi nạp game · Game chưa vào được cảnh đầu · app chưa hỗ trợ mô-đun
+  Node: path/posix".
+  - `require('path/posix')` (và `path/win32`) nay là `path`.
+  - Màn lỗi đó (0.1.82) hiện khi 15 giây sau `load` chưa có cảnh đầu và có lỗi nạp script **hoặc** mô-đun thiếu. Không có
+    lỗi script nào thì mô-đun thiếu chỉ là `{}` mà plugin có thể không dùng, và màn lỗi của MV che một game có thể chỉ đang
+    nạp chậm. Nay màn lỗi (và lỗi giữ cho "Tự sửa lỗi") chỉ có khi có lỗi script thật; mô-đun thiếu chỉ ghi vào console.
 - **Thử máy:** game của ảnh chụp, mở bằng "Chạy nhẹ": qua màn khởi động, vào màn tiêu đề; ảnh trong `img/pictures` vẫn
-  hiện khi game dùng tới.
+  hiện khi game dùng tới. Game của ảnh thứ hai: không còn màn "Lỗi khi nạp game"; nếu game vẫn đứng ở màn đen, "Gửi nhật
+  ký" sẽ có dòng "[AGVN] game chưa vào cảnh đầu sau 15 giây".
