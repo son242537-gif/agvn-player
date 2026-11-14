@@ -39,12 +39,15 @@
  *     html-electron.js, and every page game greenworks and steamworks.js (Steam) from html-steam.js, loaded before this.
  * 15. fs as a game scanning its folder needs it (an RPG Maker MV game's mod loader, 0.1.77, 06/11/2026): existsSync is
  *     false for a missing file (the app answers a HEAD with 404, never with its empty picture) and true for a folder,
- *     readdirSync lists a folder and statSync tells it from a file (the app's /__agvn/fs/, AgvnHtmlFs), each with the
- *     files the game wrote (localStorage); require('process') is `process`, and events, stream, util, assert, url, tty,
+ *     readdirSync lists a folder (one the app cannot find is empty, as a PC had it) and statSync tells it from a file
+ *     (the app's /__agvn/fs/, AgvnHtmlFs, which also finds "/www/…" in a game whose root is its www folder), each with
+ *     the files the game wrote (localStorage); require('process') is `process`, and events, stream, util, assert, url, tty,
  *     string_decoder, worker_threads and module come from html-node-modules.js, loaded before this. MV, which goes on
  *     after an error in a script as it loads, shows that error once its first scene has not come 15 s after the page
  *     loaded, as MZ does. fs.constants (F_OK, R_OK...) is there too: an MZ plugin checked its files with
  *     fs.accessSync(p, fs.constants.R_OK), whose TypeError its catch took for "missing" (0.1.88, 09/11/2026).
+ * 16. A plugin's preload of a whole picture folder that only works on NW.js (SRD_PreloaderCore) is skipped when it
+ *     fails, instead of stopping the game at its boot: the pictures then load as the game shows them.
  * 16. A data file the game asked for and did not get (no answer, 404, or JSON it cannot read) goes once to the session
  *     log, as the app does not see why a script of the game gave up on it (the same game, a JSON in a data/ folder).
  */
@@ -162,7 +165,10 @@
         mkdirSync: function () {},
         readdirSync: function (p, opts) {
             var listed = fsInfo('list', p), written = storedIn(p), types = {};
-            if (!listed && !Object.keys(written).length) throw noEntry(p);
+            // a folder the app cannot find is empty, as before 0.1.82, not an error: the game ran on a PC, where it was
+            // there, and a plugin that read it with fs.readdir(p, cb) and no check of the error stopped the game at
+            // "Cannot read properties of undefined (reading 'length')" (SRD_PreloaderCore, 0.1.93, 14/11/2026)
+            if (!listed && !Object.keys(written).length) console.warn('[AGVN] fs.readdirSync: không thấy thư mục ' + norm(p));
             (listed || []).forEach(function (e) { types[e.name] = e.dir; });
             Object.keys(written).forEach(function (n) { if (!(n in types)) types[n] = written[n]; });
             return Object.keys(types).sort().map(function (n) {
@@ -746,6 +752,35 @@
         }, true);
         document.addEventListener('focusin', function (ev) { fitSoon(ev.target); }, true);
         window.addEventListener('resize', function () { fitSoon(document.activeElement); });
+    }
+
+    // --- 16: a plugin's "preload every picture of a folder", which lists the folder only on NW.js (Utils.isNwjs(), false
+    // here, see 1) and then reads .length of the list it never made: SRD_PreloaderCore stopped the game at Scene_Boot
+    // with "Cannot read properties of undefined (reading 'length')" at _.preloadImageFolder (0.1.93, 14/11/2026).
+    // Preloading only spares a wait, so a folder whose preload fails is skipped, once said in the console, and its
+    // pictures load when the game shows them, as on a phone build.
+    function skipFailedPreloads() {
+        var ns = window.SRD && window.SRD.PreloaderCore;
+        if (!ns || ns.__agvnPreloads) return !!ns;
+        ns.__agvnPreloads = true;
+        Object.keys(ns).forEach(function (name) {
+            var f = ns[name];
+            if (typeof f !== 'function' || !/^preload\w*Folder$/i.test(name)) return;
+            ns[name] = function (folder) {
+                try {
+                    return f.apply(this, arguments);
+                } catch (e) {
+                    console.warn('[AGVN] SRD_PreloaderCore: bỏ nạp trước thư mục ' + folder + ' (chỉ chạy trên NW.js): ' + e.message);
+                    return undefined;
+                }
+            };
+        });
+        return true;
+    }
+    if (typeof document.addEventListener === 'function') {
+        document.addEventListener('load', function preloads() {
+            if (skipFailedPreloads()) document.removeEventListener('load', preloads, true);
+        }, true);
     }
 
     // --- 12: WebGL refuses a picture wider or taller than MAX_TEXTURE_SIZE ("texImage2D: width or height out of

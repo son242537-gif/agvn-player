@@ -111,10 +111,27 @@ public final class AgvnHtmlFiles {
         }
     }
 
+    /**
+     * {@code urlPath} without a first folder named as {@code root} itself, which {@code root} does not hold: "/www/img/a.png"
+     * for a game whose root is its www folder. RPG Maker MV plugins find the game's folder from the page's address
+     * (location.pathname.replace(/(\/www|)\/[^\/]*$/, '/www/')), which in "Chạy nhẹ" gives "/www/" for the root, and
+     * SRD_PreloaderCore's image folders were not found (0.1.93, 14/11/2026). Null when there is no such folder in it.
+     */
+    static String withoutRootName(File root, String urlPath) {
+        if (urlPath == null) return null;
+        String path = urlPath.startsWith("/") ? urlPath.substring(1) : urlPath;
+        int slash = path.indexOf('/');
+        String first = decode(slash < 0 ? path : path.substring(0, slash));
+        if (!first.equalsIgnoreCase(root.getName()) || new File(root, first).exists()) return null;
+        return slash < 0 ? "/" : path.substring(slash);
+    }
+
     /** The file for {@code urlPath}, else in its other format ({@link #sibling}), else in {@link AgvnNwjsGame#appDir}. */
     static File fileFor(File root, String urlPath) {
         File file = resolve(root, urlPath);
         if (file != null) return file;
+        String inRoot = withoutRootName(root, urlPath);
+        if (inRoot != null && (file = resolve(root, inRoot)) != null) return file;
         String other = sibling(urlPath);
         file = other != null ? resolve(root, other) : null;
         File app = file == null ? AgvnNwjsGame.appDir(root) : null;

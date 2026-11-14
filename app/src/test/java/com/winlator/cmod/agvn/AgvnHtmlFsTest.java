@@ -61,4 +61,21 @@ public class AgvnHtmlFsTest {
         assertEquals(Arrays.asList("a.png"), asar.children("mods/moda/img", new HashSet<>()));
         assertNull(asar.children("mods/nope", new HashSet<>()));
     }
+
+    @Test
+    public void aWwwPathInAGameWhoseRootIsItsWwwFolder() throws Exception {
+        // SRD_PreloaderCore (0.1.93, 14/11/2026): the plugin found the game folder as "/www/" from the page's address
+        File www = tmp.newFolder("Game", "www");
+        File pictures = new File(www, "img/pictures");
+        assertTrue(pictures.mkdirs());
+        assertTrue(new File(pictures, "a.png").createNewFile());
+        assertEquals(pictures, AgvnHtmlFs.find(www, "/www/img/pictures"));
+        assertEquals(www, AgvnHtmlFs.find(www, "/www"));
+        assertEquals(new File(pictures, "a.png"), AgvnHtmlFiles.fileFor(www, "/www/img/pictures/a.png"));
+        assertEquals("/img/pictures", AgvnHtmlFiles.withoutRootName(www, "/WWW/img/pictures"));
+        assertNull("another game's root", AgvnHtmlFiles.withoutRootName(tmp.newFolder("other"), "/www/img"));
+        File inner = new File(www, "www");
+        assertTrue(inner.mkdirs());
+        assertNull("a real www folder inside wins", AgvnHtmlFiles.withoutRootName(www, "/www/img"));
+    }
 }

@@ -1,0 +1,6 @@
+AGVN Player v0.1.94 - agvn.io
+
+Sửa lỗi:
+- "Chạy nhẹ": game RPG Maker MV có plugin nạp trước cả thư mục ảnh (như SRD_PreloaderCore) không còn dừng ở lúc khởi động với lỗi "Cannot read properties of undefined (reading 'length')". Ảnh vẫn hiện, chỉ nạp lúc game cần.
+- "Chạy nhẹ": thư mục game mà app không tìm thấy được coi là thư mục trống như trước bản 0.1.82, không làm game văng.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

@@ -4029,3 +4029,28 @@ làm như vậy.
 - **Thử máy:** một game RPG Maker MV có plugin Steam (thường có `greenworks.js` và `lib/greenworks-win64.node` ở thư
   mục game) mở bằng "Chạy nhẹ": game vào được màn tiêu đề; mở một thành tựu rồi thoát và vào lại, game không mở lại
   thành tựu đó lần nữa. Hồi quy: game Electron "Chạy nhẹ" vẫn mở.
+
+## "Chạy nhẹ": SRD_PreloaderCore dừng game lúc khởi động (bản 0.1.94)
+
+Báo cáo ngày 14/11/2026 (ảnh chụp, app 0.1.93): một game RPG Maker MV (gói AGVN, có `AGVN_Splash.js`) dừng ở màn lỗi
+`TypeError: Cannot read properties of undefined (reading 'length')` tại `_.preloadImageFolder (SRD_PreloaderCore.js:609)`
+← `_.setupImagePreloads` ← `Scene_Boot.start`.
+
+- **Vì sao (anh Sơn chỉ ra):** game đặt "nạp trước toàn bộ ảnh pictures", và plugin chỉ lấy danh sách ảnh trong thư mục
+  khi chạy trên NW.js (bản PC). "Chạy nhẹ" cố ý báo không phải NW.js (`Utils.isNwjs()` sai, mục 1 của `html-compat.js`,
+  để engine dùng cách lưu của trình duyệt mà app chuyển thành tệp thật), nên danh sách không được tạo và plugin đọc
+  `.length` của `undefined`. Lớp "bỏ qua lỗi nhỏ" (mục 2) không cứu được, vì `Scene_Boot.start` chạy lại mỗi khung và
+  lỗi lặp quá 60 lần trong 5 giây.
+- **Sửa (`html-compat.js` mục 16):** khi script của plugin nạp xong, các hàm `preload…Folder` của `SRD.PreloaderCore`
+  được bọc lại: hàm lỗi thì thư mục đó bị bỏ qua, console ghi "[AGVN] SRD_PreloaderCore: bỏ nạp trước thư mục … (chỉ
+  chạy trên NW.js)", và phần khởi động còn lại chạy tiếp. Nạp trước chỉ để đỡ chờ: ảnh vẫn được nạp lúc game hiện nó.
+- **Thêm, cho trường hợp plugin có gọi `fs`:**
+  - `fs.readdirSync` (và `fs.readdir`) của một thư mục app không tìm thấy trả `[]` như trước 0.1.82, kèm cảnh báo trong
+    console, không ném `ENOENT` nữa: plugin đọc bằng `fs.readdir(p, cb)` mà không kiểm lỗi sẽ văng đúng như trên.
+  - Đường dẫn `/www/…` trong game mà thư mục gốc đã là `www` (plugin tự tính thư mục game từ địa chỉ trang:
+    `location.pathname.replace(/(\/www|)\/[^\/]*$/, '/www/')`) được tìm lại không có `/www` (`AgvnHtmlFiles.withoutRootName`,
+    cho cả `fs` lẫn tệp tải thường).
+- **Test:** `AgvnHtmlFsTest.aWwwPathInAGameWhoseRootIsItsWwwFolder`; chạy thử bằng Node với plugin mô phỏng đúng stack
+  trên (thư mục lỗi bị bỏ qua, phần sau vẫn chạy) và các phép kiểm `fs` cũ.
+- **Thử máy:** game của ảnh chụp, mở bằng "Chạy nhẹ": qua màn khởi động, vào màn tiêu đề; ảnh trong `img/pictures` vẫn
+  hiện khi game dùng tới.

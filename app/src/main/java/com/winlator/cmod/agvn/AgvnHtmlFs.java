@@ -56,8 +56,17 @@ final class AgvnHtmlFs {
         return json(sb.append(']').toString());
     }
 
-    /** The file or folder of game path {@code urlPath} under {@code root} (the root itself for "/"), or null. */
+    /**
+     * The file or folder of game path {@code urlPath} under {@code root} (the root itself for "/"), or null; also with
+     * a first folder named as the root left out ({@link AgvnHtmlFiles#withoutRootName}).
+     */
     static File find(File root, String urlPath) {
+        File found = walk(root, urlPath);
+        String inRoot = found == null ? AgvnHtmlFiles.withoutRootName(root, urlPath) : null;
+        return inRoot != null ? walk(root, inRoot) : found;
+    }
+
+    private static File walk(File root, String urlPath) {
         File current = root;
         for (String part : AgvnHtmlFiles.decode(urlPath).replace('\\', '/').split("/")) {
             if (part.isEmpty() || part.equals(".")) continue;
