@@ -4041,7 +4041,7 @@ Báo cáo ngày 14/11/2026 (ảnh chụp, app 0.1.93): một game RPG Maker MV (
   để engine dùng cách lưu của trình duyệt mà app chuyển thành tệp thật), nên danh sách không được tạo và plugin đọc
   `.length` của `undefined`. Lớp "bỏ qua lỗi nhỏ" (mục 2) không cứu được, vì `Scene_Boot.start` chạy lại mỗi khung và
   lỗi lặp quá 60 lần trong 5 giây.
-- **Sửa (`html-compat.js` mục 16):** khi script của plugin nạp xong, các hàm `preload…Folder` của `SRD.PreloaderCore`
+- **Sửa (`html-compat.js` mục 17):** khi script của plugin nạp xong, các hàm `preload…Folder` của `SRD.PreloaderCore`
   được bọc lại: hàm lỗi thì thư mục đó bị bỏ qua, console ghi "[AGVN] SRD_PreloaderCore: bỏ nạp trước thư mục … (chỉ
   chạy trên NW.js)", và phần khởi động còn lại chạy tiếp. Nạp trước chỉ để đỡ chờ: ảnh vẫn được nạp lúc game hiện nó.
 - **Thêm, cho trường hợp plugin có gọi `fs`:**
@@ -4061,3 +4061,36 @@ Báo cáo ngày 14/11/2026 (ảnh chụp, app 0.1.93): một game RPG Maker MV (
 - **Thử máy:** game của ảnh chụp, mở bằng "Chạy nhẹ": qua màn khởi động, vào màn tiêu đề; ảnh trong `img/pictures` vẫn
   hiện khi game dùng tới. Game của ảnh thứ hai: không còn màn "Lỗi khi nạp game"; nếu game vẫn đứng ở màn đen, "Gửi nhật
   ký" sẽ có dòng "[AGVN] game chưa vào cảnh đầu sau 15 giây".
+
+## "Chạy nhẹ": game nạp mã đã biên dịch cho NW.js (evalNWBin) đen màn, màn lỗi nói nhầm "path/posix" (bản 0.1.94)
+
+Báo cáo ngày 14/11/2026 (POCO, Lovey-Dovey Lockdown, RPG Maker MV 1.6, hãng Chimaki, bản PC Việt hoá + cheat; kết luận
+từ đọc mã game và mã app, chưa có logcat): màn "Lỗi khi nạp game · Game chưa vào được cảnh đầu · app chưa hỗ trợ mô-đun
+Node: path/posix".
+
+- **Vì sao:**
+  - `js/main.js` của hãng không gọi thẳng `SceneManager.run(Scene_Boot)`. Nó chờ `loadSpine()`, một Promise gọi
+    `nw.Window.get().evalNWBin(null, path.resolve('.', 'js/plugins/ChimakiSpine.bin'))`. `nwWindow` của app không có
+    `evalNWBin` → TypeError trong Promise, không có `.catch` → `Scene_Boot` không bao giờ chạy.
+  - `path/posix` là đánh lạc hướng: `NekoGakuen_MulitLanguage.js` có `require('path/posix')` nhưng không dùng biến đó.
+  - `ChimakiSpine.bin` (1,27 MB, đầu tệp `a4 05 de c0`) là mã V8 do `nwjc` biên dịch cho đúng bản V8 của NW.js đi kèm, chứa
+    toàn bộ hệ Spine của game (`$spineManager`, lệnh `C_SPINE …`). WebView không chạy được loại mã này, kể cả khi app có
+    `evalNWBin`.
+  - Từ bản sửa "màn lỗi chỉ khi có lỗi script" (cũng 0.1.94), lỗi trong Promise không phát sự kiện `error`, nên nếu không
+    sửa thêm, game này sẽ đen màn im lặng.
+- **Sửa (`html-compat.js` mục 18; chuỗi `agvn_ui_agvn1_html_nw_bin`, 6 ngôn ngữ):**
+  - `nw.Window.get().evalNWBin` (và `evalNWBinModule`) ném lỗi có tên tệp: "Game dùng mã đã biên dịch riêng cho NW.js
+    (evalNWBin: js/plugins/ChimakiSpine.bin), không chạy được trên điện thoại". Đó là lỗi màn hình hiện sau 15 giây và lỗi
+    giữ cho "Tự sửa lỗi".
+  - Promise bị từ chối mà không ai bắt lúc game nạp (`unhandledrejection`) cũng được tính là lỗi nạp cho màn đó, cho mọi
+    game có trình nạp kiểu này.
+  - `require('path/posix')` là `path` (đã sửa trước trong 0.1.94).
+- **Không làm:** dò trước ở danh sách game (chuỗi `evalNWBin` hay tệp `.bin` đầu `a4 05 de c0`). Màn lỗi đã nói đúng lý
+  do ở lần mở đầu, và "Tự sửa lỗi" hỏi lại khi người chơi thoát.
+- **Phần của game, không phải của app:** chạy game này trên điện thoại cần một plugin JS thay cho `ChimakiSpine.bin` (viết
+  lại `$spineManager` và lệnh `C_SPINE` trên `js/plugins/pixi-spine.js` có sẵn, dữ liệu ở `img/spine/`); chỉ làm khi anh
+  Sơn yêu cầu.
+- **Test:** chạy thử bằng Node đúng trình nạp của `main.js` (Promise, `evalNWBin`, `require('path/posix')`): màn lỗi ghi
+  đúng tên tệp `.bin`, không còn "path/posix", lỗi được giữ cho "Tự sửa lỗi".
+- **Thử máy:** Lovey-Dovey Lockdown bằng "Chạy nhẹ": sau khoảng 15 giây màn hình ghi "Game dùng mã đã biên dịch riêng cho
+  NW.js (evalNWBin: js/plugins/ChimakiSpine.bin)…". Hồi quy: một game MV không dùng `evalNWBin` vẫn vào màn tiêu đề như cũ.

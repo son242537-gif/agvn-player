@@ -46,10 +46,12 @@
  *     after an error in a script as it loads, shows that error once its first scene has not come 15 s after the page
  *     loaded, as MZ does (a module the app has not, with no such error, is only told in the console). fs.constants (F_OK, R_OK...) is there too: an MZ plugin checked its files with
  *     fs.accessSync(p, fs.constants.R_OK), whose TypeError its catch took for "missing" (0.1.88, 09/11/2026).
- * 16. A plugin's preload of a whole picture folder that only works on NW.js (SRD_PreloaderCore) is skipped when it
- *     fails, instead of stopping the game at its boot: the pictures then load as the game shows them.
  * 16. A data file the game asked for and did not get (no answer, 404, or JSON it cannot read) goes once to the session
  *     log, as the app does not see why a script of the game gave up on it (the same game, a JSON in a data/ folder).
+ * 17. A plugin's preload of a whole picture folder that only works on NW.js (SRD_PreloaderCore) is skipped when it
+ *     fails, instead of stopping the game at its boot: the pictures then load as the game shows them.
+ * 18. nw.Window.get().evalNWBin (NW.js-compiled code, which only NW.js's own V8 runs) fails with the file named, and
+ *     that, or any promise the boot waited on that failed, is the error 15 shows: not a module the game never used.
  */
 (function () {
     'use strict';
@@ -229,6 +231,20 @@
         setMinimumSize: noop, setMaximumSize: noop, reload: function () { location.reload(); },
         isFullscreen: true, title: document.title };
     nwWindow.on = nwWindow.once = function () { return nwWindow; };
+    // 18: code compiled by NW.js's nwjc for its own V8 (a .bin a game runs with nw.Window.get().evalNWBin), which no
+    // other engine can run: Lovey-Dovey Lockdown's main.js waited on it (its Spine system, js/plugins/ChimakiSpine.bin)
+    // before SceneManager.run, so the game stayed black and the screen named only a module it never used (14/11/2026).
+    // The call fails with the file named, and that is the error the screen shows (15)
+    function nwBin(file) {
+        var name = 'evalNWBin: ' + String(file || '').replace(/\\/g, '/').replace(/^\/+/, '');
+        var text = said('nwBin', 'Game dùng mã đã biên dịch riêng cho NW.js (%1$s), không chạy được trên điện thoại')
+            .replace('%1$s', function () { return name; });
+        if (!loadError) loadError = text;
+        console.error('[AGVN] ' + text);
+        throw new Error(text);
+    }
+    nwWindow.evalNWBin = function (frame, file) { nwBin(file); };
+    nwWindow.evalNWBinModule = function (frame, file) { nwBin(file); };
     var gui = { Window: { get: function () { return nwWindow; } }, App: { quit: noop, argv: [], dataPath: '/' },
         Shell: { openExternal: noop, openItem: noop }, Menu: function () { return { append: noop, createMacBuiltin: noop }; },
         MenuItem: function () { return {}; }, Screen: { Init: noop, on: noop, screens: [] } };
@@ -718,6 +734,13 @@
     // on its error screen, and the first scene never comes). The first one is kept with its file and line once that
     // screen shows. MV goes on after such an error, so there it is no stop.
     var loadError = '';
+    // a promise the boot waited on that failed with no catch, as main.js's own loader (18): an error too, for 15 below
+    window.addEventListener('unhandledrejection', function (ev) {
+        var e = ev && ev.reason;
+        if (loadError || !e) return;
+        loadError = (e.name ? e.name + ': ' : '') + (e.message || String(e));
+        console.error('[AGVN] lỗi khi nạp game (promise): ' + loadError);
+    });
     window.addEventListener('error', function (ev) {
         if (loadError || !ev || !(ev.error || ev.message)) return;
         var e = ev.error;
@@ -758,7 +781,7 @@
         window.addEventListener('resize', function () { fitSoon(document.activeElement); });
     }
 
-    // --- 16: a plugin's "preload every picture of a folder", which lists the folder only on NW.js (Utils.isNwjs(), false
+    // --- 17: a plugin's "preload every picture of a folder", which lists the folder only on NW.js (Utils.isNwjs(), false
     // here, see 1) and then reads .length of the list it never made: SRD_PreloaderCore stopped the game at Scene_Boot
     // with "Cannot read properties of undefined (reading 'length')" at _.preloadImageFolder (0.1.93, 14/11/2026).
     // Preloading only spares a wait, so a folder whose preload fails is skipped, once said in the console, and its

@@ -4,6 +4,7 @@
     <string name="agvn_ui_agvn1_html_load_title">เกิดข้อผิดพลาดขณะโหลดเกม</string>
     <string name="agvn_ui_agvn1_html_no_first_scene">เกมยังไปไม่ถึงฉากแรก</string>
     <string name="agvn_ui_agvn1_html_missing_modules">โมดูล Node ที่แอปยังไม่รองรับ: %1$s</string>
+    <string name="agvn_ui_agvn1_html_nw_bin">เกมใช้โค้ดที่คอมไพล์ไว้สำหรับ NW.js เท่านั้น (%1$s) ซึ่งรันบนโทรศัพท์ไม่ได้</string>
     <string name="agvn_ui_agvn1_picture_game_folder">โฟลเดอร์เกม</string>
     <string name="agvn_ui_agvn1_picture_no_access_game">แอปอ่านโฟลเดอร์เกมไม่ได้</string>
     <string name="agvn_ui_agvn1_picture_short">ไฟล์มีขนาดแค่ %1$s ไบต์ ไม่ใช่รูปภาพ</string>

@@ -4,6 +4,7 @@
     <string name="agvn_ui_agvn1_html_load_title">Error saat memuat game</string>
     <string name="agvn_ui_agvn1_html_no_first_scene">Game belum sampai ke adegan pertama</string>
     <string name="agvn_ui_agvn1_html_missing_modules">Modul Node yang belum didukung aplikasi: %1$s</string>
+    <string name="agvn_ui_agvn1_html_nw_bin">Game memakai kode yang dikompilasi khusus untuk NW.js (%1$s), tidak bisa berjalan di ponsel</string>
     <string name="agvn_ui_agvn1_picture_game_folder">folder game</string>
     <string name="agvn_ui_agvn1_picture_no_access_game">aplikasi tidak bisa membaca folder game</string>
     <string name="agvn_ui_agvn1_picture_short">file hanya %1$s byte, bukan gambar</string>

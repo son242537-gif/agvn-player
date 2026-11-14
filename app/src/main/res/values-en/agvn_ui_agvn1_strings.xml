@@ -4,6 +4,7 @@
     <string name="agvn_ui_agvn1_html_load_title">Error loading the game</string>
     <string name="agvn_ui_agvn1_html_no_first_scene">The game did not reach its first scene</string>
     <string name="agvn_ui_agvn1_html_missing_modules">Node modules the app does not support yet: %1$s</string>
+    <string name="agvn_ui_agvn1_html_nw_bin">The game uses code compiled only for NW.js (%1$s), which cannot run on a phone</string>
     <string name="agvn_ui_agvn1_picture_game_folder">the game folder</string>
     <string name="agvn_ui_agvn1_picture_no_access_game">the app cannot read the game folder</string>
     <string name="agvn_ui_agvn1_picture_short">the file is only %1$s bytes, not a picture</string>

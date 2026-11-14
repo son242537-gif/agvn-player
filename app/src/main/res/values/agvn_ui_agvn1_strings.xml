@@ -4,6 +4,7 @@
     <string name="agvn_ui_agvn1_html_load_title">Lỗi khi nạp game</string>
     <string name="agvn_ui_agvn1_html_no_first_scene">Game chưa vào được cảnh đầu</string>
     <string name="agvn_ui_agvn1_html_missing_modules">app chưa hỗ trợ mô-đun Node: %1$s</string>
+    <string name="agvn_ui_agvn1_html_nw_bin">Game dùng mã đã biên dịch riêng cho NW.js (%1$s), không chạy được trên điện thoại</string>
     <string name="agvn_ui_agvn1_picture_game_folder">thư mục game</string>
     <string name="agvn_ui_agvn1_picture_no_access_game">app không đọc được thư mục game</string>
     <string name="agvn_ui_agvn1_picture_short">tệp chỉ có %1$s byte, không phải ảnh</string>

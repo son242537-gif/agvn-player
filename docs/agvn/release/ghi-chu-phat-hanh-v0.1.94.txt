@@ -4,4 +4,5 @@ Sửa lỗi:
 - "Chạy nhẹ": game RPG Maker MV có plugin nạp trước cả thư mục ảnh (như SRD_PreloaderCore) không còn dừng ở lúc khởi động với lỗi "Cannot read properties of undefined (reading 'length')". Ảnh vẫn hiện, chỉ nạp lúc game cần.
 - "Chạy nhẹ": thư mục game mà app không tìm thấy được coi là thư mục trống như trước bản 0.1.82, không làm game văng.
 - "Chạy nhẹ": game gọi mô-đun "path/posix" không còn bị báo "app chưa hỗ trợ mô-đun Node". Màn "Lỗi khi nạp game" chỉ hiện khi script của game thật sự lỗi, không che game đang nạp chậm.
+- "Chạy nhẹ": game dùng mã đã biên dịch riêng cho NW.js (tệp .bin, như Lovey-Dovey Lockdown) nay báo đúng lý do trên màn hình, thay vì đen màn hay nói nhầm sang mô-đun khác. Game loại này cần bản chuyển riêng cho điện thoại.
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

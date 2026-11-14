@@ -134,7 +134,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     private String pageTexts() {
         return "window.__agvnText = {loadTitle: " + AgvnHtmlKeys.js(getString(R.string.agvn_ui_agvn1_html_load_title))
                 + ", noFirstScene: " + AgvnHtmlKeys.js(getString(R.string.agvn_ui_agvn1_html_no_first_scene))
-                + ", missingModules: " + AgvnHtmlKeys.js(getString(R.string.agvn_ui_agvn1_html_missing_modules)) + "};\n";
+                + ", missingModules: " + AgvnHtmlKeys.js(getString(R.string.agvn_ui_agvn1_html_missing_modules))
+                + ", nwBin: " + AgvnHtmlKeys.js(getString(R.string.agvn_ui_agvn1_html_nw_bin)) + "};\n";
     }
 
     /** "Tự sửa lỗi": an error that stopped the game (html-compat.js keeps it in __agvnFatal), asked about at the end. */
