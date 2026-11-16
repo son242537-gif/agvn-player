@@ -146,6 +146,7 @@
     <string name="agvn_movie_open_title">เปิดวิดีโอในเกมไม่ได้</string>
     <string name="agvn_movie_open_detail">Wine ของแอปยังเปิดวิดีโอหนึ่งของเกมไม่ได้ (%1$s) เกมจึงอาจค้างที่จอดำรอให้วิดีโอเล่นจบ ปัญหาอยู่ที่แอป ไม่ใช่ที่เกม</string>
     <string name="agvn_movie_open_unknown">รูปแบบที่ Wine ยังถอดรหัสเองไม่ได้</string>
+    <string name="agvn_movie_open_32bit">วิธีอ่านวิดีโอแบบใหม่ของ Wine อ่านวิดีโอของเกม 32 บิตไม่ได้</string>
     <string name="agvn_movie_open_old">วิธีอ่านวิดีโอแบบเก่าของ Wine เปิดวิดีโอแบบนี้ได้ เลือก \"รันอีกครั้ง อ่านวิดีโอแบบเก่า\": เกมจะปิดแล้วเปิดใหม่ ส่วนที่เล่นไปแต่ยังไม่เซฟจะหายไป</string>
     <string name="agvn_movie_open_restart">รันอีกครั้ง อ่านวิดีโอแบบเก่า</string>
     <string name="agvn_wine10_move">รันอีกครั้งด้วย Wine ใหม่</string>

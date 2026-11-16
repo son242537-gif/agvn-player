@@ -1,0 +1,7 @@
+AGVN Player v0.1.96 - agvn.io
+
+Sửa lỗi:
+- Phim trong game 32-bit (như logo đầu game của nhiều game Unity) nay mở được. Trước đây Wine của app không mở được phim nào cho game 32-bit, nên game có thể đứng ở màn hình đen chờ phim chạy xong. Game 32-bit giờ đọc phim bằng cách cũ của Wine ngay từ đầu.
+- Nếu một phim vẫn gặp lỗi này, app báo trên màn hình và đề nghị "Chạy lại, đọc phim cách cũ".
+- Dành cho người làm game: tham số chạy (args) thêm vào agvn-profile.json sau khi đã thêm game nay được áp ở lần mở kế tiếp, như env và dllOverrides.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

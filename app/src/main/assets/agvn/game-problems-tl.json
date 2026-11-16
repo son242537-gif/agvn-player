@@ -80,6 +80,10 @@
       "title": "Hindi mabuksan ng Wine ang video sa game",
       "cause": "Nagpe-play ang game ng video (kadalasan sa paglipat ng eksena) na hindi kusang ma-decode ng bagong paraan ng Wine sa pagbasa ng video, pinakamadalas ang MP4 na may MP3 na audio. Kailangan noon ng Wine ang transcoder ng Steam, na wala sa labas ng Steam, kaya hindi mabuksan ang video at puwedeng matigil ang game sa itim na screen habang hinihintay matapos ang video. Nasa Wine ng app ang problema, hindi sa game. Kaya ng lumang paraan ng Wine na i-decode ang ganitong video."
     },
+    "movie-no-data": {
+      "title": "Hindi mabuksan ng Wine ang video sa game",
+      "cause": "Hindi mabasa ng bagong paraan ng Wine ang video para sa 32-bit na program: wala itong natatanggap na data ng video, kaya hindi nabubuksan ang video at maaaring manatili ang game sa itim na screen habang hinihintay itong matapos. Nasa Wine ng app ang problema, wala sa game. Kayang buksan ng lumang paraan ng Wine ang video na ito."
+    },
     "deadlock": {
       "title": "Na-deadlock ang game, naka-freeze",
       "cause": "Naghihintayan nang walang katapusan ang mga thread ng game: may thread na may hawak na lock at hindi ito binibitawan, at naghintay ang main thread sa lock na iyon nang mahigit 1 minuto kaya nag-freeze ang game (kadalasan habang naglo-load ng eksena, itim ang screen). Hindi ito error sa data ng game: nasa paraan ng CPU emulation o ng Wine sa pagpapatakbo ng mga thread ng game sa phone ang problema. Medyo pinababagal ng bawat ayos sa ibaba ang game, kaya iminumungkahi lang ito ng app kapag na-deadlock ang game."

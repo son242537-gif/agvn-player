@@ -33,6 +33,7 @@ import java.util.List;
  * A movie that does not open at all, as it needs Steam's media converter ({@link AgvnMediaFoundation#NO_TRANSCODER}):
  * the bar says so once a session, with the kind of stream Wine could not decode ("âm thanh MP3"), and offers to start
  * the game again reading movies the old way, which plays it (Tenants of the Dead, black at a scene change, 26/10/2026).
+ * The same for a movie the new media source got no data of ({@link AgvnMedia32#NO_DATA}).
  */
 public final class AgvnMovieWatch implements Callback<String> {
     private static final String TAG = "AGVN", EXTRA_SKIP = "agvnMovieSkip";
@@ -64,21 +65,28 @@ public final class AgvnMovieWatch implements Callback<String> {
         if (rules.add(line, SystemClock.uptimeMillis())) handler.post(this::found);
         int caps = line.indexOf(CANNOT_DECODE);
         if (caps >= 0) undecoded = line.substring(caps + CANNOT_DECODE.length());
-        if (line.contains(AgvnMediaFoundation.NO_TRANSCODER)) handler.post(this::notOpened);
+        if (line.contains(AgvnMediaFoundation.NO_TRANSCODER)) handler.post(() -> notOpened(false));
+        else if (line.contains(AgvnMedia32.NO_DATA)) handler.post(() -> notOpened(true));
     }
 
-    /** A movie that needs Steam's converter: told once a session, with "Chạy lại, đọc phim cách cũ" if not on yet. */
-    private void notOpened() {
+    /**
+     * A movie that needs Steam's converter, or ({@code noData}) one the new media source got no data of, as for a
+     * 32-bit program ({@link AgvnMedia32}): told once a session, with "Chạy lại, đọc phim cách cũ" if not on yet.
+     */
+    private void notOpened(boolean noData) {
         if (notOpenedTold || activity.isFinishing() || activity.isDestroyed()) return;
         notOpenedTold = true;
-        String kind = AgvnMediaFoundation.kind(undecoded);
-        AgvnSessionLog.event("Phim trong game không mở được (" + (kind != null ? kind : "định dạng Wine không tự giải mã")
+        String kind = noData ? null : AgvnMediaFoundation.kind(undecoded);
+        AgvnSessionLog.event(noData ? "Phim trong game không mở được: cách đọc phim mới của Proton 9 không nhận được dữ"
+                + " liệu phim, như với mọi chương trình 32-bit"
+                : "Phim trong game không mở được (" + (kind != null ? kind : "định dạng Wine không tự giải mã")
                 + "): Wine cần bộ chuyển mã của Steam (protondemuxer), app không có");
-        Log.i(TAG, "movie not opened: " + undecoded);
+        Log.i(TAG, "movie not opened: " + (noData ? "no data (32-bit)" : undecoded));
         Shortcut s = activity.agvnShortcut();
         boolean old = s == null || !AgvnMediaFoundation.canReadOldWay(s);
-        String audio = AgvnMediaFoundation.audio(undecoded);
-        String shown = audio != null ? activity.getString(R.string.agvn_ui_agvn2_movie_audio, audio) : kind;
+        String audio = noData ? null : AgvnMediaFoundation.audio(undecoded);
+        String shown = noData ? activity.getString(R.string.agvn_movie_open_32bit)
+                : audio != null ? activity.getString(R.string.agvn_ui_agvn2_movie_audio, audio) : kind;
         String detail = activity.getString(R.string.agvn_movie_open_detail,
                 shown != null ? shown : activity.getString(R.string.agvn_movie_open_unknown))
                 + (old ? "" : "\n" + activity.getString(R.string.agvn_movie_open_old));

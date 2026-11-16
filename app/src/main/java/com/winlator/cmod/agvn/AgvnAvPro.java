@@ -32,6 +32,7 @@ public final class AgvnAvPro {
     public static void apply(EnvVars env, Shortcut shortcut) {
         String path = shortcut != null ? AgvnExeRedirect.toUnixPath(shortcut.path, shortcut.container) : null;
         apply(env, path != null ? dlls(new File(path)) : Collections.emptySet());
+        AgvnMedia32.apply(env, AgvnMedia32.applies(shortcut)); // a 32-bit game's movies open Wine's old way only
     }
 
     /** {@code dlls}: the AVPro plugins of the game, as {@link #dlls(File)} lists them. */

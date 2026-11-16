@@ -146,6 +146,7 @@
     <string name="agvn_movie_open_title">游戏中的视频无法打开</string>
     <string name="agvn_movie_open_detail">应用的 Wine 还无法打开游戏的一段视频（%1$s），所以游戏可能停在黑屏等视频播完。问题出在应用，不在游戏。</string>
     <string name="agvn_movie_open_unknown">Wine 暂时无法自行解码的格式</string>
+    <string name="agvn_movie_open_32bit">Wine 的新视频读取方式无法读取 32 位游戏的视频</string>
     <string name="agvn_movie_open_old">Wine 的旧视频解码方式能打开这类视频。选择“重新运行，用旧方式解码视频”：游戏会关闭并重新打开；未保存的进度将丢失。</string>
     <string name="agvn_movie_open_restart">重新运行，用旧方式解码视频</string>
     <string name="agvn_wine10_move">用新版 Wine 重新运行</string>

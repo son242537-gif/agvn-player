@@ -4134,3 +4134,72 @@ Báo cáo ngày 14/11/2026: 7 Girls War v1.02 (Kagura Games, VX Ace), máy POCO.
   1. Mở 7 Girls War bản gốc, không vá: vào được màn tiêu đề.
   2. Chơi tới minigame máy xèng: guồng dừng có tiếng.
   3. Gửi nhật ký: `tim-tep.txt` có dòng `Ruby 1.9: @@ trong "class << ..." (script ... 'プチスロット'`.
+
+## Game 32-bit không mở được phim nào: lỗi thunk của Proton 9 (bản 0.1.96)
+
+Báo cáo và nhật ký ngày 16/11/2026: I will purify you (Unity 2022.3.62f2 IL2CPP x86), POCO F8 Pro, app 0.1.93,
+proton-9.0-arm64ec, FEXCore.
+- **Triệu chứng:** sau splash, game đứng ở màn hình đen. `su-kien.txt`: "Màn hình đen tới giây 80 … không hỏi, game
+  đã hiện hình trước đó".
+
+- **Dấu vết:**
+  - `Player.log`: `WindowsVideoMedia error 0x80004001 … Creating DXGI DeviceManager` (app chủ ý tắt, xem
+    `AgvnMediaFoundation`), rồi `WindowsVideoMedia error 0xc00d36bb … CreateObjectFromByteStream`.
+  - Wine: `GStreamer-Base-CRITICAL: gst_type_find_helper_for_data_with_extension: assertion 'data != NULL' failed`, rồi
+    `wg_source.c:99:detect_caps_from_data: Failed to detect caps for url …Cheeseburger-CI_Ani.mp4, data 0x0, size
+    658352`. Số 658352 là dung lượng cả tệp phim.
+  - Bản game đã đổi phim sang WebM/VP8 cũng ra đúng hai dòng đó (`…Cheeseburger-CI_Ani.webm, data 0x0, size 568511`,
+    lúc 18:25 và 18:31). Unity vẫn đưa WebM qua Media Foundation trước, nên đổi định dạng không né được lỗi.
+- **Nguyên nhân: lỗi trong Proton 9, không phải trong game.**
+  - Trên Proton arm64ec, chương trình 32-bit gọi phần 64-bit của Wine qua các "thunk" (`wow64_…` trong
+    `dlls/winegstreamer/wg_parser.c`).
+  - Hai thunk của trình đọc phim mới (`wg_source.c`) khai thiếu trường:
+    - `wow64_wg_source_create` thiếu `file_size`;
+    - `wow64_wg_source_push_data` thiếu `offset`.
+  - Vì thiếu trường, phần 64-bit đọc lệch: con trỏ dữ liệu lấy từ chỗ đệm (bằng 0), kích thước lấy từ nửa thấp của
+    `file_size` (dung lượng tệp). Mã máy của `winegstreamer.so` trong gói app xác nhận: đọc dữ liệu ở vị trí 4 và kích
+    thước ở vị trí 8, trong khi chương trình 32-bit đặt chúng ở 16 và 20. Kết quả cũng bị ghi trả về sai chỗ.
+  - Vậy trình đọc mới không mở được **phim nào** cho **mọi** chương trình 32-bit. Proton trên Steam không gặp, vì ở đó
+    game 32-bit chạy bằng Wine 32-bit, không qua các thunk này.
+  - Mọi thunk của trình đọc cũ (`wg_parser`) đều khớp cấu trúc thật (đã so tự động từng cái với `unixlib.h` của nhánh
+    `experimental_9.0`). Wine gốc cũng dùng trình đọc này.
+- **Sửa (`AgvnMedia32`):**
+  - Game có exe 32-bit (PE32, không phải .NET "AnyCPU") chạy trên Proton 9 được đặt `WINE_OLD_MEDIA_SOURCE=1` lúc mở,
+    trừ khi biến đó đã được đặt (người chơi đặt `0` thì vẫn giữ cách mới).
+  - Không game đang chạy tốt nào bị ảnh hưởng: với game 32-bit, cách mới vốn không mở được phim nào. Game 64-bit giữ
+    cách mới. Proton 10 không có trình đọc mới, không đổi gì.
+  - `su-kien.txt`: "Game 32-bit trên Proton 9: đọc phim bằng cách cũ của Wine (WINE_OLD_MEDIA_SOURCE=1)…".
+  - Trường hợp còn sót (exe mở game là 64-bit nhưng game là 32-bit, hoặc biến đặt `0`): dòng `assertion 'data !=
+    NULL' failed` làm thanh "Phim trong game không mở được" hiện ra (`AgvnMovieWatch`), với nút "Chạy lại, đọc phim
+    cách cũ". "Tự sửa lỗi" có mục `movie-no-data` cho cùng dòng đó.
+- **Về màn hình đen của game này:** nhật ký không có lỗi nào của DXVK hay shader, và khung hình vẫn được đưa lên đều.
+  Ở cả bốn lượt thử A/B, phim đều hỏng theo đúng lỗi trên, nên các lượt đó chưa loại được lỗi phim. `Exclusive FS: 1`
+  trong log DXVK là dòng có ở mọi game (chế độ "được phép"), không phải dấu hiệu lỗi. Cần thử lại bằng 0.1.96 rồi mới
+  kết luận về đường vẽ URP.
+- **Thử máy:**
+  1. Mở I will purify you (bản gốc, phim H.264): logo hãng phát, game vào màn tiêu đề.
+  2. `moi-truong.txt` có `WINE_OLD_MEDIA_SOURCE=1`; `Player.log` không còn `CreateObjectFromByteStream`.
+  3. Một game Unity 64-bit có phim: vẫn phát như trước, `moi-truong.txt` không có biến đó.
+  4. Game 32-bit không có phim: chạy như trước.
+
+## `args` của agvn-profile.json sửa sau khi thêm game (bản 0.1.96)
+
+Cùng báo cáo: thêm `args` vào `agvn-profile.json` sau khi đã thêm game thì `moi-truong.txt` vẫn ghi "Tham số chạy:
+(không có)", trong khi `env` thêm cùng lúc được áp.
+
+- **Vì sao:** `AgvnProfileEnv` chỉ đọc lại `env` và `dllOverrides` mỗi lần mở game. `args` chỉ được chép vào game một
+  lần, lúc "Thêm game".
+- **Sửa (`AgvnProfileArgs`, gọi từ `AgvnProfileEnv.atLaunch`):** mỗi lần mở game, `args` của profile sửa sau cùng
+  cũng được đọc lại.
+  - Shortcut ghi `agvnProfileArgs`: những tham số profile đã cho lần trước (`()` nếu không cho tham số nào).
+  - Tham số profile cho bây giờ thay đúng phần nó đã cho trước đó; tham số người chơi hay "Tự sửa lỗi" thêm thì giữ.
+    Profile không đổi thì không đụng gì, kể cả khi người chơi đã xoá tham số của profile.
+  - Game thêm từ trước bản này chưa có ghi nhận đó. App không đoán:
+    - Có cả hai bản profile (trong thư mục game và bản sao của app): bản không được sửa sau cùng vẫn giữ tham số lúc
+      thêm game, nên app biết profile đổi gì và thay đúng phần đó.
+    - Chỉ có một bản: app chỉ thêm tham số của profile khi game chưa có tham số nào. Game đã có tham số thì giữ
+      nguyên; muốn áp profile mới thì dùng "Đặt lại" trong "Tự sửa lỗi" hoặc thêm lại game.
+  - Tham số có ký tự không an toàn bị từ chối như lúc thêm game (`AgvnProfileValidator.checkArgs`).
+  - `su-kien.txt`: "agvn-profile.json (…) đổi args từ khi thêm game, nay áp: …".
+- **Thử máy:** thêm `"args": ["-popupwindow"]` vào profile của một game đã thêm, mở game: `moi-truong.txt` ghi
+  "Tham số chạy của game: -popupwindow", và lệnh chạy Wine có tham số đó.

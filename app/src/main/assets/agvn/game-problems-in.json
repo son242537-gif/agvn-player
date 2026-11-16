@@ -80,6 +80,10 @@
       "title": "Wine tidak bisa membuka video dalam game",
       "cause": "Game memutar video (biasanya saat pergantian adegan) yang tidak bisa didekode sendiri oleh cara baca video baru Wine, paling sering video MP4 dengan audio MP3. Wine lalu butuh transcoder Steam, yang tidak ada di luar Steam, jadi video tidak terbuka dan game bisa tertahan di layar hitam menunggu video selesai. Masalahnya ada di Wine aplikasi, bukan di game. Cara baca video lama Wine bisa mendekode jenis video ini."
     },
+    "movie-no-data": {
+      "title": "Wine tidak bisa membuka video dalam game",
+      "cause": "Cara baru Wine membaca video tidak bisa membacanya untuk program 32-bit: Wine tidak menerima data videonya, jadi video tidak bisa dibuka dan game bisa berhenti di layar hitam menunggu video selesai. Masalahnya ada di Wine milik aplikasi, bukan di game. Cara lama Wine membaca video bisa membuka video ini."
+    },
     "deadlock": {
       "title": "Game terkunci (deadlock), membeku",
       "cause": "Thread-thread game saling menunggu tanpa akhir: satu thread memegang kunci tanpa melepasnya, thread utama menunggu kunci itu lebih dari 1 menit sehingga game membeku (biasanya saat memuat adegan, layar hitam). Ini bukan kerusakan data game: masalahnya ada di cara emulator CPU atau Wine menjalankan thread game di ponsel. Tiap perbaikan di bawah membuat game sedikit lebih lambat, jadi aplikasi hanya menyarankannya saat game terkunci."

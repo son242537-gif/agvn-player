@@ -189,7 +189,9 @@ public final class AgvnGameImporter {
 
     static void applyProfile(Shortcut shortcut, Candidate c, File profileCopy, LaunchPresetResolver.Effective eff) {
         AgvnProfile p = c.profile;
-        shortcut.putExtra("execArgs", String.join(" ", p.args));
+        String args = AgvnProfileArgs.given(p);
+        shortcut.putExtra("execArgs", args);
+        shortcut.putExtra(AgvnProfileArgs.EXTRA, AgvnProfileArgs.record(args)); // a later edit replaces these
         File exeDir = new File(c.gameDir, c.exe).getParentFile();
         String dlls = GameDllOverrides.build(GameDllOverrides.detect(exeDir), p.dllOverrides);
         shortcut.putExtra("envVars", buildEnvVars(p.env, dlls));

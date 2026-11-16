@@ -146,6 +146,7 @@
     <string name="agvn_movie_open_title">A movie in the game can\'t open</string>
     <string name="agvn_movie_open_detail">The app\'s Wine can\'t open one of the game\'s movies (%1$s), so the game may sit on a black screen waiting for it to finish. The problem is in the app, not the game.</string>
     <string name="agvn_movie_open_unknown">a format Wine can\'t decode by itself yet</string>
+    <string name="agvn_movie_open_32bit">Wine\'s new way of reading movies can\'t read them for a 32-bit game</string>
     <string name="agvn_movie_open_old">Wine\'s old way of reading movies can open this kind. Pick \"Restart, read movies the old way\": the game closes and reopens; unsaved progress will be lost.</string>
     <string name="agvn_movie_open_restart">Restart, read movies the old way</string>
     <string name="agvn_wine10_move">Restart with the new Wine</string>

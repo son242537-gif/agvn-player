@@ -145,6 +145,7 @@
     <string name="agvn_movie_open_title">Hindi mabuksan ang video sa game</string>
     <string name="agvn_movie_open_detail">Hindi pa mabuksan ng Wine ng app ang isang video ng game (%1$s), kaya puwedeng matigil ang game sa itim na screen habang hinihintay matapos ang video. Nasa app ang problema, hindi sa game.</string>
     <string name="agvn_movie_open_unknown">format na hindi pa kusang ma-decode ng Wine</string>
+    <string name="agvn_movie_open_32bit">hindi mabasa ng bagong paraan ng Wine ang video ng 32-bit na game</string>
     <string name="agvn_movie_open_old">Kaya ng lumang paraan ng Wine sa pagbasa ng video ang ganitong video. Piliin ang \"Patakbuhin ulit, lumang paraan ng video\": magsasara at magbubukas ulit ang game; mawawala ang hindi pa na-save na laro.</string>
     <string name="agvn_movie_open_restart">Patakbuhin ulit, lumang paraan ng video</string>
     <string name="agvn_wine10_move">Patakbuhin ulit sa bagong Wine</string>

@@ -80,6 +80,10 @@
       "title": "Wine can't open a movie in the game",
       "cause": "The game plays a movie (usually between scenes) that Wine's new way of reading movies can't decode by itself, most often an MP4 movie with MP3 audio. Wine then needs Steam's transcoder, which isn't there outside Steam, so the movie doesn't open and the game may sit on a black screen waiting for it to finish. The problem is in the app's Wine, not in the game. Wine's old way of reading movies can decode this kind."
     },
+    "movie-no-data": {
+      "title": "Wine can't open a movie in the game",
+      "cause": "Wine's new way of reading movies can't read them for a 32-bit program: it gets none of the movie's data, so the movie doesn't open and the game may sit on a black screen waiting for it to finish. The problem is in the app's Wine, not in the game. Wine's old way of reading movies can open this movie."
+    },
     "deadlock": {
       "title": "The game is deadlocked and frozen",
       "cause": "The game's threads wait for each other forever: one thread holds a lock and never releases it, and the main thread waits for that lock for over 1 minute, so the game freezes (often while loading a scene, on a black screen). This isn't a game data problem: it's in how the CPU emulator or Wine runs the game's threads on the phone. Each fix below makes the game a bit slower, so the app only offers them when the game is deadlocked."

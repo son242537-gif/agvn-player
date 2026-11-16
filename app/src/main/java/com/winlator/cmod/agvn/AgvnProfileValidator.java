@@ -29,10 +29,7 @@ public final class AgvnProfileValidator {
             throw new AgvnProfileException("Tên game (name) dài " + name.length() + " ký tự, tối đa 80: " + name);
         p.name = name;
 
-        for (String arg : p.args) {
-            if (arg == null || !SAFE_VALUE.matcher(arg).matches())
-                throw new AgvnProfileException("Tham số chạy (args) có ký tự không an toàn: " + arg);
-        }
+        checkArgs(p);
         checkEnv(p);
         checkResolution(p.resolution);
         checkFps(p.fpsLimit);
@@ -94,6 +91,14 @@ public final class AgvnProfileValidator {
     }
 
     /** The env and dllOverrides rules alone (AgvnProfileEnv reads them again at each start). */
+    /** The profile's args: each one of safe characters only (read again at each start, AgvnProfileEnv). */
+    static void checkArgs(AgvnProfile p) throws AgvnProfileException {
+        for (String arg : p.args) {
+            if (arg == null || !SAFE_VALUE.matcher(arg).matches())
+                throw new AgvnProfileException("Tham số chạy (args) có ký tự không an toàn: " + arg);
+        }
+    }
+
     static void checkEnv(AgvnProfile p) throws AgvnProfileException {
         for (Map.Entry<String, String> e : p.env.entrySet()) {
             if (!ENV_KEY.matcher(e.getKey()).matches() || e.getValue() == null || !SAFE_VALUE.matcher(e.getValue()).matches())

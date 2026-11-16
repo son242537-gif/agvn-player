@@ -19,6 +19,7 @@ import java.util.Objects;
  * game's variables once; a game maker who then set WINEDEBUG in the profile, in the game folder and in
  * profiles/&lt;folder&gt;, saw no change in moi-truong.txt (SRPG Studio, 06/11/2026). At each start the profile edited
  * last is read again, and what it gives now replaces what it gave before; what the player or a Doctor fix set stays.
+ * Its args are read again with them ({@link AgvnProfileArgs}).
  */
 public final class AgvnProfileEnv {
     private static final String TAG = "AGVN";
@@ -41,24 +42,33 @@ public final class AgvnProfileEnv {
         try {
             String dir = s.getExtra(AgvnGameImporter.EXTRA_GAME_DIR);
             String copy = s.getExtra(AgvnGameImporter.EXTRA_PROFILE_PATH);
-            file = edited(dir.isEmpty() ? null : new File(dir, AgvnProfile.FILE_NAME),
-                    copy.isEmpty() ? null : new File(copy));
+            File inGame = dir.isEmpty() ? null : new File(dir, AgvnProfile.FILE_NAME);
+            File own = copy.isEmpty() ? null : new File(copy);
+            file = edited(inGame, own);
             if (file == null) return;
             AgvnProfile p = AgvnProfile.parse(FileUtils.readString(file));
             AgvnProfileValidator.checkEnv(p);
-            String now = given(p), before = s.getExtra(EXTRA);
-            if (now.equals(before)) return;
-            String env = s.getExtra("envVars"), after = apply(env, before, now);
-            s.putExtra("envVars", after.isEmpty() ? null : after);
-            s.putExtra(EXTRA, now.isEmpty() ? null : now);
+            AgvnProfileValidator.checkArgs(p);
+            String said = null, now = given(p), before = s.getExtra(EXTRA);
+            boolean save = !now.equals(before);
+            if (save) {
+                String env = s.getExtra("envVars"), after = apply(env, before, now);
+                s.putExtra("envVars", after.isEmpty() ? null : after);
+                s.putExtra(EXTRA, now.isEmpty() ? null : now);
+                if (!after.equals(env)) {
+                    said = "đổi env/dllOverrides từ khi thêm game, nay áp: " + (now.isEmpty() ? "(không có)" : now);
+                }
+            }
+            String args = AgvnProfileArgs.atLaunch(s, p, file == inGame ? own : inGame);
+            if (args != null && !args.isEmpty()) said = (said == null ? "" : said + " · ") + args;
+            if (!save && args == null) return;
             s.saveData();
-            if (!after.equals(env)) {
-                note = "agvn-profile.json (" + file.getPath() + ") đổi env/dllOverrides từ khi thêm game, nay áp: "
-                        + (now.isEmpty() ? "(không có)" : now);
+            if (said != null) {
+                note = "agvn-profile.json (" + file.getPath() + ") " + said;
                 Log.i(TAG, s.name + ": " + note);
             }
         } catch (AgvnProfileException e) {
-            note = "agvn-profile.json (" + file.getPath() + ") không áp được env/dllOverrides: " + e.getMessage();
+            note = "agvn-profile.json (" + file.getPath() + ") không áp được env/dllOverrides/args: " + e.getMessage();
         } catch (RuntimeException e) {
             Log.w(TAG, "profile variables not rechecked", e);
         }

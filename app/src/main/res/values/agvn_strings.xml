@@ -146,6 +146,7 @@
     <string name="agvn_movie_open_title">Phim trong game không mở được</string>
     <string name="agvn_movie_open_detail">Wine của app chưa mở được một phim của game (%1$s), nên game có thể đứng ở màn hình đen chờ phim chạy xong. Lỗi nằm ở app, không phải ở game.</string>
     <string name="agvn_movie_open_unknown">định dạng Wine chưa tự giải mã được</string>
+    <string name="agvn_movie_open_32bit">cách đọc phim mới của Wine không đọc được phim cho game 32-bit</string>
     <string name="agvn_movie_open_old">Cách đọc phim cũ của Wine mở được loại phim này. Chọn \"Chạy lại, đọc phim cách cũ\": game tắt rồi mở lại; phần chơi chưa lưu sẽ mất.</string>
     <string name="agvn_movie_open_restart">Chạy lại, đọc phim cách cũ</string>
     <string name="agvn_wine10_move">Chạy lại bằng Wine mới</string>

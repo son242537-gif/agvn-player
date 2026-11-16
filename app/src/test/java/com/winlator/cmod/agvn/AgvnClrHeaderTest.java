@@ -73,4 +73,15 @@ public class AgvnClrHeaderTest {
         assertTrue(AgvnClrHeader.runs64(exe("Game64.exe", 0x8664, 0x20b, AgvnClrHeader.IL_ONLY)));
         assertTrue(AgvnClrHeader.runs64(exe("Native64.exe", 0x8664, 0x20b, -1)));
     }
+
+    /** Proton 9's new media source opens no movie for a 32-bit program (AgvnMedia32). */
+    @Test
+    public void aThirtyTwoBitGameIsOneWineRunsSo() throws Exception {
+        assertTrue(AgvnMedia32.thirtyTwo(exe("Unity32.exe", 0x14c, 0x10b, -1)));
+        assertTrue(".NET that asks for 32-bit", AgvnMedia32.thirtyTwo(exe("Net32.exe", 0x14c, 0x10b,
+                AgvnClrHeader.IL_ONLY | AgvnClrHeader.REQUIRES_32)));
+        assertFalse("AnyCPU runs 64-bit", AgvnMedia32.thirtyTwo(exe("Any.exe", 0x14c, 0x10b, AgvnClrHeader.IL_ONLY)));
+        assertFalse(AgvnMedia32.thirtyTwo(exe("Unity64.exe", 0x8664, 0x20b, -1)));
+        assertFalse("no exe", AgvnMedia32.thirtyTwo(new File(tmp.getRoot(), "none.exe")));
+    }
 }

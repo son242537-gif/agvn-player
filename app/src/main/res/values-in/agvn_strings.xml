@@ -146,6 +146,7 @@
     <string name="agvn_movie_open_title">Video dalam game tidak bisa dibuka</string>
     <string name="agvn_movie_open_detail">Wine di aplikasi belum bisa membuka salah satu video game (%1$s), jadi game bisa tertahan di layar hitam menunggu video selesai. Masalahnya ada di aplikasi, bukan di game.</string>
     <string name="agvn_movie_open_unknown">format yang belum bisa didekode Wine</string>
+    <string name="agvn_movie_open_32bit">cara baru Wine membaca video tidak bisa membacanya untuk game 32-bit</string>
     <string name="agvn_movie_open_old">Cara lama Wine membaca video bisa membuka jenis video ini. Pilih \"Jalankan ulang, baca video cara lama\": game ditutup lalu dibuka lagi; progres yang belum disimpan akan hilang.</string>
     <string name="agvn_movie_open_restart">Jalankan ulang, baca video cara lama</string>
     <string name="agvn_wine10_move">Jalankan ulang dengan Wine baru</string>

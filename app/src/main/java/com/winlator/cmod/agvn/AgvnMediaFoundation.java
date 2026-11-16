@@ -29,7 +29,8 @@ import com.winlator.cmod.core.EnvVars;
  * movie that never came ("WindowsVideoMedia error 0xc00d36bb ... CreateObjectFromByteStream"). Wine's old media source
  * (decodebin, which puts mpegaudioparse first) plays it; WINE_OLD_MEDIA_SOURCE=1 picks it ("media-old"), offered only
  * to a game whose movie failed so ({@link AgvnMovieWatch}, game-problems.json "movie-transcode"), and only on Proton 9:
- * Proton 10's winegstreamer has neither the switch nor this way of failing.
+ * Proton 10's winegstreamer has neither the switch nor this way of failing. A 32-bit game reads the old way from the
+ * start: the new source opens no movie for it ({@link AgvnMedia32}).
  *
  * <p>AVPro Video (RenderHeads), a Unity plugin, plays through Media Foundation's Media Engine. With hardware decoding,
  * its default, it hands the engine a DXGI device manager it creates itself; with the switch on, Wine's
@@ -65,11 +66,14 @@ public final class AgvnMediaFoundation {
         }
     }
 
-    /** True when the game reads movies the old way: WINE_OLD_MEDIA_SOURCE set to a number but 0, as Wine reads it. */
+    /**
+     * True when the game reads movies the old way: WINE_OLD_MEDIA_SOURCE set to a number but 0, as Wine reads it; not
+     * set, a 32-bit game on Proton 9 does ({@link AgvnMedia32}).
+     */
     static boolean oldSource(Shortcut s) {
         EnvVars env = new EnvVars(s.container.getEnvVars());
         env.putAll(s.getExtra("envVars"));
-        return oldSource(env.has(OLD_MEDIA_SOURCE) ? env.get(OLD_MEDIA_SOURCE) : null);
+        return env.has(OLD_MEDIA_SOURCE) ? oldSource(env.get(OLD_MEDIA_SOURCE)) : AgvnMedia32.applies(s);
     }
 
     /** Wine's own test: getenv("WINE_OLD_MEDIA_SOURCE") and atoi() of it. */
