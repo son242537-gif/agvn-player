@@ -83,4 +83,17 @@ public class AgvnMouseLookTest {
         look.move(620, 270);
         assertEquals("a drag turned the camera", null, look.takePress());
     }
+
+    @Test
+    public void aFingerThatTurnsTheCameraThroughAgvnLookIsATapOnlyWhileItBarelyMoves() {
+        AgvnMouseLook look = new AgvnMouseLook(() -> true, () -> 0L);
+        com.winlator.cmod.xserver.Pointer.Button left = com.winlator.cmod.xserver.Pointer.Button.BUTTON_LEFT;
+        look.reported(AgvnMouseLook.LOCKED);
+        assertTrue(look.pressLater(left));
+        for (int i = 0; i < 40; i++) look.moved(0.4f, 27); // 16 px of a shaking finger, in small steps
+        assertEquals("a tap", left, look.takePress());
+        assertTrue(look.pressLater(left));
+        for (int i = 0; i < 40; i++) look.moved(1.5f, 27); // 60 px
+        assertEquals("a drag: nothing clicked", null, look.takePress());
+    }
 }

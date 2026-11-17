@@ -433,4 +433,15 @@
     <string name="agvn_html_picture_title">游戏缺少界面图片</string>
     <string name="agvn_html_picture_detail">无法读取 %1$s（%2$s），游戏的部分按钮或边框可能无法显示。请检查游戏文件夹是否已完整复制。</string>
     <string name="agvn_html_picture_access">应用还没有“所有文件访问权限”：请在 Android 设置中为 AGVN Player 授予此权限。</string>
+    <!-- 3D camera: speed, up and down, gyroscope, per game (agvn/AgvnCameraDialog, agvn/AgvnLookControl) -->
+    <string name="agvn_camera_title">3D 视角</string>
+    <string name="agvn_camera_speed">转动灵敏度</string>
+    <string name="agvn_camera_vertical">上下（相对左右）</string>
+    <string name="agvn_camera_gyro">倾斜手机转动（陀螺仪）</string>
+    <string name="agvn_camera_gyro_speed">陀螺仪灵敏度</string>
+    <string name="agvn_camera_no_gyro">此手机没有陀螺仪</string>
+    <string name="agvn_camera_note">用于用鼠标转动视角的游戏：滑动屏幕（游戏锁定鼠标时）、视角摇杆、视角区域以及Bắn/Ngắm（开火/瞄准）按钮。仅为此游戏保存。</string>
+    <string name="agvn_camera_default">默认</string>
+    <string name="agvn_camera_done">完成</string>
+    <string name="agvn_camera_on_drag">拖动时转动视角</string>
 </resources>

@@ -86,6 +86,7 @@ public class ControlElement {
     private ColorFilter themeColorFilter = null;
     private int themeColorFilterColor = 1; 
     private boolean mouseMoveMode = false;
+    private com.winlator.cmod.agvn.AgvnLookControl agvnLook; // AGVN: turns the camera as it is dragged, when set
     private String customIconPath = null;
     private Bitmap customIconBitmap = null;
     private int currentPointerId = -1;
@@ -208,6 +209,15 @@ public class ControlElement {
 
     public void setMouseMoveMode(boolean mouseMoveMode) {
         this.mouseMoveMode = mouseMoveMode;
+    }
+
+    /** AGVN: "Xoay camera khi kéo": a button or a trackpad that turns the camera as it is dragged (agvn/AgvnLookControl). */
+    public boolean isAgvnLook() {
+        return agvnLook != null;
+    }
+
+    public void setAgvnLook(boolean on) {
+        if (on != (agvnLook != null)) agvnLook = on ? new com.winlator.cmod.agvn.AgvnLookControl() : null;
     }
 
     public String getCustomIconPath() {
@@ -839,6 +849,7 @@ public class ControlElement {
             if (opacity != 1.0f) elementJSONObject.put("opacity", opacity);
             if (customColor != 0) elementJSONObject.put("customColor", customColor);
             if (mouseMoveMode) elementJSONObject.put("mouseMoveMode", true);
+            if (agvnLook != null) elementJSONObject.put("agvnLook", true); // AGVN
             if (customIconPath != null) elementJSONObject.put("customIconPath", customIconPath);
 
             if (type == Type.RANGE_BUTTON && range != null) {
@@ -879,6 +890,7 @@ public class ControlElement {
                     invalidateSelf();
                     return true;
                 }
+                if (agvnLook != null) agvnLook.down(x, y); // AGVN
                 if (isKeepButtonPressedAfterMinTime()) touchTime = System.currentTimeMillis();
                 if (!toggleSwitch || !selected) {
                     setButtonBindingsActive(true);
@@ -895,6 +907,7 @@ public class ControlElement {
                 if (type == Type.TRACKPAD) {
                     if (currentPosition == null) currentPosition = new PointF();
                     currentPosition.set(x, y);
+                    if (agvnLook != null) agvnLook.down(x, y); // AGVN
                 }
                 return handleTouchMove(pointerId, x, y);
             }
@@ -913,6 +926,10 @@ public class ControlElement {
     public boolean handleTouchMove(int pointerId, float x, float y) {
         if (pointerId == currentPointerId && type == Type.BUTTON && mouseMoveMode) {
             inputControlsView.getTouchpadView().mouseMove(x, y, MotionEvent.ACTION_MOVE);
+            return true;
+        }
+        else if (pointerId == currentPointerId && agvnLook != null && (type == Type.BUTTON || type == Type.TRACKPAD)) {
+            agvnLook.move(inputControlsView, x, y); // AGVN: the camera turns with the finger
             return true;
         }
         else if (pointerId == currentPointerId && (type == Type.D_PAD || type == Type.STICK || type == Type.TRACKPAD)) {
@@ -986,6 +1003,12 @@ public class ControlElement {
                         boolean direction = i == 0 ? up : i == 1 ? right : i == 2 ? down : left;
                         boolean opposite = i == 0 ? down : i == 1 ? left : i == 2 ? up : right;
                         boolean state = binding.isMouseMove() ? (direction || opposite) : direction;
+                        if (binding.isMouseMove()) {
+                            // AGVN: the mouse goes the stick's own way, diagonals too, past a round dead zone
+                            boolean out = deltaX * deltaX + deltaY * deltaY > STICK_DEAD_ZONE * STICK_DEAD_ZONE;
+                            value = out ? (i == 1 || i == 3 ? deltaX : deltaY) : 0;
+                            state = value != 0;
+                        }
                         if (binding.isMouseMove() || states[i] != state) {
                             inputControlsView.handleInputEvent(binding, state, value);
                         }
@@ -1119,6 +1142,7 @@ public class ControlElement {
 
     public boolean handleTouchUp(int pointerId) {
         if (pointerId == currentPointerId) {
+            if (type == Type.TRACKPAD && agvnLook != null) agvnLook.tapUp(inputControlsView); // AGVN: a tap clicks there
             if (type == Type.BUTTON) {
                 if (mouseMoveMode) {
                     inputControlsView.getTouchpadView().mouseMove(0, 0, MotionEvent.ACTION_UP);

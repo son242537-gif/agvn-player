@@ -433,4 +433,15 @@
     <string name="agvn_html_picture_title">The game is missing interface images</string>
     <string name="agvn_html_picture_detail">Could not read %1$s (%2$s), so some of the game\'s buttons or frames may not show. Check that the whole game folder was copied.</string>
     <string name="agvn_html_picture_access">The app doesn\'t have All files access yet: give AGVN Player this permission in Android Settings.</string>
+    <!-- 3D camera: speed, up and down, gyroscope, per game (agvn/AgvnCameraDialog, agvn/AgvnLookControl) -->
+    <string name="agvn_camera_title">3D camera</string>
+    <string name="agvn_camera_speed">Turn sensitivity</string>
+    <string name="agvn_camera_vertical">Up and down (beside sideways)</string>
+    <string name="agvn_camera_gyro">Tilt the phone to turn (gyroscope)</string>
+    <string name="agvn_camera_gyro_speed">Gyroscope sensitivity</string>
+    <string name="agvn_camera_no_gyro">This phone has no gyroscope</string>
+    <string name="agvn_camera_note">For games that turn the camera with the mouse: swipes (while the game holds the mouse), the camera stick, the camera zone and the Bắn/Ngắm (fire/aim) buttons. Kept for this game only.</string>
+    <string name="agvn_camera_default">Default</string>
+    <string name="agvn_camera_done">Done</string>
+    <string name="agvn_camera_on_drag">Turn the camera when dragged</string>
 </resources>

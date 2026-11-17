@@ -527,7 +527,6 @@ public class InputControlsView extends View {
             return;
         }
         if (xServer == null || profile == null || mouseMoveTimer != null) return;
-        WinHandler winHandler = xServer.getWinHandler();
         {
             final float cursorSpeed = profile.getCursorSpeed();
             mouseMoveTimer = new Timer();
@@ -535,13 +534,9 @@ public class InputControlsView extends View {
                 @Override
                 public void run() {
                     if (mouseMoveOffset.x != 0 || mouseMoveOffset.y != 0) {// Only move if there's an offset
-                        if (xServer.isRelativeMouseMovement())
-                            winHandler.mouseEvent(MouseEventFlags.MOVE, (int) (mouseMoveOffset.x * cursorSpeed * 10), (int) (mouseMoveOffset.y * cursorSpeed * 10), 0);
-                        else
-                            xServer.injectPointerMoveDelta(
-                                (int) (mouseMoveOffset.x * cursorSpeed * 10),
-                                (int) (mouseMoveOffset.y * cursorSpeed * 10)
-                            );
+                        // AGVN: while the game holds the cursor the camera turns slowly near the stick's centre and
+                        // fast at its rim, at the player's speed; the cursor moves as it did, no part of a step lost
+                        xServer.agvnLook.stick(mouseMoveOffset.x, mouseMoveOffset.y, cursorSpeed, 1f / 60);
                     }
                 }
             }, 0, 1000 / 60); // 60 FPS

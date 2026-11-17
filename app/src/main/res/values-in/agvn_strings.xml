@@ -433,4 +433,15 @@
     <string name="agvn_html_picture_title">Game kekurangan gambar antarmuka</string>
     <string name="agvn_html_picture_detail">Tidak bisa membaca %1$s (%2$s), jadi beberapa tombol atau bingkai game mungkin tidak tampil. Pastikan folder game sudah disalin lengkap.</string>
     <string name="agvn_html_picture_access">Aplikasi belum punya izin Akses semua file: berikan izin ini untuk AGVN Player di Setelan Android.</string>
+    <!-- 3D camera: speed, up and down, gyroscope, per game (agvn/AgvnCameraDialog, agvn/AgvnLookControl) -->
+    <string name="agvn_camera_title">Kamera 3D</string>
+    <string name="agvn_camera_speed">Sensitivitas putar</string>
+    <string name="agvn_camera_vertical">Atas-bawah (dibanding samping)</string>
+    <string name="agvn_camera_gyro">Miringkan ponsel untuk memutar (giroskop)</string>
+    <string name="agvn_camera_gyro_speed">Sensitivitas giroskop</string>
+    <string name="agvn_camera_no_gyro">Ponsel ini tidak punya giroskop</string>
+    <string name="agvn_camera_note">Untuk game yang memutar kamera dengan mouse: usapan layar (saat game menahan mouse), stik kamera, zona kamera, dan tombol Bắn/Ngắm (tembak/bidik). Disimpan hanya untuk game ini.</string>
+    <string name="agvn_camera_default">Bawaan</string>
+    <string name="agvn_camera_done">Selesai</string>
+    <string name="agvn_camera_on_drag">Putar kamera saat diseret</string>
 </resources>

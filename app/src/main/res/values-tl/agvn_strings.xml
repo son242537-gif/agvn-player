@@ -420,4 +420,15 @@
     <string name="agvn_html_picture_title">Kulang ang larawan ng interface ng game</string>
     <string name="agvn_html_picture_detail">Hindi mabasa ang %1$s (%2$s), kaya maaaring hindi lumabas ang ilang button o frame ng game. Tingnan kung kumpleto ang nakopyang folder ng game.</string>
     <string name="agvn_html_picture_access">Wala pang permisong Access sa lahat ng file ang app: ibigay ang permisong ito sa AGVN Player sa Android Settings.</string>
+    <!-- 3D camera: speed, up and down, gyroscope, per game (agvn/AgvnCameraDialog, agvn/AgvnLookControl) -->
+    <string name="agvn_camera_title">3D camera</string>
+    <string name="agvn_camera_speed">Bilis ng pag-ikot</string>
+    <string name="agvn_camera_vertical">Taas-baba (kumpara sa gilid)</string>
+    <string name="agvn_camera_gyro">Ikiling ang phone para umikot (gyroscope)</string>
+    <string name="agvn_camera_gyro_speed">Bilis ng gyroscope</string>
+    <string name="agvn_camera_no_gyro">Walang gyroscope ang phone na ito</string>
+    <string name="agvn_camera_note">Para sa mga larong umiikot ang camera gamit ang mouse: pag-swipe (habang hawak ng laro ang mouse), camera stick, camera zone at mga button na Bắn/Ngắm (fire/aim). Para sa larong ito lang.</string>
+    <string name="agvn_camera_default">Default</string>
+    <string name="agvn_camera_done">Tapos</string>
+    <string name="agvn_camera_on_drag">Iikot ang camera kapag hinila</string>
 </resources>

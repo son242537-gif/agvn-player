@@ -132,6 +132,8 @@ public class TouchpadView extends View {
     private class Finger {
         private int x;
         private int y;
+        // AGVN: where the finger is on the screen, now and at the last move, for the camera (agvn/AgvnLook)
+        private float screenX, screenY, screenLastX, screenLastY;
         private final int startX;
         private final int startY;
         private int lastX;
@@ -143,11 +145,17 @@ public class TouchpadView extends View {
             this.x = this.startX = this.lastX = (int)transformedPoint[0];
             this.y = this.startY = this.lastY = (int)transformedPoint[1];
             touchTime = System.currentTimeMillis();
+            screenX = screenLastX = x; // AGVN
+            screenY = screenLastY = y;
         }
 
         public void update(float x, float y) {
             lastX = this.x;
             lastY = this.y;
+            screenLastX = screenX; // AGVN
+            screenLastY = screenY;
+            screenX = x;
+            screenY = y;
             float[] transformedPoint = XForm.transformPoint(xform, x, y);
             this.x = (int)transformedPoint[0];
             this.y = (int)transformedPoint[1];
@@ -337,10 +345,14 @@ public class TouchpadView extends View {
                 fingers[pointerId] = new Finger(event.getX(actionIndex), event.getY(actionIndex));
                 numFingers = countFingers();
                 if (simTouchScreen) {
+                    final Finger agvnFinger = fingers[pointerId]; // AGVN
                     final Runnable clickDelay = () -> {
                         if (continueClick) {
-                            xServer.injectPointerMove(lastTouchedPosX, lastTouchedPosY);
-                            agvnPress(Pointer.Button.BUTTON_LEFT);
+                            // AGVN: while the game holds the cursor the finger turns the camera: the pointer stays, and
+                            // a finger that already swept it (a flick quicker than this delay) clicks nothing (agvn/AgvnLook)
+                            boolean held = xServer.agvnMouseLook.locked();
+                            if (!held) xServer.injectPointerMove(lastTouchedPosX, lastTouchedPosY);
+                            if (!held || agvnFinger.travelDistance() <= agvnTapSlop()) agvnPress(Pointer.Button.BUTTON_LEFT);
                         }
                     };
                     if (pointerId == 0) {
@@ -486,6 +498,11 @@ public class TouchpadView extends View {
         if (!xServer.agvnMouseLook.pressLater(button)) xServer.injectPointerButtonPress(button);
     }
 
+    /** AGVN: the farthest a tap moves in the X screen's pixels, as agvn/AgvnMouseLook's: a 40th of its short side. */
+    private int agvnTapSlop() {
+        return Math.max(8, Math.min(xServer.screenInfo.width, xServer.screenInfo.height) / 40);
+    }
+
     /** AGVN: the finger lifted: the press it held back, if it was a tap. */
     private void agvnTapPress() {
         Pointer.Button button = xServer.agvnMouseLook.takePress();
@@ -538,7 +555,7 @@ public class TouchpadView extends View {
                 Finger finger2 = findSecondFinger(finger1);
                 if (finger2 != null && finger1.isTap()) {
                     // AGVN: with the simulated touchscreen the cursor is not under the fingers, so right-click between them
-                    if (simTouchScreen) xServer.injectPointerMove((finger1.x + finger2.x) / 2, (finger1.y + finger2.y) / 2);
+                    if (simTouchScreen && !xServer.agvnMouseLook.locked()) xServer.injectPointerMove((finger1.x + finger2.x) / 2, (finger1.y + finger2.y) / 2);
                     pressPointerButtonRight(finger1);
                 }
                 break;
@@ -557,6 +574,9 @@ public class TouchpadView extends View {
     }
 
     private void handleFingerMove(Finger finger1) {
+        // AGVN: while the game holds the cursor every finger turns the camera, at once and at the player's speed, and
+        // a second finger is no scroll or click that stops it (agvn/AgvnLook)
+        if (xServer.agvnLook.finger(finger1.screenX - finger1.screenLastX, finger1.screenY - finger1.screenLastY, getWidth(), getHeight())) return;
         boolean skipPointerMove = false;
 
         Finger finger2 = numFingers == 2 ? findSecondFinger(finger1) : null;
@@ -600,6 +620,17 @@ public class TouchpadView extends View {
             }
             else xServer.injectPointerMoveDelta(dx, dy);
         }
+    }
+
+    /**
+     * AGVN: a tap at (x, y) of the screen on a camera zone (agvn/AgvnLookControl): a click there, as a tap off the
+     * controls makes.
+     */
+    public void agvnTapAt(float x, float y) {
+        float[] point = XForm.transformPoint(xform, x, y);
+        if (!xServer.agvnMouseLook.locked()) xServer.injectPointerMove((int)point[0], (int)point[1]);
+        xServer.injectPointerButtonPress(Pointer.Button.BUTTON_LEFT);
+        postDelayed(() -> xServer.injectPointerButtonRelease(Pointer.Button.BUTTON_LEFT), 30);
     }
 
     private Finger findSecondFinger(Finger finger) {

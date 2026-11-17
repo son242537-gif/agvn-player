@@ -246,6 +246,7 @@ public class ControlsProfile implements Comparable<ControlsProfile> {
                 if (elementJSONObject.has("opacity")) element.setOpacity((float)elementJSONObject.getDouble("opacity"));
                 if (elementJSONObject.has("customColor")) element.setCustomColor(elementJSONObject.getInt("customColor"));
                 if (elementJSONObject.has("mouseMoveMode")) element.setMouseMoveMode(elementJSONObject.getBoolean("mouseMoveMode"));
+                if (elementJSONObject.has("agvnLook")) element.setAgvnLook(elementJSONObject.getBoolean("agvnLook")); // AGVN: turns the camera as dragged
                 if (elementJSONObject.has("customIconPath")) element.setCustomIconPath(elementJSONObject.getString("customIconPath"));
 
                 boolean hasGamepadBinding = true;

@@ -53,7 +53,7 @@ public final class AgvnMouseLook {
     private boolean warpHeld;
     /** A finger's press waiting to know whether it is a tap or a drag ({@link #pressLater}), and how far it went. */
     private Pointer.Button heldPress;
-    private int travel;
+    private float travel;
 
     public AgvnMouseLook(XServer xServer) {
         this.xServer = xServer;
@@ -128,6 +128,11 @@ public final class AgvnMouseLook {
         return button;
     }
 
+    /** A finger holding a press turned the camera by {@code px} screen pixels (AgvnLook): past {@code slop}, no tap. */
+    synchronized void moved(float px, int slop) {
+        if (heldPress != null && (travel += px) > slop) heldPress = null;
+    }
+
     /** The farthest a tap moves, in the X screen's pixels: a 40th of its short side. */
     private int tapSlop() {
         if (xServer == null) return 16;
@@ -176,7 +181,7 @@ public final class AgvnMouseLook {
         dragging = false;
     }
 
-    private void by(int dx, int dy) {
+    synchronized void by(int dx, int dy) { // also AgvnLook
         if (xServer == null) return; // the tests
         WinHandler winHandler = xServer.getWinHandler();
         boolean sendInput = winHandler != null && winHandler.agvnRelativeReady();

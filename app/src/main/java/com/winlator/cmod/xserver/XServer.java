@@ -40,6 +40,7 @@ public class XServer {
     private final com.winlator.cmod.agvn.AgvnInputHold inputHold = new com.winlator.cmod.agvn.AgvnInputHold(); // AGVN: taps the game sees
     public final com.winlator.cmod.agvn.AgvnRawMouse agvnRawMouse = new com.winlator.cmod.agvn.AgvnRawMouse(this); // AGVN: raw input
     public final com.winlator.cmod.agvn.AgvnMouseLook agvnMouseLook = new com.winlator.cmod.agvn.AgvnMouseLook(this); // AGVN: camera drag
+    public final com.winlator.cmod.agvn.AgvnLook agvnLook = new com.winlator.cmod.agvn.AgvnLook(this); // AGVN: camera speed
     public final InputDeviceManager inputDeviceManager;
     public final GrabManager grabManager;
     public final CursorLocker cursorLocker;

@@ -433,4 +433,15 @@
     <string name="agvn_html_picture_title">เกมขาดภาพของอินเทอร์เฟซ</string>
     <string name="agvn_html_picture_detail">อ่าน %1$s ไม่ได้ (%2$s) ปุ่มหรือกรอบบางส่วนของเกมจึงอาจไม่แสดง โปรดตรวจสอบว่าคัดลอกโฟลเดอร์เกมครบแล้ว</string>
     <string name="agvn_html_picture_access">แอปยังไม่มีสิทธิ์เข้าถึงไฟล์ทั้งหมด: โปรดให้สิทธิ์นี้แก่ AGVN Player ในการตั้งค่า Android</string>
+    <!-- 3D camera: speed, up and down, gyroscope, per game (agvn/AgvnCameraDialog, agvn/AgvnLookControl) -->
+    <string name="agvn_camera_title">กล้อง 3D</string>
+    <string name="agvn_camera_speed">ความไวการหมุน</string>
+    <string name="agvn_camera_vertical">ขึ้นลง (เทียบกับซ้ายขวา)</string>
+    <string name="agvn_camera_gyro">เอียงเครื่องเพื่อหมุน (ไจโรสโคป)</string>
+    <string name="agvn_camera_gyro_speed">ความไวไจโรสโคป</string>
+    <string name="agvn_camera_no_gyro">เครื่องนี้ไม่มีไจโรสโคป</string>
+    <string name="agvn_camera_note">สำหรับเกมที่หมุนกล้องด้วยเมาส์: การปัดหน้าจอ (ขณะเกมจับเมาส์) ก้านหมุนกล้อง โซนหมุนกล้อง และปุ่ม Bắn/Ngắm (ยิง/เล็ง) บันทึกเฉพาะเกมนี้</string>
+    <string name="agvn_camera_default">ค่าเริ่มต้น</string>
+    <string name="agvn_camera_done">เสร็จ</string>
+    <string name="agvn_camera_on_drag">หมุนกล้องเมื่อลาก</string>
 </resources>

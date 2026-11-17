@@ -4203,3 +4203,66 @@ Cùng báo cáo: thêm `args` vào `agvn-profile.json` sau khi đã thêm game t
   - `su-kien.txt`: "agvn-profile.json (…) đổi args từ khi thêm game, nay áp: …".
 - **Thử máy:** thêm `"args": ["-popupwindow"]` vào profile của một game đã thêm, mở game: `moi-truong.txt` ghi
   "Tham số chạy của game: -popupwindow", và lệnh chạy Wine có tham số đó.
+
+## Xoay camera game 3D: độ nhạy, vuốt nhanh, ngón thứ hai, vùng xoay, cần xoay, con quay (bản 0.1.97)
+
+Anh Sơn hỏi ngày 17/11/2026 vì sao xoay góc nhìn ở game 3D khó cực kỳ so với GameHub. App có bảy chỗ cộng lại:
+
+- **Vuốt nhanh không quay:** 80 ms đầu của mỗi cú vuốt bị bỏ (độ trễ chờ cú bấm của `TouchpadView`), lần dời đầu
+  cũng không tính. Cú vuốt nhanh chỉ dài 100–150 ms.
+- **Không có độ nhạy:** ngón đi 1 điểm ảnh của màn X thì game nhận 1 đơn vị chuột. Vuốt hết bề ngang chỉ được 854 đơn
+  vị trên máy yếu (màn X 854×480), 1280 trên máy mạnh: máy càng yếu camera càng chậm. "Tốc độ con trỏ" không áp vào đây.
+- **Ngón thứ hai làm camera đứng:** hai ngón gần nhau thành cuộn chuột, xa nhau mà một ngón đứng yên thành bấm chuột
+  trái, ba ngón thì không quay.
+- **Ngón chạm trúng nút không xoay được:** đè Bắn hay Ngắm rồi kéo chỉ là bắn.
+- **App đoán sai thì camera giật:** game xoay camera bằng chuột mà không ẩn, không giữ con trỏ thì mỗi lần chạm con trỏ
+  nhảy tới chỗ ngón.
+- **Cần xoay thô:** nhanh nhất 600 đơn vị một giây, tốc độ bị làm tròn còn khoảng 10 nấc, nghiêng chéo nhẹ bị kéo về
+  hàng ngang hay dọc.
+- **Không có con quay, không chỉnh gì được theo game.**
+
+Sửa (`AgvnLook`, `AgvnCamera`, `AgvnCameraSettings`, `AgvnLookControl`, `AgvnGyroLook`, `AgvnCameraDialog`):
+
+- **Vuốt màn hình, khi game giữ chuột** (`AgvnMouseLook.locked`, như trước):
+  - Mỗi ngón ngoài phím ảo xoay camera ngay từ lần dời đầu, không chờ 80 ms.
+  - Quãng xoay tính theo phần màn hình ngón đã đi: vuốt hết cạnh dài là 2000 đơn vị chuột ở độ nhạy ×1, máy nào cũng
+    vậy. Phần lẻ của một đơn vị được giữ cho lần sau, nên vuốt chậm không mất.
+  - Hai, ba ngón cùng vuốt đều xoay; không thành cuộn chuột hay bấm chuột.
+  - Chạm nhanh vẫn là một cú click (bắn, tương tác). Ngón đã đi quá 1/40 cạnh ngắn màn hình thì không click, kể cả cú
+    vuốt xong trước 80 ms.
+  - Game không giữ chuột (menu, game 2D, visual novel) thì chạm và kéo như cũ.
+- **Cần xoay** (cần gán Mouse Move):
+  - Vùng chết tròn, đi chéo đúng hướng ngón.
+  - Khi game giữ chuột: nghiêng nhẹ quay chậm và mịn để ngắm, nghiêng hết quay nhanh (1500 đơn vị một giây ở ×1).
+  - Khi game hiện con trỏ: tốc độ như cũ, chỉ không mất phần lẻ.
+- **Nút kéo để xoay** (ô "Xoay camera khi kéo" trong trình sửa phím, khoá `agvnLook` trong tệp `.icp`): nút vẫn bấm
+  phím của nó, và kéo ngón đang đè thì camera xoay theo, như nút bắn của game bắn súng trên điện thoại.
+- **Vùng xoay camera** (trackpad có `agvnLook`): kéo trong vùng là xoay camera bằng chuột tương đối, kể cả khi app
+  không nhận ra game giữ chuột. Chạm nhanh trong vùng là click đúng chỗ đó, như chạm ra ngoài phím ảo.
+- **Bố cục "AGVN · Hành động 3D"** (`agvnLayoutVersion` 2, bản cài sẵn chưa sửa được thay):
+  - Thêm vùng xoay camera ở giữa bên phải, phía trên. Vùng mờ hơn phím (độ mờ 0,3).
+  - Bắn và Ngắm kéo để xoay được.
+  - Test kiểm vùng không đè lên phím nào trên màn 16:9 tới 22:9 và máy tính bảng 4:3.
+  - Bố cục người chơi đã sửa thì giữ nguyên; muốn có vùng xoay thì thêm trackpad và đánh dấu ô mới.
+- **"Camera 3D" trong thanh bên của game** (dưới "Rung"), lưu riêng từng game trong shortcut (`agvnCamera`):
+  - Độ nhạy xoay: ×0,25 tới ×4, dùng cho vuốt, cần xoay, vùng xoay, nút kéo để xoay.
+  - Xoay lên xuống so với ngang: ×0,5 tới ×1,5.
+  - Nghiêng máy để xoay (con quay), tắt sẵn, và độ nhạy của nó. Xoay máy sang phải thì nhìn sang phải, nghiêng mép trên
+    về phía mình thì nhìn lên. Con quay chỉ được đọc khi người chơi bật và màn game đang mở, và chỉ xoay camera khi game
+    giữ chuột. Máy không có con quay thì ô này mờ.
+  - Chỉnh là có tác dụng ngay trong game. Người chơi đã chỉnh thì `su-kien.txt` ghi "Camera 3D do người chơi chỉnh: …".
+- **Không đổi:** chất lượng hình, số khung hình, game không giữ chuột. Không có hộp hỏi mới.
+- **Không làm:** chế độ `touchscreen_toggle` của Winlator (ngón số 0 điều khiển chuột) không có chỗ bật nào trong app,
+  nên không sửa.
+- **Thử máy:**
+  1. Game 3D giữ chuột (Romantic Escape): vuốt nhanh một cái, camera quay; vuốt chậm, camera quay mịn.
+  2. Đè cần đi bằng ngón trái, vuốt camera bằng ngón phải: vừa đi vừa xoay. Đặt thêm một ngón lên màn hình: camera
+     vẫn xoay.
+  3. Chạm nhanh: game nhận một cú click. Vuốt nhanh: không click.
+  4. Bố cục "Hành động 3D": đè Bắn rồi kéo, vừa bắn vừa xoay; kéo trong vùng xoay, camera xoay; chạm vào vùng lúc ở menu
+     game, nút dưới vùng được bấm.
+  5. "Camera 3D": kéo độ nhạy lên ×2, vuốt cùng một quãng thì camera quay gấp đôi; tắt game mở lại, độ nhạy còn.
+  6. Bật con quay: xoay máy sang phải nhìn sang phải, nghiêng mép trên về phía mình nhìn lên. Hướng nào ngược thì báo
+     lại để đảo. Mở menu game (con trỏ hiện): nghiêng máy không làm gì.
+  7. Cần xoay: nghiêng nhẹ quay chậm, nghiêng hết quay nhanh, đi chéo không giật.
+  8. Game 2D, visual novel, menu có con trỏ: chạm, kéo như cũ.

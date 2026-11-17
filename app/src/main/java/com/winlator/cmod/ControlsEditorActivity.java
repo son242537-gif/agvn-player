@@ -197,6 +197,9 @@ public class ControlsEditorActivity extends AppCompatActivity implements View.On
             view.findViewById(R.id.CBToggleSwitch).setVisibility(View.GONE);
             view.findViewById(R.id.LLCustomTextIcon).setVisibility(View.GONE);
             view.findViewById(R.id.LLRangeOptions).setVisibility(View.GONE);
+            // AGVN: a button or a trackpad can turn the camera as it is dragged (agvn/AgvnLookControl)
+            boolean agvnLook = type == ControlElement.Type.BUTTON || type == ControlElement.Type.TRACKPAD;
+            view.findViewById(R.id.CBAgvnLook).setVisibility(agvnLook ? View.VISIBLE : View.GONE);
 
             if (type == ControlElement.Type.BUTTON) {
                 view.findViewById(R.id.LLShape).setVisibility(View.VISIBLE);
@@ -286,6 +289,13 @@ public class ControlsEditorActivity extends AppCompatActivity implements View.On
             element.setMouseMoveMode(isChecked);
             profile.save();
             inputControlsView.invalidate();
+        });
+
+        CheckBox cbAgvnLook = view.findViewById(R.id.CBAgvnLook); // AGVN
+        cbAgvnLook.setChecked(element.isAgvnLook());
+        cbAgvnLook.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            element.setAgvnLook(isChecked);
+            profile.save();
         });
 
         final EditText etCustomText = view.findViewById(R.id.ETCustomText);

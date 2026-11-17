@@ -288,5 +288,12 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/agvn_ui_layout_move_cursor_on_drag" />
         </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/CBAgvnLook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/agvn_camera_on_drag" />
     </LinearLayout>
 </ScrollView>

@@ -433,4 +433,15 @@
     <string name="agvn_html_picture_title">Game thiếu ảnh giao diện</string>
     <string name="agvn_html_picture_detail">Không đọc được %1$s (%2$s), nên một số nút hoặc khung của game có thể không hiện. Hãy kiểm tra đã chép đủ thư mục game.</string>
     <string name="agvn_html_picture_access">App chưa có quyền Truy cập tất cả tệp: hãy cấp quyền này cho AGVN Player trong Cài đặt Android.</string>
+    <!-- 3D camera: speed, up and down, gyroscope, per game (agvn/AgvnCameraDialog, agvn/AgvnLookControl) -->
+    <string name="agvn_camera_title">Camera 3D</string>
+    <string name="agvn_camera_speed">Độ nhạy xoay</string>
+    <string name="agvn_camera_vertical">Xoay lên xuống (so với ngang)</string>
+    <string name="agvn_camera_gyro">Nghiêng máy để xoay (con quay)</string>
+    <string name="agvn_camera_gyro_speed">Độ nhạy con quay</string>
+    <string name="agvn_camera_no_gyro">Máy này không có con quay</string>
+    <string name="agvn_camera_note">Dùng cho game xoay camera bằng chuột: vuốt màn hình (khi game giữ chuột), cần xoay, vùng xoay camera và nút Bắn/Ngắm. Chỉ lưu cho game này.</string>
+    <string name="agvn_camera_default">Mặc định</string>
+    <string name="agvn_camera_done">Xong</string>
+    <string name="agvn_camera_on_drag">Xoay camera khi kéo</string>
 </resources>
