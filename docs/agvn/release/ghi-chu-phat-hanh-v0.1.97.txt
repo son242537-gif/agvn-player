@@ -1,0 +1,10 @@
+AGVN Player v0.1.97 - agvn.io
+
+Xoay camera game 3D dễ hơn:
+- Vuốt màn hình để xoay camera nay quay ngay, kể cả vuốt nhanh. Máy yếu quay nhanh như máy mạnh.
+- Vừa giữ cần đi vừa vuốt xoay được; đặt thêm ngón lên màn hình camera không dừng nữa. Chạm nhanh vẫn là bấm, vuốt thì không bấm nhầm.
+- Cần xoay mượt hơn: nghiêng nhẹ quay chậm để ngắm, nghiêng hết quay nhanh, đi chéo đúng hướng.
+- Bố cục "Hành động 3D": thêm vùng xoay camera ở phía trên bên phải, và nút Bắn, Ngắm đè rồi kéo thì vừa bắn vừa xoay.
+- Mục mới "Camera 3D" trong thanh bên của game: chỉnh độ nhạy, mức xoay lên xuống, và bật "Nghiêng máy để xoay" (con quay). Lưu riêng cho từng game.
+- Trình sửa phím có ô mới "Xoay camera khi kéo" cho nút và vùng xoay.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
