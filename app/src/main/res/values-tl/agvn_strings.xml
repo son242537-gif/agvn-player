@@ -490,4 +490,5 @@
     <string name="agvn_unpack_notif_done">Na-extract na ang %1$s. I-tap para buksan ang AGVN Player.</string>
     <string name="agvn_unpack_notif_failed">Hindi pa ma-extract ang %1$s</string>
     <string name="agvn_unpack_notif_password">May password ang archive. Buksan ang AGVN Player, piliin ulit ang archive at ilagay ang password.</string>
+    <string name="agvn_sharp_switch">Patalasin ang larawan kapag pinalaki sa screen (kaunting dagdag na gamit ng GPU)</string>
 </resources>

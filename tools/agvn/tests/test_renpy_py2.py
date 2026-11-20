@@ -82,7 +82,7 @@ class Py2Test(unittest.TestCase):
                 "print(sorted(hooks), type(python.wrap_node).__name__, sorted(renpy.name_blacklist), file is not None)\n")
         out = subprocess.run([sys.executable, "-I", "-c", "import sys; sys.path.insert(0, %r)\n" % RENPY_DIR + code],
                              capture_output=True, text=True, check=True).stdout.splitlines()[-1]
-        self.assertEqual("['renpy.pyanalysis', 'renpy.python', 'renpy.revertable'] Py2Wrap ['renpy.python.wrap_node'] True",
+        self.assertEqual("['renpy.pyanalysis', 'renpy.python', 'renpy.revertable', 'renpy.script'] Py2Wrap ['renpy.python.wrap_node'] True",
                          out)
 
 

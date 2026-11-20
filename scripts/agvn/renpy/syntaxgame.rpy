@@ -35,7 +35,16 @@ init python:
         except ImportError: import json, os
         return a, b, os.sep
 
+    def older():
+        big = 10L + 0xFFL
+        if big: print "quiet", big
+        scope = {}
+        exec "made = 7" in scope
+        code = "also = 8"
+        exec code in scope
+        return big, scope["made"], scope["also"]
+
 label start:
-    $ results = (numfloat(Clock()), half(), caught())
+    $ results = (numfloat(Clock()), half(), caught(), more(), older())
     $ renpy.write_log("AGVN-SYNTAX RESULTS %r", results)
     return

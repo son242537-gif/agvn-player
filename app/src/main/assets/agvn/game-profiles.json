@@ -14,6 +14,19 @@
         "simulatedTouchscreen": true,
         "weakDevice": {"resolution": "854x480", "fpsLimit": 24, "texturePool": 512}
       }
+    },
+    {
+      "id": "sexy-beach-premium-resort",
+      "match": ["SexyBeachPR_64.exe"],
+      "profile": {
+        "schemaVersion": 1,
+        "name": "Sexy Beach Premium Resort",
+        "exe": "SexyBeachPR_64.exe",
+        "args": ["-screen-width", "1280", "-screen-height", "720", "-screen-fullscreen", "0"],
+        "resolution": "1280x720",
+        "simulatedTouchscreen": true,
+        "weakDevice": {"resolution": "1280x720"}
+      }
     }
   ]
 }

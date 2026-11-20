@@ -7,6 +7,8 @@
 #     decimal integer literals are not permitted" for "[:02]" (0.1.97, 20/11/2026; JoiPlay's Ren'Py 8.5.0 the same).
 #     Only a whole number written the Python 2 way is changed now.
 #   - "except X, e:" becomes "except X as e:", and ur"..." becomes r"...", which Ren'Py does not mend.
+#   - nor these: 10L (a long), "print x" after a colon or a semicolon ("if x: print y"; as Ren'Py's own, it prints
+#     nothing), and exec "code" [in globals].
 # main.py puts install() on renpy.compat.fixes for every game: a block that compiles as it is never comes here.
 
 import re
@@ -77,9 +79,55 @@ def fix_except(tokens):
         yield t
 
 
+STARTS = (token.NEWLINE, token.INDENT, token.DEDENT, token.NL, token.COMMENT, tokenize.ENCODING)
+
+
+def tok(kind, text, at, end=False):
+    """A token put in at the start of `at`, or at its end: untokenize only needs positions that do not go back."""
+    where = at.end if end else at.start
+    return tokenize.TokenInfo(kind, text, where, where, at.line)
+
+
+def fix_statements(tokens):
+    """10L -> 10; "print x" after ":" or ";" -> "0, x" (as Ren'Py does at a line's start); exec "c" in g -> exec("c", g)."""
+    tokens = list(tokens)
+    out, close_at, depth, skip = [], None, 0, -1
+    for i, t in enumerate(tokens):
+        if i == skip:
+            continue
+        prev = tokens[i - 1] if i else None
+        nxt = tokens[i + 1] if i + 1 < len(tokens) else None
+        if t.type == token.NAME and t.string in ("L", "l") and prev is not None and prev.type == token.NUMBER \
+                and prev.end == t.start:
+            continue
+        if t.type == token.OP:
+            depth += t.string in "([{" and 1 or t.string in ")]}" and -1 or 0
+        starts = prev is None or prev.type in STARTS or prev.type == token.OP and prev.string in (":", ";")
+        if close_at is not None and depth == close_at and (t.type in (token.NEWLINE, token.ENDMARKER)
+                                                           or t.type == token.OP and t.string == ";"):
+            out.append(tok(token.OP, ")", t))
+            close_at = None
+        if t.type == token.NAME and nxt is not None and not (nxt.type == token.OP and nxt.string in "(=.,)]"):
+            inline = prev is not None and prev.type == token.OP and prev.string in (":", ";")
+            if t.string == "print" and inline and depth == 0:
+                out.extend([tok(token.NUMBER, "0", t), tok(token.OP, ",", t, True)])
+                if nxt.type == token.OP and nxt.string == ">>":
+                    skip = i + 1  # print >>f, x -> 0, f, x
+                continue
+            if t.string == "exec" and starts and depth == 0 and nxt.type in (token.STRING, token.NAME):
+                out.extend([t, tok(token.OP, "(", t, True)])
+                close_at = depth
+                continue
+        if close_at is not None and depth == close_at and t.type == token.NAME and t.string == "in":
+            out.append(tok(token.OP, ",", t))
+            continue
+        out.append(t)
+    return out
+
+
 def fix_spaceship(tokens):
-    """Ren'Py's own (a <> b -> a != b), then the two above: fix_tokens calls this one between its other fixes."""
-    for t in fix_except(fix_ur_strings(tokens)):
+    """Ren'Py's own (a <> b -> a != b), then the ones above: fix_tokens calls this one between its other fixes."""
+    for t in fix_statements(fix_except(fix_ur_strings(tokens))):
         if t.type == token.OP and t.string == "<>":
             yield tokenize.TokenInfo(token.OP, "!=", t.start, t.end, t.line)
         else:

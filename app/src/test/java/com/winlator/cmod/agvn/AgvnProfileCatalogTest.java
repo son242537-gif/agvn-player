@@ -80,6 +80,12 @@ public class AgvnProfileCatalogTest {
         String json = new String(Files.readAllBytes(new File("src/main/assets/" + AgvnProfileCatalog.ASSET).toPath()), StandardCharsets.UTF_8);
         AgvnProfileCatalog c = AgvnProfileCatalog.parse(json);
         assertTrue(c.size() > 0);
+        // Sexy Beach Premium Resort: its window arguments come with the app, not typed by the player (20/11/2026)
+        File game = tmp.newFolder("SEXY-BEACH-PREMIUM-RESORT-AGVN-PLAYER");
+        assertTrue(new File(game, "SexyBeachPR_64.exe").createNewFile());
+        AgvnProfile p = c.find(game);
+        assertEquals("SexyBeachPR_64.exe", AgvnProfileValidator.validate(p, game));
+        assertEquals("-screen-width 1280 -screen-height 720 -screen-fullscreen 0", AgvnProfileArgs.given(p));
     }
 
     @Test

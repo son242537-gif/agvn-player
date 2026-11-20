@@ -4451,3 +4451,24 @@ Ngày 20/11/2026 toàn bộ mã AGVN được rà theo 5 mảng; danh sách lỗ
   6. Câu hỏi xoá tệp nén: "Giữ lại" giữ nguyên; "Xóa tệp nén" xoá mọi phần của bộ.
   7. `adb logcat | grep AGVN` khi giải tệp có mật khẩu: không thấy dòng lệnh hay mật khẩu.
   8. ZIP và 7z thường vẫn giải như trước; màn Giấy phép có mục 7-Zip.
+
+## "Làm nét hình" cho từng game, hồ sơ có sẵn cho Sexy Beach Premium Resort, thêm cú pháp Python 2 (bản 0.1.101)
+
+- **"Làm nét hình" trong "Chỉnh đồ họa":** ô chọn cho từng game (`AgvnSharpScreen.EXTRA_CHOICE` = `agvnSharp`: "1" bật,
+  "0" tắt, trống = chưa chọn). Lựa chọn của người chơi cho game đứng trước mặc định theo hạng máy và trước cấu hình lưu
+  từ thanh bên; chỉ ghi khi người chơi thật sự đổi ô. Máy hạng Trung bình và Yếu cũng bật được (tự chọn, tốn thêm GPU).
+  Game "Chạy nhẹ" không có ô này (không qua trình vẽ của app).
+- **Sexy Beach Premium Resort (hướng dẫn của maintainer, 20/11/2026):** người chơi phải tự gõ
+  `-screen-width 1280 -screen-height 720 -screen-fullscreen 0` trước lần mở đầu. Thêm mục `sexy-beach-premium-resort`
+  vào `assets/agvn/game-profiles.json` (khớp `SexyBeachPR_64.exe`): app chọn đúng tệp chạy, đặt tham số và màn hình
+  1280×720 khi thêm game. Bước 3 trong tệp hướng dẫn của game không còn cần với bản app này. Không thêm `-popupwindow`
+  (có tiếng mà đen màn, theo hướng dẫn).
+- **Cú pháp Python 2 (`agvn_syntax.py`, chỉ chạy trên khối mã không biên dịch được):** `10L` → `10`; `print x` sau dấu
+  `:` hoặc `;` (như Ren'Py tự làm ở đầu dòng: không in gì); `exec "code" in g` → `exec("code", g)`.
+- **Test:** `AgvnSharpScreenTest.thePlayersChoiceForAGameComesFirst`, `AgvnProfileCatalogTest`
+  (`bundledCatalogParsesAndEveryEntryIsValid`), `run-syntax-test.sh` (hàm `older`), `run-py2-test.sh`;
+  `tools/agvn/tests/test_renpy_py2.py` sửa theo hook `renpy.script` có từ 0.1.99.
+- **Thử máy:**
+  1. Máy Flagship, "Chỉnh đồ họa": ô "Làm nét hình" đang bật; bỏ chọn, Lưu, mở game: hình mềm như 0.1.99 và công tắc
+     trong thanh bên tắt. Bật lại: nét.
+  2. Sexy Beach Premium Resort: xoá khỏi thư viện, thêm lại, không gõ tham số: game hiện hình ở cửa sổ 1280×720.

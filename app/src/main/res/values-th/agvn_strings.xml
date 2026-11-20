@@ -503,4 +503,5 @@
     <string name="agvn_unpack_notif_done">แตกไฟล์ %1$s เสร็จแล้ว แตะเพื่อเปิด AGVN Player</string>
     <string name="agvn_unpack_notif_failed">ยังแตกไฟล์ %1$s ไม่ได้</string>
     <string name="agvn_unpack_notif_password">ไฟล์บีบอัดมีรหัสผ่าน เปิด AGVN Player เลือกไฟล์บีบอัดอีกครั้ง แล้วใส่รหัสผ่าน</string>
+    <string name="agvn_sharp_switch">ทำให้ภาพคมขึ้นเมื่อขยายเต็มจอ (ใช้ GPU เพิ่มเล็กน้อย)</string>
 </resources>

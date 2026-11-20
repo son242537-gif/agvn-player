@@ -1431,7 +1431,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
                     : (container != null ? container.getRendererPresentMode() : "fifo");
             vkRenderer.setVkPresentMode(com.winlator.cmod.contentdialog.RendererOptionsDialog.toVkPresentMode(presentMode));
             // AGVN: a flagship phone starts with SGSR when nothing chose a filter (AgvnSharpScreen)
-            vkRenderer.setFilterMode(com.winlator.cmod.agvn.AgvnSharpScreen.startMode(this, container, agvnFilterMode()));
+            vkRenderer.setFilterMode(com.winlator.cmod.agvn.AgvnSharpScreen.startMode(this, container, agvnFilterMode(), agvnSharpChoice()));
         }
 
         if (shortcut != null) {
@@ -2165,7 +2165,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         };
 
         // AGVN: the switch shows SGSR on where AgvnSharpScreen started with it
-        String savedFilter = com.winlator.cmod.agvn.AgvnSharpScreen.sidebarSaved(this, container, agvnFilterMode());
+        String savedFilter = com.winlator.cmod.agvn.AgvnSharpScreen.sidebarSaved(this, container, agvnFilterMode(), agvnSharpChoice());
         boolean fsrOn = !savedFilter.isEmpty() && Integer.parseInt(savedFilter) > 0;
         if (swEnableFSR != null) {
             swEnableFSR.setChecked(fsrOn);
@@ -3409,6 +3409,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
         this.screenEffectProfile = screenEffectProfile;
     }
 
+
+    /** AGVN: the player's "Làm nét hình" choice for this game in "Chỉnh đồ họa" ("" = none). */
+    private String agvnSharpChoice() {
+        return shortcut != null ? shortcut.getExtra(com.winlator.cmod.agvn.AgvnSharpScreen.EXTRA_CHOICE) : "";
+    }
 
     /** AGVN: the renderer filter the game's or its container's settings ask for (0 = none). */
     private int agvnFilterMode() {

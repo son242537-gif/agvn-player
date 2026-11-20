@@ -19,6 +19,16 @@ public class AgvnSharpScreenTest {
     }
 
     @Test
+    public void thePlayersChoiceForAGameComesFirst() {
+        assertEquals(AgvnSharpScreen.SGSR, AgvnSharpScreen.startMode(0, "", DeviceTier.YEU, "1")); // on, on a weak phone
+        assertEquals(0, AgvnSharpScreen.startMode(0, "", DeviceTier.FLAGSHIP, "0"));
+        assertEquals(0, AgvnSharpScreen.startMode(3, "3", DeviceTier.FLAGSHIP, "0")); // off means off
+        assertEquals(3, AgvnSharpScreen.startMode(3, "", DeviceTier.YEU, "1")); // the game's own filter stays
+        assertEquals(AgvnSharpScreen.SGSR, AgvnSharpScreen.startMode(0, "", DeviceTier.FLAGSHIP, ""));
+        assertEquals(0, AgvnSharpScreen.startMode(0, "", DeviceTier.YEU, null));
+    }
+
+    @Test
     public void aChoiceIsKept() {
         assertEquals(3, AgvnSharpScreen.startMode(3, "", DeviceTier.FLAGSHIP)); // FSR set for the game
         assertEquals(4, AgvnSharpScreen.startMode(4, "", DeviceTier.YEU));

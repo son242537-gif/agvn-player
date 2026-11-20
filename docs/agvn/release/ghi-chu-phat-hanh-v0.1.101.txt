@@ -5,7 +5,9 @@ Mới:
 - Thư viện → giữ vào game → "Cách chạy": đổi giữa Chạy nhẹ và Windows bất cứ lúc nào. Trước đây bấm nhầm "Chạy bằng Windows" thì không quay lại được.
 - Trong game Chạy nhẹ, bấm "Chạy bằng Windows" giờ có hỏi lại trước khi chuyển.
 - Thư viện → giữ vào game → "Lưu hồ sơ game": ghi cấu hình đang chạy của game vào thư mục game (agvn-profile.json). Chép thư mục game sang máy khác thì game nhận lại cấu hình đó.
+- "Chỉnh đồ họa" có thêm ô "Làm nét hình khi phóng lên màn hình" cho từng game, bật được trên mọi máy.
+- Sexy Beach Premium Resort: app tự đặt tham số chạy khi thêm game, không cần gõ tay.
 
 Sửa lỗi:
-- "Chạy nhẹ" game Ren'Py 6/7 (chạy thử): chạy thêm được nhiều kiểu mã Python 2 cũ, như d.keys()[0], iteritems() và has_key() trên mọi dict, sorted(cmp=...), cPickle, StringIO.
+- "Chạy nhẹ" game Ren'Py 6/7 (chạy thử): chạy thêm được nhiều kiểu mã Python 2 cũ, như d.keys()[0], iteritems() và has_key() trên mọi dict, sorted(cmp=...), cPickle, StringIO, số 10L, print giữa dòng, exec "code".
 Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

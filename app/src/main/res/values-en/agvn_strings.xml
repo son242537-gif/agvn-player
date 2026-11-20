@@ -503,4 +503,5 @@
     <string name="agvn_unpack_notif_done">%1$s is extracted. Tap to open AGVN Player.</string>
     <string name="agvn_unpack_notif_failed">Could not extract %1$s</string>
     <string name="agvn_unpack_notif_password">The archive has a password. Open AGVN Player, pick the archive again and enter the password.</string>
+    <string name="agvn_sharp_switch">Sharpen the picture when it is stretched to the screen (uses a little more GPU)</string>
 </resources>

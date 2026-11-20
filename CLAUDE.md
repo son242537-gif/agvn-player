@@ -85,6 +85,11 @@ and Ren'Py 8.5.3 (RAPT and SDK, for the Ren'Py runner) from renpy.org into `app/
 AGVN's own build, `app/agvn-godot/`, made by `scripts/agvn/godot/build-godot.sh`, see `app/agvn-godot.gradle`). In a
 fresh cloud checkout, run `scripts/agvn/prepare-native-deps.sh` first.
 
+"Thêm từ tệp nén" unpacks game archives in the app: ZIP through zip4j, 7z through commons-compress, and RAR, tar and the
+rarer methods through 7-Zip 25.01, a separate program committed as `app/src/main/jniLibs/arm64-v8a/libagvn7zz.so`
+(LGPL with the unRAR restriction, maintainer's decision 2026-11-20). Rebuild it only to change its version:
+`scripts/agvn/7zip/build-7zz.sh` (`--host` builds a PC copy the unit tests use when it is there).
+
 ### Publish an Update (maintainer's PC only)
 Phones update themselves from GitHub Releases (Cài đặt → Cập nhật ứng dụng). There is one channel: every phone gets the
 newest release, and there are no test builds. The script builds with the release key, so it runs only on the

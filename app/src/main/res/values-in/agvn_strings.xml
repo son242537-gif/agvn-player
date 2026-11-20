@@ -503,4 +503,5 @@
     <string name="agvn_unpack_notif_done">%1$s selesai diekstrak. Ketuk untuk membuka AGVN Player.</string>
     <string name="agvn_unpack_notif_failed">Belum bisa mengekstrak %1$s</string>
     <string name="agvn_unpack_notif_password">File arsip memakai kata sandi. Buka AGVN Player, pilih lagi file arsipnya, lalu masukkan kata sandi.</string>
+    <string name="agvn_sharp_switch">Pertajam gambar saat diperbesar ke layar (memakai sedikit lebih banyak GPU)</string>
 </resources>

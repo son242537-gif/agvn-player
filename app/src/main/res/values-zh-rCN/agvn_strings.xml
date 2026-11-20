@@ -503,4 +503,5 @@
     <string name="agvn_unpack_notif_done">%1$s 已解压完成。点按打开 AGVN Player。</string>
     <string name="agvn_unpack_notif_failed">未能解压 %1$s</string>
     <string name="agvn_unpack_notif_password">压缩包有密码。请打开 AGVN Player，重新选择压缩包并输入密码。</string>
+    <string name="agvn_sharp_switch">拉伸到屏幕时锐化画面（多占用一点 GPU）</string>
 </resources>

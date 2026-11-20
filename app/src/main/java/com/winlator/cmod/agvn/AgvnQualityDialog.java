@@ -95,6 +95,16 @@ public final class AgvnQualityDialog {
         root.addView(ends, gap);
         root.addView(slider);
         root.addView(hint);
+        // "Làm nét hình": the app's renderer sharpens what it stretches (AgvnSharpScreen); not for "Chạy nhẹ" games
+        android.widget.CheckBox sharp = new android.widget.CheckBox(activity);
+        sharp.setText(R.string.agvn_sharp_switch);
+        sharp.setTextSize(14);
+        boolean sharpWas = AgvnSharpScreen.on(activity, shortcut.container, shortcut.getRendererFilterMode(),
+                shortcut.getExtra(AgvnSharpScreen.EXTRA_CHOICE));
+        sharp.setChecked(sharpWas);
+        boolean[] sharpTouched = {false};
+        sharp.setOnCheckedChangeListener((b, on) -> sharpTouched[0] = true);
+        if (!AgvnHtmlGame.isLight(shortcut.getExtra(AgvnHtmlGame.EXTRA_RUNNER))) root.addView(sharp);
         root.addView(note);
         refresh.run();
 
@@ -103,6 +113,8 @@ public final class AgvnQualityDialog {
                 .setView(root)
                 .setPositiveButton(R.string.agvn_quality_save, (d, w) -> {
                     AgvnQuality.Level level = auto[0] ? AgvnQuality.Level.AUTO : AgvnQuality.Level.atStep(slider.getProgress());
+                    if (sharpTouched[0] && sharp.isChecked() != sharpWas) // a choice only when the player made one
+                        shortcut.putExtra(AgvnSharpScreen.EXTRA_CHOICE, sharp.isChecked() ? "1" : "0");
                     AgvnQuality.apply(activity, shortcut, level);
                     AppUtils.showToast(activity, activity.getString(R.string.agvn_quality_applied, name(activity, AgvnQuality.Level.atStep(slider.getProgress()))));
                     if (onChanged != null) onChanged.run();
