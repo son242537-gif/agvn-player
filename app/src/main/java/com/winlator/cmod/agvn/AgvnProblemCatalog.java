@@ -24,7 +24,13 @@ final class AgvnProblemCatalog {
     static final class Problem {
         String id, title, cause;
         List<String> when, engines, lines, fixes;
-        transient List<Pattern> patterns = Collections.emptyList();
+        /**
+         * Lines that name the problem only when the game never started ({@link AgvnEvidence#noStart}): a game prints
+         * DXVK's "Minimum required feature level D3D_FEATURE_LEVEL_11_1 not supported", then runs on 11_0; with the
+         * line among "lines", every later crash of it read "Game báo thiếu DirectX" (audit of 20/11/2026).
+         */
+        List<String> linesNoStart;
+        transient List<Pattern> patterns = Collections.emptyList(), noStartPatterns = Collections.emptyList();
     }
 
     /** A problem found, with the values its texts fill in ({1}, {crash}, {fps}, {gpu}, {cpu}). */
@@ -69,11 +75,16 @@ final class AgvnProblemCatalog {
         Json file = new Gson().fromJson(json, Json.class);
         List<Problem> list = file != null && file.problems != null ? file.problems : new ArrayList<>();
         for (Problem p : list) {
-            List<Pattern> compiled = new ArrayList<>();
-            if (p.lines != null) for (String re : p.lines) compiled.add(Pattern.compile(re, Pattern.CASE_INSENSITIVE));
-            p.patterns = compiled;
+            p.patterns = compiled(p.lines);
+            p.noStartPatterns = compiled(p.linesNoStart);
         }
         return new AgvnProblemCatalog(list);
+    }
+
+    private static List<Pattern> compiled(List<String> lines) {
+        List<Pattern> compiled = new ArrayList<>();
+        if (lines != null) for (String re : lines) compiled.add(Pattern.compile(re, Pattern.CASE_INSENSITIVE));
+        return compiled;
     }
 
     /**
@@ -116,8 +127,9 @@ final class AgvnProblemCatalog {
             if (p.engines != null && !p.engines.contains(ev.engine)) continue;
             if (!ev.holdsAll(p.when != null ? p.when : DEFAULT_WHEN)) continue;
             Map<String, String> params = new LinkedHashMap<>(ev.params);
-            if (!p.patterns.isEmpty()) {
+            if (!p.patterns.isEmpty() || !p.noStartPatterns.isEmpty()) {
                 Matcher m = firstMatch(p.patterns, ev.lines);
+                if (m == null && ev.noStart()) m = firstMatch(p.noStartPatterns, ev.lines);
                 if (m == null) continue;
                 if (m.groupCount() >= 1 && m.group(1) != null) params.put("1", m.group(1));
             }

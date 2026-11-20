@@ -43,6 +43,8 @@ final class AgvnFixes {
     /** A button: its fix id, its words, and what it sets ({@code to}). */
     static final class Fix {
         final String id, label, to;
+        /** "twin-config": the other entry of the same game, as read when the button was made ({@link AgvnGameTwin}). */
+        Shortcut twin;
 
         Fix(String id, String label, String to) {
             this.id = id;
@@ -71,16 +73,26 @@ final class AgvnFixes {
             Fix fix = make(a, s, finding, state, id);
             if (fix != null) fixes.add(fix);
         }
-        // the settings of the same game's other entry (AgvnGameTwin), whatever the problem: first when that entry ran
-        // well with them, else before "send-logs"
+        // the settings of the same game's other entry (AgvnGameTwin), for a problem settings may fix: first when that
+        // entry ran well with them, else before "send-logs"
         boolean windows = !AgvnHtmlGame.isLight(s.getExtra(AgvnHtmlGame.EXTRA_RUNNER));
-        Fix twin = windows && !fixes.isEmpty() && !tried.contains(AgvnGameTwin.FIX) ? AgvnGameTwin.fix(a, s) : null;
+        Fix twin = windows && !fixes.isEmpty() && !tried.contains(AgvnGameTwin.FIX) && changesSettings(finding.fixes())
+                ? AgvnGameTwin.fix(a, s) : null;
         if (twin != null) {
             int last = fixes.size() - 1;
             boolean logsLast = fixes.get(last).id.equals("send-logs");
-            fixes.add(AgvnGameTwin.ranWell(a, twin) ? 0 : logsLast ? last : last + 1, twin);
+            fixes.add(AgvnGameTwin.ranWell(a, twin.twin) ? 0 : logsLast ? last : last + 1, twin);
         }
         return fixes;
+    }
+
+    /**
+     * True when a problem names a fix of the game's settings among {@code ids}: one that names none (a missing Steam,
+     * a broken file: "Gửi nhật ký" alone) is not one another entry's settings fix (audit of 20/11/2026).
+     */
+    static boolean changesSettings(List<String> ids) {
+        for (String id : ids) if (!ALWAYS.contains(id)) return true;
+        return false;
     }
 
     /**

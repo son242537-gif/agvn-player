@@ -43,7 +43,9 @@ public final class AgvnGameMove {
             s.putExtra(EXTRA_TO, null);
             s.saveData();
             Container target = new ContainerManager(ctx).getContainerById(Integer.parseInt(to.trim()));
-            return target != null && target.id != s.container.id ? move(s, target) : null;
+            Shortcut moved = target != null && target.id != s.container.id ? move(s, target) : null;
+            if (moved != null) AgvnGoodConfig.moved(ctx, s, moved); // "Tự sửa lỗi"'s state of it, a fix on trial too
+            return moved;
         } catch (RuntimeException e) {
             Log.w(TAG, "game not moved", e);
             return null;

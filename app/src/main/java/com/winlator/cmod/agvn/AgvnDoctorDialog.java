@@ -52,6 +52,7 @@ public final class AgvnDoctorDialog {
         Shortcut restart = again == null || System.currentTimeMillis() - again.time > AgvnDoctorStore.RELAUNCH_MS
                 ? null : AgvnRelaunch.find(a, again.container, again.shortcut);
         if (restart != null) {
+            AgvnDoctorStore.dropPending(a, restart); // what the session closed for this restart left: stale by then
             AgvnRelaunch.start(a, restart);
             return;
         }

@@ -6,7 +6,10 @@ import android.util.Log;
 
 import com.winlator.cmod.container.Shortcut;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -28,10 +31,19 @@ final class AgvnRepairEnd {
     /**
      * True when the game closed by itself (or crashed) before it could be asked about the fix on trial. Not when the app
      * stopped the game meanwhile: Rj01608199 (vivo V2403A, 16/10/2026) died at each return to the app, when the X server
-     * had dropped it, and two fixes went back counted as tried after "42 s", 28 of them stopped.
+     * had dropped it, and two fixes went back counted as tried after "42 s", 28 of them stopped. Not a game the player
+     * left by its own Exit menu ({@link #cleanExit}), unless its end shows a problem all the same ({@code problem}: the
+     * doctor's catalog finds one, as Unreal's crash box, after which the game ends with code 0 too): a look at the fix
+     * and out within a minute took it off the game as tried (audit of 20/11/2026).
      */
-    static boolean endedTooSoon(AgvnEvidence ev) {
-        return !ev.stopped && (ev.crashed || ev.endedByGame) && ev.seconds < AgvnEvidence.GOOD_AFTER_S;
+    static boolean endedTooSoon(AgvnEvidence ev, boolean problem) {
+        if (ev.stopped || ev.seconds >= AgvnEvidence.GOOD_AFTER_S) return false;
+        return ev.crashed || ev.endedByGame && (problem || !cleanExit(ev));
+    }
+
+    /** The game drew its window and ended with an exit code agvn-winhandler.exe told, not a crash's (AgvnGameEnd). */
+    static boolean cleanExit(AgvnEvidence ev) {
+        return ev.started && ev.exitKnown && !ev.exitCrash;
     }
 
     /** True when a fix is on trial, it was put on before this start, and the game ran with it ({@code ran}). */
@@ -54,7 +66,7 @@ final class AgvnRepairEnd {
      */
     static boolean afterGame(Context ctx, Shortcut s, AgvnEvidence ev, Map<String, String> ran) {
         Properties state = AgvnGoodConfig.load(ctx, s);
-        if (!endedTooSoon(ev) || !ranWithTrial(s, state, ran)) return false;
+        if (!ranWithTrial(s, state, ran) || !endedTooSoon(ev, AgvnDoctor.catalog(ctx).find(ev) != null)) return false;
         String label = putBack(s, state);
         AgvnGoodConfig.save(ctx, s, state);
         AgvnSessionLog.event("Tự sửa lỗi: game tự tắt sau " + ev.seconds + " giây khi đang thử " + label
@@ -81,9 +93,25 @@ final class AgvnRepairEnd {
     /** The settings from before the first try back on {@code s} (saved); the fix on trial stays tried. Its words. */
     static String putBack(Shortcut s, Properties state) {
         String label = AgvnRepair.label(state);
-        AgvnRepair.restore(s, AgvnRepair.before(state));
+        goBack(s, state);
         s.saveData();
         AgvnRepair.stopTrying(state);
         return label;
+    }
+
+    /**
+     * The settings from before the first try back on {@code s}, the fix on trial in {@code state} with them: the move
+     * "Chạy bằng Wine mới" asked for is no setting, and the game still moved to Proton 10 at its next start though the
+     * player had gone on to another fix (audit of 20/11/2026). The caller saves.
+     */
+    static void goBack(Shortcut s, Properties state) {
+        AgvnRepair.restore(s, AgvnRepair.before(state));
+        for (String extra : moveExtras(AgvnRepair.trying(state))) s.putExtra(extra, null);
+    }
+
+    /** The extras fix {@code trying} left on the game besides its settings: the move to Proton 10 not done yet. */
+    static List<String> moveExtras(String trying) {
+        return AgvnWine10Fix.ID.equals(trying) ? Arrays.asList(AgvnGameMove.EXTRA_TO, AgvnWine10Fix.EXTRA_WANTED)
+                : Collections.emptyList();
     }
 }

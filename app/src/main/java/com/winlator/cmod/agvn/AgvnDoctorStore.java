@@ -74,6 +74,40 @@ final class AgvnDoctorStore {
             SystemClock.sleep(RUNNER_END_STEP_MS);
     }
 
+    /** True when {@code e} is of the game whose entry is file {@code shortcut} in container {@code container}. */
+    static boolean of(Entry e, int container, String shortcut) {
+        return e.container == container && e.shortcut.equals(shortcut);
+    }
+
+    /**
+     * True when a restart of {@code s} was asked for since {@code sinceMs} (its session's start) and is not taken yet:
+     * the app is closing this session itself ("Mở lại game ngay"), so it is no run that went well (AgvnDoctor). Not one
+     * asked for longer than {@link #RELAUNCH_MS} ago: the player stayed in the game.
+     */
+    static boolean relaunchAsked(Context ctx, Shortcut s, long sinceMs) {
+        Properties p = AgvnPropsFile.load(new File(ctx.getFilesDir(), RELAUNCH));
+        return !p.isEmpty() && asked(new Entry(p), s.container.id, s.file.getPath(), sinceMs, System.currentTimeMillis());
+    }
+
+    static boolean asked(Entry e, int container, String shortcut, long sinceMs, long nowMs) {
+        return of(e, container, shortcut) && e.time >= sinceMs && nowMs - e.time <= RELAUNCH_MS;
+    }
+
+    /**
+     * {@code s} starts again at once: the problem its closed session left is dropped. It showed after the next session,
+     * though that one ran well, as after "Chạy lại, tắt bộ nhớ chia sẻ" (audit of 20/11/2026). Another game's problem
+     * stays, and a report whose fix went back (AgvnRepairEnd): its settings did change.
+     */
+    static void dropPending(Context ctx, Shortcut s) {
+        File f = new File(ctx.getFilesDir(), PENDING);
+        Properties p = AgvnPropsFile.load(f);
+        if (!p.isEmpty() && dropped(new Entry(p), s.container.id, s.file.getPath())) f.delete();
+    }
+
+    static boolean dropped(Entry e, int container, String shortcut) {
+        return of(e, container, shortcut) && !e.params.containsKey(AgvnRepairEnd.UNDONE);
+    }
+
     static boolean hasPending(Context ctx) {
         return new File(ctx.getFilesDir(), PENDING).isFile();
     }

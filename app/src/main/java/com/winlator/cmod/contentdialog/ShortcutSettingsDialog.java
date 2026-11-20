@@ -670,6 +670,7 @@ public class ShortcutSettingsDialog extends ContentDialog implements DXVKConfigD
         File oldDesktopFile = shortcut.file;
         File newDesktopFile = new File(parent, newName + ".desktop");
         if (!newDesktopFile.isFile() && oldDesktopFile.renameTo(newDesktopFile)) {
+            com.winlator.cmod.agvn.AgvnGoodConfig.renamed(getContext(), shortcut.container, oldDesktopFile.getName(), newDesktopFile.getName()); // AGVN: "Tự sửa lỗi"'s state of the game keeps its name
             updateShortcutFileReference(newDesktopFile);
             deleteOldFileIfExists(oldDesktopFile);
         }

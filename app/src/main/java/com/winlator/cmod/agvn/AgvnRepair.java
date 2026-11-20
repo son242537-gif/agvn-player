@@ -110,11 +110,16 @@ final class AgvnRepair {
 
     /**
      * The player reports {@code symptom}: the settings {@code now} are kept to go back to. The same symptom again goes
-     * on where it was (its settings before, the fixes tried); another one starts afresh.
+     * on where it was (the fixes tried; with a fix on trial, its settings before too); another one starts afresh. With
+     * no fix on trial the game has no fix of the report on it, so {@code now} are its settings to go back to: the old
+     * ones were kept, and "Vẫn còn lỗi" then undid what the player had set in "Cấu hình" in between (audit of
+     * 20/11/2026).
      */
     static void begin(Properties state, String symptom, Map<String, String> now) {
-        if (symptom.equals(symptom(state)) && state.containsKey(HAS_BEFORE)) return;
-        clear(state);
+        boolean goesOn = symptom.equals(symptom(state)) && state.containsKey(HAS_BEFORE);
+        if (goesOn && !trying(state).isEmpty()) return;
+        if (goesOn) for (String key : keys()) state.remove(BEFORE + key);
+        else clear(state);
         state.setProperty(SYMPTOM, symptom);
         state.setProperty(HAS_BEFORE, "1");
         for (Map.Entry<String, String> e : now.entrySet()) state.setProperty(BEFORE + e.getKey(), e.getValue());
@@ -143,10 +148,15 @@ final class AgvnRepair {
         }
     }
 
+    /** True when a fix is on trial for another symptom than {@code symptom}. */
+    static boolean otherOnTrial(Properties state, String symptom) {
+        return !trying(state).isEmpty() && !symptom.equals(symptom(state));
+    }
+
     /** The player picks another problem while a fix is on trial: the settings go back, the report is forgotten. */
     static void abandon(Context a, Shortcut s) {
         Properties state = AgvnGoodConfig.load(a, s);
-        restore(s, before(state));
+        AgvnRepairEnd.goBack(s, state);
         s.saveData();
         clear(state);
         AgvnGoodConfig.save(a, s, state);
@@ -165,6 +175,10 @@ final class AgvnRepair {
     /** Starts trying {@code fix} for {@code finding}: false when it could not be put on the game. */
     static boolean start(Activity a, Shortcut s, AgvnProblemCatalog.Finding finding, AgvnFixes.Fix fix) {
         Properties state = AgvnGoodConfig.load(a, s);
+        if (otherOnTrial(state, finding.id())) { // not asked about any more: it goes back first, as the dialog does,
+            abandon(a, s); // else it stayed on the game for good (the black-screen bar's fix over a report's trial)
+            state = AgvnGoodConfig.load(a, s);
+        }
         begin(state, finding.id(), snapshot(s));
         if (!AgvnFixApply.apply(a, s, fix, state)) return false;
         trying(state, fix);
@@ -189,7 +203,7 @@ final class AgvnRepair {
     static AgvnFixes.Fix next(Activity a, Shortcut s) {
         Properties state = AgvnGoodConfig.load(a, s);
         AgvnSessionLog.event("Tự sửa lỗi: vẫn còn lỗi với " + label(state) + ", trả cấu hình về như trước");
-        restore(s, before(state));
+        AgvnRepairEnd.goBack(s, state);
         s.saveData();
         AgvnProblemCatalog.Finding f = AgvnDoctor.catalog(a).finding(symptom(state), AgvnGodotGame.params(s));
         for (AgvnFixes.Fix fix : f != null ? left(a, s, f, state) : Collections.<AgvnFixes.Fix>emptyList()) {

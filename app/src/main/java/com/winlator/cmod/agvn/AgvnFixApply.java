@@ -35,6 +35,7 @@ final class AgvnFixApply {
 
     /** True when the game's settings changed, so it should start again. */
     static boolean apply(Activity a, Shortcut s, AgvnFixes.Fix fix, Properties state) {
+        Map<String, String> was = AgvnGoodConfig.snapshot(s);
         switch (fix.id) {
             case "send-logs":
                 AgvnLogShare.share(a, s);
@@ -46,14 +47,13 @@ final class AgvnFixApply {
                 open(a, new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", a.getPackageName(), null)));
                 return false;
             case "restore-good":
-                AgvnGoodConfig.restore(s,
-                        AgvnGoodConfig.restored(AgvnGoodConfig.good(state), AgvnGoodConfig.snapshot(s)));
+                AgvnGoodConfig.restore(s, AgvnGoodConfig.restored(AgvnGoodConfig.good(state), was));
                 break;
             case "reset":
                 reset(a, s);
                 break;
             case AgvnGameTwin.FIX:
-                if (!AgvnGameTwin.apply(a, s, fix.to)) return false;
+                if (!AgvnGameTwin.apply(a, s, fix)) return false;
                 break;
             case "quality-down":
             case "quality-up":
@@ -128,15 +128,16 @@ final class AgvnFixApply {
             case AgvnDllProxy.FIX:
                 s.putExtra("envVars", AgvnDllProxy.apply(s.getExtra("envVars"), fix.to));
                 break;
-            default:
-                // one "Tự sửa lỗi" tries for what the player reports, or a Godot game's "Chạy nhẹ"
+            default: // one "Tự sửa lỗi" tries for what the player reports, or a Godot game's "Chạy nhẹ"
                 if (!AgvnRepairFixes.apply(s, fix) && !AgvnGodotGame.applyLight(s, fix) && !AgvnRenpyWine.apply(s, fix))
                     return false;
                 break;
         }
         s.saveData();
-        if (fix.id.equals("restore-good") || fix.id.equals("reset")) state.remove(AgvnGoodConfig.TRIED);
-        else AgvnGoodConfig.addTried(state, fix.id);
+        // Going back keeps the fixes tried (only a good run forgets them, AgvnGoodConfig.setGood): one that did not help
+        // was offered again. A fix is kept with what it set: not the player's change (AgvnGoodConfig.changedByPlayer).
+        if (!fix.id.equals("restore-good") && !fix.id.equals("reset"))
+            AgvnGoodConfig.addTried(state, fix.id, was, AgvnGoodConfig.snapshot(s));
         AgvnGoodConfig.save(a, s, state);
         Log.i(TAG, "fix " + fix.id + (fix.to != null ? " -> " + fix.to : "") + " for " + s.name);
         return true;

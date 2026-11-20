@@ -186,22 +186,22 @@ public class AgvnRepairTest {
         AgvnEvidence box = new AgvnEvidence();
         box.started = box.endedByGame = true;
         box.seconds = 30;
-        assertTrue(AgvnRepairEnd.endedTooSoon(box));
+        assertTrue(AgvnRepairEnd.endedTooSoon(box, false));
         AgvnEvidence crash = new AgvnEvidence();
         crash.crashed = true;
         crash.seconds = 12;
-        assertTrue(AgvnRepairEnd.endedTooSoon(crash));
+        assertTrue(AgvnRepairEnd.endedTooSoon(crash, false));
         box.seconds = AgvnEvidence.GOOD_AFTER_S; // a minute in: the bar could ask
-        assertFalse(AgvnRepairEnd.endedTooSoon(box));
+        assertFalse(AgvnRepairEnd.endedTooSoon(box, false));
         AgvnEvidence quit = new AgvnEvidence();
         quit.started = quit.playerQuit = true;
         quit.seconds = 20;
-        assertFalse("the player quit: asked about as before", AgvnRepairEnd.endedTooSoon(quit));
+        assertFalse("the player quit: asked about as before", AgvnRepairEnd.endedTooSoon(quit, false));
         AgvnEvidence left = new AgvnEvidence();
         left.started = left.endedByGame = left.stopped = true;
         left.seconds = 42;
         assertFalse("Rj01608199, 16/10/2026: it died at the return to the app, 28 of its 42 s stopped",
-                AgvnRepairEnd.endedTooSoon(left));
+                AgvnRepairEnd.endedTooSoon(left, false));
 
         // the trial stops, the fix stays tried, and the report goes on from the same settings before
         Map<String, String> before = new LinkedHashMap<>();
@@ -251,5 +251,68 @@ public class AgvnRepairTest {
             for (AgvnProblemCatalog.Problem p : catalog.all()) used |= p.fixes.contains(id);
             assertTrue(id + " is a fix of some problem", used);
         }
+    }
+
+    @Test
+    public void leavingByTheGamesOwnExitIsNoFailedTrial() {
+        // a fix on trial, a look at the game, out by its Exit menu after 20 s: the fix went back as tried and not
+        // helping (audit of 20/11/2026). The exit code agvn-winhandler.exe tells says it was no crash
+        AgvnEvidence exit = new AgvnEvidence();
+        exit.started = exit.endedByGame = exit.exitKnown = true;
+        exit.seconds = 20;
+        assertTrue(AgvnRepairEnd.cleanExit(exit));
+        assertNull(catalog.find(exit));
+        assertFalse(AgvnRepairEnd.endedTooSoon(exit, catalog.find(exit) != null));
+        // Av Director Life again: Unreal's box, OK, exit code 0: the box is the problem the catalog finds
+        exit.lines.add(AgvnUnrealBox.LINE + "The UE-AVDirectorLife Game has crashed and will close");
+        assertTrue(AgvnRepairEnd.endedTooSoon(exit, catalog.find(exit) != null));
+        exit.lines.clear();
+        exit.exitCrash = true; // 0xC0000005 and no line in Wine's log
+        assertTrue(AgvnRepairEnd.endedTooSoon(exit, false));
+        exit.exitCrash = exit.exitKnown = false; // Wine went without telling a code
+        assertTrue(AgvnRepairEnd.endedTooSoon(exit, false));
+        AgvnEvidence never = new AgvnEvidence(); // closed before its window: no clean exit whatever the code
+        never.endedByGame = never.exitKnown = true;
+        never.seconds = 8;
+        assertTrue(AgvnRepairEnd.endedTooSoon(never, false));
+    }
+
+    @Test
+    public void theSameReportAgainStartsFromTheSettingsAsTheyAreNow() {
+        // "Hình chập chờn" reported, a fix tried and gone back; the player then sets a larger screen and no variables in
+        // "Cấu hình" and reports it again: "Vẫn còn lỗi" put the first report's settings back (audit of 20/11/2026)
+        Map<String, String> before = new LinkedHashMap<>();
+        before.put("dxwrapperConfig", "version=2.3.1,async=1");
+        before.put("envVars", "TU_DEBUG=noconform");
+        Properties state = new Properties();
+        AgvnRepair.begin(state, "report-flicker", before);
+        AgvnRepair.trying(state, new AgvnFixes.Fix("async-off", "Tắt DXVK async", "0"));
+        AgvnRepair.stopTrying(state);
+        Map<String, String> edited = new LinkedHashMap<>();
+        edited.put("dxwrapperConfig", "version=2.3.1,async=1");
+        edited.put("screenSize", "1280x720");
+        AgvnRepair.begin(state, "report-flicker", edited);
+        assertEquals(edited, AgvnRepair.before(state));
+        assertEquals("what was tried stays tried", Collections.singleton("async-off"), AgvnRepair.tried(state));
+        assertEquals("report-flicker", AgvnRepair.symptom(state));
+    }
+
+    @Test
+    public void aFixOnTrialGoesBackBeforeAnotherReportStarts() {
+        Properties state = new Properties();
+        assertFalse(AgvnRepair.otherOnTrial(state, "report-black"));
+        AgvnRepair.begin(state, "report-flicker", Collections.emptyMap());
+        assertFalse("nothing on trial yet", AgvnRepair.otherOnTrial(state, "report-black"));
+        AgvnRepair.trying(state, new AgvnFixes.Fix("async-off", "Tắt DXVK async", "0"));
+        // the black-screen bar's "Ren'Py qua ANGLE" over it: "Tắt DXVK async" stayed on the game, never asked about
+        assertTrue(AgvnRepair.otherOnTrial(state, "report-black"));
+        assertFalse("the same report goes on", AgvnRepair.otherOnTrial(state, "report-flicker"));
+        AgvnRepair.stopTrying(state);
+        assertFalse(AgvnRepair.otherOnTrial(state, "report-black"));
+
+        // "Chạy bằng Wine mới" on trial and given up before the game started: its move is called off too
+        assertEquals(Arrays.asList("agvnMoveTo", "agvnWine10Wanted"), AgvnRepairEnd.moveExtras(AgvnWine10Fix.ID));
+        assertTrue("a move another fix asked for stays", AgvnRepairEnd.moveExtras("dxvk-other").isEmpty());
+        assertTrue(AgvnRepairEnd.moveExtras("").isEmpty());
     }
 }

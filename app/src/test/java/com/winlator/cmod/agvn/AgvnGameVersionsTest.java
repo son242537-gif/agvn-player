@@ -109,4 +109,28 @@ public class AgvnGameVersionsTest {
         org.junit.Assert.assertTrue(AgvnGameTwin.differ(fixed, first));
         org.junit.Assert.assertFalse("nothing to offer", AgvnGameTwin.differ(fixed, new java.util.LinkedHashMap<>(fixed)));
     }
+
+    @Test
+    public void theOtherEntrysSettingsAreOfferedOnlyWhereTheyCanHelp() {
+        // an entry on "Chạy nhẹ" has the import's Wine settings, never run: no twin (audit of 20/11/2026)
+        assertTrue(AgvnGameTwin.runsOnWine(""));
+        assertTrue(AgvnGameTwin.runsOnWine(AgvnHtmlGame.RUNNER_WINE));
+        assertFalse(AgvnGameTwin.runsOnWine(AgvnHtmlGame.RUNNER_HTML));
+        assertFalse(AgvnGameTwin.runsOnWine(AgvnHtmlGame.RUNNER_RENPY));
+        // a missing Steam or a broken file is nothing settings fix
+        assertFalse(AgvnFixes.changesSettings(Collections.singletonList("send-logs")));
+        assertFalse(AgvnFixes.changesSettings(java.util.Arrays.asList("power-save-settings", "app-settings", "send-logs")));
+        assertTrue(AgvnFixes.changesSettings(java.util.Arrays.asList("dxvk-other", "send-logs")));
+        // an Unreal game's texture pool follows its Đồ họa step: no difference by itself, and an entry whose good
+        // settings were kept before the pool was is still one that ran well
+        java.util.Map<String, String> good = new java.util.LinkedHashMap<>();
+        good.put("dxwrapperConfig", "version=1.10.3");
+        java.util.Map<String, String> now = new java.util.LinkedHashMap<>(good);
+        now.put(AgvnGameImporter.EXTRA_TEXTURE_POOL, "2000");
+        assertFalse(AgvnGameTwin.differ(now, good));
+        assertTrue(AgvnGameTwin.ranWell(true, good, now));
+        assertFalse("never ran well", AgvnGameTwin.ranWell(false, good, now));
+        now.put("dxwrapperConfig", "version=2.3.1");
+        assertFalse("changed since", AgvnGameTwin.ranWell(true, good, now));
+    }
 }

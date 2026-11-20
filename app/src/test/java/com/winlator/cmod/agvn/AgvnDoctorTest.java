@@ -712,4 +712,80 @@ public class AgvnDoctorTest {
         assertTrue(env, env.contains("winmm=n,b") && env.contains("version=b") && !env.contains("version=n"));
         assertNull("once switched, not offered again", AgvnDllProxy.dll(exeDir, "version.dll", env));
     }
+
+    @Test
+    public void aFeatureLevelLineCountsOnlyForAGameThatNeverStarted() {
+        // DXVK prints it for a game that asks for 11_1 first and then runs on 11_0; on such a phone every later crash
+        // read "Game báo thiếu DirectX" and hid what the crash was (audit of 20/11/2026)
+        String line = "err:   D3D11InternalCreateDevice: Minimum required feature level D3D_FEATURE_LEVEL_11_1 not supported";
+        assertEquals("never started: DirectX it is", "directx", found(noStart(line)));
+        AgvnEvidence later = new AgvnEvidence();
+        later.started = later.crashed = true;
+        later.seconds = 600;
+        later.lines.add(line);
+        assertEquals("crash", found(later));
+        later.seconds = 20;
+        assertEquals("a crash soon after its window too", "crash", found(later));
+        later.lines.add("err:   DxvkAdapter: Failed to create device");
+        assertEquals("a line that does say so still counts", "directx", found(later));
+        assertNotNull(catalog.byId("directx").linesNoStart);
+    }
+
+    @Test
+    public void aSessionOnTrialOrClosedToStartAgainIsNotKeptAsGood() {
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.started = true;
+        ev.seconds = 300;
+        java.util.Properties state = new java.util.Properties();
+        assertTrue(AgvnDoctor.keepsGood(ev, state, false));
+        assertFalse("\"Mở lại game ngay\": the app closed it", AgvnDoctor.keepsGood(ev, state, true));
+        AgvnRepair.begin(state, "report-flicker", Collections.emptyMap());
+        AgvnRepair.trying(state, new AgvnFixes.Fix("async-off", "Tắt DXVK async", "0"));
+        assertFalse("only the player's answer keeps a fix on trial", AgvnDoctor.keepsGood(ev, state, false));
+        AgvnRepair.stopTrying(state);
+        assertTrue(AgvnDoctor.keepsGood(ev, state, false));
+        ev.crashed = true;
+        assertFalse(AgvnDoctor.keepsGood(ev, state, false));
+
+        // the restart as AgvnDoctorStore keeps it: this game's, asked for during this session, a moment ago
+        java.util.Properties p = new java.util.Properties();
+        p.setProperty("container", "3");
+        p.setProperty("shortcut", "/c3/Desktop/Toeha.desktop");
+        p.setProperty("time", "100000");
+        AgvnDoctorStore.Entry again = new AgvnDoctorStore.Entry(p);
+        assertTrue(AgvnDoctorStore.asked(again, 3, "/c3/Desktop/Toeha.desktop", 40_000, 101_000));
+        assertFalse("another game's", AgvnDoctorStore.asked(again, 3, "/c3/Desktop/Other.desktop", 40_000, 101_000));
+        assertFalse("another container's", AgvnDoctorStore.asked(again, 4, "/c3/Desktop/Toeha.desktop", 40_000, 101_000));
+        assertFalse("left from before this session", AgvnDoctorStore.asked(again, 3, "/c3/Desktop/Toeha.desktop", 100_001, 101_000));
+        assertFalse("the player stayed in the game", AgvnDoctorStore.asked(again, 3, "/c3/Desktop/Toeha.desktop", 40_000,
+                100_000 + AgvnDoctorStore.RELAUNCH_MS + 1));
+    }
+
+    @Test
+    public void theProblemOfASessionClosedToStartAgainIsDropped() {
+        // "Chạy lại, tắt bộ nhớ chia sẻ": the closed session left its crash to ask about, the game started again at
+        // once and ran well, and the library then asked about the crash (audit of 20/11/2026)
+        java.util.Properties p = new java.util.Properties();
+        p.setProperty("container", "3");
+        p.setProperty("shortcut", "/c3/Desktop/Toeha.desktop");
+        p.setProperty("problem", "crash");
+        p.setProperty("time", "100000");
+        assertTrue(AgvnDoctorStore.dropped(new AgvnDoctorStore.Entry(p), 3, "/c3/Desktop/Toeha.desktop"));
+        assertFalse("another game's problem stays", AgvnDoctorStore.dropped(new AgvnDoctorStore.Entry(p), 3, "/c3/Desktop/B.desktop"));
+        assertFalse(AgvnDoctorStore.dropped(new AgvnDoctorStore.Entry(p), 2, "/c3/Desktop/Toeha.desktop"));
+        p.setProperty(AgvnDoctorStore.PARAM + AgvnRepairEnd.UNDONE, "Đổi DXVK sang bản 2.3.1");
+        assertFalse("a fix that went back is still told", AgvnDoctorStore.dropped(new AgvnDoctorStore.Entry(p), 3, "/c3/Desktop/Toeha.desktop"));
+    }
+
+    @Test
+    public void aScreenTheDoctorsOwnStepDownGotRefusedIsStillKept() {
+        // "Giảm Đồ họa" from the doctor, then the game closes at once: "no-start" now, not "...-after-change", and the
+        // screen is refused as before
+        List<String> keys = Arrays.asList("screenSize", AgvnQuality.EXTRA_QUALITY);
+        assertEquals("no-start-after-change", AgvnDoctor.asChanged("no-start", true));
+        assertEquals("no-start", AgvnDoctor.asChanged("no-start", false));
+        assertEquals("crash", AgvnDoctor.asChanged("crash", true));
+        assertTrue(AgvnDoctor.refusedScreen(AgvnDoctor.asChanged("no-start", true), true, keys, "640x360", "854x480"));
+        assertFalse(AgvnDoctor.refusedScreen(AgvnDoctor.asChanged("no-start", false), false, keys, "640x360", "854x480"));
+    }
 }

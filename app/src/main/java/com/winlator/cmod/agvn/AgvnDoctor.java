@@ -140,17 +140,20 @@ public final class AgvnDoctor {
         if (timed && AgvnRepairEnd.afterGame(ctx, s, ev, now)) return; // the fix on trial went back: its report goes on
         Properties state = AgvnGoodConfig.load(ctx, s);
         List<String> changed = AgvnGoodConfig.changed(AgvnGoodConfig.good(state), now);
-        ev.changed = AgvnGoodConfig.hasGood(state) && !changed.isEmpty();
+        // "changed" is the player's doing: not what the doctor's own fixes tried since the last good run set
+        ev.changed = AgvnGoodConfig.hasGood(state) && !AgvnGoodConfig.changedByPlayer(state, now).isEmpty();
         AgvnProblemCatalog.Finding f = catalog(ctx).find(ev);
         if (f == null) {
-            if (ev.good()) {
+            if (keepsGood(ev, state, timed && AgvnDoctorStore.relaunchAsked(ctx, s, AgvnSessionTrack.startMs()))) {
                 AgvnGoodConfig.setGood(state, now);
                 AgvnGoodConfig.save(ctx, s, state);
             }
             return;
         }
         String screen = now.containsKey("screenSize") ? now.get("screenSize") : s.container.getScreenSize();
-        if (refusedScreen(f.id(), ev.changed, changed, screen, AgvnGoodConfig.good(state).get("screenSize"))) {
+        boolean differs = AgvnGoodConfig.hasGood(state) && !changed.isEmpty();
+        if (refusedScreen(asChanged(f.id(), differs), differs, changed, screen,
+                AgvnGoodConfig.good(state).get("screenSize"))) {
             state.setProperty(AgvnGoodConfig.TOO_SMALL, screen);
             AgvnGoodConfig.save(ctx, s, state);
         }
@@ -159,6 +162,24 @@ public final class AgvnDoctor {
         Log.i(TAG, "doctor: " + f.id() + " for " + s.name);
         if (AgvnMemorySaver.ranOutOfRam(f.id())) AgvnMemorySaver.markRamShort(s); // its next starts save the most RAM
         AgvnDoctorStore.ask(ctx, s, f);
+    }
+
+    /**
+     * True when a session that ended well is kept as the game's good settings. Not while a fix the player's report is
+     * trying is on the game: only their answer tells whether it works ({@link AgvnRepair#fixed}). Not when the app
+     * closed the game to start it again ({@code relaunch}: "Mở lại game ngay" after a fix, or "Chạy lại, tắt bộ nhớ chia
+     * sẻ"): that session was cut short for what was wrong with it. Both were kept before (audit of 20/11/2026).
+     */
+    static boolean keepsGood(AgvnEvidence ev, Properties state, boolean relaunch) {
+        return ev.good() && AgvnRepair.trying(state).isEmpty() && !relaunch;
+    }
+
+    /**
+     * {@code problem} as {@link #refusedScreen} reads it: "no-start" of a game whose settings differ from the good ones
+     * only by the doctor's own fix (Đồ họa one step down) is still the game refusing that screen.
+     */
+    static String asChanged(String problem, boolean differs) {
+        return differs && problem.equals("no-start") ? "no-start-after-change" : problem;
     }
 
     /** True when the game refused this screen size: "low-resolution", or only the screen got smaller before it failed. */

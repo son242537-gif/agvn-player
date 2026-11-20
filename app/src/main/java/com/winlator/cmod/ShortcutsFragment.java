@@ -97,7 +97,7 @@ public class ShortcutsFragment extends Fragment {
     private static final int MENU_GROUP_ORIENTATION_MODE = 9;
     private static final int MENU_HELP = 10; // AGVN
     private static final String STEAMGRID_BASE_URL = "https://www.steamgriddb.com/api/v2/";
-    private static String STEAMGRID_API_KEY = "0324c52513634547a7b32d6d323635d0";
+    private static String STEAMGRID_API_KEY = ""; // AGVN: upstream's SteamGridDB key is not shipped
     private static final ExecutorService DYNAMIC_SHORTCUT_EXECUTOR = Executors.newSingleThreadExecutor();
     private static final AtomicInteger DYNAMIC_SHORTCUT_SYNC_GENERATION = new AtomicInteger();
     private static volatile String lastDynamicShortcutSignature;
@@ -1108,6 +1108,7 @@ public class ShortcutsFragment extends Fragment {
         } catch (Exception ignored) {}
 
         if (fileDeleted) disableShortcutOnScreen(requireContext(), shortcut);
+        if (fileDeleted) com.winlator.cmod.agvn.AgvnGoodConfig.forget(requireContext(), shortcut); // AGVN: no "Tự sửa lỗi" state left for a game added under this name later
         return fileDeleted;
     }
 
