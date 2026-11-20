@@ -57,7 +57,9 @@ final class AgvnLiveLogs {
             logcat(new File(app, LOGCAT));
             write(new File(app, DEVICE), AgvnDeviceReport.text(context));
             File light = new File(context.getFilesDir(), AgvnLightSession.FILE);
-            if (light.isFile()) copy(light, new File(app, LIGHT));
+            // the last "Chạy nhẹ" session's notes only when it was this game's: a log sent for one game held another's
+            if (light.isFile() && (gameName == null || gameName.equals(AgvnLightSession.nameIn(light))))
+                copy(light, new File(app, LIGHT));
             if (lastIsThis) copy(last, new File(app, LIGHT_LAST));
             File rgssFiles = new File(new File(context.getFilesDir(), AgvnRgssFiles.RUN_DIR), AgvnRgssFiles.FILES_LOG);
             String files = gameDir != null ? AgvnRgssConfig.filesLogOf(FileUtils.readString(rgssFiles), gameDir) : null;

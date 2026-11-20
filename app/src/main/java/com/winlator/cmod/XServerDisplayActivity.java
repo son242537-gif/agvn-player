@@ -909,9 +909,11 @@ public class XServerDisplayActivity extends AppCompatActivity {
         if (!isInPictureInPictureMode()) {
             agvnAway = false; // AGVN: a game that loaded on while away (agvn/AgvnLoadAway) has nothing to stop
             com.winlator.cmod.agvn.AgvnLoadAway.back();
-            com.winlator.cmod.agvn.AgvnGamePause.resumed(); // AGVN: the time away is not the game's
             agvnRest(false);
-            ProcessHelper.resumeAllWineProcesses();
+            if (!isPaused) { // AGVN: a game the player stopped with ⏸ stays stopped until ⏸ again, as its button says
+                com.winlator.cmod.agvn.AgvnGamePause.resumed(); // AGVN: the time away is not the game's
+                ProcessHelper.resumeAllWineProcesses();
+            }
         }
     }
 

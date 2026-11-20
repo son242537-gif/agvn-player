@@ -134,7 +134,13 @@ public abstract class ProcessHelper {
                     if (PRINT_DEBUG) System.out.println(line);
                     synchronized (debugCallbacks) {
                         if (!debugCallbacks.isEmpty()) {
-                            for (Callback<String> callback : debugCallbacks) callback.call(line);
+                            for (Callback<String> callback : debugCallbacks) {
+                                try {
+                                    callback.call(line);
+                                } catch (RuntimeException e) { // AGVN: a watcher's error must not end the app mid-game
+                                    Log.w("ProcessHelper", "output callback failed", e);
+                                }
+                            }
                         }
                     }
                 }

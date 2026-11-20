@@ -103,6 +103,7 @@ public final class AgvnGameScanner {
         Walk w = new Walk();
         for (Root root : roots) if (root.dir != null) w.roots.add(canonical(root.dir));
         for (Root root : roots) {
+            w.visited = 0; // each root its own share: a crowded Download no longer left the roots after it unsearched
             if (root.dir != null && root.dir.isDirectory()) walk(root.dir, root.depth, w, !root.includeSelf, 0);
         }
         for (File game : w.found.games) {

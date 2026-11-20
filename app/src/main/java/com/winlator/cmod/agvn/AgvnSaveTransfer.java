@@ -161,9 +161,18 @@ final class AgvnSaveTransfer {
     private static boolean write(InputStream in, File target) throws IOException {
         File parent = target.getParentFile();
         if (parent != null && !parent.isDirectory() && !parent.mkdirs()) return false;
-        try (OutputStream out = new FileOutputStream(target)) {
-            byte[] buffer = new byte[64 * 1024];
-            for (int n; (n = in.read(buffer)) != -1; ) out.write(buffer, 0, n);
+        // beside the save, then in its place: a zip cut off half-way left the save it was replacing cut off too
+        File part = new File(target.getPath() + ".agvn-part");
+        try {
+            try (OutputStream out = new FileOutputStream(part)) {
+                byte[] buffer = new byte[64 * 1024];
+                for (int n; (n = in.read(buffer)) != -1; ) out.write(buffer, 0, n);
+            }
+            if (!part.renameTo(target)) { // a file system that does not rename over a file
+                if (!target.delete() || !part.renameTo(target)) throw new IOException("cannot replace " + target.getName());
+            }
+        } finally {
+            part.delete(); // gone already when it took the save's place
         }
         return true;
     }

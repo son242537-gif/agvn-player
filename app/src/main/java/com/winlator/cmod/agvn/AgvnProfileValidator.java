@@ -54,8 +54,10 @@ public final class AgvnProfileValidator {
             }
         }
         String exe = resolveExe(p, gameDir);
-        if (gameDir.getName().contains("wine ") || exe.contains("wine "))
-            throw new AgvnProfileException("Tên thư mục hoặc đường dẫn exe không được chứa chữ \"wine \" (viết thường, có dấu cách). Hãy đổi tên thư mục.");
+        // the whole path: the entry's command is cut at its last "wine ", so a parent folder ("/Download/wine games/X")
+        // added the game and then it could not start
+        if (new File(gameDir, exe).getAbsolutePath().contains("wine "))
+            throw new AgvnProfileException("Đường dẫn tới game không được chứa chữ \"wine \" (viết thường, có dấu cách) ở thư mục nào. Hãy đổi tên thư mục đó.");
         return exe;
     }
 

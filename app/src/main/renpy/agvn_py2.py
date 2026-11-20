@@ -12,6 +12,7 @@
 #     takes bytes to write too, and .decode() of text gives the text.
 # Code that asks for Python 3's division itself ("from __future__ import division") keeps it.
 
+import __future__
 import ast
 import builtins
 import copy
@@ -25,6 +26,21 @@ def py2_div(a, b):
     if isinstance(a, int) and isinstance(b, int):
         return a // b
     return a / b
+
+
+def py2_idiv_item(container, key, b):
+    """container[key] /= b of Python 2."""
+    container[key] = py2_div(container[key], b)
+
+
+def py2_idiv_attr(obj, name, b):
+    """obj.name /= b of Python 2, obj worked out once."""
+    setattr(obj, name, py2_div(getattr(obj, name), b))
+
+
+def py2_mode(mode):
+    """Python 2's "U" (universal newlines), which Python 3.12 refuses: text mode reads so anyway."""
+    return mode.replace("U", "") or "r"
 
 
 def py2_decode(obj, *args, **kwargs):
@@ -76,12 +92,16 @@ def game_code(depth=2):
 
 def py2_open(file, mode="r", buffering=-1, *args, **kwargs):
     """Python 2's open() for the game's own code; Ren'Py's and Python's code get Python 3's."""
-    if not game_code() or "b" in mode or args or kwargs:
+    if not game_code():
+        return py3_open(file, mode, buffering, *args, **kwargs)
+    mode = py2_mode(mode)  # open(path, "rU") of a Python 2 game: "invalid mode: 'rU'"
+    if "b" in mode or args or kwargs:
         return py3_open(file, mode, buffering, *args, **kwargs)
     return Py2File(py3_open(file, mode, buffering, encoding="utf-8", errors="surrogateescape"))
 
 
 def py2_file(name, mode="r", buffering=-1):
+    mode = py2_mode(mode)
     if "b" in mode:
         return py3_open(name, mode, buffering)
     return Py2File(py3_open(name, mode, buffering, encoding="utf-8", errors="surrogateescape"))
@@ -94,6 +114,8 @@ def py2_execfile(path, globals=None, locals=None):
 
 BUILTINS = {
     "__agvn_div__": py2_div,
+    "__agvn_idiv_item__": py2_idiv_item,
+    "__agvn_idiv_attr__": py2_idiv_attr,
     "__agvn_decode__": py2_decode,
     "file": py2_file,
     "unicode": str,
@@ -123,7 +145,10 @@ class Py2Decode(ast.NodeTransformer):
 
 
 class Py2Division(ast.NodeTransformer):
-    """a / b -> __agvn_div__(a, b); a /= b and a.x /= b -> a = __agvn_div__(a, b) (a[i] /= b stays as it is)."""
+    """
+    a / b -> __agvn_div__(a, b); a /= b -> a = __agvn_div__(a, b); a[i] /= b and a.x /= b through helpers that work
+    the container out once (stats["hp"] /= 2 gave 2.5 where Python 2 gave 2; a slice target stays as it is).
+    """
 
     def visit_BinOp(self, node):
         self.generic_visit(node)
@@ -134,12 +159,23 @@ class Py2Division(ast.NodeTransformer):
 
     def visit_AugAssign(self, node):
         self.generic_visit(node)
-        if not isinstance(node.op, ast.Div) or not isinstance(node.target, (ast.Name, ast.Attribute)):
+        target = node.target
+        if not isinstance(node.op, ast.Div):
             return node
-        load = copy.deepcopy(node.target)
-        load.ctx = ast.Load()
-        call = ast.Call(func=ast.Name(id="__agvn_div__", ctx=ast.Load()), args=[load, node.value], keywords=[])
-        return ast.copy_location(ast.Assign(targets=[node.target], value=call), node)
+        if isinstance(target, ast.Name):
+            load = ast.Name(id=target.id, ctx=ast.Load())
+            call = ast.Call(func=ast.Name(id="__agvn_div__", ctx=ast.Load()), args=[load, node.value], keywords=[])
+            return ast.copy_location(ast.Assign(targets=[target], value=call), node)
+        if isinstance(target, ast.Attribute):
+            args = [target.value, ast.Constant(value=target.attr), node.value]
+            name = "__agvn_idiv_attr__"
+        elif isinstance(target, ast.Subscript) and not isinstance(target.slice, ast.Slice):
+            args = [target.value, target.slice, node.value]
+            name = "__agvn_idiv_item__"
+        else:
+            return node
+        call = ast.Call(func=ast.Name(id=name, ctx=ast.Load()), args=args, keywords=[])
+        return ast.copy_location(ast.Expr(value=call), node)
 
 
 def asks_true_division(tree):
@@ -155,7 +191,13 @@ class Py2Wrap:
 
     def visit(self, tree):
         tree = Py2Decode().visit(self.wrap.visit(tree))
-        if not asks_true_division(tree):
+        # a file that begins with "rpy python 3" (Ren'Py 7.4 to 7.6) asked for Python 3's division: Ren'Py keeps that
+        # in the flags of the py_compile call this runs in
+        try:
+            flags = sys._getframe(1).f_locals.get("flags", 0)
+        except ValueError:
+            flags = 0
+        if not asks_true_division(tree) and not flags & __future__.division.compiler_flag:
             tree = Py2Division().visit(tree)
         return ast.fix_missing_locations(tree)
 
@@ -180,6 +222,16 @@ DICT_METHODS = {"iteritems": lambda self: iter(self.items()), "iterkeys": lambda
                 "itervalues": lambda self: iter(self.values())}
 
 
+# Bump when what this file does to the game's code changes: Ren'Py keeps compiled blocks in game/cache, by the
+# block's text, and would go on running the ones compiled before (or by another Ren'Py 8 that ran this folder).
+RULES = 2
+
+
+def patch_script(module):
+    """The trial's own bytecode cache (a string: Ren'Py's module backup takes it)."""
+    module.BYTECODE_FILE = "cache/bytecode-agvn-py2-%d.rpyb" % RULES
+
+
 def patch_revertable(module):
     cls = getattr(module, "RevertableDict", None)
     for name, method in DICT_METHODS.items():
@@ -195,6 +247,7 @@ def install(hooks):
     builtins.open = py2_open
     hooks["renpy.python"] = patch_python
     hooks["renpy.revertable"] = patch_revertable
+    hooks["renpy.script"] = patch_script
     hooks["renpy.pyanalysis"] = patch_analysis
     print("AGVN: Ren'Py 6/7 game (Python 2) on Ren'Py 8, on trial: Python 2 builtins, division, text and dict methods;"
           " the app keeps its saves, files copied from the game's: " + os.environ.get("AGVN_RENPY_PY2_SAVES", "?"))

@@ -162,9 +162,8 @@ public class PreloaderDialog {
         launchScrim.setVisibility(hasArtwork ? View.VISIBLE : View.GONE);
         applyLaunchTextColors(hasArtwork);
 
-        if (!hasUserArtwork && !hasBanner && banner != null) {
-            requestTheGamesDbBanner(launchTitleText, banner);
-        }
+        // AGVN: no lookup of the game's title on thegamesdb.net when it has no banner yet (upstream's fallback sent the
+        // title out at every such start): nothing but the updater uses the network. The library draws the banner.
     }
 
     private int withAlpha(int color, int alpha) {

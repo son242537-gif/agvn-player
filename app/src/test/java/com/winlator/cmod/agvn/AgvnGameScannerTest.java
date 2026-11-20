@@ -165,4 +165,25 @@ public class AgvnGameScannerTest {
         for (File d : dirs) names.append(d.getName()).append('|');
         return names.toString();
     }
+
+    @Test
+    public void aParentFolderWithWineInItsNameIsRefusedAsTheGameFolderIs() throws Exception {
+        // the entry's command is cut at its last "wine ": "/Download/wine games/MyGame/Game.exe" was added, then never started
+        File dir = tmp.newFolder("wine games", "MyGame");
+        touch(new File(dir, "Game.exe"));
+        try {
+            AgvnProfileValidator.validate(AgvnProfile.defaultFor(dir.getName()), dir);
+            org.junit.Assert.fail("added a game the library cannot start");
+        } catch (AgvnProfileException e) {
+            assertTrue(e.getMessage(), e.getMessage().contains("wine "));
+        }
+    }
+
+    @Test
+    public void anotherFoldersGameOfTheSameNameIsNotTheSameEntry() throws Exception {
+        File first = tmp.newFolder("A", "Windows"), second = tmp.newFolder("B", "Windows");
+        assertTrue("its own entry: replaced on re-import", AgvnGameImporter.sameFolder(first.getAbsolutePath(), first));
+        assertTrue("an entry from before entries knew their folder", AgvnGameImporter.sameFolder("", first));
+        org.junit.Assert.assertFalse("two downloads unpacked to \"Windows\"", AgvnGameImporter.sameFolder(first.getAbsolutePath(), second));
+    }
 }

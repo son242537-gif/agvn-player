@@ -22,6 +22,19 @@ init python:
         except (KeyError, IndexError):
             return "other"
 
+    def more():
+        try:
+            raise KeyError("k")
+        except KeyError,e:
+            pass
+        try:
+            raise ValueError("v")
+        except ValueError: a, b = 1, 2
+        try:
+            import nothing_here
+        except ImportError: import json, os
+        return a, b, os.sep
+
 label start:
     $ results = (numfloat(Clock()), half(), caught())
     $ renpy.write_log("AGVN-SYNTAX RESULTS %r", results)

@@ -138,17 +138,19 @@ public final class AgvnGameImporter {
 
     /** Creates (or replaces) the shortcut in {@code container}; returns the .desktop file. */
     public static File importGame(Context ctx, Container container, Candidate c, DeviceTier tier) throws IOException {
-        String name = c.profile.name.trim();
-        String folder = c.gameDir.getName();
-        File profileDir = new File(getProfilesRoot(), c.variant == null ? folder : AgvnProfile.variantName(folder, c.variant));
+        File desktopDir = container.getDesktopDir();
+        desktopDir.mkdirs();
+        String name = freeName(container, desktopDir, c.profile.name.trim(), c.gameDir);
+        c.profile.name = name;
+        // by the entry's name, one per entry: by the folder's name, two games unpacked into folders both called
+        // "Windows" shared one copy, and one ran with the other's env and args (AgvnProfileEnv)
+        File profileDir = new File(getProfilesRoot(), name);
         profileDir.mkdirs();
         File profileCopy = new File(profileDir, AgvnProfile.FILE_NAME);
         if (!FileUtils.writeString(profileCopy, c.profile.toJson()))
             throw new IOException("cannot write profile to " + profileCopy);
 
         File exeFile = new File(c.gameDir, c.exe);
-        File desktopDir = container.getDesktopDir();
-        desktopDir.mkdirs();
         File desktopFile = new File(desktopDir, name + ".desktop");
         Map<String, String> kept = keptExtras(container, desktopFile);
         try (PrintWriter writer = new PrintWriter(desktopFile, "UTF-8")) {
@@ -170,6 +172,27 @@ public final class AgvnGameImporter {
         PreLaunchCheck.applyUeConfig(ctx, shortcut);
         AgvnGameIcons.write(container, c.gameDir, c.engine, exeFile, name);
         return desktopFile;
+    }
+
+    /**
+     * {@code name}, or "name (2)", "name (3)"... while the library entry of that name is another folder's game. Entries
+     * are files named after the game, so a second game of the same name (two downloads that unpack to "Windows" or
+     * "Game", two profiles with one name) replaced the first: it left the library, and the new one took its home-screen
+     * shortcut, favourite mark and cover. The same folder added again still replaces its own entry.
+     */
+    static String freeName(Container container, File desktopDir, String name, File gameDir) {
+        String candidate = name;
+        for (int n = 2; n < 100; n++) {
+            File file = new File(desktopDir, candidate + ".desktop");
+            if (!file.isFile() || sameFolder(new Shortcut(container, file).getExtra(EXTRA_GAME_DIR), gameDir)) return candidate;
+            candidate = name + " (" + n + ")";
+        }
+        return candidate;
+    }
+
+    /** True for the entry of {@code gameDir} itself, or one made before entries knew their folder. */
+    static boolean sameFolder(String entryDir, File gameDir) {
+        return entryDir == null || entryDir.isEmpty() || new File(entryDir).equals(gameDir.getAbsoluteFile());
     }
 
     /** Extras a re-import must not lose: the launcher-shortcut id, favourite flag, last run and a picked cover. */

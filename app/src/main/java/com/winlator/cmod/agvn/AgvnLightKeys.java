@@ -172,7 +172,8 @@ final class AgvnLightKeys extends View {
             invalidate();
         } else if (action == MotionEvent.ACTION_MOVE && dragId >= 0) {
             int p = ev.findPointerIndex(dragId);
-            if (p < 0) return true;
+            // the key under the finger went (another finger pressed "Xóa"): nothing to move, where it once crashed
+            if (p < 0 || selected < 0 || selected >= layout.elements.size()) return true;
             float[] at = AgvnLightGeometry.moved(ev.getX(p), ev.getY(p), grabDx, grabDy, getWidth(), getHeight());
             AgvnLightLayout.Element e = layout.elements.get(selected);
             e.x = at[0];

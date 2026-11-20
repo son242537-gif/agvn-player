@@ -98,7 +98,7 @@ public class BigPictureActivity extends AppCompatActivity {
     private Shortcut currentShortcut;
     private int lastFocusedItemIndex = RecyclerView.NO_POSITION;
 
-    private static String API_KEY = "0324c52513634547a7b32d6d323635d0";
+    private static String API_KEY = ""; // AGVN: upstream's SteamGridDB key is not shipped; a player's own key still works
     private static final String BASE_URL = "https://www.steamgriddb.com/api/v2/";
 
     private static final int REQUEST_CODE_UPLOAD_CUSTOM_COVER = 1069;
@@ -931,6 +931,7 @@ public class BigPictureActivity extends AppCompatActivity {
 
 
     private void fetchCoverArt(Shortcut shortcut) {
+        if (API_KEY.isEmpty()) return; // AGVN: no key, no request to steamgriddb.com
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .client(new OkHttpClient())

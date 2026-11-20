@@ -60,7 +60,11 @@ final class AgvnEngineLogs {
 
     /** The game's exe as a file on the phone: the 64-bit one it starts instead, if any ({@link AgvnExe64}). */
     static File exe(Shortcut shortcut) {
-        return AgvnExeMain.launched(shortcut, AgvnExe64.launched(shortcut, new File(shortcut.path.replace("\"", ""))));
+        // a shortcut made in the container's file manager holds a Windows path ("D:\\Games\\X\\Game.exe"), no file on the
+        // phone: its engine logs were never found
+        String unix = AgvnExeRedirect.toUnixPath(shortcut.path, shortcut.container);
+        File start = new File(unix != null ? unix : shortcut.path.replace("\"", ""));
+        return AgvnExeMain.launched(shortcut, AgvnExe64.launched(shortcut, start));
     }
 
     /** The game's folder: the one it was imported from, else the exe's. */

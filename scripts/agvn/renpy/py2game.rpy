@@ -22,8 +22,17 @@ init python:
         has_file = True
     except NameError:
         has_file = False
+    stats = {"hp": 5}
+    stats["hp"] /= 2
+    class Box(object):
+        v = 7
+    box = Box()
+    box.v /= 2
+    import os
+    universal = open(os.path.join(config.gamedir, "script.rpyc"), "rU")
+    universal.close()
     results = [half == 640 and type(half) is int, third == 3, mixed == 3.5, count == 2, pairs == ["a", "b"],
-               keys == ["a", "b"], ok_str, big == 5, xs == [0, 1, 2], has_file]
+               keys == ["a", "b"], ok_str, big == 5, xs == [0, 1, 2], has_file, stats["hp"] == 2, box.v == 3]
     renpy.write_log("AGVN-PY2 RESULTS %r" % (results,))
 
 screen center_box():

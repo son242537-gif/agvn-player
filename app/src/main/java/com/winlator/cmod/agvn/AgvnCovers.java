@@ -22,6 +22,8 @@ public final class AgvnCovers {
     private static final int COVER_W = 600, COVER_H = 900, BANNER_W = 1280, BANNER_H = 720;
     /** Pictures are decoded at least this large (when larger), so a cover or banner keeps its detail. */
     private static final int FULL_W = 1280, FULL_H = 720;
+    /** The most pixels a source picture is decoded to (about 32 MB as a bitmap). */
+    private static final long MAX_PIXELS = 8_000_000;
 
     private static final java.util.concurrent.ExecutorService EXECUTOR = java.util.concurrent.Executors.newSingleThreadExecutor();
     private static final java.util.Set<String> PENDING = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
@@ -110,6 +112,8 @@ public final class AgvnCovers {
         if (o.outWidth <= 0 || o.outHeight <= 0) return null;
         int sample = 1;
         while (o.outWidth / (sample * 2) >= minW && o.outHeight / (sample * 2) >= minH) sample *= 2;
+        // a strip (60000x700) never gets both sides down to the cover's, and was decoded whole: out of memory, no cover
+        while ((long) (o.outWidth / sample) * (o.outHeight / sample) > MAX_PIXELS) sample *= 2;
         BitmapFactory.Options decode = new BitmapFactory.Options();
         decode.inSampleSize = sample;
         return BitmapFactory.decodeByteArray(data, 0, data.length, decode);

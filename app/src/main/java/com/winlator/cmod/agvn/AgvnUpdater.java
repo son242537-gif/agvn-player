@@ -200,6 +200,9 @@ public final class AgvnUpdater {
         c.setReadTimeout(TIMEOUT_MS);
         c.setInstanceFollowRedirects(true); // GitHub sends release files from another https host
         c.setUseCaches(false);
+        // Android's own agent names the phone's model and build ("Dalvik/2.1.0 (Linux; U; Android 16; <model>
+        // Build/<id>)"): the update check sends nothing about the device
+        c.setRequestProperty("User-Agent", "AGVN-Player");
         return c;
     }
 }

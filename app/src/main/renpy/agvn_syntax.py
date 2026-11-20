@@ -45,27 +45,34 @@ def fix_ur_strings(tokens):
 
 
 def fix_except(tokens):
-    """except X, e: -> except X as e: (the comma outside any bracket of a line that starts with except)."""
-    start, depth, is_except = True, 0, False
+    """
+    except X, e: -> except X as e: the comma outside any bracket between the "except" that starts a line and its colon.
+    Nothing after the colon is touched ("except: a, b = 0, 0", "except ImportError: import json, os": in 0.1.98 that
+    comma became "as" too), a clause may run over lines inside brackets, and "as" gets a space on both sides
+    ("except Exception,e:" became "ase" in 0.1.98).
+    """
+    start, depth, in_clause = True, 0, False
     for t in tokens:
-        if t.type in (token.NEWLINE, tokenize.NL, token.INDENT, token.DEDENT):
-            start, depth, is_except = True, 0, False
+        if t.type in (token.NEWLINE, token.INDENT, token.DEDENT) or t.type == tokenize.NL and depth == 0:
+            start, depth, in_clause = True, 0, False
             yield t
             continue
-        if t.type == tokenize.COMMENT:
+        if t.type in (tokenize.COMMENT, tokenize.NL):
             yield t
             continue
         if start:
-            is_except = t.type == token.NAME and t.string == "except"
+            in_clause = t.type == token.NAME and t.string == "except"
             start = False
         if t.type == token.OP:
             if t.string in "([{":
                 depth += 1
             elif t.string in ")]}":
                 depth -= 1
-            elif t.string == "," and is_except and depth == 0:
-                yield tokenize.TokenInfo(token.NAME, " as", t.start, t.end, t.line)
-                is_except = False
+            elif t.string == ":" and depth == 0:
+                in_clause = False
+            elif t.string == "," and in_clause and depth == 0:
+                yield tokenize.TokenInfo(token.NAME, " as ", t.start, t.end, t.line)
+                in_clause = False
                 continue
         yield t
 

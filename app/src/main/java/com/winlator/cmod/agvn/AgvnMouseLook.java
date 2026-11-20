@@ -51,6 +51,8 @@ public final class AgvnMouseLook {
     private boolean told;
     /** The game warped the pointer to one point as it holds it, and has not shown its cursor since. */
     private boolean warpHeld;
+    /** Guards the warp fields; nothing else is locked while it is held. */
+    private final Object warpLock = new Object();
     /** A finger's press waiting to know whether it is a tap or a drag ({@link #pressLater}), and how far it went. */
     private Pointer.Button heldPress;
     private float travel;
@@ -84,20 +86,34 @@ public final class AgvnMouseLook {
         this.onText = onText;
     }
 
-    /** The game put the X pointer at (x, y) (its warp, WindowRequests.warpPointer). */
-    public synchronized void warped(int x, int y) {
+    /**
+     * The game put the X pointer at (x, y) (its warp, WindowRequests.warpPointer). Called with the X server's locks
+     * held, so it takes {@link #warpLock} and never this object's own lock: {@link #by} holds that one while it waits
+     * for the X locks, and the two threads waited for each other for good when a game without agvn-winhandler's
+     * SendInput (a container's desktop) answered every finger move with a warp.
+     */
+    public void warped(int x, int y) {
         long now = clock.getAsLong();
-        warpCount = warps(warpCount, x == warpX && y == warpY, now - warpLastMs);
-        warpX = x;
-        warpY = y;
-        warpLastMs = now;
-        if (warpCount >= WARPS) warpHeld = true;
+        synchronized (warpLock) {
+            warpCount = warps(warpCount, x == warpX && y == warpY, now - warpLastMs);
+            warpX = x;
+            warpY = y;
+            warpLastMs = now;
+            if (warpCount >= WARPS) warpHeld = true;
+        }
     }
 
     /** True while the game holds the cursor. */
     public synchronized boolean locked() {
-        if (warpHeld && !cursorHidden.getAsBoolean()) warpHeld = false; // its cursor shows: a menu, the mouse is let go
-        return warpHeld || locked(reported, warpCount, clock.getAsLong() - warpLastMs);
+        boolean held;
+        synchronized (warpLock) {
+            held = warpHeld;
+        }
+        boolean shown = held && !cursorHidden.getAsBoolean(); // its cursor shows: a menu, the mouse is let go
+        synchronized (warpLock) {
+            if (shown) warpHeld = false;
+            return warpHeld || locked(reported, warpCount, clock.getAsLong() - warpLastMs);
+        }
     }
 
     /** Whether the game shows no cursor where the pointer is (Wine's empty cursor for a hidden one). */

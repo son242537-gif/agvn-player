@@ -73,16 +73,29 @@ public final class AgvnSaveDialogs {
             File backup = newZip(shortcut, "truoc-khi-nhap");
             if (AgvnSaveTransfer.export(places, prefs(shortcut), shortcut.name, backup) == 0) backup.delete();
 
-            int count;
-            if (sources.size() == 1 && isAgvnZip(sources.get(0))) {
+            int count = 0;
+            try {
+                // each AGVN save zip is put back where its files belong, whatever else was picked with it: picked with
+                // another file, it was unpacked as plain files into the first save folder and nothing was restored
+                List<AgvnSaveTransfer.Source> plain = new ArrayList<>();
                 List<String> prefs = new ArrayList<>();
-                try (InputStream in = sources.get(0).open()) {
-                    count = AgvnSaveTransfer.restore(in, places, prefs);
+                boolean restored = false;
+                for (AgvnSaveTransfer.Source source : sources) {
+                    if (!isAgvnZip(source)) {
+                        plain.add(source);
+                        continue;
+                    }
+                    try (InputStream in = source.open()) {
+                        count += AgvnSaveTransfer.restore(in, places, prefs);
+                    }
+                    restored = true;
                 }
                 String key = prefsKey(shortcut);
-                if (key != null) count += AgvnSavePrefs.write(userReg(shortcut), key, prefs);
-            } else {
-                count = AgvnSaveTransfer.copyInto(sources, places.get(0));
+                if (restored && key != null) count += AgvnSavePrefs.write(userReg(shortcut), key, prefs);
+                if (!plain.isEmpty()) count += AgvnSaveTransfer.copyInto(plain, places.get(0));
+            } catch (IOException e) { // a broken zip: say where the saves from before are
+                if (!backup.isFile()) throw e;
+                throw new IOException(e.getMessage() + activity.getString(R.string.agvn_save_imported_backup, readable(backup)), e);
             }
             if (count == 0) return activity.getString(R.string.agvn_save_import_none);
             String text = activity.getString(R.string.agvn_save_imported, count, readable(places.get(0).dir));

@@ -509,6 +509,20 @@ static const char *agvnWineProcesses[] = {
     "winhandler.exe", "agvn-winhandler.exe"};
 static HANDLE agvnGame;
 
+/* AGVN 3: TRUE when the process's exe is under C:\windows (Wine's own), or cannot be asked */
+static BOOL agvnInWindows(DWORD pid) {
+  char path[MAX_PATH];
+  DWORD size = sizeof(path);
+  BOOL inside = TRUE;
+  HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+  if (!hProcess)
+    return TRUE;
+  if (QueryFullProcessImageNameA(hProcess, 0, path, &size))
+    inside = _strnicmp(path, "C:\\windows\\", 11) == 0;
+  CloseHandle(hProcess);
+  return inside;
+}
+
 /* AGVN 3: how many processes run besides Wine's own and this one */
 static int agvnGameProcesses(void) {
   int count = 0;
@@ -523,6 +537,9 @@ static int agvnGameProcesses(void) {
       BOOL wine = pe32.th32ProcessID == self;
       for (size_t i = 0; !wine && i < sizeof(agvnWineProcesses) / sizeof(agvnWineProcesses[0]); i++)
         wine = _stricmp(pe32.szExeFile, agvnWineProcesses[i]) == 0;
+      /* a game's own exe may carry such a name ("Start.exe" beside a launcher): Wine's is in C:\windows */
+      if (wine && pe32.th32ProcessID != self && !agvnInWindows(pe32.th32ProcessID))
+        wine = FALSE;
       if (!wine)
         count++;
     } while (Process32Next(hSnap, &pe32));
