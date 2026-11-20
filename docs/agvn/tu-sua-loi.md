@@ -4452,7 +4452,7 @@ Ngày 20/11/2026 toàn bộ mã AGVN được rà theo 5 mảng; danh sách lỗ
   7. `adb logcat | grep AGVN` khi giải tệp có mật khẩu: không thấy dòng lệnh hay mật khẩu.
   8. ZIP và 7z thường vẫn giải như trước; màn Giấy phép có mục 7-Zip.
 
-## "Làm nét hình" cho từng game, hồ sơ có sẵn cho Sexy Beach Premium Resort, thêm cú pháp Python 2 (bản 0.1.101)
+## "Làm nét hình" cho từng game, hồ sơ có sẵn cho Sexy Beach Premium Resort, thêm cú pháp Python 2 (bản 0.1.102)
 
 - **"Làm nét hình" trong "Chỉnh đồ họa":** ô chọn cho từng game (`AgvnSharpScreen.EXTRA_CHOICE` = `agvnSharp`: "1" bật,
   "0" tắt, trống = chưa chọn). Lựa chọn của người chơi cho game đứng trước mặc định theo hạng máy và trước cấu hình lưu
@@ -4473,7 +4473,7 @@ Ngày 20/11/2026 toàn bộ mã AGVN được rà theo 5 mảng; danh sách lỗ
      trong thanh bên tắt. Bật lại: nét.
   2. Sexy Beach Premium Resort: xoá khỏi thư viện, thêm lại, không gõ tham số: game hiện hình ở cửa sổ 1280×720.
 
-## "Mở bằng AGVN Player", bộ part1/part2 rời, kiểm tra sau giải nén, cảnh báo trùng game (bản 0.1.101)
+## "Mở bằng AGVN Player", bộ part1/part2 rời, kiểm tra sau giải nén, cảnh báo trùng game (bản 0.1.102)
 
 - **Mở tệp nén từ app khác:** `AgvnOpenArchiveActivity` nhận VIEW/SEND cho ZIP, RAR, 7z, tar (theo kiểu MIME; tệp
   kiểu `application/octet-stream` chỉ khi tên có đuôi tệp nén). `AgvnOpenArchivePath`/`AgvnUriPath` đổi địa chỉ

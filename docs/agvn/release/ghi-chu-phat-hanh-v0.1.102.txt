@@ -1,0 +1,13 @@
+AGVN Player v0.1.102 - agvn.io
+
+Mới:
+- Bấm vào tệp game (ZIP, RAR, 7z) trong danh sách tải của trình duyệt hoặc trình quản lý tệp rồi chọn "AGVN Player": app giải nén và thêm game luôn.
+- Game chia thành nhiều tệp riêng (tên.part1.zip, tên.part2.zip…): chọn một tệp, app giải hết vào cùng một thư mục, chỉ hỏi mật khẩu một lần.
+- Giải nén xong app báo rõ nếu đó là bản Android (APK), bản macOS/Linux, hoặc còn một tệp nén bên trong (và giải tiếp giúp).
+- Thêm một game đã có trong thư viện ở thư mục khác: app hỏi trước, nêu rõ bản cũ nằm ở đâu.
+- "Chỉnh đồ họa" có thêm ô "Làm nét hình khi phóng lên màn hình" cho từng game, bật được trên mọi máy.
+- Sexy Beach Premium Resort: app tự đặt tham số chạy khi thêm game, không cần gõ tay.
+
+Sửa lỗi:
+- "Chạy nhẹ" game Ren'Py 6/7 (chạy thử): sửa thêm cú pháp Python 2 cũ như số 10L, print giữa dòng, exec "code".
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
