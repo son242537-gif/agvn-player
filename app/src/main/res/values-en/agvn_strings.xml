@@ -503,5 +503,25 @@
     <string name="agvn_unpack_notif_done">%1$s is extracted. Tap to open AGVN Player.</string>
     <string name="agvn_unpack_notif_failed">Could not extract %1$s</string>
     <string name="agvn_unpack_notif_password">The archive has a password. Open AGVN Player, pick the archive again and enter the password.</string>
+    <string name="agvn_open_title">Open an archive with AGVN Player</string>
+    <string name="agvn_open_not_ready">AGVN Player is not set up yet. Open AGVN Player, wait for the first setup to finish, then open this archive again.</string>
+    <string name="agvn_open_busy">AGVN Player has a game or another screen open. Quit the game, go back to the library, then open this archive again.</string>
+    <string name="agvn_open_no_path">The other app does not tell where \"%1$s\" is stored, so AGVN Player cannot open it directly.\n\nOpen AGVN Player, tap \"Add game\", choose \"Add from an archive\" and pick the file there (usually in Download).</string>
+    <string name="agvn_open_app">Open AGVN Player</string>
+    <string name="agvn_unpacked_apk_title">This is the Android version (APK)</string>
+    <string name="agvn_unpacked_apk">This archive holds the Android version of the game (an APK file), not the Windows version. Install it directly like any app; it is not added to AGVN Player.\n\nThe unpacked files are in %1$s.</string>
+    <string name="agvn_unpacked_apk_install">Install APK</string>
+    <string name="agvn_unpacked_inner_title">The archive holds another archive</string>
+    <string name="agvn_unpacked_inner">The unpacked archive holds just one more archive: \"%1$s\". The game is inside it.\n\nUnpack that one too?</string>
+    <string name="agvn_unpacked_other_os_title">Not the Windows version</string>
+    <string name="agvn_unpacked_other_os">This archive is the %1$s version of the game and has no .exe file. AGVN Player runs the Windows (PC) version. Download the Windows version and add it again.\n\nThe unpacked files are in %2$s; you can delete that folder.</string>
+    <string name="agvn_dup_title">This game seems to be in the library already</string>
+    <string name="agvn_dup_message">The library already has \"%1$s\", stored in:\n%2$s\n\nThe copy you are adding is in another folder:\n%3$s\n\nIf you keep both, the library has two entries for the same game, each with its own settings.</string>
+    <string name="agvn_dup_message_gone">The library already has \"%1$s\", which was stored in:\n%2$s\n(that folder is no longer on the phone)\n\nThe copy you are adding is in:\n%3$s\n\nIf you keep both, the library has two entries for the same game. The old entry can no longer run; you can remove it in the library.</string>
+    <string name="agvn_dup_keep_both">Keep both</string>
+    <string name="agvn_dup_show">See the existing copy</string>
+    <string name="agvn_dup_info">Folder: %1$s\nProgram: %2$s\nLast played: %3$s</string>
+    <string name="agvn_dup_info_gone">This folder is no longer on the phone: this entry can no longer run.</string>
+    <string name="agvn_dup_never_played">never</string>
     <string name="agvn_sharp_switch">Sharpen the picture when it is stretched to the screen (uses a little more GPU)</string>
 </resources>

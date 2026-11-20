@@ -2,6 +2,10 @@ AGVN Player v0.1.101 - agvn.io
 
 Mới:
 - "Thêm game" → "Thêm từ tệp nén (ZIP, RAR, 7z)": chọn tệp game vừa tải, dán mật khẩu nếu có, app tự giải nén vào thư mục AGVN rồi thêm game. Đọc được ZIP, RAR, 7z, tar và tệp chia nhiều phần; báo rõ khi sai mật khẩu, thiếu phần, tệp hỏng hoặc máy không đủ chỗ. Ảnh và video của game không còn tràn ra thư mục Download hay thư viện ảnh. Rời app trong lúc giải nén vẫn chạy tiếp, có thông báo tiến độ. Xong thì app hỏi có xoá tệp nén để lấy lại chỗ không.
+- Bấm vào tệp game (ZIP, RAR, 7z) trong danh sách tải của trình duyệt hoặc trình quản lý tệp rồi chọn "AGVN Player": app giải nén và thêm game luôn.
+- Game chia thành nhiều tệp riêng (tên.part1.zip, tên.part2.zip…): chọn một tệp, app giải hết vào cùng một thư mục, chỉ hỏi mật khẩu một lần.
+- Giải nén xong app báo rõ nếu đó là bản Android (APK), bản macOS/Linux, hoặc còn một tệp nén bên trong (và giải tiếp giúp).
+- Thêm một game đã có trong thư viện ở thư mục khác: app hỏi trước, nêu rõ bản cũ nằm ở đâu.
 - Thư viện → giữ vào game → "Cách chạy": đổi giữa Chạy nhẹ và Windows bất cứ lúc nào. Trước đây bấm nhầm "Chạy bằng Windows" thì không quay lại được.
 - Trong game Chạy nhẹ, bấm "Chạy bằng Windows" giờ có hỏi lại trước khi chuyển.
 - Thư viện → giữ vào game → "Lưu hồ sơ game": ghi cấu hình đang chạy của game vào thư mục game (agvn-profile.json). Chép thư mục game sang máy khác thì game nhận lại cấu hình đó.

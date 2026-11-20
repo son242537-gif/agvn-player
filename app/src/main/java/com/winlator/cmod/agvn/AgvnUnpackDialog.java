@@ -42,17 +42,26 @@ public final class AgvnUnpackDialog {
     private static final String SEVEN_ZIP = "libagvn7zz.so";
 
     public interface Done {
-        /** {@code gameDir}: the new folder, complete. */
-        void onUnpacked(File gameDir);
+        /** {@code result.dir}: the new folder, complete. {@code password}: the one that opened the archive, or null. */
+        void onUnpacked(AgvnUnpack.Result result, String password);
     }
 
     private AgvnUnpackDialog() {}
 
     public static void start(MainActivity activity, File archive, Done done) {
-        run(activity, archive, null, done);
+        run(activity, archive, null, false, false, done);
     }
 
-    private static void run(MainActivity a, File archive, String password, Done done) {
+    /**
+     * An archive found inside the one just unpacked: {@code password}, the outer one's, is tried first, and the archive
+     * is not offered for deletion (it goes with the folder it lies in, {@link AgvnUnpackCheck}).
+     */
+    static void startInner(MainActivity activity, File archive, String password, Done done) {
+        run(activity, archive, password, true, password != null, done);
+    }
+
+    /** {@code guessed}: the password was not typed for this archive, so a wrong one is asked for as if none was given. */
+    private static void run(MainActivity a, File archive, String password, boolean inner, boolean guessed, Done done) {
         if (a.isFinishing() || a.isDestroyed()) return;
         int pad = (int) (20 * a.getResources().getDisplayMetrics().density);
         LinearLayout box = new LinearLayout(a);
@@ -133,19 +142,20 @@ public final class AgvnUnpackDialog {
                 AgvnUnpackService.end(app, watching ? null : AgvnUnpackPassword.notice(a, archive.getName(), failure));
                 if (gone) return; // the folder is in AGVN: "Thêm game" finds it
                 dialog.dismiss();
-                if (unpacked != null) AgvnUnpackFlow.askDelete(a, unpacked, () -> done.onUnpacked(unpacked.dir));
-                else failed(a, archive, password, failure, done);
+                if (unpacked == null) failed(a, archive, guessed ? null : password, inner, failure, done);
+                else if (inner) done.onUnpacked(unpacked, password);
+                else AgvnUnpackFlow.askDelete(a, unpacked, () -> done.onUnpacked(unpacked, password));
             });
         });
     }
 
-    private static void failed(MainActivity a, File archive, String password, AgvnUnpackException e, Done done) {
+    private static void failed(MainActivity a, File archive, String password, boolean inner, AgvnUnpackException e, Done done) {
         android.util.Log.w("AGVN", "unpack " + archive.getName() + ": " + e.getMessage(), e.getCause());
         switch (e.reason) {
             case NEED_PASSWORD:
             case WRONG_PASSWORD:
                 AgvnUnpackPassword.ask(a, archive.getName(), e.reason == Reason.WRONG_PASSWORD ? password : null,
-                        typed -> run(a, archive, typed, done));
+                        typed -> run(a, archive, typed, inner, false, done));
                 break;
             case CANCELLED:
                 Toast.makeText(a, R.string.agvn_unpack_cancelled, Toast.LENGTH_SHORT).show();

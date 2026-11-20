@@ -503,5 +503,25 @@
     <string name="agvn_unpack_notif_done">%1$s selesai diekstrak. Ketuk untuk membuka AGVN Player.</string>
     <string name="agvn_unpack_notif_failed">Belum bisa mengekstrak %1$s</string>
     <string name="agvn_unpack_notif_password">File arsip memakai kata sandi. Buka AGVN Player, pilih lagi file arsipnya, lalu masukkan kata sandi.</string>
+    <string name="agvn_open_title">Buka file arsip dengan AGVN Player</string>
+    <string name="agvn_open_not_ready">AGVN Player belum selesai disiapkan. Buka AGVN Player, tunggu penyiapan pertama selesai, lalu buka lagi file arsip ini.</string>
+    <string name="agvn_open_busy">AGVN Player sedang membuka game atau layar lain. Keluar dari game, kembali ke pustaka, lalu buka lagi file arsip ini.</string>
+    <string name="agvn_open_no_path">Aplikasi itu tidak memberi tahu di mana \"%1$s\" disimpan, jadi AGVN Player tidak bisa membukanya langsung.\n\nBuka AGVN Player, ketuk \"Tambah game\", pilih \"Tambah dari file arsip\", lalu pilih file itu di sana (biasanya di Download).</string>
+    <string name="agvn_open_app">Buka AGVN Player</string>
+    <string name="agvn_unpacked_apk_title">Ini versi Android (APK)</string>
+    <string name="agvn_unpacked_apk">File arsip ini berisi versi Android dari game (file APK), bukan versi Windows. Pasang langsung seperti aplikasi biasa; tidak ditambahkan ke AGVN Player.\n\nFile yang diekstrak ada di %1$s.</string>
+    <string name="agvn_unpacked_apk_install">Pasang APK</string>
+    <string name="agvn_unpacked_inner_title">Di dalam arsip ada arsip lain</string>
+    <string name="agvn_unpacked_inner">Arsip yang baru diekstrak hanya berisi satu arsip lagi: \"%1$s\". Game ada di dalamnya.\n\nEkstrak juga arsip itu?</string>
+    <string name="agvn_unpacked_other_os_title">Bukan versi Windows</string>
+    <string name="agvn_unpacked_other_os">File arsip ini adalah versi %1$s dari game dan tidak punya file .exe. AGVN Player menjalankan versi Windows (PC). Unduh versi Windows lalu tambahkan lagi.\n\nFile yang diekstrak ada di %2$s; folder itu boleh dihapus.</string>
+    <string name="agvn_dup_title">Sepertinya game ini sudah ada di pustaka</string>
+    <string name="agvn_dup_message">Pustaka sudah punya \"%1$s\", tersimpan di:\n%2$s\n\nSalinan yang sedang ditambahkan ada di folder lain:\n%3$s\n\nJika keduanya disimpan, pustaka punya dua entri untuk game yang sama, masing-masing dengan pengaturannya sendiri.</string>
+    <string name="agvn_dup_message_gone">Pustaka sudah punya \"%1$s\", yang dulu tersimpan di:\n%2$s\n(folder itu sudah tidak ada di ponsel)\n\nSalinan yang sedang ditambahkan ada di:\n%3$s\n\nJika keduanya disimpan, pustaka punya dua entri untuk game yang sama. Entri lama tidak bisa dijalankan lagi; Anda bisa menghapusnya di pustaka.</string>
+    <string name="agvn_dup_keep_both">Simpan keduanya</string>
+    <string name="agvn_dup_show">Lihat salinan yang ada</string>
+    <string name="agvn_dup_info">Folder: %1$s\nProgram: %2$s\nTerakhir dimainkan: %3$s</string>
+    <string name="agvn_dup_info_gone">Folder ini sudah tidak ada di ponsel: entri ini tidak bisa dijalankan lagi.</string>
+    <string name="agvn_dup_never_played">belum pernah</string>
     <string name="agvn_sharp_switch">Pertajam gambar saat diperbesar ke layar (memakai sedikit lebih banyak GPU)</string>
 </resources>

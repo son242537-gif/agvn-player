@@ -4472,3 +4472,31 @@ Ngày 20/11/2026 toàn bộ mã AGVN được rà theo 5 mảng; danh sách lỗ
   1. Máy Flagship, "Chỉnh đồ họa": ô "Làm nét hình" đang bật; bỏ chọn, Lưu, mở game: hình mềm như 0.1.99 và công tắc
      trong thanh bên tắt. Bật lại: nét.
   2. Sexy Beach Premium Resort: xoá khỏi thư viện, thêm lại, không gõ tham số: game hiện hình ở cửa sổ 1280×720.
+
+## "Mở bằng AGVN Player", bộ part1/part2 rời, kiểm tra sau giải nén, cảnh báo trùng game (bản 0.1.101)
+
+- **Mở tệp nén từ app khác:** `AgvnOpenArchiveActivity` nhận VIEW/SEND cho ZIP, RAR, 7z, tar (theo kiểu MIME; tệp
+  kiểu `application/octet-stream` chỉ khi tên có đuôi tệp nén). `AgvnOpenArchivePath`/`AgvnUriPath` đổi địa chỉ
+  `content:` thành đường dẫn thật, chỉ nhận tệp nằm trong bộ nhớ dùng chung; không tìm được thì báo người chơi vào
+  "Thêm game → Thêm từ tệp nén", không tự chép tệp nhiều GB. App chưa cài xong môi trường, thiếu quyền tệp, hoặc đang
+  mở game thì báo lý do và không làm gì. Không dùng mạng, không thêm quyền.
+- **Bộ `tên.partN.zip/.7z/.rar` là các tệp nén riêng** (`AgvnArchiveSeries`, `AgvnUnpackSeries`): giải lần lượt vào
+  một thư mục, một lần hỏi mật khẩu, thiếu số nào báo số đó, huỷ/lỗi thì xoá hết. RAR chỉ coi là bộ rời khi header nói
+  nó không phải volume; bộ volume thật của WinRAR vẫn là một tệp nén như trước. Đổi hành vi: chọn riêng
+  `X.part2.zip` khi không có part1 giờ báo thiếu part1.
+- **Kiểm tra sau giải nén** (`AgvnUnpackedKind`, `AgvnUnpackCheck`), chỉ khi `AgvnGameScanner` không thấy game: bản
+  Android (APK/OBB; có đúng một APK thì có nút "Cài APK" mở trình cài của Android), tệp nén lồng bên trong (đề nghị
+  giải tiếp, thử mật khẩu ngoài trước, xoá thư mục ngoài khi xong), bản macOS/Linux, còn lại là hộp "Không thấy game".
+- **Trùng game** (`AgvnImportTwin`): bấm "Thêm" mà cùng game đã có ở thư mục khác (`AgvnGameVersions`) thì hỏi một
+  lần: Thêm cả hai / Xem bản đã có / Hủy. Thêm lại đúng thư mục cũ không hỏi. Có thể nhận nhầm hai game khác nhau
+  cùng tên thư mục và tên exe, nên lời hỏi là "Có vẻ…" và nêu cả hai đường dẫn.
+- **Test:** `AgvnUriPathTest`, `AgvnUnpackSeriesTest`, `AgvnUnpackSeriesRarTest`, `AgvnUnpackedKindTest` (771 bài, 2
+  bỏ qua). Chưa kiểm: các intent filter và việc đổi địa chỉ trên máy thật, hộp thoại, nút "Cài APK".
+- **Thử máy:**
+  1. Bấm vào `.zip`, `.rar`, `.7z` trong mục tải xuống của Chrome, Files by Google, trình quản lý tệp HyperOS: có
+     "AGVN Player", chọn thì giải nén rồi vào màn xem trước. Bấm `.pdf` hay `.apk`: app không được đề nghị.
+  2. Làm lại khi đang chơi game (báo bận, game không sao), khi app đã bị vuốt tắt, và từ tệp đính kèm Zalo/Telegram
+     (báo vào "Thêm từ tệp nén").
+  3. `Game.part1.zip` + part2 + part3 có mật khẩu: một thư mục, hỏi mật khẩu một lần. Xoá part2: báo thiếu part2.
+  4. Tệp nén chỉ có APK; ZIP chứa một RAR; bản macOS: mỗi loại đúng lời báo.
+  5. Thêm game, chép thư mục sang chỗ khác, thêm bản chép: hộp hỏi nêu hai đường dẫn. Thêm lại thư mục cũ: không hỏi.

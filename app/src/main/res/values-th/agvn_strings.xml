@@ -503,5 +503,25 @@
     <string name="agvn_unpack_notif_done">แตกไฟล์ %1$s เสร็จแล้ว แตะเพื่อเปิด AGVN Player</string>
     <string name="agvn_unpack_notif_failed">ยังแตกไฟล์ %1$s ไม่ได้</string>
     <string name="agvn_unpack_notif_password">ไฟล์บีบอัดมีรหัสผ่าน เปิด AGVN Player เลือกไฟล์บีบอัดอีกครั้ง แล้วใส่รหัสผ่าน</string>
+    <string name="agvn_open_title">เปิดไฟล์บีบอัดด้วย AGVN Player</string>
+    <string name="agvn_open_not_ready">AGVN Player ยังตั้งค่าไม่เสร็จ เปิด AGVN Player รอให้การตั้งค่าครั้งแรกเสร็จ แล้วเปิดไฟล์บีบอัดนี้อีกครั้ง</string>
+    <string name="agvn_open_busy">AGVN Player กำลังเปิดเกมหรือหน้าจออื่นอยู่ ออกจากเกม กลับไปที่คลังเกม แล้วเปิดไฟล์บีบอัดนี้อีกครั้ง</string>
+    <string name="agvn_open_no_path">แอปนั้นไม่ได้บอกว่าไฟล์ \"%1$s\" อยู่ที่ไหน AGVN Player จึงเปิดโดยตรงไม่ได้\n\nเปิด AGVN Player แตะ \"เพิ่มเกม\" เลือก \"เพิ่มจากไฟล์บีบอัด\" แล้วเลือกไฟล์นั้น (ปกติอยู่ใน Download)</string>
+    <string name="agvn_open_app">เปิด AGVN Player</string>
+    <string name="agvn_unpacked_apk_title">นี่คือเวอร์ชัน Android (APK)</string>
+    <string name="agvn_unpacked_apk">ไฟล์บีบอัดนี้มีเกมเวอร์ชัน Android (ไฟล์ APK) ไม่ใช่เวอร์ชัน Windows ให้ติดตั้งโดยตรงเหมือนแอปทั่วไป ไม่ต้องเพิ่มใน AGVN Player\n\nไฟล์ที่แตกแล้วอยู่ที่ %1$s</string>
+    <string name="agvn_unpacked_apk_install">ติดตั้ง APK</string>
+    <string name="agvn_unpacked_inner_title">ในไฟล์บีบอัดมีไฟล์บีบอัดอีกไฟล์</string>
+    <string name="agvn_unpacked_inner">ไฟล์ที่เพิ่งแตกมีแค่ไฟล์บีบอัดอีกหนึ่งไฟล์: \"%1$s\" เกมอยู่ในไฟล์นั้น\n\nแตกไฟล์นั้นต่อเลยไหม?</string>
+    <string name="agvn_unpacked_other_os_title">ไม่ใช่เวอร์ชัน Windows</string>
+    <string name="agvn_unpacked_other_os">ไฟล์บีบอัดนี้เป็นเกมเวอร์ชัน %1$s และไม่มีไฟล์ .exe AGVN Player เล่นเวอร์ชัน Windows (PC) ให้ดาวน์โหลดเวอร์ชัน Windows แล้วเพิ่มใหม่\n\nไฟล์ที่แตกแล้วอยู่ที่ %2$s ลบโฟลเดอร์นั้นได้</string>
+    <string name="agvn_dup_title">ดูเหมือนเกมนี้มีอยู่ในคลังแล้ว</string>
+    <string name="agvn_dup_message">ในคลังมี \"%1$s\" อยู่แล้ว เก็บไว้ที่:\n%2$s\n\nชุดที่กำลังเพิ่มอยู่ในโฟลเดอร์อื่น:\n%3$s\n\nถ้าเก็บทั้งสอง คลังจะมีสองรายการของเกมเดียวกัน แต่ละรายการมีการตั้งค่าของตัวเอง</string>
+    <string name="agvn_dup_message_gone">ในคลังมี \"%1$s\" อยู่แล้ว ซึ่งเคยเก็บไว้ที่:\n%2$s\n(โฟลเดอร์นั้นไม่อยู่ในเครื่องแล้ว)\n\nชุดที่กำลังเพิ่มอยู่ที่:\n%3$s\n\nถ้าเก็บทั้งสอง คลังจะมีสองรายการของเกมเดียวกัน รายการเก่าเล่นไม่ได้แล้ว ลบออกจากคลังได้</string>
+    <string name="agvn_dup_keep_both">เก็บทั้งสอง</string>
+    <string name="agvn_dup_show">ดูชุดที่มีอยู่</string>
+    <string name="agvn_dup_info">โฟลเดอร์: %1$s\nโปรแกรม: %2$s\nเล่นล่าสุด: %3$s</string>
+    <string name="agvn_dup_info_gone">โฟลเดอร์นี้ไม่อยู่ในเครื่องแล้ว รายการนี้เล่นไม่ได้อีก</string>
+    <string name="agvn_dup_never_played">ยังไม่เคยเล่น</string>
     <string name="agvn_sharp_switch">ทำให้ภาพคมขึ้นเมื่อขยายเต็มจอ (ใช้ GPU เพิ่มเล็กน้อย)</string>
 </resources>

@@ -65,7 +65,7 @@ final class AgvnUnpackPassword {
         dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v -> {
             String pasted = clipboard(a);
             if (pasted == null) return;
-            input.setText(AgvnUnpack.trimPassword(pasted));
+            input.setText(AgvnArchiveNames.trimPassword(pasted));
             input.setSelection(input.length());
         });
         input.requestFocus();

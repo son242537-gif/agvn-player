@@ -157,4 +157,17 @@ public final class AgvnArchiveNames {
     public static File partialFolder(File parent, String name) {
         return new File(parent, "." + name + PARTIAL_SUFFIX);
     }
+
+    /** A pasted password without the spaces and line breaks around it; null when nothing is left. */
+    public static String trimPassword(String typed) {
+        if (typed == null) return null;
+        int start = 0, end = typed.length();
+        while (start < end && blank(typed.charAt(start))) start++;
+        while (end > start && blank(typed.charAt(end - 1))) end--;
+        return start == end ? null : typed.substring(start, end);
+    }
+
+    private static boolean blank(char c) {
+        return c <= ' ' || Character.isWhitespace(c) || Character.isSpaceChar(c) || c == '​' || c == '﻿';
+    }
 }

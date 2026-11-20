@@ -95,7 +95,9 @@ final class AgvnUnpack7zz {
             File dir = AgvnArchiveNames.freeFolder(gamesRoot, name);
             if (!game.renameTo(dir)) throw new AgvnUnpackException(Reason.CANNOT_WRITE, dir.getPath());
             if (game == partial) partial = null;
-            return new AgvnUnpack.Result(dir, sweep.files - 1, skipped.size() + sweep.removed); // less the .nomedia
+            AgvnUnpack.Result result = new AgvnUnpack.Result(dir, sweep.files - 1, skipped.size() + sweep.removed); // less the .nomedia
+            result.top = game == inner ? top : null;
+            return result;
         } catch (IOException e) { // the program could not be started
             throw new AgvnUnpackException(Reason.UNSUPPORTED_METHOD, null, 0, e);
         } finally {

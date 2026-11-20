@@ -58,13 +58,7 @@ private fun AgvnAddGameFlow(activity: MainActivity, onClose: () -> Unit) {
 
     /** Unpacks into internal storage/AGVN, then the game inside goes to the usual settings preview. */
     fun unpack(archive: File) {
-        AgvnUnpackDialog.start(activity, archive) { dir ->
-            scope.launch {
-                val found = withContext(Dispatchers.IO) { runCatching { AgvnUnpackFlow.games(activity, dir) }.getOrDefault(emptyList()) }
-                AgvnUnpackFlow.unpacked(activity, dir, found) { onClose() }
-                scanRevision++ // the list behind shows the new folder
-            }
-        }
+        AgvnUnpackFlow.run(activity, archive, { onClose() }) { scanRevision++ } // the list behind shows the new folder
     }
 
     LaunchedEffect(scanRevision) {

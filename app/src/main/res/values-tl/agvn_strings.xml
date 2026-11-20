@@ -490,5 +490,25 @@
     <string name="agvn_unpack_notif_done">Na-extract na ang %1$s. I-tap para buksan ang AGVN Player.</string>
     <string name="agvn_unpack_notif_failed">Hindi pa ma-extract ang %1$s</string>
     <string name="agvn_unpack_notif_password">May password ang archive. Buksan ang AGVN Player, piliin ulit ang archive at ilagay ang password.</string>
+    <string name="agvn_open_title">Buksan ang archive gamit ang AGVN Player</string>
+    <string name="agvn_open_not_ready">Hindi pa tapos ang setup ng AGVN Player. Buksan ang AGVN Player, hintaying matapos ang unang setup, saka buksan ulit ang archive na ito.</string>
+    <string name="agvn_open_busy">May bukas na laro o ibang screen ang AGVN Player. Lumabas sa laro, bumalik sa library, saka buksan ulit ang archive na ito.</string>
+    <string name="agvn_open_no_path">Hindi sinasabi ng kabilang app kung nasaan ang \"%1$s\", kaya hindi ito mabuksan nang direkta ng AGVN Player.\n\nBuksan ang AGVN Player, i-tap ang \"Magdagdag ng laro\", piliin ang \"Magdagdag mula sa archive\" at piliin doon ang file (kadalasang nasa Download).</string>
+    <string name="agvn_open_app">Buksan ang AGVN Player</string>
+    <string name="agvn_unpacked_apk_title">Ito ang bersyong Android (APK)</string>
+    <string name="agvn_unpacked_apk">Ang archive na ito ay may bersyong Android ng laro (APK file), hindi ang bersyong Windows. I-install ito nang direkta gaya ng karaniwang app; hindi ito idinadagdag sa AGVN Player.\n\nNasa %1$s ang mga na-unpack na file.</string>
+    <string name="agvn_unpacked_apk_install">I-install ang APK</string>
+    <string name="agvn_unpacked_inner_title">May isa pang archive sa loob ng archive</string>
+    <string name="agvn_unpacked_inner">Isa pang archive lang ang laman ng na-unpack: \"%1$s\". Nasa loob nito ang laro.\n\nI-unpack din iyon?</string>
+    <string name="agvn_unpacked_other_os_title">Hindi ito ang bersyong Windows</string>
+    <string name="agvn_unpacked_other_os">Ang archive na ito ay ang bersyong %1$s ng laro at walang .exe file. Bersyong Windows (PC) ang pinapatakbo ng AGVN Player. I-download ang bersyong Windows at idagdag ulit.\n\nNasa %2$s ang mga na-unpack na file; puwede mong burahin ang folder na iyon.</string>
+    <string name="agvn_dup_title">Mukhang nasa library na ang larong ito</string>
+    <string name="agvn_dup_message">Mayroon nang \"%1$s\" sa library, na nasa:\n%2$s\n\nNasa ibang folder ang kopyang idinadagdag mo:\n%3$s\n\nKapag itinago ang dalawa, dalawang entry ng iisang laro ang nasa library, bawat isa may sariling settings.</string>
+    <string name="agvn_dup_message_gone">Mayroon nang \"%1$s\" sa library, na dating nasa:\n%2$s\n(wala na sa phone ang folder na iyon)\n\nAng kopyang idinadagdag mo ay nasa:\n%3$s\n\nKapag itinago ang dalawa, dalawang entry ng iisang laro ang nasa library. Hindi na tatakbo ang lumang entry; puwede mo itong alisin sa library.</string>
+    <string name="agvn_dup_keep_both">Itago ang dalawa</string>
+    <string name="agvn_dup_show">Tingnan ang kopyang naroon na</string>
+    <string name="agvn_dup_info">Folder: %1$s\nProgram: %2$s\nHuling nilaro: %3$s</string>
+    <string name="agvn_dup_info_gone">Wala na sa phone ang folder na ito: hindi na tatakbo ang entry na ito.</string>
+    <string name="agvn_dup_never_played">hindi pa</string>
     <string name="agvn_sharp_switch">Patalasin ang larawan kapag pinalaki sa screen (kaunting dagdag na gamit ng GPU)</string>
 </resources>

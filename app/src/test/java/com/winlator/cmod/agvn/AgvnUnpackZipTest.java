@@ -116,7 +116,7 @@ public class AgvnUnpackZipTest {
         }
         File spaced = zip("Space.zip", " có dấu cách ", EncryptionMethod.AES, "a.txt", "a");
         assertEquals("a password that does end in a space", 1, unpack(spaced, " có dấu cách \n").files);
-        assertEquals("ＡＢＣ", AgvnUnpack.trimPassword(" 　ＡＢＣ​\t"));
+        assertEquals("ＡＢＣ", AgvnArchiveNames.trimPassword(" 　ＡＢＣ​\t"));
     }
 
     @Test

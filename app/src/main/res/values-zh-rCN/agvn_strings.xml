@@ -503,5 +503,25 @@
     <string name="agvn_unpack_notif_done">%1$s 已解压完成。点按打开 AGVN Player。</string>
     <string name="agvn_unpack_notif_failed">未能解压 %1$s</string>
     <string name="agvn_unpack_notif_password">压缩包有密码。请打开 AGVN Player，重新选择压缩包并输入密码。</string>
+    <string name="agvn_open_title">用 AGVN Player 打开压缩包</string>
+    <string name="agvn_open_not_ready">AGVN Player 还没有完成初始安装。请打开 AGVN Player，等首次安装完成后，再重新打开这个压缩包。</string>
+    <string name="agvn_open_busy">AGVN Player 正开着游戏或其他界面。请退出游戏，回到游戏库，再重新打开这个压缩包。</string>
+    <string name="agvn_open_no_path">那个应用没有说明“%1$s”存放在哪里，AGVN Player 无法直接打开。\n\n请打开 AGVN Player，点“添加游戏”，选择“从压缩包添加”，然后在那里选择该文件（通常在 Download 里）。</string>
+    <string name="agvn_open_app">打开 AGVN Player</string>
+    <string name="agvn_unpacked_apk_title">这是安卓版（APK）</string>
+    <string name="agvn_unpacked_apk">这个压缩包里是游戏的安卓版（APK 文件），不是 Windows 版。请像普通应用一样直接安装，不用添加到 AGVN Player。\n\n解压出的文件在 %1$s。</string>
+    <string name="agvn_unpacked_apk_install">安装 APK</string>
+    <string name="agvn_unpacked_inner_title">压缩包里还有一个压缩包</string>
+    <string name="agvn_unpacked_inner">刚解压的内容只有另一个压缩包：“%1$s”。游戏在它里面。\n\n继续解压它吗？</string>
+    <string name="agvn_unpacked_other_os_title">不是 Windows 版</string>
+    <string name="agvn_unpacked_other_os">这个压缩包是游戏的 %1$s 版，没有 .exe 文件。AGVN Player 运行的是 Windows（PC）版。请下载 Windows 版后再添加。\n\n解压出的文件在 %2$s，可以删除该文件夹。</string>
+    <string name="agvn_dup_title">游戏库里好像已经有这个游戏</string>
+    <string name="agvn_dup_message">游戏库里已有“%1$s”，位于：\n%2$s\n\n你正在添加的这份在另一个文件夹：\n%3$s\n\n两份都保留的话，游戏库里会有同一个游戏的两个条目，各有各的设置。</string>
+    <string name="agvn_dup_message_gone">游戏库里已有“%1$s”，原先位于：\n%2$s\n（该文件夹已不在手机上）\n\n你正在添加的这份位于：\n%3$s\n\n两份都保留的话，游戏库里会有同一个游戏的两个条目。旧条目已无法运行，可以在游戏库里删除。</string>
+    <string name="agvn_dup_keep_both">两份都保留</string>
+    <string name="agvn_dup_show">查看已有的那份</string>
+    <string name="agvn_dup_info">文件夹：%1$s\n程序：%2$s\n上次游玩：%3$s</string>
+    <string name="agvn_dup_info_gone">该文件夹已不在手机上：这个条目已无法运行。</string>
+    <string name="agvn_dup_never_played">从未玩过</string>
     <string name="agvn_sharp_switch">拉伸到屏幕时锐化画面（多占用一点 GPU）</string>
 </resources>

@@ -18,7 +18,20 @@ import java.util.List;
 
 /** What follows an unpacked archive on "Thêm game": its game goes to the usual preview, as if the folder had been found. */
 public final class AgvnUnpackFlow {
+    /** A new folder is in AGVN. {@code games}: how many games were found in it. */
+    public interface After {
+        void unpacked(int games);
+    }
+
     private AgvnUnpackFlow() {}
+
+    /**
+     * Unpacks {@code archive} (any part of it) behind its dialog, looks at what came out ({@link AgvnUnpackCheck}) and
+     * goes on to the settings preview of the game. {@code onImported}: after the game was added (may be null).
+     */
+    public static void run(MainActivity a, File archive, Runnable onImported, After after) {
+        AgvnUnpackCheck.step(a, archive, null, null, 0, onImported, after);
+    }
 
     /**
      * The games of a folder just unpacked (slow: off the main thread). A folder with an exe no rule recognises counts

@@ -25,7 +25,7 @@ public final class AgvnArchiveKind {
     private static final Pattern ZIP_PART = Pattern.compile("(?i)^(.+)\\.z(\\d{2,3})$");
     /** name.r00 beside name.rar */
     private static final Pattern RAR_PART = Pattern.compile("(?i)^(.+)\\.r(\\d{2,3})$");
-    /** name.part2.rar; a .zip or .7z named so is an archive of its own (7-Zip does not join them either) */
+    /** name.part2.rar; a .zip or .7z named so is an archive of its own: {@link AgvnArchiveSeries} unpacks them together */
     static final Pattern PART_N = Pattern.compile("(?i)^(.+)\\.part(\\d+)\\.(zip|7z|rar)$");
     private static final Pattern SINGLE = Pattern.compile("(?i)^(.+)\\.(zip|7z|rar)$");
     private static final Pattern TAR = Pattern.compile("(?i)^(.+)\\.(tar|tar\\.(gz|xz|zst|bz2)|tgz|txz|tzst|tbz2)$");
@@ -85,7 +85,7 @@ public final class AgvnArchiveKind {
         m = RAR_PART.matcher(name);
         if (m.matches()) return m.group(1) + ".rar";
         m = PART_N.matcher(name);
-        if (m.matches() && m.group(3).equalsIgnoreCase("rar") && Integer.parseInt(m.group(2)) != 1)
+        if (m.matches() && Integer.parseInt(m.group(2)) != 1) // a RAR set, or archives of their own (AgvnArchiveSeries)
             return AgvnArchiveRarSet.partName(name, m, 1);
         return null;
     }

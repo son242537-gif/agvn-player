@@ -39,6 +39,8 @@ public final class AgvnUnpack {
         public final int rejected;
         /** Every file of the archive (all parts of a set): what the player may delete now. */
         public List<File> archiveFiles = Collections.emptyList();
+        /** The archive's one top folder, when its content was unpacked without it ({@link AgvnUnpackSeries}). */
+        String top;
 
         Result(File dir, int files, int rejected) {
             this.dir = dir;
@@ -48,19 +50,6 @@ public final class AgvnUnpack {
     }
 
     private AgvnUnpack() {}
-
-    /** A pasted password without the spaces and line breaks around it; null when nothing is left. */
-    public static String trimPassword(String typed) {
-        if (typed == null) return null;
-        int start = 0, end = typed.length();
-        while (start < end && blank(typed.charAt(start))) start++;
-        while (end > start && blank(typed.charAt(end - 1))) end--;
-        return start == end ? null : typed.substring(start, end);
-    }
-
-    private static boolean blank(char c) {
-        return c <= ' ' || Character.isWhitespace(c) || Character.isSpaceChar(c) || c == '​' || c == '﻿';
-    }
 
     /**
      * Unpacks the archive {@code picked} belongs to (any part of it) into a new folder of {@code gamesRoot}.
@@ -78,13 +67,20 @@ public final class AgvnUnpack {
     /** {@code freeBytes}: the room to count on, or -1 to ask the storage (tests). */
     static Result extract(File picked, String password, File gamesRoot, File sevenZip, Listener listener, long freeBytes)
             throws AgvnUnpackException {
-        AgvnArchiveKind.Volumes volumes = AgvnArchiveKind.resolve(picked);
+        // name.part1.zip, name.part2.zip...: archives of their own, all unpacked into one folder
+        AgvnArchiveSeries series = AgvnArchiveSeries.find(picked);
+        if (series != null) return AgvnUnpackSeries.extract(series, password, gamesRoot, sevenZip, listener, freeBytes);
+        return extract(AgvnArchiveKind.resolve(picked), password, gamesRoot, sevenZip, listener, freeBytes);
+    }
+
+    static Result extract(AgvnArchiveKind.Volumes volumes, String password, File gamesRoot, File sevenZip, Listener listener,
+                          long freeBytes) throws AgvnUnpackException {
         if (volumes.missing != null) throw new AgvnUnpackException(Reason.MISSING_PART, volumes.missing);
         if (volumes.type == AgvnArchiveKind.Type.UNKNOWN) throw new AgvnUnpackException(Reason.NOT_ARCHIVE);
         if (!volumes.first.isFile()) throw new AgvnUnpackException(Reason.MISSING_PART, volumes.first.getName());
         // the password without what a paste adds; as typed after that, for a password that does end in a space
         Set<String> tries = new LinkedHashSet<>();
-        tries.add(trimPassword(password));
+        tries.add(AgvnArchiveNames.trimPassword(password));
         if (password != null && !password.isEmpty()) tries.add(password.replace("\r", "").replace("\n", ""));
         AgvnUnpackException wrong = null;
         for (String attempt : tries) {
@@ -188,7 +184,9 @@ public final class AgvnUnpack {
             File dir = AgvnArchiveNames.freeFolder(gamesRoot, name);
             if (!partial.renameTo(dir)) throw new AgvnUnpackException(Reason.CANNOT_WRITE, dir.getPath());
             partial = null;
-            return new Result(dir, files, rejected);
+            Result result = new Result(dir, files, rejected);
+            result.top = top;
+            return result;
         } catch (OutOfMemoryError e) { // a dictionary bigger than the app's memory
             throw new AgvnUnpackException(Reason.UNSUPPORTED_METHOD, null, 0, e);
         } finally {

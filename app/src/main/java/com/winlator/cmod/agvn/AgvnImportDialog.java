@@ -82,7 +82,8 @@ public final class AgvnImportDialog {
                 .setTitle(p.name)
                 .setMessage(msg.toString().trim())
                 .setPositiveButton(existing != null ? R.string.agvn_import_update : R.string.agvn_import_confirm,
-                        (d, w) -> doImport(activity, candidate, tier, existing, onImported))
+                        // AGVN: a second copy of a game the library has is asked about first (AgvnImportTwin)
+                        (d, w) -> AgvnImportTwin.ask(activity, candidate, existing, () -> doImport(activity, candidate, tier, existing, onImported)))
                 .setNeutralButton(activity.getString(R.string.agvn_import_change_tier, DeviceTierManager.label(activity, tier)), (d, w) ->
                         AgvnTierDialog.choose(activity, activity.getString(R.string.agvn_tier_for_game), tier.ordinal() + 1,
                                 chosen -> preview(activity, gameDir, variant, chosen != null ? chosen : DeviceTierManager.detect(activity), existing, onImported)))

@@ -503,5 +503,25 @@
     <string name="agvn_unpack_notif_done">Đã giải nén xong %1$s. Chạm để mở AGVN Player.</string>
     <string name="agvn_unpack_notif_failed">Chưa giải nén được %1$s</string>
     <string name="agvn_unpack_notif_password">Tệp nén có mật khẩu. Mở AGVN Player, chọn lại tệp nén rồi nhập mật khẩu.</string>
+    <string name="agvn_open_title">Mở tệp nén bằng AGVN Player</string>
+    <string name="agvn_open_not_ready">AGVN Player chưa cài đặt xong. Mở AGVN Player, chờ cài đặt lần đầu xong, rồi mở lại tệp nén này.</string>
+    <string name="agvn_open_busy">AGVN Player đang mở game hoặc một màn hình khác. Thoát game, về thư viện, rồi mở lại tệp nén này.</string>
+    <string name="agvn_open_no_path">Ứng dụng kia không cho biết tệp \"%1$s\" nằm ở đâu nên AGVN Player không mở trực tiếp được.\n\nMở AGVN Player, bấm \"Thêm game\", chọn \"Thêm từ tệp nén\" rồi chọn tệp đó (thường nằm trong Download).</string>
+    <string name="agvn_open_app">Mở AGVN Player</string>
+    <string name="agvn_unpacked_apk_title">Đây là bản Android (APK)</string>
+    <string name="agvn_unpacked_apk">Tệp nén này chứa bản Android của game (file APK), không phải bản Windows. Hãy cài trực tiếp như một ứng dụng thường, không thêm vào AGVN Player.\n\nFile đã giải nén nằm ở %1$s.</string>
+    <string name="agvn_unpacked_apk_install">Cài APK</string>
+    <string name="agvn_unpacked_inner_title">Trong tệp nén là một tệp nén khác</string>
+    <string name="agvn_unpacked_inner">Tệp vừa giải nén chỉ chứa một tệp nén nữa: \"%1$s\". Game nằm trong tệp đó.\n\nGiải nén tiếp để lấy game?</string>
+    <string name="agvn_unpacked_other_os_title">Không phải bản Windows</string>
+    <string name="agvn_unpacked_other_os">Tệp nén này là bản %1$s của game, không có file .exe. AGVN Player chạy bản Windows (PC). Hãy tải bản Windows của game rồi thêm lại.\n\nFile đã giải nén nằm ở %2$s, bạn có thể xóa thư mục đó.</string>
+    <string name="agvn_dup_title">Có vẻ game này đã có trong thư viện</string>
+    <string name="agvn_dup_message">Thư viện đã có mục \"%1$s\", nằm ở:\n%2$s\n\nBản bạn đang thêm nằm ở thư mục khác:\n%3$s\n\nThêm cả hai thì thư viện có hai mục cho cùng một game, mỗi mục có cấu hình riêng.</string>
+    <string name="agvn_dup_message_gone">Thư viện đã có mục \"%1$s\", trước đây nằm ở:\n%2$s\n(thư mục này không còn trên máy)\n\nBản bạn đang thêm nằm ở:\n%3$s\n\nThêm cả hai thì thư viện có hai mục cho cùng một game. Mục cũ không còn chạy được, bạn có thể xóa nó trong thư viện.</string>
+    <string name="agvn_dup_keep_both">Thêm cả hai</string>
+    <string name="agvn_dup_show">Xem bản đã có</string>
+    <string name="agvn_dup_info">Thư mục: %1$s\nFile chạy: %2$s\nChơi lần cuối: %3$s</string>
+    <string name="agvn_dup_info_gone">Thư mục này không còn trên máy: mục này không chạy được nữa.</string>
+    <string name="agvn_dup_never_played">chưa chơi</string>
     <string name="agvn_sharp_switch">Làm nét hình khi phóng lên màn hình (tốn thêm một chút GPU)</string>
 </resources>

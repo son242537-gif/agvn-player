@@ -88,7 +88,7 @@ public class AgvnArchiveKindTest {
                 "E.rar", "E.r00", "ảnh.png", "setup.exe", "F.7Z", "G.part02.rar", "G.part03.rar", "H.part1.zip", "H.part2.zip",
                 "I.tar.gz", "J.TGZ", "K.tar", "L.tar.zst", "M.gz"};
         assertEquals(Arrays.asList("Game.zip", "B.7z.001", "C.zip.002", "D.part1.rar", "E.rar", "F.7Z", "G.part02.rar", "G.part03.rar",
-                        "H.part1.zip", "H.part2.zip", "I.tar.gz", "J.TGZ", "K.tar", "L.tar.zst"),
+                        "H.part1.zip", "I.tar.gz", "J.TGZ", "K.tar", "L.tar.zst"), // H.part2.zip: unpacked with part 1
                 AgvnArchiveKind.pickable(names));
         assertTrue(AgvnArchiveKind.pickable(null).isEmpty());
     }

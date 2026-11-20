@@ -118,7 +118,7 @@ final class AgvnGameVersions {
         }
     }
 
-    private static File exeOf(Shortcut s) {
+    static File exeOf(Shortcut s) {
         String unix = AgvnExeRedirect.toUnixPath(s.path, s.container);
         return new File(unix != null ? unix : s.path.replace("\"", ""));
     }

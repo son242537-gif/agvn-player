@@ -188,6 +188,139 @@
             android:excludeFromRecents="true"
             android:exported="false" />
 
+        <!-- AGVN: "Mở bằng AGVN Player" for a downloaded game archive, from a browser's downloads or a file manager
+             (agvn/AgvnOpenArchiveActivity). Archive types by name; a file of an unknown type only when its address ends
+             in an archive's extension. pathPattern stops at the first dot, so one line per number of dots; pathSuffix
+             (Android 12 and later) needs none. host="*": without a host Android does not look at the path at all. -->
+        <activity
+            android:name="com.winlator.cmod.agvn.AgvnOpenArchiveActivity"
+            android:theme="@style/AgvnTranslucent"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:exported="true"
+            tools:ignore="UnusedAttribute,AppLinkUrlError">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="application/zip" />
+                <data android:mimeType="application/x-zip-compressed" />
+                <data android:mimeType="application/x-zip" />
+                <data android:mimeType="application/x-7z-compressed" />
+                <data android:mimeType="application/vnd.rar" />
+                <data android:mimeType="application/x-rar-compressed" />
+                <data android:mimeType="application/x-rar" />
+                <data android:mimeType="application/rar" />
+                <data android:mimeType="application/x-tar" />
+                <data android:mimeType="application/x-gtar" />
+                <data android:mimeType="application/x-compressed-tar" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/zip" />
+                <data android:mimeType="application/x-zip-compressed" />
+                <data android:mimeType="application/x-zip" />
+                <data android:mimeType="application/x-7z-compressed" />
+                <data android:mimeType="application/vnd.rar" />
+                <data android:mimeType="application/x-rar-compressed" />
+                <data android:mimeType="application/x-rar" />
+                <data android:mimeType="application/rar" />
+                <data android:mimeType="application/x-tar" />
+                <data android:mimeType="application/x-gtar" />
+                <data android:mimeType="application/x-compressed-tar" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:host="*" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="application/gzip" />
+                <data android:mimeType="application/x-gzip" />
+                <data android:mimeType="application/x-xz" />
+                <data android:mimeType="application/zstd" />
+                <data android:mimeType="application/x-bzip2" />
+                <data android:pathPattern=".*\\.zip" />
+                <data android:pathPattern=".*\\..*\\.zip" />
+                <data android:pathPattern=".*\\..*\\..*\\.zip" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.zip" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.zip" />
+                <data android:pathPattern=".*\\.rar" />
+                <data android:pathPattern=".*\\..*\\.rar" />
+                <data android:pathPattern=".*\\..*\\..*\\.rar" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.rar" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.rar" />
+                <data android:pathPattern=".*\\.7z" />
+                <data android:pathPattern=".*\\..*\\.7z" />
+                <data android:pathPattern=".*\\..*\\..*\\.7z" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.7z" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.7z" />
+                <data android:pathPattern=".*\\.001" />
+                <data android:pathPattern=".*\\..*\\.001" />
+                <data android:pathPattern=".*\\..*\\..*\\.001" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.001" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.001" />
+                <data android:pathSuffix=".zip" />
+                <data android:pathSuffix=".ZIP" />
+                <data android:pathSuffix=".rar" />
+                <data android:pathSuffix=".RAR" />
+                <data android:pathSuffix=".7z" />
+                <data android:pathSuffix=".7Z" />
+                <data android:pathSuffix=".001" />
+                <data android:pathSuffix=".tar" />
+                <data android:pathSuffix=".tar.gz" />
+                <data android:pathSuffix=".tgz" />
+                <data android:pathSuffix=".tar.xz" />
+                <data android:pathSuffix=".txz" />
+                <data android:pathSuffix=".tar.zst" />
+                <data android:pathSuffix=".tar.bz2" />
+            </intent-filter>
+            <!-- a file: address sent without a type -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="file" />
+                <data android:host="*" />
+                <data android:pathPattern=".*\\.zip" />
+                <data android:pathPattern=".*\\..*\\.zip" />
+                <data android:pathPattern=".*\\..*\\..*\\.zip" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.zip" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.zip" />
+                <data android:pathPattern=".*\\.rar" />
+                <data android:pathPattern=".*\\..*\\.rar" />
+                <data android:pathPattern=".*\\..*\\..*\\.rar" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.rar" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.rar" />
+                <data android:pathPattern=".*\\.7z" />
+                <data android:pathPattern=".*\\..*\\.7z" />
+                <data android:pathPattern=".*\\..*\\..*\\.7z" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.7z" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.7z" />
+                <data android:pathPattern=".*\\.001" />
+                <data android:pathPattern=".*\\..*\\.001" />
+                <data android:pathPattern=".*\\..*\\..*\\.001" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.001" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.001" />
+                <data android:pathSuffix=".zip" />
+                <data android:pathSuffix=".ZIP" />
+                <data android:pathSuffix=".rar" />
+                <data android:pathSuffix=".RAR" />
+                <data android:pathSuffix=".7z" />
+                <data android:pathSuffix=".7Z" />
+                <data android:pathSuffix=".001" />
+                <data android:pathSuffix=".tar" />
+                <data android:pathSuffix=".tar.gz" />
+                <data android:pathSuffix=".tgz" />
+                <data android:pathSuffix=".tar.xz" />
+                <data android:pathSuffix=".txz" />
+                <data android:pathSuffix=".tar.zst" />
+                <data android:pathSuffix=".tar.bz2" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name="com.winlator.cmod.XServerDisplayActivity"
             android:theme="@style/AppThemeFullscreen"
