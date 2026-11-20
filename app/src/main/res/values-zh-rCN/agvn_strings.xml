@@ -462,15 +462,15 @@
     <string name="agvn_runner_confirm_windows">把此游戏改为用 Windows 运行？Windows 比轻量运行更吃性能、更热。\n\n想改回来：游戏库 → 长按游戏 → “运行方式”。</string>
     <string name="agvn_runner_confirm_yes">用 Windows 运行</string>
 
-    <!-- "Thêm từ tệp nén": unpacks a downloaded ZIP or 7z into internal storage/AGVN and adds the game -->
-    <string name="agvn_unpack_action">从压缩包添加（ZIP、7z）</string>
+    <!-- "Thêm từ tệp nén": unpacks a downloaded ZIP, RAR, 7z or TAR into internal storage/AGVN and adds the game -->
+    <string name="agvn_unpack_action">从压缩包添加（ZIP、RAR、7z）</string>
     <string name="agvn_unpack_pick_title">选择游戏的压缩包</string>
     <string name="agvn_unpack_pick_hint">打开下载的压缩包所在的文件夹（通常是 Download），然后点该文件。分卷压缩包点任意一个分卷即可。应用会解压到 内部存储/AGVN。</string>
-    <string name="agvn_unpack_pick_empty">这个文件夹中没有子文件夹或 ZIP、7z 压缩包</string>
+    <string name="agvn_unpack_pick_empty">这个文件夹中没有子文件夹或 ZIP、RAR、7z、TAR 压缩包</string>
     <string name="agvn_unpack_opening">正在打开压缩包…</string>
     <string name="agvn_unpack_progress_title">正在解压 %1$s</string>
     <string name="agvn_unpack_progress">%1$d%% · %2$s / %3$s</string>
-    <string name="agvn_unpack_keep_open">完成前请保持应用打开，屏幕不会熄灭。</string>
+    <string name="agvn_unpack_keep_open">可以切换到其他应用，解压会继续进行（见通知栏）。请不要划掉 AGVN Player。</string>
     <string name="agvn_unpack_cancelled">已取消解压，没有留下未完成的文件。</string>
     <string name="agvn_unpack_start">解压</string>
     <string name="agvn_unpack_password_title">%1$s 的密码</string>
@@ -483,9 +483,8 @@
     <string name="agvn_unpack_err_missing_part">缺少压缩包的分卷“%1$s”。请把所有分卷下载到同一个文件夹，然后重试。</string>
     <string name="agvn_unpack_err_missing_any">缺少压缩包的某个分卷。请把所有分卷下载到同一个文件夹，然后重试。</string>
     <string name="agvn_unpack_err_no_space">可用空间不足：还差约 %1$s。请删除一些应用、照片或视频，然后重试。</string>
-    <string name="agvn_unpack_err_rar">应用暂时不能解压 RAR 文件。请用 ZArchiver 解压到 内部存储/AGVN，然后像以前一样点“添加游戏”。</string>
     <string name="agvn_unpack_err_method">这个压缩包使用了应用暂时无法读取的压缩方式。请用 ZArchiver 解压到 内部存储/AGVN，然后像以前一样点“添加游戏”。</string>
-    <string name="agvn_unpack_err_not_archive">这个文件不是 ZIP 或 7z 压缩包。</string>
+    <string name="agvn_unpack_err_not_archive">这个文件不是 ZIP、RAR、7z 或 TAR 压缩包。</string>
     <string name="agvn_unpack_err_write">无法写入 内部存储/AGVN（%1$s）。请检查存储权限和可用空间，然后重试。</string>
     <string name="agvn_unpack_err_damaged_file">压缩包在文件“%1$s”处损坏，通常是下载不完整。密码没有错。请重新下载压缩包，然后重试。</string>
     <string name="agvn_unpack_err_damaged">压缩包已损坏或下载未完成。请重新下载，然后重试。</string>
@@ -494,4 +493,14 @@
     <string name="agvn_unpack_no_game_title">压缩包中没有找到游戏</string>
     <string name="agvn_unpack_no_game">已解压到 %1$s，但应用没有在其中找到游戏。如果这是补丁或附加内容，请把它复制到游戏的文件夹中。</string>
     <string name="agvn_unpack_offer">这个文件夹中还没有解压好的游戏，但有压缩包：%1$s。\n\n解压到 内部存储/AGVN 并添加游戏吗？</string>
+    <string name="agvn_unpack_delete_title">删除压缩包以节省空间吗？</string>
+    <string name="agvn_unpack_delete_message">游戏已解压到 %1$s。压缩包“%2$s”已不再需要，删除后可腾出 %3$s。</string>
+    <string name="agvn_unpack_delete_message_set">游戏已解压到 %1$s。分卷压缩包“%2$s”（共 %3$d 卷）已不再需要，删除后可腾出 %4$s。</string>
+    <string name="agvn_unpack_delete_keep">保留</string>
+    <string name="agvn_unpack_delete_yes">删除压缩包</string>
+    <string name="agvn_unpack_delete_failed">无法删除 %1$s。可以用文件管理应用删除。</string>
+    <string name="agvn_unpack_notif_progress">正在解压 %1$s · %2$d%%</string>
+    <string name="agvn_unpack_notif_done">%1$s 已解压完成。点按打开 AGVN Player。</string>
+    <string name="agvn_unpack_notif_failed">未能解压 %1$s</string>
+    <string name="agvn_unpack_notif_password">压缩包有密码。请打开 AGVN Player，重新选择压缩包并输入密码。</string>
 </resources>

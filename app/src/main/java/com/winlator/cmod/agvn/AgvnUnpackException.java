@@ -13,10 +13,9 @@ public final class AgvnUnpackException extends Exception {
         NO_SPACE,
         /** A broken or half-downloaded archive; {@link #detail}: the file that failed its check, or null. */
         DAMAGED,
-        UNSUPPORTED_RAR,
-        /** A ZIP or 7z packed with a method the app cannot read (Deflate64, PPMd, BCJ2...). */
+        /** Packed in a way neither Java's readers nor 7-Zip can read, or needing more memory than the phone gives. */
         UNSUPPORTED_METHOD,
-        /** Not a ZIP, 7z or RAR at all. */
+        /** Not a ZIP, 7z, RAR or TAR at all. */
         NOT_ARCHIVE,
         /** The game folder could not be written; {@link #detail}: the file or folder. */
         CANNOT_WRITE,

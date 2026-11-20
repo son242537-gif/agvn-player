@@ -449,15 +449,15 @@
     <string name="agvn_runner_confirm_windows">Ilipat ang game na ito sa Windows? Mas mabigat at mas mainit ang Windows kaysa Magaang Takbo.\n\nPara bumalik: Library → pindutin nang matagal ang game → \"Paraan ng pagtakbo\".</string>
     <string name="agvn_runner_confirm_yes">Patakbuhin sa Windows</string>
 
-    <!-- "Thêm từ tệp nén": unpacks a downloaded ZIP or 7z into internal storage/AGVN and adds the game -->
-    <string name="agvn_unpack_action">Magdagdag mula sa archive (ZIP, 7z)</string>
+    <!-- "Thêm từ tệp nén": unpacks a downloaded ZIP, RAR, 7z or TAR into internal storage/AGVN and adds the game -->
+    <string name="agvn_unpack_action">Magdagdag mula sa archive (ZIP, RAR, 7z)</string>
     <string name="agvn_unpack_pick_title">Piliin ang archive ng game</string>
     <string name="agvn_unpack_pick_hint">Pumunta sa folder ng na-download na archive (kadalasan ay Download) at i-tap ang file. Kung hati sa ilang bahagi ang archive, i-tap ang kahit aling bahagi. Ie-extract ito ng app sa Internal storage/AGVN.</string>
-    <string name="agvn_unpack_pick_empty">Walang subfolder o ZIP, 7z archive sa folder na ito</string>
+    <string name="agvn_unpack_pick_empty">Walang subfolder o ZIP, RAR, 7z, TAR archive sa folder na ito</string>
     <string name="agvn_unpack_opening">Binubuksan ang archive…</string>
     <string name="agvn_unpack_progress_title">Ine-extract ang %1$s</string>
     <string name="agvn_unpack_progress">%1$d%% · %2$s / %3$s</string>
-    <string name="agvn_unpack_keep_open">Panatilihing bukas ang app hanggang matapos. Hindi mamamatay ang screen.</string>
+    <string name="agvn_unpack_keep_open">Puwede kang lumipat sa ibang app; tuloy pa rin ang pag-extract (tingnan sa notification). Huwag i-swipe pasara ang AGVN Player.</string>
     <string name="agvn_unpack_cancelled">Kinansela ang pag-extract, walang naiwang hindi tapos na file.</string>
     <string name="agvn_unpack_start">I-extract</string>
     <string name="agvn_unpack_password_title">Password ng %1$s</string>
@@ -470,9 +470,8 @@
     <string name="agvn_unpack_err_missing_part">Kulang ang bahaging \"%1$s\" ng archive. I-download ang lahat ng bahagi sa iisang folder, saka subukan ulit.</string>
     <string name="agvn_unpack_err_missing_any">May kulang na bahagi ang archive. I-download ang lahat ng bahagi sa iisang folder, saka subukan ulit.</string>
     <string name="agvn_unpack_err_no_space">Kulang ang bakanteng espasyo: mga %1$s pa ang kailangan. Magbura ng ilang app, larawan o video, saka subukan ulit.</string>
-    <string name="agvn_unpack_err_rar">Hindi pa kayang i-extract ng app ang RAR. I-extract ito gamit ang ZArchiver sa Internal storage/AGVN, saka pindutin ang \"Magdagdag ng game\" gaya ng dati.</string>
     <string name="agvn_unpack_err_method">Gumagamit ang archive na ito ng compression na hindi pa nababasa ng app. I-extract ito gamit ang ZArchiver sa Internal storage/AGVN, saka pindutin ang \"Magdagdag ng game\" gaya ng dati.</string>
-    <string name="agvn_unpack_err_not_archive">Hindi ZIP o 7z archive ang file na ito.</string>
+    <string name="agvn_unpack_err_not_archive">Hindi ZIP, RAR, 7z o TAR archive ang file na ito.</string>
     <string name="agvn_unpack_err_write">Hindi makasulat sa Internal storage/AGVN (%1$s). Tingnan ang pahintulot sa storage at bakanteng espasyo, saka subukan ulit.</string>
     <string name="agvn_unpack_err_damaged_file">Sira ang archive sa file na \"%1$s\", kadalasan dahil hindi kumpleto ang download. Hindi mali ang password. I-download ulit ang archive, saka subukan ulit.</string>
     <string name="agvn_unpack_err_damaged">Sira ang archive o hindi natapos ang download. I-download ulit, saka subukan ulit.</string>
@@ -481,4 +480,14 @@
     <string name="agvn_unpack_no_game_title">Walang nakitang game sa archive</string>
     <string name="agvn_unpack_no_game">Na-extract sa %1$s, pero walang nakitang game ang app doon. Kung patch o add-on ito, kopyahin ito sa folder ng game.</string>
     <string name="agvn_unpack_offer">Wala pang na-extract na game sa folder na ito, pero may mga archive: %1$s.\n\nI-extract sa Internal storage/AGVN at idagdag ang game?</string>
+    <string name="agvn_unpack_delete_title">Burahin ang archive para makatipid ng space?</string>
+    <string name="agvn_unpack_delete_message">Na-extract na ang game sa %1$s. Hindi na kailangan ang archive na \"%2$s\"; kapag binura, mababawi ang %3$s.</string>
+    <string name="agvn_unpack_delete_message_set">Na-extract na ang game sa %1$s. Hindi na kailangan ang set ng archive na \"%2$s\" (%3$d bahagi); kapag binura, mababawi ang %4$s.</string>
+    <string name="agvn_unpack_delete_keep">Itago</string>
+    <string name="agvn_unpack_delete_yes">Burahin ang archive</string>
+    <string name="agvn_unpack_delete_failed">Hindi mabura ang %1$s. Puwede mo itong burahin gamit ang Files app.</string>
+    <string name="agvn_unpack_notif_progress">Ine-extract ang %1$s · %2$d%%</string>
+    <string name="agvn_unpack_notif_done">Na-extract na ang %1$s. I-tap para buksan ang AGVN Player.</string>
+    <string name="agvn_unpack_notif_failed">Hindi pa ma-extract ang %1$s</string>
+    <string name="agvn_unpack_notif_password">May password ang archive. Buksan ang AGVN Player, piliin ulit ang archive at ilagay ang password.</string>
 </resources>

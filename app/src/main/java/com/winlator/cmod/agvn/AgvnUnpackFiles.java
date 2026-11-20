@@ -74,6 +74,27 @@ final class AgvnUnpackFiles {
         return new AgvnUnpackException(Reason.CANNOT_WRITE, name, 0, e);
     }
 
+    /** Room for {@code total} bytes of content and a spare? {@code freeBytes}: the room to count on, -1 to ask the storage. */
+    static void checkRoom(long total, File gamesRoot, long freeBytes) throws AgvnUnpackException {
+        if (!gamesRoot.isDirectory() && !gamesRoot.mkdirs()) throw new AgvnUnpackException(Reason.CANNOT_WRITE, gamesRoot.getPath());
+        long free = freeBytes >= 0 ? freeBytes : gamesRoot.getUsableSpace();
+        if (total + AgvnUnpack.SPARE_BYTES > free) throw new AgvnUnpackException(Reason.NO_SPACE, null, total + AgvnUnpack.SPARE_BYTES - free, null);
+    }
+
+    /** The hidden folder {@code name} is unpacked into: new and empty but for its .nomedia. */
+    static File begin(File gamesRoot, String name) throws AgvnUnpackException {
+        File partial = AgvnArchiveNames.partialFolder(gamesRoot, name);
+        delete(partial); // left by a run the phone killed
+        if (!partial.mkdirs()) throw new AgvnUnpackException(Reason.CANNOT_WRITE, partial.getPath());
+        try {
+            touch(new File(partial, AgvnUnpack.NOMEDIA));
+        } catch (AgvnUnpackException e) {
+            delete(partial);
+            throw e;
+        }
+        return partial;
+    }
+
     static void touch(File file) throws AgvnUnpackException {
         try {
             new FileOutputStream(file).close();

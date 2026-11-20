@@ -54,6 +54,7 @@ official source code, with patches: scripts/agvn/godot in the AGVN Player reposi
 <li>Spine Runtimes 4.2 (spine-cpp and spine-godot, Copyright (c) 2013-2025 Esoteric Software LLC), built into the Godot
 engine above so that Godot games made with Spine can use Lite Run. Spine Runtimes is not open source and not under the GPL: it is used
 under the Spine Runtimes License Agreement, whose full text is at the end of this page. Source code: https://github.com/EsotericSoftware/spine-runtimes.</li>
+<li>7-Zip 25.01 (Copyright (C) 1999-2025 Igor Pavlov; GNU LGPL 2.1 or later, the RAR decompression code under the GNU LGPL with the "unRAR license restriction"; the zstd and LZFSE decoders under the BSD 3-clause license, XXH64 under the BSD 2-clause license): the console program 7zz, built unmodified from the official source and shipped with the app as a separate program (libagvn7zz.so) that "Add from an archive" runs to extract RAR, TAR and the other ZIP and 7z compression methods. The RAR decompression code was developed using the unRAR source code of Alexander Roshal, under this restriction (as written): "The unRAR sources cannot be used to re-create the RAR compression algorithm, which is proprietary. Distribution of modified unRAR sources in separate form or as a part of other software is permitted, provided that it is clearly stated in the documentation and source comments that the code may not be used to develop a RAR (WinRAR) compatible archiver." This code may not be used to re-create the RAR compression algorithm or to develop a RAR (WinRAR) compatible archiver. Source code: https://github.com/ip7z/7zip/releases/tag/25.01 (7z2501-src.tar.xz); build script: scripts/agvn/7zip in the AGVN Player repository. The full licenses are at the end of this page.</li>
 <li>Android libraries: AndroidX, Material Components, Gson, OkHttp, Retrofit, Glide, zstd-jni, XZ for Java,
 Apache Commons Compress, Conscrypt, Bouncy Castle, OpenJSSE, junixsocket (Apache 2.0 / MIT / BSD respectively)</li>
 </ul>
@@ -64,5 +65,8 @@ Apache Commons Compress, Conscrypt, Bouncy Castle, OpenJSSE, junixsocket (Apache
 <h3>Licenses of Godot and the libraries it comes with</h3>
 <p>LICENSE.txt and COPYRIGHT.txt of Godot 4.7.2 as written, the license of Swappy and the Spine Runtimes license, after
 the licenses of mkxp-z.</p>
+<h3>Licenses of 7-Zip</h3>
+<p>DOC/License.txt, DOC/unRarLicense.txt and the GNU LGPL 2.1 (DOC/copying.txt) of 7-Zip 25.01 as written, after
+the licenses of Godot.</p>
 <h3>GNU GPL version 3</h3>
 </body></html>

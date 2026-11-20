@@ -54,6 +54,7 @@ kode sumber resmi, dengan patch: scripts/agvn/godot di repositori AGVN Player. L
 <li>Spine Runtimes 4.2 (spine-cpp dan spine-godot, Copyright (c) 2013-2025 Esoteric Software LLC), di-build ke dalam engine
 Godot di atas agar game Godot yang dibuat dengan Spine bisa memakai Mode Ringan. Spine Runtimes bukan open source dan tidak berlisensi GPL: dipakai
 sesuai Spine Runtimes License Agreement, teks lengkapnya ada di akhir halaman ini. Kode sumber: https://github.com/EsotericSoftware/spine-runtimes.</li>
+<li>7-Zip 25.01 (Copyright (C) 1999-2025 Igor Pavlov; GNU LGPL 2.1 atau yang lebih baru, kode dekompresi RAR di bawah GNU LGPL dengan "unRAR license restriction"; dekoder zstd dan LZFSE di bawah lisensi BSD 3-clause, XXH64 di bawah BSD 2-clause): program konsol 7zz, dibangun tanpa perubahan dari kode sumber resmi dan disertakan sebagai program terpisah (libagvn7zz.so) yang dijalankan "Tambah dari file arsip" untuk mengekstrak RAR, TAR, serta jenis kompresi ZIP dan 7z lainnya. Kode dekompresi RAR dikembangkan dari kode sumber unRAR milik Alexander Roshal, dengan batasan berikut (teks asli): "The unRAR sources cannot be used to re-create the RAR compression algorithm, which is proprietary. Distribution of modified unRAR sources in separate form or as a part of other software is permitted, provided that it is clearly stated in the documentation and source comments that the code may not be used to develop a RAR (WinRAR) compatible archiver." Kode ini tidak boleh dipakai untuk membuat ulang algoritma kompresi RAR atau membuat pengarsip yang kompatibel dengan RAR (WinRAR). Kode sumber: https://github.com/ip7z/7zip/releases/tag/25.01 (7z2501-src.tar.xz); skrip build: scripts/agvn/7zip di repositori AGVN Player. Lisensi lengkap ada di akhir halaman ini.</li>
 <li>Library Android: AndroidX, Material Components, Gson, OkHttp, Retrofit, Glide, zstd-jni, XZ for Java,
 Apache Commons Compress, Conscrypt, Bouncy Castle, OpenJSSE, junixsocket (masing-masing Apache 2.0 / MIT / BSD)</li>
 </ul>
@@ -64,5 +65,8 @@ Apache Commons Compress, Conscrypt, Bouncy Castle, OpenJSSE, junixsocket (masing
 <h3>Lisensi Godot dan library yang disertakan</h3>
 <p>Teks asli LICENSE.txt dan COPYRIGHT.txt dari Godot 4.7.2, lisensi Swappy dan lisensi Spine Runtimes, setelah
 lisensi mkxp-z.</p>
+<h3>Lisensi 7-Zip</h3>
+<p>DOC/License.txt, DOC/unRarLicense.txt, dan GNU LGPL 2.1 (DOC/copying.txt) dari 7-Zip 25.01 sesuai aslinya, setelah
+lisensi Godot.</p>
 <h3>GNU GPL versi 3</h3>
 </body></html>

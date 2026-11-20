@@ -19,7 +19,9 @@ import com.winlator.cmod.core.FileUtils;
  * then the full GPL text (assets/agvn/gpl-3.0.txt), which GPL requires to be given along,
  * then Ren'Py's LICENSE.txt with the libraries in librenpython.so (assets/agvn/renpy-license.txt, app/agvn-renpy.gradle),
  * then mkxp-z and the libraries in libmkxp-z.so (assets/agvn/mkxp-z-license.txt, scripts/agvn/mkxp-z/licenses.sh),
- * then Godot and the libraries in libgodot_android.so (assets/agvn/godot-license.txt, scripts/agvn/godot/build-godot.sh).
+ * then Godot and the libraries in libgodot_android.so (assets/agvn/godot-license.txt, scripts/agvn/godot/build-godot.sh),
+ * then 7-Zip's license with the unRAR restriction and the GNU LGPL 2.1 (assets/agvn/7zip-license.txt,
+ * scripts/agvn/7zip/build-7zz.sh).
  */
 public class LicensesActivity extends AppCompatActivity {
     @Override
@@ -40,9 +42,10 @@ public class LicensesActivity extends AppCompatActivity {
         String renpy = FileUtils.readString(this, "agvn/renpy-license.txt");
         String mkxpz = FileUtils.readString(this, "agvn/mkxp-z-license.txt");
         String godot = FileUtils.readString(this, "agvn/godot-license.txt");
+        String sevenZip = FileUtils.readString(this, "agvn/7zip-license.txt");
         text.setText(TextUtils.concat(Html.fromHtml(html != null ? html : "", Html.FROM_HTML_MODE_LEGACY), "\n",
                 gpl != null ? gpl : "", "\n\n", renpy != null ? renpy : "", "\n\n", mkxpz != null ? mkxpz : "", "\n\n",
-                godot != null ? godot : ""));
+                godot != null ? godot : "", "\n\n", sevenZip != null ? sevenZip : ""));
         ScrollView scroll = new ScrollView(this);
         scroll.setBackgroundColor(Color.parseColor("#15171C"));
         scroll.addView(text);

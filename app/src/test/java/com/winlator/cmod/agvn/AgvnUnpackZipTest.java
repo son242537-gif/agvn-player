@@ -184,7 +184,7 @@ public class AgvnUnpackZipTest {
         }
         assertEquals(0, games.list().length);
         try {
-            AgvnUnpack.extract(z, null, games, new AgvnUnpackFixtures.Quiet(), AgvnUnpack.SPARE_BYTES + 5);
+            AgvnUnpack.extract(z, null, games, null, new AgvnUnpackFixtures.Quiet(), AgvnUnpack.SPARE_BYTES + 5);
             fail();
         } catch (AgvnUnpackException e) {
             assertEquals(Reason.NO_SPACE, e.reason);

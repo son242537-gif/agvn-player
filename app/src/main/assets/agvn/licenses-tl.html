@@ -54,6 +54,7 @@ opisyal na source code, may mga patch: scripts/agvn/godot sa repository ng AGVN 
 <li>Spine Runtimes 4.2 (spine-cpp at spine-godot, Copyright (c) 2013-2025 Esoteric Software LLC), isinama sa Godot engine
 sa itaas para magamit ng mga Godot game na gawa sa Spine ang Magaang Takbo. Hindi open source ang Spine Runtimes at wala ito sa ilalim ng GPL: ginagamit
 ito ayon sa Spine Runtimes License Agreement, na nasa dulo ng pahinang ito ang buong teksto. Source code: https://github.com/EsotericSoftware/spine-runtimes.</li>
+<li>7-Zip 25.01 (Copyright (C) 1999-2025 Igor Pavlov; GNU LGPL 2.1 o mas bago, ang code na pang-extract ng RAR ay nasa GNU LGPL na may "unRAR license restriction"; ang zstd at LZFSE decoder ay nasa BSD 3-clause license, ang XXH64 ay nasa BSD 2-clause): ang console program na 7zz, binuo nang walang pagbabago mula sa opisyal na source at kasama ng app bilang hiwalay na program (libagvn7zz.so) na pinapatakbo ng "Magdagdag mula sa archive" para i-extract ang RAR, TAR at iba pang compression ng ZIP at 7z. Ang code na pang-extract ng RAR ay ginawa gamit ang unRAR source code ni Alexander Roshal, sa ilalim ng restriksyong ito (orihinal na teksto): "The unRAR sources cannot be used to re-create the RAR compression algorithm, which is proprietary. Distribution of modified unRAR sources in separate form or as a part of other software is permitted, provided that it is clearly stated in the documentation and source comments that the code may not be used to develop a RAR (WinRAR) compatible archiver." Hindi maaaring gamitin ang code na ito para muling likhain ang RAR compression algorithm o gumawa ng archiver na compatible sa RAR (WinRAR). Source code: https://github.com/ip7z/7zip/releases/tag/25.01 (7z2501-src.tar.xz); build script: scripts/agvn/7zip sa repository ng AGVN Player. Nasa dulo ng page na ito ang buong mga lisensya.</li>
 <li>Mga Android library: AndroidX, Material Components, Gson, OkHttp, Retrofit, Glide, zstd-jni, XZ for Java,
 Apache Commons Compress, Conscrypt, Bouncy Castle, OpenJSSE, junixsocket (Apache 2.0 / MIT / BSD ayon sa pagkakasunod)</li>
 </ul>
@@ -64,5 +65,8 @@ Apache Commons Compress, Conscrypt, Bouncy Castle, OpenJSSE, junixsocket (Apache
 <h3>Mga lisensya ng Godot at ng mga kasamang library</h3>
 <p>Ang orihinal na LICENSE.txt at COPYRIGHT.txt ng Godot 4.7.2, ang lisensya ng Swappy at ang lisensya ng Spine Runtimes, kasunod ng
 mga lisensya ng mkxp-z.</p>
+<h3>Mga lisensya ng 7-Zip</h3>
+<p>Ang DOC/License.txt, DOC/unRarLicense.txt at GNU LGPL 2.1 (DOC/copying.txt) ng 7-Zip 25.01 ayon sa pagkakasulat, kasunod ng
+mga lisensya ng Godot.</p>
 <h3>GNU GPL bersyon 3</h3>
 </body></html>

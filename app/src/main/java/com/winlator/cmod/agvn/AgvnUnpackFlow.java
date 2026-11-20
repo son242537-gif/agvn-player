@@ -2,6 +2,7 @@
 package com.winlator.cmod.agvn;
 
 import android.content.Context;
+import android.text.format.Formatter;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -50,6 +51,33 @@ public final class AgvnUnpackFlow {
         } else {
             Toast.makeText(a, a.getString(R.string.agvn_unpack_done_many, place), Toast.LENGTH_LONG).show();
         }
+    }
+
+    /**
+     * The archive is unpacked: may its file (every part of a set) be deleted? Asked once, "Giữ lại" unless the player
+     * chooses otherwise, with the room it frees. {@code then}: runs after the answer.
+     */
+    static void askDelete(MainActivity a, AgvnUnpack.Result result, Runnable then) {
+        List<File> files = result.archiveFiles;
+        long bytes = 0;
+        for (File f : files) bytes += f.length();
+        if (bytes <= 0 || a.isFinishing() || a.isDestroyed()) {
+            then.run();
+            return;
+        }
+        String place = AgvnGameImporter.getGamesRoot().getName() + "/" + result.dir.getName();
+        String size = Formatter.formatShortFileSize(a, bytes), name = files.get(0).getName();
+        new AlertDialog.Builder(a)
+                .setTitle(R.string.agvn_unpack_delete_title)
+                .setMessage(files.size() == 1 ? a.getString(R.string.agvn_unpack_delete_message, place, name, size)
+                        : a.getString(R.string.agvn_unpack_delete_message_set, place, name, files.size(), size))
+                .setPositiveButton(R.string.agvn_unpack_delete_keep, null)
+                .setNegativeButton(R.string.agvn_unpack_delete_yes, (d, w) -> {
+                    for (File f : files)
+                        if (!f.delete() && f.exists()) Toast.makeText(a, a.getString(R.string.agvn_unpack_delete_failed, f.getName()), Toast.LENGTH_LONG).show();
+                })
+                .setOnDismissListener(d -> then.run())
+                .show();
     }
 
     /** A scanned folder holds archives and no game: offers to unpack ({@code archives}: their names, one per archive). */

@@ -4422,3 +4422,32 @@ Ngày 20/11/2026 toàn bộ mã AGVN được rà theo 5 mảng; danh sách lỗ
   6. Tệp `.rar` và RAR đổi đuôi `.zip`: báo chưa hỗ trợ RAR. Tệp tải dở: báo hỏng hoặc tải chưa xong.
   7. Tệp 3 GB trở lên: thanh tiến độ chạy, màn hình không tắt, máy không hết RAM; thử khoá màn hình giữa chừng.
   8. "Thêm game" thường, "Chọn thư mục khác", chọn .exe vẫn chạy; ba nút dưới cùng vừa màn hình dọc và ngang.
+
+## Giải nén mọi loại tệp: lõi 7-Zip, RAR, tar, chạy nền, xoá tệp nén (bản 0.1.101)
+
+- **Quyết định của maintainer (20/11/2026):** app phải đọc mọi loại tệp nén; đồng ý đóng kèm 7-Zip 25.01 (LGPL-2.1+,
+  mã `Rar*` kèm điều khoản unRAR: không dùng để viết lại thuật toán nén RAR). Chi tiết ở `LICENSES.md` và màn Giấy phép.
+- **Cách làm:** chương trình `7zz` nguyên bản, dựng bằng `scripts/agvn/7zip/build-7zz.sh` (nguồn ghim trong `pins.txt`),
+  nằm ở `jniLibs/arm64-v8a/libagvn7zz.so` và được chạy như một tiến trình riêng (`AgvnUnpack7zz*`). ZIP vẫn qua zip4j,
+  7z qua commons-compress; gặp kiểu nén không đọc được (Deflate64, LZMA, PPMd, BCJ2…) thì chuyển sang 7zz. RAR/RAR5 (có
+  mật khẩu, mã hoá tên, `.partN.rar`, `.rar + .r00`) và `.tar`, `.tar.gz`, `.tar.xz`, `.tar.bz2`, `.tar.zst` đi thẳng
+  qua 7zz. An toàn như cũ: thư mục tạm ẩn, bỏ mục thoát ra ngoài, xoá symlink/hard link sau khi giải, `.nomedia`,
+  không ghi đè game đang có. Dòng lệnh và mật khẩu không ghi vào log.
+- **Chạy nền:** `AgvnUnpackService` (foreground service kiểu `dataSync`, thông báo tiến độ có nút Hủy, giữ máy thức tối
+  đa 3 giờ); không có quyền thông báo vẫn chạy. Xong thì hỏi một lần "Xóa tệp nén cho đỡ tốn chỗ?", mặc định giữ lại.
+- **Chưa kiểm ở đây:** tệp `libagvn7zz.so` chưa chạy được trên máy dựng (không có qemu); giải nén RAR có nén thật, RAR4
+  và RAR mã hoá tên chưa được chạy (máy không có `rar`: test dùng RAR5 dạng "stored" tự dựng và lời báo đã chụp lại);
+  zstd trong ZIP. `name.part1.zip` / `name.part01.7z` không được ghép bộ (7-Zip cũng không ghép). ZIP tên Shift-JIS/GBK
+  mà phải chuyển sang 7zz có thể ra tên lạ. Tên tệp có `: ? * < > |` (tệp nén từ Linux/macOS) báo không ghi được.
+- **Test:** 753 bài, 2 bỏ qua. `AgvnUnpack7zzTest`, `AgvnUnpack7zzRarTest` cần `build-7zz.sh --host` (không có thì tự bỏ
+  qua); `AgvnUnpack7zzParseTest`, `AgvnUnpack7zzSweepTest` luôn chạy.
+- **Thử máy (quan trọng nhất: 7zz có chạy được từ thư mục thư viện của app trên Android 16 / HyperOS 3 không):**
+  1. RAR5 thường của một game: tiến độ chạy, game vào AGVN, màn xem trước mở.
+  2. RAR có mật khẩu: sai thì hỏi lại, đúng thì giải. RAR mã hoá cả tên tệp.
+  3. Bộ `.part1.rar`: chọn phần 2 vẫn giải; xoá phần cuối thì thông báo nêu tên phần thiếu. Bộ `.rar + .r00`.
+  4. ZIP trên 2 GB tạo bằng Windows (Deflate64), một `.tar.gz`.
+  5. Đang giải tệp lớn: về màn hình chính, khoá máy một phút, phần trăm trên thông báo vẫn tăng; bấm Hủy trên thông
+     báo thì dừng và không sót thư mục. Từ chối quyền thông báo: vẫn giải được.
+  6. Câu hỏi xoá tệp nén: "Giữ lại" giữ nguyên; "Xóa tệp nén" xoá mọi phần của bộ.
+  7. `adb logcat | grep AGVN` khi giải tệp có mật khẩu: không thấy dòng lệnh hay mật khẩu.
+  8. ZIP và 7z thường vẫn giải như trước; màn Giấy phép có mục 7-Zip.

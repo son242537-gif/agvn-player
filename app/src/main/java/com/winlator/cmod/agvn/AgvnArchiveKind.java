@@ -14,10 +14,10 @@ import java.util.regex.Pattern;
 /**
  * What a downloaded archive is and which files belong to it: the kind by its first bytes (the extension only when the
  * bytes say nothing), and the parts of a split archive found beside the file the player picked, with the first part
- * that is not there. Pure Java (JVM-testable).
+ * that is not there. RAR sets are in {@link AgvnArchiveRarSet}. Pure Java (JVM-testable).
  */
 public final class AgvnArchiveKind {
-    public enum Type { ZIP, SEVEN_Z, RAR, UNKNOWN }
+    public enum Type { ZIP, SEVEN_Z, RAR, /** .tar, also packed again: .tar.gz, .tar.xz, .tar.zst, .tar.bz2 */ TAR, UNKNOWN }
 
     /** name.zip.001, name.7z.002, name.001 */
     private static final Pattern NUMBERED = Pattern.compile("(?i)^(.+?)(\\.(zip|7z|rar))?\\.(\\d{3})$");
@@ -25,9 +25,10 @@ public final class AgvnArchiveKind {
     private static final Pattern ZIP_PART = Pattern.compile("(?i)^(.+)\\.z(\\d{2,3})$");
     /** name.r00 beside name.rar */
     private static final Pattern RAR_PART = Pattern.compile("(?i)^(.+)\\.r(\\d{2,3})$");
-    /** name.part2.rar */
-    private static final Pattern PART_N = Pattern.compile("(?i)^(.+)\\.part(\\d+)\\.(zip|7z|rar)$");
+    /** name.part2.rar; a .zip or .7z named so is an archive of its own (7-Zip does not join them either) */
+    static final Pattern PART_N = Pattern.compile("(?i)^(.+)\\.part(\\d+)\\.(zip|7z|rar)$");
     private static final Pattern SINGLE = Pattern.compile("(?i)^(.+)\\.(zip|7z|rar)$");
+    private static final Pattern TAR = Pattern.compile("(?i)^(.+)\\.(tar|tar\\.(gz|xz|zst|bz2)|tgz|txz|tzst|tbz2)$");
 
     /** The archive a picked file belongs to. */
     public static final class Volumes {
@@ -36,6 +37,10 @@ public final class AgvnArchiveKind {
         public File first;
         /** A numbered set's parts in order (.001, .002, ...): one stream cut into files. Empty for other kinds. */
         public final List<File> parts = new ArrayList<>();
+        /** Every file of the archive that is there, in order: what "Xóa tệp nén" removes. */
+        public final List<File> files = new ArrayList<>();
+        /** A TAR packed again (.tar.gz, .tar.xz...): unpacked in two steps. */
+        public boolean tarWrapped;
         /** Name of the first part that is not beside the others, or null. */
         public String missing;
         /** The archive's name without its extensions: the game folder is named after it. */
@@ -56,7 +61,7 @@ public final class AgvnArchiveKind {
     /** A file "Thêm từ tệp nén" lists: an archive or a part of one. */
     public static boolean isArchiveName(String name) {
         return SINGLE.matcher(name).matches() || NUMBERED.matcher(name).matches() || ZIP_PART.matcher(name).matches()
-                || RAR_PART.matcher(name).matches();
+                || RAR_PART.matcher(name).matches() || TAR.matcher(name).matches();
     }
 
     /** The archives of a folder, one name per split archive (its first part; a later part when the first is not there). */
@@ -79,12 +84,15 @@ public final class AgvnArchiveKind {
         if (m.matches()) return m.group(1) + ".zip";
         m = RAR_PART.matcher(name);
         if (m.matches()) return m.group(1) + ".rar";
+        m = PART_N.matcher(name);
+        if (m.matches() && m.group(3).equalsIgnoreCase("rar") && Integer.parseInt(m.group(2)) != 1)
+            return AgvnArchiveRarSet.partName(name, m, 1);
         return null;
     }
 
     /** By the first bytes; UNKNOWN when they are no archive's (or the file cannot be read). */
     public static Type sniff(File file) {
-        byte[] b = new byte[8];
+        byte[] b = new byte[512];
         int n = 0;
         try (InputStream in = new FileInputStream(file)) {
             int r;
@@ -101,6 +109,8 @@ public final class AgvnArchiveKind {
         if (n >= 6 && b[0] == '7' && b[1] == 'z' && (b[2] & 0xFF) == 0xBC && (b[3] & 0xFF) == 0xAF && b[4] == 0x27 && b[5] == 0x1C)
             return Type.SEVEN_Z;
         if (n >= 7 && b[0] == 'R' && b[1] == 'a' && b[2] == 'r' && b[3] == '!' && b[4] == 0x1A && b[5] == 7) return Type.RAR;
+        // a TAR packed again (gzip, xz, zstd) says nothing of the TAR inside: its name does
+        if (n >= 262 && b[257] == 'u' && b[258] == 's' && b[259] == 't' && b[260] == 'a' && b[261] == 'r') return Type.TAR;
         return Type.UNKNOWN;
     }
 
@@ -141,10 +151,12 @@ public final class AgvnArchiveKind {
                 }
             }
             v.first = v.parts.isEmpty() ? picked : v.parts.get(0);
+            v.files.addAll(v.parts);
         } else if ((m = PART_N.matcher(name)).matches()) {
             named = byExtension(m.group(3));
             v.baseName = m.group(1);
             v.first = picked;
+            if (named == Type.RAR) AgvnArchiveRarSet.newStyle(v, dir, names, name, m);
         } else if ((m = ZIP_PART.matcher(name)).matches() || ((m = SINGLE.matcher(name)).matches() && m.group(2).equalsIgnoreCase("zip"))) {
             named = Type.ZIP;
             v.baseName = m.group(1);
@@ -154,14 +166,20 @@ public final class AgvnArchiveKind {
                 Matcher p = ZIP_PART.matcher(n);
                 if (p.matches() && p.group(1).equalsIgnoreCase(v.baseName)) last = Math.max(last, Integer.parseInt(p.group(2)));
             }
-            for (int i = 1; i <= last && v.missing == null; i++) {
-                String part = v.baseName + String.format(Locale.ROOT, ".z%02d", i);
-                if (find(names, part) == null) v.missing = part;
+            for (int i = 1; i <= last; i++) {
+                String part = v.baseName + String.format(Locale.ROOT, ".z%02d", i), found = find(names, part);
+                if (found != null) v.files.add(new File(dir, found));
+                else if (v.missing == null) v.missing = part;
             }
             if (zip == null) v.missing = v.baseName + ".zip"; // the last part, which lists all the files
             v.first = zip != null ? new File(dir, zip) : picked;
-        } else if ((m = RAR_PART.matcher(name)).matches()) {
+        } else if ((m = RAR_PART.matcher(name)).matches() || ((m = SINGLE.matcher(name)).matches() && m.group(2).equalsIgnoreCase("rar"))) {
             named = Type.RAR;
+            v.baseName = m.group(1);
+            v.first = picked;
+            AgvnArchiveRarSet.oldStyle(v, dir, names);
+        } else if ((m = TAR.matcher(name)).matches()) {
+            named = Type.TAR;
             v.baseName = m.group(1);
             v.first = picked;
         } else {
@@ -170,13 +188,17 @@ public final class AgvnArchiveKind {
             v.baseName = m.matches() ? m.group(1) : name;
             v.first = picked;
         }
+        boolean listed = false;
+        for (File f : v.files) listed |= f.getName().equals(v.first.getName());
+        if (!listed) v.files.add(v.first);
         Type seen = v.first.isFile() ? sniff(v.first) : Type.UNKNOWN;
         v.type = seen != Type.UNKNOWN ? seen : named;
+        v.tarWrapped = v.type == Type.TAR && seen != Type.TAR;
         return v;
     }
 
     /** The name in {@code names} equal to {@code wanted} ignoring case (shared storage ignores case), or null. */
-    private static String find(String[] names, String wanted) {
+    static String find(String[] names, String wanted) {
         for (String n : names) if (n.equalsIgnoreCase(wanted)) return n;
         return null;
     }

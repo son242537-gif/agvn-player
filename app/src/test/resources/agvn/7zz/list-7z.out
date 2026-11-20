@@ -1,0 +1,60 @@
+Path = Game
+Size = 0
+Packed Size = 0
+Modified = 2026-11-20 13:28:39.5819017
+Attributes = D drwxr-xr-x
+CRC = 
+Encrypted = -
+Method = 
+Block = 
+
+Path = Game/empty
+Size = 0
+Packed Size = 0
+Modified = 2026-11-20 13:28:39.5819017
+Attributes = D drwxr-xr-x
+CRC = 
+Encrypted = -
+Method = 
+Block = 
+
+Path = Game/www
+Size = 0
+Packed Size = 0
+Modified = 2026-11-20 13:28:39.5819017
+Attributes = D drwxr-xr-x
+CRC = 
+Encrypted = -
+Method = 
+Block = 
+
+Path = Game/Tên tiếng Việt.txt
+Size = 1
+Packed Size = 300029
+Modified = 2026-11-20 13:28:39.5819017
+Attributes = A -rw-r--r--
+CRC = 8CDC1683
+Encrypted = -
+Method = LZMA2:384k
+Block = 0
+
+Path = Game/data.bin
+Size = 300000
+Packed Size = 
+Modified = 2026-11-20 13:28:39.5819017
+Attributes = A -rw-r--r--
+CRC = 7786FC21
+Encrypted = -
+Method = LZMA2:384k
+Block = 0
+
+Path = Game/www/index.html
+Size = 6
+Packed Size = 
+Modified = 2026-11-20 13:28:39.5819017
+Attributes = A -rw-r--r--
+CRC = 363A3020
+Encrypted = -
+Method = LZMA2:384k
+Block = 0
+

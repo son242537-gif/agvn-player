@@ -159,9 +159,10 @@ public class AgvnUnpackPartsTest {
     @Test
     public void rarIsToldApartByItsBytes() throws Exception {
         byte[] rar = {'R', 'a', 'r', '!', 0x1A, 7, 1, 0, 1, 2, 3};
-        assertEquals(Reason.UNSUPPORTED_RAR, failure(AgvnUnpackFixtures.write(new File(downloads, "Game.rar"), rar), null, null));
-        assertEquals(Reason.UNSUPPORTED_RAR, failure(AgvnUnpackFixtures.write(new File(downloads, "Renamed.zip"), rar), null, null));
-        assertEquals(Reason.UNSUPPORTED_RAR, failure(AgvnUnpackFixtures.write(new File(downloads, "Game.part1.rar"), new byte[0]), null, null));
+        // RAR goes to 7-Zip's program (AgvnUnpack7zzRarTest); without it, as on a machine that has none, it cannot be read
+        assertEquals(Reason.UNSUPPORTED_METHOD, failure(AgvnUnpackFixtures.write(new File(downloads, "Game.rar"), rar), null, null));
+        assertEquals(Reason.UNSUPPORTED_METHOD, failure(AgvnUnpackFixtures.write(new File(downloads, "Renamed.zip"), rar), null, null));
+        assertEquals(Reason.UNSUPPORTED_METHOD, failure(AgvnUnpackFixtures.write(new File(downloads, "Game.part1.rar"), new byte[0]), null, null));
         assertEquals(Reason.NOT_ARCHIVE, failure(AgvnUnpackFixtures.write(new File(downloads, "video.mp4"), new byte[]{0, 0, 0, 24}), null, null));
         assertEquals("a web page saved as .zip", Reason.DAMAGED,
                 failure(AgvnUnpackFixtures.write(new File(downloads, "404.zip"), AgvnUnpackFixtures.bytes("<html>Not found</html>")), null, null));

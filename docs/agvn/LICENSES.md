@@ -59,8 +59,30 @@ Anh Sơn quyết định ngày 02/10/2026: app phát hành theo **GNU GPL phiên
     `mkxp-z-license.txt`. Xem `scripts/agvn/mkxp-z/README.md`.
   - Zip4j 2.11.5 (`net.lingala.zip4j:zip4j`, cho "Thêm từ tệp nén": đọc ZIP có mật khẩu và ZIP chia nhiều phần):
     Apache 2.0. Tệp 7z do Apache Commons Compress 1.20 (Apache 2.0) và XZ for Java đọc, hai thư viện app đã có sẵn.
-    App chưa đọc RAR: giấy phép của unrar cấm dùng mã để làm lại bộ nén RAR, không tương thích GPL, nên cần anh Sơn
-    quyết định riêng. Mã nguồn: https://github.com/srikanth-lingala/zip4j.
+    Mã nguồn: https://github.com/srikanth-lingala/zip4j.
+  - 7-Zip 25.01 (chương trình dòng lệnh `7zz`, cho "Thêm từ tệp nén": RAR/RAR5, TAR và `.tar.gz/.xz/.zst`, ZIP nén
+    Deflate64/LZMA/zstd, 7z nén PPMd/BCJ2): Copyright (C) 1999-2025 Igor Pavlov, **GNU LGPL 2.1 hoặc mới hơn**; riêng
+    `CPP/7zip/Compress/Rar*` theo "GNU LGPL" kèm **"unRAR license restriction"**; `LzfseDecoder.cpp` và `C/ZstdDec.c`
+    theo BSD 3-clause, `C/Xxh64.c` theo BSD 2-clause. **Anh Sơn đã đồng ý đưa vào app ngày 20/11/2026.**
+    - Điều kiện unRAR, nguyên văn `DOC/License.txt` của mã nguồn: "The decompression engine for RAR archives was
+      developed using source code of unRAR program. All copyrights to original unRAR code are owned by Alexander
+      Roshal. The license for original unRAR code has the following restriction: The unRAR sources cannot be used to
+      re-create the RAR compression algorithm, which is proprietary. Distribution of modified unRAR sources in separate
+      form or as a part of other software is permitted, provided that it is clearly stated in the documentation and
+      source comments that the code may not be used to develop a RAR (WinRAR) compatible archiver."
+    - `DOC/unRarLicense.txt`, điều 2: "The unRAR sources may be used in any software to handle RAR archives without
+      limitations free of charge, but cannot be used to re-create the RAR compression algorithm, which is proprietary."
+      Điều 3: "The unRAR utility may be freely distributed. No person or company may charge a fee for the distribution
+      of unRAR without written permission from the copyright holder."
+    - Nghĩa là: app chỉ **giải nén** RAR; không ai được dùng mã này để viết lại thuật toán nén RAR hay làm chương
+      trình nén tương thích RAR (WinRAR). Điều kiện này không có trong GPL, nên 7-Zip **không dựng vào mã của
+      app**: nó đi kèm như một **chương trình chạy riêng, nguyên bản không sửa** (`libagvn7zz.so` trong
+      `jniLibs/arm64-v8a`, app chạy nó thành tiến trình riêng và chỉ đọc kết quả in ra), giống proot ở mục "Chương
+      trình chạy riêng" bên dưới. App không tạo tệp RAR.
+    - Dựng bằng `scripts/agvn/7zip/build-7zz.sh` từ `7z2501-src.tar.xz` (SHA-256 ghi ở `sevenzip_src_sha256` trong
+      `scripts/agvn/pins.txt`), không có bản vá. Mã nguồn: https://github.com/ip7z/7zip/releases/tag/25.01 (bản gốc:
+      https://www.7-zip.org). Nguyên văn `DOC/License.txt`, `DOC/unRarLicense.txt` và GNU LGPL 2.1 (`DOC/copying.txt`):
+      `app/src/main/assets/agvn/7zip-license.txt`, app hiện ở cuối màn giấy phép.
 
 ## Vì sao chuyển sang GPL
 
@@ -83,7 +105,7 @@ Anh Sơn quyết định ngày 02/10/2026: app phát hành theo **GNU GPL phiên
 
 - **Được dùng:** chỉ mã có giấy phép tương thích GPL 3, gồm MIT, BSD, zlib, Apache 2.0, LGPL, "GPL 2 hoặc mới hơn"
   và GPL 3.
-- **Chương trình chạy riêng** (ví dụ proot) chỉ đi kèm app, không ảnh hưởng giấy phép của app.
+- **Chương trình chạy riêng** (ví dụ proot, 7-Zip) chỉ đi kèm app, không ảnh hưởng giấy phép của app.
 - **Không dùng:**
   - Mã đóng, ví dụ JoiPlay và MTool.
   - Mã có giấy phép cấm sửa hoặc cấm thương mại.

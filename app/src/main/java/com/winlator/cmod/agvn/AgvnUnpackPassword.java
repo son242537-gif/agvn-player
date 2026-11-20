@@ -83,6 +83,23 @@ final class AgvnUnpackPassword {
         }
     }
 
+    /**
+     * The notification for a player who is in another app when unpacking ends. {@code e}: null when it went well.
+     * Null when there is nothing to tell (the player cancelled).
+     */
+    static String notice(Context ctx, String archiveName, AgvnUnpackException e) {
+        if (e == null) return ctx.getString(R.string.agvn_unpack_notif_done, archiveName);
+        switch (e.reason) {
+            case CANCELLED:
+                return null;
+            case NEED_PASSWORD:
+            case WRONG_PASSWORD:
+                return ctx.getString(R.string.agvn_unpack_notif_password);
+            default:
+                return ctx.getString(R.string.agvn_unpack_notif_failed, archiveName) + ". " + message(ctx, e);
+        }
+    }
+
     /** Why the archive could not be unpacked and what to do, in the player's words. */
     static String message(Context ctx, AgvnUnpackException e) {
         switch (e.reason) {
@@ -91,8 +108,6 @@ final class AgvnUnpackPassword {
                         : ctx.getString(R.string.agvn_unpack_err_missing_any);
             case NO_SPACE:
                 return ctx.getString(R.string.agvn_unpack_err_no_space, Formatter.formatShortFileSize(ctx, e.bytes));
-            case UNSUPPORTED_RAR:
-                return ctx.getString(R.string.agvn_unpack_err_rar);
             case UNSUPPORTED_METHOD:
                 return ctx.getString(R.string.agvn_unpack_err_method);
             case NOT_ARCHIVE:

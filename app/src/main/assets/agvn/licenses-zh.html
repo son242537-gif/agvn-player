@@ -34,6 +34,7 @@
 <li>mkxp-z（GPL 3.0 或更新版本，Copyright 2013-2023 Amaryllis Kulla 及 mkxp-z 作者；用于 RPG Maker XP/VX/VX Ace 游戏的轻量运行），包含 Ruby 3.1（Ruby License / BSD-2-Clause）、SDL2、SDL_image、SDL_sound、SDL_ttf 和 PhysicsFS（zlib）、OpenAL Soft 和 FluidSynth（LGPL 2.1）、FreeType（FreeType License）及其他库：https://github.com/mkxp-z/mkxp-z 。源代码和 Android 构建脚本：AGVN Player 代码库中的 scripts/agvn/mkxp-z。完整许可证见本页末尾。</li>
 <li>Godot Engine 4.7.2（MIT，Copyright 2014-present Godot Engine contributors, 2007-2014 Juan Linietsky 和 Ariel Manzur；用于 Godot 4 游戏的轻量运行），包含 FreeType、HarfBuzz、ICU、mbedTLS、Vulkan Memory Allocator、Swappy（Apache 2.0）及其他库：https://godotengine.org ，源代码 https://github.com/godotengine/godot 。应用中的引擎由官方源代码重新构建，带有补丁：AGVN Player 代码库中的 scripts/agvn/godot。完整许可证见本页末尾。</li>
 <li>Spine Runtimes 4.2（spine-cpp 和 spine-godot，Copyright (c) 2013-2025 Esoteric Software LLC），构建进上面的 Godot 引擎，让用 Spine 制作的 Godot 游戏可以轻量运行。Spine Runtimes 不是开源软件，也不受 GPL 约束：按 Spine Runtimes License Agreement 使用，全文见本页末尾。源代码：https://github.com/EsotericSoftware/spine-runtimes</li>
+<li>7-Zip 25.01（Copyright (C) 1999-2025 Igor Pavlov；GNU LGPL 2.1 或更高版本，其中 RAR 解压代码采用附带“unRAR license restriction”的 GNU LGPL；zstd 与 LZFSE 解码器采用 BSD 3-clause 许可，XXH64 采用 BSD 2-clause 许可）：命令行程序 7zz，由官方源代码原样构建、未作修改，作为独立程序（libagvn7zz.so）随应用提供，“从压缩包添加”运行它来解压 RAR、TAR 以及 ZIP、7z 的其他压缩方式。RAR 解压代码基于 Alexander Roshal 的 unRAR 源代码开发，须遵守以下限制（原文）："The unRAR sources cannot be used to re-create the RAR compression algorithm, which is proprietary. Distribution of modified unRAR sources in separate form or as a part of other software is permitted, provided that it is clearly stated in the documentation and source comments that the code may not be used to develop a RAR (WinRAR) compatible archiver." 该代码不得用于重新实现 RAR 压缩算法，也不得用于开发与 RAR (WinRAR) 兼容的压缩软件。源代码：https://github.com/ip7z/7zip/releases/tag/25.01（7z2501-src.tar.xz）；构建脚本：AGVN Player 代码仓库中的 scripts/agvn/7zip。完整许可证见本页末尾。</li>
 <li>Android 库：AndroidX、Material Components、Gson、OkHttp、Retrofit、Glide、zstd-jni、XZ for Java、Apache Commons Compress、Conscrypt、Bouncy Castle、OpenJSSE、junixsocket（分别为 Apache 2.0 / MIT / BSD）</li>
 </ul>
 <h3>Ren'Py 的许可证</h3>
@@ -42,5 +43,7 @@
 <p>位于 Ren'Py 的许可证之后，在本页末尾。</p>
 <h3>Godot 及其附带库的许可证</h3>
 <p>Godot 4.7.2 的 LICENSE.txt 和 COPYRIGHT.txt 原文、Swappy 的许可证和 Spine Runtimes 许可证，位于 mkxp-z 的许可证之后。</p>
+<h3>7-Zip 的许可证</h3>
+<p>7-Zip 25.01 的 DOC/License.txt、DOC/unRarLicense.txt 和 GNU LGPL 2.1（DOC/copying.txt）原文，位于 Godot 的许可证之后。</p>
 <h3>GNU GPL 第 3 版</h3>
 </body></html>

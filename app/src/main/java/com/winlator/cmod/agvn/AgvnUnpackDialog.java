@@ -1,6 +1,7 @@
 /* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.Lifecycle;
 
 import com.winlator.cmod.MainActivity;
 import com.winlator.cmod.R;
@@ -25,14 +27,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * "Thêm từ tệp nén": unpacks the archive the player picked into internal storage/AGVN ({@link AgvnUnpack}) behind a
- * dialog with the percent done, the file being written and "Hủy". The screen stays on while it works. The password is
- * asked only when the archive turns out to be locked ({@link AgvnUnpackPassword}), again after a wrong one.
+ * dialog with the percent done, the file being written and "Hủy". The screen stays on while the dialog shows; when the
+ * player goes to another app the work goes on ({@link AgvnUnpackService}) and its end is told by a notification. The
+ * password is asked only when the archive turns out to be locked ({@link AgvnUnpackPassword}), again after a wrong
+ * one. Once unpacked, the player is asked whether the archive may be deleted ({@link AgvnUnpackFlow#askDelete}).
  */
 public final class AgvnUnpackDialog {
     /** One archive at a time. */
     private static final ExecutorService WORK = Executors.newSingleThreadExecutor();
     /** The dialog is redrawn this often at most; the worker reports after every block it writes. */
     private static final long REDRAW_MS = 120;
+
+    /** 7-Zip's console program in the app's nativeLibraryDir (scripts/agvn/7zip/build-7zz.sh). */
+    private static final String SEVEN_ZIP = "libagvn7zz.so";
 
     public interface Done {
         /** {@code gameDir}: the new folder, complete. */
@@ -74,14 +81,14 @@ public final class AgvnUnpackDialog {
                 .setCancelable(false)
                 .setNegativeButton(R.string.agvn_cancel, (d, w) -> cancel.set(true))
                 .create();
-        // closed with its screen (the app was closed): the work stops and the half-written folder is removed
-        dialog.setOnDismissListener(d -> {
-            if (!finished.get()) cancel.set(true);
-        });
+        // closed with its screen (the player left the app): the work goes on, the notification has "Hủy"
         dialog.show();
         if (dialog.getWindow() != null) dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         Handler main = new Handler(Looper.getMainLooper());
+        Context app = a.getApplicationContext();
+        File sevenZip = new File(a.getApplicationInfo().nativeLibraryDir, SEVEN_ZIP);
+        AgvnUnpackService.begin(app, archive.getName(), cancel);
         AgvnUnpack.Listener listener = new AgvnUnpack.Listener() {
             long drawn;
 
@@ -90,10 +97,11 @@ public final class AgvnUnpackDialog {
                 long now = SystemClock.uptimeMillis();
                 if (now - drawn < REDRAW_MS && doneBytes < totalBytes) return;
                 drawn = now;
+                int permille = totalBytes > 0 ? (int) (doneBytes * 1000 / totalBytes) : 1000;
+                AgvnUnpackService.progress(app, permille);
                 main.post(() -> {
                     if (finished.get()) return;
                     bar.setIndeterminate(false);
-                    int permille = totalBytes > 0 ? (int) (doneBytes * 1000 / totalBytes) : 1000;
                     bar.setProgress(permille);
                     percent.setText(a.getString(R.string.agvn_unpack_progress, permille / 10,
                             Formatter.formatShortFileSize(a, doneBytes), Formatter.formatShortFileSize(a, totalBytes)));
@@ -110,7 +118,7 @@ public final class AgvnUnpackDialog {
             AgvnUnpack.Result result = null;
             AgvnUnpackException error = null;
             try {
-                result = AgvnUnpack.extract(archive, password, AgvnGameImporter.getGamesRoot(), listener);
+                result = AgvnUnpack.extract(archive, password, AgvnGameImporter.getGamesRoot(), sevenZip, listener);
             } catch (AgvnUnpackException e) {
                 error = e;
             } catch (Throwable t) { // never leaves the dialog up
@@ -120,9 +128,12 @@ public final class AgvnUnpackDialog {
             AgvnUnpackException failure = error;
             main.post(() -> {
                 finished.set(true);
-                if (a.isFinishing() || a.isDestroyed()) return;
+                boolean gone = a.isFinishing() || a.isDestroyed();
+                boolean watching = !gone && a.getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED);
+                AgvnUnpackService.end(app, watching ? null : AgvnUnpackPassword.notice(a, archive.getName(), failure));
+                if (gone) return; // the folder is in AGVN: "Thêm game" finds it
                 dialog.dismiss();
-                if (unpacked != null) done.onUnpacked(unpacked.dir);
+                if (unpacked != null) AgvnUnpackFlow.askDelete(a, unpacked, () -> done.onUnpacked(unpacked.dir));
                 else failed(a, archive, password, failure, done);
             });
         });

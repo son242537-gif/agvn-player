@@ -24,6 +24,8 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+    <!-- AGVN: "Thêm từ tệp nén" keeps unpacking while the player is in another app (agvn/AgvnUnpackService) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" tools:ignore="ProtectedPermissions" />
 
@@ -71,6 +73,12 @@
         <service
             android:name="com.winlator.cmod.agvn.AgvnUpdateJob"
             android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false" />
+
+        <!-- AGVN: unpacking a game archive goes on with the app in the background; dataSync: work on the phone's own files -->
+        <service
+            android:name="com.winlator.cmod.agvn.AgvnUnpackService"
+            android:foregroundServiceType="dataSync"
             android:exported="false" />
 
         <activity

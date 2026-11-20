@@ -12,10 +12,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * "Thêm từ tệp nén": unpacks a downloaded ZIP or 7z into a folder of its own under the games folder, so nothing spills
+ * "Thêm từ tệp nén": unpacks a downloaded archive into a folder of its own under the games folder, so nothing spills
  * loose beside the archive. The work is done in a hidden folder that gets its name only when all of it is there and is
- * removed when anything fails; an existing game folder is never touched. Pure Java (JVM-testable); slow, never on the
- * main thread.
+ * removed when anything fails; an existing game folder is never touched. ZIP is read with zip4j (it gets old ZIPs'
+ * file names right) and 7z with commons-compress; RAR, TAR and what those two cannot read go to 7-Zip's own program
+ * ({@link AgvnUnpack7zz}). Pure Java (JVM-testable); slow, never on the main thread.
  */
 public final class AgvnUnpack {
     /** Room kept free beyond the archive's content. */
@@ -36,6 +37,8 @@ public final class AgvnUnpack {
         public final int files;
         /** Entries left out because they pointed outside the folder. */
         public final int rejected;
+        /** Every file of the archive (all parts of a set): what the player may delete now. */
+        public List<File> archiveFiles = Collections.emptyList();
 
         Result(File dir, int files, int rejected) {
             this.dir = dir;
@@ -64,15 +67,21 @@ public final class AgvnUnpack {
      * {@code password}: as typed or pasted, null when none was asked yet ({@link Reason#NEED_PASSWORD} then asks).
      */
     public static Result extract(File picked, String password, File gamesRoot, Listener listener) throws AgvnUnpackException {
-        return extract(picked, password, gamesRoot, listener, -1);
+        return extract(picked, password, gamesRoot, null, listener, -1);
+    }
+
+    /** {@code sevenZip}: 7-Zip's program (libagvn7zz.so in the app's nativeLibraryDir); null: only what Java reads. */
+    public static Result extract(File picked, String password, File gamesRoot, File sevenZip, Listener listener) throws AgvnUnpackException {
+        return extract(picked, password, gamesRoot, sevenZip, listener, -1);
     }
 
     /** {@code freeBytes}: the room to count on, or -1 to ask the storage (tests). */
-    static Result extract(File picked, String password, File gamesRoot, Listener listener, long freeBytes) throws AgvnUnpackException {
+    static Result extract(File picked, String password, File gamesRoot, File sevenZip, Listener listener, long freeBytes)
+            throws AgvnUnpackException {
         AgvnArchiveKind.Volumes volumes = AgvnArchiveKind.resolve(picked);
-        if (volumes.type == AgvnArchiveKind.Type.RAR) throw new AgvnUnpackException(Reason.UNSUPPORTED_RAR);
         if (volumes.missing != null) throw new AgvnUnpackException(Reason.MISSING_PART, volumes.missing);
         if (volumes.type == AgvnArchiveKind.Type.UNKNOWN) throw new AgvnUnpackException(Reason.NOT_ARCHIVE);
+        if (!volumes.first.isFile()) throw new AgvnUnpackException(Reason.MISSING_PART, volumes.first.getName());
         // the password without what a paste adds; as typed after that, for a password that does end in a space
         Set<String> tries = new LinkedHashSet<>();
         tries.add(trimPassword(password));
@@ -80,7 +89,9 @@ public final class AgvnUnpack {
         AgvnUnpackException wrong = null;
         for (String attempt : tries) {
             try {
-                return extractOnce(volumes, attempt, gamesRoot, listener, freeBytes);
+                Result result = route(volumes, attempt, gamesRoot, sevenZip, listener, freeBytes);
+                result.archiveFiles = volumes.files;
+                return result;
             } catch (AgvnUnpackException e) {
                 if (e.reason != Reason.WRONG_PASSWORD) throw e;
                 wrong = e;
@@ -89,13 +100,39 @@ public final class AgvnUnpack {
         throw wrong;
     }
 
+    /** Java's readers first for ZIP and 7z; 7-Zip's program for the rest and for what they cannot read. */
+    private static Result route(AgvnArchiveKind.Volumes volumes, String password, File gamesRoot, File sevenZip, Listener listener,
+                                long freeBytes) throws AgvnUnpackException {
+        boolean java = volumes.type == AgvnArchiveKind.Type.ZIP || volumes.type == AgvnArchiveKind.Type.SEVEN_Z;
+        if (!java) return AgvnUnpack7zz.extract(sevenZip, volumes, password, gamesRoot, listener, freeBytes);
+        boolean[] opened = {false};
+        try {
+            return extractOnce(volumes, password, gamesRoot, listener, freeBytes, opened);
+        } catch (AgvnUnpackException e) {
+            // a method Java cannot read (Deflate64, LZMA, zstd; PPMd, BCJ2), or a ZIP zip4j cannot open at all
+            boolean again = e.reason == Reason.UNSUPPORTED_METHOD
+                    || (e.reason == Reason.DAMAGED && !opened[0] && volumes.type == AgvnArchiveKind.Type.ZIP);
+            if (listener.cancelled()) throw new AgvnUnpackException(Reason.CANCELLED);
+            if (!again || sevenZip == null || !sevenZip.isFile()) throw e;
+            try {
+                return AgvnUnpack7zz.extract(sevenZip, volumes, password, gamesRoot, listener, freeBytes);
+            } catch (AgvnUnpackException second) {
+                // 7-Zip could not open it either: what Java found stands (it names the part that is likely missing)
+                boolean same = second.reason == Reason.NOT_ARCHIVE || (second.reason == Reason.DAMAGED && second.detail == null)
+                        || (second.reason == Reason.MISSING_PART && second.detail == null);
+                throw same && e.reason != Reason.UNSUPPORTED_METHOD ? e : second;
+            }
+        }
+    }
+
     private static Result extractOnce(AgvnArchiveKind.Volumes volumes, String password, File gamesRoot, Listener listener,
-                                      long freeBytes) throws AgvnUnpackException {
+                                      long freeBytes, boolean[] opened) throws AgvnUnpackException {
         char[] key = password != null ? password.toCharArray() : null;
         AgvnArchiveReader reader;
         try {
             reader = volumes.type == AgvnArchiveKind.Type.ZIP ? new AgvnUnpackZip(volumes.first, key)
                     : new AgvnUnpack7z(volumes.parts.isEmpty() ? Collections.singletonList(volumes.first) : volumes.parts, key);
+            opened[0] = true;
         } catch (AgvnUnpackException e) {
             // the end of a ZIP or 7z lists its files: a set whose last part is not there cannot be opened
             String next = e.reason == Reason.DAMAGED ? volumes.likelyMissingNext() : null;
@@ -114,16 +151,11 @@ public final class AgvnUnpack {
                 locked |= item.encrypted;
             }
             if (locked && key == null) throw new AgvnUnpackException(Reason.NEED_PASSWORD);
-            if (!gamesRoot.isDirectory() && !gamesRoot.mkdirs()) throw new AgvnUnpackException(Reason.CANNOT_WRITE, gamesRoot.getPath());
-            long free = freeBytes >= 0 ? freeBytes : gamesRoot.getUsableSpace();
-            if (total + SPARE_BYTES > free) throw new AgvnUnpackException(Reason.NO_SPACE, null, total + SPARE_BYTES - free, null);
+            AgvnUnpackFiles.checkRoom(total, gamesRoot, freeBytes);
 
             String top = AgvnArchiveNames.singleTop(paths);
             String name = AgvnArchiveNames.folderName(top != null ? top : volumes.baseName);
-            partial = AgvnArchiveNames.partialFolder(gamesRoot, name);
-            AgvnUnpackFiles.delete(partial); // left by a run the phone killed
-            if (!partial.mkdirs()) throw new AgvnUnpackException(Reason.CANNOT_WRITE, partial.getPath());
-            AgvnUnpackFiles.touch(new File(partial, NOMEDIA));
+            partial = AgvnUnpackFiles.begin(gamesRoot, name);
 
             long done = 0;
             int files = 0, rejected = 0;
