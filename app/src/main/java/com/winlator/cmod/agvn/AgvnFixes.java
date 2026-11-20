@@ -71,6 +71,15 @@ final class AgvnFixes {
             Fix fix = make(a, s, finding, state, id);
             if (fix != null) fixes.add(fix);
         }
+        // the settings of the same game's other entry (AgvnGameTwin), whatever the problem: first when that entry ran
+        // well with them, else before "send-logs"
+        boolean windows = !AgvnHtmlGame.isLight(s.getExtra(AgvnHtmlGame.EXTRA_RUNNER));
+        Fix twin = windows && !fixes.isEmpty() && !tried.contains(AgvnGameTwin.FIX) ? AgvnGameTwin.fix(a, s) : null;
+        if (twin != null) {
+            int last = fixes.size() - 1;
+            boolean logsLast = fixes.get(last).id.equals("send-logs");
+            fixes.add(AgvnGameTwin.ranWell(a, twin) ? 0 : logsLast ? last : last + 1, twin);
+        }
         return fixes;
     }
 

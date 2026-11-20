@@ -193,11 +193,17 @@ def enable_faulthandler():
 
 fault_log = enable_faulthandler()
 
+try:  # Ren'Py's mending of Python 2 syntax, mended, for every game (agvn_syntax.py)
+    here = os.path.dirname(os.path.abspath(__file__))
+    if here not in sys.path:
+        sys.path.insert(0, here)
+    import agvn_syntax
+    ModuleHooks.HOOKS["renpy.compat.fixes"] = agvn_syntax.install
+except Exception as e:
+    print("AGVN: Python 2 syntax:", e)
+
 if os.environ.get("AGVN_RENPY_PY2") == "1":
     try:
-        here = os.path.dirname(os.path.abspath(__file__))
-        if here not in sys.path:
-            sys.path.insert(0, here)
         import agvn_py2
         agvn_py2.install(ModuleHooks.HOOKS)
     except Exception as e:

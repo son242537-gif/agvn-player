@@ -52,6 +52,9 @@ final class AgvnFixApply {
             case "reset":
                 reset(a, s);
                 break;
+            case AgvnGameTwin.FIX:
+                if (!AgvnGameTwin.apply(a, s, fix.to)) return false;
+                break;
             case "quality-down":
             case "quality-up":
                 AgvnQuality.apply(a, s, AgvnQuality.Level.valueOf(fix.to));

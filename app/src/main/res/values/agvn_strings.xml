@@ -370,6 +370,7 @@
     <string name="agvn_doctor_fixed">Đã sửa: %1$s. Đang mở lại game…</string>
     <string name="agvn_doctor_saved">Đã lưu: %1$s. Có tác dụng khi mở lại game.</string>
     <string name="agvn_fix_restore_good">Dùng lại cấu hình đã chạy được</string>
+    <string name="agvn_fix_twin_config">Dùng cấu hình của mục «%1$s» (cùng game này)</string>
     <string name="agvn_fix_reset">Về cấu hình gốc của AGVN</string>
     <string name="agvn_fix_quality">Đổi Đồ họa sang %1$s (%2$s)</string>
     <string name="agvn_fix_dxvk">Đổi DXVK sang bản %1$s</string>

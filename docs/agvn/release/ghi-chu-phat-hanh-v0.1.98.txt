@@ -1,0 +1,6 @@
+AGVN Player v0.1.98 - agvn.io
+
+Sửa lỗi:
+- "Chạy nhẹ" game Ren'Py viết cho Ren'Py 7 (Python 2) không còn dừng ở "Parsing the script failed … leading zeros in decimal integer literals" (như Hero Harem Guild). App sửa chỗ Ren'Py 8 đọc sai số kiểu cũ, không sửa tệp nào của game.
+- Game có hai mục trong thư viện (cùng game, khác thư mục): khi một mục bị lỗi, "Tự sửa lỗi" có thêm nút "Dùng cấu hình của mục kia", và nhật ký ghi rõ có mục cùng game.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

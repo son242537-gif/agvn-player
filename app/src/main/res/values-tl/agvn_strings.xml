@@ -361,6 +361,7 @@
     <string name="agvn_doctor_fixed">Naayos: %1$s. Binubuksan ulit ang game…</string>
     <string name="agvn_doctor_saved">Na-save: %1$s. Gagana pagbukas ulit ng game.</string>
     <string name="agvn_fix_restore_good">Gamitin ulit ang config na gumana</string>
+    <string name="agvn_fix_twin_config">Gamitin ang config ng «%1$s» (parehong game)</string>
     <string name="agvn_fix_reset">Ibalik sa orihinal na config ng AGVN</string>
     <string name="agvn_fix_quality">Gawing %1$s ang Graphics (%2$s)</string>
     <string name="agvn_fix_dxvk">Gawing bersyon %1$s ang DXVK</string>

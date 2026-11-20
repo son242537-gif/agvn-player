@@ -92,4 +92,21 @@ public class AgvnGameVersionsTest {
                 new File(tmp.getRoot(), "old"), "profile/AppData/LocalLow/a/b", null);
         assertEquals(0, AgvnGameVersions.copyFolderSaves(Collections.singletonList(profile), to));
     }
+
+    @Test
+    public void twoEntriesOfOneGameKeepTheirOwnSettingsUntilAsked() {
+        // Toeha (vivo V2352A, 0.1.97, 20/11/2026): "Toeha" and "Toeha Player", one Unity game in two folders; five fixes
+        // went to the first entry while the player opened the second
+        String[] unity = {"I'm moralist", "toeha"};
+        org.junit.Assert.assertTrue(AgvnGameVersions.sameGame("Toeha Player", "toeha.exe", unity, "Toeha", "TOEHA.exe", unity));
+        org.junit.Assert.assertFalse(AgvnGameVersions.sameGame("Toeha Player", "toeha.exe", unity, "Other", "toeha.exe",
+                new String[]{"Someone", "else"}));
+        java.util.Map<String, String> fixed = new java.util.LinkedHashMap<>();
+        fixed.put("dxwrapperConfig", "version=1.10.3");
+        fixed.put("graphicsDriverConfig", "version=System");
+        java.util.Map<String, String> first = new java.util.LinkedHashMap<>();
+        first.put("dxwrapperConfig", "version=2.3.1");
+        org.junit.Assert.assertTrue(AgvnGameTwin.differ(fixed, first));
+        org.junit.Assert.assertFalse("nothing to offer", AgvnGameTwin.differ(fixed, new java.util.LinkedHashMap<>(fixed)));
+    }
 }

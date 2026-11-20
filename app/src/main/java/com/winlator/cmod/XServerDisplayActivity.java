@@ -1329,6 +1329,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         com.winlator.cmod.agvn.AgvnElectronGame.logging(envVars, shortcut); // AGVN: why an Electron game closed
         com.winlator.cmod.agvn.AgvnAvPro.apply(envVars, shortcut); // AGVN: MP4 video frames in normal memory; AVPro gets its DXGI manager, not its WinRT player
         guestProgramLauncherComponent.setEnvVars(envVars);
+        com.winlator.cmod.agvn.AgvnGameTwin.prepareNote(this, shortcut); // AGVN: the same game's other entry, for the log
         if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.start(shortcut, envVars); // AGVN: logs of this play session
         if (shortcut != null && debugDialog != null) com.winlator.cmod.agvn.AgvnSessionLog.addLog(debugDialog.getLogFile()); // AGVN: and Wine's own log
         if (shortcut != null) agvnStartup = com.winlator.cmod.agvn.AgvnStartupProgress.start(this, shortcut, agvnStatus); // AGVN: a slow start shows how it goes

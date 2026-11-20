@@ -370,6 +370,7 @@
     <string name="agvn_doctor_fixed">แก้แล้ว: %1$s กำลังเปิดเกมใหม่…</string>
     <string name="agvn_doctor_saved">บันทึกแล้ว: %1$s มีผลเมื่อเปิดเกมใหม่</string>
     <string name="agvn_fix_restore_good">กลับไปใช้การตั้งค่าที่เคยเล่นได้</string>
+    <string name="agvn_fix_twin_config">ใช้การตั้งค่าของรายการ «%1$s» (เกมเดียวกัน)</string>
     <string name="agvn_fix_reset">กลับไปใช้การตั้งค่าเริ่มต้นของ AGVN</string>
     <string name="agvn_fix_quality">เปลี่ยนกราฟิกเป็น %1$s (%2$s)</string>
     <string name="agvn_fix_dxvk">เปลี่ยน DXVK เป็นเวอร์ชัน %1$s</string>

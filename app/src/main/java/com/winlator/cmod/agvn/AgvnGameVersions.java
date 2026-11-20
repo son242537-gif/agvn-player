@@ -49,6 +49,13 @@ final class AgvnGameVersions {
         return null;
     }
 
+    /** Another entry of {@code s}'s own game (another folder of it: a new version, another build), or null. */
+    static Shortcut twin(List<Shortcut> library, Shortcut s) {
+        List<Shortcut> others = new ArrayList<>();
+        for (Shortcut o : library) if (!o.file.equals(s.file)) others.add(o);
+        return older(others, s.name, exeOf(s));
+    }
+
     static boolean sameGame(String name, String exeName, String[] unity, String otherName, String otherExe,
                             String[] otherUnity) {
         if (exeName == null || !exeName.equalsIgnoreCase(otherExe)) return false;

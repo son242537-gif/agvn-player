@@ -370,6 +370,7 @@
     <string name="agvn_doctor_fixed">已修复：%1$s。正在重新打开游戏…</string>
     <string name="agvn_doctor_saved">已保存：%1$s。重新打开游戏后生效。</string>
     <string name="agvn_fix_restore_good">恢复之前能运行的配置</string>
+    <string name="agvn_fix_twin_config">使用“%1$s”的配置（同一个游戏）</string>
     <string name="agvn_fix_reset">恢复 AGVN 原始配置</string>
     <string name="agvn_fix_quality">将画质改为 %1$s（%2$s）</string>
     <string name="agvn_fix_dxvk">将 DXVK 改为 %1$s 版</string>

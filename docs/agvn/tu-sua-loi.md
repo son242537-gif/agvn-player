@@ -4266,3 +4266,55 @@ Sửa (`AgvnLook`, `AgvnCamera`, `AgvnCameraSettings`, `AgvnLookControl`, `AgvnG
      lại để đảo. Mở menu game (con trỏ hiện): nghiêng máy không làm gì.
   7. Cần xoay: nghiêng nhẹ quay chậm, nghiêng hết quay nhanh, đi chéo không giật.
   8. Game 2D, visual novel, menu có con trỏ: chạm, kéo như cũ.
+
+## Ren'Py 7 (Python 2) dừng ở "leading zeros in decimal integer literals"; sửa lỗi theo từng mục game (bản 0.1.98)
+
+Báo cáo ngày 20/11/2026 (vivo V2352A, Adreno 735, Android 16, app 0.1.97), hai trường hợp.
+
+### 1. Hero Harem Guild: "Parsing the script failed"
+
+`File "game/script/013fishingChristmas.rpy", line 532: leading zeros in decimal integer literals are not permitted` ở
+dòng `numfloat = (str(self.clock.counter)+"00").split(".")[1][:02]`. JoiPlay (Ren'Py 8.5.0) lỗi y hệt.
+
+- **Vì sao (mã Ren'Py 8.5.3, `renpy/python.py` và `renpy/compat/fixes.py`):**
+  - Khi một khối Python không dịch được, Ren'Py 8 tự sửa cú pháp Python 2 (`fix_tokens`) rồi dịch lại; không được thì báo
+    lỗi **của bản gốc**.
+  - `fix_octal_numbers` đổi **mọi** số bắt đầu bằng `0` thành `0o…`: `02` → `0o2` (đúng), nhưng `0.5` → `0o.5`,
+    `0x1F` → `0ox1F`, `0e0` → `0oe0` (hỏng). Khối nào vừa có số bát phân kiểu Python 2 vừa có số thực hay số hex thì bản
+    "đã sửa" lại hỏng, và Ren'Py báo dòng `02`. Dựng lại được trên PC bằng Ren'Py 8.5.3
+    (`scripts/agvn/renpy/run-syntax-test.sh`): đúng thông báo trên.
+- **Sửa (`app/src/main/renpy/agvn_syntax.py`, gắn vào `renpy.compat.fixes` cho mọi game qua `main.py`):**
+  - chỉ số nguyên viết kiểu Python 2 (`0` rồi các chữ số 0–7) mới thành `0o…`;
+  - thêm `except X, e:` → `except X as e:` và `ur"…"` → `r"…"`, hai cú pháp Ren'Py chưa sửa.
+  - Chỉ dùng hàm cấp mô-đun: Ren'Py sao lưu mô-đun của nó bằng pickle, và một `lambda` ở đó làm **mọi** game Ren'Py dừng
+    lúc mở (đã gặp khi thử bản vá đầu, như lỗi của 0.1.56). Bài thử đếm cả traceback.
+  - Không sửa tệp nào của game; khối nào dịch được sẵn thì không đi qua đây.
+- **Thử trên PC:** `run-syntax-test.sh`: Ren'Py gốc 1 lỗi cú pháp, có `agvn_syntax.py` thì 0 lỗi, 0 traceback, lint chạy
+  hết; kết quả các hàm đúng như Python 2 (`'34'`, `(0.5, 31, 493)`). `run-py2-test.sh` (game Ren'Py 7.3.5) vẫn 10/10.
+- **Chưa làm:** thông báo tiếng Việt riêng cho lỗi này; kèm Ren'Py 7 thật. Lỗi phụ `'NoneType' object has no attribute
+  'stores'` khi đưa app ra nền lúc đang ở màn lỗi sẽ hết cùng lỗi chính.
+
+### 2. Toeha: sửa lỗi ở mục này, chơi ở mục kia
+
+Hai mục của cùng một game Unity (`Toeha`: `D:\TOEHA-VIET-HOA-CHEAT-AGVN\toeha.exe`; `Toeha Player`:
+`D:\TOEHA-AGVN-PLAYER\toeha.exe`). Năm cách sửa (present wait, đồng bộ khung hình, Đồ họa, DXVK 1.10.3, driver System)
+lưu cho `Toeha`; người chơi mở `Toeha Player`, vẫn Turnip + DXVK 2.3.1, vẫn đứng hình. App không nói gì.
+
+- **Vì sao:** cấu hình và các cách sửa thuộc về từng mục (lối tắt). Đó là chủ ý: mục kia có thể là bản đang chạy tốt.
+- **Sửa (`AgvnGameTwin`, `AgvnGameVersions.twin`):**
+  - Cùng game = cùng tên exe, và với Unity cùng công ty + sản phẩm (`app.info`), không thì cùng tên bỏ số phiên bản (quy
+    tắc sẵn có của "bản mới của game").
+  - Khi "Tự sửa lỗi" hỏi về một mục mà thư viện có mục khác của cùng game với cấu hình khác, có thêm nút **"Dùng cấu hình
+    của mục «…» (cùng game này)"**: đứng đầu nếu mục kia đã chạy tốt với cấu hình đó, không thì đứng trước "Gửi nhật ký".
+    Bấm thì mục này nhận toàn bộ cấu hình chạy của mục kia (các khoá của `AgvnGoodConfig`).
+  - `su-kien.txt` của mỗi phiên ghi "Thư viện có mục khác của cùng game: «…», cấu hình khác mục này…".
+  - Không tự chép cấu hình khi không có lỗi, theo luật "không đánh đổi game đang chạy tốt".
+- **Chưa làm:** gắn sửa theo "vân tay" game cho mọi mục; cảnh báo trùng game lúc thêm mục; kiểm lại driver/DXVK thật sự
+  đã nạp sau mỗi cách sửa.
+- **Còn mở (cần thử lại):** Toeha đứng hình trên Turnip 26.2.0 + DXVK 2.3.1 chưa rõ nguyên nhân; driver System / DXVK
+  1.10.3 chưa được thử trên mục `Toeha Player`. Khung game 1288×746 tràn màn hình ảo 1280×720.
+- **Test:** `AgvnGameVersionsTest.twoEntriesOfOneGameKeepTheirOwnSettingsUntilAsked`.
+- **Thử máy:**
+  1. Hero Harem Guild bằng "Chạy nhẹ": qua màn "Parsing the script failed", vào game. Một game Ren'Py 8 khác vẫn mở.
+  2. Mục `Toeha Player` đứng hình rồi thoát: "Tự sửa lỗi" có nút "Dùng cấu hình của mục «Toeha»…". Bấm, mở lại:
+     `moi-truong.txt` có driver System và DXVK 1.10.3 như mục `Toeha`. `su-kien.txt` có dòng về mục cùng game.

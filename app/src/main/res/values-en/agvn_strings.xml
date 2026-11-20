@@ -370,6 +370,7 @@
     <string name="agvn_doctor_fixed">Fixed: %1$s. Restarting the game…</string>
     <string name="agvn_doctor_saved">Saved: %1$s. Takes effect when the game restarts.</string>
     <string name="agvn_fix_restore_good">Go back to the settings that worked</string>
+    <string name="agvn_fix_twin_config">Use the settings of “%1$s” (the same game)</string>
     <string name="agvn_fix_reset">Back to AGVN\'s original settings</string>
     <string name="agvn_fix_quality">Change Graphics to %1$s (%2$s)</string>
     <string name="agvn_fix_dxvk">Switch DXVK to version %1$s</string>
