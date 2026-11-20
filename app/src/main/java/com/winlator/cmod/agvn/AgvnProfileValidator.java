@@ -31,6 +31,7 @@ public final class AgvnProfileValidator {
 
         checkArgs(p);
         checkEnv(p);
+        AgvnProfileSettings.validate(p);
         checkResolution(p.resolution);
         checkFps(p.fpsLimit);
         checkPool(p.texturePool);

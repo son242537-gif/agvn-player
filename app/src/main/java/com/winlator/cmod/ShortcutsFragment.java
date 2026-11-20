@@ -756,6 +756,14 @@ public class ShortcutsFragment extends Fragment {
         else if (LibraryComposeHost.ACTION_QUALITY.equals(action)) {
             com.winlator.cmod.agvn.AgvnQualityDialog.show(requireActivity(), shortcut, this::loadShortcutsList);
         }
+        else if (LibraryComposeHost.ACTION_RUNNER.equals(action)) { // AGVN: "Cách chạy"
+            com.winlator.cmod.agvn.AgvnRunModeDialog.show(requireActivity(), shortcut, this::loadShortcutsList);
+        }
+        else if (LibraryComposeHost.ACTION_SAVE_PROFILE.equals(action)) { // AGVN: "Lưu hồ sơ game"
+            java.io.File saved = com.winlator.cmod.agvn.AgvnProfileSettings.save(shortcut);
+            Toast.makeText(context, saved != null ? getString(R.string.agvn_profile_saved, saved.getPath())
+                    : getString(R.string.agvn_profile_save_failed), Toast.LENGTH_LONG).show();
+        }
         else if (LibraryComposeHost.ACTION_SAVE_EXPORT.equals(action)) {
             com.winlator.cmod.agvn.AgvnSaveDialogs.exportSaves(requireActivity(), shortcut);
         }

@@ -61,6 +61,8 @@ public final class AgvnProfile {
     public String locale;
     /** "html" or "wine" for RPG Maker MV/MZ and Tyrano games; missing = html when index.html is there. */
     public String runner;
+    /** Game settings whatever the phone, by shortcut key ({@link AgvnProfileSettings#KEYS}); missing = the app's own. */
+    public Map<String, String> settings;
 
     public static AgvnProfile parse(String json) throws AgvnProfileException {
         AgvnProfile profile;
@@ -122,5 +124,10 @@ public final class AgvnProfile {
 
     public String toJson() {
         return new Gson().toJson(this);
+    }
+
+    /** For a file a person reads and edits ("Lưu hồ sơ game"). */
+    public String toPrettyJson() {
+        return new com.google.gson.GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(this) + "\n";
     }
 }

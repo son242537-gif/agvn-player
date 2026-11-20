@@ -447,4 +447,18 @@
     <string name="agvn_camera_default">默认</string>
     <string name="agvn_camera_done">完成</string>
     <string name="agvn_camera_on_drag">拖动时转动视角</string>
+    <!-- "Lưu hồ sơ game" (AgvnProfileSettings) -->
+    <string name="agvn_profile_save_action">保存游戏配置档 (agvn-profile.json)</string>
+    <string name="agvn_profile_saved">已把游戏设置保存到 %1$s。把游戏文件夹复制到另一台手机，游戏会沿用这些设置。</string>
+    <string name="agvn_profile_save_failed">无法把 agvn-profile.json 写入游戏文件夹。</string>
+    <!-- "Cách chạy" (AgvnRunModeDialog) -->
+    <string name="agvn_runner_action">运行方式</string>
+    <string name="agvn_runner_title">«%1$s» 的运行方式</string>
+    <string name="agvn_runner_light">轻量运行：不模拟 Windows，快、不发热、省电</string>
+    <string name="agvn_runner_windows">Windows：模拟 Windows，更吃性能。轻量运行出错时使用</string>
+    <string name="agvn_runner_only_windows">此游戏只能用 Windows 运行，暂无轻量运行。</string>
+    <string name="agvn_runner_now_light">下次启动将使用轻量运行。</string>
+    <string name="agvn_runner_now_windows">下次启动将使用 Windows。</string>
+    <string name="agvn_runner_confirm_windows">把此游戏改为用 Windows 运行？Windows 比轻量运行更吃性能、更热。\n\n想改回来：游戏库 → 长按游戏 → “运行方式”。</string>
+    <string name="agvn_runner_confirm_yes">用 Windows 运行</string>
 </resources>

@@ -222,6 +222,7 @@ public final class AgvnGameImporter {
         shortcut.putExtra(AgvnProfileEnv.EXTRA, given.isEmpty() ? null : given);
         AgvnQuality.setStartFps(shortcut, AgvnFrameLock.fps(c.engine.name(), eff.fps));
         AgvnLayouts.applyImport(shortcut, AgvnLayouts.kindFor(p, c.engine));
+        AgvnProfileSettings.apply(shortcut, p); // the profile's "settings", over the app's own choices
         String screen = AgvnKirikiriScreen.larger(eff.resolution, c.gameSize); // a KiriKiri game plays in its window
         if (screen != null) shortcut.putExtra("screenSize", screen);
         shortcut.putExtra(AgvnKirikiri.EXTRA_GAME_SIZE, c.gameSize);

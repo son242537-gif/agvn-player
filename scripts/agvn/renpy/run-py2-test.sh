@@ -27,4 +27,4 @@ for g in tutorial the_question py2game; do
         "$rp8/lib/py3-linux-x86_64/python" "$here/py2-harness.py" "$work/$g" lint > "$work/$g.lint" 2>&1 || true
     echo "-- $g: $(grep -c Traceback "$work/$g.lint" || true) tracebacks"
 done
-grep -h "AGVN-PY2 RESULTS" "$work/py2game/log.txt"
+grep -h "AGVN-PY2 RESULTS\|AGVN-PY2 WAYS" "$work/py2game/log.txt"

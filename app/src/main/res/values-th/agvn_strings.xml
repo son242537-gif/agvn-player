@@ -447,4 +447,18 @@
     <string name="agvn_camera_default">ค่าเริ่มต้น</string>
     <string name="agvn_camera_done">เสร็จ</string>
     <string name="agvn_camera_on_drag">หมุนกล้องเมื่อลาก</string>
+    <!-- "Lưu hồ sơ game" (AgvnProfileSettings) -->
+    <string name="agvn_profile_save_action">บันทึกโปรไฟล์เกม (agvn-profile.json)</string>
+    <string name="agvn_profile_saved">บันทึกการตั้งค่าของเกมไว้ที่ %1$s แล้ว คัดลอกโฟลเดอร์เกมไปเครื่องอื่น เกมจะใช้การตั้งค่านี้</string>
+    <string name="agvn_profile_save_failed">เขียน agvn-profile.json ลงโฟลเดอร์เกมไม่ได้</string>
+    <!-- "Cách chạy" (AgvnRunModeDialog) -->
+    <string name="agvn_runner_action">วิธีรัน</string>
+    <string name="agvn_runner_title">วิธีรัน «%1$s»</string>
+    <string name="agvn_runner_light">โหมดเบา: ไม่จำลอง Windows เร็ว เครื่องเย็น ประหยัดแบต</string>
+    <string name="agvn_runner_windows">Windows: จำลอง Windows หนักกว่า ใช้เมื่อโหมดเบามีปัญหา</string>
+    <string name="agvn_runner_only_windows">เกมนี้รันได้ด้วย Windows เท่านั้น ยังไม่มีโหมดเบา</string>
+    <string name="agvn_runner_now_light">ครั้งถัดไปเกมจะรันด้วยโหมดเบา</string>
+    <string name="agvn_runner_now_windows">ครั้งถัดไปเกมจะรันด้วย Windows</string>
+    <string name="agvn_runner_confirm_windows">ย้ายเกมนี้ไปรันด้วย Windows ไหม Windows หนักและร้อนกว่าโหมดเบา\n\nถ้าจะกลับ: คลัง → กดค้างที่เกม → \"วิธีรัน\"</string>
+    <string name="agvn_runner_confirm_yes">รันด้วย Windows</string>
 </resources>

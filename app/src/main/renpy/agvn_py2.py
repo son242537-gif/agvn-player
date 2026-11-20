@@ -20,6 +20,8 @@ import functools
 import os
 import sys
 
+import agvn_py2_ways
+
 
 def py2_div(a, b):
     """Python 2's "/": two whole numbers (bools too) give a whole number, rounded down; anything else as Python 3."""
@@ -184,13 +186,13 @@ def asks_true_division(tree):
 
 
 class Py2Wrap:
-    """Ren'Py's wrap_node (it makes the game's dicts and lists revertable), then Python 2's .decode() and division."""
+    """Ren'Py's wrap_node (the game's dicts and lists made revertable), then Python 2's ways, .decode() and division."""
 
     def __init__(self, wrap):
         self.wrap = wrap
 
     def visit(self, tree):
-        tree = Py2Decode().visit(self.wrap.visit(tree))
+        tree = Py2Decode().visit(agvn_py2_ways.Py2Ways().visit(self.wrap.visit(tree)))
         # a file that begins with "rpy python 3" (Ren'Py 7.4 to 7.6) asked for Python 3's division: Ren'Py keeps that
         # in the flags of the py_compile call this runs in
         try:
@@ -224,7 +226,7 @@ DICT_METHODS = {"iteritems": lambda self: iter(self.items()), "iterkeys": lambda
 
 # Bump when what this file does to the game's code changes: Ren'Py keeps compiled blocks in game/cache, by the
 # block's text, and would go on running the ones compiled before (or by another Ren'Py 8 that ran this folder).
-RULES = 2
+RULES = 3
 
 
 def patch_script(module):
@@ -245,6 +247,7 @@ def install(hooks):
         if not hasattr(builtins, name):
             setattr(builtins, name, value)
     builtins.open = py2_open
+    agvn_py2_ways.install()
     hooks["renpy.python"] = patch_python
     hooks["renpy.revertable"] = patch_revertable
     hooks["renpy.script"] = patch_script

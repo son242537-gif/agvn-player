@@ -92,6 +92,8 @@ object LibraryComposeHost {
     const val ACTION_REMOVE = "remove"
     const val ACTION_FAVORITE = "favorite"
     const val ACTION_QUALITY = "quality"
+    const val ACTION_RUNNER = "runner" // AGVN: "Cách chạy"
+    const val ACTION_SAVE_PROFILE = "save_profile" // AGVN: "Lưu hồ sơ game"
     const val ACTION_SAVE_IMPORT = "save_import"
     const val ACTION_SAVE_EXPORT = "save_export"
     const val ACTION_SEND_LOGS = "send_logs"

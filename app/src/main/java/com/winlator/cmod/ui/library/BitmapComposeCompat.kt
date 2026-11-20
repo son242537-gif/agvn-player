@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Favorite
@@ -540,6 +541,10 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_QUALITY)
                 }
+                LibraryActionTileCompat(Icons.Outlined.SwapHoriz, stringResource(R.string.agvn_runner_action), Modifier.weight(1f), horizontal = true) {
+                    close()
+                    cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_RUNNER)
+                }
             }
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
@@ -583,6 +588,10 @@ internal fun LibraryItemMenuCompat(item: LibraryItem, cb: LibraryCallbacks, clos
                     close()
                     cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SEND_LOGS)
                 }
+            }
+            LibraryActionTileCompat(Icons.Outlined.Save, stringResource(R.string.agvn_profile_save_action), Modifier.fillMaxWidth().padding(top = 8.dp), horizontal = true) {
+                close()
+                cb.onAction(item.shortcutPath, LibraryComposeHost.ACTION_SAVE_PROFILE)
             }
             val selection = LocalLibrarySelection.current
             if (selection != null) {

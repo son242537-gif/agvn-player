@@ -447,4 +447,18 @@
     <string name="agvn_camera_default">Mặc định</string>
     <string name="agvn_camera_done">Xong</string>
     <string name="agvn_camera_on_drag">Xoay camera khi kéo</string>
+    <!-- "Lưu hồ sơ game" (AgvnProfileSettings) -->
+    <string name="agvn_profile_save_action">Lưu hồ sơ game (agvn-profile.json)</string>
+    <string name="agvn_profile_saved">Đã lưu cấu hình của game vào %1$s. Chép thư mục game sang máy khác thì game nhận lại cấu hình này.</string>
+    <string name="agvn_profile_save_failed">Không ghi được agvn-profile.json vào thư mục game.</string>
+    <!-- "Cách chạy" (AgvnRunModeDialog) -->
+    <string name="agvn_runner_action">Cách chạy</string>
+    <string name="agvn_runner_title">Cách chạy «%1$s»</string>
+    <string name="agvn_runner_light">Chạy nhẹ: không giả lập Windows, nhanh, mát máy, đỡ tốn pin</string>
+    <string name="agvn_runner_windows">Windows: giả lập Windows, nặng hơn. Dùng khi Chạy nhẹ bị lỗi</string>
+    <string name="agvn_runner_only_windows">Game này chỉ chạy được bằng Windows, chưa có Chạy nhẹ.</string>
+    <string name="agvn_runner_now_light">Lần mở sau game chạy bằng Chạy nhẹ.</string>
+    <string name="agvn_runner_now_windows">Lần mở sau game chạy bằng Windows.</string>
+    <string name="agvn_runner_confirm_windows">Chuyển game này sang chạy bằng Windows? Windows nặng và nóng máy hơn Chạy nhẹ.\n\nMuốn quay lại: Thư viện → giữ vào game → \"Cách chạy\".</string>
+    <string name="agvn_runner_confirm_yes">Chạy bằng Windows</string>
 </resources>

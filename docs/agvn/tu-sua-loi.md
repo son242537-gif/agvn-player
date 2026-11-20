@@ -4351,3 +4351,40 @@ Ngày 20/11/2026 toàn bộ mã AGVN được rà theo 5 mảng; danh sách lỗ
   3. "Chỉnh đồ họa" có 6 bước, bước cuối "Full HD" 1920×1080. Đặt hạng máy Trung bình trong Cài đặt: còn 5 bước và
      game mở không có SGSR.
   4. Game pixel (RPG Maker qua Wine): xem viền điểm ảnh có bị quầng không; nếu có thì báo lại để loại game đó.
+
+## "Cách chạy" trong thư viện, hỏi lại trước khi sang Windows, "Lưu hồ sơ game", thêm Python 2 (bản 0.1.101)
+
+- **Bấm nhầm "Chạy bằng Windows" (maintainer hỏi, 20/11/2026):** `AgvnHtmlGame.toWindows` ghi `agvnRunner=wine` vào mục
+  game và không hỏi; đường về chỉ có trong "Tự sửa lỗi" khi bản Windows lỗi (`rgss-light`, `page-light`, `renpy-light`,
+  `godot-light`), nên game chạy được bằng Windows thì phải xoá rồi thêm lại.
+  - `AgvnRunMode.lightFor`: tìm "Chạy nhẹ" của một mục theo đúng thứ tự của `AgvnGameImporter` (trang web, Ren'Py 8,
+    RGSS, Godot), rồi hai đường "Tự sửa lỗi" đã biết (Ren'Py 6/7 chạy thử, trang của game Electron). Hồ sơ ghi
+    `"runner": "wine"` thì không có "Chạy nhẹ".
+  - `AgvnRunModeDialog`: thư viện → giữ vào game → **"Cách chạy"**, hai lựa chọn, cách đang dùng được đánh dấu. Game chỉ
+    có một cách thì hộp thoại nói rõ. Không đụng tới gì khác của mục game.
+  - Menu trong game Chạy nhẹ: "Game bị lỗi? Chạy bằng Windows" hỏi lại một lần và chỉ đường quay về. Các hộp báo lỗi
+    ("Game chưa mở được…") giữ nguyên: ở đó người chơi đã đọc và chọn.
+- **"Lưu hồ sơ game":** hồ sơ có thêm mục `settings` (`AgvnProfileSettings.KEYS`: `dxwrapper`, `dxwrapperConfig`,
+  `wincomponents`, `audioDriver`, `emulator`, `box64Preset`, `fexcorePreset`, `fullscreenStretched`), áp sau các lựa
+  chọn của app lúc thêm game. Chỉ gồm thứ thuộc về game: không có driver, cỡ màn hình, FPS (hạng máy và "Tự sửa lỗi"
+  quyết). Nút trong thư viện ghi `agvn-profile.json` vào thư mục game từ cấu hình đang chạy: tên, exe, cách chạy,
+  ngôn ngữ, biến môi trường (trừ `WINEDLLOVERRIDES`, vốn được dò lại), tham số, `settings`. Cách dùng cho kho game:
+  chạy tốt trên máy thử → "Lưu hồ sơ game" → đóng tệp này vào ZIP của game. `tools/agvn/agvn_profile_lib.py` kiểm
+  `settings` theo cùng luật.
+  - **Rủi ro cần biết:** `dxwrapperConfig` (bản DXVK) hợp với máy thử chưa chắc hợp mọi GPU; xem lại tệp trước khi
+    đóng gói, bỏ `settings` nếu không chắc. "Tự sửa lỗi" vẫn chạy bình thường sau đó.
+- **Python 2 (mục G của đợt rà soát):** `agvn_py2_ways.py`, chỉ chạy cho game Ren'Py 6/7 chạy thử: `keys()/values()/
+  items()`, `map/filter/zip/range` cho ra list; `iteritems/iterkeys/itervalues/has_key` trên mọi dict và `it.next()`;
+  `sorted(cmp=)`, `.sort(cmp=)`; lớp có `__nonzero__`, `__div__`, `__unicode__`, `next()`, `__cmp__`; mô-đun `cPickle`,
+  `StringIO`, `cStringIO`, `itertools.izip…`, `string.letters/join…`. `RULES = 3` (bytecode biên dịch lại).
+  Chưa làm: `print` giữa dòng, `exec "code"`, `0L`, trộn `str`/`bytes`, `__metaclass__`, tệp `.py` riêng của game.
+- **Test:** `AgvnRunModeTest`, `AgvnProfileSettingsTest`; `scripts/agvn/renpy/run-py2-test.sh` (dòng `AGVN-PY2 WAYS`, 12
+  mục đều True, tutorial và the_question của Ren'Py 7.3.5 không traceback); `run-syntax-test.sh` không đổi.
+  `tools/agvn/tests/html_electron_sim.js` nạp thêm `html-steam.js` (bài test hỏng từ khi Steam tách tệp ở 0.1.8x).
+- **Thử máy (chưa thử trên điện thoại):**
+  1. Game RPG Maker MV đang Chạy nhẹ: menu trong game → "Chạy bằng Windows" → có hộp hỏi; Huỷ thì game chơi tiếp.
+  2. Đồng ý, game mở bằng Windows. Thoát, thư viện → giữ vào game → "Cách chạy" → chọn Chạy nhẹ → mở lại: Chạy nhẹ.
+  3. Game Unity: "Cách chạy" báo chỉ chạy bằng Windows.
+  4. "Lưu hồ sơ game" trên một game đã qua "Tự sửa lỗi": thư mục game có `agvn-profile.json`; xoá game khỏi thư viện,
+     thêm lại: cấu hình DXVK và biến môi trường như trước.
+  5. Một game Ren'Py 7 từng dừng ở lỗi `'dict_keys' object is not subscriptable` hay `has no attribute 'iteritems'`.

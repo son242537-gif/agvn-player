@@ -434,4 +434,18 @@
     <string name="agvn_camera_default">Default</string>
     <string name="agvn_camera_done">Tapos</string>
     <string name="agvn_camera_on_drag">Iikot ang camera kapag hinila</string>
+    <!-- "Lưu hồ sơ game" (AgvnProfileSettings) -->
+    <string name="agvn_profile_save_action">I-save ang profile ng game (agvn-profile.json)</string>
+    <string name="agvn_profile_saved">Na-save ang settings ng game sa %1$s. Kopyahin ang folder ng game sa ibang phone at gagamitin ng game ang settings na ito.</string>
+    <string name="agvn_profile_save_failed">Hindi maisulat ang agvn-profile.json sa folder ng game.</string>
+    <!-- "Cách chạy" (AgvnRunModeDialog) -->
+    <string name="agvn_runner_action">Paraan ng pagtakbo</string>
+    <string name="agvn_runner_title">Paraan ng pagtakbo ng «%1$s»</string>
+    <string name="agvn_runner_light">Magaang Takbo: walang Windows emulation, mabilis, malamig, tipid sa baterya</string>
+    <string name="agvn_runner_windows">Windows: ine-emulate ang Windows, mas mabigat. Gamitin kapag may error ang Magaang Takbo</string>
+    <string name="agvn_runner_only_windows">Sa Windows lang tumatakbo ang game na ito, wala pang Magaang Takbo.</string>
+    <string name="agvn_runner_now_light">Sa susunod, tatakbo ang game sa Magaang Takbo.</string>
+    <string name="agvn_runner_now_windows">Sa susunod, tatakbo ang game sa Windows.</string>
+    <string name="agvn_runner_confirm_windows">Ilipat ang game na ito sa Windows? Mas mabigat at mas mainit ang Windows kaysa Magaang Takbo.\n\nPara bumalik: Library → pindutin nang matagal ang game → \"Paraan ng pagtakbo\".</string>
+    <string name="agvn_runner_confirm_yes">Patakbuhin sa Windows</string>
 </resources>

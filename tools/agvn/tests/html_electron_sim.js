@@ -16,7 +16,7 @@ function page(electron) {
   ctx.window = ctx;
   if (electron) ctx.__agvnElectron = true;
   vm.createContext(ctx);
-  for (const f of ['html-electron.js', 'html-compat.js'])
+  for (const f of ['html-electron.js', 'html-steam.js', 'html-compat.js'])
     vm.runInContext(fs.readFileSync(path.join(dir, f), 'utf8'), ctx, { filename: f });
   return ctx;
 }

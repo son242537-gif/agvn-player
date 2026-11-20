@@ -73,7 +73,7 @@ final class AgvnLightMenu {
         hud = switchRow("📊", R.string.agvn_light_hud, (b, on) -> { if (!filling) tools.setHud(on); });
         row("📋", R.string.agvn_logs_send, TEXT, () -> after(tools::sendLogs));
         Runnable windows = tools.host.windows();
-        if (windows != null) row("🖥", R.string.agvn_html_use_windows, TEXT, () -> after(windows));
+        if (windows != null) row("🖥", R.string.agvn_html_use_windows, TEXT, () -> after(() -> AgvnRunModeDialog.confirmWindows(a, windows)));
         row("✕", R.string.agvn_html_exit, DANGER, () -> after(tools.host::quit));
         scroll = new ScrollView(a);
         scroll.addView(panel);

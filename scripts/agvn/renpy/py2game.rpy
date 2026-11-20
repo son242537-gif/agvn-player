@@ -31,6 +31,49 @@ init python:
     import os
     universal = open(os.path.join(config.gamedir, "script.rpyc"), "rU")
     universal.close()
+    first = d.keys()[0] in ("a", "b")
+    joined = sorted(d.items() + [("c", 3)])[-1] == ("c", 3)
+    doubled = map(lambda x: x * 2, [1, 2])
+    doubled.append(6)
+    zipped = zip([1, 2], "ab")[1] == (2, "b")
+    plain = dict(a=1)
+    def kw(**kwargs):
+        return kwargs.has_key("a") and [k for k, v in kwargs.iteritems()] == ["a"]
+    it = iter([4, 5])
+    nexted = it.next() == 4
+    by_cmp = sorted([3, 1, 2], cmp=lambda a, b: cmp(b, a)) == [3, 2, 1]
+    nums = [3, 1, 2]
+    nums.sort(cmp=lambda a, b: cmp(a, b))
+    class Old(object):
+        def __init__(self, v):
+            self.v = v
+        def __nonzero__(self):
+            return self.v != 0
+        def __div__(self, other):
+            return Old(self.v / other)
+        def __cmp__(self, other):
+            return cmp(self.v, other.v)
+    classes = (not Old(0)) and bool(Old(1)) and (Old(9) / 2).v == 4 and Old(1) < Old(2) and Old(2) == Old(2) \
+        and max([Old(1), Old(3)]).v == 3 and len({Old(1): 1}) == 1
+    class Counter(object):
+        def __init__(self):
+            self.n = 0
+        def __iter__(self):
+            return self
+        def next(self):
+            self.n += 1
+            if self.n > 2:
+                raise StopIteration
+            return self.n
+    counted = list(Counter()) == [1, 2]
+    import cPickle, StringIO, itertools, string
+    modules = cPickle.loads(cPickle.dumps([1])) == [1] and StringIO.StringIO("x").read() == "x" \
+        and list(itertools.izip([1], [2])) == [(1, 2)] and string.join(["a", "b"], "-") == "a-b" \
+        and "a" in string.letters
+    ranged = range(3) + [3] == [0, 1, 2, 3]
+    ways = [first, joined, doubled == [2, 4, 6], zipped, kw(a=1), nexted, by_cmp, nums == [1, 2, 3], classes, counted,
+            modules, ranged]
+    renpy.write_log("AGVN-PY2 WAYS %r" % (ways,))
     results = [half == 640 and type(half) is int, third == 3, mixed == 3.5, count == 2, pairs == ["a", "b"],
                keys == ["a", "b"], ok_str, big == 5, xs == [0, 1, 2], has_file, stats["hp"] == 2, box.v == 3]
     renpy.write_log("AGVN-PY2 RESULTS %r" % (results,))

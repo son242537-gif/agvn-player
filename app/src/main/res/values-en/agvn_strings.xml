@@ -447,4 +447,18 @@
     <string name="agvn_camera_default">Default</string>
     <string name="agvn_camera_done">Done</string>
     <string name="agvn_camera_on_drag">Turn the camera when dragged</string>
+    <!-- "Lưu hồ sơ game" (AgvnProfileSettings) -->
+    <string name="agvn_profile_save_action">Save game profile (agvn-profile.json)</string>
+    <string name="agvn_profile_saved">Saved the game\'s settings to %1$s. Copy the game folder to another phone and the game takes these settings.</string>
+    <string name="agvn_profile_save_failed">Could not write agvn-profile.json into the game folder.</string>
+    <!-- "Cách chạy" (AgvnRunModeDialog) -->
+    <string name="agvn_runner_action">Run mode</string>
+    <string name="agvn_runner_title">Run mode of «%1$s»</string>
+    <string name="agvn_runner_light">Lite Run: no Windows emulation, fast, cool, saves battery</string>
+    <string name="agvn_runner_windows">Windows: emulates Windows, heavier. Use it when Lite Run fails</string>
+    <string name="agvn_runner_only_windows">This game only runs with Windows; it has no Lite Run yet.</string>
+    <string name="agvn_runner_now_light">The game starts with Lite Run next time.</string>
+    <string name="agvn_runner_now_windows">The game starts with Windows next time.</string>
+    <string name="agvn_runner_confirm_windows">Move this game to Windows? Windows is heavier and hotter than Lite Run.\n\nTo go back: Library → hold the game → \"Run mode\".</string>
+    <string name="agvn_runner_confirm_yes">Run with Windows</string>
 </resources>

@@ -447,4 +447,18 @@
     <string name="agvn_camera_default">Bawaan</string>
     <string name="agvn_camera_done">Selesai</string>
     <string name="agvn_camera_on_drag">Putar kamera saat diseret</string>
+    <!-- "Lưu hồ sơ game" (AgvnProfileSettings) -->
+    <string name="agvn_profile_save_action">Simpan profil game (agvn-profile.json)</string>
+    <string name="agvn_profile_saved">Pengaturan game disimpan ke %1$s. Salin folder game ke ponsel lain dan game memakai pengaturan ini.</string>
+    <string name="agvn_profile_save_failed">Tidak bisa menulis agvn-profile.json ke folder game.</string>
+    <!-- "Cách chạy" (AgvnRunModeDialog) -->
+    <string name="agvn_runner_action">Cara menjalankan</string>
+    <string name="agvn_runner_title">Cara menjalankan «%1$s»</string>
+    <string name="agvn_runner_light">Mode Ringan: tanpa emulasi Windows, cepat, adem, hemat baterai</string>
+    <string name="agvn_runner_windows">Windows: emulasi Windows, lebih berat. Pakai saat Mode Ringan bermasalah</string>
+    <string name="agvn_runner_only_windows">Game ini hanya bisa dijalankan dengan Windows, belum ada Mode Ringan.</string>
+    <string name="agvn_runner_now_light">Berikutnya game dijalankan dengan Mode Ringan.</string>
+    <string name="agvn_runner_now_windows">Berikutnya game dijalankan dengan Windows.</string>
+    <string name="agvn_runner_confirm_windows">Pindahkan game ini ke Windows? Windows lebih berat dan lebih panas daripada Mode Ringan.\n\nUntuk kembali: Pustaka → tahan game → \"Cara menjalankan\".</string>
+    <string name="agvn_runner_confirm_yes">Jalankan dengan Windows</string>
 </resources>
