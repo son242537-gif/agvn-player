@@ -37,7 +37,8 @@ public final class AgvnHtmlFiles {
     /** 1x1 fully transparent PNG. */
     static final byte[] TRANSPARENT_PNG = Base64.getDecoder().decode(
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=");
-    private static final Map<String, String> CORS = Collections.singletonMap("Access-Control-Allow-Origin", "*");
+    /** With the page's limit on connections ({@link AgvnHtmlResponse#CSP}). */
+    private static final Map<String, String> CORS = AgvnHtmlResponse.HEADERS;
     /**
      * Formats RPG Maker picks between: .m4a/.mp4 on a phone, .ogg/.webm on a PC; encrypted .rpgmvm/.rpgmvo (MV) or with
      * a trailing "_" (MZ). A game ships one of each pair, and the browser tells the formats apart by their content.
@@ -69,6 +70,12 @@ public final class AgvnHtmlFiles {
      */
     public static WebResourceResponse serve(File root, String entry, String urlPath, String compatJs, Consumer<String> standIn,
                                             Consumer<String> missing) {
+        return serve(root, entry, urlPath, compatJs, standIn, missing, null);
+    }
+
+    /** As above; {@code range}: the request's Range header or null, answered for a file of the game as it is on disk. */
+    static WebResourceResponse serve(File root, String entry, String urlPath, String compatJs, Consumer<String> standIn,
+                                     Consumer<String> missing, String range) {
         if (COMPAT_PATH.equals(urlPath) && compatJs != null)
             return text("application/javascript", compatJs);
         File file = fileFor(root, urlPath);
@@ -98,14 +105,13 @@ public final class AgvnHtmlFiles {
             return new WebResourceResponse("text/plain", "UTF-8", 404, "Not Found", CORS, empty());
         }
         String mime = mimeType(file.getName());
-        if (compatJs != null && (file.getName().equalsIgnoreCase("index.html") || file.getName().equalsIgnoreCase(entry))) {
-            String html = FileUtils.readString(file);
-            if (html != null) return text("text/html", inject(html));
+        boolean page = compatJs != null && (file.getName().equalsIgnoreCase("index.html") || file.getName().equalsIgnoreCase(entry));
+        if (page || AgvnHtmlResponse.checked(mime, file.length())) { // read whole: UTF-8 or not, and the page's script
+            byte[] bytes = FileUtils.read(file);
+            if (bytes != null) return AgvnHtmlResponse.text(mime, bytes, page, range);
         }
         try {
-            WebResourceResponse r = new WebResourceResponse(mime, isText(mime) ? "UTF-8" : null, new FileInputStream(file));
-            r.setResponseHeaders(CORS);
-            return r;
+            return AgvnHtmlResponse.file(mime, isText(mime) ? "UTF-8" : null, new FileInputStream(file), file.length(), range);
         } catch (IOException e) {
             return blocked();
         }

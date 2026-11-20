@@ -66,7 +66,20 @@
             result = this.run(all.subarray(0, whole));
             this.left = all.slice(whole);
         }
-        return outEnc ? Buffer.from(result).toString(outEnc) : Buffer.from(result);
+        return this.text(result, outEnc, true);
+    };
+
+    // The output as text. For utf8 and utf16le one decoder serves the whole message, as Node's does: a letter of
+    // several bytes cut by the end of a block (16 bytes, so most Vietnamese and Japanese text) came out as two "�"
+    // from update() + final(), each decoded alone
+    Cipher.prototype.text = function (result, outEnc, more) {
+        if (!outEnc) return Buffer.from(result);
+        var name = String(outEnc).toLowerCase().replace(/^utf-?8$/, 'utf-8').replace(/^(utf-?16le|ucs-?2)$/, 'utf-16le');
+        if ((name !== 'utf-8' && name !== 'utf-16le') || typeof g.TextDecoder !== 'function')
+            return Buffer.from(result).toString(outEnc);
+        if (!this.decoder || this.decoderName !== name) // a first "\ufeff" as Buffer's toString has it: utf8 without
+            this.decoder = new g.TextDecoder(this.decoderName = name, { ignoreBOM: name !== 'utf-8' });
+        return this.decoder.decode(result, { stream: more });
     };
 
     Cipher.prototype.final = function (outEnc) {
@@ -87,7 +100,7 @@
             if (!p) throw new Error('bad decrypt');
             result = result.subarray(0, result.length - p);
         }
-        return outEnc ? Buffer.from(result).toString(outEnc) : Buffer.from(result);
+        return this.text(result, outEnc, false);
     };
 
     Cipher.prototype.setAutoPadding = function (on) { this.padding = on !== false; return this; };

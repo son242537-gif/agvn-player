@@ -1,0 +1,16 @@
+AGVN Player v0.1.99 - agvn.io
+
+Bản sửa sau đợt rà soát toàn bộ app.
+
+Riêng tư:
+- App không còn gửi tên game ra ngoài khi mở game chưa có ảnh bìa. Lúc kiểm tra cập nhật, app không còn gửi tên máy và bản Android.
+- "Chạy nhẹ" game dạng trang web: chặn thêm đường kết nối ra mạng của trang game.
+
+Sửa lỗi:
+- "Chạy nhẹ" RPG Maker MV: lưu game bị lỗi không còn làm mất save cũ của ô đó. Game báo lỗi khi hết chỗ lưu thay vì im lặng không lưu.
+- "Chạy nhẹ" Ren'Py viết cho Ren'Py 7: sửa thêm cú pháp "except X,e:" và phép chia số nguyên.
+- "Tự sửa lỗi": cách sửa đã thử mà không giúp sẽ không được đề nghị lại; không còn báo nhầm "thiếu DirectX" hay "lỗi với cấu hình mới"; không còn hộp báo lỗi cũ hiện lại sau khi game đã chạy tốt.
+- Thêm game trùng tên ở thư mục khác không còn thay mất game cũ trong thư viện.
+- Nhập save từ tệp zip hỏng không còn làm hỏng save đang có.
+- Game có tệp chạy tên giống chương trình của Wine (như Start.exe) không còn bị đóng nhầm. Bấm ⏸ rồi rời app, quay lại game vẫn dừng.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

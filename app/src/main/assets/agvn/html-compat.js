@@ -52,6 +52,22 @@
  *     fails, instead of stopping the game at its boot: the pictures then load as the game shows them.
  * 18. nw.Window.get().evalNWBin (NW.js-compiled code, which only NW.js's own V8 runs) fails with the file named, and
  *     that, or any promise the boot waited on that failed, is the error 15 shows: not a module the game never used.
+ * 19. RPG Maker MV 1.6 keeps the slot's last save through a save that fails (a plugin's error as it saves), as on a PC:
+ *     its backup is the save's file, held while the game saves and written back, not a copy in the browser's storage,
+ *     which the engine put back where the file saves no longer read (the old save was gone), and which a large save
+ *     did not fit in (every save then failed).
+ * 20. fs tells what it could not do, and keeps bytes: a write the browser's storage refuses (full, about 5 MB) throws
+ *     ENOSPC instead of saying nothing; a Buffer or typed array is written and read back byte for byte, and
+ *     readFileSync takes 'base64', 'hex', 'latin1'/'binary', and 'buffer' or {encoding: null} for a Buffer (with no
+ *     encoding it still gives the UTF-8 text, where Node gives a Buffer: plugins here do JSON.parse and .split on it);
+ *     a missing .png is ENOENT, not the app's empty picture; a file with "#" or "?" in its name is found; fs.readFile
+ *     and the like call back once (also when the callback throws) and keep a last argument that is no function;
+ *     fs.promises and require('fs/promises') are there.
+ * 21. path.join, normalize, resolve, relative, dirname, basename and extname answer as Node's (posix) do: a relative
+ *     path stays relative and a last "/" stays ("\" still counts as "/"), so path.join(base, 'save/') + name is a
+ *     file in save/. fs takes any of them as a path of the game folder, as before.
+ * 22. An error the engine prints after the game has started (SceneManager.onError: an error outside a scene's
+ *     update, a failed promise in MZ) is kept for "Tự sửa lỗi" (5), as the ones it catches in a scene are.
  */
 (function () {
     'use strict';
@@ -66,12 +82,14 @@
         return '/' + out.join('/');
     }
 
-    function httpGet(p, method) {
+    // binary: the file's bytes, one per character (its low byte), instead of its UTF-8 text
+    function httpGet(p, method, binary) {
         try {
             var xhr = new XMLHttpRequest();
             xhr.__agvnQuiet = true; // fs's own look, which may well find nothing (16)
-            xhr.open(method || 'GET', encodeURI(norm(p)), false);
-            xhr.overrideMimeType('text/plain; charset=utf-8');
+            // 20: each part encoded on its own: encodeURI left "#" and "?", and "img/a#1.png" asked for "img/a"
+            xhr.open(method || 'GET', norm(p).split('/').map(encodeURIComponent).join('/'), false);
+            xhr.overrideMimeType('text/plain; charset=' + (binary ? 'x-user-defined' : 'utf-8'));
             xhr.send();
             return xhr.status === 200 ? xhr : null;
         } catch (e) {
@@ -83,20 +101,65 @@
         try { return localStorage.getItem(FS_PREFIX + norm(p)); } catch (e) { return null; }
     }
 
+    // 21: path as Node's posix one. Every answer used to be absolute and lost its last "/", so MV's own
+    // path.join(base, 'save/') + 'file1.rpgsave' was "/savefile1.rpgsave", and a plugin that wrote its own file so
+    // wrote beside the folder it meant. "\" counts as "/" and a missing part as '', as before; the game folder is '/'
+    function str(p) { return String(p || '').replace(/\\/g, '/'); }
+
+    function parts(p, abs) { // p without "", "." and what ".." takes back; above a relative path's start ".." stays
+        var out = [];
+        p.split('/').forEach(function (s) {
+            if (s === '..') { if (out.length && out[out.length - 1] !== '..') out.pop(); else if (!abs) out.push(s); }
+            else if (s && s !== '.') out.push(s);
+        });
+        return out;
+    }
+
+    function normalize(p) {
+        p = str(p);
+        var abs = p.charAt(0) === '/', last = p.slice(-1) === '/', r = parts(p, abs).join('/');
+        if (!r) return abs ? '/' : last ? './' : '.';
+        return (abs ? '/' : '') + r + (last ? '/' : '');
+    }
+
+    function resolve() {
+        var all = '';
+        for (var i = arguments.length - 1; i >= 0 && all.charAt(0) !== '/'; i--) {
+            if (str(arguments[i])) all = str(arguments[i]) + '/' + all;
+        }
+        return '/' + parts(all, true).join('/');
+    }
+
     var path = {
         sep: '/',
         delimiter: ':',
-        normalize: norm,
-        join: function () { return norm(Array.prototype.slice.call(arguments).join('/')); },
-        resolve: function () { return norm(Array.prototype.slice.call(arguments).join('/')); },
-        dirname: function (p) { p = norm(p); return p.substring(0, p.lastIndexOf('/')) || '/'; },
-        basename: function (p, ext) {
-            var b = norm(p).split('/').pop();
-            return ext && b.slice(-ext.length) === ext ? b.slice(0, -ext.length) : b;
+        normalize: normalize,
+        join: function () { return normalize(Array.prototype.map.call(arguments, str).filter(Boolean).join('/')); },
+        resolve: resolve,
+        dirname: function (p) {
+            p = str(p);
+            var root = p.charAt(0) === '/', end = -1, name = false; // Node's own steps: the "/" before the last name
+            for (var i = p.length - 1; i >= 1 && end < 0; i--) {
+                if (p.charAt(i) !== '/') name = true; else if (name) end = i;
+            }
+            if (end < 0) return root ? '/' : '.';
+            return root && end === 1 ? '//' : p.slice(0, end);
         },
-        extname: function (p) { var b = norm(p).split('/').pop(), i = b.lastIndexOf('.'); return i > 0 ? b.slice(i) : ''; },
-        relative: function (from, to) { return norm(to).replace(norm(from) + '/', ''); },
-        isAbsolute: function (p) { return String(p).charAt(0) === '/'; },
+        basename: function (p, ext) {
+            var b = str(p).replace(/\/+$/, '').split('/').pop();
+            if (ext === str(p)) return ''; // as Node: the whole path, but not a last name that is all ext
+            return ext && b !== ext && b.slice(-ext.length) === ext ? b.slice(0, -ext.length) : b;
+        },
+        extname: function (p) {
+            var b = path.basename(p), i = b.lastIndexOf('.');
+            return i > 0 && b !== '..' ? b.slice(i) : '';
+        },
+        relative: function (from, to) {
+            var a = parts(resolve(from), true), b = parts(resolve(to), true), same = 0;
+            while (same < a.length && same < b.length && a[same] === b[same]) same++;
+            return a.slice(same).map(function () { return '..'; }).concat(b.slice(same)).join('/');
+        },
+        isAbsolute: function (p) { return str(p).charAt(0) === '/'; },
         // 11: a game picked its language by its exe's name, path.parse(process.execPath).name, and got the default with
         // "path.parse is not a function" (20/10/2026). As Node's for '/' paths, nothing normalised; "\" counts as "/"
         parse: function (p) {
@@ -113,6 +176,7 @@
             return !dir ? base : dir === o.root ? dir + base : dir + '/' + base;
         }
     };
+    path.posix = path.win32 = path;
 
     // 15: a folder's entries or a file's facts from the app, null when the game folder has no such path
     function fsInfo(op, p) {
@@ -121,6 +185,32 @@
     }
 
     function noEntry(p) { var e = new Error("ENOENT: no such file or directory, '" + p + "'"); e.code = 'ENOENT'; return e; }
+
+    // 20: bytes the game wrote (a Buffer, a typed array) are kept in the browser's storage, which holds text, as base64
+    // after this mark; String(data) made "1,2,3" of a Uint8Array, and of a Buffer its UTF-8 text, other bytes lost
+    var B64 = '\u0000agvn-b64:';
+
+    function isBytes(d) { return typeof ArrayBuffer === 'function' && (d instanceof ArrayBuffer || ArrayBuffer.isView(d)); }
+
+    function buffer(d) { // d's own bytes, of any typed array
+        return d instanceof ArrayBuffer ? window.Buffer.from(d) : window.Buffer.from(d.buffer, d.byteOffset, d.byteLength);
+    }
+
+    // the encoding fs was asked for ('utf8', or {encoding: 'hex'}): undefined for none, 'buffer' for {encoding: null}
+    function encodingOf(opts) {
+        var e = typeof opts === 'string' ? opts : opts && typeof opts === 'object' ? opts.encoding : undefined;
+        return e === undefined ? e : e === null ? 'buffer' : String(e).toLowerCase();
+    }
+
+    // true for an encoding that is not UTF-8 text and that Buffer has; one it has not is read as text, as before
+    function otherThanText(enc) {
+        return !!window.Buffer && !!enc && !/^utf-?8$/.test(enc) && (enc === 'buffer' || window.Buffer.isEncoding(enc));
+    }
+
+    function storedSize(s) {
+        if (s.indexOf(B64) !== 0) return s.length;
+        return (s.length - B64.length) / 4 * 3 - (s.slice(-2) === '==' ? 2 : s.slice(-1) === '=' ? 1 : 0);
+    }
 
     // the names the game wrote (localStorage) in folder p, by name: true for a folder
     function storedIn(p) {
@@ -153,15 +243,42 @@
             return stored(p) !== null || httpGet(p, 'HEAD') !== null || fsInfo('stat', p) !== null
                 || Object.keys(storedIn(p)).length > 0;
         },
-        readFileSync: function (p) {
-            var s = stored(p);
-            if (s !== null) return s;
-            var xhr = httpGet(p);
-            if (!xhr) { var e = new Error('ENOENT: ' + p); e.code = 'ENOENT'; throw e; }
-            return xhr.responseText;
+        // 20: with no encoding, the UTF-8 text as before, not Node's Buffer: plugins written for NW.js that do
+        // JSON.parse(fs.readFileSync(p)) run on both, and here so do those that go on with .split or .length
+        readFileSync: function (p, opts) {
+            var enc = encodingOf(opts), bytes = otherThanText(enc), s = stored(p), data;
+            if (s !== null && s.indexOf(B64) !== 0) {
+                if (!bytes) return s;
+                data = window.Buffer.from(s);
+            } else if (s !== null) {
+                data = window.Buffer.from(s.slice(B64.length), 'base64');
+            } else {
+                // a missing picture: the app answers a GET with its empty one, and a HEAD with 404 (15)
+                if (/\.png$/i.test(String(p)) && !httpGet(p, 'HEAD')) throw noEntry(p);
+                var xhr = httpGet(p, 'GET', bytes);
+                if (!xhr) throw noEntry(p);
+                if (!bytes) return xhr.responseText;
+                var text = xhr.responseText;
+                data = new window.Buffer(text.length);
+                for (var i = 0; i < text.length; i++) data[i] = text.charCodeAt(i) & 0xff;
+            }
+            return enc === 'buffer' ? data : data.toString(bytes ? enc : 'utf8');
         },
-        writeFileSync: function (p, data) {
-            try { localStorage.setItem(FS_PREFIX + norm(p), String(data)); } catch (e) { /* storage full */ }
+        // 20: a write the browser's storage refuses is an error, as a full disk is on a PC (ENOSPC): the game said
+        // "saved" and nothing was written
+        writeFileSync: function (p, data, opts) {
+            var enc = encodingOf(opts), value;
+            if (window.Buffer && isBytes(data)) value = B64 + buffer(data).toString('base64');
+            else if (typeof data === 'string' && enc !== 'buffer' && otherThanText(enc)) // text that stands for bytes
+                value = B64 + window.Buffer.from(data, enc).toString('base64');
+            else value = String(data);
+            try {
+                localStorage.setItem(FS_PREFIX + norm(p), value);
+            } catch (e) {
+                var full = new Error("ENOSPC: no space left on device, write '" + p + "'");
+                full.code = 'ENOSPC';
+                throw full;
+            }
         },
         unlinkSync: function (p) { try { localStorage.removeItem(FS_PREFIX + norm(p)); } catch (e) { /* ignore */ } },
         mkdirSync: function () {},
@@ -181,7 +298,7 @@
         },
         statSync: function (p, opts) {
             var s = stored(p);
-            if (s !== null) return stats(false, s.length);
+            if (s !== null) return stats(false, storedSize(s));
             var info = fsInfo('stat', p);
             if (info) return stats(info.dir, info.size, info.mtime);
             if (httpGet(p, 'HEAD') !== null) return stats(false, 0); // its other format, or its encrypted form
@@ -204,10 +321,14 @@
         accessSync: function (p) { fs.statSync(p); },
         // a copy, a move or an addition is written as any file is (localStorage); readdirSync stays empty, so a plugin
         // that backs up a whole folder copies nothing
-        copyFileSync: function (from, to) { fs.writeFileSync(to, fs.readFileSync(from)); },
-        renameSync: function (from, to) { fs.writeFileSync(to, fs.readFileSync(from)); fs.unlinkSync(from); },
+        copyFileSync: function (from, to) { fs.writeFileSync(to, fs.readFileSync(from, 'buffer')); }, // every byte (20)
+        renameSync: function (from, to) { fs.copyFileSync(from, to); fs.unlinkSync(from); },
         appendFileSync: function (p, data) {
-            var now = '';
+            var B = window.Buffer, was = stored(p), now = '';
+            if (B && (isBytes(data) || was !== null && was.indexOf(B64) === 0)) { // bytes stay bytes (20)
+                try { now = fs.readFileSync(p, 'buffer'); } catch (e) { now = B.alloc(0); }
+                return fs.writeFileSync(p, B.concat([now, isBytes(data) ? buffer(data) : B.from(String(data))]));
+            }
             try { now = fs.readFileSync(p); } catch (e) { /* a new file */ }
             fs.writeFileSync(p, now + String(data));
         },
@@ -216,12 +337,26 @@
     };
     ['readFile', 'writeFile', 'unlink', 'mkdir', 'readdir', 'stat', 'lstat', 'access', 'copyFile', 'rename', 'appendFile',
         'rm', 'rmdir', 'open', 'close', 'fsync', 'write'].forEach(function (name) {
+        // 20: the callback once, after the work: called inside the try, one that threw was called again with its own
+        // error as the file's; and the last argument is the callback only when it is a function (fs.writeFile(p, data)
+        // lost its data). Still called before the function returns, not later as Node does
         fs[name] = function () {
-            var args = Array.prototype.slice.call(arguments), cb = args.pop();
-            try { var r = fs[name + 'Sync'].apply(fs, args); if (typeof cb === 'function') cb(null, r); } catch (e) { if (typeof cb === 'function') cb(e); }
+            var args = Array.prototype.slice.call(arguments), error = null, result;
+            var cb = typeof args[args.length - 1] === 'function' ? args.pop() : null;
+            try { result = fs[name + 'Sync'].apply(fs, args); } catch (e) { error = e; }
+            if (cb && error) cb(error); else if (cb) cb(null, result);
         };
     });
-    fs.exists = function (p, cb) { cb(fs.existsSync(p)); };
+    fs.exists = function (p, cb) { var there = fs.existsSync(p); if (typeof cb === 'function') cb(there); };
+    // 20: fs.promises, and require('fs/promises') below: the same work, its answer or its error in a promise
+    fs.promises = {};
+    ['readFile', 'writeFile', 'unlink', 'mkdir', 'readdir', 'stat', 'lstat', 'access', 'copyFile', 'rename', 'appendFile',
+        'rm', 'rmdir'].forEach(function (name) {
+        fs.promises[name] = function () {
+            var args = arguments;
+            return new Promise(function (done) { done(fs[name + 'Sync'].apply(fs, args)); });
+        };
+    });
 
     var noop = function () {};
     var nwWindow = { on: noop, once: noop, removeAllListeners: noop, close: noop, focus: noop, maximize: noop,
@@ -262,7 +397,8 @@
         homedir: function () { return '/'; }, tmpdir: function () { return '/tmp'; }, endianness: function () { return 'LE'; },
         userInfo: function () { return { username: 'player', homedir: '/' }; }, networkInterfaces: function () { return {}; } };
     // path/posix and path/win32 are path under other names (a plugin's require('path/posix'), 14/11/2026)
-    var modules = { fs: fs, path: path, 'path/posix': path, 'path/win32': path, 'nw.gui': gui, os: os };
+    var modules = { fs: fs, 'fs/promises': fs.promises, path: path, 'path/posix': path, 'path/win32': path, 'nw.gui': gui,
+        os: os };
     // 13: Node's Buffer and crypto (html-node-*.js, loaded first), and child_process for a plugin that opens a page with
     // it: an error it can catch, since a phone runs no program
     if (window.__agvnNodeCrypto) modules.crypto = window.__agvnNodeCrypto;
@@ -378,7 +514,7 @@
     })();
 
     // The file a plugin's own data has on a PC: the engine's path for it, which the plugin may rename, without its
-    // folder (cut as the engine gives it: path.join here drops the folder's last "/"). Null when no plain save name.
+    // folder (cut as the engine gives it, with the folder's last "/" or, before 21, without). Null when no plain save name.
     function pcFile(SM, dirOf, fileOf, id) {
         try {
             var dir = String(SM[dirOf]()), file = String(SM[fileOf](id));
@@ -460,6 +596,29 @@
             saves.remove(name(id));
             if (fromBrowser || own(id)) remove.call(this, id);
         };
+        // 19: MV 1.6 saves with a rescue: StorageManager.backup(id), the save, and when that throws (a plugin's error in
+        // makeSaveContents, the global file) StorageManager.remove(id) and restoreBackup(id). Off NW.js its backup is a
+        // copy in localStorage, and restoreBackup puts it back there, not in the file: remove had deleted the file, and
+        // a game whose saves are files does not read the browser's, so the slot's last save was gone, where a PC keeps
+        // it. And a save too large for localStorage failed at backup, every time. While the save is a file, its backup
+        // is that file's text, held here, and restoreBackup writes it back; one the browser holds is the engine's.
+        var backup = SM.backup, restore = SM.restoreBackup, clean = SM.cleanBackup, kept = null;
+        if (typeof backup === 'function' && typeof restore === 'function') {
+            SM.backup = function (id) {
+                var text = saves.read(name(id));
+                kept = text === null ? null : { id: id, text: text };
+                if (!kept) return backup.apply(this, arguments);
+            };
+            SM.restoreBackup = function (id) {
+                if (!kept || kept.id !== id) return restore.apply(this, arguments);
+                if (!saves.write(name(id), kept.text)) console.warn('[AGVN] save/' + name(id) + ' not put back');
+                kept = null;
+            };
+            if (typeof clean === 'function') SM.cleanBackup = function (id) {
+                if (kept && kept.id === id) kept = null;
+                return clean.apply(this, arguments);
+            };
+        }
         if (!fromBrowser) return;
         try {
             for (var i = 0; i < localStorage.length; i++) {
@@ -567,6 +726,17 @@
             G.printLoadingError = function (url) {
                 keepFatal('Failed to load: ' + url);
                 return printLoadingError.apply(this, arguments);
+            };
+        }
+        // 22: every error the engine prints is one it stopped for (MV: name, message; MZ: and the error). catchException
+        // above keeps the ones a scene's update threw; SceneManager.onError (window's "error": a timer's or a
+        // listener's error, and in MZ a promise nobody caught, onReject) only prints, so the game stopped after its
+        // first scene and "Tự sửa lỗi" had nothing. The first error kept stays (keepFatal): none is told twice
+        if (G && typeof G.printError === 'function') {
+            var printError = G.printError;
+            G.printError = function (name, message) {
+                keepFatal((name ? name + ': ' : '') + message);
+                return printError.apply(this, arguments);
             };
         }
         if (AM) {

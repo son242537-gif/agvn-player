@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.RenderProcessGoneDetail;
+import android.webkit.ServiceWorkerClient;
+import android.webkit.ServiceWorkerController;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -56,6 +58,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     private String keyboardJs = "";
     /** For "Gửi nhật ký" ({@link AgvnLightSession#keeper}): the pictures shown empty, the files the page did not find. */
     private Consumer<String> standIns, missing;
+    /** The game on screen, whose files a service worker's requests are answered from ({@link Workers}). */
+    private static volatile AgvnHtmlActivity serving;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -117,6 +121,12 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         s.setTextZoom(100);
         if (asar == null && AgvnHtmlViewport.zoomsOut(index)) s.setUseWideViewPort(true); // its scale below 1, as in Chrome
         webView.setWebViewClient(new GameClient());
+        serving = this;
+        try { // a service worker's requests are answered as the page's are, not by the network
+            ServiceWorkerController.getInstance().setServiceWorkerClient(new Workers());
+        } catch (RuntimeException e) {
+            android.util.Log.w("AGVN", "no service worker client: " + e);
+        }
         webView.setWebChromeClient(new AgvnHtmlConsole(logs,
                 AgvnLightSession.keeper(getApplicationContext(), AgvnLightSession.PAGE, AgvnLightSession.LISTED)));
         if (rpgMaker) webView.addJavascriptInterface(new AgvnHtmlSaves(root), AgvnHtmlSaves.NAME); // saves as on a PC
@@ -151,24 +161,42 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         }
     };
 
+    /** The answer to a request of the page, or of a service worker of it: a file of the game, or nothing. */
+    private WebResourceResponse intercept(WebResourceRequest request) {
+        Uri url = request.getUrl();
+        String range = AgvnHtmlResponse.rangeOf(request.getRequestHeaders()); // a video or sound moved through
+        if (!host.equals(url.getHost())) { // no network: nothing leaves the phone, but the game's own file it names
+            String local = asar == null ? AgvnHtmlOutside.localPath(root, url.getEncodedPath()) : null;
+            outside.note(url.getHost(), url.toString(), local, missing);
+            if (local == null) return AgvnHtmlFiles.blocked();
+            return AgvnHtmlFiles.serve(root, entry, local, compatJs, standIns, missing, range);
+        }
+        String path = url.getEncodedPath();
+        if (AgvnHtmlFs.handles(path)) return asar != null ? asar.fs(path) : AgvnHtmlFs.serve(root, path); // readdirSync, statSync
+        // a HEAD only asks whether a file is there (fs.existsSync of html-compat.js): a missing one is 404, no
+        // stand-in, and its absence is no problem to report
+        if ("HEAD".equalsIgnoreCase(request.getMethod()))
+            return asar != null ? asar.head(path) : AgvnHtmlFiles.head(root, path);
+        if (asar != null) return asar.serve(path, entry, compatJs, missing, range);
+        return AgvnHtmlFiles.serve(root, entry, path, compatJs, standIns, missing, range);
+    }
+
+    /**
+     * A service worker's requests, which WebView does not show the page's client: without this they went to the network
+     * (audit of 20/11/2026). Answered as the page's are, by the game on screen; with none, refused.
+     */
+    private static final class Workers extends ServiceWorkerClient {
+        @Override
+        public WebResourceResponse shouldInterceptRequest(WebResourceRequest request) {
+            AgvnHtmlActivity game = serving;
+            return game != null ? game.intercept(request) : AgvnHtmlFiles.blocked();
+        }
+    }
+
     private final class GameClient extends WebViewClient {
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-            Uri url = request.getUrl();
-            if (!host.equals(url.getHost())) { // no network: nothing leaves the phone, but the game's own file it names
-                String local = asar == null ? AgvnHtmlOutside.localPath(root, url.getEncodedPath()) : null;
-                outside.note(url.getHost(), url.toString(), local, missing);
-                if (local == null) return AgvnHtmlFiles.blocked();
-                return AgvnHtmlFiles.serve(root, entry, local, compatJs, standIns, missing);
-            }
-            String path = url.getEncodedPath();
-            if (AgvnHtmlFs.handles(path)) return asar != null ? asar.fs(path) : AgvnHtmlFs.serve(root, path); // readdirSync, statSync
-            // a HEAD only asks whether a file is there (fs.existsSync of html-compat.js): a missing one is 404, no
-            // stand-in, and its absence is no problem to report
-            if ("HEAD".equalsIgnoreCase(request.getMethod()))
-                return asar != null ? asar.head(path) : AgvnHtmlFiles.head(root, path);
-            if (asar != null) return asar.serve(path, entry, compatJs, missing);
-            return AgvnHtmlFiles.serve(root, entry, path, compatJs, standIns, missing);
+            return intercept(request);
         }
 
         @Override
@@ -252,6 +280,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
             webView.destroy();
             webView = null;
         }
+        if (serving == this) serving = null; // a service worker still running is answered with nothing
         if (isFinishing() && !toWindows) AgvnKeepAlive.stop(this); // back to the library, which needs no keep-alive
         if (isFinishing()) AgvnLightSession.ended(this);
         super.onDestroy();

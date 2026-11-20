@@ -67,7 +67,7 @@ final class AgvnAsar {
         }
     }
 
-    private void add(String prefix, JsonObject dir) {
+    private void add(String prefix, JsonObject dir) throws IOException {
         JsonElement children = dir.get("files");
         if (children == null || !children.isJsonObject()) return;
         for (Map.Entry<String, JsonElement> e : children.getAsJsonObject().entrySet()) {
@@ -79,7 +79,10 @@ final class AgvnAsar {
             } else if (node.has("size")) {
                 boolean unpacked = node.has("unpacked") && node.get("unpacked").getAsBoolean();
                 long offset = unpacked ? -1 : node.has("offset") ? Long.parseLong(node.get("offset").getAsString()) : 0;
-                files.put(path.toLowerCase(Locale.ROOT), new Object[]{path, offset, node.get("size").getAsLong()});
+                long size = node.get("size").getAsLong();
+                // a size or place below 0 is no asar's: reading it threw (NegativeArraySizeException) and closed the game
+                if (size < 0 || !unpacked && offset < 0) throw new IOException("bad asar entry: " + path);
+                files.put(path.toLowerCase(Locale.ROOT), new Object[]{path, offset, size});
             }
         }
     }
@@ -125,6 +128,14 @@ final class AgvnAsar {
         return (long) files.get(realPath.toLowerCase(Locale.ROOT))[2];
     }
 
+    /** How many bytes {@link #open} gives: an unpacked file's own length, and never past the archive's end. */
+    long length(String realPath) {
+        Object[] f = files.get(realPath.toLowerCase(Locale.ROOT));
+        long offset = (long) f[1];
+        if (offset < 0) return new File(file.getPath() + ".unpacked", realPath).length();
+        return Math.max(0, Math.min((long) f[2], length - base - offset));
+    }
+
     /** The bytes of {@code realPath} (a path {@link #find} gave). */
     InputStream open(String realPath) throws IOException {
         Object[] f = files.get(realPath.toLowerCase(Locale.ROOT));
@@ -167,13 +178,19 @@ final class AgvnAsar {
 
     /** At most {@code max} bytes of {@code path} as UTF-8 text, or null when it is not there. */
     String text(String path, int max) {
+        byte[] bytes = bytes(path, max);
+        return bytes != null ? new String(bytes, StandardCharsets.UTF_8) : null;
+    }
+
+    /** At most {@code max} bytes of {@code path}, or null when it is not there. */
+    byte[] bytes(String path, int max) {
         String real = find(path);
         if (real == null) return null;
         try (InputStream in = open(real)) {
-            byte[] buf = new byte[(int) Math.min(size(real), max)];
+            byte[] buf = new byte[(int) Math.min(length(real), max)];
             int n = 0, r;
             while (n < buf.length && (r = in.read(buf, n, buf.length - n)) > 0) n += r;
-            return new String(buf, 0, n, StandardCharsets.UTF_8);
+            return n == buf.length ? buf : java.util.Arrays.copyOf(buf, n);
         } catch (IOException e) {
             return null;
         }

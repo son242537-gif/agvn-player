@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -22,7 +21,7 @@ import java.util.function.Consumer;
  */
 final class AgvnHtmlAsar {
     static final int MAX_PAGE = 16 << 20;
-    private static final Map<String, String> CORS = Collections.singletonMap("Access-Control-Allow-Origin", "*");
+    private static final Map<String, String> CORS = AgvnHtmlResponse.HEADERS; // with the page's limit on connections
 
     private final AgvnAsar asar;
     /** The page's folder in the archive, "" or "web-desktop/". */
@@ -84,10 +83,13 @@ final class AgvnHtmlAsar {
         return AgvnHtmlFs.json(op.equals("stat") ? AgvnHtmlFs.stat(true, 0, asar.file.lastModified()) : AgvnHtmlFs.list(names, dirs));
     }
 
-    /** As {@link AgvnHtmlFiles#serve}: the file, the entry page with {@code compatJs}, or 404 told to {@code missing}. */
-    WebResourceResponse serve(String urlPath, String entry, String compatJs, Consumer<String> missing) {
+    /**
+     * As {@link AgvnHtmlFiles#serve}: the file (the part of it {@code range}, the request's Range header, asks for), the
+     * entry page with {@code compatJs}, or 404 told to {@code missing}.
+     */
+    WebResourceResponse serve(String urlPath, String entry, String compatJs, Consumer<String> missing, String range) {
         if (AgvnHtmlFiles.COMPAT_PATH.equals(urlPath) && compatJs != null) return text("application/javascript", compatJs);
-        if (patched(urlPath) != null) return AgvnHtmlFiles.serve(patch, entry, inPatch(urlPath), compatJs, null, missing);
+        if (patched(urlPath) != null) return AgvnHtmlFiles.serve(patch, entry, inPatch(urlPath), compatJs, null, missing, range);
         String real = find(urlPath);
         if (real == null) {
             Log.w("AGVN", "Electron game file missing: " + urlPath);
@@ -95,13 +97,15 @@ final class AgvnHtmlAsar {
             return new WebResourceResponse("text/plain", "UTF-8", 404, "Not Found", CORS, new ByteArrayInputStream(new byte[0]));
         }
         String name = real.substring(real.lastIndexOf('/') + 1), mime = AgvnHtmlFiles.mimeType(name);
-        if (compatJs != null && (name.equalsIgnoreCase("index.html") || name.equalsIgnoreCase(entry))) {
-            String html = asar.text(real, MAX_PAGE);
-            if (html != null) return text("text/html", AgvnHtmlFiles.inject(html));
+        boolean page = compatJs != null && (name.equalsIgnoreCase("index.html") || name.equalsIgnoreCase(entry));
+        long length = asar.length(real);
+        if (page || AgvnHtmlResponse.checked(mime, length)) { // read whole: UTF-8 or not, and the page's script
+            byte[] bytes = asar.bytes(real, MAX_PAGE);
+            if (bytes != null) return AgvnHtmlResponse.text(mime, bytes, page, range);
         }
         try {
             InputStream in = asar.open(real);
-            return new WebResourceResponse(mime, AgvnHtmlFiles.isText(mime) ? "UTF-8" : null, 200, "OK", CORS, in);
+            return AgvnHtmlResponse.file(mime, AgvnHtmlFiles.isText(mime) ? "UTF-8" : null, in, length, range);
         } catch (IOException e) {
             return AgvnHtmlFiles.blocked();
         }

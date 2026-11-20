@@ -180,5 +180,7 @@
     });
 
     Buffer.poolSize = 8192;
-    g.Buffer = Buffer;
+    // Buffer(x) without `new`, which Node still takes and old plugins write: a class refuses to be called so
+    g.Buffer = typeof Proxy !== 'function' ? Buffer
+        : new Proxy(Buffer, { apply: function (B, self, args) { return new B(args[0], args[1], args[2]); } });
 })(typeof window !== 'undefined' ? window : this);

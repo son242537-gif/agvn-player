@@ -4318,3 +4318,8 @@ lưu cho `Toeha`; người chơi mở `Toeha Player`, vẫn Turnip + DXVK 2.3.1,
   1. Hero Harem Guild bằng "Chạy nhẹ": qua màn "Parsing the script failed", vào game. Một game Ren'Py 8 khác vẫn mở.
   2. Mục `Toeha Player` đứng hình rồi thoát: "Tự sửa lỗi" có nút "Dùng cấu hình của mục «Toeha»…". Bấm, mở lại:
      `moi-truong.txt` có driver System và DXVK 1.10.3 như mục `Toeha`. `su-kien.txt` có dòng về mục cùng game.
+
+## Đợt rà soát toàn bộ app và các sửa của bản 0.1.99
+
+Ngày 20/11/2026 toàn bộ mã AGVN được rà theo 5 mảng; danh sách lỗi, vị trí trong mã, cách kiểm và kết quả sửa nằm ở
+[`ra-soat-2026-11-20.md`](./ra-soat-2026-11-20.md) (mục I là những gì 0.1.99 đã sửa, sửa một phần và cố ý không sửa).

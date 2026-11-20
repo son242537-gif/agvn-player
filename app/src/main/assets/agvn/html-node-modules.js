@@ -16,7 +16,11 @@
         (this._events[name] = this._events[name] || []).push(fn);
         return this;
     };
-    EventEmitter.prototype.prependListener = EventEmitter.prototype.on;
+    EventEmitter.prototype.prependListener = function (name, fn) { // the first to hear, as Node's
+        if (!this._events) this._events = {};
+        (this._events[name] = this._events[name] || []).unshift(fn);
+        return this;
+    };
     EventEmitter.prototype.once = function (name, fn) {
         var self = this;
         function once() { self.off(name, once); fn.apply(self, arguments); }
@@ -50,9 +54,10 @@
     EventEmitter.defaultMaxListeners = 10;
     EventEmitter.once = function (em, name) { return new Promise(function (ok) { em.once(name, function () { ok(Array.prototype.slice.call(arguments)); }); }); };
 
+    // as Node: the prototype the constructor has keeps what was put on it before the call, and gets the parent's
     function inherits(ctor, parent) {
         ctor.super_ = parent;
-        ctor.prototype = Object.create(parent.prototype, { constructor: { value: ctor, writable: true, configurable: true } });
+        Object.setPrototypeOf(ctor.prototype, parent.prototype);
     }
 
     function inspect(v) {

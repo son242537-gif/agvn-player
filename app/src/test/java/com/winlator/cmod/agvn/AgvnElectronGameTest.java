@@ -115,6 +115,61 @@ public class AgvnElectronGameTest {
         assertNull(AgvnAsar.of(f));
     }
 
+    /** An archive whose header is {@code json}, followed by {@code data}. */
+    private static void rawAsar(File out, String json, byte[] data) throws IOException {
+        byte[] header = utf8(json);
+        int padded = (header.length + 3) & ~3, payload = 4 + padded, size = 4 + payload;
+        ByteArrayOutputStream f = new ByteArrayOutputStream();
+        for (int v : new int[]{4, size, payload, header.length}) f.write(new byte[]{(byte) v, (byte) (v >> 8), (byte) (v >> 16), (byte) (v >> 24)});
+        f.write(header);
+        f.write(new byte[padded - header.length]);
+        f.write(data);
+        Files.write(out.toPath(), f.toByteArray());
+    }
+
+    @Test
+    public void aSizeOrPlaceBelowZeroIsNoAsar() throws Exception {
+        // a size of -1 made text() ask for an array of -1 bytes, which closed the game (audit of 20/11/2026)
+        File good = new File(tmp.getRoot(), "good.asar");
+        rawAsar(good, "{\"files\":{\"a.js\":{\"size\":3,\"offset\":\"0\"}}}", utf8("abc"));
+        assertEquals("abc", AgvnAsar.of(good).text("a.js", 100));
+        File negativeSize = new File(tmp.getRoot(), "size.asar");
+        rawAsar(negativeSize, "{\"files\":{\"a.js\":{\"size\":-1,\"offset\":\"0\"}}}", utf8("abc"));
+        assertNull(AgvnAsar.of(negativeSize));
+        File negativeOffset = new File(tmp.getRoot(), "offset.asar");
+        rawAsar(negativeOffset, "{\"files\":{\"dir\":{\"files\":{\"a.js\":{\"size\":3,\"offset\":\"-8\"}}}}}", utf8("abc"));
+        assertNull("also in a folder of it", AgvnAsar.of(negativeOffset));
+        File notANumber = new File(tmp.getRoot(), "nan.asar");
+        rawAsar(notANumber, "{\"files\":{\"a.js\":{\"size\":3,\"offset\":\"x\"}}}", utf8("abc"));
+        assertNull(AgvnAsar.of(notANumber));
+        // a file said to be longer than the archive is: what is there, and its length says so (Content-Length)
+        File cut = new File(tmp.getRoot(), "cut.asar");
+        rawAsar(cut, "{\"files\":{\"a.js\":{\"size\":300,\"offset\":\"1\"},\"b.js\":{\"size\":5,\"offset\":\"900\"}}}", utf8("abc"));
+        AgvnAsar a = AgvnAsar.of(cut);
+        assertEquals(2, a.length("a.js"));
+        assertArrayEquals(utf8("bc"), a.bytes("a.js", 100));
+        assertEquals(0, a.length("b.js"));
+        assertEquals("", a.text("b.js", 100));
+        assertNull(a.bytes("missing.js", 100));
+    }
+
+    @Test
+    public void anUnpackedFilesLengthIsItsOwn() throws Exception {
+        // the header's size is what the packer saw; a file patched since is served whole, with its real length
+        Map<String, byte[]> files = new LinkedHashMap<>();
+        files.put("index.html", utf8("<html></html>"));
+        files.put("big.bin", new byte[]{1, 2});
+        File archive = new File(tmp.getRoot(), "patched.asar");
+        asar(archive, files, "big.bin");
+        Files.write(new File(archive.getPath() + ".unpacked", "big.bin").toPath(), new byte[]{1, 2, 3, 4, 5});
+        AgvnAsar a = AgvnAsar.of(archive);
+        assertEquals(5, a.length("big.bin"));
+        assertEquals(5, a.bytes("big.bin", 100).length);
+        assertEquals(13, a.length("index.html"));
+        assertEquals("<html></html>", new String(a.bytes("index.html", 100), StandardCharsets.UTF_8));
+        assertEquals("cut at its limit", 4, a.bytes("index.html", 4).length);
+    }
+
     @Test
     public void aPageOnTheAppsOwnProtocolWithItsPatchFolder() throws Exception {
         // Electron 44 (31/10/2026): main.cjs registers app:// and opens app://game/main.html; resources/patch/ wins
