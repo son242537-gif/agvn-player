@@ -27,7 +27,9 @@ public final class AgvnQuality {
         // FPS a 60 Hz screen shows evenly: 20 or 30 (24 runs as 20 there, as 24 on 120 Hz; see AgvnFramePacing)
         MEDIUM("960x544", 30, 768, DeviceTier.TRUNG_BINH),
         HIGH("1280x720", 30, 1024, DeviceTier.FLAGSHIP),
-        HIGHEST("1600x900", 0, 1536, DeviceTier.FLAGSHIP);
+        HIGHEST("1600x900", 0, 1536, DeviceTier.FLAGSHIP),
+        /** Offered on a flagship phone only ({@link #steps}); "Tự sửa lỗi" never raises a game to it. */
+        FULL_HD("1920x1080", 0, 1536, DeviceTier.FLAGSHIP);
 
         final String resolution;
         /** 0 = no cap. */
@@ -47,17 +49,26 @@ public final class AgvnQuality {
             return AUTO;
         }
 
-        /** Slider position 0..4 (AUTO has none). */
+        /** Slider position 0..5 (AUTO has none). */
         public int step() {
             return ordinal() - 1;
         }
 
         public static Level atStep(int step) {
-            return values()[Math.max(0, Math.min(4, step)) + 1];
+            return values()[Math.max(0, Math.min(FULL_HD.step(), step)) + 1];
         }
     }
 
     private AgvnQuality() {}
+
+    /**
+     * The last slider step a phone of {@code tier} is offered: Full HD on a flagship, Rất cao on the others, whose
+     * slider stays as it was. A game already saved at {@code saved} keeps its step on the slider.
+     */
+    static int lastStep(DeviceTier tier, Level saved) {
+        int last = (tier == DeviceTier.FLAGSHIP ? Level.FULL_HD : Level.HIGHEST).step();
+        return Math.max(last, saved == null ? 0 : saved.step());
+    }
 
     public static Level current(Shortcut shortcut) {
         return Level.of(shortcut.getExtra(EXTRA_QUALITY, Level.AUTO.name()));

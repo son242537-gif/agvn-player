@@ -36,7 +36,15 @@ public class AgvnQualityCoversTest {
     public void sliderStepsGoFromCoolToSharp() {
         assertEquals(AgvnQuality.Level.LOWEST, AgvnQuality.Level.atStep(0));
         assertEquals(AgvnQuality.Level.HIGHEST, AgvnQuality.Level.atStep(4));
-        assertEquals(AgvnQuality.Level.HIGHEST, AgvnQuality.Level.atStep(9));
+        assertEquals(AgvnQuality.Level.FULL_HD, AgvnQuality.Level.atStep(5));
+        assertEquals(AgvnQuality.Level.FULL_HD, AgvnQuality.Level.atStep(9));
+        // Full HD is a flagship's step; the other phones' slider ends at Rất cao, unless the game is already on it
+        assertEquals(5, AgvnQuality.lastStep(DeviceTier.FLAGSHIP, AgvnQuality.Level.AUTO));
+        assertEquals(4, AgvnQuality.lastStep(DeviceTier.TRUNG_BINH, AgvnQuality.Level.HIGH));
+        assertEquals(4, AgvnQuality.lastStep(DeviceTier.YEU, null));
+        assertEquals(5, AgvnQuality.lastStep(DeviceTier.YEU, AgvnQuality.Level.FULL_HD));
+        assertEquals("1920x1080", AgvnQuality.Level.FULL_HD.resolution);
+        assertEquals(AgvnQuality.Level.FULL_HD, AgvnQuality.Level.of("FULL_HD"));
         assertEquals(2, AgvnQuality.Level.MEDIUM.step());
         int lastFps = 0;
         for (int step = 0; step < 4; step++) {

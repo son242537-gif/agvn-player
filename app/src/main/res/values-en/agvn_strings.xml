@@ -252,6 +252,8 @@
     <string name="agvn_quality_medium_desc">Fairly cool, a bit less RAM, clear picture</string>
     <string name="agvn_quality_high_desc">Nice picture, warmer phone</string>
     <string name="agvn_quality_highest_desc">Best picture, no FPS limit: the game and cheat menus set FPS themselves. Hot phone, fast battery drain, for flagship phones only</string>
+    <string name="agvn_quality_full_hd">Full HD</string>
+    <string name="agvn_quality_full_hd_desc">Sharpest: 1920×1080, no FPS limit. For flagship phones only; a heavy game runs hot and drops frames, then go back to High</string>
     <string name="agvn_quality_cool">◀ Cooler</string>
     <string name="agvn_quality_pretty">Prettier ▶</string>
     <string name="agvn_quality_recommended">★ Suggested for your phone: %1$s</string>

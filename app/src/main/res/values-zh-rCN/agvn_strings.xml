@@ -252,6 +252,8 @@
     <string name="agvn_quality_medium_desc">温度适中，稍省内存，画面清晰</string>
     <string name="agvn_quality_high_desc">画面好看，手机更热</string>
     <string name="agvn_quality_highest_desc">最好看，不限 FPS：由游戏和作弊菜单自行调整 FPS。手机会很热、掉电快，只建议旗舰机使用</string>
+    <string name="agvn_quality_full_hd">Full HD</string>
+    <string name="agvn_quality_full_hd_desc">最清晰：1920×1080，不限 FPS。仅适合旗舰机；大型游戏会发热、掉帧，此时请调回“高”</string>
     <string name="agvn_quality_cool">◀ 更凉快</string>
     <string name="agvn_quality_pretty">更好看 ▶</string>
     <string name="agvn_quality_recommended">★ 为你的手机推荐：%1$s</string>

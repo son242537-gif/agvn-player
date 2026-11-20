@@ -252,6 +252,8 @@
     <string name="agvn_quality_medium_desc">เย็นพอประมาณ ประหยัด RAM เล็กน้อย ภาพชัด</string>
     <string name="agvn_quality_high_desc">ภาพสวย เครื่องอุ่นขึ้น</string>
     <string name="agvn_quality_highest_desc">สวยที่สุด ไม่จำกัด FPS: เกมและเมนูสูตรโกงปรับ FPS เอง เครื่องร้อน แบตหมดเร็ว ควรใช้กับเครื่องเรือธงเท่านั้น</string>
+    <string name="agvn_quality_full_hd">Full HD</string>
+    <string name="agvn_quality_full_hd_desc">คมชัดที่สุด: 1920×1080 ไม่จำกัด FPS สำหรับเครื่องเรือธงเท่านั้น เกมหนักจะทำให้เครื่องร้อนและ FPS ตก ให้กลับไปที่ระดับสูง</string>
     <string name="agvn_quality_cool">◀ เครื่องเย็น</string>
     <string name="agvn_quality_pretty">สวยขึ้น ▶</string>
     <string name="agvn_quality_recommended">★ แนะนำสำหรับเครื่องของคุณ: %1$s</string>

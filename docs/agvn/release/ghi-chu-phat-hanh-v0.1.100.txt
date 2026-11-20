@@ -1,0 +1,8 @@
+AGVN Player v0.1.100 - agvn.io
+
+Hình nét hơn cho máy mạnh (hạng Flagship). Máy hạng Trung bình và Yếu không đổi gì.
+
+Mới:
+- Máy Flagship: hình game được làm nét khi phóng lên màn hình điện thoại (bộ lọc SGSR). Ai đã tự chọn bộ lọc và bấm "Lưu cấu hình" trong thanh bên lúc chơi thì app giữ lựa chọn đó. Muốn tắt: mở thanh bên trong game, tắt công tắc nâng hình rồi bấm "Lưu cấu hình".
+- Máy Flagship: "Chỉnh đồ họa" có thêm mức Full HD 1920×1080. App không tự chuyển game nào sang mức này: game nặng sẽ nóng máy và tụt FPS, khi đó hãy về mức Cao.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

@@ -252,6 +252,8 @@
     <string name="agvn_quality_medium_desc">Mát vừa phải, bớt chút RAM, hình rõ</string>
     <string name="agvn_quality_high_desc">Hình đẹp, máy ấm hơn</string>
     <string name="agvn_quality_highest_desc">Đẹp nhất, không giới hạn FPS: game và menu cheat tự chỉnh FPS. Máy nóng, pin tụt nhanh, chỉ nên dùng cho máy flagship</string>
+    <string name="agvn_quality_full_hd">Full HD</string>
+    <string name="agvn_quality_full_hd_desc">Nét nhất: 1920×1080, không giới hạn FPS. Chỉ dành cho máy flagship; game nặng sẽ nóng máy và tụt FPS, khi đó hãy về mức Cao</string>
     <string name="agvn_quality_cool">◀ Mát máy</string>
     <string name="agvn_quality_pretty">Đẹp hơn ▶</string>
     <string name="agvn_quality_recommended">★ Gợi ý cho máy của bạn: %1$s</string>

@@ -252,6 +252,8 @@
     <string name="agvn_quality_medium_desc">Cukup dingin, sedikit hemat RAM, gambar jelas</string>
     <string name="agvn_quality_high_desc">Gambar bagus, ponsel lebih hangat</string>
     <string name="agvn_quality_highest_desc">Paling bagus, FPS tanpa batas: game dan menu cheat mengatur FPS sendiri. Ponsel panas, baterai cepat habis, hanya untuk ponsel flagship</string>
+    <string name="agvn_quality_full_hd">Full HD</string>
+    <string name="agvn_quality_full_hd_desc">Paling tajam: 1920×1080, FPS tanpa batas. Hanya untuk ponsel flagship; game berat membuat ponsel panas dan FPS turun, kembalilah ke Tinggi</string>
     <string name="agvn_quality_cool">◀ Lebih dingin</string>
     <string name="agvn_quality_pretty">Lebih bagus ▶</string>
     <string name="agvn_quality_recommended">★ Saran untuk ponsel Anda: %1$s</string>

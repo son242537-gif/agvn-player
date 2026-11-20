@@ -4323,3 +4323,31 @@ lưu cho `Toeha`; người chơi mở `Toeha Player`, vẫn Turnip + DXVK 2.3.1,
 
 Ngày 20/11/2026 toàn bộ mã AGVN được rà theo 5 mảng; danh sách lỗi, vị trí trong mã, cách kiểm và kết quả sửa nằm ở
 [`ra-soat-2026-11-20.md`](./ra-soat-2026-11-20.md) (mục I là những gì 0.1.99 đã sửa, sửa một phần và cố ý không sửa).
+
+## Hình nét hơn cho máy Flagship: SGSR mặc định và mức Full HD (bản 0.1.100)
+
+- **Người chơi thấy gì:** cùng một game, hình trên AGVN Player kém nét hơn GameHub (maintainer, 20/11/2026, POCO F8 Pro).
+- **Nguyên nhân:** mức gợi ý của hạng Flagship là 1280×720, và trình vẽ Vulkan của app phóng hình đó lên màn hình
+  (khoảng 1220p) bằng lọc thường, không làm nét. Các bộ nâng hình (SGSR, FSR, Lanczos 2) đã có sẵn trong app nhưng chỉ
+  bật khi người chơi tự mở thanh bên. Mức cao nhất của "Chỉnh đồ họa" là 1600×900.
+- **Sửa:**
+  - `AgvnSharpScreen`: máy hạng Flagship bắt đầu với SGSR (mode 2) khi **chưa ai chọn**: game và container không đặt
+    `rendererFilterMode`, và container chưa có `graphicsFilterMode` (thanh bên chưa từng "Lưu cấu hình", kể cả lưu ở
+    trạng thái tắt). Công tắc trong thanh bên hiện đúng trạng thái bật. Trình vẽ tự về lọc thường nếu không dựng được
+    SGSR (`VulkanRendererFilters`).
+  - `AgvnQuality.Level.FULL_HD` (1920×1080, không giới hạn FPS, texture pool như Rất cao): thanh trượt có bước thứ sáu
+    chỉ trên máy Flagship (`AgvnQuality.lastStep`). "Tự sửa lỗi" không bao giờ nâng game lên mức này
+    (`AgvnFixes.quality` vẫn dừng ở Rất cao); mức gợi ý vẫn là Cao.
+- **Vì sao chỉ hạng Flagship:** SGSR là thêm một lượt vẽ mỗi khung hình, Full HD gấp 2,25 lần số điểm ảnh của 720p. Máy
+  hạng Trung bình và Yếu không dư GPU, nên với chúng không có gì thay đổi (luật "không đánh đổi game đang chạy tốt").
+  Đây là mặc định theo hạng máy như độ phân giải gợi ý, không phải một cách sửa lỗi.
+- **Chưa làm:** độ nét (`graphicsSharpness`) vẫn 50; chưa có lựa chọn này trong "Chỉnh đồ họa" ngoài thư viện; trình vẽ
+  OpenGL không có bộ nâng hình.
+- **Test:** `AgvnSharpScreenTest`, `AgvnQualityCoversTest.sliderStepsGoFromCoolToSharp`.
+- **Thử máy (chưa thử trên điện thoại):**
+  1. POCO F8 Pro, một game đang ở mức Cao, chưa từng "Lưu cấu hình" trong thanh bên: mở game, chữ và viền nét hơn bản
+     0.1.99; thanh bên có công tắc nâng hình đang bật, chọn SGSR. So FPS và nhiệt với 0.1.99.
+  2. Tắt công tắc: hình về như cũ ngay. Bấm "Lưu cấu hình", mở lại game: vẫn tắt.
+  3. "Chỉnh đồ họa" có 6 bước, bước cuối "Full HD" 1920×1080. Đặt hạng máy Trung bình trong Cài đặt: còn 5 bước và
+     game mở không có SGSR.
+  4. Game pixel (RPG Maker qua Wine): xem viền điểm ảnh có bị quầng không; nếu có thì báo lại để loại game đó.

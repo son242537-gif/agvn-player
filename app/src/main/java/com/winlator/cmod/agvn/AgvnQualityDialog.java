@@ -16,7 +16,7 @@ import com.winlator.cmod.container.Shortcut;
 import com.winlator.cmod.core.AppUtils;
 
 /**
- * Library action "Chỉnh đồ họa": a 5-step slider from "Mát máy" to "Đẹp hơn" that says in plain words what each step
+ * Library action "Chỉnh đồ họa": a 5-step slider (6 on a flagship phone: Full HD) from "Mát máy" to "Đẹp hơn" that says in plain words what each step
  * does, marks the step suggested for this phone, and has "Về mức gợi ý" to go back to automatic.
  */
 public final class AgvnQualityDialog {
@@ -51,7 +51,7 @@ public final class AgvnQualityDialog {
         ends.addView(pretty, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
 
         SeekBar slider = new SeekBar(activity);
-        slider.setMax(4);
+        slider.setMax(AgvnQuality.lastStep(DeviceTierManager.current(activity), saved));
         GradientDrawable tick = new GradientDrawable();
         tick.setShape(GradientDrawable.OVAL);
         tick.setColor(0xFFB0B0B0);
@@ -131,6 +131,7 @@ public final class AgvnQualityDialog {
             case LOW: return activity.getString(R.string.agvn_quality_low);
             case HIGH: return activity.getString(R.string.agvn_quality_high);
             case HIGHEST: return activity.getString(R.string.agvn_quality_highest);
+            case FULL_HD: return activity.getString(R.string.agvn_quality_full_hd);
             default: return activity.getString(R.string.agvn_quality_medium);
         }
     }
@@ -141,6 +142,7 @@ public final class AgvnQualityDialog {
             case LOW: return activity.getString(R.string.agvn_quality_low_desc);
             case HIGH: return activity.getString(R.string.agvn_quality_high_desc);
             case HIGHEST: return activity.getString(R.string.agvn_quality_highest_desc);
+            case FULL_HD: return activity.getString(R.string.agvn_quality_full_hd_desc);
             default: return activity.getString(R.string.agvn_quality_medium_desc);
         }
     }

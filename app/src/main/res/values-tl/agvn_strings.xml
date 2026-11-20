@@ -250,6 +250,8 @@
     <string name="agvn_quality_medium_desc">Katamtamang lamig, kaunting tipid sa RAM, malinaw ang larawan</string>
     <string name="agvn_quality_high_desc">Magandang larawan, mas mainit ang phone</string>
     <string name="agvn_quality_highest_desc">Pinakamaganda, walang limit sa FPS: ang game at cheat menu ang mag-aayos ng FPS. Mainit ang phone, mabilis maubos ang baterya, para lang sa flagship na phone</string>
+    <string name="agvn_quality_full_hd">Full HD</string>
+    <string name="agvn_quality_full_hd_desc">Pinakamalinaw: 1920×1080, walang limit sa FPS. Para lang sa flagship na phone; iinit ang phone at bababa ang FPS sa mabigat na game, bumalik sa Mataas</string>
     <string name="agvn_quality_cool">◀ Malamig</string>
     <string name="agvn_quality_pretty">Mas maganda ▶</string>
     <string name="agvn_quality_recommended">★ Rekomendado sa phone mo: %1$s</string>
