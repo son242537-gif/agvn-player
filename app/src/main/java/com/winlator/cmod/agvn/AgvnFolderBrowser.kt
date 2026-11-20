@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.FolderZip
 import androidx.compose.material.icons.outlined.SdStorage
 import androidx.compose.material.icons.outlined.Smartphone
 import androidx.compose.material.icons.outlined.SportsEsports
@@ -56,10 +57,12 @@ import java.io.File
  * Folder picker for "Chọn thư mục khác": storage list, then folders and the game files of the open folder. "Quét thư mục
  * này" scans the open folder. Tapping an .exe adds that very exe (any game, even one the scan does not pick); tapping
  * index.html, Game.ini or an RPG Maker archive adds the game of that folder, also a phone copy without an .exe.
+ * With [archives] it is the picker of "Thêm từ tệp nén": it opens at [start] and lists downloaded archives instead, one
+ * row per split archive ([AgvnArchiveKind.pickable]); there is nothing to scan.
  */
 @Composable
-fun AgvnFolderBrowser(onBack: () -> Unit, onScan: (File) -> Unit, onPickFile: (File) -> Unit) {
-    var path by rememberSaveable { mutableStateOf<String?>(null) }
+fun AgvnFolderBrowser(onBack: () -> Unit, onScan: (File) -> Unit, onPickFile: (File) -> Unit, archives: Boolean = false, start: File? = null) {
+    var path by rememberSaveable { mutableStateOf(start?.takeIf { it.isDirectory }?.absolutePath) }
     val current = path?.let { File(it) }
     val context = LocalContext.current
     val volumes = remember { AgvnGameImporter.storageVolumes() }
@@ -77,8 +80,11 @@ fun AgvnFolderBrowser(onBack: () -> Unit, onScan: (File) -> Unit, onPickFile: (F
         value = if (current == null) volumes.map { it to false } else withContext(Dispatchers.IO) {
             val files = current.listFiles { f -> !f.name.startsWith(".") } ?: emptyArray()
             val dirs = files.filter { it.isDirectory }.sortedBy { AgvnGameTitle.searchKey(it.name) }
-            val picks = files.filter { it.isFile && (it.name.endsWith(".exe", ignoreCase = true) || AgvnLightGame.isGameFile(it.name)) }
-                .sortedBy { AgvnGameTitle.searchKey(it.name) }
+            val picks = if (archives) {
+                AgvnArchiveKind.pickable(files.filter { it.isFile }.map { it.name }.toTypedArray()).map { File(current, it) }
+            } else {
+                files.filter { it.isFile && (it.name.endsWith(".exe", ignoreCase = true) || AgvnLightGame.isGameFile(it.name)) }
+            }.sortedBy { AgvnGameTitle.searchKey(it.name) }
             dirs.map { it to false } + picks.map { it to true }
         }
     }
@@ -91,10 +97,10 @@ fun AgvnFolderBrowser(onBack: () -> Unit, onScan: (File) -> Unit, onPickFile: (F
         Column(Modifier.widthIn(max = 720.dp).fillMaxSize().padding(horizontal = 12.dp)) {
             Row(Modifier.fillMaxWidth().padding(top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.agvn_add_back)) }
-                Text(stringResource(R.string.agvn_folder_title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Text(stringResource(if (archives) R.string.agvn_unpack_pick_title else R.string.agvn_folder_title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             }
             Text(
-                stringResource(R.string.agvn_folder_hint),
+                stringResource(if (archives) R.string.agvn_unpack_pick_hint else R.string.agvn_folder_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 6.dp)
@@ -113,7 +119,7 @@ fun AgvnFolderBrowser(onBack: () -> Unit, onScan: (File) -> Unit, onPickFile: (F
             Box(Modifier.fillMaxWidth().weight(1f)) {
                 if (list != null && list.isEmpty()) {
                     Text(
-                        stringResource(R.string.agvn_folder_empty),
+                        stringResource(if (archives) R.string.agvn_unpack_pick_empty else R.string.agvn_folder_empty),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.align(Alignment.Center).padding(24.dp)
                     )
@@ -121,7 +127,7 @@ fun AgvnFolderBrowser(onBack: () -> Unit, onScan: (File) -> Unit, onPickFile: (F
                     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 4.dp)) {
                         items(list, key = { it.first.absolutePath }) { (file, exe) ->
                             val icon = when {
-                                exe -> Icons.Outlined.SportsEsports
+                                exe -> if (archives) Icons.Outlined.FolderZip else Icons.Outlined.SportsEsports
                                 current != null -> Icons.Outlined.Folder
                                 file == internal -> Icons.Outlined.Smartphone
                                 else -> Icons.Outlined.SdStorage
@@ -133,7 +139,7 @@ fun AgvnFolderBrowser(onBack: () -> Unit, onScan: (File) -> Unit, onPickFile: (F
                     }
                 }
             }
-            Button(
+            if (!archives) Button(
                 onClick = { current?.let(onScan) },
                 enabled = current != null,
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)

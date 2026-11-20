@@ -30,7 +30,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,7 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.winlator.cmod.R
 
-/** "Thêm game": search, "Chưa thêm" then "Đã có trong thư viện", and the two other ways to add a game at the bottom. */
+/** "Thêm game": search, "Chưa thêm" then "Đã có trong thư viện", and the other ways to add a game at the bottom ([AgvnAddGameActions]). */
 @Composable
 fun AgvnAddGameScreen(
     entries: List<AgvnImportEntry>?,
@@ -55,6 +54,7 @@ fun AgvnAddGameScreen(
     onRescan: () -> Unit,
     onPick: (AgvnImportEntry) -> Unit,
     onPickFolder: () -> Unit,
+    onPickArchive: () -> Unit,
     onPickExe: () -> Unit
 ) {
     val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -88,7 +88,7 @@ fun AgvnAddGameScreen(
                     else -> GameList(entries.filter { AgvnGameTitle.matches(it.title, query) }, query, icons, onPick)
                 }
             }
-            BottomActions(landscape, onPickFolder, onPickExe)
+            AgvnAddGameActions(landscape, onPickFolder, onPickArchive, onPickExe)
         }
     }
 }
@@ -174,30 +174,5 @@ private fun EmptyState(onRescan: () -> Unit) {
         Text(stringResource(R.string.agvn_add_empty_body), textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(12.dp))
         OutlinedButton(onClick = onRescan) { Text(stringResource(R.string.agvn_add_rescan)) }
-    }
-}
-
-@Composable
-private fun BottomActions(landscape: Boolean, onPickFolder: () -> Unit, onPickExe: () -> Unit) {
-    val folder: @Composable (Modifier) -> Unit = { m ->
-        OutlinedButton(onClick = onPickFolder, modifier = m) {
-            Icon(Icons.Outlined.FolderOpen, null, Modifier.size(18.dp))
-            Spacer(Modifier.size(8.dp))
-            Text(stringResource(R.string.agvn_add_pick_folder))
-        }
-    }
-    val exe: @Composable (Modifier) -> Unit = { m ->
-        TextButton(onClick = onPickExe, modifier = m) { Text(stringResource(R.string.agvn_add_pick_exe)) }
-    }
-    if (landscape) {
-        Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            folder(Modifier.weight(1f))
-            exe(Modifier.weight(1f))
-        }
-    } else {
-        Column(Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-            folder(Modifier.fillMaxWidth())
-            exe(Modifier.fillMaxWidth())
-        }
     }
 }

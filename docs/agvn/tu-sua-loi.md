@@ -4388,3 +4388,37 @@ Ngày 20/11/2026 toàn bộ mã AGVN được rà theo 5 mảng; danh sách lỗ
   4. "Lưu hồ sơ game" trên một game đã qua "Tự sửa lỗi": thư mục game có `agvn-profile.json`; xoá game khỏi thư viện,
      thêm lại: cấu hình DXVK và biến môi trường như trước.
   5. Một game Ren'Py 7 từng dừng ở lỗi `'dict_keys' object is not subscriptable` hay `has no attribute 'iteritems'`.
+
+## Giải nén game ngay trong app: "Thêm từ tệp nén (ZIP, 7z)" (bản 0.1.101)
+
+- **Vì sao:** trang Hướng dẫn của agvn.io dành phần lớn cho giải nén, mật khẩu, tệp nhiều phần; khách mới rớt ở đó
+  trước khi mở được app. Lỗi hay gặp: mật khẩu dán thừa dấu cách, thiếu phần, hết chỗ, tệp không có thư mục gốc nên ảnh
+  và video rơi thẳng ra Download và hiện trong thư viện ảnh, tên tệp tiếng Nhật thành ký tự lạ.
+- **Làm gì:** `AgvnUnpack*` và `AgvnArchive*` (zip4j 2.11.5 cho ZIP kể cả ZipCrypto/AES và tệp chia phần;
+  commons-compress cho 7z kể cả AES). Không dùng mạng.
+  - Luôn giải vào thư mục riêng `AGVN/<tên>`; tệp nén có đúng một thư mục gốc thì dùng thư mục đó (trừ khi nó là một
+    phần của game: `www`, `game`, `data`, `lib`…). Ghi `.nomedia` trước tiên. Mục nào thoát ra ngoài thư mục đích
+    (zip-slip) bị bỏ.
+  - Giải vào thư mục tạm ẩn `.<tên>.agvn-dang-giai-nen`, xong mới đổi tên; hỏng, huỷ hay hết chỗ thì xoá. Không bao
+    giờ ghi đè thư mục game đang có ("Tên (2)").
+  - Mật khẩu: cắt khoảng trắng và xuống dòng; "sai mật khẩu" tách khỏi "tệp hỏng / tải chưa xong". Thiếu phần thì nêu
+    tên phần thiếu. Kiểm chỗ trống trước khi ghi. Tên tệp cũ: UTF-8 → CP932 → GBK → CP437.
+  - RAR: nhận ra bằng chữ ký tệp (kể cả đổi đuôi thành .zip) và báo dùng ZArchiver. Chưa hỗ trợ vì giấy phép unrar
+    không hợp GPL của app: cần maintainer quyết.
+  - Xong thì vào thẳng màn xem trước của "Thêm game" (một game), hoặc quét lại danh sách (nhiều game).
+- **Chưa làm / chưa kiểm:** chưa thử trên điện thoại; tệp 7z có mật khẩu trong test là tệp dựng tay theo đặc tả, cần
+  thử tệp 7-Zip thật; ZIP Deflate64/LZMA/zstd và 7z PPMd/BCJ2 không đọc được (báo dùng ZArchiver); `name.part1.zip`
+  không được ghép bộ; không có foreground service nên rời app lâu thì Android có thể dừng việc giải nén; không xoá
+  tệp nén sau khi xong.
+- **Test:** `AgvnArchiveKindTest`, `AgvnArchiveNamesTest`, `AgvnUnpackZipTest`, `AgvnUnpackPartsTest`,
+  `AgvnUnpack7zTest` (733 bài, 2 bỏ qua: một bài tên tệp Unicode cần locale UTF-8, chạy được trên Windows).
+- **Thử máy:**
+  1. ZIP không mật khẩu, không thư mục gốc, toàn ảnh/video: ra `AGVN/<tên zip>/` có `.nomedia`; Download và thư viện
+     ảnh không có gì mới; màn xem trước mở ra.
+  2. ZIP thật của agvn.io có mật khẩu: dán thừa dấu cách (phải được), rồi sai mật khẩu (báo "Sai mật khẩu", hỏi lại).
+  3. Tệp `.7z` có mật khẩu do 7-Zip tạo, có và không "Encrypt file names".
+  4. Bộ chia phần `.zip + .z01`, `.zip.001`, `.7z.001`: bấm vào phần giữa; xoá một phần thì thông báo nêu tên phần đó.
+  5. Giải cùng tệp hai lần: lần hai ra "… (2)", lần đầu còn nguyên. Bấm "Hủy" giữa chừng: không còn thư mục nào sót.
+  6. Tệp `.rar` và RAR đổi đuôi `.zip`: báo chưa hỗ trợ RAR. Tệp tải dở: báo hỏng hoặc tải chưa xong.
+  7. Tệp 3 GB trở lên: thanh tiến độ chạy, màn hình không tắt, máy không hết RAM; thử khoá màn hình giữa chừng.
+  8. "Thêm game" thường, "Chọn thư mục khác", chọn .exe vẫn chạy; ba nút dưới cùng vừa màn hình dọc và ngang.

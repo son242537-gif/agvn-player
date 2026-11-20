@@ -85,7 +85,7 @@ public final class AgvnImportEntry {
     }
 
     /** The folder's game, one row per game when it holds several, or only the row of {@code picked} (an exe name). */
-    private static List<AgvnImportEntry> build(Context ctx, File dir, AgvnLibraryIndex library, AgvnProfileCatalog catalog,
+    static List<AgvnImportEntry> build(Context ctx, File dir, AgvnLibraryIndex library, AgvnProfileCatalog catalog,
                                                String picked) {
         File profileFile = new File(dir, AgvnProfile.FILE_NAME);
         boolean hasProfile = profileFile.isFile();

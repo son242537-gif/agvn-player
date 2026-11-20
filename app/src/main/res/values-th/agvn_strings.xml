@@ -461,4 +461,37 @@
     <string name="agvn_runner_now_windows">ครั้งถัดไปเกมจะรันด้วย Windows</string>
     <string name="agvn_runner_confirm_windows">ย้ายเกมนี้ไปรันด้วย Windows ไหม Windows หนักและร้อนกว่าโหมดเบา\n\nถ้าจะกลับ: คลัง → กดค้างที่เกม → \"วิธีรัน\"</string>
     <string name="agvn_runner_confirm_yes">รันด้วย Windows</string>
+
+    <!-- "Thêm từ tệp nén": unpacks a downloaded ZIP or 7z into internal storage/AGVN and adds the game -->
+    <string name="agvn_unpack_action">เพิ่มจากไฟล์บีบอัด (ZIP, 7z)</string>
+    <string name="agvn_unpack_pick_title">เลือกไฟล์บีบอัดของเกม</string>
+    <string name="agvn_unpack_pick_hint">เปิดไปยังโฟลเดอร์ที่มีไฟล์บีบอัดที่ดาวน์โหลดไว้ (ปกติคือ Download) แล้วแตะที่ไฟล์ ถ้าไฟล์แบ่งเป็นหลายส่วน แตะส่วนไหนก็ได้ แอปจะแตกไฟล์ไปที่ ที่เก็บข้อมูลภายใน/AGVN</string>
+    <string name="agvn_unpack_pick_empty">โฟลเดอร์นี้ไม่มีโฟลเดอร์ย่อยหรือไฟล์บีบอัด ZIP, 7z</string>
+    <string name="agvn_unpack_opening">กำลังเปิดไฟล์บีบอัด…</string>
+    <string name="agvn_unpack_progress_title">กำลังแตกไฟล์ %1$s</string>
+    <string name="agvn_unpack_progress">%1$d%% · %2$s / %3$s</string>
+    <string name="agvn_unpack_keep_open">เปิดแอปค้างไว้จนกว่าจะเสร็จ หน้าจอจะไม่ดับ</string>
+    <string name="agvn_unpack_cancelled">ยกเลิกการแตกไฟล์แล้ว ไม่มีไฟล์ค้างเหลืออยู่</string>
+    <string name="agvn_unpack_start">แตกไฟล์</string>
+    <string name="agvn_unpack_password_title">รหัสผ่านของ %1$s</string>
+    <string name="agvn_unpack_password_message">ไฟล์บีบอัดนี้มีรหัสผ่าน ใส่รหัสผ่านที่เขียนไว้ในหน้าดาวน์โหลดเกม</string>
+    <string name="agvn_unpack_password_wrong">รหัสผ่านไม่ถูกต้อง ตรวจตัวพิมพ์ใหญ่ ตัวพิมพ์เล็ก และตัวเลข แล้วใส่ใหม่ ไฟล์บีบอัดไม่ได้เสีย</string>
+    <string name="agvn_unpack_password_hint">รหัสผ่าน</string>
+    <string name="agvn_unpack_password_show">แสดงรหัสผ่าน</string>
+    <string name="agvn_unpack_password_paste">วาง</string>
+    <string name="agvn_unpack_failed_title">ยังแตกไฟล์ไม่ได้</string>
+    <string name="agvn_unpack_err_missing_part">ขาดส่วน \"%1$s\" ของไฟล์บีบอัด ดาวน์โหลดทุกส่วนไว้ในโฟลเดอร์เดียวกันแล้วลองใหม่</string>
+    <string name="agvn_unpack_err_missing_any">ขาดบางส่วนของไฟล์บีบอัด ดาวน์โหลดทุกส่วนไว้ในโฟลเดอร์เดียวกันแล้วลองใหม่</string>
+    <string name="agvn_unpack_err_no_space">พื้นที่ว่างไม่พอ ยังขาดอีกประมาณ %1$s ลบแอป รูป หรือวิดีโอบางส่วนแล้วลองใหม่</string>
+    <string name="agvn_unpack_err_rar">แอปยังแตกไฟล์ RAR ไม่ได้ โปรดแตกไฟล์ด้วย ZArchiver ไปที่ ที่เก็บข้อมูลภายใน/AGVN แล้วกด \"เพิ่มเกม\" เหมือนเดิม</string>
+    <string name="agvn_unpack_err_method">ไฟล์บีบอัดนี้ใช้วิธีบีบอัดที่แอปยังอ่านไม่ได้ โปรดแตกไฟล์ด้วย ZArchiver ไปที่ ที่เก็บข้อมูลภายใน/AGVN แล้วกด \"เพิ่มเกม\" เหมือนเดิม</string>
+    <string name="agvn_unpack_err_not_archive">ไฟล์นี้ไม่ใช่ไฟล์บีบอัด ZIP หรือ 7z</string>
+    <string name="agvn_unpack_err_write">เขียนลง ที่เก็บข้อมูลภายใน/AGVN ไม่ได้ (%1$s) ตรวจสิทธิ์เข้าถึงที่เก็บข้อมูลและพื้นที่ว่างแล้วลองใหม่</string>
+    <string name="agvn_unpack_err_damaged_file">ไฟล์บีบอัดเสียที่ไฟล์ \"%1$s\" มักเพราะดาวน์โหลดไม่ครบ รหัสผ่านไม่ได้ผิด โปรดดาวน์โหลดไฟล์บีบอัดใหม่แล้วลองอีกครั้ง</string>
+    <string name="agvn_unpack_err_damaged">ไฟล์บีบอัดเสียหรือดาวน์โหลดไม่เสร็จ โปรดดาวน์โหลดใหม่แล้วลองอีกครั้ง</string>
+    <string name="agvn_unpack_done">แตกไฟล์ไปที่ %1$s แล้ว</string>
+    <string name="agvn_unpack_done_many">แตกไฟล์ไปที่ %1$s แล้ว แตะเกมในรายการเพื่อเพิ่ม</string>
+    <string name="agvn_unpack_no_game_title">ไม่พบเกมในไฟล์บีบอัด</string>
+    <string name="agvn_unpack_no_game">แตกไฟล์ไปที่ %1$s แล้ว แต่แอปไม่พบเกมในนั้น ถ้าเป็นแพตช์หรือส่วนเสริม ให้คัดลอกไปไว้ในโฟลเดอร์ของเกม</string>
+    <string name="agvn_unpack_offer">โฟลเดอร์นี้ยังไม่มีเกมที่แตกไฟล์แล้ว แต่มีไฟล์บีบอัด: %1$s\n\nแตกไฟล์ไปที่ ที่เก็บข้อมูลภายใน/AGVN แล้วเพิ่มเกมไหม</string>
 </resources>

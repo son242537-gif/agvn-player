@@ -1,6 +1,7 @@
 /* Copyright (c) 2026 agvn.io — MIT License (see LICENSE). */
 package com.winlator.cmod.agvn
 
+import android.os.Environment
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.ComponentDialog
@@ -40,14 +41,31 @@ object AgvnAddGameHost {
     }
 }
 
-/** Game list, or the folder picker while "Chọn thư mục khác" is open (it also adds a tapped game file). Scans run off the main thread. */
+/**
+ * Game list, or the folder picker while "Chọn thư mục khác" is open (it also adds a tapped game file) or "Thêm từ tệp
+ * nén" picks an archive. Scans run off the main thread.
+ */
 @Composable
 private fun AgvnAddGameFlow(activity: MainActivity, onClose: () -> Unit) {
     var entries by remember { mutableStateOf<List<AgvnImportEntry>?>(null) }
     var scanRevision by remember { mutableIntStateOf(0) }
     var browsing by rememberSaveable { mutableStateOf(false) }
     var pickedFolder by remember { mutableStateOf<File?>(null) }
+    // "Thêm từ tệp nén": the picker lists archives, opened at Download or at the folder a scan found archives in
+    var archives by rememberSaveable { mutableStateOf(false) }
+    var archiveStart by remember { mutableStateOf<File?>(null) }
     val scope = rememberCoroutineScope()
+
+    /** Unpacks into internal storage/AGVN, then the game inside goes to the usual settings preview. */
+    fun unpack(archive: File) {
+        AgvnUnpackDialog.start(activity, archive) { dir ->
+            scope.launch {
+                val found = withContext(Dispatchers.IO) { runCatching { AgvnUnpackFlow.games(activity, dir) }.getOrDefault(emptyList()) }
+                AgvnUnpackFlow.unpacked(activity, dir, found) { onClose() }
+                scanRevision++ // the list behind shows the new folder
+            }
+        }
+    }
 
     LaunchedEffect(scanRevision) {
         entries = null
@@ -62,7 +80,21 @@ private fun AgvnAddGameFlow(activity: MainActivity, onClose: () -> Unit) {
         pickedFolder?.let { folder ->
             val prefix = folder.absolutePath
             if (found.none { it.dir.absolutePath == prefix || it.dir.absolutePath.startsWith("$prefix/") }) {
-                Toast.makeText(activity, R.string.agvn_add_folder_nothing, Toast.LENGTH_LONG).show()
+                // downloads still packed: offered to be unpacked here rather than with another app
+                val packed = withContext(Dispatchers.IO) { AgvnArchiveKind.pickable(folder.list()) }
+                if (packed.isEmpty()) {
+                    Toast.makeText(activity, R.string.agvn_add_folder_nothing, Toast.LENGTH_LONG).show()
+                } else {
+                    AgvnUnpackFlow.offer(activity, packed) {
+                        if (packed.size == 1) {
+                            unpack(File(folder, packed[0]))
+                        } else {
+                            archiveStart = folder
+                            archives = true
+                            browsing = true
+                        }
+                    }
+                }
             }
             pickedFolder = null
         }
@@ -77,8 +109,13 @@ private fun AgvnAddGameFlow(activity: MainActivity, onClose: () -> Unit) {
                 browsing = false
                 scanRevision++
             },
+            archives = archives,
+            start = if (archives) archiveStart else null,
             onPickFile = { file ->
-                scope.launch {
+                if (archives) {
+                    browsing = false
+                    unpack(file)
+                } else scope.launch {
                     val entry = withContext(Dispatchers.IO) { runCatching { AgvnImportEntry.forFile(activity, file) }.getOrNull() }
                     if (entry != null && !activity.isFinishing) {
                         AgvnImportDialog.preview(activity, entry.dir, entry.variant, DeviceTierManager.current(activity), entry.existing) { onClose() }
@@ -94,7 +131,15 @@ private fun AgvnAddGameFlow(activity: MainActivity, onClose: () -> Unit) {
             onPick = { entry ->
                 AgvnImportDialog.preview(activity, entry.dir, entry.variant, DeviceTierManager.current(activity), entry.existing) { onClose() }
             },
-            onPickFolder = { browsing = true },
+            onPickFolder = {
+                archives = false
+                browsing = true
+            },
+            onPickArchive = {
+                archiveStart = File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS)
+                archives = true
+                browsing = true
+            },
             onPickExe = {
                 onClose()
                 activity.openFileManagerFromLibrary()

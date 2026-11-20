@@ -461,4 +461,37 @@
     <string name="agvn_runner_now_windows">Lần mở sau game chạy bằng Windows.</string>
     <string name="agvn_runner_confirm_windows">Chuyển game này sang chạy bằng Windows? Windows nặng và nóng máy hơn Chạy nhẹ.\n\nMuốn quay lại: Thư viện → giữ vào game → \"Cách chạy\".</string>
     <string name="agvn_runner_confirm_yes">Chạy bằng Windows</string>
+
+    <!-- "Thêm từ tệp nén": unpacks a downloaded ZIP or 7z into internal storage/AGVN and adds the game -->
+    <string name="agvn_unpack_action">Thêm từ tệp nén (ZIP, 7z)</string>
+    <string name="agvn_unpack_pick_title">Chọn tệp nén của game</string>
+    <string name="agvn_unpack_pick_hint">Mở tới nơi có tệp nén đã tải (thường là Download) rồi chạm vào tệp. Tệp chia nhiều phần thì chạm phần nào cũng được. App giải nén vào Bộ nhớ trong/AGVN.</string>
+    <string name="agvn_unpack_pick_empty">Thư mục này không có thư mục con hay tệp nén ZIP, 7z</string>
+    <string name="agvn_unpack_opening">Đang mở tệp nén…</string>
+    <string name="agvn_unpack_progress_title">Đang giải nén %1$s</string>
+    <string name="agvn_unpack_progress">%1$d%% · %2$s / %3$s</string>
+    <string name="agvn_unpack_keep_open">Giữ app mở cho tới khi xong. Màn hình sẽ không tắt.</string>
+    <string name="agvn_unpack_cancelled">Đã hủy giải nén, không để lại file dở dang.</string>
+    <string name="agvn_unpack_start">Giải nén</string>
+    <string name="agvn_unpack_password_title">Mật khẩu của %1$s</string>
+    <string name="agvn_unpack_password_message">Tệp nén này có mật khẩu. Nhập mật khẩu ghi ở trang tải game.</string>
+    <string name="agvn_unpack_password_wrong">Sai mật khẩu. Kiểm tra chữ hoa, chữ thường, số rồi nhập lại. Tệp nén không hỏng.</string>
+    <string name="agvn_unpack_password_hint">Mật khẩu</string>
+    <string name="agvn_unpack_password_show">Hiện mật khẩu</string>
+    <string name="agvn_unpack_password_paste">Dán</string>
+    <string name="agvn_unpack_failed_title">Chưa giải nén được</string>
+    <string name="agvn_unpack_err_missing_part">Thiếu phần \"%1$s\" của tệp nén. Tải đủ mọi phần về cùng một thư mục rồi thử lại.</string>
+    <string name="agvn_unpack_err_missing_any">Thiếu một phần của tệp nén. Tải đủ mọi phần về cùng một thư mục rồi thử lại.</string>
+    <string name="agvn_unpack_err_no_space">Không đủ chỗ trống: còn thiếu khoảng %1$s. Xóa bớt ứng dụng, ảnh hoặc video rồi thử lại.</string>
+    <string name="agvn_unpack_err_rar">App chưa giải nén được tệp RAR. Hãy giải nén bằng ZArchiver vào Bộ nhớ trong/AGVN, rồi bấm \"Thêm game\" như trước.</string>
+    <string name="agvn_unpack_err_method">Tệp nén này dùng kiểu nén app chưa đọc được. Hãy giải nén bằng ZArchiver vào Bộ nhớ trong/AGVN, rồi bấm \"Thêm game\" như trước.</string>
+    <string name="agvn_unpack_err_not_archive">Tệp này không phải tệp nén ZIP hay 7z.</string>
+    <string name="agvn_unpack_err_write">Không ghi được vào Bộ nhớ trong/AGVN (%1$s). Kiểm tra quyền truy cập bộ nhớ và chỗ trống rồi thử lại.</string>
+    <string name="agvn_unpack_err_damaged_file">Tệp nén bị hỏng ở file \"%1$s\", thường do tải về chưa trọn vẹn. Mật khẩu không sai. Hãy tải lại tệp nén rồi thử lại.</string>
+    <string name="agvn_unpack_err_damaged">Tệp nén bị hỏng hoặc tải về chưa xong. Hãy tải lại rồi thử lại.</string>
+    <string name="agvn_unpack_done">Đã giải nén vào %1$s</string>
+    <string name="agvn_unpack_done_many">Đã giải nén vào %1$s. Chạm vào game trong danh sách để thêm.</string>
+    <string name="agvn_unpack_no_game_title">Không thấy game trong tệp nén</string>
+    <string name="agvn_unpack_no_game">Đã giải nén vào %1$s nhưng app không thấy game trong đó. Nếu đây là bản vá hay phần bổ sung, hãy chép nó vào thư mục của game.</string>
+    <string name="agvn_unpack_offer">Thư mục này chưa có game đã giải nén, nhưng có tệp nén: %1$s.\n\nGiải nén vào Bộ nhớ trong/AGVN rồi thêm game?</string>
 </resources>

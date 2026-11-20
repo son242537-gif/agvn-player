@@ -57,6 +57,10 @@ Anh Sơn quyết định ngày 02/10/2026: app phát hành theo **GNU GPL phiên
   - Hai file của Ruby 3.1.3 cho `String#unicode_normalize` (`assets/agvn/mkxp-z/ruby/unicode_normalize/normalize.rb` và
     `tables.rb`, từ bản 0.1.53): giấy phép Ruby, như Ruby trong `libmkxp-z.so`; nguyên văn giấy phép có trong
     `mkxp-z-license.txt`. Xem `scripts/agvn/mkxp-z/README.md`.
+  - Zip4j 2.11.5 (`net.lingala.zip4j:zip4j`, cho "Thêm từ tệp nén": đọc ZIP có mật khẩu và ZIP chia nhiều phần):
+    Apache 2.0. Tệp 7z do Apache Commons Compress 1.20 (Apache 2.0) và XZ for Java đọc, hai thư viện app đã có sẵn.
+    App chưa đọc RAR: giấy phép của unrar cấm dùng mã để làm lại bộ nén RAR, không tương thích GPL, nên cần anh Sơn
+    quyết định riêng. Mã nguồn: https://github.com/srikanth-lingala/zip4j.
 
 ## Vì sao chuyển sang GPL
 

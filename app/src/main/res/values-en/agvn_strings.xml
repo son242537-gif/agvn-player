@@ -461,4 +461,37 @@
     <string name="agvn_runner_now_windows">The game starts with Windows next time.</string>
     <string name="agvn_runner_confirm_windows">Move this game to Windows? Windows is heavier and hotter than Lite Run.\n\nTo go back: Library → hold the game → \"Run mode\".</string>
     <string name="agvn_runner_confirm_yes">Run with Windows</string>
+
+    <!-- "Thêm từ tệp nén": unpacks a downloaded ZIP or 7z into internal storage/AGVN and adds the game -->
+    <string name="agvn_unpack_action">Add from an archive (ZIP, 7z)</string>
+    <string name="agvn_unpack_pick_title">Pick the game\'s archive</string>
+    <string name="agvn_unpack_pick_hint">Open the folder that holds the downloaded archive (usually Download), then tap the file. For an archive split into parts, tap any part. The app extracts it to Internal storage/AGVN.</string>
+    <string name="agvn_unpack_pick_empty">This folder has no subfolders or ZIP, 7z archives</string>
+    <string name="agvn_unpack_opening">Opening the archive…</string>
+    <string name="agvn_unpack_progress_title">Extracting %1$s</string>
+    <string name="agvn_unpack_progress">%1$d%% · %2$s / %3$s</string>
+    <string name="agvn_unpack_keep_open">Keep the app open until it finishes. The screen stays on.</string>
+    <string name="agvn_unpack_cancelled">Extraction cancelled, no partial files were left.</string>
+    <string name="agvn_unpack_start">Extract</string>
+    <string name="agvn_unpack_password_title">Password for %1$s</string>
+    <string name="agvn_unpack_password_message">This archive has a password. Enter the password shown on the game\'s download page.</string>
+    <string name="agvn_unpack_password_wrong">Wrong password. Check upper and lower case and digits, then enter it again. The archive is not damaged.</string>
+    <string name="agvn_unpack_password_hint">Password</string>
+    <string name="agvn_unpack_password_show">Show password</string>
+    <string name="agvn_unpack_password_paste">Paste</string>
+    <string name="agvn_unpack_failed_title">Could not extract</string>
+    <string name="agvn_unpack_err_missing_part">Part \"%1$s\" of the archive is missing. Download all parts into the same folder, then try again.</string>
+    <string name="agvn_unpack_err_missing_any">A part of the archive is missing. Download all parts into the same folder, then try again.</string>
+    <string name="agvn_unpack_err_no_space">Not enough free space: about %1$s more is needed. Delete some apps, photos or videos, then try again.</string>
+    <string name="agvn_unpack_err_rar">The app cannot extract RAR files yet. Extract it with ZArchiver into Internal storage/AGVN, then tap \"Add game\" as before.</string>
+    <string name="agvn_unpack_err_method">This archive uses a compression method the app cannot read yet. Extract it with ZArchiver into Internal storage/AGVN, then tap \"Add game\" as before.</string>
+    <string name="agvn_unpack_err_not_archive">This file is not a ZIP or 7z archive.</string>
+    <string name="agvn_unpack_err_write">Could not write to Internal storage/AGVN (%1$s). Check storage access and free space, then try again.</string>
+    <string name="agvn_unpack_err_damaged_file">The archive is damaged at file \"%1$s\", usually because the download was incomplete. The password is not wrong. Download the archive again, then try again.</string>
+    <string name="agvn_unpack_err_damaged">The archive is damaged or the download did not finish. Download it again, then try again.</string>
+    <string name="agvn_unpack_done">Extracted to %1$s</string>
+    <string name="agvn_unpack_done_many">Extracted to %1$s. Tap the game in the list to add it.</string>
+    <string name="agvn_unpack_no_game_title">No game found in the archive</string>
+    <string name="agvn_unpack_no_game">Extracted to %1$s, but the app found no game in it. If this is a patch or an add-on, copy it into the game\'s folder.</string>
+    <string name="agvn_unpack_offer">This folder has no extracted game yet, but it has archives: %1$s.\n\nExtract to Internal storage/AGVN and add the game?</string>
 </resources>

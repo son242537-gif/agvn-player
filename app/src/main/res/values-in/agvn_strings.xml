@@ -461,4 +461,37 @@
     <string name="agvn_runner_now_windows">Berikutnya game dijalankan dengan Windows.</string>
     <string name="agvn_runner_confirm_windows">Pindahkan game ini ke Windows? Windows lebih berat dan lebih panas daripada Mode Ringan.\n\nUntuk kembali: Pustaka → tahan game → \"Cara menjalankan\".</string>
     <string name="agvn_runner_confirm_yes">Jalankan dengan Windows</string>
+
+    <!-- "Thêm từ tệp nén": unpacks a downloaded ZIP or 7z into internal storage/AGVN and adds the game -->
+    <string name="agvn_unpack_action">Tambah dari file arsip (ZIP, 7z)</string>
+    <string name="agvn_unpack_pick_title">Pilih file arsip game</string>
+    <string name="agvn_unpack_pick_hint">Buka folder tempat file arsip yang diunduh (biasanya Download), lalu ketuk filenya. Untuk arsip yang dibagi beberapa bagian, ketuk bagian mana saja. Aplikasi mengekstraknya ke Penyimpanan internal/AGVN.</string>
+    <string name="agvn_unpack_pick_empty">Folder ini tidak berisi subfolder atau file arsip ZIP, 7z</string>
+    <string name="agvn_unpack_opening">Membuka file arsip…</string>
+    <string name="agvn_unpack_progress_title">Mengekstrak %1$s</string>
+    <string name="agvn_unpack_progress">%1$d%% · %2$s / %3$s</string>
+    <string name="agvn_unpack_keep_open">Biarkan aplikasi terbuka sampai selesai. Layar tetap menyala.</string>
+    <string name="agvn_unpack_cancelled">Ekstrak dibatalkan, tidak ada file setengah jadi yang tertinggal.</string>
+    <string name="agvn_unpack_start">Ekstrak</string>
+    <string name="agvn_unpack_password_title">Kata sandi %1$s</string>
+    <string name="agvn_unpack_password_message">File arsip ini memakai kata sandi. Masukkan kata sandi yang tertulis di halaman unduhan game.</string>
+    <string name="agvn_unpack_password_wrong">Kata sandi salah. Periksa huruf besar, huruf kecil, dan angka, lalu masukkan lagi. File arsip tidak rusak.</string>
+    <string name="agvn_unpack_password_hint">Kata sandi</string>
+    <string name="agvn_unpack_password_show">Tampilkan kata sandi</string>
+    <string name="agvn_unpack_password_paste">Tempel</string>
+    <string name="agvn_unpack_failed_title">Belum bisa diekstrak</string>
+    <string name="agvn_unpack_err_missing_part">Bagian \"%1$s\" dari file arsip tidak ada. Unduh semua bagian ke folder yang sama, lalu coba lagi.</string>
+    <string name="agvn_unpack_err_missing_any">Ada bagian file arsip yang tidak ada. Unduh semua bagian ke folder yang sama, lalu coba lagi.</string>
+    <string name="agvn_unpack_err_no_space">Ruang kosong tidak cukup: masih kurang sekitar %1$s. Hapus beberapa aplikasi, foto, atau video, lalu coba lagi.</string>
+    <string name="agvn_unpack_err_rar">Aplikasi belum bisa mengekstrak file RAR. Ekstrak dengan ZArchiver ke Penyimpanan internal/AGVN, lalu ketuk \"Tambah game\" seperti biasa.</string>
+    <string name="agvn_unpack_err_method">File arsip ini memakai jenis kompresi yang belum bisa dibaca aplikasi. Ekstrak dengan ZArchiver ke Penyimpanan internal/AGVN, lalu ketuk \"Tambah game\" seperti biasa.</string>
+    <string name="agvn_unpack_err_not_archive">File ini bukan file arsip ZIP atau 7z.</string>
+    <string name="agvn_unpack_err_write">Tidak bisa menulis ke Penyimpanan internal/AGVN (%1$s). Periksa izin penyimpanan dan ruang kosong, lalu coba lagi.</string>
+    <string name="agvn_unpack_err_damaged_file">File arsip rusak pada file \"%1$s\", biasanya karena unduhan belum lengkap. Kata sandinya tidak salah. Unduh ulang file arsip, lalu coba lagi.</string>
+    <string name="agvn_unpack_err_damaged">File arsip rusak atau unduhan belum selesai. Unduh ulang, lalu coba lagi.</string>
+    <string name="agvn_unpack_done">Sudah diekstrak ke %1$s</string>
+    <string name="agvn_unpack_done_many">Sudah diekstrak ke %1$s. Ketuk game di daftar untuk menambahkannya.</string>
+    <string name="agvn_unpack_no_game_title">Tidak ada game di file arsip</string>
+    <string name="agvn_unpack_no_game">Sudah diekstrak ke %1$s, tetapi aplikasi tidak menemukan game di dalamnya. Jika ini patch atau tambahan, salin ke folder game.</string>
+    <string name="agvn_unpack_offer">Folder ini belum berisi game yang sudah diekstrak, tetapi ada file arsip: %1$s.\n\nEkstrak ke Penyimpanan internal/AGVN lalu tambahkan game?</string>
 </resources>
