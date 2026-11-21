@@ -84,12 +84,12 @@ final class AgvnHtmlAsar {
     }
 
     /**
-     * As {@link AgvnHtmlFiles#serve}: the file (the part of it {@code range}, the request's Range header, asks for), the
+     * As {@link AgvnHtmlFiles#serve}: the file, the
      * entry page with {@code compatJs}, or 404 told to {@code missing}.
      */
-    WebResourceResponse serve(String urlPath, String entry, String compatJs, Consumer<String> missing, String range) {
+    WebResourceResponse serve(String urlPath, String entry, String compatJs, Consumer<String> missing) {
         if (AgvnHtmlFiles.COMPAT_PATH.equals(urlPath) && compatJs != null) return text("application/javascript", compatJs);
-        if (patched(urlPath) != null) return AgvnHtmlFiles.serve(patch, entry, inPatch(urlPath), compatJs, null, missing, range);
+        if (patched(urlPath) != null) return AgvnHtmlFiles.serve(patch, entry, inPatch(urlPath), compatJs, null, missing);
         String real = find(urlPath);
         if (real == null) {
             Log.w("AGVN", "Electron game file missing: " + urlPath);
@@ -101,11 +101,11 @@ final class AgvnHtmlAsar {
         long length = asar.length(real);
         if (page || AgvnHtmlResponse.checked(mime, length)) { // read whole: UTF-8 or not, and the page's script
             byte[] bytes = asar.bytes(real, MAX_PAGE);
-            if (bytes != null) return AgvnHtmlResponse.text(mime, bytes, page, range);
+            if (bytes != null) return AgvnHtmlResponse.text(mime, bytes, page);
         }
         try {
             InputStream in = asar.open(real);
-            return AgvnHtmlResponse.file(mime, AgvnHtmlFiles.isText(mime) ? "UTF-8" : null, in, length, range);
+            return AgvnHtmlResponse.file(mime, AgvnHtmlFiles.isText(mime) ? "UTF-8" : null, in);
         } catch (IOException e) {
             return AgvnHtmlFiles.blocked();
         }

@@ -22,45 +22,6 @@ public class AgvnHtmlFilesTest {
     private static final String TAG = "<script src=\"" + AgvnHtmlFiles.COMPAT_PATH + "\"></script>";
 
     @Test
-    public void thePartOfAFileARangeAsksFor() {
-        assertArrayEquals(new long[]{0, 99}, AgvnHtmlResponse.range("bytes=0-99", 1000));
-        assertArrayEquals("to the end", new long[]{100, 999}, AgvnHtmlResponse.range("bytes=100-", 1000));
-        assertArrayEquals("the last 50", new long[]{950, 999}, AgvnHtmlResponse.range("bytes=-50", 1000));
-        assertArrayEquals("more than the file has: all of it", new long[]{0, 999}, AgvnHtmlResponse.range("bytes=-5000", 1000));
-        assertArrayEquals("past the end: up to it", new long[]{990, 999}, AgvnHtmlResponse.range("bytes=990-2000", 1000));
-        assertArrayEquals(new long[]{0, 0}, AgvnHtmlResponse.range(" bytes=0-0 ", 1000));
-        assertSame("starts past the end", AgvnHtmlResponse.UNSATISFIABLE, AgvnHtmlResponse.range("bytes=1000-", 1000));
-        assertSame(AgvnHtmlResponse.UNSATISFIABLE, AgvnHtmlResponse.range("bytes=5000-6000", 1000));
-        assertSame(AgvnHtmlResponse.UNSATISFIABLE, AgvnHtmlResponse.range("bytes=-0", 1000));
-        // not understood: the whole file, as with no header
-        for (String header : new String[]{null, "", "bytes=", "bytes=-", "garbage", "bytes=a-b", "items=0-5", "bytes=0-5,10-15",
-                "bytes=9-3", "bytes=99999999999999999999-", "bytes 0-5"}) {
-            assertNull(String.valueOf(header), AgvnHtmlResponse.range(header, 1000));
-        }
-        assertNull("an empty file has no part", AgvnHtmlResponse.range("bytes=0-", 0));
-        assertEquals("bytes=5-", AgvnHtmlResponse.rangeOf(Collections.singletonMap("range", "bytes=5-")));
-        assertEquals("bytes=5-", AgvnHtmlResponse.rangeOf(Collections.singletonMap("Range", "bytes=5-")));
-        assertNull(AgvnHtmlResponse.rangeOf(Collections.singletonMap("Accept", "*/*")));
-        assertNull(AgvnHtmlResponse.rangeOf(null));
-    }
-
-    @Test
-    public void thePartIsReadFromItsFirstByteToItsLast() throws Exception {
-        byte[] file = new byte[1000];
-        for (int i = 0; i < file.length; i++) file[i] = (byte) i;
-        long[] r = AgvnHtmlResponse.range("bytes=300-309", file.length);
-        byte[] part = all(AgvnHtmlResponse.part(new ByteArrayInputStream(file), r[0], r[1] - r[0] + 1));
-        assertEquals(10, part.length);
-        assertEquals((byte) 300, part[0]);
-        assertEquals((byte) 309, part[9]);
-        InputStream one = AgvnHtmlResponse.part(new ByteArrayInputStream(file), 998, 1);
-        assertEquals(1, one.available());
-        assertEquals(998 & 0xff, one.read());
-        assertEquals("nothing after its last byte", -1, one.read());
-        assertEquals(0, all(AgvnHtmlResponse.part(new ByteArrayInputStream(file), 0, 0)).length);
-    }
-
-    @Test
     public void aPageThatIsNotUtf8KeepsItsOwnCharset() {
         Charset sjis = Charset.forName("Shift_JIS");
         byte[] utf8Page = "<html><head><meta charset=\"UTF-8\"><title>ゲーム</title></head></html>".getBytes(StandardCharsets.UTF_8);

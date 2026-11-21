@@ -4539,3 +4539,21 @@ Ngày 20/11/2026 toàn bộ mã AGVN được rà theo 5 mảng; danh sách lỗ
 - **Đánh đổi:** thêm game từ thư mục giờ là hai lần bấm ("+" rồi chọn) thay vì một.
 - **Thử máy:** "+" → hai dòng; dòng hai mở trình chọn ở Download, chọn tệp thì giải nén; Back ở trình chọn về danh
   sách "Thêm game". Thư viện trống: ba ô, ô giữa là tệp nén. Chưa cấp quyền tệp: hỏi quyền trước.
+
+## "Chạy nhẹ": video MP4 đọc lỗi, game RPG Maker MV đứng ở "Now Loading" (bản 0.1.104)
+
+- **Báo cáo (POCO, 22/11/2026, app 0.1.102):** Thiếu Nữ Tu Tiên Truyện (RPG Maker MV 1.6.1) đứng mãi ở "Now
+  Loading"; logcat có `ffmpeg_demuxer.cc … PIPELINE_ERROR_READ`. Màn tiêu đề chờ `movies/shipin.mp4` nạp xong.
+- **Nguyên nhân:** lỗi do bản 0.1.99 (đợt rà soát, mục trả lời Range/206, khi đó đã ghi "chưa thử trên máy"). Từ 0.1.99
+  `AgvnHtmlResponse.file` tự trả lời Range: mã 206, luồng đã nhảy sẵn tới byte đầu của khúc, kèm `Content-Length` và
+  `Content-Range`. WebView vốn tự xử lý Range trên luồng app đưa (tự bỏ qua tới byte được hỏi), nên hai bên cùng làm
+  một việc. Báo cáo nghi `Content-Length` bị lặp; em nghi thêm việc nhảy byte hai lần. **Cả hai đều chưa đo được** (không
+  có DevTools); cách sửa dưới đây gỡ cả hai.
+- **Sửa:** trả về đúng như trước 0.1.99: luôn cả tệp, mã 200, không `Content-Length`, không `Content-Range`, không
+  `Accept-Ranges`; WebView tự lo Range. Bỏ mã phân tích Range và hai bài test của nó. Tiêu đề CSP và CORS giữ nguyên.
+  Không làm theo đề xuất "206 + byte[]" của báo cáo: nếu WebView tự nhảy byte thì 206 của app vẫn sai.
+- **Test:** 772 bài, 2 bỏ qua (bớt 2 bài của mã Range đã bỏ). Không có test nào chạy WebView thật.
+- **Thử máy:**
+  1. Thiếu Nữ Tu Tiên Truyện bằng Chạy nhẹ: qua "Now Loading", tới màn tiêu đề có video nền.
+  2. Một game MV/MZ khác có phim (`movies/*.mp4` hoặc `.webm`): phim phát, tua được nếu game cho tua.
+  3. Nhạc nền `.ogg`/`.m4a` dài vẫn phát và lặp như trước.

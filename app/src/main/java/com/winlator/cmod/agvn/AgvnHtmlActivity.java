@@ -164,12 +164,11 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     /** The answer to a request of the page, or of a service worker of it: a file of the game, or nothing. */
     private WebResourceResponse intercept(WebResourceRequest request) {
         Uri url = request.getUrl();
-        String range = AgvnHtmlResponse.rangeOf(request.getRequestHeaders()); // a video or sound moved through
         if (!host.equals(url.getHost())) { // no network: nothing leaves the phone, but the game's own file it names
             String local = asar == null ? AgvnHtmlOutside.localPath(root, url.getEncodedPath()) : null;
             outside.note(url.getHost(), url.toString(), local, missing);
             if (local == null) return AgvnHtmlFiles.blocked();
-            return AgvnHtmlFiles.serve(root, entry, local, compatJs, standIns, missing, range);
+            return AgvnHtmlFiles.serve(root, entry, local, compatJs, standIns, missing);
         }
         String path = url.getEncodedPath();
         if (AgvnHtmlFs.handles(path)) return asar != null ? asar.fs(path) : AgvnHtmlFs.serve(root, path); // readdirSync, statSync
@@ -177,8 +176,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         // stand-in, and its absence is no problem to report
         if ("HEAD".equalsIgnoreCase(request.getMethod()))
             return asar != null ? asar.head(path) : AgvnHtmlFiles.head(root, path);
-        if (asar != null) return asar.serve(path, entry, compatJs, missing, range);
-        return AgvnHtmlFiles.serve(root, entry, path, compatJs, standIns, missing, range);
+        if (asar != null) return asar.serve(path, entry, compatJs, missing);
+        return AgvnHtmlFiles.serve(root, entry, path, compatJs, standIns, missing);
     }
 
     /**

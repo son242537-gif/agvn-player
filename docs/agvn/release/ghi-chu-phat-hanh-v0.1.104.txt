@@ -1,0 +1,5 @@
+AGVN Player v0.1.104 - agvn.io
+
+Sửa lỗi:
+- "Chạy nhẹ" game dạng trang web (RPG Maker MV/MZ…): video MP4 trong game không phát được từ bản 0.1.99, làm game có video ở màn tiêu đề đứng mãi ở "Now Loading". Đã sửa.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

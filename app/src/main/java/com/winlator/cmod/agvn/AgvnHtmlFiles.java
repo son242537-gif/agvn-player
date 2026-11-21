@@ -70,12 +70,6 @@ public final class AgvnHtmlFiles {
      */
     public static WebResourceResponse serve(File root, String entry, String urlPath, String compatJs, Consumer<String> standIn,
                                             Consumer<String> missing) {
-        return serve(root, entry, urlPath, compatJs, standIn, missing, null);
-    }
-
-    /** As above; {@code range}: the request's Range header or null, answered for a file of the game as it is on disk. */
-    static WebResourceResponse serve(File root, String entry, String urlPath, String compatJs, Consumer<String> standIn,
-                                     Consumer<String> missing, String range) {
         if (COMPAT_PATH.equals(urlPath) && compatJs != null)
             return text("application/javascript", compatJs);
         File file = fileFor(root, urlPath);
@@ -108,10 +102,10 @@ public final class AgvnHtmlFiles {
         boolean page = compatJs != null && (file.getName().equalsIgnoreCase("index.html") || file.getName().equalsIgnoreCase(entry));
         if (page || AgvnHtmlResponse.checked(mime, file.length())) { // read whole: UTF-8 or not, and the page's script
             byte[] bytes = FileUtils.read(file);
-            if (bytes != null) return AgvnHtmlResponse.text(mime, bytes, page, range);
+            if (bytes != null) return AgvnHtmlResponse.text(mime, bytes, page);
         }
         try {
-            return AgvnHtmlResponse.file(mime, isText(mime) ? "UTF-8" : null, new FileInputStream(file), file.length(), range);
+            return AgvnHtmlResponse.file(mime, isText(mime) ? "UTF-8" : null, new FileInputStream(file));
         } catch (IOException e) {
             return blocked();
         }
