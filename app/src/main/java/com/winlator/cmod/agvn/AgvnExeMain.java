@@ -76,8 +76,11 @@ public final class AgvnExeMain {
     }
 
     private static File chosen(Shortcut s, File exe) {
-        String name = s.getExtra(EXTRA);
         File dir = exe.getParentFile();
+        String asked = s.getExtra(AgvnProfileExe.EXTRA); // the profile's own exe comes first (AgvnProfileExe)
+        File profile = asked.isEmpty() || asked.contains("/") || asked.contains("\\") || dir == null ? null : new File(dir, asked);
+        if (profile != null && profile.isFile() && !profile.equals(exe)) return profile;
+        String name = s.getExtra(EXTRA);
         File chosen = name.isEmpty() || name.contains("/") || name.contains("\\") || dir == null ? null : new File(dir, name);
         if (chosen != null && chosen.isFile()) return chosen;
         return gameFor(exe, s.getExtra(AgvnGameImporter.EXTRA_ENGINE)); // a crash handler never is the game
@@ -114,7 +117,8 @@ public final class AgvnExeMain {
         });
         if (to == null) return launch;
         note = "Chạy file game chính: " + picked[1].getName() + " thay cho " + picked[0].getName()
-                + (GameExeResolver.neverAGame(picked[0].getName()) ? " (chương trình phụ của game, không phải game)"
+                + (picked[1].getName().equals(s.getExtra(AgvnProfileExe.EXTRA)) ? " (theo exe trong agvn-profile.json)"
+                : GameExeResolver.neverAGame(picked[0].getName()) ? " (chương trình phụ của game, không phải game)"
                 : " (chương trình .NET, đã chọn trong Tự sửa lỗi)");
         Log.i(TAG, "main exe " + launch + " -> " + to);
         return to;

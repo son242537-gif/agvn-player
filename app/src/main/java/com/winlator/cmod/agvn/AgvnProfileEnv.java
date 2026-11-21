@@ -61,7 +61,9 @@ public final class AgvnProfileEnv {
             }
             String args = AgvnProfileArgs.atLaunch(s, p, file == inGame ? own : inGame);
             if (args != null && !args.isEmpty()) said = (said == null ? "" : said + " · ") + args;
-            if (!save && args == null) return;
+            String exe = dir.isEmpty() ? null : AgvnProfileExe.atLaunch(s, p, new File(dir)); // the profile's exe, heard
+            if (exe != null && !exe.isEmpty()) said = (said == null ? "" : said + " · ") + exe;
+            if (!save && args == null && exe == null) return;
             s.saveData();
             if (said != null) {
                 note = "agvn-profile.json (" + file.getPath() + ") " + said;

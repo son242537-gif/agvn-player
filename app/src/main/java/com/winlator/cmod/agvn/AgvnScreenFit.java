@@ -33,7 +33,7 @@ import java.util.Arrays;
  * small frame gets the screen change too. UI thread.
  */
 public final class AgvnScreenFit {
-    static final String EXTRA_FIT = "agvnFit";
+    static final String EXTRA_FIT = "agvnFit", EXTRA_WINDOW = "agvnFitWindow"; // the window the choice was made for
     private static final String TAG = "AGVN";
     private static final long POLL_MS = 1000;
     private static final int STABLE_POLLS = 3;
@@ -42,6 +42,7 @@ public final class AgvnScreenFit {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable poll = this::poll;
     private boolean on, asked;
+    private String refused;
     private float[] shown, last;
     private int stable;
 
@@ -51,6 +52,7 @@ public final class AgvnScreenFit {
         String saved = s != null ? s.getExtra(EXTRA_FIT) : "";
         on = "1".equals(saved);
         asked = !saved.isEmpty();
+        refused = "0".equals(saved) ? s.getExtra(EXTRA_WINDOW) : null;
         handler.postDelayed(poll, POLL_MS);
     }
 
@@ -80,6 +82,8 @@ public final class AgvnScreenFit {
             float[] rect = mainWindow();
             if (on) show(rect);
             else if (!asked && AgvnSessionTrack.started()) settle(rect);
+            else if (rect != null && AgvnFitMath.otherWindow(refused, rect[2], rect[3])) asked = false; // another window
+
         } catch (RuntimeException e) {
             Log.w(TAG, "screen fit check failed", e);
         }
@@ -147,6 +151,8 @@ public final class AgvnScreenFit {
         Shortcut s = activity.agvnShortcut();
         if (s == null) return;
         s.putExtra(EXTRA_FIT, value);
+        s.putExtra(EXTRA_WINDOW, last != null ? (int) last[2] + "x" + (int) last[3] : null);
+        refused = "0".equals(value) ? s.getExtra(EXTRA_WINDOW) : null;
         s.saveData();
     }
 

@@ -1,0 +1,7 @@
+AGVN Player v0.1.103 - agvn.io
+
+Sửa lỗi:
+- Game có menu khởi động của hãng (BootStrap.exe) bên cạnh tệp game: khi thêm game, app chọn đúng tệp game, không chọn menu khởi động hay công cụ kiểm tra tệp.
+- Sửa ô "exe" trong agvn-profile.json sau khi đã thêm game: app chạy đúng tệp đó từ lần mở sau, không cần thêm lại game.
+- "Vừa màn hình": đã bấm "Hoàn tác" cho cửa sổ menu khởi động thì app vẫn tự phóng cửa sổ game (cửa sổ khác) ra toàn màn hình.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.

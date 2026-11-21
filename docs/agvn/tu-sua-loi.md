@@ -4500,3 +4500,32 @@ Ngày 20/11/2026 toàn bộ mã AGVN được rà theo 5 mảng; danh sách lỗ
   3. `Game.part1.zip` + part2 + part3 có mật khẩu: một thư mục, hỏi mật khẩu một lần. Xoá part2: báo thiếu part2.
   4. Tệp nén chỉ có APK; ZIP chứa một RAR; bản macOS: mỗi loại đúng lời báo.
   5. Thêm game, chép thư mục sang chỗ khác, thêm bản chép: hộp hỏi nêu hai đường dẫn. Thêm lại thư mục cũ: không hỏi.
+
+## Oppai Spy Gakuen: chạy nhầm BootStrap.exe, ô "exe" của hồ sơ bị bỏ qua, cửa sổ game nằm góc (bản 0.1.103)
+
+- **Báo cáo (POCO, 21/11/2026):** mở game ra menu khởi động tiếng Nhật của hãng (`BootStrap.exe`, NSIS) thay vì game
+  (`hspy.exe`, KiriKiri); ghi `"exe": "hspy.exe"` vào `agvn-profile.json` vẫn chạy BootStrap; cửa sổ game 1280×720
+  nằm góc trên trái.
+- **Nguyên nhân:**
+  1. `GameExeResolver.resolveExe` lấy exe đầu tiên không phải "chương trình phụ"; `BootStrap.exe` và
+     `ファイル破損チェックツール.exe` không nằm trong danh sách đó, và `BootStrap` đứng trước `hspy` theo thứ tự tên.
+  2. Lệnh chạy của mục game chỉ được ghi một lần lúc thêm game; lúc mở game app chỉ đọc lại `env`, `dllOverrides`,
+     `args` của hồ sơ (`AgvnProfileEnv.atLaunch`), không đọc `exe`.
+  3. (Suy từ mã, chưa có nhật ký xác nhận) "Vừa màn hình" ghi nhớ lựa chọn cho cả game: bấm "Hoàn tác" khi nó phóng
+     cửa sổ menu khởi động thì cửa sổ game sau đó không bao giờ được xét lại (`agvnFit=0`).
+- **Sửa:**
+  - Game KiriKiri: ưu tiên exe có tệp `.cf`/`.cfu` cùng tên. Thêm `bootstrap`, `ツール`, `チェック` vào danh sách
+    chương trình phụ.
+  - `AgvnProfileExe`: mỗi lần mở game, exe trong hồ sơ (tệp nằm cùng thư mục với exe của mục game) được chạy thay,
+    qua cùng cơ chế với `AgvnExeMain`; `su-kien.txt` ghi "theo exe trong agvn-profile.json". Exe ở thư mục khác thì
+    phải thêm lại game. Game Unreal giữ nguyên luật Shipping.exe.
+  - `AgvnScreenFit` nhớ cỡ cửa sổ của lựa chọn (`agvnFitWindow`); cửa sổ lệch quá 10% so với cửa sổ đã từ chối là cửa
+    sổ khác và được xét lại (`AgvnFitMath.otherWindow`). Lựa chọn cũ không có cỡ cửa sổ thì giữ nguyên.
+- **Không làm:** mục game đã thêm bằng `BootStrap.exe` mà không có hồ sơ ghi `exe` vẫn chạy BootStrap (không tự đổi
+  tệp chạy của game đang mở được); thêm lại game hoặc ghi `exe` vào hồ sơ. Không đặt `SkipBootStrap` trong registry.
+- **Test:** `AgvnProfileExeTest` (774 bài, 2 bỏ qua).
+- **Thử máy:**
+  1. Mục Oppai Spy Gakuen đang chạy BootStrap, hồ sơ có `"exe": "hspy.exe"`: mở game vào thẳng game; `su-kien.txt` có
+     dòng "Chạy file game chính: hspy.exe thay cho BootStrap.exe (theo exe trong agvn-profile.json)".
+  2. Xoá mục, bỏ `exe` khỏi hồ sơ, thêm lại: màn xem trước ghi tệp chạy `hspy.exe`.
+  3. Bản game không có đoạn `default.tjs` tự phóng: cửa sổ game được "Vừa màn hình" phóng kín sau khoảng 3 giây.

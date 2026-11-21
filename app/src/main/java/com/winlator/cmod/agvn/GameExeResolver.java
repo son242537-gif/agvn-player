@@ -30,6 +30,8 @@ public final class GameExeResolver {
     /** Name parts of exes that only serve a game (launcher, setup, crash reporter, settings...), never a game of their own. */
     private static final String[] HELPERS = {"launcher", "setup", "config", "crash", "report", "update", "patch", "install",
             "redist", "setting", "editor", "server", "tool", "helper", "physx", "dotnet", "oalinst", "nwjc", "bssndrpt",
+            // a maker's start menu (NSIS BootStrap.exe) and its file checker beside the KiriKiri game (21/11/2026)
+            "bootstrap", "ツール", "チェック",
             // the same in Japanese, Chinese and Korean: エンジン設定.exe beside コトネイロ.exe was a second game (20/10/2026)
             "設定", "设置", "設置", "コンフィグ", "ランチャー", "セットアップ", "アンインストール", "启动器", "卸载", "설정"};
     /** More game exes than this in one folder: a folder of tools rather than a collection, so it stays one game. */
@@ -128,6 +130,12 @@ public final class GameExeResolver {
             }
         }
         if (exes.size() == 1) return exes.get(0).getName();
+        if (engine == Engine.KIRIKIRI) { // the engine's exe has its settings beside it: hspy.exe and hspy.cf
+            for (File exe : exes) {
+                String base = exe.getName().substring(0, exe.getName().length() - 4);
+                if (new File(gameDir, base + ".cf").isFile() || new File(gameDir, base + ".cfu").isFile()) return exe.getName();
+            }
+        }
         for (File exe : exes) if (!isHelper(exe.getName().toLowerCase(Locale.ROOT))) return exe.getName();
         for (File exe : exes) {
             String n = exe.getName().toLowerCase(Locale.ROOT);

@@ -24,6 +24,17 @@ public final class AgvnFitMath {
 
     private AgvnFitMath() {}
 
+    /**
+     * True when a w x h window is another window than the one of size {@code refused} ("1280x720"): over a tenth off
+     * either way. A fit refused for a maker's start menu says nothing about the game's window that follows it.
+     */
+    static boolean otherWindow(String refused, float w, float h) {
+        String[] wh = refused == null ? new String[0] : refused.split("x");
+        if (wh.length != 2 || !wh[0].matches("\\d{1,5}") || !wh[1].matches("\\d{1,5}")) return false;
+        int rw = Integer.parseInt(wh[0]), rh = Integer.parseInt(wh[1]);
+        return Math.abs(w - rw) > Math.max(rw, w) * 0.1f || Math.abs(h - rh) > Math.max(rh, h) * 0.1f;
+    }
+
     /** {@link #SMALL}, {@link #OVERFLOW}, or null when a w x h window at x, y suits an sw x sh screen. */
     static String verdict(int x, int y, int w, int h, int sw, int sh) {
         return verdict(x, y, w, h, sw, sh, 0, 0);
