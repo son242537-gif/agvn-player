@@ -524,4 +524,6 @@
     <string name="agvn_dup_info_gone">This folder is no longer on the phone: this entry can no longer run.</string>
     <string name="agvn_dup_never_played">never</string>
     <string name="agvn_sharp_switch">Sharpen the picture when it is stretched to the screen (uses a little more GPU)</string>
+    <string name="agvn_add_from_phone">Add a game already on the phone</string>
+    <string name="agvn_unpack_empty_subtitle">Pick the ZIP, RAR or 7z you downloaded; the app unpacks it and adds the game</string>
 </resources>

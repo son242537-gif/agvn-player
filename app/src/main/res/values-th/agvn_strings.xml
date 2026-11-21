@@ -524,4 +524,6 @@
     <string name="agvn_dup_info_gone">โฟลเดอร์นี้ไม่อยู่ในเครื่องแล้ว รายการนี้เล่นไม่ได้อีก</string>
     <string name="agvn_dup_never_played">ยังไม่เคยเล่น</string>
     <string name="agvn_sharp_switch">ทำให้ภาพคมขึ้นเมื่อขยายเต็มจอ (ใช้ GPU เพิ่มเล็กน้อย)</string>
+    <string name="agvn_add_from_phone">เพิ่มเกมที่มีอยู่ในเครื่อง</string>
+    <string name="agvn_unpack_empty_subtitle">เลือกไฟล์ ZIP, RAR, 7z ที่เพิ่งดาวน์โหลด แอปจะแตกไฟล์แล้วเพิ่มเกมให้</string>
 </resources>

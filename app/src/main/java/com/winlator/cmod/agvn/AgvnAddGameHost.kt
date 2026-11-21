@@ -27,11 +27,12 @@ import java.io.File
 object AgvnAddGameHost {
     @Suppress("DEPRECATION") // systemUiVisibility: keeps the library's immersive mode on the dialog window
     @JvmStatic
-    fun show(activity: MainActivity) {
+    @JvmOverloads
+    fun show(activity: MainActivity, archive: Boolean = false) { // archive: straight to "Thêm từ tệp nén"'s picker
         if (activity.isFinishing || activity.isDestroyed) return
         val dialog = ComponentDialog(activity, android.R.style.Theme_DeviceDefault_NoActionBar_Fullscreen)
         val view = ComposeView(activity)
-        view.setContent { WinZTheme { AgvnAddGameFlow(activity) { dialog.dismiss() } } }
+        view.setContent { WinZTheme { AgvnAddGameFlow(activity, archive) { dialog.dismiss() } } }
         dialog.setContentView(view, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         dialog.window?.let { w ->
             w.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -46,14 +47,16 @@ object AgvnAddGameHost {
  * nén" picks an archive. Scans run off the main thread.
  */
 @Composable
-private fun AgvnAddGameFlow(activity: MainActivity, onClose: () -> Unit) {
+private fun AgvnAddGameFlow(activity: MainActivity, startArchive: Boolean, onClose: () -> Unit) {
     var entries by remember { mutableStateOf<List<AgvnImportEntry>?>(null) }
     var scanRevision by remember { mutableIntStateOf(0) }
-    var browsing by rememberSaveable { mutableStateOf(false) }
+    var browsing by rememberSaveable { mutableStateOf(startArchive) }
     var pickedFolder by remember { mutableStateOf<File?>(null) }
     // "Thêm từ tệp nén": the picker lists archives, opened at Download or at the folder a scan found archives in
-    var archives by rememberSaveable { mutableStateOf(false) }
-    var archiveStart by remember { mutableStateOf<File?>(null) }
+    var archives by rememberSaveable { mutableStateOf(startArchive) }
+    var archiveStart by remember {
+        mutableStateOf(if (startArchive) File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS) else null)
+    }
     val scope = rememberCoroutineScope()
 
     /** Unpacks into internal storage/AGVN, then the game inside goes to the usual settings preview. */

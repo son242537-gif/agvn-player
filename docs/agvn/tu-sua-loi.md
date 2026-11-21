@@ -4529,3 +4529,13 @@ Ngày 20/11/2026 toàn bộ mã AGVN được rà theo 5 mảng; danh sách lỗ
      dòng "Chạy file game chính: hspy.exe thay cho BootStrap.exe (theo exe trong agvn-profile.json)".
   2. Xoá mục, bỏ `exe` khỏi hồ sơ, thêm lại: màn xem trước ghi tệp chạy `hspy.exe`.
   3. Bản game không có đoạn `default.tjs` tự phóng: cửa sổ game được "Vừa màn hình" phóng kín sau khoảng 3 giây.
+
+## "Thêm từ tệp nén" ngay ở thư viện (bản 0.1.103)
+
+- **Maintainer (21/11/2026):** không tìm thấy mục giải nén trong app: nút chỉ nằm cuối màn "Thêm game".
+- **Sửa:** dấu "+" trên thanh thư viện mở menu hai dòng có chữ: "Thêm game có sẵn trong máy" (màn "Thêm game" như cũ)
+  và "Thêm từ tệp nén (ZIP, RAR, 7z)" (`AgvnImportDialog.showArchive` → `AgvnAddGameHost.show(activity, true)`: mở
+  thẳng trình chọn tệp nén ở Download). Thư viện trống có thêm ô "Thêm từ tệp nén". Nút cuối màn "Thêm game" giữ nguyên.
+- **Đánh đổi:** thêm game từ thư mục giờ là hai lần bấm ("+" rồi chọn) thay vì một.
+- **Thử máy:** "+" → hai dòng; dòng hai mở trình chọn ở Download, chọn tệp thì giải nén; Back ở trình chọn về danh
+  sách "Thêm game". Thư viện trống: ba ô, ô giữa là tệp nén. Chưa cấp quyền tệp: hỏi quyền trước.

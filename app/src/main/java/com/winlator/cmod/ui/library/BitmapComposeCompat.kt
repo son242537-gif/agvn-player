@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.FolderZip
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.DeleteOutline
@@ -258,7 +259,23 @@ private fun LibraryLandscapeHeader(
         LibraryTopIcon(if (grid) Icons.Outlined.ViewList else Icons.Outlined.GridView, false) {
             onGridViewChanged(!grid)
         }
-        LibraryTopIcon(Icons.Outlined.Add, false) { activity?.let { com.winlator.cmod.agvn.AgvnImportDialog.show(it) } }
+        // AGVN: "+" names both ways to add a game; unpacking an archive was only at the bottom of "Thêm game"
+        var addMenu by remember { mutableStateOf(false) }
+        Box {
+            LibraryTopIcon(Icons.Outlined.Add, false) { addMenu = true }
+            DropdownMenu(expanded = addMenu, onDismissRequest = { addMenu = false }) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.agvn_add_from_phone)) },
+                    leadingIcon = { Icon(Icons.Outlined.Add, null) },
+                    onClick = { addMenu = false; activity?.let { com.winlator.cmod.agvn.AgvnImportDialog.show(it) } }
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.agvn_unpack_action)) },
+                    leadingIcon = { Icon(Icons.Outlined.FolderZip, null) },
+                    onClick = { addMenu = false; activity?.let { com.winlator.cmod.agvn.AgvnImportDialog.showArchive(it) } }
+                )
+            }
+        }
         LibraryTopIcon(Icons.Outlined.HelpOutline, false) { activity?.let { com.winlator.cmod.agvn.AgvnGuideActivity.open(it) } }
         LibraryTopIcon(Icons.Outlined.Home, true) {}
         LibraryTopIcon(Icons.Outlined.SportsEsports, false) { activity?.navigateToMainDestination(R.id.main_menu_input_controls) }

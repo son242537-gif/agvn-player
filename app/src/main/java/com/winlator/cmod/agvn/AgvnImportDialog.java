@@ -42,6 +42,12 @@ public final class AgvnImportDialog {
         AgvnAddGameHost.show(activity);
     }
 
+    /** The library's "Thêm từ tệp nén": the same screen, opened on its archive picker. */
+    public static void showArchive(MainActivity activity) {
+        if (AgvnGameImporter.storageBlocked()) show(activity); // the permission question first
+        else AgvnAddGameHost.show(activity, true);
+    }
+
     /**
      * Settings preview for one game ({@code variant}: its exe when the folder holds several games or it was picked by
      * hand, else null); {@code onImported} runs after a successful import.

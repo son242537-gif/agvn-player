@@ -524,4 +524,6 @@
     <string name="agvn_dup_info_gone">该文件夹已不在手机上：这个条目已无法运行。</string>
     <string name="agvn_dup_never_played">从未玩过</string>
     <string name="agvn_sharp_switch">拉伸到屏幕时锐化画面（多占用一点 GPU）</string>
+    <string name="agvn_add_from_phone">添加手机里已有的游戏</string>
+    <string name="agvn_unpack_empty_subtitle">选择刚下载的 ZIP、RAR、7z 文件；应用会自动解压并添加游戏</string>
 </resources>

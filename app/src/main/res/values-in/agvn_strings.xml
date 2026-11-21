@@ -524,4 +524,6 @@
     <string name="agvn_dup_info_gone">Folder ini sudah tidak ada di ponsel: entri ini tidak bisa dijalankan lagi.</string>
     <string name="agvn_dup_never_played">belum pernah</string>
     <string name="agvn_sharp_switch">Pertajam gambar saat diperbesar ke layar (memakai sedikit lebih banyak GPU)</string>
+    <string name="agvn_add_from_phone">Tambah game yang sudah ada di ponsel</string>
+    <string name="agvn_unpack_empty_subtitle">Pilih file ZIP, RAR, 7z yang baru diunduh; aplikasi mengekstrak lalu menambahkan game</string>
 </resources>

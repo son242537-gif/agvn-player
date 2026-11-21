@@ -524,4 +524,6 @@
     <string name="agvn_dup_info_gone">Thư mục này không còn trên máy: mục này không chạy được nữa.</string>
     <string name="agvn_dup_never_played">chưa chơi</string>
     <string name="agvn_sharp_switch">Làm nét hình khi phóng lên màn hình (tốn thêm một chút GPU)</string>
+    <string name="agvn_add_from_phone">Thêm game có sẵn trong máy</string>
+    <string name="agvn_unpack_empty_subtitle">Chọn tệp ZIP, RAR, 7z vừa tải về; app tự giải nén rồi thêm game</string>
 </resources>

@@ -1,5 +1,8 @@
 AGVN Player v0.1.103 - agvn.io
 
+Mới:
+- Thư viện: bấm dấu "+" có ngay hai lựa chọn "Thêm game có sẵn trong máy" và "Thêm từ tệp nén (ZIP, RAR, 7z)". Thư viện đang trống cũng có ô "Thêm từ tệp nén". Trước đây nút giải nén chỉ nằm cuối màn "Thêm game".
+
 Sửa lỗi:
 - Game có menu khởi động của hãng (BootStrap.exe) bên cạnh tệp game: khi thêm game, app chọn đúng tệp game, không chọn menu khởi động hay công cụ kiểm tra tệp.
 - Sửa ô "exe" trong agvn-profile.json sau khi đã thêm game: app chạy đúng tệp đó từ lần mở sau, không cần thêm lại game.

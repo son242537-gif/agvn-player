@@ -511,4 +511,6 @@
     <string name="agvn_dup_info_gone">Wala na sa phone ang folder na ito: hindi na tatakbo ang entry na ito.</string>
     <string name="agvn_dup_never_played">hindi pa</string>
     <string name="agvn_sharp_switch">Patalasin ang larawan kapag pinalaki sa screen (kaunting dagdag na gamit ng GPU)</string>
+    <string name="agvn_add_from_phone">Magdagdag ng game na nasa phone na</string>
+    <string name="agvn_unpack_empty_subtitle">Piliin ang ZIP, RAR o 7z na na-download; ia-unpack ng app at idadagdag ang game</string>
 </resources>

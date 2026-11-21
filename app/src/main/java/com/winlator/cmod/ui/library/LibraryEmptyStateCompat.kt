@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.FolderZip
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -99,6 +100,11 @@ private fun EmptyLibraryContent(activity: MainActivity?, modifier: Modifier) {
         Spacer(Modifier.height(20.dp))
         EmptyActionCard(Icons.Outlined.Add, stringResource(R.string.agvn_ui_library_add_game), stringResource(R.string.agvn_ui_library_empty_add_subtitle)) {
             activity?.let { com.winlator.cmod.agvn.AgvnImportDialog.show(it) }
+        }
+        Spacer(Modifier.height(12.dp))
+        // AGVN: a downloaded archive, unpacked by the app
+        EmptyActionCard(Icons.Outlined.FolderZip, stringResource(R.string.agvn_unpack_action), stringResource(R.string.agvn_unpack_empty_subtitle)) {
+            activity?.let { com.winlator.cmod.agvn.AgvnImportDialog.showArchive(it) }
         }
         Spacer(Modifier.height(12.dp))
         EmptyActionCard(Icons.Outlined.HelpOutline, stringResource(R.string.agvn_ui_library_view_guide), stringResource(R.string.agvn_ui_library_empty_guide_subtitle)) {
