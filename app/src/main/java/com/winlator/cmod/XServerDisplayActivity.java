@@ -591,6 +591,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
             Log.w("AGVN", "DXVK 1.11.1-sarek is not bundled, using 1.10.3");
             this.dxwrapperConfig.put("version", "1.10.3");
         }
+        com.winlator.cmod.agvn.AgvnVkd3d.atLaunch(shortcut, dxwrapper, this.dxwrapperConfig); // AGVN: a DirectX 12-only game gets VKD3D
 
         if (!wineInfo.isWin64()) {
             onExtractFileListener = (file, size) -> {

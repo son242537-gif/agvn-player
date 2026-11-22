@@ -86,6 +86,25 @@ def _is_rpgmaker(game_dir):
         or _any_file(_path(game_dir, "data"), "", ".rxdata", ".rvdata", ".rvdata2"))
 
 
+MAGINE_PACK = b"GEPK0001"
+
+
+def _is_magine(game_dir):
+    """Magine: content/catalog.json and packs in content/ that start with GEPK0001 (GameExeResolver.isMagine)."""
+    content = _path(game_dir, "content")
+    if not _is_file(_path(game_dir, "content", "catalog.json")):
+        return False
+    for n in _children(content):
+        p = os.path.join(content, n)
+        if n.lower().endswith(".pak") and os.path.isfile(p):
+            try:
+                with open(p, "rb") as f:
+                    return f.read(len(MAGINE_PACK)) == MAGINE_PACK
+            except OSError:
+                return False
+    return False
+
+
 GODOT_MAGIC = b"GDPC"
 
 
@@ -135,6 +154,8 @@ def detect_engine(game_dir):
     # SRPG Studio: its data and runtime packs beside game.exe, and no DLL
     if _is_file(sub("data.dts")) and (_is_file(sub("runtime.rts")) or _is_file(sub("environment.evs"))):
         return "SRPG_STUDIO"
+    if _is_magine(game_dir):
+        return "MAGINE"
     # a stray .xp3 or .nsa in an Electron or NW.js game is no KiriKiri or NScripter one
     chromium = any(_is_file(sub(*rel)) for rel in (("chrome_100_percent.pak",), ("v8_context_snapshot.bin",),
                                                    ("package.nw",), ("resources", "app.asar"),

@@ -4557,3 +4557,67 @@ Ngày 20/11/2026 toàn bộ mã AGVN được rà theo 5 mảng; danh sách lỗ
   1. Thiếu Nữ Tu Tiên Truyện bằng Chạy nhẹ: qua "Now Loading", tới màn tiêu đề có video nền.
   2. Một game MV/MZ khác có phim (`movies/*.mp4` hoặc `.webm`): phim phát, tua được nếu game cho tua.
   3. Nhạc nền `.ogg`/`.m4a` dài vẫn phát và lặp như trước.
+
+## Game chỉ chạy bằng DirectX 12, và engine Magine (bản 0.1.105)
+
+Báo cáo ngày 22/11/2026: Idol Ikusei Simulator (`HuntingWoman3Gamma.exe`, 64-bit, SDL3 GPU, chỉ có shader DXIL/DXBC),
+POCO F8 Pro, app 0.1.102, Proton 9, DXVK 2.3.1.
+
+### Lỗi 1: game DirectX 12 thuần báo `gpu_unsupported`
+
+- **Vì sao:** container mặc định không có VKD3D (`DefaultVersion.VKD3D = "None"`). Khi đó
+  `XServerDisplayActivity.extractDXWrapperFiles` trả lại `d3d12.dll` của chính Wine
+  (`restoreOriginalDllFiles`), và bản đó không chạy được game này.
+  - Log `+loaddll`: `d3d12.dll : builtin`, không có dòng `vkd3d-proton` nào.
+  - `VKD3D_FEATURE_LEVEL=12_1` vẫn được đặt dù VKD3D không bật, nên dễ tưởng VKD3D đang chạy.
+- **Sửa (`AgvnVkd3d`, gọi trong `XServerDisplayActivity` ngay sau khi đọc cài đặt DXVK của game):**
+  - Game cần DirectX 12 được đặt `vkd3dVersion=2.14.1` cho lần chạy đó, khi cài đặt của nó chưa có VKD3D. Bản này có
+    sẵn trong app (`assets/dxwrapper/vkd3d-2.14.1.tzst`), và đúng là bản đã chạy được game này.
+  - "Cần DirectX 12" nghĩa là một trong hai:
+    - Game làm bằng Magine.
+    - Exe, hoặc một DLL cạnh nó, nạp `d3d12.dll`, và không tệp nào nạp `d3d11`, `d3d10`, `d3d9`, `d3d8`, `ddraw` hay
+      `opengl32`.
+  - Game vẽ được cả DirectX 11 thì để nguyên. Unreal Engine 5 tự chọn DirectX 12 khi có, và từng làm game UE 5.8 chết
+    lúc mở.
+  - Người chơi đã chọn một bản VKD3D cho game thì app giữ nguyên lựa chọn đó.
+  - Chỉ áp khi game dùng DXVK. VKD3D nằm trong bộ DXVK của app; WineD3D không dùng được VKD3D.
+  - `su-kien.txt`: "Game chỉ vẽ bằng DirectX 12 (engine Magine): dùng VKD3D 2.14.1 cho lần chạy này…".
+- **Giới hạn:** game nạp `d3d12.dll` lúc chạy (như SDL3 tự nạp) và không phải Magine thì app chưa nhận ra. Bảng nạp
+  (import) của exe không có DLL đó. Game như vậy chọn VKD3D trong cài đặt DXVK của game.
+
+### Lỗi 3: engine Magine
+
+- **Nhận diện (`GameExeResolver.isMagine`, bản Python trong `agvn_profile_lib.py`):** có `content/catalog.json`, và tệp
+  `.pak` trong `content/` bắt đầu bằng 8 byte `GEPK0001`.
+- **Game đã thêm từ trước, đang lưu là UNKNOWN:** nhận engine Magine ở lần mở kế tiếp (`AgvnEngineRecheck`, như SRPG
+  Studio), rồi được bật VKD3D ngay lần đó.
+- Chưa đặt sẵn `args`/`env` riêng cho Magine (như `MAGINE_DEVICE_CLASS=mobile`): các giá trị đó đổi chất lượng hình,
+  nên vẫn để cho `agvn-profile.json` của từng game.
+
+### Lỗi 5: `d3d12.dll` gói kèm cạnh exe
+
+- `WineUtils.applySystemTweaks` đặt `d3d12` và `d3d12core` là `native,builtin` trong registry của mọi container. Vì
+  vậy một `d3d12.dll` nằm cạnh exe đã được nạp trước bản của Wine, không cần `dllOverrides`.
+- `GameDllOverrides` bỏ qua các DLL đồ hoạ là đúng: thêm chúng vào `WINEDLLOVERRIDES` sẽ đè lựa chọn của DXVK/VKD3D.
+- Trong báo cáo, lúc thử, DLL và `dllOverrides` được thêm cùng một lần. Nên chưa có bằng chứng là chỉ DLL thôi thì
+  không đủ.
+
+### Chưa sửa
+
+- **Lỗi 2, phim qua Media Foundation chỉ 7–15 FPS:**
+  - Cần đo trên máy:
+    - Bỏ `WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER` cho riêng game này (biến của game đặt `0`), xem DirectX 12 có đi
+      được đường texture không.
+    - Bật `GST_DEBUG=4` để biết bộ giải mã (avdec_h264) dùng bao nhiêu luồng.
+  - Máy lúc đó dùng 4 GB swap, RAM trống chỉ 128–200 MB, `kswapd0` ăn 11% CPU. Thiếu RAM có thể là một phần nguyên
+    nhân.
+- **Lỗi 4, chữ game in ra stdout không vào nhật ký:**
+  - Cần thử trong Wine xem stdout của game mở qua `agvn-winhandler.exe` có tới được Wine không. Máy cloud lần này
+    không chạy được Wine (wineserver văng `free(): invalid pointer` ngay lúc mở), nên chưa thử được.
+  - Một khả năng: thư viện C của game đệm stdout khi nó không phải màn hình console. Chữ chỉ ra theo từng khối 4 KB,
+    hoặc lúc game thoát, nên mất khi game bị tắt ngang.
+- **Thử máy:**
+  1. Bản gốc của game (không DLL VKD3D cạnh exe, không `dllOverrides`): vào được game. `su-kien.txt` có dòng
+     "Game chỉ vẽ bằng DirectX 12 (engine Magine)", và log có `vkd3d-proton`.
+  2. `su-kien.txt` dòng đầu: "engine MAGINE".
+  3. Một game Unity hoặc Unreal: không có dòng VKD3D đó, chạy như trước.

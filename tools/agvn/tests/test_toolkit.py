@@ -212,6 +212,17 @@ class EngineDetectionTest(unittest.TestCase):
             f.write(b"MZ... the engine ..." + pck + struct.pack("<Q", 1 << 40) + b"GDPC")
         self.assertEqual("UNKNOWN", detect_engine(root))
 
+    def test_magine_by_its_packs(self):
+        # Idol Ikusei Simulator (22/11/2026): content/catalog.json and content/*.pak that start with GEPK0001
+        root = self.game("magine", "HuntingWoman3Gamma.exe", "content/catalog.json")
+        with open(os.path.join(root, "content", "base.pak"), "wb") as f:
+            f.write(b"GEPK0001 rest")
+        self.assertEqual("MAGINE", detect_engine(root))
+        self.assertEqual("HuntingWoman3Gamma.exe", resolve_exe(root, "MAGINE"))
+        with open(os.path.join(root, "content", "base.pak"), "wb") as f:
+            f.write(b"PK\x03\x04 zip")
+        self.assertEqual("UNKNOWN", detect_engine(root))
+
     def test_rpgmaker_families(self):
         mv = self.check("RPGMAKER_MV", "mv", "Game.exe", "notification_helper.exe", "nw.dll", "www/js/rpg_core.js")
         self.assertEqual("Game.exe", resolve_exe(mv, "RPGMAKER_MV"))

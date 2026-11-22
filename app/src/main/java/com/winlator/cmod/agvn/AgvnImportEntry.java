@@ -161,6 +161,7 @@ public final class AgvnImportEntry {
             case RPGMAKER_MV: return "RPG Maker MV";
             case WOLFRPG: return "Wolf RPG";
             case SRPG_STUDIO: return "SRPG Studio";
+            case MAGINE: return "Magine";
             default: return ctx.getString(R.string.agvn_add_engine_unknown);
         }
     }

@@ -14,7 +14,8 @@ import java.io.File;
  * LC_ALL=ja_JP.UTF-8 KiriKiri gets, so Chromium ran with --lang=ja. At its start such a game gets the engine its folder
  * shows now; the Japanese locale goes too unless its profile or a kana name asks for it, and KiriKiri's screen size.
  * <p>A game of an engine the app learned to see after it was added also gets that engine: SRPG Studio (0.1.80), which
- * a player could only add by its exe or with agvn-profile.json, as a Windows game of no known engine.
+ * a player could only add by its exe or with agvn-profile.json, as a Windows game of no known engine; Magine (0.1.105),
+ * whose games need DirectX 12 ({@link AgvnVkd3d}).
  */
 public final class AgvnEngineRecheck {
     private static final String TAG = "AGVN";
@@ -43,14 +44,20 @@ public final class AgvnEngineRecheck {
         }
     }
 
+    /** Engines the app learned to see after games of them were added as of no known engine. */
+    private static final java.util.List<String> LEARNED = java.util.Arrays.asList(
+            GameExeResolver.Engine.SRPG_STUDIO.name(), GameExeResolver.Engine.MAGINE.name());
+
     /**
      * The engine to keep instead of {@code stored}: what {@code gameDir} shows when it is an Electron or NW.js one, or
-     * SRPG Studio for a game stored with no known engine; else null.
+     * one of {@link #LEARNED} for a game stored with no known engine; else null.
      */
     static String engineNow(String stored, File gameDir) {
-        String srpg = GameExeResolver.Engine.SRPG_STUDIO.name();
         boolean none = stored == null || stored.isEmpty() || GameExeResolver.Engine.UNKNOWN.name().equals(stored);
-        if (none && GameExeResolver.detectEngine(gameDir).name().equals(srpg)) return srpg;
+        if (none) {
+            String learned = GameExeResolver.detectEngine(gameDir).name();
+            if (LEARNED.contains(learned)) return learned;
+        }
         boolean japanese = GameExeResolver.Engine.KIRIKIRI.name().equals(stored)
                 || GameExeResolver.Engine.NSCRIPTER.name().equals(stored);
         if (!japanese || !GameExeResolver.chromiumShell(gameDir)) return null;

@@ -71,7 +71,7 @@ public final class AgvnSessionLog {
                     AgvnExe64.takeNote(), AgvnPathLink.takeNote(), AgvnFrameLock.takeNote(),
                     AgvnExeMain.takeNote(), AgvnEngineRecheck.takeNote(), AgvnDxvkSet.takeNote(),
                     AgvnProfileEnv.takeNote(), AgvnHeapPad.takeNote(), AgvnMlangFix.takeNote(),
-                    AgvnMedia32.takeNote(), AgvnRenpyWine.why(shortcut), AgvnGameTwin.takeNote()};
+                    AgvnMedia32.takeNote(), AgvnVkd3d.takeNote(), AgvnRenpyWine.why(shortcut), AgvnGameTwin.takeNote()};
             for (String note : notes) if (note != null) event(note);
             String stale = staleWine();
             if (stale != null) event(stale);

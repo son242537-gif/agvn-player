@@ -20,7 +20,7 @@ public final class GameExeResolver {
     /** Stored by name in the shortcut extra "agvnEngine": never rename or remove a value. */
     public enum Engine {
         UNREAL, UNITY, GODOT, GAMEMAKER, RENPY, KIRIKIRI, TYRANO, SIGLUS, NSCRIPTER, RPGMAKER, RPGMAKER_MV, WOLFRPG,
-        SRPG_STUDIO, UNKNOWN
+        SRPG_STUDIO, MAGINE, UNKNOWN
     }
 
     private static final List<String> IGNORED = Arrays.asList(
@@ -62,6 +62,7 @@ public final class GameExeResolver {
         // SRPG Studio: its data and runtime packs beside game.exe, and no DLL (report of 05/11/2026)
         if (isFile(top.get("data.dts")) && (isFile(top.get("runtime.rts")) || isFile(top.get("environment.evs"))))
             return Engine.SRPG_STUDIO;
+        if (isMagine(top)) return Engine.MAGINE;
         boolean chromium = chromiumShell(top);
         if (!chromium && anyFile(children, "", ".xp3")) return Engine.KIRIKIRI;
         if (!chromium && (anyFile(children, "", ".nsa") || isFile(top.get("nscript.dat")))) return Engine.NSCRIPTER;
@@ -106,6 +107,27 @@ public final class GameExeResolver {
         File[] data = listOrEmpty(path(top, "data"));
         return anyFile(children, "rgss", ".dll") || anyFile(listOrEmpty(path(top, "system")), "rgss", ".dll")
                 || anyFile(children, "", ".rgssad", ".rgss2a", ".rgss3a") || anyFile(data, "", ".rxdata", ".rvdata", ".rvdata2");
+    }
+
+    /** "GEPK0001", the first 8 bytes of a Magine pack. */
+    static final byte[] MAGINE_PACK = {'G', 'E', 'P', 'K', '0', '0', '0', '1'};
+
+    /**
+     * Magine (Idol Ikusei Simulator, 22/11/2026): content/catalog.json and packs in content/ that start with
+     * {@link #MAGINE_PACK}. Its exe draws with DirectX 12 only (SDL3 GPU, DXIL shaders): {@link AgvnVkd3d}.
+     */
+    private static boolean isMagine(Map<String, File> top) {
+        if (!isFile(path(top, "content", "catalog.json"))) return false;
+        for (File f : listOrEmpty(path(top, "content"))) {
+            if (!f.isFile() || !f.getName().toLowerCase(Locale.ROOT).endsWith(".pak")) continue;
+            byte[] head = new byte[MAGINE_PACK.length];
+            try (java.io.FileInputStream in = new java.io.FileInputStream(f)) {
+                return in.read(head) == head.length && Arrays.equals(head, MAGINE_PACK);
+            } catch (java.io.IOException e) {
+                return false;
+            }
+        }
+        return false;
     }
 
     /** Exe path relative to {@code gameDir} with '/' separators, or null when nothing fits. */

@@ -1,0 +1,6 @@
+AGVN Player v0.1.105 - agvn.io
+
+Sửa lỗi:
+- Game chỉ chạy bằng DirectX 12 (như Idol Ikusei Simulator) không còn báo "gpu_unsupported" rồi tắt: app tự bật VKD3D cho riêng game đó. Game chạy được cả DirectX 11 thì không đổi gì.
+- App nhận ra game làm bằng engine Magine.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
