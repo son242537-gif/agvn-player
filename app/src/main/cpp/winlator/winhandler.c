@@ -10,6 +10,7 @@
 #include <tlhelp32.h>
 #include <windows.h>
 #include <winsock2.h>
+#include "../agvn/field-caret.h" /* AGVN 6 */
 
 
 #define SERVER_PORT 7946
@@ -54,7 +55,9 @@
 /* AGVN 4: /heappad, a 32-bit game's zeroed heap blocks get two more zero bytes
    (app/src/main/cpp/agvn/heap-pad.c, SRPG Studio) */
 /* AGVN 5: RC_AGVN_STATE's AGVN_STATE_TEXT_INPUT */
-#define AGVN_VERSION 5
+/* AGVN 6: AGVN_STATE_TEXT_CARET only for a caret in a text field of Windows
+   (agvnFieldCaret) */
+#define AGVN_VERSION 6
 BOOL agvnStartPadded(LPCWSTR exe, LPCWSTR args, LPCWSTR dir,
                      PROCESS_INFORMATION *pi);
 
@@ -379,6 +382,18 @@ void handleInput(const char *buffer, int len) {
 
 static BOOL agvnTyping(DWORD now);
 
+/* AGVN 6: whether the caret's window {hwnd} is a text field of Windows: an
+   edit control (Edit, RichEdit, a .NET or Delphi edit box, a memo) or a Visual
+   Basic text box. KiriKiri, Unity and GameMaker put a caret in their own
+   window to place the IME's box, with no field to type in: the Android keyboard
+   came up over the title screen (Sickly Days, KiriKiri Z, 24/11/2026). A field
+   a game draws itself is told by its input context (AGVN_STATE_TEXT_INPUT). */
+static BOOL agvnFieldCaret(HWND hwnd) {
+  WCHAR name[96];
+  if (!GetClassNameW(hwnd, name, 96)) return FALSE;
+  return agvnFieldClass((const unsigned short *)name);
+}
+
 /* AGVN 2: RC_AGVN_STATE's bits now. The mouse is locked when the foreground
    thread's cursor is hidden and the cursor is held in a small part of the
    screen, a quarter of it each way at most: Unity's CursorLockMode.Locked
@@ -386,7 +401,7 @@ static BOOL agvnTyping(DWORD now);
    there. A game that hides the cursor to draw its own clips it to its window
    at most (Unity's CursorLockMode.Confined), and its taps stay where the
    finger is. The caret is the one of the foreground thread: a text field of
-   Windows (a name box, a launcher). */
+   Windows (a name box, a launcher), from AGVN 6 only in one (agvnFieldCaret). */
 static BYTE agvnState(void) {
   BYTE state = 0;
   CURSORINFO cursor;
@@ -402,7 +417,8 @@ static BYTE agvnState(void) {
     state |= AGVN_STATE_MOUSE_LOCKED;
   ZeroMemory(&gui, sizeof(gui));
   gui.cbSize = sizeof(gui);
-  if (GetGUIThreadInfo(0, &gui) && gui.hwndCaret != NULL)
+  if (GetGUIThreadInfo(0, &gui) && gui.hwndCaret != NULL &&
+      agvnFieldCaret(gui.hwndCaret))
     state |= AGVN_STATE_TEXT_CARET;
   if (agvnTyping(GetTickCount()))
     state |= AGVN_STATE_TEXT_INPUT;

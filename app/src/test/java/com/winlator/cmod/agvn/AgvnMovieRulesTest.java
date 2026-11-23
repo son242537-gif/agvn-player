@@ -52,6 +52,21 @@ public class AgvnMovieRulesTest {
     }
 
     @Test
+    public void aWholeMovieDroppedAtOnceIsAMovieThatDoesNotPlay() {
+        // Sickly Days (KiriKiri Z, 32-bit, Wine's old media source, 24/11/2026): the decoder refused the caps once,
+        // then every frame of the movie was dropped in a burst far shorter than a second, and the screen stayed black
+        AgvnMovieRules rules = new AgvnMovieRules();
+        assertFalse(rules.add(CAPS, 0));
+        assertFalse(rules.add(REFUSED, 10));
+        int found = 0;
+        for (int i = 0; i < 6905; i++) if (rules.add(PUSH, 20 + i / 50)) found++; // 140 ms
+        assertEquals("once", 1, found);
+        // frames dropped now and then, a few a second, are not
+        AgvnMovieRules few = new AgvnMovieRules();
+        for (int i = 0; i < 2000; i++) assertFalse(few.add(PUSH, i * 100L)); // 10 a second for 200 s
+    }
+
+    @Test
     public void aFewRefusedFramesAreNotAMovieThatDoesNotPlay() {
         AgvnMovieRules rules = new AgvnMovieRules();
         // a burst shorter than a second: a decoder trying caps before it takes others

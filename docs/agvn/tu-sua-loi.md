@@ -4701,3 +4701,66 @@ màn tiêu đề, vỏ máy lên 51°C, CPU 84°C.
   3. Chơi thử: nhân vật đi, nhạc, hiệu ứng đúng tốc độ.
   4. Bật "Tần số quét cao": HUD lại theo tần số của màn.
   5. Game Ren'Py, Godot "Chạy nhẹ": phím ảo vẫn mờ như cũ, độ mờ chỉnh được.
+
+## Bàn phím Android tự bật ở màn tiêu đề; phim WMV3 của game 32-bit đen màn mà app không báo (bản 0.1.108)
+
+Báo cáo ngày 24/11/2026: Sickly Days and Summer Traces (KiriKiri Z 32-bit, Proton 9.0 arm64ec, FEXCore 2601), POCO F8
+Pro.
+
+### Lỗi 1: bàn phím Android tự bật dù game không có ô nhập chữ
+
+- **Hiện tượng:** khoảng 3 giây sau khi cửa sổ game hiện, bàn phím Android bật lên che hơn nửa màn hình.
+  - `su-kien.txt`: "Game có ô nhập chữ (con trỏ nhập chữ của Windows): mở bàn phím".
+  - Các game khác cũng có dòng "mở bàn phím": Afternoon Affairs, Oppai Spy Gakuen, Scream, Taimanin Yukikaze
+    (KiriKiri); Aura 2, Cyber100, Interns, Love Mansion, Sexpatch... (Unity); Apartment Story (GameMaker).
+- **Vì sao:** `agvn-winhandler.exe` báo "có ô nhập chữ" (`AGVN_STATE_TEXT_CARET`) mỗi khi luồng của game có caret của
+  Windows. KiriKiri, Unity, GameMaker đặt một caret ngay trong cửa sổ game để đặt chỗ khung gõ (IME), dù không có ô nào
+  để gõ.
+- **Sửa (`agvn-winhandler.exe` 6, `app/src/main/cpp/agvn/field-caret.h`):**
+  - Caret chỉ tính là ô nhập chữ khi nằm trong một ô nhập thật của Windows: lớp có chữ "edit" (Edit, RichEdit20W,
+    RICHEDIT50W, ô nhập .NET `WindowsForms10.EDIT...`, `TEdit` của Delphi), "memo" (`TMemo`) hoặc "textbox"
+    (`ThunderRT6TextBox` của Visual Basic).
+  - Caret trong cửa sổ của chính game (`TVPMainWindow`, `UnityWndClass`, `YYGameMakerYY`...) không mở bàn phím nữa.
+  - Ô game tự vẽ vẫn được nhận như trước, qua input context (`AGVN_STATE_TEXT_INPUT`): Ren'Py, SDL, Unity, Godot.
+  - Nút [⌨] vẫn mở bàn phím lúc nào cũng được.
+- **Kiểm:**
+  - `scripts/agvn/winhandler/test/field-caret-test.c`: quy tắc tên lớp, chỉ cần gcc; chạy qua ở máy cloud.
+  - `run-caret-test.sh`: thử trong Wine trên PC (caret trong cửa sổ game, rồi ô EDIT, rồi caret trong cửa sổ game lại).
+    Wine 9.0 của máy cloud lần này hỏng ngay khi tạo prefix ("free(): invalid pointer", cả với `cmd /c echo`), nên chưa
+    chạy được ở đây.
+- **Chưa làm:** tuỳ chọn theo game "Tự mở bàn phím" (báo cáo đề nghị). Khi caret không còn làm bàn phím tự bật, tuỳ
+  chọn này không còn cần.
+
+### Lỗi 2: phim WMV3 chỉ có tiếng, màn đen hay trắng suốt độ dài phim, app không báo gì
+
+- **Hiện tượng:**
+  - Phim mở đầu (WMV3 1920×1080, WMA Pro): màn đen tới giây 94 mà vẫn có tiếng.
+  - Phim chuyển cảnh: màn trắng.
+  - Không có thanh báo, không bỏ qua phim.
+- **Vì sao Wine không giải mã:**
+  - Game 32-bit đọc phim bằng cách cũ của Wine (`AgvnMedia32`, bản 0.1.96).
+  - Proton 9 đưa phim WMV3 cho `avdec_wmv3` mà không có sequence header (`codec_data`), nên bộ giải mã từ chối, như
+    `AgvnWine10` ghi từ trước.
+  - Proton 10 phát được, và `AgvnMovieWatch` có sẵn thanh "Chạy lại bằng Wine mới" và "Bỏ qua phim" cho đúng chuyện này.
+- **Vì sao thanh không hiện (nhiều khả năng, chưa có nhật ký để chắc):**
+  - `AgvnMovieRules` chỉ nhận một phim không phát được khi 100 dòng lỗi trải dài ít nhất 1 giây trong 5 giây.
+  - Với cách đọc cũ, bộ giải mã có thể nhận cả phim một lúc và bỏ hết khung trong một đợt ngắn hơn 1 giây: 6905 dòng
+    "Failed to push transform input", rồi im. Đợt đó bị coi là bộ giải mã đang thử định dạng, như test cũ đặt ra.
+- **Sửa (`AgvnMovieRules`):**
+  - Thêm một cách nhận: 200 khung bị bỏ ("Failed to push transform input", mỗi dòng một khung) trong 10 giây, dù dồn sát
+    nhau, là phim không phát được.
+  - Cách cũ vẫn giữ.
+  - Vài khung bị bỏ thưa thớt (10 một giây) vẫn không tính.
+  - Dòng "Failed to find any element factory ... type 64x" không dùng làm dấu hiệu: đó chỉ là lúc Wine tìm bộ phân tích
+    (parser) cho WMV, không có là bình thường.
+- **Không làm:**
+  - Sửa `codec_data` trong Wine: phải dựng lại Proton 9. Proton 10 đã phát được loại phim này, nên app đề nghị chuyển.
+  - Quét `.wmv` lúc thêm game để chuyển sẵn sang Proton 10: chuyển Wine tốn gần 900 MB và đổi cách chạy của game, nên
+    chỉ đề nghị khi phim thật sự không phát được (luật "Fixes Apply to Every Phone").
+- **Thử máy (Sickly Days bản gốc, có phim):**
+  1. Ở phim mở đầu: thanh "Phim trong game không phát được" hiện trong vài giây. `su-kien.txt` có dòng "Phim trong game
+     không phát được: WMV3 1920x1080…".
+  2. "Chạy lại bằng Wine mới": game mở lại trên Proton 10, phim có hình.
+  3. "Bỏ qua phim": phim dừng (nhấp chuột hoặc Esc), hoặc app báo không bỏ qua được.
+  4. Màn tiêu đề: bàn phím Android không tự bật. Ô nhập tên trong Cài đặt của game: bàn phím tự bật nếu đó là ô nhập
+     của Windows hay ô game bật nhập chữ cho nó; nếu không, bấm [⌨] để gõ.

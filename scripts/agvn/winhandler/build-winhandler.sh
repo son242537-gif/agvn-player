@@ -8,10 +8,12 @@
 # (0.1.74) RC_AGVN_GAME_ENDED: it ends, and Wine with it, once the game and its processes have ended, and from AGVN 4
 # (0.1.81) /heappad (app/src/main/cpp/agvn/heap-pad.c): a 32-bit game's zeroed heap blocks get two more zero bytes,
 # for SRPG Studio's scripts, and from AGVN 5 (0.1.88) RC_AGVN_STATE's AGVN_STATE_TEXT_INPUT: the game turned on its
-# own text input (an input context for its window, after it had none: SDL and Ren'Py, Unity, Unreal, Godot). Every game
-# starts through it (AgvnStarter); the container's winhandler.exe only when it cannot be written there. Test it in Wine
-# with scripts/agvn/winhandler/test/run-test.sh, /heappad with run-heappad-test.sh, and the text input with
-# run-typing-test.sh (same folder).
+# own text input (an input context for its window, after it had none: SDL and Ren'Py, Unity, Unreal, Godot), and from
+# AGVN 6 (0.1.108) a caret counts as a text field only in an edit control or a text box
+# (app/src/main/cpp/agvn/field-caret.h): KiriKiri, Unity and GameMaker put one in their own window for the IME. Every
+# game starts through it (AgvnStarter); the container's winhandler.exe only when it cannot be written there. Test it in
+# Wine with scripts/agvn/winhandler/test/run-test.sh, /heappad with run-heappad-test.sh, the text input with
+# run-typing-test.sh and the caret with run-caret-test.sh (same folder); field-caret-test.c needs only gcc.
 #
 # Needs mingw-w64 from Ubuntu: apt-get install gcc-mingw-w64-x86-64-win32 binutils-mingw-w64-i686. No timestamp in
 # the exe, so the same compiler gives the same file. The source includes psapi.h before windows.h, hence the two
