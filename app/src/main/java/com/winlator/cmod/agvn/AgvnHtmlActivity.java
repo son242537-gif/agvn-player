@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.RenderProcessGoneDetail;
@@ -226,6 +227,12 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("deprecation")
+    /** Each finger to the on-screen keys or to the game, as it landed ({@link AgvnTouchSplit}). */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        return tools != null ? tools.dispatchTouch(event, super::dispatchTouchEvent) : super.dispatchTouchEvent(event);
+    }
+
     @Override
     public void onBackPressed() {
         if (tools != null) tools.onBack();

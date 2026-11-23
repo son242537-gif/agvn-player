@@ -7,6 +7,7 @@ import android.os.Process;
 import android.util.Log;
 import android.view.InputDevice;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 
 import com.winlator.cmod.agvn.sdl.SDLActivity;
 import com.winlator.cmod.core.FileUtils;
@@ -81,6 +82,12 @@ public class AgvnRgssActivity extends SDLActivity {
     protected void onResume() {
         super.onResume();
         if (tools != null) tools.onResume();
+    }
+
+    /** Each finger to the on-screen keys or to the game, as it landed ({@link AgvnTouchSplit}). */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        return tools != null ? tools.dispatchTouch(event, super::dispatchTouchEvent) : super.dispatchTouchEvent(event);
     }
 
     @Override

@@ -4621,3 +4621,42 @@ POCO F8 Pro, app 0.1.102, Proton 9, DXVK 2.3.1.
      "Game chỉ vẽ bằng DirectX 12 (engine Magine)", và log có `vkd3d-proton`.
   2. `su-kien.txt` dòng đầu: "engine MAGINE".
   3. Một game Unity hoặc Unreal: không có dòng VKD3D đó, chạy như trước.
+
+## "Chạy nhẹ": giữ phím ảo thì ngón chạm game bị nuốt, không vừa đi vừa xoay được (bản 0.1.106)
+
+Báo cáo ngày 23/11/2026: Dâm Từ Phủ (Godot 4.7.2, 3D góc nhìn thứ nhất), POCO F8 Pro, bản 0.1.102. Bộ phím "2D", xoay góc
+nhìn bằng cách kéo ngón trên màn.
+
+- **Hiện tượng:**
+  - Chỉ kéo, hoặc chỉ giữ ▲: được.
+  - Kéo trước rồi giữ ▲: vừa đi vừa xoay được.
+  - Giữ ▲ trước rồi kéo ngón khác: không xoay.
+  - Đang đi và xoay, nhấc ngón xoay rồi đặt lại: hết xoay, tới khi nhả hết các ngón.
+- **Vì sao:**
+  - View phím ảo (`AgvnLightKeys`) phủ kín màn, nằm trên view của game.
+  - Khi view phím đang giữ một ngón, Android gắn thẳng ngón mới vào nó, không hỏi nó có nhận không
+    (`ViewGroup.dispatchTouchEvent`). View phím bỏ qua ngón không trúng phím, nên game không bao giờ thấy ngón đó.
+  - Không có dòng nhật ký nào.
+  - Mọi game "Chạy nhẹ" đều bị, không riêng Godot: HTML, Ren'Py, RPG Maker XP/VX/VX Ace cũng dùng chung view phím này.
+- **Sửa (`AgvnTouchSplit`, `AgvnTouchGroups`, gọi từ `dispatchTouchEvent` của cả bốn màn chơi):**
+  - Mỗi ngón lúc chạm xuống được giao hẳn cho một bên, tới khi nhấc lên:
+    - Trúng phím thì cho phím.
+    - Còn lại cho game, và cho thanh công cụ, menu nằm trên phím. Chỗ phím nằm dưới thanh công cụ hay menu thì vẫn
+      thuộc thanh công cụ, menu.
+  - Mỗi bên chỉ nhận ngón của mình:
+    - Ngón đầu tiên của một bên là `DOWN`, ngón sau là `POINTER_DOWN`.
+    - Nhấc ngón cuối của một bên là `UP`. `CANCEL` thì cả hai bên nhận.
+    - Sự kiện có ngón của cả hai bên được tách làm hai, mất các điểm đọc giữa hai sự kiện. Sự kiện chỉ có ngón của
+      game thì đi nguyên như cũ.
+  - Phím ảo đang ẩn hay đang sửa phím: chạm đi như trước.
+  - Godot: nút chuột của phím ảo bấm ở chỗ ngón chạm game sau cùng. Trước đây có lúc nó bấm ngay ở chỗ phím.
+- **Phía game:** Godot chỉ giả chuột từ ngón đầu tiên của nó. Game Godot muốn xoay bằng ngón thứ hai phải tự đọc
+  `InputEventScreenDrag` (index > 0). Bản Player của Dâm Từ Phủ đã có autoload `AgvnCham` làm việc này.
+- **Thử máy (Dâm Từ Phủ, bản `INSHI-YASHIKI-AGVN-PLAYER`):**
+  1. Giữ ▲ trước, rồi kéo ngón phải: vừa đi vừa xoay.
+  2. Đang giữ ▲, nhấc ngón phải rồi kéo lại nhiều lần: vẫn xoay.
+  3. Kéo trước, rồi giữ ▲: như cũ.
+  4. Giữ ▲ và bấm Shift cùng lúc: vẫn chạy nhanh, nhả ra không kẹt phím.
+  5. Đang giữ ▲, chạm ⌨, Sửa, Ẩn, ☰ trên thanh công cụ: nút vẫn ăn. Mở menu ☰ rồi chạm chỗ có phím dưới menu: menu
+     nhận.
+  6. Game 2D, Ren'Py, HTML "Chạy nhẹ": chạm menu như cũ. Chế độ sửa phím kéo phím như cũ.

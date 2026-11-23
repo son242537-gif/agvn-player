@@ -12,6 +12,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.InputDevice;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -154,6 +155,12 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
     @Override
     protected void onWebPageRefused() {
         Toast.makeText(this, R.string.agvn_renpy_no_web, Toast.LENGTH_SHORT).show();
+    }
+
+    /** Each finger to the on-screen keys or to the game, as it landed ({@link AgvnTouchSplit}). */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        return tools != null ? tools.dispatchTouch(event, super::dispatchTouchEvent) : super.dispatchTouchEvent(event);
     }
 
     @Override

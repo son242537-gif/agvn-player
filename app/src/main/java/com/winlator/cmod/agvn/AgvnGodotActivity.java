@@ -90,8 +90,13 @@ public class AgvnGodotActivity extends GodotActivity {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        touchX = event.getX();
-        touchY = event.getY();
+        return tools != null ? tools.dispatchTouch(event, this::gameTouch) : gameTouch(event);
+    }
+
+    /** A touch the game gets, not one on an on-screen key: where it is, for the keys' mouse buttons. */
+    private boolean gameTouch(MotionEvent event) {
+        touchX = event.getX(event.getActionIndex());
+        touchY = event.getY(event.getActionIndex());
         return super.dispatchTouchEvent(event);
     }
 

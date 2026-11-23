@@ -2,6 +2,7 @@
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -66,6 +67,7 @@ public final class AgvnLightTools {
     private final AgvnLightBar bar;
     private final AgvnLightMenu menu;
     private final AgvnLightSlow slow;
+    private final AgvnTouchSplit split;
     private final AgvnLightEditor editor = new AgvnLightEditor(this);
     private final AgvnLightSets sets = new AgvnLightSets(this);
 
@@ -89,6 +91,7 @@ public final class AgvnLightTools {
         keys.setAlpha(prefs.opacity());
         keys.setVisibility(pick.id == AgvnLightPick.OFF || prefs.keysHidden(game) ? View.GONE : View.VISIBLE);
         activity.addContentView(keys, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        split = new AgvnTouchSplit(keys, layout);
         hud = new AgvnLightHud(activity, host);
         bar = new AgvnLightBar(this);
         menu = new AgvnLightMenu(this, this.gameName);
@@ -102,6 +105,11 @@ public final class AgvnLightTools {
     static AgvnLightTools attach(Activity activity, String kind, String gameName, File gameDir, Host host) {
         AgvnPowerSave.warn(activity);
         return new AgvnLightTools(activity, kind, gameName, gameDir, host);
+    }
+
+    /** A touch of the game's screen: each finger to the keys or to the game, as it landed ({@link AgvnTouchSplit}). */
+    boolean dispatchTouch(MotionEvent event, AgvnTouchSplit.Rest rest) {
+        return split.dispatch(event, rest, keysShown() && !editor.active());
     }
 
     /** Back: ends editing, else closes the menu, else opens it. Always handled. */
