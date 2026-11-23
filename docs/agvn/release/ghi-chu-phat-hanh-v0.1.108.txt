@@ -1,0 +1,6 @@
+AGVN Player v0.1.108 - agvn.io
+
+Sửa lỗi:
+- Bàn phím Android không còn tự bật che màn hình ở những game không có ô nhập chữ (nhiều game KiriKiri, Unity, GameMaker). Bàn phím vẫn tự bật ở ô nhập chữ thật, và nút ⌨ vẫn mở được lúc nào cũng được.
+- Phim trong game không có hình mà chỉ có tiếng (phim WMV của nhiều game 32-bit): app nay nhận ra và hiện thanh "Phim trong game không phát được", với hai lựa chọn "Chạy lại bằng Wine mới" và "Bỏ qua phim".
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
