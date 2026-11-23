@@ -57,6 +57,8 @@ public class AgvnHtmlActivity extends AppCompatActivity {
     private final AgvnHtmlOutside outside = new AgvnHtmlOutside();
     /** assets/agvn/html-keyboard.js, run on each page once loaded ({@link AgvnPageKeyboard}). */
     private String keyboardJs = "";
+    /** assets/agvn/html-frame.js with the page's frame cap ({@link AgvnRefreshCap#pageFps}); "" when unreadable. */
+    private String frameJs = "";
     /** For "Gửi nhật ký" ({@link AgvnLightSession#keeper}): the pictures shown empty, the files the page did not find. */
     private Consumer<String> standIns, missing;
     /** The game on screen, whose files a service worker's requests are answered from ({@link Workers}). */
@@ -94,6 +96,9 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         if (compatJs != null && getIntent().getBooleanExtra(AgvnFullscreen.INTENT, false))
             compatJs = "window.__agvnStretch = true;\n" + compatJs; // "Toàn màn hình cho mọi game"
         if (compatJs != null) compatJs = pageTexts() + compatJs; // its error box in the app's language
+        String frame = com.winlator.cmod.core.FileUtils.readString(this, "agvn/html-frame.js");
+        if (frame != null) frameJs = "window.__agvnMaxFps = " + AgvnRefreshCap.pageFps(this) + ";\n" + frame;
+        if (compatJs != null && !frameJs.isEmpty()) compatJs = frameJs + "\n" + compatJs; // before the engine's scripts
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         AgvnRefreshCap.apply(this); // 60 Hz: the page draws every refresh, the games move 60 times a second
         // with a log setting on (Cài đặt > Nhật ký), the page can be inspected over USB and logs all its console
@@ -112,6 +117,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
             return;
         }
         webView.setBackgroundColor(Color.BLACK);
+        AgvnRefreshCap.view(webView); // 60 frames a second, also on Android 15's per-view frame rates
         WebSettings s = webView.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);
@@ -208,6 +214,7 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         public void onPageFinished(WebView view, String url) {
             AgvnLightSession.started(AgvnHtmlActivity.this);
             if (!keyboardJs.isEmpty()) view.evaluateJavascript(keyboardJs, null); // the keyboard for a field a script focuses
+            if (!frameJs.isEmpty()) view.evaluateJavascript(frameJs, null); // a page without html-compat.js: its frame cap
             view.evaluateJavascript(AgvnHtmlKeys.TRACK, null); // where the right mouse button goes
         }
 
@@ -226,13 +233,13 @@ public class AgvnHtmlActivity extends AppCompatActivity {
         }
     }
 
-    @SuppressWarnings("deprecation")
     /** Each finger to the on-screen keys or to the game, as it landed ({@link AgvnTouchSplit}). */
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         return tools != null ? tools.dispatchTouch(event, super::dispatchTouchEvent) : super.dispatchTouchEvent(event);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onBackPressed() {
         if (tools != null) tools.onBack();

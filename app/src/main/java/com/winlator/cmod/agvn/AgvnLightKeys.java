@@ -43,6 +43,15 @@ final class AgvnLightKeys extends View {
         this.sink = sink;
     }
 
+    /**
+     * The keys are see-through (the player's opacity, a view alpha): drawn with the alpha in each shape, not into a
+     * layer as big as the screen, which Android made at every frame the game drew (120 a second on a 120 Hz screen).
+     */
+    @Override
+    public boolean hasOverlappingRendering() {
+        return false;
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         painter.draw(canvas, layout, getWidth(), getHeight(), this::pressedBy, editing ? selected : -1);

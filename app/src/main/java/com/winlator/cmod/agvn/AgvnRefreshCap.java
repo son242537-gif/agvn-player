@@ -2,8 +2,11 @@
 package com.winlator.cmod.agvn;
 
 import android.app.Activity;
+import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 import android.view.Display;
+import android.view.View;
 import android.view.WindowManager;
 
 import androidx.preference.PreferenceManager;
@@ -17,6 +20,9 @@ import java.util.List;
  * for nothing, and the first RPG Maker MV versions even run twice as fast. These games ask Android for the screen's
  * 60 Hz mode at the same resolution. RPG Maker XP runs at 40 FPS, which 120 Hz shows evenly and 60 Hz does not, so
  * mkxp-z leaves the screen as it is. "Tần số quét cao" on in the settings (high_refresh_rate_mode) leaves it too.
+ * HyperOS kept 120 Hz all the same, its frame rate free up to 120 (BLACKBOOK80, RPG Maker MZ, 24/11/2026): the
+ * window also asks for 60 frames a second, without the boost a touch gives (Android 15), and an HTML page draws at
+ * most 60 times a second whatever the screen does ({@link #pageFps}, html-frame.js).
  */
 final class AgvnRefreshCap {
     private static final String TAG = "AGVN";
@@ -51,9 +57,28 @@ final class AgvnRefreshCap {
         return faster && best != null ? best.id : -1;
     }
 
+    /** The most frames a second an HTML page draws (html-frame.js): {@link #MAX_HZ}; 0 with "Tần số quét cao". */
+    static int pageFps(Context context) {
+        return highRefresh(context) ? 0 : (int) MAX_HZ;
+    }
+
+    private static boolean highRefresh(Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean("high_refresh_rate_mode", false);
+    }
+
+    /** The game's view asks for {@link #MAX_HZ} frames a second too (Android 15's per-view frame rates). */
+    static void view(View view) {
+        if (Build.VERSION.SDK_INT < 35 || view == null || highRefresh(view.getContext())) return;
+        try {
+            view.setRequestedFrameRate(MAX_HZ);
+        } catch (RuntimeException e) {
+            Log.w(TAG, "view frame rate left as it is", e);
+        }
+    }
+
     static void apply(Activity activity) {
         try {
-            if (PreferenceManager.getDefaultSharedPreferences(activity).getBoolean("high_refresh_rate_mode", false)) return;
+            if (highRefresh(activity)) return;
             Display display = activity.getWindowManager().getDefaultDisplay();
             List<Mode> modes = new ArrayList<>();
             for (Display.Mode m : display.getSupportedModes()) modes.add(of(m));
@@ -61,7 +86,9 @@ final class AgvnRefreshCap {
             if (id < 0) return;
             WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
             lp.preferredDisplayModeId = id;
+            lp.preferredRefreshRate = MAX_HZ;
             activity.getWindow().setAttributes(lp);
+            if (Build.VERSION.SDK_INT >= 35) activity.getWindow().setFrameRateBoostOnTouchEnabled(false);
             Log.i(TAG, "screen asked for its 60 Hz mode " + id + " while this game runs");
         } catch (RuntimeException e) {
             Log.w(TAG, "screen mode left as it is", e);

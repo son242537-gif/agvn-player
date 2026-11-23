@@ -4660,3 +4660,44 @@ nhìn bằng cách kéo ngón trên màn.
   5. Đang giữ ▲, chạm ⌨, Sửa, Ẩn, ☰ trên thanh công cụ: nút vẫn ăn. Mở menu ☰ rồi chạm chỗ có phím dưới menu: menu
      nhận.
   6. Game 2D, Ren'Py, HTML "Chạy nhẹ": chạm menu như cũ. Chế độ sửa phím kéo phím như cũ.
+
+## Game HTML nóng máy khi đứng yên: màn vẫn 120 Hz (bản 0.1.107)
+
+Báo cáo ngày 24/11/2026: BLACKBOOK80 (RPG Maker MZ 1.10.0), POCO 2510DPC44G (HyperOS), bản 0.1.102. Để game đứng yên ở
+màn tiêu đề, vỏ máy lên 51°C, CPU 84°C.
+
+- **Số đo:**
+  - WebView và app dùng khoảng 1,4 nhân liên tục.
+  - Chính game chỉ khoảng 4–5% một nhân: 120 lần gọi `requestAnimationFrame` một giây, 60 khung vẽ.
+  - `dumpsys display`: `mActiveRenderFrameRate=120`, `render: (0.0 120.0)`, dù app đã xin chế độ 60 Hz.
+- **Vì sao:**
+  - `AgvnRefreshCap` chỉ xin chế độ 60 Hz (`preferredDisplayModeId`). HyperOS vẫn để tốc độ vẽ tới 120, nên trang game và
+    WebView làm việc 120 lần một giây.
+  - Bộ đếm FPS của app (HUD, kiểm tra game chậm) tự chạy một vòng `requestAnimationFrame` không bao giờ dừng. WebView vì
+    thế làm việc ở mọi lần quét của màn, kể cả trang đứng yên.
+  - Phím ảo mờ (độ mờ là alpha của cả view phủ kín màn) bị Android vẽ qua một lớp đệm to bằng màn hình ở mỗi khung game
+    vẽ. Phím không tự vẽ lại; nhưng mỗi khung của WebView, cả cửa sổ được ghép lại và lớp đệm đó được dựng lại.
+- **Sửa:**
+  - `html-frame.js` (tài sản mới) bọc `requestAnimationFrame` của trang:
+    - Trang được gọi tối đa 60 lần một giây, đúng vào các lần quét của màn, không dồn bù sau một khung chậm.
+    - Màn 60 Hz thì mọi lần quét vẫn đi như cũ. Người chơi bật "Tần số quét cao" thì không giới hạn.
+    - Game RPG Maker MV/MZ, NW.js, Electron: chạy trước script của engine, cùng `html-compat.js`. Trang HTML khác:
+      chạy khi trang tải xong.
+    - Nó đếm khung trang được gọi (`window.__agvnFrame.frames`).
+  - `AgvnHtmlKeys.FPS` đọc số đếm đó, không tự chạy vòng nào nữa. Trang đứng yên thì 0 FPS, mà kiểm tra game chậm coi
+    là màn đứng yên.
+  - `AgvnRefreshCap` xin thêm `preferredRefreshRate = 60`. Từ Android 15: tắt việc chạm làm màn nhảy lên tần số cao
+    (`setFrameRateBoostOnTouchEnabled(false)`), và view WebView xin 60 khung (`setRequestedFrameRate`). Vẫn như cũ khi bật
+    "Tần số quét cao".
+  - `AgvnLightKeys.hasOverlappingRendering()` trả `false`: độ mờ được tính vào từng hình của phím, không vẽ qua lớp đệm
+    to bằng màn. Áp cho mọi game "Chạy nhẹ".
+  - `tools/agvn/tests/html_frame_sim.js` chạy thử ở màn 60, 90, 120 và 144 Hz.
+- **Không đổi:** game vẫn chạy 60 khung như nó được làm ra; tốc độ game không đổi. Màn 60 Hz không khác gì.
+- **Chưa làm:** tuỳ chọn "Giới hạn 30 FPS" cho game HTML (báo cáo đề nghị). Đó là giảm khung, nên chỉ thêm khi anh muốn.
+- **Thử máy (BLACKBOOK80, để yên ở màn tiêu đề 10 giây):**
+  1. HUD hiện khoảng 60 FPS, không phải 120.
+  2. `dumpsys display | grep mActiveRenderFrameRate`: 60 nếu HyperOS nghe theo. Nếu vẫn 120, số đo luồng vẫn phải giảm:
+     `CrRendererMain`, `RenderThread`, `Chrome_InProcGpu` thấp hơn hẳn so với bản 0.1.102.
+  3. Chơi thử: nhân vật đi, nhạc, hiệu ứng đúng tốc độ.
+  4. Bật "Tần số quét cao": HUD lại theo tần số của màn.
+  5. Game Ren'Py, Godot "Chạy nhẹ": phím ảo vẫn mờ như cũ, độ mờ chỉnh được.

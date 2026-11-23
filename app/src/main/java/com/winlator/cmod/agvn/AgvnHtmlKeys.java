@@ -8,12 +8,13 @@ package com.winlator.cmod.agvn;
  */
 final class AgvnHtmlKeys {
     /**
-     * Frames per second since the last call (requestAnimationFrame, which RPG Maker MV/MZ and Tyrano draw on); the
-     * first call starts the counter and gives -1.
+     * Frames per second the page drew since the last call: the frames requestAnimationFrame called it for (RPG Maker
+     * MV/MZ and Tyrano draw on it), counted by html-frame.js; -1 at the first call or before that script runs. It
+     * kept a loop of its own going, which made WebView work at every refresh of the screen even for a still page.
      */
-    static final String FPS = "(function(){var o=window.__agvnFps;if(!o){o=window.__agvnFps={n:0,t:performance.now()};"
-            + "(function f(){o.n++;requestAnimationFrame(f);})();return -1;}var now=performance.now(),"
-            + "v=Math.round(o.n*1000/Math.max(1,now-o.t));o.n=0;o.t=now;return v;})()";
+    static final String FPS = "(function(){var f=window.__agvnFrame;if(!f)return -1;var o=window.__agvnFps,"
+            + "now=performance.now();window.__agvnFps={n:f.frames,t:now};if(!o)return -1;"
+            + "return Math.round((f.frames-o.n)*1000/Math.max(1,now-o.t));})()";
 
     /**
      * Where the player last touched or moved the mouse on the page (window.__agvnPointer), for the right button of an
