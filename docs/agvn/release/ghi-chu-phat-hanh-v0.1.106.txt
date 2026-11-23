@@ -1,0 +1,6 @@
+AGVN Player v0.1.106 - agvn.io
+
+Sửa lỗi:
+- Game "Chạy nhẹ" (Godot, HTML, Ren'Py, RPG Maker): đang giữ một phím ảo (như ▲ để đi) thì ngón chạm vào game không còn bị mất. Giờ vừa đi vừa kéo xoay góc nhìn được, kể cả khi nhấc ngón xoay ra rồi đặt lại.
+- Game Godot: phím ảo gán chuột bấm đúng chỗ vừa chạm trong game.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
