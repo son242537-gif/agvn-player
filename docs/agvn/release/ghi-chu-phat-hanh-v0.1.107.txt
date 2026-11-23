@@ -1,0 +1,6 @@
+AGVN Player v0.1.107 - agvn.io
+
+Sửa lỗi:
+- Game HTML (như RPG Maker MV/MZ) trên máy màn 90, 120 hay 144 Hz không còn vẽ thừa khung: trang game vẽ tối đa 60 khung một giây, đúng tốc độ game được làm ra. Máy mát hơn và đỡ hao pin, nhất là khi để game đứng yên. Ai bật "Bật tần số quét cao" trong Cài đặt thì vẫn như trước.
+- Phím ảo của game "Chạy nhẹ" vẽ nhẹ hơn, đỡ nóng máy, độ mờ vẫn chỉnh được như cũ.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
