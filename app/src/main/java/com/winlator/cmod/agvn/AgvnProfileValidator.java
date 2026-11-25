@@ -40,8 +40,13 @@ public final class AgvnProfileValidator {
             checkFps(p.weakDevice.fpsLimit);
             checkPool(p.weakDevice.texturePool);
         }
-        if (p.controls != null && !AgvnLayouts.isKind(p.controls))
-            throw new AgvnProfileException("Bộ phím (controls) phải là một trong: " + String.join(", ", AgvnLayouts.KINDS) + ": " + p.controls);
+        if (p.controls != null && AgvnProfileControls.isFile(p.controls)) { // the game's own keys (AgvnProfileControls)
+            String problem = AgvnProfileControls.problem(gameDir, p.controls);
+            if (problem != null) throw new AgvnProfileException(problem);
+        } else if (p.controls != null && !AgvnLayouts.isKind(p.controls)) {
+            throw new AgvnProfileException("Bộ phím (controls) phải là một trong: " + String.join(", ", AgvnLayouts.KINDS)
+                    + ", hoặc tên tệp .icp trong thư mục game: " + p.controls);
+        }
         if (!AgvnHtmlGame.isValidRunner(p.runner))
             throw new AgvnProfileException("Cách chạy (runner) phải là html, renpy, rgss, godot hoặc wine: " + p.runner);
         if (!AgvnLocale.isValid(p.locale))

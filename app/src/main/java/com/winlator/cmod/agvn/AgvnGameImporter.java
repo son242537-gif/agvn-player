@@ -166,6 +166,7 @@ public final class AgvnGameImporter {
         LaunchPresetResolver.Effective eff = LaunchPresetResolver.resolve(c.profile, tier, DeviceTierManager.getRules(ctx).preset(tier));
         for (Map.Entry<String, String> e : kept.entrySet()) shortcut.putExtra(e.getKey(), e.getValue());
         applyProfile(shortcut, c, profileCopy, eff);
+        AgvnProfileControls.apply(ctx, shortcut, c.gameDir, c.profile); // the game's own .icp, when it names one
         shortcut.putExtra(EXTRA_TIER, tier.name());
         shortcut.saveData();
         shortcut.genUUID();

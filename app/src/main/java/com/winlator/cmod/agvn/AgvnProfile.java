@@ -55,7 +55,10 @@ public final class AgvnProfile {
     public Map<String, String> dllOverrides = new LinkedHashMap<>();
     /** UE Engine.ini overrides: section -> key -> value. */
     public Map<String, Map<String, String>> ueEngineIni = new LinkedHashMap<>();
-    /** On-screen controls layout: pc, vn, rpg, 2d, action or mouse (see {@link AgvnLayouts}); missing = chosen by engine. */
+    /**
+     * On-screen controls: pc, vn, rpg, 2d, action or mouse (see {@link AgvnLayouts}), or a .icp file in the game folder
+     * ({@link AgvnProfileControls}); missing = chosen by engine.
+     */
     public String controls;
     /** Wine LC_ALL, e.g. "ja_JP"; "" = container default; missing = chosen by engine (see {@link AgvnLocale}). */
     public String locale;

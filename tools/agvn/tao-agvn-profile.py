@@ -17,7 +17,15 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from agvn_profile_lib import CONTROLS, ProfileError, controls_for, detect_engine, resolve_exe, validate  # noqa: E402
+from agvn_profile_lib import (CONTROLS, ProfileError, controls_for, detect_engine, is_controls_file,  # noqa: E402
+                              resolve_exe, validate)
+
+
+def _controls(value):
+    """--controls: one of the app's layouts, or the game's own .icp (checked with the rest of the profile)."""
+    if value in CONTROLS or is_controls_file(value):
+        return value
+    raise argparse.ArgumentTypeError("phải là %s, hoặc tên tệp .icp trong thư mục game" % ", ".join(CONTROLS))
 
 PROFILE = "agvn-profile.json"
 
@@ -70,8 +78,9 @@ def main(argv=None):
     p.add_argument("--pool", type=int, help="texture pool (MB), chỉ cho Unreal")
     p.add_argument("--weak-pool", type=int, help="texture pool máy yếu (MB), chỉ cho Unreal")
     p.add_argument("--no-touch", action="store_true", help="tắt Simulated Touchscreen")
-    p.add_argument("--controls", choices=CONTROLS,
-                   help="bộ phím ảo: pc, vn, rpg, 2d, action, mouse (mặc định: app tự chọn theo engine)")
+    p.add_argument("--controls", type=_controls,
+                   help="bộ phím ảo: pc, vn, rpg, 2d, action, mouse, hoặc tệp .icp trong thư mục game, như"
+                        " phim-ao.icp (mặc định: app tự chọn theo engine)")
     p.add_argument("--force", action="store_true", help="ghi đè profile đang có")
     p.add_argument("--check", action="store_true", help="chỉ kiểm tra profile đang có")
     args = p.parse_args(argv)

@@ -4790,8 +4790,16 @@ Xiaomi 2510DPC44G, Android 16, Proton 9 arm64ec, bản 0.1.102.
     (`AgvnProfileSettings`, `tools/agvn/agvn_profile_lib.py`).
     - App từ 0.1.108 trở về trước từ chối cả hồ sơ có khoá này. Chỉ thêm vào hồ sơ game sau khi bản 0.1.109 phát hành.
     - Game RPG Maker chạy Wine không cần khoá này: đã có mặc định.
-- **Chưa làm:** `controls` của hồ sơ nhận đường dẫn tới tệp `.icp` trong thư mục game (bộ phím riêng của game). Báo cáo
-  ghi không gấp.
+- **Bộ phím riêng của game (cùng báo cáo):** `"controls"` của `agvn-profile.json` nhận thêm tên một tệp `.icp` trong thư
+  mục game, ví dụ `"controls": "phim-ao.icp"` (`AgvnProfileControls`).
+  - Game hành động cần phím chữ (A S D F G, Q W E R T, Z X C) trước phải tự "Nhập bộ phím".
+  - Lúc "Thêm game", tệp thành một bộ phím ảo mang tên game, với số hiệu ngoài vùng 9000–9099 của các bộ AGVN. Game
+    dùng nó như người chơi đã chọn, nên app không tự chọn bộ khác đè lên. Áp cho cả game Windows lẫn "Chạy nhẹ".
+  - Bộ phím ghi nhớ tệp gốc (`agvnSource`): thêm game lại thì cập nhật đúng bộ đó, không tạo thêm. Phím người chơi sửa
+    trong game nằm ở một bản sao riêng, thêm game lại không đụng tới.
+  - Tệp phải nằm trong thư mục game và là bộ phím ảo (JSON có `elements`). Nếu không, hồ sơ bị từ chối với lý do rõ ràng
+    (`AgvnProfileValidator`, `tools/agvn/agvn_profile_lib.py`). `tao-agvn-profile.py --controls phim-ao.icp` ghi được.
+  - App bản 0.1.108 trở về trước từ chối hồ sơ có `controls` là tên tệp.
 - **Thử máy:**
   1. Kim Dung Quần Hiệp Truyện 5 (`runner: wine`): thêm game, bấm Chơi, không chỉnh gì. Chữ AGVN màu vàng, màn tiêu
      đề tông đỏ vàng.
@@ -4799,3 +4807,6 @@ Xiaomi 2510DPC44G, Android 16, Proton 9 arm64ec, bản 0.1.102.
   3. Một game Unity hay KiriKiri: màu như cũ.
   4. Nếu có máy khác (nhất là máy không phải Snapdragon), thử lại bước 1. Nếu máy đó lại đảo màu với `rgba8`, thì lỗi
      nằm ở trình điều khiển, phải sửa ở trình vẽ chứ không theo engine.
+  5. Bộ phím riêng: trong app làm bộ phím có phím chữ, "Xuất" ra `.icp`, chép vào thư mục game, ghi
+     `"controls": "<tên tệp>.icp"` vào `agvn-profile.json`, rồi thêm game. Phím ảo của game là bộ đó. Thêm game lần nữa:
+     không thêm bộ phím trùng tên.

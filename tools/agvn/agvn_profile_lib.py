@@ -4,6 +4,7 @@ Mirrors app/src/main/java/com/winlator/cmod/agvn/GameExeResolver.java and AgvnPr
 Keep both sides in sync; tests/test_toolkit.py and the Java unit tests validate the same example profile.
 Copyright (c) 2026 agvn.io - MIT License.
 """
+import json
 import os
 import re
 
@@ -387,9 +388,17 @@ def clean_name(name):
 
 
 def controls_for(engine, profile=None):
-    """Layout the app picks: the profile's "controls" when set, else by engine (like AgvnLayouts.kindFor)."""
+    """Keys the app gives: the profile's "controls" when set (a layout, or the game's own .icp), else by engine
+    (like AgvnLayouts.kindFor)."""
     chosen = (profile or {}).get("controls")
-    return chosen if chosen in CONTROLS else _ENGINE_CONTROLS.get(engine, "pc")
+    if chosen in CONTROLS or is_controls_file(chosen):
+        return chosen
+    return _ENGINE_CONTROLS.get(engine, "pc")
+
+
+def is_controls_file(controls):
+    """True when "controls" names the game's own .icp (AgvnProfileControls.isFile)."""
+    return isinstance(controls, str) and controls.strip().lower().endswith(".icp")
 
 
 def _check_resolution(res):
@@ -415,6 +424,25 @@ def _check_pool(pool):
         return
     if not isinstance(pool, int) or not 128 <= pool <= 4096:
         raise ProfileError("Texture pool phải từ 128 đến 4096 MB: %s" % pool)
+
+
+def _check_controls_file(game_dir, controls):
+    """Mirrors AgvnProfileControls.problem: a .icp inside the game folder that is a controls profile."""
+    path = controls.strip().replace("\\", "/")
+    if path.startswith("/") or re.match(r"^[A-Za-z]:", path) or ".." in path:
+        raise ProfileError("Tệp bộ phím (controls) phải nằm trong thư mục game: %s" % controls)
+    full = os.path.realpath(os.path.join(game_dir, path))
+    if not full.startswith(os.path.realpath(game_dir) + os.sep):
+        raise ProfileError("Tệp bộ phím (controls) phải nằm trong thư mục game: %s" % controls)
+    if not os.path.isfile(full):
+        raise ProfileError("Không thấy tệp bộ phím (controls): %s" % controls)
+    try:
+        with open(full, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        data = None
+    if not isinstance(data, dict) or not isinstance(data.get("elements"), list):
+        raise ProfileError("Tệp bộ phím (controls) không phải bộ phím ảo (.icp): %s" % controls)
 
 
 def validate(profile, game_dir):
@@ -450,8 +478,11 @@ def validate(profile, game_dir):
         if k == "surfaceFormat" and v not in ("rgba8", "bgra8"):
             raise ProfileError("surfaceFormat phải là rgba8 hoặc bgra8: %s" % v)
     controls = profile.get("controls")
-    if controls is not None and controls not in CONTROLS:
-        raise ProfileError("Bộ phím (controls) phải là một trong: %s: %s" % (", ".join(CONTROLS), controls))
+    if is_controls_file(controls):
+        _check_controls_file(game_dir, controls)  # the game's own keys (AgvnProfileControls)
+    elif controls is not None and controls not in CONTROLS:
+        raise ProfileError("Bộ phím (controls) phải là một trong: %s, hoặc tên tệp .icp trong thư mục game: %s"
+                           % (", ".join(CONTROLS), controls))
     if profile.get("runner") not in (None, "html", "renpy", "rgss", "godot", "wine"):
         raise ProfileError("Cách chạy (runner) phải là html, renpy, rgss, godot hoặc wine: %s" % profile.get("runner"))
     locale = profile.get("locale")

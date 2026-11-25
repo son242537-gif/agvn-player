@@ -37,7 +37,9 @@ Tùy chọn cài thêm (anh tự tải từ trang chính thức, script không t
    - Simulated Touchscreen bật sẵn (tắt bằng `--no-touch`).
    - Bộ phím ảo app tự chọn theo engine: Ren'Py/KiriKiri/Tyrano/Siglus/NScripter → `vn`,
      RPG Maker/Wolf RPG/SRPG Studio → `rpg`, GameMaker/Godot → `2d`, còn lại → `pc`. Game 3D hoặc game chỉ dùng chuột: thêm `--controls action` / `--controls mouse`
-     (ghi vào `"controls"` trong profile).
+     (ghi vào `"controls"` trong profile). Game cần bộ phím riêng (phím chữ A S D F G, Q W E R T...): làm bộ phím trong app,
+     "Xuất" ra tệp `.icp`, chép vào thư mục game rồi thêm `--controls phim-ao.icp`; app nạp bộ phím đó lúc "Thêm game"
+     (từ bản 0.1.109; bản cũ hơn từ chối hồ sơ này).
 6. **Chép lên điện thoại:** `/sdcard/AGVN/<Game>/` (cả thư mục game lẫn `agvn-profile.json`).
 7. Trong app: Thư viện → **+** → chọn game → **Nhập**. Chơi thử 5–15 phút và chạy `do-tai.sh`.
 
