@@ -54,8 +54,9 @@ Still open from `handoff-pc.md`:
 ## Beyond the phases: iOS (saved, not started)
 
 An iOS app for the "Chạy nhẹ" engines (HTML first, then Ren'Py, Godot, mkxp-z, KiriKiri) was planned and set aside on
-2026-11-25, to be started when the maintainer asks. Windows games (Wine, FEX/Box64) cannot run on iOS (no JIT). Plan,
-build and TestFlight steps, decisions still open, minimum iPhone: [`ios/ke-hoach-ios.md`](./ios/ke-hoach-ios.md).
+2026-11-25, to be started when the maintainer asks. Windows games need JIT, so not through TestFlight or the App Store;
+sideloaded with JIT they run, as Madeira (FEX + Wine + DXMT, GPL-3) shows. Plan, build and TestFlight steps, decisions
+still open, minimum iPhone: [`ios/ke-hoach-ios.md`](./ios/ke-hoach-ios.md).
 
 ## Implementation notes (deviations decided during the build)
 

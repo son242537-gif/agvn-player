@@ -6,6 +6,44 @@ khoản Apple Developer Program (99 USD/năm).
 Những điều đánh dấu **(kiểm lại)** là hiểu biết tới giữa 2026, phải xem lại khi bắt đầu, vì Apple và các engine đổi
 nhanh.
 
+## Cập nhật 25/11/2026: Madeira chạy được game Windows trên iPhone
+
+Anh Sơn nhắc tới Madeira (https://github.com/willfaust/Madeira). Mục "game Windows không chạy được" bên dưới sai so với
+hiện nay: ý đó đúng với app phát qua TestFlight và App Store, không đúng với app cài ngoài có JIT.
+
+- **Cách làm của Madeira:**
+  - FEX-Emu dịch mã x86 và x86-64 sang ARM64.
+  - Wine 11 dựng kiểu ARM64EC; game 32-bit chạy qua WoW64.
+  - DXMT vẽ Direct3D 9, 10, 11 bằng Metal; Direct3D 12 do bản riêng của Madeira lo.
+  - Tất cả chạy trong một tiến trình: wineserver là một luồng, vì iOS cấm mở chương trình con.
+- **JIT:** chỉ có khi gắn trình gỡ lỗi, qua StikDebug hoặc trình giúp có sẵn trong app. Trên iOS 27, iPhone tự ghép đôi
+  được, không cần máy tính; trên iOS 26 phải nhập tệp ghép đôi.
+- **Yêu cầu:**
+  - iOS 26 trở lên.
+  - Trang dự án không nói chip tối thiểu, chỉ nói phát triển trên iPhone Pro đời mới. Một số bài viết nói từ iPhone 13
+    Pro (A15).
+- **Phát hành:** chỉ cài ngoài (SideStore, AltStore, Sideloadly...), không lên App Store được vì JIT cần trình gỡ lỗi.
+  Apple ID miễn phí dùng được nhưng phải ký lại mỗi 7 ngày.
+- **Giấy phép:** GPL-3.0-or-later kèm ngoại lệ cho Metal Shader Converter của Apple. Cùng họ GPL với AGVN Android, nên
+  AGVN cho iOS có thể dựa trên Madeira như AGVN Android dựa trên Winlator-Ludashi.
+- **Unity:**
+  - Game Unity bản Windows chạy được, ví dụ Cuphead, Nine Sols, ULTRAKILL theo dự án.
+  - Issue #249 (10/10/2026, bản 0.1.3): game Unity IL2CPP văng ("write to NULL" trong `GameAssembly.dll`), ngay sau dòng
+    `RoGetActivationFactory` không tìm thấy `Windows.System.DispatcherQueue`. Chưa thấy nhà phát triển trả lời. Bản
+    0.2.0 (04/11/2026) có sửa chung về bộ nhớ và JIT; chưa rõ đã hết lỗi này chưa **(kiểm lại)**.
+- **Visual novel:** có chỉnh locale tiếng Nhật (code page 932) theo từng game, cần cho KiriKiri, Wolf RPG...
+- **Hệ quả cho kế hoạch:**
+  - **App TestFlight:** không có JIT (bản TestFlight không có quyền gỡ lỗi `get-task-allow`), nên chỉ chơi được các
+    engine "Chạy nhẹ", như mục 1 bên dưới.
+  - **Game Windows:** phải là bản cài ngoài, ký bằng chứng chỉ phát triển.
+    - Với tài khoản 99 USD: đăng ký UDID của từng máy, tối đa 100 iPhone một năm, mỗi bản dùng được một năm.
+    - Hoặc người chơi tự ký bằng Apple ID miễn phí, ký lại mỗi 7 ngày.
+  - **Hai hướng:**
+    - Hướng 1: làm app TestFlight "Chạy nhẹ" như kế hoạch dưới, game Windows thì giới thiệu Madeira.
+    - Hướng 2: dựng AGVN cho iOS trên Madeira, thêm cái riêng của AGVN (tiếng Việt, thêm game một chạm, hồ sơ game,
+      "Tự sửa lỗi", bàn phím, phím ảo), phát cài ngoài.
+  - Anh chọn khi khởi động lại.
+
 ## 1. Chạy được gì, không chạy được gì
 
 | Loại game | Trên iOS chạy bằng gì | Khả năng |
@@ -15,11 +53,14 @@ nhanh.
 | Godot 4 | Bản iOS của Godot; game GDScript được, game C# thì không | Được |
 | RPG Maker XP/VX/VX Ace | mkxp-z (Ruby) tự dựng cho iOS; dùng lại các script giả hàm Windows của AGVN | Được nhưng vất hơn |
 | KiriKiri | Bộ chạy KiriKiri viết lại (từ mã nguồn mở KiriKiri Z), không có Wine | Chỉ một phần game |
-| Game Windows (Wine + FEX/Box64) | Không | Không làm |
-| Game Unity port sang APK | Không dùng lại được APK; mỗi game phải dựng lại bằng IL2CPP | Chỉ từng game Mono, rất tốn công |
-| Wolf RPG | Chỉ có bản Windows | Không |
+| Game Windows (Wine + FEX) | Không qua TestFlight/App Store; cài ngoài có JIT thì được, như Madeira (xem trên) | Chỉ bản cài ngoài |
+| Game Unity port sang APK | Không dùng lại được APK. Chạy bản Windows qua Madeira, hoặc dựng lại từng game bằng IL2CPP | Bản Windows qua Madeira; IL2CPP có lỗi (#249) |
+| Wolf RPG | Chỉ có bản Windows | Chỉ bản cài ngoài (như game Windows) |
 
-### Vì sao game Windows không chạy được trên iPhone
+### Vì sao game Windows không chạy được qua TestFlight hay App Store
+
+(Lưu 25/11/2026, trước khi biết Madeira. Các ý dưới đúng với app phát qua kho; Madeira vượt được các ý 2–4 và lấy JIT
+bằng trình gỡ lỗi cho bản cài ngoài.)
 
 1. **iOS cấm JIT.** Chỉ WebKit của Apple, và trình duyệt khác ở EU (BrowserEngineKit), được ghi mã mới vào bộ nhớ rồi
    chạy. FEX/Box64 dịch x86 sang ARM lúc chạy, tức là JIT.
