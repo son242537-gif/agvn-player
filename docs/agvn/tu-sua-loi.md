@@ -4764,3 +4764,38 @@ Pro.
   3. "Bỏ qua phim": phim dừng (nhấp chuột hoặc Esc), hoặc app báo không bỏ qua được.
   4. Màn tiêu đề: bàn phím Android không tự bật. Ô nhập tên trong Cài đặt của game: bàn phím tự bật nếu đó là ô nhập
      của Windows hay ô game bật nhập chữ cho nó; nếu không, bấm [⌨] để gõ.
+
+## Game RPG Maker XP/VX/VX Ace chạy bằng Wine bị đảo màu đỏ và xanh dương (bản 0.1.109)
+
+Báo cáo ngày 25/11/2026: Kim Dung Quần Hiệp Truyện 5 (RPG Maker, nhiều Win32API nên phải "Chạy bằng Windows"),
+Xiaomi 2510DPC44G, Android 16, Proton 9 arm64ec, bản 0.1.102.
+
+- **Hiện tượng:**
+  - Đỏ và xanh dương đổi chỗ: chữ AGVN vàng hiện thành xanh dương, da người xanh, áo xanh thành vàng.
+  - Chỉ đúng màu khi người chơi tự vào Cấu hình → Hình ảnh → Định dạng bề mặt = RGBA.
+- **Vì sao chưa chắc:**
+  - Mặc định của container là `bgra8`: X server cấp bộ đệm HAL BGRA (định dạng 5). Thứ tự màu X server báo cho Wine
+    (visual R=0xff0000, B=0x0000ff) khớp với BGRA, và `copyArea1` chép điểm ảnh không đổi gì.
+  - Trình vẽ Vulkan nhập bộ đệm theo định dạng trình điều khiển GPU báo (`importAHBToWinTex`). Vậy đảo màu có thể do
+    trình điều khiển của máy đó, hoặc do đường vẽ mà RGSS dùng (Direct3D 8/9 qua wined3d và OpenGL, rồi qua lớp
+    Vulkan), chưa phân định được khi chưa có nhật ký.
+  - Đã biết chắc một điều: trên máy báo lỗi, `rgba8` cho màu đúng.
+- **Sửa:**
+  - `AgvnSurfaceFormat.defaultFor`, gọi từ `Shortcut.getSurfaceFormat`: game có engine `RPGMAKER` (XP/VX/VX Ace) mà
+    Wine chạy (không phải mkxp-z "Chạy nhẹ") dùng `rgba8` khi chưa ai đặt định dạng.
+    - Áp lúc mở game, nên game đã thêm từ trước cũng được, không cần thêm lại.
+    - Hồ sơ game hay người chơi đặt định dạng thì giữ.
+    - Game khác dùng định dạng của container như cũ.
+  - `agvn-profile.json` nhận `"settings": {"surfaceFormat": "rgba8"}` (hoặc `"bgra8"`), giá trị khác bị từ chối
+    (`AgvnProfileSettings`, `tools/agvn/agvn_profile_lib.py`).
+    - App từ 0.1.108 trở về trước từ chối cả hồ sơ có khoá này. Chỉ thêm vào hồ sơ game sau khi bản 0.1.109 phát hành.
+    - Game RPG Maker chạy Wine không cần khoá này: đã có mặc định.
+- **Chưa làm:** `controls` của hồ sơ nhận đường dẫn tới tệp `.icp` trong thư mục game (bộ phím riêng của game). Báo cáo
+  ghi không gấp.
+- **Thử máy:**
+  1. Kim Dung Quần Hiệp Truyện 5 (`runner: wine`): thêm game, bấm Chơi, không chỉnh gì. Chữ AGVN màu vàng, màn tiêu
+     đề tông đỏ vàng.
+  2. Một game RPG Maker XP/VX/VX Ace "Chạy nhẹ" (mkxp-z): như cũ.
+  3. Một game Unity hay KiriKiri: màu như cũ.
+  4. Nếu có máy khác (nhất là máy không phải Snapdragon), thử lại bước 1. Nếu máy đó lại đảo màu với `rgba8`, thì lỗi
+     nằm ở trình điều khiển, phải sửa ở trình vẽ chứ không theo engine.

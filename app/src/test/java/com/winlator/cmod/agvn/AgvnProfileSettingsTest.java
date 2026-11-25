@@ -19,6 +19,33 @@ public class AgvnProfileSettingsTest {
     @Rule public TemporaryFolder tmp = new TemporaryFolder();
 
     @Test
+    public void aProfileGivesTheSurfaceFormatRgbaOrBgraOnly() throws Exception {
+        AgvnProfile p = AgvnProfile.defaultFor("Game");
+        p.settings = new LinkedHashMap<>();
+        p.settings.put("surfaceFormat", "rgba8");
+        AgvnProfileSettings.validate(p);
+        p.settings.put("surfaceFormat", "bgra8");
+        AgvnProfileSettings.validate(p);
+        p.settings.put("surfaceFormat", "rgb565");
+        try {
+            AgvnProfileSettings.validate(p);
+            fail("not a surface format the app has");
+        } catch (AgvnProfileException expected) {}
+    }
+
+    @Test
+    public void anRpgMakerGameInWineStartsInRgba() {
+        // Kim Dung Quần Hiệp Truyện 5 (RPG Maker, "Chạy bằng Windows"): red and blue swapped in bgra8
+        assertEquals("rgba8", AgvnSurfaceFormat.defaultFor("RPGMAKER", null));
+        assertEquals("rgba8", AgvnSurfaceFormat.defaultFor("RPGMAKER", AgvnHtmlGame.RUNNER_WINE));
+        assertNull("mkxp-z draws it: no X server", AgvnSurfaceFormat.defaultFor("RPGMAKER", AgvnHtmlGame.RUNNER_RGSS));
+        assertNull("every other game keeps the container's", AgvnSurfaceFormat.defaultFor("UNITY", null));
+        assertNull(AgvnSurfaceFormat.defaultFor("RPGMAKER_MV", null));
+        assertNull(AgvnSurfaceFormat.defaultFor("WOLFRPG", null));
+        assertNull("a game added before the engine was kept", AgvnSurfaceFormat.defaultFor(null, null));
+    }
+
+    @Test
     public void onlyGameSettingsAreAllowed() throws Exception {
         AgvnProfile p = AgvnProfile.defaultFor("Game");
         p.settings = new LinkedHashMap<>();

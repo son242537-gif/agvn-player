@@ -22,7 +22,7 @@ import java.util.Map;
 public final class AgvnProfileSettings {
     /** Shortcut extras a profile may set; mirrored in tools/agvn/agvn_profile_lib.py (SETTINGS). */
     static final List<String> KEYS = Arrays.asList("dxwrapper", "dxwrapperConfig", "wincomponents", "audioDriver",
-            "emulator", "box64Preset", "fexcorePreset", "fullscreenStretched");
+            "emulator", "box64Preset", "fexcorePreset", "fullscreenStretched", "surfaceFormat");
     private static final int MAX_VALUE = 400;
 
     private AgvnProfileSettings() {}
@@ -34,6 +34,8 @@ public final class AgvnProfileSettings {
             if (!KEYS.contains(e.getKey()) || v == null || v.length() > MAX_VALUE || !AgvnProfileValidator.SAFE_VALUE.matcher(v).matches())
                 throw new AgvnProfileException("Cài đặt (settings) không được phép: " + e.getKey()
                         + " (chỉ dùng: " + String.join(", ", KEYS) + ")");
+            if (e.getKey().equals("surfaceFormat") && !AgvnSurfaceFormat.isValid(v))
+                throw new AgvnProfileException("surfaceFormat phải là rgba8 hoặc bgra8: " + v);
         }
     }
 

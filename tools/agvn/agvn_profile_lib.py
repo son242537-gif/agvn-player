@@ -11,7 +11,7 @@ SAFE_VALUE = re.compile(r"^[A-Za-z0-9_\-=./:,+]*$")
 ENV_KEY = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 # Mirrors AgvnProfileSettings.KEYS: the game settings a profile may give, whatever the phone.
 SETTINGS = ("dxwrapper", "dxwrapperConfig", "wincomponents", "audioDriver", "emulator", "box64Preset", "fexcorePreset",
-            "fullscreenStretched")
+            "fullscreenStretched", "surfaceFormat")
 RESOLUTION = re.compile(r"^(\d{3,4})x(\d{3,4})$")
 INI_SECTION = re.compile(r"^(/Script/[A-Za-z0-9_.]+|SystemSettings|ConsoleVariables|TextureStreaming)$")
 INI_KEY = re.compile(r"^[A-Za-z0-9_.]+$")
@@ -447,6 +447,8 @@ def validate(profile, game_dir):
     for k, v in (profile.get("settings") or {}).items():
         if k not in SETTINGS or not isinstance(v, str) or len(v) > 400 or not SAFE_VALUE.match(v):
             raise ProfileError("Cài đặt (settings) không được phép: %s (chỉ dùng: %s)" % (k, ", ".join(SETTINGS)))
+        if k == "surfaceFormat" and v not in ("rgba8", "bgra8"):
+            raise ProfileError("surfaceFormat phải là rgba8 hoặc bgra8: %s" % v)
     controls = profile.get("controls")
     if controls is not None and controls not in CONTROLS:
         raise ProfileError("Bộ phím (controls) phải là một trong: %s: %s" % (", ".join(CONTROLS), controls))

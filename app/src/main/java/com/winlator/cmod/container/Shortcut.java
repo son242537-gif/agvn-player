@@ -304,6 +304,10 @@ public class Shortcut {
     public String getSurfaceFormat() {
         String v = getExtra("surfaceFormat", null);
         if (v == null || v.isEmpty()) v = getLegacyDisplayXValue("surfaceFormat");
+        if (v == null || v.isEmpty()) { // AGVN: an RPG Maker XP/VX/VX Ace game in Wine draws right in rgba8
+            v = com.winlator.cmod.agvn.AgvnSurfaceFormat.defaultFor(getExtra(com.winlator.cmod.agvn.AgvnGameImporter.EXTRA_ENGINE, null),
+                    getExtra(com.winlator.cmod.agvn.AgvnHtmlGame.EXTRA_RUNNER, null));
+        }
         if (v == null || v.isEmpty()) {
             boolean overridesRenderer = getExtra("rendererNative", null) != null
                     || getExtra("useDisplayX", null) != null
