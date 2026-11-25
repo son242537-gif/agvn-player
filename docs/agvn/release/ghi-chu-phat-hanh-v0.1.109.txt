@@ -1,0 +1,8 @@
+AGVN Player v0.1.109 - agvn.io
+
+Sửa lỗi:
+- Game RPG Maker XP, VX, VX Ace chạy bằng Windows không còn bị đảo màu đỏ và xanh dương: app tự chọn định dạng bề mặt RGBA cho các game này, người chơi không phải tự chỉnh nữa. Ai đã tự chọn định dạng khác thì vẫn giữ.
+
+Mới:
+- Dành cho người làm game: agvn-profile.json có thể đặt định dạng bề mặt ("surfaceFormat") và nạp bộ phím ảo riêng của game, là tệp .icp trong thư mục game ("controls": "phim-ao.icp"). Bộ phím đó được nạp lúc thêm game, không phải tự nhập nữa.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
