@@ -51,6 +51,12 @@ Still open from `handoff-pc.md`:
 
 ---
 
+## Beyond the phases: iOS (saved, not started)
+
+An iOS app for the "Chạy nhẹ" engines (HTML first, then Ren'Py, Godot, mkxp-z, KiriKiri) was planned and set aside on
+2026-11-25, to be started when the maintainer asks. Windows games (Wine, FEX/Box64) cannot run on iOS (no JIT). Plan,
+build and TestFlight steps, decisions still open, minimum iPhone: [`ios/ke-hoach-ios.md`](./ios/ke-hoach-ios.md).
+
 ## Implementation notes (deviations decided during the build)
 
 - P2: a missing `keystore.properties` does not fail the default release build (cloud/test builds are debug-signed with a warning); `-PagvnRequireReleaseSigning=true` makes it fatal for real releases.
