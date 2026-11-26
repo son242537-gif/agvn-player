@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -35,8 +36,9 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * One-tap support bundle: /sdcard/Download/AGVN-nhat-ky-yyyyMMdd-HHmm.zip with device info, logcat,
- * the last crash, the two newest app log files and the newest game sessions ({@link #newestSessions}): the export the
- * crash prompt makes had no game in it, though the app had closed while one played (OPPO PLE110, 16/10/2026).
+ * the last crash, the two newest app log files, the newest game sessions ({@link #newestSessions}) and the last
+ * "Chạy nhẹ" run ({@link #lightRun}): the export the crash prompt makes had no game in it, though the app had closed
+ * while one played (OPPO PLE110, 16/10/2026).
  * Never includes API keys or full preference dumps.
  */
 public final class DiagnosticsExporter {
@@ -93,8 +95,29 @@ public final class DiagnosticsExporter {
                 String at = "phien/" + session.getParentFile().getName() + "/" + session.getName() + "/";
                 if (files != null) for (File f : files) putFile(out, at + f.getName(), f);
             }
+            lightRun(ctx, out);
         }
         return zip;
+    }
+
+    /**
+     * The last "Chạy nhẹ" run as {@link AgvnLightSession} keeps it ("chay-nhe.txt": runner, game, whether its first
+     * screen came up, its error) and, for Ren'Py, the logs it wrote ("renpy/"). Such a run leaves no session folder
+     * unless it crashed: Summer Time Saga's "No module named 'saga'" was only in logcat (26/11/2026).
+     */
+    private static void lightRun(Context ctx, ZipOutputStream out) throws IOException {
+        File now = new File(ctx.getFilesDir(), AgvnLightSession.FILE);
+        File run = now.isFile() ? now : AgvnLightSession.lastFile(ctx);
+        if (!run.isFile()) return;
+        putFile(out, AgvnLiveLogs.LIGHT, run);
+        Properties p = AgvnPropsFile.load(run);
+        String dir = p.getProperty(AgvnLightSession.GAME_DIR);
+        if (dir == null || !AgvnHtmlGame.RUNNER_RENPY.equals(p.getProperty(AgvnLightSession.RUNNER))) return;
+        File logs = AgvnRenpyGame.publicDir(new File(SettingsFragment.DEFAULT_WINLATOR_PATH), new File(dir));
+        for (String name : new String[]{"log.txt", "traceback.txt", "errors.txt", "faulthandler.txt"}) {
+            File f = new File(logs, name);
+            if (f.isFile() && f.length() > 0) putFile(out, AgvnLiveLogs.RENPY + "/" + name, f);
+        }
     }
 
     /**

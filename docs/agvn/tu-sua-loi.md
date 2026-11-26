@@ -4810,3 +4810,37 @@ Xiaomi 2510DPC44G, Android 16, Proton 9 arm64ec, bản 0.1.102.
   5. Bộ phím riêng: trong app làm bộ phím có phím chữ, "Xuất" ra `.icp`, chép vào thư mục game, ghi
      `"controls": "<tên tệp>.icp"` vào `agvn-profile.json`, rồi thêm game. Phím ảo của game là bộ đó. Thêm game lần nữa:
      không thêm bộ phím trùng tên.
+
+## "Chạy nhẹ" Ren'Py: game dừng trước màn hình đầu thì văng về thư viện, không báo gì (sau bản 0.1.109)
+
+Báo cáo ngày 26/11/2026: Summer Time Saga (bản Việt hoá), Xiaomi 23078PND5G (Dimensity 9200+, Mali-G715), Android 13,
+bản 0.1.109. Bấm Chơi ba lần, lần nào cũng văng ngay.
+
+- **Nhật ký:** Ren'Py nạp script thì lỗi ở `game/src/+config.rpy` dòng 2:
+  `ModuleNotFoundError: No module named 'saga'`.
+  - Ren'Py 8.5.3 của "Chạy nhẹ" chỉ nhập được module Python dạng mã nguồn `.py` trong `game/`,
+    `game/python-packages/` và gói `.rpa`, hoặc từ thư mục game. Gói `saga` của game không ở dạng đó: có thể là thư
+    viện biên dịch cho Windows, `.pyc` của Python khác, hay nằm trong `lib/` của bản Windows. Chưa biết chắc khi chưa
+    xem thư mục game.
+  - Bản Windows có Python riêng của game nên chạy được.
+- **Lỗi của app:**
+  - `AgvnRenpyActivity.finish()` đã có hộp thoại "Game chưa mở được" kèm nút "Chạy bằng Windows".
+  - Nhưng Ren'Py trên Android kết thúc bằng `finishAndRemoveTask()` rồi `System.exit(0)` ngay sau đó
+    (`renpy/bootstrap.py`). Tiến trình tắt khi hộp thoại vừa bắt đầu dựng (4 ms sau trong logcat), nên người chơi không
+    thấy gì.
+  - Phiên lại ghi là "đã báo" (`AgvnLightSession.shown`), nên "Tự sửa lỗi" ở thư viện cũng im.
+- **Sửa:**
+  - `AgvnRenpyActivity.finishAndRemoveTask`: trước màn hình đầu, luồng của Ren'Py đứng chờ ở đây. Hai nút của hộp thoại
+    ("Đóng", "Chạy bằng Windows") kết thúc tiến trình như trước.
+  - Hộp thoại ghi thêm dòng lỗi của `traceback.txt` lần chạy này (`AgvnRenpyGame.errorSince`). Phiên cũng ghi dòng lỗi
+    đó thay cho câu chung.
+  - "Xuất nhật ký lỗi" (gói chung ở Cài đặt) nay có lần chạy "Chạy nhẹ" gần nhất (`chay-nhe.txt`) và nhật ký
+    Ren'Py của nó (`renpy/log.txt`, `traceback.txt`...). Trước đây dòng lỗi chỉ nằm trong logcat.
+- **Thử máy:**
+  1. Một game Ren'Py 8 có lỗi khi nạp script (ví dụ thêm `init python early: import khong_co_module_nay` vào một
+     `.rpy` của game thử): bấm Chơi. Hộp thoại "Game chưa mở được" hiện, có dòng
+     `ModuleNotFoundError: No module named 'khong_co_module_nay'`. Bấm "Chạy bằng Windows": game mở bằng Wine. Lần
+     sau bấm Chơi thì game vẫn chạy bằng Windows.
+  2. Bấm "Đóng": về thư viện, "Tự sửa lỗi" không hỏi lại.
+  3. Một game Ren'Py 8 bình thường: mở, chơi, thoát game như cũ. Không có hộp thoại, không bị treo khi thoát.
+  4. "Xuất nhật ký lỗi" ở Cài đặt sau bước 1: gói có `chay-nhe.txt` và `renpy/traceback.txt`.

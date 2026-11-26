@@ -107,6 +107,16 @@ public final class AgvnRenpyGame {
     }
 
     /**
+     * The error of the traceback.txt Ren'Py wrote in {@code publicDir} ({@link #publicDir}) since {@code sinceMs}
+     * ("ModuleNotFoundError: No module named 'saga'"), or null when it wrote none then.
+     */
+    static String errorSince(File publicDir, long sinceMs) {
+        File traceback = new File(publicDir, "traceback.txt");
+        if (!traceback.isFile() || traceback.lastModified() < sinceMs - AgvnEngineLogs.OLD_SLACK_MS) return null;
+        return AgvnCrashScan.renpyError(FileUtils.readString(traceback));
+    }
+
+    /**
      * The engine's environment: librenpython.so and Ren'Py read the ANDROID_* ones, AGVN's main.py the AGVN_RENPY_* ones.
      * Ren'Py saves in the first of OLD_PUBLIC/game/saves, PRIVATE/saves and PUBLIC/saves that is a writable folder,
      * so with game/saves made beforehand the saves stay in the game folder, where a PC and "Chạy bằng Windows" keep

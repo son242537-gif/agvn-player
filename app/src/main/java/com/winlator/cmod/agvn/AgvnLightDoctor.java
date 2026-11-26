@@ -13,9 +13,6 @@ import com.winlator.cmod.container.Shortcut;
 import com.winlator.cmod.core.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -126,14 +123,8 @@ public final class AgvnLightDoctor {
     private static String renpyError(Properties p, long start) {
         if (!AgvnHtmlGame.RUNNER_RENPY.equals(p.getProperty(AgvnLightSession.RUNNER))) return null;
         String dir = p.getProperty(AgvnLightSession.GAME_DIR);
-        File traceback = new File(AgvnRenpyGame.publicDir(new File(SettingsFragment.DEFAULT_WINLATOR_PATH),
-                dir != null ? new File(dir) : null), "traceback.txt");
-        if (!traceback.isFile() || traceback.lastModified() < start - AgvnEngineLogs.OLD_SLACK_MS) return null;
-        try {
-            return AgvnCrashScan.renpyError(new String(Files.readAllBytes(traceback.toPath()), StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            return null;
-        }
+        return AgvnRenpyGame.errorSince(AgvnRenpyGame.publicDir(new File(SettingsFragment.DEFAULT_WINLATOR_PATH),
+                dir != null ? new File(dir) : null), start);
     }
 
     /** True while the runner's process (pid, name) still lives: an HTML game in this very process is alive too. */

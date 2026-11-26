@@ -3,6 +3,7 @@ package com.winlator.cmod.agvn;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Rule;
@@ -139,5 +140,23 @@ public class AgvnRenpyGameTest {
                 AgvnLightRecheck.runner("", "RENPY", null, game("r7", "lib/py2-windows-x86_64/")));
         assertEquals("", AgvnLightRecheck.runner("", "UNITY", null, later));
         assertEquals("", AgvnLightRecheck.runner("", "RENPY", null, null));
+    }
+
+    /** The dialog of a game that stops before its first screen names the error of this run's traceback.txt. */
+    @Test
+    public void theErrorOfThisRunsTracebackOnly() throws Exception {
+        File logs = tmp.newFolder("renpy-logs");
+        File traceback = new File(logs, "traceback.txt");
+        assertNull("no traceback", AgvnRenpyGame.errorSince(logs, 0));
+        String text = "I'm sorry, but an uncaught exception occurred.\n\nWhile loading the script.\n"
+                + "  File \"game/src/+config.rpy\", line 1, in <module>\n"
+                + "ModuleNotFoundError: No module named 'saga'\n\n-- Full Traceback ------\n\nFull traceback:\n"
+                + "  File \"renpy/bootstrap.py\", line 401, in bootstrap\nModuleNotFoundError: No module named 'saga'\n";
+        Files.write(traceback.toPath(), text.getBytes(StandardCharsets.UTF_8));
+        long now = System.currentTimeMillis();
+        assertTrue(traceback.setLastModified(now));
+        assertEquals("ModuleNotFoundError: No module named 'saga'", AgvnRenpyGame.errorSince(logs, now - 1000));
+        assertTrue(traceback.setLastModified(now - 60_000));
+        assertNull("a run before's", AgvnRenpyGame.errorSince(logs, now));
     }
 }

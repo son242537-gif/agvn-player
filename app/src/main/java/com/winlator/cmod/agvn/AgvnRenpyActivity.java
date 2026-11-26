@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Looper;
 import android.os.Process;
 import android.util.Log;
 import android.util.TypedValue;
@@ -53,9 +54,12 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
     /** True once Ren'Py shows its first screen; before that Back just leaves (a dialog then would stop Ren'Py). */
     private volatile boolean started;
     private volatile boolean failed;
+    /** When this run began: a traceback.txt older than this is a run before's. */
+    private long startMs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        startMs = System.currentTimeMillis();
         String dir = getIntent().getStringExtra(EXTRA_GAME_DIR);
         gameDir = dir != null ? new File(dir) : null;
         publicDir = AgvnRenpyGame.publicDir(new File(SettingsFragment.DEFAULT_WINLATOR_PATH), gameDir);
@@ -202,17 +206,41 @@ public class AgvnRenpyActivity extends PythonSDLActivity {
             return;
         }
         failed = true;
-        AgvnLightSession.shown(this, "Ren'Py stopped before its first screen"); // this dialog offers the fixes
+        String error = AgvnRenpyGame.errorSince(publicDir, startMs); // "ModuleNotFoundError: No module named 'saga'"
+        // the dialog offers the fixes: nothing for the doctor to ask again
+        AgvnLightSession.shown(this, error != null ? error : "Ren'Py stopped before its first screen");
         boolean windows = AgvnHtmlGame.hasWindowsExe(this);
+        String message = getString(R.string.agvn_renpy_failed_message, new File(publicDir, "traceback.txt").getPath())
+                + (error != null ? "\n\n" + error : "");
         runOnUiThread(() -> {
             AlertDialog.Builder b = new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
                     .setTitle(R.string.agvn_renpy_failed_title)
-                    .setMessage(getString(R.string.agvn_renpy_failed_message, new File(publicDir, "traceback.txt").getPath()))
+                    .setMessage(message)
                     .setNegativeButton(R.string.agvn_close, (d, w) -> end())
                     .setCancelable(false);
             if (windows) b.setPositiveButton(R.string.agvn_html_use_windows, (d, w) -> switchToWindows());
             b.show();
         });
+    }
+
+    /**
+     * Ren'Py's last call, on its own thread, with System.exit(0) right after it (renpy/bootstrap.py). Before the first
+     * screen, finish() has just put up its dialog, which the exit took away unseen: Summer Time Saga stopped on an
+     * error in its scripts and went back to the library three times without a word, the doctor silent too as the
+     * session said the dialog was shown (Xiaomi 23078PND5G, 0.1.109, 26/11/2026). That thread now waits here, and the
+     * dialog's buttons end the process.
+     */
+    @Override
+    public void finishAndRemoveTask() {
+        super.finishAndRemoveTask();
+        if (!failed || Looper.myLooper() == Looper.getMainLooper()) return;
+        while (true) {
+            try {
+                Thread.sleep(60_000);
+            } catch (InterruptedException e) {
+                return;
+            }
+        }
     }
 
     /** Ends this process: SDL and Python cannot start twice in one process, and the app's screens live elsewhere. */
