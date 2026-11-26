@@ -1,0 +1,6 @@
+AGVN Player v0.1.110 - agvn.io
+
+Sửa lỗi:
+- Game Ren'Py chạy bằng "Chạy nhẹ" mà dừng ngay lúc mở (ví dụ Summer Time Saga) không còn văng thẳng về thư viện mà không báo gì: app hiện hộp thoại "Game chưa mở được" kèm dòng lỗi của game và nút "Chạy bằng Windows". Chọn Windows thì những lần sau game vẫn chạy bằng Windows.
+- "Xuất nhật ký lỗi" trong Cài đặt nay gửi kèm nhật ký của lần chạy "Chạy nhẹ" gần nhất, để AGVN biết vì sao game dừng.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
