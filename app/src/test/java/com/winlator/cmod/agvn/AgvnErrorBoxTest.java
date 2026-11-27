@@ -192,6 +192,22 @@ public class AgvnErrorBoxTest {
     }
 
     @Test
+    public void freedrenoThatCannotOpenTheGpuIsToldFromZink() {
+        // Kim Dung Quần Hiệp Truyện 5 (RPG Maker in Wine, OpenGL), Adreno 825 with Turnip, 27/11/2026: closed in 9 s
+        java.util.List<String> kimDung = Arrays.asList("MESA-LOADER: failed to retrieve device information",
+                "glx: failed to create dri3 screen", "failed to load driver: kgsl",
+                "glx: failed to create drisw screen", "X Error:  BadImplementation", "X Error:  GLXBadContext");
+        assertTrue(AgvnOpenGlCheck.freedrenoFailed(kimDung));
+        assertFalse("not Zink's failure: WineD3D stays offered", AgvnOpenGlCheck.zinkFailed(kimDung));
+        assertFalse(AgvnOpenGlCheck.freedrenoFailed(Collections.singletonList("failed to load driver: zink")));
+        AgvnEvidence ev = new AgvnEvidence();
+        ev.lines.addAll(kimDung);
+        ev.endedByGame = true;
+        ev.seconds = 9;
+        assertTrue("it failed at once: started again with Zink", ev.endedEarly());
+    }
+
+    @Test
     public void anOrdinaryBoxSaysNothing() {
         AgvnEvidence ev = box("UNITY", "Do you want to save your game before quitting?");
         ev.endedByGame = false;

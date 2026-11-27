@@ -1334,6 +1334,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
         guestProgramLauncherComponent.setEnvVars(envVars);
         com.winlator.cmod.agvn.AgvnGameTwin.prepareNote(this, shortcut); // AGVN: the same game's other entry, for the log
         if (shortcut != null) com.winlator.cmod.agvn.AgvnSessionLog.start(shortcut, envVars); // AGVN: logs of this play session
+        com.winlator.cmod.agvn.AgvnOpenGlCheck.noteAtStart(this, graphicsDriver); // AGVN: why OpenGL goes through Zink
         if (shortcut != null && debugDialog != null) com.winlator.cmod.agvn.AgvnSessionLog.addLog(debugDialog.getLogFile()); // AGVN: and Wine's own log
         if (shortcut != null) agvnStartup = com.winlator.cmod.agvn.AgvnStartupProgress.start(this, shortcut, agvnStatus); // AGVN: a slow start shows how it goes
         guestProgramLauncherComponent.setTerminationCallback((status) -> {
@@ -2599,7 +2600,7 @@ public class XServerDisplayActivity extends AppCompatActivity {
     }
 
     private String getSelectedOpenGLDriver() {
-        return "freedreno".equalsIgnoreCase(graphicsDriver) ? "freedreno" : "zink";
+        return com.winlator.cmod.agvn.AgvnOpenGlCheck.openGl(this, graphicsDriver); // AGVN: Zink where freedreno failed
     }
 
     private void extractOpenGLDriver(File rootDir) {

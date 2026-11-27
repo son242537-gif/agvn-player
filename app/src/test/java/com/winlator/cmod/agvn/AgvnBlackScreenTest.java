@@ -190,12 +190,12 @@ public class AgvnBlackScreenTest {
     public void theLargerScreenOffered() {
         int[] full = {0, 0, 854, 480};
         // a KiriKiri game: a screen larger than it (AgvnKirikiriScreen), also when it is taller or of its size
-        assertEquals("1280x1024", AgvnBlackScreenRules.bigger("854x480", "1280x720", full, false));
-        assertEquals("1024x768", AgvnBlackScreenRules.bigger("960x544", "800x600", new int[]{0, 0, 960, 544}, false));
+        assertEquals("1400x784", AgvnBlackScreenRules.bigger("854x480", "1280x720", full, false));
+        assertEquals("1176x664", AgvnBlackScreenRules.bigger("960x544", "800x600", new int[]{0, 0, 960, 544}, false));
         int[] hd720 = {0, 0, 1280, 720};
-        assertEquals("1280x1024", AgvnBlackScreenRules.bigger("1280x720", "1280x720", hd720, false));
+        assertEquals("1400x784", AgvnBlackScreenRules.bigger("1280x720", "1280x720", hd720, false));
         // its size not read: KAG3 went full screen, so it is no smaller than the screen
-        assertEquals("1280x1024", AgvnBlackScreenRules.bigger("1280x720", "-", hd720, false));
+        assertEquals("1400x784", AgvnBlackScreenRules.bigger("1280x720", "-", hd720, false));
         assertEquals("1288x770", AgvnBlackScreenRules.bigger("1280x720", "-", new int[]{-4, -24, 1288, 769}, false));
         assertNull("a larger screen already", AgvnBlackScreenRules.bigger("1280x1024", "1280x720", hd720, false));
         // a window the screen cuts off: its own size
@@ -204,7 +204,7 @@ public class AgvnBlackScreenTest {
         // a maximized window's frame past the edges is no reason for a screen its size: the next one
         assertEquals("1280x720", AgvnBlackScreenRules.bigger("960x544", null, new int[]{-6, -6, 972, 556}, true));
         int[] hd = {0, 0, 1280, 720};
-        assertEquals("1280x1024", AgvnBlackScreenRules.bigger("1280x720", "1280x720", hd, true));
+        assertEquals("1400x784", AgvnBlackScreenRules.bigger("1280x720", "1280x720", hd, true));
         assertEquals("1600x900", AgvnBlackScreenRules.bigger("1280x800", null, null, true));
         assertEquals("1920x1080", AgvnBlackScreenRules.bigger("1600x900", null, null, true));
         int[] fullHd = {0, 0, 1920, 1080};

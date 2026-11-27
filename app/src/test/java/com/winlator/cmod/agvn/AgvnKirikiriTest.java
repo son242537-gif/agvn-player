@@ -127,14 +127,20 @@ public class AgvnKirikiriTest {
     @Test
     public void theScreenIsLargerThanTheGame() {
         // KAG3 goes full screen, and hangs black in Wine, when the screen is not larger than the game: an equal one too
-        assertEquals("1280x1024", AgvnKirikiriScreen.larger("1280x720", "1280x720")); // 0.1.20 hung on 1280x720
-        assertEquals("1280x1024", AgvnKirikiriScreen.larger("854x480", "1280x720"));
-        assertEquals("1280x1024", AgvnKirikiriScreen.larger("960x544", "1280x960"));
-        assertEquals("1024x768", AgvnKirikiriScreen.larger("960x544", "800x600")); // too low
-        assertEquals("1280x1024", AgvnKirikiriScreen.larger("1024x768", "1024x768"));
-        assertEquals("1600x1200", AgvnKirikiriScreen.larger("1600x900", "1600x900"));
-        assertEquals("1920x1440", AgvnKirikiriScreen.larger("1280x720", "1920x1080"));
+        // grown in proportion: the shape chosen stays, with room for the window's bars (64 px) and sides of 8 px steps
+        assertEquals("1400x784", AgvnKirikiriScreen.larger("1280x720", "1280x720")); // 0.1.20 hung on 1280x720
+        assertEquals("2040x1144", AgvnKirikiriScreen.larger("1920x1080", "1920x1080")); // was 1920x1440 (27/11/2026)
+        assertEquals("1400x784", AgvnKirikiriScreen.larger("854x480", "1280x720"));
+        assertEquals("1808x1024", AgvnKirikiriScreen.larger("960x544", "1280x960"));
+        assertEquals("1176x664", AgvnKirikiriScreen.larger("960x544", "800x600")); // too low
+        assertEquals("1112x832", AgvnKirikiriScreen.larger("1024x768", "1024x768"));
+        assertEquals("1720x968", AgvnKirikiriScreen.larger("1600x900", "1600x900"));
+        assertEquals("2040x1144", AgvnKirikiriScreen.larger("1280x720", "1920x1080"));
+        assertEquals("1280x960", AgvnKirikiriScreen.larger("800x600", "1280x720")); // 4:3 chosen, 4:3 kept
+        // a screen whose size is not known: the first taller one that holds the game, else one of its size
+        assertEquals("1280x1024", AgvnKirikiriScreen.larger(null, "1280x720"));
         assertEquals("1024x2564", AgvnKirikiriScreen.larger(null, "1023x2500")); // none listed: even, with room for the bars
+        assertEquals("1024x2564", AgvnKirikiriScreen.larger("2000x1000", "1023x2500")); // grown past 4096: not that
         // a screen larger in one direction and not smaller in the other stays: the game keeps its window
         assertEquals("1280x720", AgvnKirikiriScreen.larger("1280x720", "800x600")); // a small frame: "Vừa màn hình"
         assertEquals("1600x900", AgvnKirikiriScreen.larger("1600x900", "1280x720")); // the player's larger screen

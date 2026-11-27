@@ -4844,3 +4844,44 @@ bản 0.1.109. Bấm Chơi ba lần, lần nào cũng văng ngay.
   2. Bấm "Đóng": về thư viện, "Tự sửa lỗi" không hỏi lại.
   3. Một game Ren'Py 8 bình thường: mở, chơi, thoát game như cũ. Không có hộp thoại, không bị treo khi thoát.
   4. "Xuất nhật ký lỗi" ở Cài đặt sau bước 1: gói có `chay-nhe.txt` và `renpy/traceback.txt`.
+
+## KiriKiri: chọn độ phân giải bằng khổ game thì bị đổi sang 4:3, game không phủ màn (sau bản 0.1.110)
+
+Báo cáo ngày 27/11/2026: một game KiriKiri khổ 1920x1080, máy POCO màn 2510x1156, Proton 9 arm64ec.
+
+- **Hiện tượng:** chọn "1920x1080 (16:9)" hay gõ 1920x1080 thì lệnh chạy vẫn là `/desktop=shell,1920x1440`. Cấu hình mở lại
+  cũng thấy 1920x1440. Màn ảo 4:3 trên máy màn dài nên game 16:9 chỉ chiếm khoảng 60 % bề ngang.
+- **Vì sao app đổi:** KAG3 tự vào toàn màn hình khi màn không lớn hơn game, kể cả bằng game, và toàn màn hình của nó
+  treo đen trong Wine (bản 0.1.20). `AgvnKirikiriScreen.larger` nên cấp màn lớn hơn game, nhưng lấy từ danh sách khổ 4:3
+  (`TALLER`).
+- **Sửa:** màn được nới theo đúng tỉ lệ của màn đã chọn, đến khi chứa được game và thanh tiêu đề, thanh menu
+  (`FRAME_ROOM` 64 px). Mỗi cạnh làm tròn lên bội số 8. Ví dụ: 1920x1080 cho game 1920x1080 thành 2040x1144; 1280x720 cho
+  game 1280x720 thành 1400x784; 800x600 (4:3) vẫn giữ 4:3, thành 1280x960 cho game 1280x720. Danh sách 4:3 chỉ còn dùng
+  khi không đọc được màn đang chọn.
+  - Game đã thêm từ trước, có màn lớn hơn game rồi (ví dụ 1280x1024), giữ nguyên màn đó.
+- **Thử máy:**
+  1. Game KiriKiri khổ 1920x1080: Cấu hình → Hình ảnh → 1920x1080, mở game. `moi-truong.txt` ghi
+     `/desktop=shell,2040x1144`. Game chạy trong cửa sổ, cao gần hết màn, không đen màn.
+  2. Game KiriKiri 1280x720 thêm mới ở mức máy mặc định: màn 1400x784, game chạy trong cửa sổ.
+  3. Một game KiriKiri đã thêm từ trước: màn như cũ.
+
+## Adreno 8xx: driver OpenGL freedreno không mở được GPU, game OpenGL tắt sau vài giây (sau bản 0.1.110)
+
+Báo cáo ngày 27/11/2026: Kim Dung Quần Hiệp Truyện 5 (RPG Maker chạy bằng Wine), Xiaomi 25053RT47C (Adreno 825), Android
+17, Turnip 26.2.0, bản 0.1.110. Bấm Chơi bốn lần, lần nào game cũng tắt sau 9 giây, mã thoát 0.
+
+- **Nhật ký:** với Turnip, OpenGL dùng driver freedreno (`GALLIUM_DRIVER=freedreno`, `MESA_LOADER_DRIVER_OVERRIDE=kgsl`).
+  Mesa của driver này không nhận ra Adreno 825: `MESA-LOADER: failed to retrieve device information`,
+  `failed to load driver: kgsl`, rồi GLX lỗi `BadImplementation`. Vulkan (Turnip) thì vẫn chạy.
+- **Sửa:**
+  - Khi dòng `failed to load driver: kgsl` có trong nhật ký Wine, app ghi nhớ cho máy đó (theo bản app) rằng freedreno
+    không mở được GPU (`AgvnOpenGlCheck.freedrenoFailed`). Từ đó mọi game trên máy chạy OpenGL qua Vulkan bằng Zink
+    (`GALLIUM_DRIVER=zink`, `MESA_LOADER_DRIVER_OVERRIDE=zink`), như trên các driver khác.
+  - Lần game tắt vì lỗi này (tắt trong vòng một phút), app tự mở lại game ngay, lần này với Zink, không hỏi.
+  - Không bật theo tên GPU: Adreno nào mà freedreno mở được thì vẫn dùng freedreno như cũ. Bản app mới có thể mang Mesa
+    nhận ra GPU, nên mỗi bản app thử lại freedreno một lần.
+  - `su-kien.txt` ghi lý do: "OpenGL chạy qua Vulkan (Zink): driver OpenGL freedreno không mở được GPU của máy này".
+- **Thử máy:**
+  1. Máy Adreno 825: mở Kim Dung Quần Hiệp Truyện 5. Lần đầu game tắt rồi tự mở lại; lần này `moi-truong.txt` ghi
+     `GALLIUM_DRIVER=zink`, game vào màn tiêu đề. Các lần sau mở thẳng bằng Zink.
+  2. POCO F8 Pro (Adreno 830): một game RPG Maker XP và một game OpenGL vẫn dùng freedreno nếu trước đây chạy được.

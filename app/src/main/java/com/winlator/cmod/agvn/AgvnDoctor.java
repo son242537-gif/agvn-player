@@ -137,6 +137,13 @@ public final class AgvnDoctor {
     /** {@code now}: the settings the session ran with; {@code timed}: the app saw the session end, so its length is known. */
     private static void diagnose(Context ctx, Shortcut s, AgvnEvidence ev, Map<String, String> now, boolean timed) {
         if (AgvnOpenGlCheck.zinkFailed(ev.lines)) AgvnOpenGlCheck.failed(ctx, s); // no more WineD3D with this driver
+        boolean noFreedreno = AgvnOpenGlCheck.freedrenoFailed(ev.lines) && AgvnOpenGlCheck.freedrenoFailed(ctx); // new
+        if (noFreedreno && timed && ev.endedEarly()) {
+            AgvnSessionLog.event("Driver OpenGL freedreno không mở được GPU của máy này: từ giờ OpenGL chạy qua Vulkan"
+                    + " (Zink), và game được mở lại ngay");
+            AgvnDoctorStore.relaunch(ctx, s); // the game failed for it alone: it starts again at once, now with Zink
+            return;
+        }
         if (timed && AgvnRepairEnd.afterGame(ctx, s, ev, now)) return; // the fix on trial went back: its report goes on
         Properties state = AgvnGoodConfig.load(ctx, s);
         List<String> changed = AgvnGoodConfig.changed(AgvnGoodConfig.good(state), now);

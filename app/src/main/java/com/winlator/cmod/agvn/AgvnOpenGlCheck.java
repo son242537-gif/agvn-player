@@ -20,11 +20,19 @@ import java.util.Properties;
  * {@link DriverSafety} keeps its probes: another driver or a newer Mesa may start. A game whose DirectX 11 level
  * WineD3D did not reach with a driver (Zink started, without features the game needs) is not offered WineD3D again
  * with it.
+ * <p>With Turnip, OpenGL is freedreno's own driver (kgsl). Its Mesa did not know an Adreno 825: "MESA-LOADER: failed
+ * to retrieve device information", "failed to load driver: kgsl", then no GLX, and Kim Dung Quần Hiệp Truyện 5 (RPG
+ * Maker in Wine, drawing with OpenGL) closed after 9 s, four times (Xiaomi 25053RT47C, 0.1.110, 27/11/2026). Once
+ * freedreno failed so on a phone, OpenGL there goes through Zink on Turnip ({@link #freedrenoUnusable}), for every
+ * game: freedreno draws nothing on it. Kept per app version, as a newer one may bring a Mesa that knows the GPU.
  */
-final class AgvnOpenGlCheck {
+public final class AgvnOpenGlCheck {
     static final String PROBLEM = "opengl-unavailable", PREFS = "agvn_opengl", ZINK_FAILED = "failed to load driver: zink";
     /** A game's DirectX 11 level was not reached ("d3d11-level"); the doctor-state key of a WineD3D that fell short. */
     static final String LEVEL_PROBLEM = "d3d11-level", SHORT = "wined3dShort";
+    /** freedreno's OpenGL (the "freedreno" driver's kgsl) could not open the GPU. */
+    static final String KGSL_FAILED = "failed to load driver: kgsl";
+    private static final String FREEDRENO = "freedreno-gl";
     private static final String TAG = "AGVN";
 
     private AgvnOpenGlCheck() {}
@@ -43,6 +51,39 @@ final class AgvnOpenGlCheck {
     static boolean zinkFailed(java.util.List<String> lines) {
         for (String line : lines) if (line != null && line.contains(ZINK_FAILED)) return true;
         return false;
+    }
+
+    /** True when Wine's lines say freedreno's OpenGL did not open the GPU ({@link #KGSL_FAILED}). */
+    static boolean freedrenoFailed(java.util.List<String> lines) {
+        for (String line : lines) if (line != null && line.contains(KGSL_FAILED)) return true;
+        return false;
+    }
+
+    /** freedreno's OpenGL did not open this phone's GPU: from now on Zink. True when it was not known before. */
+    static boolean freedrenoFailed(Context ctx) {
+        if (freedrenoUnusable(ctx)) return false;
+        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                .putBoolean(key(FREEDRENO, DriverSafety.appVersionCode(ctx)), true).apply();
+        Log.i(TAG, "freedreno's OpenGL does not open this GPU: OpenGL goes through Zink from now on");
+        return true;
+    }
+
+    /** True when freedreno's OpenGL did not open this phone's GPU, in this app version: OpenGL goes through Zink. */
+    public static boolean freedrenoUnusable(Context ctx) {
+        return ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .getBoolean(key(FREEDRENO, DriverSafety.appVersionCode(ctx)), false);
+    }
+
+    /** The OpenGL driver for {@code graphicsDriver}: "freedreno" with Turnip unless it failed, else "zink". */
+    public static String openGl(Context ctx, String graphicsDriver) {
+        return "freedreno".equalsIgnoreCase(graphicsDriver) && !freedrenoUnusable(ctx) ? "freedreno" : "zink";
+    }
+
+    /** At the start of a session: why a Turnip game's OpenGL goes through Zink, when it does. */
+    public static void noteAtStart(Context ctx, String graphicsDriver) {
+        if ("freedreno".equalsIgnoreCase(graphicsDriver) && freedrenoUnusable(ctx))
+            AgvnSessionLog.event("OpenGL chạy qua Vulkan (Zink): driver OpenGL freedreno không mở được GPU của máy này"
+                    + " (\"" + KGSL_FAILED + "\")");
     }
 
     /** {@code s} ended with Zink not starting: OpenGL does not work with its driver. */
