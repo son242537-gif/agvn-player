@@ -164,6 +164,7 @@ final class AgvnFixApply {
         String prefix = gameDir.getPath() + "/", path = exe.getPath();
         String relative = path.startsWith(prefix) ? path.substring(prefix.length()) : exe.getName();
         s.putExtra("lc_all", AgvnLocale.forGame(p, engine(s), gameDir.getName(), relative));
+        s.putExtra(AgvnProfileLocale.EXTRA, AgvnProfileLocale.record(p.locale));
         AgvnQuality.apply(ctx, s, AgvnQuality.Level.AUTO); // screen size and FPS for this phone; saves the shortcut
     }
 

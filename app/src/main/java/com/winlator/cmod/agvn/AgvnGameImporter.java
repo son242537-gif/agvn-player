@@ -234,6 +234,7 @@ public final class AgvnGameImporter {
         shortcut.putExtra(EXTRA_TEXTURE_POOL, String.valueOf(unreal ? eff.texturePool : 0));
         shortcut.putExtra(EXTRA_ENGINE, c.engine.name());
         shortcut.putExtra("lc_all", AgvnLocale.forGame(p, c.engine, c.gameDir.getName(), c.exe));
+        shortcut.putExtra(AgvnProfileLocale.EXTRA, AgvnProfileLocale.record(p.locale)); // followed when edited later
         File index = AgvnHtmlGame.indexFor(c.gameDir, c.engine);
         // a player who picked "Chạy bằng Windows" keeps it on re-import unless the profile decides
         // (a game without an .exe cannot have picked Windows)

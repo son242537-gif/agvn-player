@@ -19,7 +19,8 @@ import java.util.Objects;
  * game's variables once; a game maker who then set WINEDEBUG in the profile, in the game folder and in
  * profiles/&lt;folder&gt;, saw no change in moi-truong.txt (SRPG Studio, 06/11/2026). At each start the profile edited
  * last is read again, and what it gives now replaces what it gave before; what the player or a Doctor fix set stays.
- * Its args are read again with them ({@link AgvnProfileArgs}).
+ * Its args, exe and locale are read again with them ({@link AgvnProfileArgs}, {@link AgvnProfileExe},
+ * {@link AgvnProfileLocale}).
  */
 public final class AgvnProfileEnv {
     private static final String TAG = "AGVN";
@@ -63,7 +64,10 @@ public final class AgvnProfileEnv {
             if (args != null && !args.isEmpty()) said = (said == null ? "" : said + " · ") + args;
             String exe = dir.isEmpty() ? null : AgvnProfileExe.atLaunch(s, p, new File(dir)); // the profile's exe, heard
             if (exe != null && !exe.isEmpty()) said = (said == null ? "" : said + " · ") + exe;
-            if (!save && args == null && exe == null) return;
+            File other = file == inGame ? own : inGame;
+            String locale = AgvnProfileLocale.atLaunch(s, p, other, dir.isEmpty() ? null : new File(dir));
+            if (locale != null && !locale.isEmpty()) said = (said == null ? "" : said + " · ") + locale;
+            if (!save && args == null && exe == null && locale == null) return;
             s.saveData();
             if (said != null) {
                 note = "agvn-profile.json (" + file.getPath() + ") " + said;

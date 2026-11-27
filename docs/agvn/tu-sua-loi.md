@@ -4885,3 +4885,32 @@ Báo cáo ngày 27/11/2026: Kim Dung Quần Hiệp Truyện 5 (RPG Maker chạy 
   1. Máy Adreno 825: mở Kim Dung Quần Hiệp Truyện 5. Lần đầu game tắt rồi tự mở lại; lần này `moi-truong.txt` ghi
      `GALLIUM_DRIVER=zink`, game vào màn tiêu đề. Các lần sau mở thẳng bằng Zink.
   2. POCO F8 Pro (Adreno 830): một game RPG Maker XP và một game OpenGL vẫn dùng freedreno nếu trước đây chạy được.
+
+## `"locale"` sửa trong agvn-profile.json sau khi thêm game không có tác dụng (sau bản 0.1.110)
+
+Báo cáo ngày 27/11/2026 (phiếu KiriKiri 2.30 bản Trung): thêm `"locale": "zh_CN"` vào hồ sơ của game đã thêm,
+`moi-truong.txt` vẫn ghi `LC_ALL=ja_JP.UTF-8`. Phải dùng `"env": {"LC_ALL": "zh_CN.UTF-8"}` mới đổi được.
+
+- **Vì sao:** `LC_ALL` của game chỉ được ghi một lần lúc "Thêm game" (`AgvnGameImporter`). Lúc mở game app đã đọc lại
+  `env`, `dllOverrides`, `args` và `exe` của hồ sơ sửa sau cùng (`AgvnProfileEnv.atLaunch`), nhưng chưa đọc lại `locale`.
+- **Sửa:** `AgvnProfileLocale.atLaunch`, gọi cùng chỗ đó.
+  - Locale hồ sơ cho bây giờ thay locale nó cho lần trước (ghi nhớ ở `agvnProfileLocale`). Locale người chơi hay "Tự sửa
+    lỗi" đã chọn từ đó thì giữ.
+  - Game thêm từ trước chưa có ghi nhớ: lấy tệp hồ sơ còn lại (trong thư mục game và bản sao của app) làm mốc lúc thêm.
+    Không có tệp đó thì chỉ đổi khi `LC_ALL` của game vẫn là cái app tự cho (ví dụ `ja_JP.UTF-8` của game KiriKiri).
+  - `su-kien.txt` ghi "đổi locale từ khi thêm game, nay LC_ALL=...".
+- **Thử máy:**
+  1. Game KiriKiri đã thêm: ghi `"locale": "zh_CN"` vào `agvn-profile.json` trong thư mục game, mở game.
+     `moi-truong.txt` ghi `LC_ALL=zh_CN.UTF-8`. Bỏ khoá đó, mở lại: về `ja_JP.UTF-8`.
+  2. Game đã được "Tự sửa lỗi" đổi sang tiếng Trung, hồ sơ không có `locale`: mở lại vẫn `zh_CN.UTF-8`.
+
+### KiriKiri 2.30.2.420 bản Trung báo hộp lỗi trống chữ: chưa sửa, đã loại trừ hai nguyên nhân
+
+- Người báo đã thử cùng dữ liệu với năm tổ hợp: exe gốc nén UPX và exe đã `upx -d`, mỗi cái với `ja_JP.UTF-8` và
+  `zh_CN.UTF-8`, đều ra hộp lỗi rỗng; exe 2.32.2.426 kèm krmovie.dll 1.4.0.3 thì chạy. Vậy không phải UPX, không phải
+  bảng mã.
+- Đã kiểm thêm: Wine của app (Proton 9, liên kết bionic) tự đọc biến `LC_ALL`, không cần gói locale của hệ thống, nên
+  `zh_CN.UTF-8` có tới Wine thật (bảng mã 936).
+- Hộp lỗi là `Application->ShowException` của VCL (tiêu đề là tên exe) với một ngoại lệ không có lời. Chưa biết ngoại lệ
+  nào. Cần nhật ký Wine có kênh `seh`, `loaddll`, `file`: bật "Bật debug Wine" trong Cài đặt, đặt
+  `"env": {"WINEDEBUG": "+seh,+loaddll,+file,+msgbox"}` trong hồ sơ, mở game một lần rồi "Gửi nhật ký".
