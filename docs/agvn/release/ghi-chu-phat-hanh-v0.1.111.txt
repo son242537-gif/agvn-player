@@ -1,0 +1,9 @@
+AGVN Player v0.1.111 - agvn.io
+
+Sửa lỗi:
+- Máy dùng GPU Adreno đời mới (ví dụ Adreno 825): game RPG Maker chạy bằng Windows và các game OpenGL khác vào là tắt sau vài giây. App nay nhận ra driver OpenGL không mở được GPU của máy, tự chuyển OpenGL sang chạy qua Vulkan rồi mở lại game. Lần đầu game vẫn tắt một lần rồi tự mở lại, các lần sau mở thẳng.
+- Game KiriKiri: chọn độ phân giải bằng khổ game (ví dụ 1920x1080) không còn bị đổi sang màn 4:3 làm game nhỏ lại. App nới màn theo đúng tỉ lệ đã chọn.
+
+Mới:
+- Dành cho người làm game: "locale" sửa trong agvn-profile.json sau khi đã thêm game nay có tác dụng từ lần mở sau, không cần thêm lại game.
+Góp ý và báo lỗi: gửi nhật ký qua agvn.io.
